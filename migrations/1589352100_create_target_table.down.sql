@@ -1,1 +1,1 @@
-DROP TABLE target;
+DROP TABLE targets;

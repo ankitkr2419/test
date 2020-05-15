@@ -5,6 +5,7 @@ import (
 	"mylab/mylabdiscoveries/config"
 	"testing"
 
+	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -38,11 +39,11 @@ func (suite *TargetHandlerTestSuite) SetupTargetSuite() {
 }
 
 func (suite *TargetHandlerTestSuite) TestTargetSuccess() {
-
+	testUUID := uuid.New()
 // test create badge
  	expectedT := Target{
-		Name:             "test targat",
-		ID: 1,
+		Name: "test targat",
+		ID: testUUID,
 	}
 	var err error
 	createdT, err := suite.dbStore.CreateTarget(context.Background(), expectedT)

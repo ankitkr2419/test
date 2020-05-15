@@ -3,41 +3,43 @@ package db
 import (
 	"context"
 
+	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
 
 const(
-	createTargetQuery = `INSERT INTO target (
+	createTargetQuery = `INSERT INTO targets (
 		name,
 		dye_id,
-		well_id,
 		template_id,
-		ct)
+		threshold)
 		VALUES ($1, $2, $3, $4) RETURNING id`
 
-	getTargetListQuery = `SELECT * FROM target
+	getTargetListQuery = `SELECT * FROM targets
 		ORDER BY name ASC`
 
 	getTargetQuery = `SELECT id,
 		name,
 		dye_id,
-		well_id,
 		template_id,
-		ct FROM target WHERE id = $1`
+		threshold
+		FROM targets WHERE id = $1`
 )
+
 type ErrorResponse struct {
 	Code 	string `json:"code"`
 	Message	string `json:"message"`
 	Fields map[string]string `json:"fields"`
 }
+
 type Target struct {
-	ID           int     `db:"id" json:"id"`
+	ID           uuid.UUID     `db:"id" json:"id"`
 	Name         string  `db:"name" json:"name"`
-	Dye_ID       int     `db:"dye_id" json:"dye_id"`
-	Well_ID      int     `db:"well_id" json:"well_id"`
-	Templated_ID int     `db:"templated_id" json:"template_id"`
-	CT           float64 `db:"ct" json:"ct"`
+	Dye_ID       uuid.UUID     `db:"dye_id" json:"dye_id"`
+	Templated_ID uuid.UUID     `db:"templated_id" json:"template_id"`
+	Threshold           float64 `db:"threshold" json:"threshold"`
 }
+
 func (t *Target) Validate() (errorResponse map[string]ErrorResponse, valid bool) {
 	fieldErrors := make(map[string]string)
 
@@ -78,9 +80,8 @@ func (s *pgStore) CreateTarget(ctx context.Context, t Target) (createdTarget Tar
 		createTargetQuery,
 		t.Name,
 		t.Dye_ID,
-		t.Well_ID,
 		t.Templated_ID,
-		t.CT,
+		t.Threshold,
 	).Scan(&lastInsertId)
 
 	if err != nil {
