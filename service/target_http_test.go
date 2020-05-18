@@ -2,12 +2,14 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"mylab/mylabdiscoveries/db"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -31,9 +33,10 @@ func TestExampleTestSuite(t *testing.T) {
 }
 
 func (suite *TargetHandlerTestSuite) TestListUsersSuccess() {
+	testUUID := uuid.New()
 	suite.dbMock.On("ListTarget",mock.Anything).Return(
 		[]db.Target{
-			db.Target{Name: "test-target", ID: 1},
+			db.Target{Name: "test-target", ID: testUUID},
 		},
 		nil,
 	)
@@ -45,9 +48,9 @@ func (suite *TargetHandlerTestSuite) TestListUsersSuccess() {
 		"",
 		listTargetHandler(Dependencies{Store: suite.dbMock}),
 	)
-
+    output := fmt.Sprintf(`[{"id":"%s","name":"test-target","dye_id":"00000000-0000-0000-0000-000000000000","template_id":"00000000-0000-0000-0000-000000000000","threshold":0}]`,testUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `[{"id":1,"name":"test-target","dye_id":0,"well_id":0,"template_id":0,"ct":0}]`, recorder.Body.String())
+	assert.Equal(suite.T(),output , recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
