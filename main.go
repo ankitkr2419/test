@@ -4,6 +4,7 @@ package main
 // @APIDescription Main API for Microservices in Go!
 
 import (
+	"errors"
 	"fmt"
 	"mylab/mylabdiscoveries/config"
 	"mylab/mylabdiscoveries/db"
@@ -32,28 +33,53 @@ func main() {
 			Name:  "start",
 			Usage: "start server",
 			Action: func(c *cli.Context) error {
-				return startApp()
+				return startApp(c.Args().Get(0))
 			},
 		},
 		{
 			Name:  "create_migration",
 			Usage: "create migration file",
 			Action: func(c *cli.Context) error {
-				return db.CreateMigrationFile(c.Args().Get(0))
+				switch c.Args().Get(1) {
+				case "dev":
+					return db.CreateMigrationFileSQLite(c.Args().Get(0))
+				case "prod":
+					return db.CreateMigrationFile(c.Args().Get(0))
+				default:
+					logger.WithField("mode", c.Args().Get(1)).Info("Select valid mode")
+					return errors.New("Invalid Mode")
+				}
 			},
 		},
 		{
 			Name:  "migrate",
 			Usage: "run db migrations",
 			Action: func(c *cli.Context) error {
-				return db.RunMigrations()
+				switch c.Args().Get(0) {
+				case "dev":
+					return db.RunMigrationsSQLite()
+				case "prod":
+					return db.RunMigrations()
+				default:
+					logger.WithField("mode", c.Args().Get(1)).Info("Select valid mode")
+					return errors.New("Invalid Mode")
+				}
 			},
 		},
 		{
 			Name:  "rollback",
 			Usage: "rollback migrations",
 			Action: func(c *cli.Context) error {
-				return db.RollbackMigrations(c.Args().Get(0))
+				switch c.Args().Get(1) {
+				case "dev":
+					return db.RollbackMigrationsSQLite(c.Args().Get(0))
+				case "prod":
+					return db.RollbackMigrations(c.Args().Get(0))
+				default:
+					logger.WithField("mode", c.Args().Get(1)).Info("Select valid mode")
+					return errors.New("Invalid Mode")
+				}
+
 			},
 		},
 	}
@@ -63,10 +89,23 @@ func main() {
 	}
 }
 
-func startApp() (err error) {
-	store, err := db.Init()
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Database init failed")
+func startApp(Mode string) (err error) {
+	var store db.Storer
+	switch Mode {
+	case "dev":
+		store, err = db.InitSQL()
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Database init failed")
+			return
+		}
+	case "prod":
+		store, err = db.Init()
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Database init failed")
+			return
+		}
+	default:
+		logger.WithField("mode", Mode).Info("Select valid mode")
 		return
 	}
 

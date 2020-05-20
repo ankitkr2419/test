@@ -3,3 +3,5 @@ mylabdiscoveries
 application\.yml
 
 db/application_test\.yml
+
+mylabdiscovery

@@ -26,7 +26,7 @@ func (suite *TargetHandlerTestSuite) SetupTargetSuite() {
 	config.Load("application_test")
 
 	err := RunMigrations()
-	if err!=nil {
+	if err != nil {
 		logger.WithField("err", err.Error()).Error("Database init failed")
 	}
 
@@ -35,15 +35,15 @@ func (suite *TargetHandlerTestSuite) SetupTargetSuite() {
 		logger.WithField("err", err.Error()).Error("Database init failed")
 		return
 	}
-  suite.dbStore = store
+	suite.dbStore = store
 }
 
 func (suite *TargetHandlerTestSuite) TestTargetSuccess() {
 	testUUID := uuid.New()
-// test create badge
- 	expectedT := Target{
+	// test create badge
+	expectedT := Target{
 		Name: "test targat",
-		ID: testUUID,
+		ID:   testUUID,
 	}
 	var err error
 	createdT, err := suite.dbStore.CreateTarget(context.Background(), expectedT)
@@ -62,4 +62,3 @@ func (suite *TargetHandlerTestSuite) TestTargetSuccess() {
 	assert.Equal(suite.T(), targetList, []Target{createdT})
 
 }
-
