@@ -6,6 +6,6 @@ import (
 
 type Storer interface {
 	ListTarget(context.Context) ([]Target, error)
-	CreateTarget(context.Context, Target) (Target,error)
-
+	CreateTarget(context.Context, Target) (Target, error)
+	ListTemplates(context.Context) ([]Template, error)
 }
