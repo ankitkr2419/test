@@ -7,7 +7,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const(
+const (
 	createTargetQuery = `INSERT INTO targets (
 		name,
 		dye_id,
@@ -27,17 +27,17 @@ const(
 )
 
 type ErrorResponse struct {
-	Code 	string `json:"code"`
-	Message	string `json:"message"`
-	Fields map[string]string `json:"fields"`
+	Code    string            `json:"code"`
+	Message string            `json:"message"`
+	Fields  map[string]string `json:"fields"`
 }
 
 type Target struct {
-	ID           uuid.UUID     `db:"id" json:"id"`
-	Name         string  `db:"name" json:"name"`
-	Dye_ID       uuid.UUID     `db:"dye_id" json:"dye_id"`
-	Templated_ID uuid.UUID     `db:"templated_id" json:"template_id"`
-	Threshold           float64 `db:"threshold" json:"threshold"`
+	ID           uuid.UUID `db:"id" json:"id"`
+	Name         string    `db:"name" json:"name"`
+	Dye_ID       uuid.UUID `db:"dye_id" json:"dye_id"`
+	Templated_ID uuid.UUID `db:"templated_id" json:"template_id"`
+	Threshold    float64   `db:"threshold" json:"threshold"`
 }
 
 func (t *Target) Validate() (errorResponse map[string]ErrorResponse, valid bool) {
@@ -47,16 +47,16 @@ func (t *Target) Validate() (errorResponse map[string]ErrorResponse, valid bool)
 		fieldErrors["name"] = "Can't be blank"
 	}
 
-		if len(fieldErrors) == 0 {
+	if len(fieldErrors) == 0 {
 		valid = true
 		return
 	}
 
 	errorResponse = map[string]ErrorResponse{"error": ErrorResponse{
-			Code: "invalid_data",
-			Message: "Please provide valid target data",
-			Fields: fieldErrors,
-		},
+		Code:    "invalid_data",
+		Message: "Please provide valid target data",
+		Fields:  fieldErrors,
+	},
 	}
 
 	//TODO: Ask what other validations are expected

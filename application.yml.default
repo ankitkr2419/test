@@ -10,3 +10,5 @@ DB_URI: "postgresql://user:password@localhost:5432/dbname?sslmode=disable"
 MIGRATION_FOLDER_PATH: "./migrations"
 #// for application.yml
 # MIGRATION_FOLDER_PATH: "./../migrations" //for application_test.yml
+DB_URI_SQLITE: "./dbname"
+
