@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"mylab/mylabdiscoveries/config"
+	"mylab/cpagent/config"
 	"os"
 	"strconv"
 	"time"

@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
-	"mylab/mylabdiscoveries/db"
+	"mylab/cpagent/db"
 	"net/http"
 	"net/http/httptest"
 	"strings"

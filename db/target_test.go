@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"mylab/mylabdiscoveries/config"
+	"mylab/cpagent/config"
 	"testing"
 
 	"github.com/google/uuid"

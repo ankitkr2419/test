@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"mylab/mylabdiscoveries/config"
+	"mylab/cpagent/config"
 
 	"github.com/gorilla/mux"
 )

@@ -2,7 +2,7 @@ package service
 
 import (
 	"encoding/json"
-	"mylab/mylabdiscoveries/db"
+	"mylab/cpagent/db"
 	"net/http"
 
 	logger "github.com/sirupsen/logrus"

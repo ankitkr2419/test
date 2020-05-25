@@ -1,6 +1,6 @@
 package service
 
-import "mylab/mylabdiscoveries/db"
+import "mylab/cpagent/db"
 
 type Dependencies struct {
 	Store db.Storer
