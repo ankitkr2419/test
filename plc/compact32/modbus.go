@@ -1,4 +1,8 @@
-package plc
+package compact32
+
+import (
+	"time"
+)
 
 /* Modbus Mappings:
  *
@@ -12,6 +16,10 @@ package plc
 
    So, MODBUS["D"][101] will give us the exact modbus address of 0x0065.
 */
+
+const (
+	heartbeat time.Duration = 200 * time.Millisecond
+)
 
 var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	// Data Registers

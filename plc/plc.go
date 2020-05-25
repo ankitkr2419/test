@@ -1,8 +1,6 @@
 package plc
 
-import "fmt"
-
-type int32 Status
+type Status int32
 
 const (
 	OK             Status = iota // all good
@@ -36,11 +34,17 @@ type Scan struct {
 }
 
 type Driver interface {
-	SelfTest() Status            // Check if Homing or any other errors during bootup of PLC
-	HeartBeat() error            // Attempt to write heartbeat 3 times else fail
-	PreRun(Stage) error          // Configure the various holding and cycling stages
-	Start() error                // trigger the start of the cycling process
-	Monitor(Scan, Status, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
-	Stop(Status) error           // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
-	Calibrate() error            // TBD
+	HeartBeat() error        // Attempt to write heartbeat 3 times else fail
+	PreRun(Stage) error      // Configure the various holding and cycling stages
+	Monitor() (Scan, Status) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
+}
+
+type RealDriver interface {
+	SelfTest() Status        // Check if Homing or any other errors during bootup of PLC
+	HeartBeat() error        // Attempt to write heartbeat 3 times else fail
+	PreRun(Stage) error      // Configure the various holding and cycling stages
+	Start() error            // trigger the start of the cycling process
+	Monitor() (Scan, Status) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
+	Stop(Status) error       // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
+	Calibrate() error        // TBD
 }
