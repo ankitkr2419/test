@@ -3,14 +3,15 @@ package simulator
 import "mylab/cpagent/plc"
 
 type Simulator struct {
+	ExitCh chan error
 }
 
-func NewSimulator() plc.Driver {
-	return &Simulator{}
+func NewSimulator(exit chan error) plc.Driver {
+	return &Simulator{exit}
 }
 
-func (d *Simulator) HeartBeat() error {
-	return nil
+func (d *Simulator) HeartBeat() {
+	return
 }
 
 func (d *Simulator) PreRun(plc.Stage) error {

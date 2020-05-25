@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
+	"mylab/cpagent/plc/compact32"
+	"mylab/cpagent/plc/simulator"
 	"mylab/cpagent/service"
 	"os"
 	"strconv"
@@ -30,9 +33,16 @@ func main() {
 	cliApp.Commands = []cli.Command{
 		{
 			Name:  "start",
-			Usage: "start server",
+			Usage: "start server [--plc {simulator|compact32}]",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "plc",
+					Value: "compact32",
+					Usage: "Choose the PLC. simulator|compact32",
+				},
+			},
 			Action: func(c *cli.Context) error {
-				return startApp(c.Args().Get(0))
+				return startApp(c.Args().Get(0), c.String("plc"))
 			},
 		},
 		{
@@ -64,8 +74,31 @@ func main() {
 	}
 }
 
-func startApp(Mode string) (err error) {
+func startApp(mode, plcName string) (err error) {
 	var store db.Storer
+	var driver plc.Driver
+
+	if plcName != "simulator" && plcName != "compact32" {
+		logger.Error("Unsupported PLC. Valid PLC: 'simulator' or 'compact32'")
+		return
+	}
+
+	exit := make(chan error)
+	// PLC work in a completely separate go-routine!
+	if plcName == "compact32" {
+		driver = compact32.NewCompact32Driver(exit)
+	} else {
+		driver = simulator.NewSimulator(exit)
+	}
+
+	// The exit plan incase there is a feedback from the driver to abort/exit
+	go func() {
+		err = <-exit
+		logger.WithField("err", err.Error()).Error("PLC Driver has reequested exit")
+		// TODO: Handle exit gracefully
+		// We need to call the API on the Web to display the error and restart, abort or call service!
+	}()
+
 	store, err = db.Init()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Database init failed")
@@ -74,6 +107,7 @@ func startApp(Mode string) (err error) {
 
 	deps := service.Dependencies{
 		Store: store,
+		Plc:   driver,
 	}
 
 	// mux router

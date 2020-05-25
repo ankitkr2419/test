@@ -11,4 +11,4 @@ MIGRATION_FOLDER_PATH: "./migrations"
 #// for application.yml
 # MIGRATION_FOLDER_PATH: "./../migrations" //for application_test.yml
 DB_URI_SQLITE: "./dbname"
-
+MODBUS_TTY: "/dev/tty.usbserial-A50285BI"

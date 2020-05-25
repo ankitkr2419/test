@@ -48,3 +48,7 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		107: uint16(0x006B), // Cycle completed (R)
 	},
 }
+
+var LOOKUP map[string]string = map[string]string{
+	"heartbeat": "D101",
+}

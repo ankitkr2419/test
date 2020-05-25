@@ -12,16 +12,16 @@ const (
 )
 
 type Step struct {
-	HoldingTemp float32 // holding temperature for step
-	RampUpTemp  float32 // ramp-up temperature for step
-	HoldTime    int32   // hold time for step
+	TargetTemp float32 // holding temperature for step
+	RampUpTemp float32 // ramp-up temperature for step
+	HoldTime   int32   // hold time for step
 }
 
 // We can have at most 4 Holding steps and 6 Cycling steps.
 type Stage struct {
-	Holding    [4]Step
-	Cycle      [6]Step
-	CycleCount int32 // number of cycles to run
+	Holding    []Step // 4 steps
+	Cycle      []Step // 6 steps
+	CycleCount int32  // number of cycles to run
 }
 
 type Emissions [6]int32
@@ -34,14 +34,14 @@ type Scan struct {
 }
 
 type Driver interface {
-	HeartBeat() error        // Attempt to write heartbeat 3 times else fail
+	HeartBeat()              // Attempt to write heartbeat 3 times else fail
 	PreRun(Stage) error      // Configure the various holding and cycling stages
 	Monitor() (Scan, Status) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 }
 
 type RealDriver interface {
 	SelfTest() Status        // Check if Homing or any other errors during bootup of PLC
-	HeartBeat() error        // Attempt to write heartbeat 3 times else fail
+	HeartBeat()              // Attempt to write heartbeat 3 times else fail
 	PreRun(Stage) error      // Configure the various holding and cycling stages
 	Start() error            // trigger the start of the cycling process
 	Monitor() (Scan, Status) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
