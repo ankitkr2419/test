@@ -19,12 +19,11 @@ LOOP:
 		time.Sleep(200 * time.Millisecond) // sleep it off for a bit
 
 		// Read heartbeat status to check if PLC is alive!
-		var value []byte
-		value, err = compact32.ReadHoldingRegisters(MODBUS["D"][100], uint16(1))
+		var beat uint16
+		beat, err = compact32.ReadSingleRegister(MODBUS["D"][100])
 		if err != nil {
 			break
 		}
-		beat := binary.BigEndian.Uint16(value)
 
 		// 3 attempts to check for heartbeat of PLC and write ours!
 		for i := 0; i < 3; i++ {
@@ -105,12 +104,79 @@ func writeStageData(name string, stage plc.Stage) (err error) {
 	temp = append(temp, holdTime...)
 	data := dataBlock(temp...)
 
+	// write registers data
 	_, err = compact32.Client.WriteMultipleRegisters(address, quantity, data)
+	if err != nil {
+		return
+	}
+
+	// Cycle count
+	_, err = compact32.Client.WriteSingleRegister(MODBUS["D"][131], stage.CycleCount)
 
 	return
 }
 
-// Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
-func (d *Compact32) Monitor() (scan plc.Scan, status plc.Status) {
+// Monitor periodically. If CycleComplete == true, Scan will be populated
+func (d *Compact32) Monitor() (scan plc.Scan, err error) {
+
+	// Read current cycle
+	scan.Cycle, err = compact32.ReadSingleRegister(MODBUS["D"][133])
+	if err != nil {
+		return
+	}
+
+	// Read cycle temperature.. PLC returns 653 for 65.3 degrees
+	var tmp uint16
+	tmp, err = compact32.ReadSingleRegister(MODBUS["D"][132])
+	if err != nil {
+		return
+	}
+	scan.Temp = float32(tmp) / 10
+
+	// Read lid temperature
+	tmp, err = compact32.ReadSingleRegister(MODBUS["D"][135])
+	if err != nil {
+		return
+	}
+	scan.LidTemp = float32(tmp) / 10
+
+	// Read current cycle status
+	tmp, err = compact32.ReadSingleCoil(MODBUS["M"][107])
+	if err != nil {
+		return
+	}
+	if tmp == 0 { // 0x0000 means cycle is not complete
+		// Values would not have changed.
+		scan.CycleComplete = false
+		return
+	}
+
+	scan.CycleComplete = true
+
+	// Scan all the data from the Wells (96 x 6). Since max read is 123 registers, we shall read 96 at a time.
+	offset := 2000
+
+	for i := 0; i < 6; i++ {
+		var data []byte
+		data, err = compact32.ReadHoldingRegisters(MODBUS["D"][offset+(i*96)], uint16(96))
+		if err != nil {
+			return
+		}
+
+		// populate the wells with 6 emissions each
+		offset = 0 // offset of data. increment every 2 bytes!
+		for j := 0; j < 96; j++ {
+			emission := plc.Emissions{}
+			for k := 0; k < 6; k++ {
+				emission[k] = binary.BigEndian.Uint16(data[offset : offset+2])
+				j += 1
+				offset += 2
+			}
+
+			scan.Wells[(i*16)+(j%16)] = emission
+		}
+
+	}
+
 	return
 }

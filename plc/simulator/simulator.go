@@ -19,6 +19,6 @@ func (d *Simulator) PreRun(plc.Stage) error {
 }
 
 // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
-func (d *Simulator) Monitor() (scan plc.Scan, status plc.Status) {
+func (d *Simulator) Monitor() (scan plc.Scan, err error) {
 	return
 }
