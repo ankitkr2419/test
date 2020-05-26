@@ -20,7 +20,7 @@ LOOP:
 
 		// Read heartbeat status to check if PLC is alive!
 		var beat uint16
-		beat, err = compact32.ReadSingleRegister(MODBUS["D"][100])
+		beat, err = C32.Driver.ReadSingleRegister(MODBUS["D"][100])
 		if err != nil {
 			break
 		}
@@ -28,7 +28,7 @@ LOOP:
 		// 3 attempts to check for heartbeat of PLC and write ours!
 		for i := 0; i < 3; i++ {
 			if beat == 1 { // If beat is 1, PLC is alive, so write 2
-				_, err = compact32.WriteSingleRegister(MODBUS["D"][100], uint16(2))
+				_, err = C32.Driver.WriteSingleRegister(MODBUS["D"][100], uint16(2))
 				if err != nil {
 					// exit!!
 					break LOOP
@@ -36,7 +36,10 @@ LOOP:
 				continue LOOP
 			}
 
-			logger.Warn("Attempt: %d failed. PLC heartbeat value is still %d. Retrying...", i+1, beat)
+			logger.WithFields(logger.Fields{
+				"beat":    beat,
+				"attempt": i + 1,
+			}).Warn("Attempt failed. PLC heartbeat value has not changed. Retrying...")
 			time.Sleep(200 * time.Millisecond) // sleep it off for a bit
 		}
 
@@ -61,7 +64,7 @@ func dataBlock(value ...uint16) []byte {
 	return data
 }
 
-func (d *Compact32) PreRun(stage plc.Stage) (err error) {
+func (d *Compact32) ConfigureRun(stage plc.Stage) (err error) {
 	err = writeStageData(HOLDING_STAGE, stage)
 	if err != nil {
 		// propagate error immediately
@@ -69,6 +72,13 @@ func (d *Compact32) PreRun(stage plc.Stage) (err error) {
 	}
 
 	err = writeStageData(CYCLE_STAGE, stage)
+	if err != nil {
+		// propagate error immediately
+		return
+	}
+
+	// Cycle count
+	_, err = C32.Driver.WriteSingleRegister(MODBUS["D"][131], stage.CycleCount)
 	return
 }
 
@@ -105,43 +115,39 @@ func writeStageData(name string, stage plc.Stage) (err error) {
 	data := dataBlock(temp...)
 
 	// write registers data
-	_, err = compact32.Client.WriteMultipleRegisters(address, quantity, data)
+	_, err = C32.Driver.WriteMultipleRegisters(address, quantity, data)
 	if err != nil {
 		return
 	}
-
-	// Cycle count
-	_, err = compact32.Client.WriteSingleRegister(MODBUS["D"][131], stage.CycleCount)
-
 	return
 }
 
 // Monitor periodically. If CycleComplete == true, Scan will be populated
-func (d *Compact32) Monitor() (scan plc.Scan, err error) {
+func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
 	// Read current cycle
-	scan.Cycle, err = compact32.ReadSingleRegister(MODBUS["D"][133])
+	scan.Cycle, err = C32.Driver.ReadSingleRegister(MODBUS["D"][133])
 	if err != nil {
 		return
 	}
 
 	// Read cycle temperature.. PLC returns 653 for 65.3 degrees
 	var tmp uint16
-	tmp, err = compact32.ReadSingleRegister(MODBUS["D"][132])
+	tmp, err = C32.Driver.ReadSingleRegister(MODBUS["D"][132])
 	if err != nil {
 		return
 	}
 	scan.Temp = float32(tmp) / 10
 
 	// Read lid temperature
-	tmp, err = compact32.ReadSingleRegister(MODBUS["D"][135])
+	tmp, err = C32.Driver.ReadSingleRegister(MODBUS["D"][135])
 	if err != nil {
 		return
 	}
 	scan.LidTemp = float32(tmp) / 10
 
 	// Read current cycle status
-	tmp, err = compact32.ReadSingleCoil(MODBUS["M"][107])
+	tmp, err = C32.Driver.ReadSingleCoil(MODBUS["M"][107])
 	if err != nil {
 		return
 	}
@@ -150,30 +156,33 @@ func (d *Compact32) Monitor() (scan plc.Scan, err error) {
 		scan.CycleComplete = false
 		return
 	}
-
 	scan.CycleComplete = true
+
+	// If the invoker has already read this cycle data, don't send it again!
+	if cycle == scan.Cycle {
+		return
+	}
 
 	// Scan all the data from the Wells (96 x 6). Since max read is 123 registers, we shall read 96 at a time.
 	offset := 2000
 
 	for i := 0; i < 6; i++ {
 		var data []byte
-		data, err = compact32.ReadHoldingRegisters(MODBUS["D"][offset+(i*96)], uint16(96))
+		data, err = C32.Driver.ReadHoldingRegisters(MODBUS["D"][offset+(i*96)], uint16(96))
 		if err != nil {
 			return
 		}
 
-		// populate the wells with 6 emissions each
 		offset = 0 // offset of data. increment every 2 bytes!
-		for j := 0; j < 96; j++ {
+		for j := 0; j < 16; j++ {
+			// populate each wells with 6 emissions each
 			emission := plc.Emissions{}
 			for k := 0; k < 6; k++ {
 				emission[k] = binary.BigEndian.Uint16(data[offset : offset+2])
-				j += 1
 				offset += 2
 			}
 
-			scan.Wells[(i*16)+(j%16)] = emission
+			scan.Wells[(i*16)+j] = emission
 		}
 
 	}

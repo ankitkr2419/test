@@ -33,17 +33,17 @@ type Scan struct {
 }
 
 type Driver interface {
-	HeartBeat()             // Attempt to write heartbeat 3 times else fail
-	PreRun(Stage) error     // Configure the various holding and cycling stages
-	Monitor() (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
+	HeartBeat()                   // Attempt to write heartbeat 3 times else fail
+	ConfigureRun(Stage) error     // Configure the various holding and cycling stages
+	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 }
 
 type RealDriver interface {
-	SelfTest() Status       // Check if Homing or any other errors during bootup of PLC
-	HeartBeat()             // Attempt to write heartbeat 3 times else fail
-	PreRun(Stage) error     // Configure the various holding and cycling stages
-	Start() error           // trigger the start of the cycling process
-	Monitor() (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
-	Stop(Status) error      // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
-	Calibrate() error       // TBD
+	SelfTest() Status             // Check if Homing or any other errors during bootup of PLC
+	HeartBeat()                   // Attempt to write heartbeat 3 times else fail
+	ConfigureRun(Stage) error     // Configure the various holding and cycling stages
+	Start() error                 // trigger the start of the cycling process
+	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
+	Stop(Status) error            // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
+	Calibrate() error             // TBD
 }

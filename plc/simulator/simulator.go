@@ -14,11 +14,11 @@ func (d *Simulator) HeartBeat() {
 	return
 }
 
-func (d *Simulator) PreRun(plc.Stage) error {
+func (d *Simulator) ConfigureRun(plc.Stage) error {
 	return nil
 }
 
 // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
-func (d *Simulator) Monitor() (scan plc.Scan, err error) {
+func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	return
 }
