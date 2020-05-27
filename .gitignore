@@ -3,3 +3,7 @@ cpagent
 application\.yml
 db/application_test\.yml
 
+
+mylabdiscoveries
+
+swagger\.json

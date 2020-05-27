@@ -5,6 +5,8 @@ import (
 	"mylab/cpagent/db"
 	"net/http"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -83,6 +85,118 @@ func createTargetHandler(deps Dependencies) http.HandlerFunc {
 
 		rw.WriteHeader(http.StatusCreated)
 		rw.Write(respBytes)
+		rw.Header().Add("Content-Type", "application/json")
+	})
+}
+func updateTargetHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id, err := uuid.Parse(vars["id"])
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error target_id key is missing")
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		var t db.Target
+
+		err = json.NewDecoder(req.Body).Decode(&t)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			logger.WithField("err", err.Error()).Error("Error while decoding target data")
+			return
+		}
+
+		errorResponse, valid := t.Validate()
+		if !valid {
+			respBytes, err := json.Marshal(errorResponse)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error marshaling target data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write(respBytes)
+			return
+		}
+
+		var updatedT db.Target
+
+		t.ID = id
+
+		updatedT, err = deps.Store.UpdateTarget(req.Context(), t)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error update Target")
+			return
+		}
+
+		respBytes, err := json.Marshal(updatedT)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling Target data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.WriteHeader(http.StatusCreated)
+		rw.Write(respBytes)
+		rw.Header().Add("Content-Type", "application/json")
+	})
+}
+
+func showTargetHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		id, err := uuid.Parse(vars["id"])
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error target_id key is missing")
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		var latestT db.Target
+
+		latestT, err = deps.Store.ShowTarget(req.Context(), id)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error show target")
+			return
+		}
+
+		respBytes, err := json.Marshal(latestT)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling target data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.WriteHeader(http.StatusCreated)
+		rw.Write(respBytes)
+		rw.Header().Add("Content-Type", "application/json")
+	})
+}
+
+func deleteTargetHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id, err := uuid.Parse(vars["id"])
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error target_id key is missing")
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = deps.Store.DeleteTarget(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while deleting target")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
 	})
 }

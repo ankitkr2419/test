@@ -24,6 +24,14 @@ const (
 		template_id,
 		threshold
 		FROM targets WHERE id = $1`
+	updateTargetQuery = `UPDATE targets SET (
+		name,
+		dye_id,
+		template_id,
+		threshold =
+		($1, $2, $3, $4) where id = $5`
+
+	deleteTargetQuery = `DELETE FROM targets WHERE id = $1`
 )
 
 type ErrorResponse struct {
@@ -94,5 +102,50 @@ func (s *pgStore) CreateTarget(ctx context.Context, t Target) (createdTarget Tar
 		logger.WithField("err", err.Error()).Error("Error in getting Target")
 		return
 	}
+	return
+}
+func (s *pgStore) UpdateTarget(ctx context.Context, t Target) (updatedTarget Target, err error) {
+	var dbTarget Target
+
+	err = s.db.Get(&dbTarget, getTargetQuery, t.ID)
+
+	_, err = s.db.Exec(
+		updateTargetQuery,
+		t.Name,
+		t.Dye_ID,
+		t.Templated_ID,
+		t.Threshold,
+		t.ID,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating Target")
+		return
+	}
+
+	err = s.db.Get(&updatedTarget, getTargetQuery, t.ID)
+
+	return
+}
+
+func (s *pgStore) ShowTarget(ctx context.Context, id uuid.UUID) (dbTarget Target, err error) {
+	err = s.db.Get(&dbTarget, getTargetQuery, id)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching Target")
+		return
+	}
+
+	return
+}
+
+func (s *pgStore) DeleteTarget(ctx context.Context, id uuid.UUID) (err error) {
+	_, err = s.db.Exec(
+		deleteTargetQuery,
+		id,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error deleting Target")
+		return
+	}
+
 	return
 }

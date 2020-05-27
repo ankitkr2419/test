@@ -1,6 +1,6 @@
 module mylab/cpagent
 
-go 1.12
+go 1.14
 
 require (
 	github.com/goburrow/modbus v0.1.0
@@ -15,5 +15,4 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/urfave/cli v1.22.4
 	github.com/urfave/negroni v1.0.0
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 )
