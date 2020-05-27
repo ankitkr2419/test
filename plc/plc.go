@@ -3,12 +3,10 @@ package plc
 type Status int32
 
 const (
-	OK             Status = iota // all good
-	ERROR                        // something is wrong
-	RESTART                      // cycle was interrupted, can restart
-	ABORT                        // abort a running cycle
-	CYCLE_RUNNING                // cycle is running
-	CYCLE_COMPLETE               // cycle is complete
+	OK      Status = iota // all good
+	ERROR                 // something is wrong
+	RESTART               // cycle was interrupted, can restart
+	ABORT                 // abort a running cycle
 )
 
 type Step struct {
@@ -21,30 +19,31 @@ type Step struct {
 type Stage struct {
 	Holding    []Step // 4 steps
 	Cycle      []Step // 6 steps
-	CycleCount int32  // number of cycles to run
+	CycleCount uint16 // number of cycles to run
 }
 
-type Emissions [6]int32
+type Emissions [6]uint16
 
 type Scan struct {
-	Cycle   int32 // current running cycle
-	Wells   [96]Emissions
-	Temp    float32
-	LidTemp float32
+	Cycle         uint16 // current running cycle
+	Wells         [96]Emissions
+	Temp          float32
+	LidTemp       float32
+	CycleComplete bool
 }
 
 type Driver interface {
-	HeartBeat()              // Attempt to write heartbeat 3 times else fail
-	PreRun(Stage) error      // Configure the various holding and cycling stages
-	Monitor() (Scan, Status) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
+	HeartBeat()                   // Attempt to write heartbeat 3 times else fail
+	ConfigureRun(Stage) error     // Configure the various holding and cycling stages
+	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 }
 
 type RealDriver interface {
-	SelfTest() Status        // Check if Homing or any other errors during bootup of PLC
-	HeartBeat()              // Attempt to write heartbeat 3 times else fail
-	PreRun(Stage) error      // Configure the various holding and cycling stages
-	Start() error            // trigger the start of the cycling process
-	Monitor() (Scan, Status) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
-	Stop(Status) error       // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
-	Calibrate() error        // TBD
+	SelfTest() Status             // Check if Homing or any other errors during bootup of PLC
+	HeartBeat()                   // Attempt to write heartbeat 3 times else fail
+	ConfigureRun(Stage) error     // Configure the various holding and cycling stages
+	Start() error                 // trigger the start of the cycling process
+	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
+	Stop(Status) error            // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
+	Calibrate() error             // TBD
 }

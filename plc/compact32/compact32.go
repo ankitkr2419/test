@@ -3,7 +3,6 @@ package compact32
 import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/plc"
-	"sync"
 	"time"
 
 	"github.com/goburrow/modbus"
@@ -14,13 +13,22 @@ const (
 	CYCLE_STAGE   = "cycle"
 )
 
-type Compact32 struct {
-	sync.RWMutex
-	Client modbus.Client
-	ExitCh chan error
+// Internal Interface to ensure sync'ing and testing modbus interfaces
+type Compact32Driver interface {
+	WriteSingleRegister(address, value uint16) (results []byte, err error)
+	WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error)
+	ReadCoils(address, quantity uint16) (results []byte, err error)
+	ReadSingleCoil(address uint16) (value uint16, err error)
+	ReadHoldingRegisters(address, quantity uint16) (results []byte, err error)
+	ReadSingleRegister(address uint16) (value uint16, err error)
 }
 
-var compact32 Compact32 = Compact32{}
+type Compact32 struct {
+	ExitCh chan error
+	Driver Compact32Driver
+}
+
+var C32 Compact32
 
 func NewCompact32Driver(exit chan error) plc.Driver {
 	/* Modbus RTU/ASCII */
@@ -33,36 +41,15 @@ func NewCompact32Driver(exit chan error) plc.Driver {
 	handler.Timeout = 2 * time.Second
 
 	handler.Connect()
-	compact32.Client = modbus.NewClient(handler)
-	compact32.ExitCh = exit
+	driver := Compact32ModbusDriver{}
+	driver.Client = modbus.NewClient(handler)
+
+	C32 = Compact32{}
+	C32.Driver = &driver
+	C32.ExitCh = exit
 
 	// Start the Heartbeat
-	go compact32.HeartBeat()
+	go C32.HeartBeat()
 
-	return &compact32
-}
-
-// Helper Routines to ensure sync!
-func (d *Compact32) WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
-	d.Lock()
-	defer d.Unlock()
-
-	results, err = d.Client.WriteMultipleRegisters(address, quantity, value)
-	return
-}
-
-func (d *Compact32) WriteSingleRegister(address, value uint16) (results []byte, err error) {
-	d.Lock()
-	defer d.Unlock()
-
-	results, err = d.Client.WriteSingleRegister(address, value)
-	return
-}
-
-func (d *Compact32) ReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
-	d.Lock()
-	defer d.Unlock()
-
-	results, err = d.Client.ReadHoldingRegisters(address, quantity)
-	return
+	return &C32 // plc Driver
 }
