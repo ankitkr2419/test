@@ -49,7 +49,7 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 			emission := plc.Emissions{}
 
 			for k := 0; k < 6; k++ {
-				emission[k] = uint16(256 + k) //256 257 258 259 260 261
+				emission[k] = uint16(255 + k + cycle) //256 257 258 259 260 261
 			}
 
 			scan.Wells[(i*16)+j] = emission
