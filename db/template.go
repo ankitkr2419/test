@@ -55,8 +55,6 @@ func (s *pgStore) CreateTemplate(ctx context.Context, t Template) (createdTemp T
 		return
 	}
 
-	logger.WithField("id", id).Info("Inserted ID")
-
 	err = s.db.Get(&createdTemp, getTemplateQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting Template")
