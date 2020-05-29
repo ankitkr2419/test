@@ -5,7 +5,6 @@ import (
 	"mylab/cpagent/db"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -27,6 +26,7 @@ func listTemplateHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
 		rw.Write(respBytes)
 	})
 }
@@ -47,15 +47,8 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		errorResponse, valid := t.Validate()
+		valid, respBytes := validate(t)
 		if !valid {
-			respBytes, err := json.Marshal(errorResponse)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error marshaling template data")
-				rw.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusBadRequest)
 			rw.Write(respBytes)
@@ -70,7 +63,7 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		respBytes, err := json.Marshal(createdTemp)
+		respBytes, err = json.Marshal(createdTemp)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling targets data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -86,9 +79,8 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
-		id, err := uuid.Parse(vars["id"])
+		id, err := parseUUID(vars["id"])
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error template_id key is missing")
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -102,42 +94,26 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		errorResponse, valid := t.Validate()
+		valid, respBytes := validate(t)
 		if !valid {
-			respBytes, err := json.Marshal(errorResponse)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error marshaling template data")
-				rw.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusBadRequest)
 			rw.Write(respBytes)
 			return
 		}
 
-		var updatedTemp db.Template
-
 		t.ID = id
 
-		updatedTemp, err = deps.Store.UpdateTemplate(req.Context(), t)
+		err = deps.Store.UpdateTemplate(req.Context(), t)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error update template")
 			return
 		}
 
-		respBytes, err := json.Marshal(updatedTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling template data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
+		rw.Write([]byte("template updated successfully"))
 	})
 }
 
@@ -145,9 +121,8 @@ func showTemplateHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
-		id, err := uuid.Parse(vars["id"])
+		id, err := parseUUID(vars["id"])
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error template_id key is missing")
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -168,7 +143,7 @@ func showTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		rw.WriteHeader(http.StatusCreated)
+		rw.WriteHeader(http.StatusOK)
 		rw.Write(respBytes)
 		rw.Header().Add("Content-Type", "application/json")
 	})
@@ -177,9 +152,8 @@ func showTemplateHandler(deps Dependencies) http.HandlerFunc {
 func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
-		id, err := uuid.Parse(vars["id"])
+		id, err := parseUUID(vars["id"])
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error template_id key is missing")
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}

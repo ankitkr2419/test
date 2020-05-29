@@ -28,13 +28,13 @@ func (suite *TargetHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
 }
 
-func TestExampleTestSuite(t *testing.T) {
+func TestTargetTestSuite(t *testing.T) {
 	suite.Run(t, new(TargetHandlerTestSuite))
 }
 
-func (suite *TargetHandlerTestSuite) TestListUsersSuccess() {
+func (suite *TargetHandlerTestSuite) TestListTargetsSuccess() {
 	testUUID := uuid.New()
-	suite.dbMock.On("ListTarget", mock.Anything).Return(
+	suite.dbMock.On("ListTargets", mock.Anything).Return(
 		[]db.Target{
 			db.Target{Name: "test-target", ID: testUUID},
 		},
@@ -48,16 +48,16 @@ func (suite *TargetHandlerTestSuite) TestListUsersSuccess() {
 		"",
 		listTargetHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","name":"test-target","dye_id":"00000000-0000-0000-0000-000000000000","template_id":"00000000-0000-0000-0000-000000000000","threshold":0}]`, testUUID)
+	output := fmt.Sprintf(`[{"id":"%s","name":"test-target","dye_id":"00000000-0000-0000-0000-000000000000"}]`, testUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *TargetHandlerTestSuite) TestListUsersWhenDBFailure() {
-	suite.dbMock.On("ListTarget", mock.Anything).Return(
+func (suite *TargetHandlerTestSuite) TestListTargetsWhenDBFailure() {
+	suite.dbMock.On("ListTargets", mock.Anything).Return(
 		[]db.Target{},
-		errors.New("error fetching user records"),
+		errors.New("error fetching targets"),
 	)
 
 	recorder := makeHTTPCall(
