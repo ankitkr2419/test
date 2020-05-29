@@ -7,6 +7,10 @@ import (
 type MockCompact32Driver struct {
 	mock.Mock
 	ExitCh chan error
+
+	LastAddress  uint16
+	LastQuantity uint16
+	LastValue    []byte
 }
 
 func (m *MockCompact32Driver) WriteSingleRegister(address, value uint16) (results []byte, err error) {
@@ -15,6 +19,10 @@ func (m *MockCompact32Driver) WriteSingleRegister(address, value uint16) (result
 }
 
 func (m *MockCompact32Driver) WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
+	m.LastAddress = address
+	m.LastQuantity = quantity
+	m.LastValue = value
+
 	args := m.Called(address, quantity, value)
 	return args.Get(0).([]byte), args.Error(1)
 }

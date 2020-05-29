@@ -102,9 +102,9 @@ func writeStageData(name string, stage plc.Stage) (err error) {
 
 	// Holding stage (at most 4 steps)
 	for i, step := range arr {
-		targetTemp[i] = (uint16)(step.TargetTemp * 10)
-		rampUpTemp[i] = (uint16)(step.RampUpTemp * 10)
-		holdTime[i] = (uint16)(step.HoldTime * 10)
+		targetTemp[i] = (uint16)(step.TargetTemp * 10) // float32 with 1 decimal value to uint16
+		rampUpTemp[i] = (uint16)(step.RampUpTemp * 10) // float32 with 1 decimal value to uint16
+		holdTime[i] = (uint16)(step.HoldTime)
 	}
 
 	// Get the data as byte array!
@@ -113,6 +113,9 @@ func writeStageData(name string, stage plc.Stage) (err error) {
 	temp = append(temp, rampUpTemp...)
 	temp = append(temp, holdTime...)
 	data := dataBlock(temp...)
+
+	//logger.WithField("data", data).Info("Writing to PLC")
+	logger.Printf("%v\n", data)
 
 	// write registers data
 	_, err = C32.Driver.WriteMultipleRegisters(address, quantity, data)
