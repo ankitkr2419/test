@@ -9,17 +9,17 @@ import (
 )
 
 type emissionCases struct {
-	initial []uint16 // initial emission values to start from (for 6 target)
-	pass    []uint16 // values should not increase beyond threshold to pass per cycle
-	fail    []uint16 // values must increase beyond threshold to fail per cycle
-	test    []uint16 // any other combination if you want per cycle
+	initial  []uint16 // initial emission values to start from (for 6 target)
+	negative []uint16 // for negative samples, value should increase minimally or be same value for consecutive cycles
+	positive []uint16 // for negative samples, increase over consecutive cycles
+	testing  []uint16 // any other combination if you want per cycle like positive case with low load
 }
 
 var emissionCase = emissionCases{
 	[]uint16{1100, 1100, 1100, 1100, 1100, 1100}, // initial
-	[]uint16{0, 0, 0, 0, 0, 0},                   // pass
-	[]uint16{10, 10, 10, 10, 10, 10},             // fail
-	[]uint16{10, 0, 5, 5, 0, 10},                 // random
+	[]uint16{0, 0, 0, 0, 0, 0},                   // negative
+	[]uint16{10, 10, 10, 10, 10, 10},             // positive with high load
+	[]uint16{10, 0, 5, 5, 0, 10},                 // positive with low load
 }
 
 const (
@@ -154,7 +154,7 @@ func fillEmission(cycle uint16, ems []plc.Emissions) []plc.Emissions {
 		if i < 31 { // first 32 wells are set for fail case
 			for x := uint16(0); x < cycle-1; x++ {
 				for i, v := range emission {
-					emission[i] = v + jitter(emissionCase.fail[i])
+					emission[i] = v + jitter(emissionCase.negative[i])
 				}
 			}
 
@@ -164,7 +164,7 @@ func fillEmission(cycle uint16, ems []plc.Emissions) []plc.Emissions {
 		if i > 31 && i < 63 { // next 32 wells are set for pass case
 			for x := uint16(0); x < cycle-1; x++ {
 				for i, v := range emission {
-					emission[i] = v + jitter(emissionCase.pass[i])
+					emission[i] = v + jitter(emissionCase.positive[i])
 				}
 			}
 
@@ -174,7 +174,7 @@ func fillEmission(cycle uint16, ems []plc.Emissions) []plc.Emissions {
 		if i > 63 && i < 95 { // next 32 wells are set for user-defined testing case
 			for x := uint16(0); x < cycle-1; x++ {
 				for i, v := range emission {
-					emission[i] = v + jitter(emissionCase.test[i])
+					emission[i] = v + jitter(emissionCase.testing[i])
 				}
 			}
 
