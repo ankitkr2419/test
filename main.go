@@ -42,7 +42,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				return startApp(c.Args().Get(0), c.String("plc"))
+				return startApp(c.String("plc"))
 			},
 		},
 		{
@@ -74,7 +74,7 @@ func main() {
 	}
 }
 
-func startApp(mode, plcName string) (err error) {
+func startApp(plcName string) (err error) {
 	var store db.Storer
 	var driver plc.Driver
 
