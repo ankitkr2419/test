@@ -119,7 +119,7 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 	temp = append(temp, holdTime...)
 	data := dataBlock(temp...)
 
-	logger.WithField("data", data).Debug("Writing to PLC")
+	logger.WithField("data", data).Debug("Writing Cycle/Holding configurations to PLC")
 
 	// write registers data
 	_, err = d.Driver.WriteMultipleRegisters(address, quantity, data)
@@ -220,6 +220,8 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		}
 
 	}
+
+	logger.WithField("scan", scan).Debug("Monitored data")
 
 	// Write to inform PLC that reading is completed
 	err = d.Driver.WriteSingleCoil(MODBUS["M"][106], OFF)

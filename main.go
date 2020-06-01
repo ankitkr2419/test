@@ -46,7 +46,6 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				return startApp(c.String("plc"))
 				return startApp(c.String("plc"), c.Bool("test"))
 			},
 		},
