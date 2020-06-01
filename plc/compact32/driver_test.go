@@ -17,12 +17,13 @@ import (
 type Compact32DriverTestSuite struct {
 	suite.Suite
 	driver *MockCompact32Driver
+	C32    *Compact32
 }
 
 func (suite *Compact32DriverTestSuite) SetupTest() {
 	suite.driver = &MockCompact32Driver{}
 
-	C32 = Compact32{
+	suite.C32 = &Compact32{
 		Driver: suite.driver,
 		ExitCh: make(chan error),
 	}
@@ -39,8 +40,8 @@ func (suite *Compact32DriverTestSuite) TestHeartBeatPLCFailure() {
 		nil,
 	)
 
-	go C32.HeartBeat()
-	err := <-C32.ExitCh
+	go suite.C32.HeartBeat()
+	err := <-suite.C32.ExitCh
 
 	assert.Equal(suite.T(), err, errors.New("PLC is not responding and maybe dead. Abort!!"))
 	suite.driver.AssertExpectations(suite.T())
@@ -57,11 +58,11 @@ func (suite *Compact32DriverTestSuite) TestHeartBeatSuccess() {
 		nil,
 	)
 
-	go C32.HeartBeat()
+	go suite.C32.HeartBeat()
 
 	for i := 0; i < 4; i++ {
 		select {
-		case err := <-C32.ExitCh:
+		case err := <-suite.C32.ExitCh:
 			assert.FailNow(suite.T(), err.Error())
 		default:
 			time.Sleep(500 * time.Millisecond)
@@ -87,8 +88,7 @@ func (suite *Compact32DriverTestSuite) TestConfigureRunStaging() {
 		},
 	}
 
-	//C32.ConfigureRun(p)
-	writeStageData(HOLDING_STAGE, p)
+	suite.C32.writeStageData(HOLDING_STAGE, p)
 
 	assert.Equal(suite.T(), suite.driver.LastAddress, MODBUS["D"][101])
 	// Expected []Bytes: [2 141 3 85 3 182 0 0 0 21 0 22 0 20 0 0 0 5 0 3 0 5 0 0]
@@ -129,7 +129,7 @@ func (suite *Compact32DriverTestSuite) TestConfigureRunSuccess() {
 		CycleCount: 45,
 	}
 
-	C32.ConfigureRun(p)
+	suite.C32.ConfigureRun(p)
 
 	assert.Equal(suite.T(), suite.driver.LastAddress, MODBUS["D"][113]) // cycling stage
 

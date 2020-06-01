@@ -38,7 +38,7 @@ func (d *Compact32ModbusDriver) ReadHoldingRegisters(address, quantity uint16) (
 func (d *Compact32ModbusDriver) ReadSingleRegister(address uint16) (value uint16, err error) {
 	// Don't take lock as ReadHoldingRegisters does take a lock! Otherwise, deadlock
 	var data []byte
-	data, err = C32.Driver.ReadHoldingRegisters(address, uint16(1))
+	data, err = d.ReadHoldingRegisters(address, uint16(1))
 	if err != nil {
 		return
 	}
@@ -57,10 +57,19 @@ func (d *Compact32ModbusDriver) ReadCoils(address, quantity uint16) (results []b
 func (d *Compact32ModbusDriver) ReadSingleCoil(address uint16) (value uint16, err error) {
 	// Don't take lock as ReadCoils does take a lock! Otherwise, deadlock
 	var data []byte
-	data, err = C32.Driver.ReadCoils(address, uint16(1))
+	data, err = d.ReadCoils(address, uint16(1))
 	if err != nil {
 		return
 	}
-	value = binary.BigEndian.Uint16(data)
+	// ReadCoil returns a single  byte!
+	value = binary.BigEndian.Uint16([]byte{data[0], 0x00})
+	return
+}
+
+func (d *Compact32ModbusDriver) WriteSingleCoil(address, value uint16) (err error) {
+	d.Lock()
+	defer d.Unlock()
+
+	_, err = d.Client.WriteSingleCoil(address, value)
 	return
 }
