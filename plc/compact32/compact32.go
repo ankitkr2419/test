@@ -37,7 +37,7 @@ func NewCompact32Driver(exit chan error) plc.Driver {
 	handler.DataBits = 8
 	handler.Parity = "E"
 	handler.StopBits = 1
-	handler.SlaveId = 1
+	handler.SlaveId = 5
 	handler.Timeout = 2 * time.Second
 
 	handler.Connect()
