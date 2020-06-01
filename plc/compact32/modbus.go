@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+const (
+	ON  = uint16(0xFF00)
+	OFF = uint16(0x0000)
+)
+
 /* Modbus Mappings:
  *
  * "D" => {
