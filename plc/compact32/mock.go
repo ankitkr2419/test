@@ -46,3 +46,7 @@ func (m *MockCompact32Driver) ReadSingleRegister(address uint16) (value uint16, 
 	args := m.Called(address)
 	return args.Get(0).(uint16), args.Error(1)
 }
+func (m *MockCompact32Driver) WriteSingleCoil(address, value uint16) (err error) {
+	args := m.Called(address, value)
+	return args.Error(0)
+}
