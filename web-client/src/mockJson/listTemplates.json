@@ -1,0 +1,12 @@
+[
+  {
+      "id": "9b60c964-6632-418d-a829-be1674895af7",
+      "name": "test name 1",
+      "description": "test description 1"
+  },
+  {
+      "id": "b399985d-46a7-4296-9bdc-5411fb5cde7e",
+      "name": "test name 2",
+      "description": "test description 2"
+  }
+]
