@@ -2,17 +2,31 @@ import React from "react";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { withRouter } from "react-router";
 
-import RouteWithSubRoutes from "./RouteHelper";
-
-import AppLayoutContainer from './containers/AppLayoutContainer';
+import RouteWithSubRoutes from "RouteHelper";
 import { ROOT_URL_PATH } from "./constants";
+import AppLayoutContainer from 'containers/AppLayoutContainer';
+import TemplateContainer from "containers/TemplateContainer";
+import LoginContainer from "containers/LoginContainer";
 
 export const routeDefinitions = [
   {
     path: ROOT_URL_PATH,
     component: AppLayoutContainer,
     key: 1,
-    routes: []
+    routes: [
+      {
+        path: `${ROOT_URL_PATH}templates`,
+        exact: true,
+        component: TemplateContainer,
+        key: 2
+      },
+      {
+        path: `${ROOT_URL_PATH}login`,
+        exact: true,
+        component: LoginContainer,
+        key: 2
+      }
+    ]
   }
  ];;
 

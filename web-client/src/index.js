@@ -3,14 +3,15 @@ import ReactDOM from "react-dom";
 import { Provider } from 'react-redux';
 import { Router, Switch, Route } from 'react-router-dom';
 
-import store from './store'
-import Routes from './Routes';
+import store from 'store'
+import history from 'history.js';
+import Routes from 'Routes';
 
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router>
+    <Router history={history}>
       <Switch>
         <Route path="/" component={Routes} />
       </Switch>
