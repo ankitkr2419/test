@@ -11,9 +11,11 @@ import (
 	"mylab/cpagent/plc/compact32"
 	"mylab/cpagent/plc/simulator"
 	"mylab/cpagent/service"
+	"net/http"
 	"os"
 	"strconv"
 
+	"github.com/rs/cors"
 	logger "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/urfave/negroni"
@@ -117,8 +119,18 @@ func startApp(plcName string, test bool) (err error) {
 	// mux router
 	router := service.InitRouter(deps)
 
+	// cors configuration for front-end
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:3000"},
+	})
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+	})
+
 	// init web server
 	server := negroni.Classic()
+	server.Use(c)
 	server.UseHandler(router)
 
 	port := config.AppPort() // This can be changed to the service port number via environment variable.
