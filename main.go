@@ -13,6 +13,7 @@ import (
 	"mylab/cpagent/service"
 	"os"
 	"strconv"
+	"time"
 
 	logger "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -75,6 +76,7 @@ func main() {
 }
 
 func startApp(mode, plcName string) (err error) {
+	fmt.Println("", plcName)
 	var store db.Storer
 	var driver plc.Driver
 
@@ -86,9 +88,13 @@ func startApp(mode, plcName string) (err error) {
 	exit := make(chan error)
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
+		fmt.Println("plcName", plcName)
 		driver = compact32.NewCompact32Driver(exit)
+
 	} else {
+
 		driver = simulator.NewSimulator(exit)
+
 	}
 
 	// The exit plan incase there is a feedback from the driver to abort/exit
@@ -109,6 +115,26 @@ func startApp(mode, plcName string) (err error) {
 		Store: store,
 		Plc:   driver,
 	}
+
+	// //test---------------------------------------------
+	stg := plc.Stage{
+		[]plc.Step{{50, 2, 1}, {35, 1.5, 1}}, // holding
+		[]plc.Step{{40, 3, 1}, {35, 2.1, 1}}, // cycle
+		4,                                    //cycle count
+		32,
+	}
+	var index uint16 = 0
+	deps.Plc.ConfigureRun(stg) //
+	deps.Plc.Start()           //
+
+	for {
+		time.Sleep(250 * time.Millisecond)
+		a, _ := deps.Plc.Monitor(index + 1) //
+		fmt.Println("→", a)
+		index = index + 1
+
+	}
+	//test end -----------------------------------------
 
 	// mux router
 	router := service.InitRouter(deps)
