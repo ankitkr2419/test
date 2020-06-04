@@ -61,12 +61,16 @@ func holdingStage() {
 			if plcIO.d.currentTemp >= uint16(stp.TargetTemp*10) {
 				plcIO.d.currentTemp = uint16(stp.TargetTemp * 10)
 
-				//spending some time (cooling down) before going to next step
-				time.Sleep(250 * time.Millisecond)
+				// spending time - HoldTime
+				time.Sleep(time.Duration(stp.HoldTime) * time.Second)
 				break
 			}
 		}
 	}
+	// set currentTemp back to room temp after holding cycle ends
+	plcIO.d.currentTemp = uint16(rt * 10)
+	// set currentLidTemp back to IdealLidTemp after holding cycle ends
+	plcIO.d.currentLidTemp = plcIO.d.stage.IdealLidTemp * 10
 }
 
 func cycleStage() {
