@@ -40,9 +40,13 @@ func main() {
 					Value: "compact32",
 					Usage: "Choose the PLC. simulator|compact32",
 				},
+				&cli.BoolFlag{
+					Name:  "test",
+					Usage: "Run in test mode!",
+				},
 			},
 			Action: func(c *cli.Context) error {
-				return startApp(c.String("plc"))
+				return startApp(c.String("plc"), c.Bool("test"))
 			},
 		},
 		{
@@ -74,7 +78,7 @@ func main() {
 	}
 }
 
-func startApp(plcName string) (err error) {
+func startApp(plcName string, test bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
 
@@ -86,7 +90,7 @@ func startApp(plcName string) (err error) {
 	exit := make(chan error)
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
-		driver = compact32.NewCompact32Driver(exit)
+		driver = compact32.NewCompact32Driver(exit, test)
 	} else {
 		driver = simulator.NewSimulator(exit)
 	}
