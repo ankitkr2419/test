@@ -5,7 +5,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
-@import "core";
+@import "./core";
 @import "~bootstrap/scss/root";
 @import "~bootstrap/scss/reboot";
 @import "~bootstrap/scss/type";
@@ -14,7 +14,7 @@
 @import "~bootstrap/scss/grid";
 // @import "~bootstrap/scss/tables";
 // @import "~bootstrap/scss/forms";
-// @import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/buttons";
 // @import "~bootstrap/scss/transitions";
 // @import "~bootstrap/scss/dropdown";
 // @import "~bootstrap/scss/button-group";
@@ -22,7 +22,7 @@
 // @import "~bootstrap/scss/custom-forms";
 // @import "~bootstrap/scss/nav";
 // @import "~bootstrap/scss/navbar";
-// @import "~bootstrap/scss/card";
+@import "~bootstrap/scss/card";
 // @import "~bootstrap/scss/breadcrumb";
 // @import "~bootstrap/scss/pagination";
 // @import "~bootstrap/scss/badge";
@@ -40,3 +40,6 @@
 // @import "~bootstrap/scss/spinners";
 @import "~bootstrap/scss/utilities";
 @import "~bootstrap/scss/print";
+
+// Custom 
+@import "./global";

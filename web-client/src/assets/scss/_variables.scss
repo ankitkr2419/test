@@ -9,6 +9,11 @@ $tango: #F3811F;
 $lime-green: #3FC13A;
 $burnt-sienna: #F06666;
 
+$gray-98: #FAFAFA;
+$gray-97: #F8F8F8;
+$gray-94: #F0F0F0;
+$gray-40: #666666;
+
 // $white:    #fff !default;
 // $gray-100: #f8f9fa !default;
 // $gray-200: #e9ecef !default;
@@ -71,7 +76,7 @@ $burnt-sienna: #F06666;
 // );
 
 $primary:       $tango;
-// $secondary:     $gray-600 !default;
+$secondary:     $gray-94;
 $success:       $lime-green;
 // $info:          $cyan !default;
 // $warning:       $yellow !default;
@@ -84,7 +89,7 @@ $theme-colors: ();
 $theme-colors: map-merge(
   (
     "primary":    $primary,
-    // "secondary":  $secondary,
+    "secondary":  $secondary,
     "success":    $success,
     // "info":       $info,
     // "warning":    $warning,

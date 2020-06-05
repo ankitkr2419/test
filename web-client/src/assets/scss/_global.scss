@@ -1,0 +1,63 @@
+html {
+  @include rem-baseline;
+}
+
+html, body {
+  height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+// Button
+.btn:focus, .btn.focus {
+  box-shadow: 0 2px 6px #00000029;
+}
+
+.ml-content {
+  position: relative;
+  flex: 1;
+  padding: rem(40px 64px);
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: $gray-97 0% 0% no-repeat padding-box;
+    z-index: -2;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: rem(225px);
+    background: transparent -moz-linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
+    background: transparent -webkit-linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
+    background: transparent linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#aedbd5",endColorstr="#f3811f",GradientType=1);
+    z-index: -1;
+  }
+}
+
+.ml-card {
+
+  .card-title {
+    font-size: rem(41px);
+    line-height: rem(49px);
+    font-weight: normal;
+    color: $gray-40;
+    padding-top: rem(48px);
+    margin: rem(0 0 222px);
+  }
+}
