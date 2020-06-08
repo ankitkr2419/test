@@ -3,9 +3,7 @@ import { Nav, NavItem } from "reactstrap";
 import { NavLink } from "react-router-dom";
 import bgStep from "../../assets/images/steps.svg";
 
-export const Step = styled(Nav).attrs({
-  className: "nav-steps"
-})`
+export const Step = styled(Nav).attrs({className: "nav-steps"})`
   margin: 0 0 40px;
   padding: 0 56px;
 `;
@@ -27,9 +25,7 @@ export const StepItem = styled(NavItem)`
   }
 `;
 
-export const StepLink = styled(NavLink).attrs({
-  className: "nav-link",
-})`
+export const StepLink = styled(NavLink).attrs({className: "nav-link"})`
   font-size: 16px;
   line-height: 24px;
   color: #707070;

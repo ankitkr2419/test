@@ -49,3 +49,23 @@ html, body {
     z-index: -1;
   }
 }
+
+// Template scss
+.card-template {
+  padding: rem(48px 120px);
+
+  .template {
+
+    > .btn {
+      position: absolute;
+
+      &.btn-edit {
+        left: 16px;
+      }
+      
+      &.btn-delete {
+        right: 16px;
+      }
+    }
+  }
+}
