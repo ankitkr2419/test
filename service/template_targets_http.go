@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
 
@@ -61,7 +60,7 @@ func updateTempTargetsHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error while decoding template target data")
 			return
 		}
-		fmt.Println(t)
+
 		for _, tt := range t {
 			valid, respBytes := validate(tt)
 			if !valid {
