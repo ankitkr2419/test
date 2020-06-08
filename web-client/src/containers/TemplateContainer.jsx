@@ -2,7 +2,6 @@ import React from 'react';
 import { Step, StepItem, StepLink } from "core-components/StepBar";
 import Card from 'core-components/Card';
 
-
 const TemplateContainer = props => {
   return (
 		<>
