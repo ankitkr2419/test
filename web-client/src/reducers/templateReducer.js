@@ -1,9 +1,15 @@
-import { List, fromJS } from 'immutable';
-import { createTemplateActions, listTemplateActions, updateTemplateActions, deleteTemplateActions } from "actions/templateActions";
+import { fromJS } from "immutable";
+import {
+  createTemplateActions,
+  listTemplateActions,
+  updateTemplateActions,
+  deleteTemplateActions,
+} from "actions/templateActions";
 
-const listTemplateInitialState = {
-  list: List(),
-};
+const listTemplateInitialState = fromJS({
+  isLoading: true,
+  list: [],
+});
 
 const createTemplateInitialState = {
   data: {},
@@ -17,53 +23,64 @@ const deleteTemplateInitialState = {
   data: {},
 };
 
-export const listTemplatesReducer = (state = listTemplateInitialState, action) => {
+export const listTemplatesReducer = (
+  state = listTemplateInitialState,
+  action
+) => {
   switch (action.type) {
     case listTemplateActions.listAction:
-      return { ...state, isLoading: true };
-      case listTemplateActions.successAction:
-      return { ...state, list : fromJS(action.payload), isLoading: false };
-      case listTemplateActions.failureAction:
-      return { ...state, ...action.payload, isLoading: false };
+      return state.setIn(["isLoading"], true);
+    case listTemplateActions.successAction:
+      return state.merge({ list: fromJS(action.payload), isLoading: false });
+    case listTemplateActions.failureAction:
+      return state.setIn(["isLoading"], false);
     default:
       return state;
   }
 };
 
-export const createTemplateReducer = (state = createTemplateInitialState, action) => {
+export const createTemplateReducer = (
+  state = createTemplateInitialState,
+  action
+) => {
   switch (action.type) {
     case createTemplateActions.createAction:
       return { ...state, isLoading: true };
-      case createTemplateActions.successAction:
+    case createTemplateActions.successAction:
       return { ...state, ...action.payload, isLoading: false };
-      case createTemplateActions.failureAction:
+    case createTemplateActions.failureAction:
       return { ...state, ...action.payload, isLoading: false };
     default:
       return state;
   }
 };
 
-export const updateTemplateReducer = (state = updateTemplateInitialState, action) => {
+export const updateTemplateReducer = (
+  state = updateTemplateInitialState,
+  action
+) => {
   switch (action.type) {
     case updateTemplateActions.updateAction:
       return { ...state, isLoading: true };
-      case updateTemplateActions.successAction:
+    case updateTemplateActions.successAction:
       return { ...state, ...action.payload, isLoading: false };
-      case updateTemplateActions.failureAction:
+    case updateTemplateActions.failureAction:
       return { ...state, ...action.payload, isLoading: false };
     default:
       return state;
   }
 };
 
-
-export const deleteTemplateReducer = (state = deleteTemplateInitialState, action) => {
+export const deleteTemplateReducer = (
+  state = deleteTemplateInitialState,
+  action
+) => {
   switch (action.type) {
     case deleteTemplateActions.deleteAction:
       return { ...state, isLoading: true };
-      case deleteTemplateActions.successAction:
+    case deleteTemplateActions.successAction:
       return { ...state, ...action.payload, isLoading: false };
-      case deleteTemplateActions.failureAction:
+    case deleteTemplateActions.failureAction:
       return { ...state, ...action.payload, isLoading: false };
     default:
       return state;

@@ -1,9 +1,9 @@
 import { combineReducers } from 'redux';
-import { createTemplateReducer, listTemplateReducer } from './templateReducer';
+import { createTemplateReducer, listTemplatesReducer } from './templateReducer';
 
 const rootReducer = combineReducers({
   createTemplateReducer,
-  listTemplateReducer,
+  listTemplatesReducer,
 });
 
 export default rootReducer;
