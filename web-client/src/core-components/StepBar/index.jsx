@@ -22,14 +22,11 @@ export const StepLink = styled(NavLink).attrs({
   line-height: 24px;
   color: #707070;
   border-radius: 4px;
+  opacity: ${(props) => (props.isDisabled ? "0.53" : "")};
+  pointer-events: ${(props) => (props.isDisabled ? "none" : "")};
 
   &:hover,
   &:focus {
     color: #707070;
-  }
-
-  &.is-disabled {
-    opacity: 0.53;
-    pointer-events: none;
   }
 `;

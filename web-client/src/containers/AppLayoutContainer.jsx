@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import RouteWithSubRoutes from "RouteHelper";
+import Header from "components/Header";
 import "../assets/scss/default.scss";
-import Header from "components/core/Header/Header";
 
 const AppLayoutContainer = (props) => {
   // AppLayoutContainer Will contain headers, sub-headers, notification etc.

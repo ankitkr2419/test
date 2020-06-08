@@ -11,10 +11,12 @@ const TemplateContainer = props => {
 					<StepLink to="/templates">Template</StepLink>
 				</StepItem>
 				<StepItem>
-					<StepLink to="/login" className="is-disabled">View Target</StepLink>
+					<StepLink to="/login" isDisabled>
+						View Target
+					</StepLink>
 				</StepItem>
 			</Step>
-      <Card></Card>
+			<Card></Card>
 		</>
 	);
 };
