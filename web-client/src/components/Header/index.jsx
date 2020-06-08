@@ -1,5 +1,4 @@
 import React from "react";
-import "./Header.scss";
 import styled from "styled-components";
 import imgLogo from "assets/images/mylab-logo.png";
 
