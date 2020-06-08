@@ -1,26 +1,37 @@
 import { takeEvery, put, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
-import { createTemplateActions, listTemplateActions } from "actions/templateActions";
-import { createTemplateFailed, fetchTemplatesFailed } from "actionCreators/templateActionCreators";
+import {
+  createTemplateActions,
+  listTemplateActions,
+  updateTemplateActions,
+  deleteTemplateActions,
+} from "actions/templateActions";
+import {
+  createTemplateFailed,
+  fetchTemplatesFailed,
+  updateTemplateFailed,
+  deleteTemplateFailed,
+} from "actionCreators/templateActionCreators";
+import { HTTP_METHODS } from "../constants";
 // WIP Mock testing
 // import listJson from 'mockJson/listTemplates'
 
 export function* createTemplate(actions) {
   const {
-    payload: { body }
+    payload: { body },
   } = actions;
-  
+
   const { successAction, failureAction } = createTemplateActions;
 
   try {
     yield call(callApi, {
       payload: {
-        method: "POST",
+        method: HTTP_METHODS.POST,
         body: body,
         reqPath: "template",
         successAction,
         failureAction,
-      }
+      },
     });
   } catch (error) {
     console.error("error in create template ", error);
@@ -37,7 +48,7 @@ export function* fetchTemplates() {
         reqPath: "templates",
         successAction,
         failureAction,
-      }
+      },
     });
     // WIP Mock testing
     // yield put({
@@ -50,10 +61,63 @@ export function* fetchTemplates() {
   }
 }
 
+export function* updateTemplate(actions) {
+  const {
+    payload: { templateID, body },
+  } = actions;
+
+  const { successAction, failureAction } = updateTemplateActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: body,
+        reqPath: `template/${templateID}`,
+        successAction,
+        failureAction,
+      },
+    });
+  } catch (error) {
+    console.error("error while updating template ", error);
+    yield put(updateTemplateFailed(error));
+  }
+}
+
+export function* deleteTemplate(actions) {
+  const {
+    payload: { templateID },
+  } = actions;
+
+  const { successAction, failureAction } = deleteTemplateActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.DELETE,
+        reqPath: `template/${templateID}`,
+        successAction,
+        failureAction,
+      },
+    });
+  } catch (error) {
+    console.error("error while deleting template ", error);
+    yield put(deleteTemplateFailed(error));
+  }
+}
+
 export function* createTemplateSaga() {
   yield takeEvery(createTemplateActions.createAction, createTemplate);
 }
 
 export function* fetchTemplatesSaga() {
   yield takeEvery(listTemplateActions.listAction, fetchTemplates);
+}
+
+export function* updateTemplateSaga() {
+  yield takeEvery(updateTemplateActions.updateAction, updateTemplate);
+}
+
+export function* deleteTemplateSaga() {
+  yield takeEvery(deleteTemplateActions.deleteAction, deleteTemplate);
 }
