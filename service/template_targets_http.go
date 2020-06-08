@@ -2,9 +2,10 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
-	"fmt"
+
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -12,6 +13,8 @@ import (
 func listTempTargetsHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
+
+		//TBD find alternative option to parsing UUID
 		tempID, err := parseUUID(vars["template_id"])
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)

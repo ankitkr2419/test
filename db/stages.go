@@ -24,7 +24,8 @@ const (
 		type,
 		repeat_count,
 		template_id
-		FROM stages WHERE id = $1`
+		FROM stages
+		WHERE id = $1`
 
 	updateStageQuery = `UPDATE stages SET (
 		name,
@@ -41,7 +42,7 @@ type Stage struct {
 	Name        string    `db:"name" json:"name"`
 	Type        string    `db:"type" json:"type"`
 	RepeatCount int       `db:"repeat_count" json:"repeat_count"`
-	TemplateID  uuid.UUID `db:"templated_id" json:"template_id"`
+	TemplateID  uuid.UUID `db:"template_id" json:"template_id"`
 }
 
 func (s *pgStore) ListStages(ctx context.Context, template_id uuid.UUID) (stgs []Stage, err error) {
@@ -104,6 +105,8 @@ func (s *pgStore) ShowStage(ctx context.Context, id uuid.UUID) (dbStage Stage, e
 }
 
 func (s *pgStore) DeleteStage(ctx context.Context, id uuid.UUID) (err error) {
+
+	// added delete cascade
 	_, err = s.db.Exec(
 		deleteStageQuery,
 		id,

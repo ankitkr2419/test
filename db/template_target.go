@@ -12,19 +12,7 @@ import (
 
 const (
 	getTempTargetListQuery = `SELECT * FROM template_targets
-		ORDER BY name ASC
-		template_id = $1`
-
-	createTempTargetQuery = `INSERT INTO template_targets (
-		template_id,
-		target_id,
-		threshold)
-		VALUES ($1, $2, $3)`
-
-	getTempTargetQuery = `SELECT template_id,
-		target_id,
-		threshold
-		FROM template_targets WHERE template_id = $1 and target_id = $2`
+		where template_id = $1`
 
 	updateTempTargetQuery = `UPDATE template_targets SET
 		threshold = $1
@@ -32,16 +20,18 @@ const (
 
 	deleteTempTargetQuery = `DELETE FROM template_targets WHERE template_id = $1 and target_id = $2`
 
-	upsertTempTargetQuery1 = `INSERT INTO template_targets (template_id,
+	upsertTempTargetQuery1 = `INSERT INTO template_targets (
+		template_id,
 		target_id,
 		threshold)
 		VALUES `
 
-	upsertTempTargetQuery2 = `ON CONFLICT ON CONSTRAINT unq DO UPDATE
+	upsertTempTargetQuery2 = ` ON CONFLICT (template_id, target_id) DO UPDATE
 			SET threshold=excluded.threshold
-			WHERE template_targets.threshold is distinct from excluded.threshold`
-		)
+			WHERE template_targets.template_id = excluded.template_id AND template_targets.target_id = excluded.target_id`
+)
 
+//TemplateTarget is used to store target mapped to template
 type TemplateTarget struct {
 	TemplateID uuid.UUID `db:"template_id" json:"template_id" validate:"required"`
 	TargetID   uuid.UUID `db:"target_id" json:"target_id" validate:"required"`
@@ -57,88 +47,20 @@ func (s *pgStore) ListTemplateTargets(ctx context.Context, templateID uuid.UUID)
 	return
 }
 
-// func (s *pgStore) CreateTemplateTarget(ctx context.Context, t TemplateTarget) (createdTT TemplateTarget, err error) {
-
-// 	var id uuid.UUID
-
-// 	err = s.db.QueryRow(createTempTargetQuery, t.TemplateID, t.TargetID, t.Threshold).Scan(&id)
-// 	if err != nil {
-// 		logger.WithField("err", err.Error()).Error("Error creating TemplateTarget")
-// 		return
-// 	}
-
-// 	err = s.db.Get(&createdTT, getTempTargetQuery, id)
-// 	if err != nil {
-// 		logger.WithField("err", err.Error()).Error("Error in getting TemplateTarget")
-// 		return
-// 	}
-// 	return
-// }
-
-// func (s *pgStore) UpdateTemplateTarget(ctx context.Context, t TemplateTarget) (err error) {
-// 	result, err := s.db.Exec(
-// 		updateTempTargetQuery,
-// 		t.Threshold,
-// 		t.TemplateID,
-// 		t.TargetID,
-// 	)
-
-// 	if err != nil {
-// 		logger.WithField("err", err.Error()).Error("Error updating TemplateTarget")
-// 		return
-// 	}
-
-// 	c, _ := result.RowsAffected()
-// 	// check row count as no error is returned when row not found for update
-// 	if c == 0 {
-// 		err = errors.New("Record Not Found")
-// 		logger.WithField("err", err.Error()).Error("Error TemplateTarget not found")
-// 	}
-
-// 	return
-// }
-
-// func (s *pgStore) ShowTemplateTarget(ctx context.Context, tempID, targetID uuid.UUID) (dbTT TemplateTarget, err error) {
-// 	err = s.db.Get(&dbTT, getTempTargetQuery, tempID, targetID)
-// 	if err != nil {
-// 		logger.WithField("err", err.Error()).Error("Error fetching TemplateTarget")
-// 		return
-// 	}
-
-// 	return
-// }
-
-// func (s *pgStore) DeleteTemplateTarget(ctx context.Context, tempID, targetID uuid.UUID) (err error) {
-// 	result, err := s.db.Exec(
-// 		deleteTempTargetQuery,
-// 		tempID,
-// 		targetID,
-// 	)
-// 	if err != nil {
-// 		logger.WithField("err", err.Error()).Error("Error deleting TemplateTarget")
-// 		return
-// 	}
-
-// 	c, _ := result.RowsAffected()
-// 	// check row count as no error is returned when row not found for update
-// 	if c == 0 {
-// 		err = errors.New("Record Not Found")
-// 		logger.WithField("err", err.Error()).Error("Error Template not found")
-// 	}
-
-// 	return
-// }
-
 func (s *pgStore) UpsertTemplateTarget(ctx context.Context, t []TemplateTarget, temp_id uuid.UUID) (createdTT []TemplateTarget, err error) {
 
-	stmt, args := updateQuery(t)
+	stmt, args := makeQuery(t)
 
-	logger.WithField("stmt",stmt).Info("log")
-		logger.WithField("args",args).Info("log")
-
-	_, err = s.db.Exec(stmt, args...)
+	// prepare query approach used as to avoid repetitive parse analysis work, optimizes bulk insert
+	st, err := s.db.Prepare(stmt)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating TemplateTarget")
+		logger.WithField("error in prep query", err.Error()).Error("Query Failed")
+		return
+	}
+
+	_, err = st.Exec(args...)
+	if err != nil {
+		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
 	}
 
@@ -150,7 +72,8 @@ func (s *pgStore) UpsertTemplateTarget(ctx context.Context, t []TemplateTarget, 
 	return
 }
 
-func updateQuery(tt []TemplateTarget) (string, []interface{}) {
+// prepare bulk insert query statement
+func makeQuery(tt []TemplateTarget) (string, []interface{}) {
 
 	values := make([]string, 0, len(tt))
 	args := make([]interface{}, 0, len(tt)*3)
@@ -160,7 +83,7 @@ func updateQuery(tt []TemplateTarget) (string, []interface{}) {
 		args = append(args, t.TemplateID, t.TargetID, t.Threshold)
 	}
 
-	stmt := fmt.Sprintf(upsertTempTargetQuery1+`%s`,
+	stmt := fmt.Sprintf(upsertTempTargetQuery1+" %s",
 		strings.Join(values, ","))
 
 	stmt = replaceSQL(stmt, "(?, ?, ?)", len(values))
@@ -172,11 +95,15 @@ func updateQuery(tt []TemplateTarget) (string, []interface{}) {
 func replaceSQL(stmt, pattern string, len int) string {
 	pattern += ","
 	n := 0
+
+	// for loop exits when all ? replaced by $n
 	for strings.IndexByte(stmt, '?') != -1 {
 		n++
 		param := "$" + strconv.Itoa(n)
 		stmt = strings.Replace(stmt, "?", param, 1)
 	}
+
+	// trim last comma from stmt
 	stmt = strings.TrimSuffix(stmt, ",)")
 	return stmt
 }

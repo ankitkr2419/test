@@ -111,6 +111,8 @@ func (s *pgStore) ShowStep(ctx context.Context, id uuid.UUID) (dbStep Step, err 
 }
 
 func (s *pgStore) DeleteStep(ctx context.Context, id uuid.UUID) (err error) {
+
+	// added delete cascade
 	_, err = s.db.Exec(
 		deleteStepQuery,
 		id,

@@ -90,3 +90,13 @@ func (m *DBMockStore) ShowStep(ctx context.Context, id uuid.UUID) (s Step, err e
 	args := m.Called(ctx, id)
 	return args.Get(0).(Step), args.Error(1)
 }
+
+func (m *DBMockStore) UpsertTemplateTarget(ctx context.Context,tt []TemplateTarget,id uuid.UUID) (t []TemplateTarget, err error) {
+	args := m.Called(ctx,tt, id)
+	return args.Get(0).([]TemplateTarget), args.Error(1)
+}
+
+func (m *DBMockStore) ListTemplateTargets(ctx context.Context, id uuid.UUID) (t []TemplateTarget, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]TemplateTarget), args.Error(1)
+}
