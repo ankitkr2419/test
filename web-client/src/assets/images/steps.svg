@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="248.342" height="91" viewBox="0 0 248.342 91">
+  <defs>
+    <filter id="steps_" x="0" y="0" width="248.342" height="91" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feFlood flood-opacity="0.043"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#steps_)">
+    <g id="steps_2" data-name="steps " transform="translate(24 21)" fill="#fff">
+      <path d="M 176.7744140625 42.5 L 1.269621729850769 42.5 L 23.71013450622559 21.58032417297363 L 24.10768508911133 21.20972442626953 L 23.70525932312012 20.84440040588379 L 1.294662833213806 0.5 L 176.7810821533203 0.5 L 199.6034088134766 21.00856399536133 L 176.7744140625 42.5 Z" stroke="none"/>
+      <path d="M 2.589324951171875 1 L 24.04132080078125 20.47418403625488 L 24.84617614746094 21.20484161376953 L 24.05107116699219 21.94605255126953 L 2.539199829101563 42 L 176.5760955810547 42 L 198.8648376464844 21.01712989807129 L 176.5894165039063 1 L 2.589324951171875 1 M -1.52587890625e-05 0 L 176.9727172851563 0 L 200.3419036865234 21 L 176.9727172851563 43 L -1.52587890625e-05 43 L 23.36917114257813 21.2146053314209 L -1.52587890625e-05 0 Z" stroke="none" fill="#e5e5e5"/>
+    </g>
+  </g>
+</svg>
