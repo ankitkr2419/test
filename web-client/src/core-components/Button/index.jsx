@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Button } from "reactstrap";
 
-const MlButton = styled(Button)`
+const StyledButton = styled(Button)`
 	width: 202px;
 	height: 40px;
 	font-size: 16px;
@@ -20,4 +20,4 @@ const MlButton = styled(Button)`
 	}
 `;
 
-export default MlButton;
+export default StyledButton;

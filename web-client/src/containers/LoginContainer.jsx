@@ -1,10 +1,10 @@
 import React from 'react';
-import MlButton from 'components/shared/Button/Button';
-import styled from 'styled-components';
-import MlCard from 'components/shared/Card/Card';
-import { CardBody, Row, Col } from 'reactstrap';
+import styled from "styled-components";
+import { CardBody, Row, Col } from "reactstrap";
+import Button from 'core-components/Button';
+import Card from 'core-components/Card';
 
-const MlButtonGroup = styled.div`
+const ButtonGroup = styled.div`
 	margin: 0 0 40px 0;
 	text-align: right;
 	padding: 0 24px 0 24px;
@@ -13,21 +13,21 @@ const MlButtonGroup = styled.div`
 const LoginContainer = (props) => {
   return (
 		<>
-			<MlButtonGroup>
-				<MlButton className="mr-4">Admin</MlButton>
-				<MlButton className="mr-4">Supervisor</MlButton>
-			</MlButtonGroup>
-			<MlCard className="ml-card">
+			<ButtonGroup>
+				<Button className="mr-4">Admin</Button>
+				<Button className="mr-4">Supervisor</Button>
+			</ButtonGroup>
+			<Card className="ml-card">
 				<CardBody>
 					<Row>
 						<Col>
 							<h1 className="card-title">Compact 32</h1>
-							<MlButton color="primary">Login as Operator</MlButton>
+							<Button color="primary">Login as Operator</Button>
 						</Col>
 						<Col/>
 					</Row>
 				</CardBody>
-			</MlCard>
+			</Card>
 		</>
 	);
 };

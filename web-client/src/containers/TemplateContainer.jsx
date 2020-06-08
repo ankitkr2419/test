@@ -1,6 +1,6 @@
 import React from 'react';
-import { Step, StepItem, StepLink } from "components/shared/StepBar/StepBar";
-import MlCard from 'components/shared/Card/Card';
+import { Step, StepItem, StepLink } from "core-components/StepBar";
+import Card from 'core-components/Card';
 
 
 const TemplateContainer = props => {
@@ -14,7 +14,7 @@ const TemplateContainer = props => {
 					<StepLink to="/login" className="is-disabled">View Target</StepLink>
 				</StepItem>
 			</Step>
-      <MlCard></MlCard>
+      <Card></Card>
 		</>
 	);
 };

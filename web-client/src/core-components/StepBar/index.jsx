@@ -21,6 +21,7 @@ export const StepLink = styled(NavLink).attrs({
   font-size: 16px;
   line-height: 24px;
   color: #707070;
+  border-radius: 4px;
 
   &:hover,
   &:focus {
