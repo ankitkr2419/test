@@ -4,6 +4,42 @@ import Card from 'core-components/Card';
 import { TemplateList, TemplateListItem, Template } from "components/Template";
 import Button from 'core-components/Button';
 
+const TemplateListContainer = props => {
+	return (
+		<>
+			<TemplateList>
+				<TemplateListItem>
+					<Template title="Template Name" />
+				</TemplateListItem>
+				<TemplateListItem>
+					<Template title="Template Name" />
+				</TemplateListItem>
+				<TemplateListItem>
+					<Template title="Template 3" isActive isEditable />
+				</TemplateListItem>
+				<TemplateListItem>
+					<Template title="Template Name" />
+				</TemplateListItem>
+				<TemplateListItem>
+					<Template title="Template Name" />
+				</TemplateListItem>
+				<TemplateListItem>
+					<Template title="Template Name" />
+				</TemplateListItem>
+				<TemplateListItem>
+					<Template title="Template Name" />
+				</TemplateListItem>
+				<TemplateListItem>
+					<Template title="Template Name" />
+				</TemplateListItem>
+			</TemplateList>
+			<Button color="primary" className="mx-auto">
+				Next
+			</Button>
+		</>
+	);
+};
+
 const TemplateContainer = props => {
   return (
 		<>
@@ -16,35 +52,7 @@ const TemplateContainer = props => {
 				</StepItem>
 			</Step>
 			<Card className="card-template">
-				<TemplateList>
-					<TemplateListItem>
-						<Template title="Template Name" />
-					</TemplateListItem>
-					<TemplateListItem>
-						<Template title="Template Name" />
-					</TemplateListItem>
-					<TemplateListItem>
-						<Template title="Template 3" isActive isEditable />
-					</TemplateListItem>
-					<TemplateListItem>
-						<Template title="Template Name" />
-					</TemplateListItem>
-					<TemplateListItem>
-						<Template title="Template Name" />
-					</TemplateListItem>
-					<TemplateListItem>
-						<Template title="Template Name" />
-					</TemplateListItem>
-					<TemplateListItem>
-						<Template title="Template Name" />
-					</TemplateListItem>
-					<TemplateListItem>
-						<Template title="Template Name" />
-					</TemplateListItem>
-				</TemplateList>
-				<Button color="primary" className="mx-auto">
-					Next
-				</Button>
+				<TemplateListContainer />
 			</Card>
 		</>
 	);

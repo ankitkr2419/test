@@ -27,9 +27,11 @@ export const Template = (props) => {
 export const TemplateList = styled.ul.attrs({className: "list-template"})`
 	display: flex;
 	flex-wrap: wrap;
-	padding-left: 0;
+	padding: 0 60px;
 	list-style: none;
 	margin: 0 0 56px;
+	overflow-x: hidden;
+	overflow-y: auto
 `;
 
 export const TemplateListItem = styled.li.attrs({className: "list-template-item"})`
