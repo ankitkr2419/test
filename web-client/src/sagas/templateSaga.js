@@ -56,7 +56,7 @@ export function* fetchTemplates() {
     //   payload: listJson,
     // })
   } catch (error) {
-    console.error("error in create template ", error);
+    console.error("error in fetch template ", error);
     yield put(fetchTemplatesFailed(error));
   }
 }
