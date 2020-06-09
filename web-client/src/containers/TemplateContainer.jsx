@@ -18,36 +18,28 @@ const TemplateContainer = props => {
 			<Card className="card-template">
 				<TemplateList>
 					<TemplateListItem>
-						<Template>Template Name</Template>
+						<Template title="Template Name" />
 					</TemplateListItem>
 					<TemplateListItem>
-						<Template>Template Name</Template>
+						<Template title="Template Name" />
 					</TemplateListItem>
 					<TemplateListItem>
-						<Template isActive>
-							<Button icon className="btn-edit">
-								E
-							</Button>
-							Template 3
-							<Button icon className="btn-delete">
-								D
-							</Button>
-						</Template>
+						<Template title="Template 3" isActive isEditable />
 					</TemplateListItem>
 					<TemplateListItem>
-						<Template>Template Name</Template>
+						<Template title="Template Name" />
 					</TemplateListItem>
 					<TemplateListItem>
-						<Template>Template Name</Template>
+						<Template title="Template Name" />
 					</TemplateListItem>
 					<TemplateListItem>
-						<Template>Template Name</Template>
+						<Template title="Template Name" />
 					</TemplateListItem>
 					<TemplateListItem>
-						<Template>Template Name</Template>
+						<Template title="Template Name" />
 					</TemplateListItem>
 					<TemplateListItem>
-						<Template>Template Name</Template>
+						<Template title="Template Name" />
 					</TemplateListItem>
 				</TemplateList>
 				<Button color="primary" className="mx-auto">

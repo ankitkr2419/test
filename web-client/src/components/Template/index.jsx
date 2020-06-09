@@ -1,4 +1,28 @@
+import React from "react";
 import styled from "styled-components";
+import Button from "core-components/Button";
+
+const BtnEdit = (props) => {
+	return (
+		<Button icon className="btn-edit">E</Button>
+	);
+};
+
+const BtnDelete = (props) => {
+	return (
+		<Button icon className="btn-delete">D</Button>
+	);
+};
+
+export const Template = (props) => {
+	return (
+		<StyledTemplate {...props}>
+			{props.isEditable && props.isActive ? <BtnEdit /> : ""}
+			<span>{props.title}</span>
+			{props.isDeletable && props.isActive ? <BtnDelete /> : ""}
+		</StyledTemplate>
+	);
+};
 
 export const TemplateList = styled.ul.attrs({className: "list-template"})`
 	display: flex;
@@ -18,7 +42,7 @@ export const TemplateListItem = styled.li.attrs({className: "list-template-item"
 	text-align: center;
 `;
 
-export const Template = styled.div.attrs({ className: "template" })`
+const StyledTemplate = styled.div.attrs({ className: "template" })`
 	position: relative;
 	width: ${(props) => (props.isActive ? "315px" : "220px")};
 	height: ${(props) => (props.isActive ? "60px" : "44px")};
@@ -34,7 +58,24 @@ export const Template = styled.div.attrs({ className: "template" })`
 	border: 1px solid #e5e5e5;
 	border-radius: 8px;
 	padding: ${(props) => (props.isActive ? "8px 74px" : "8px 16px")};
+	overflow: hidden;
 
-	.btn-icon {
+	span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.btn {
+		position: absolute;
+		z-index: 2;
+	}
+
+	.btn-edit {
+		left: 16px;
+	}
+
+	.btn-delete {
+		right: 16px;
 	}
 `;
