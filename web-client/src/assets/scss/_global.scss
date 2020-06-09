@@ -42,12 +42,61 @@ html, body {
     right: 0;
     left: 0;
     height: rem(225px);
-    background: transparent -moz-linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
-    background: transparent -webkit-linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
-    background: transparent linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#aedbd5",endColorstr="#f3811f",GradientType=1);
+    background: transparent -moz-linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+    background: transparent -webkit-linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+    background: transparent linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="$pale",endColorstr="$tango",GradientType=1);
     z-index: -1;
   }
+}
+
+// Button
+button:focus {
+  outline: none;
+}
+
+.btn-primary {
+  color: $white;
+}
+
+.btn-secondary {
+  color: $gray-40;
+}
+
+// Custom Checkbox
+.custom-control-input:checked ~ .custom-control-label::after {
+  background-image: none;
+  background-color: $pale;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: none;
+  border-color: $gray-60;
+}
+
+.custom-control-label {
+  font-size: rem(18px);
+  line-height: rem(23px);
+  color: $gray-44;
+  
+  &::before {
+    width: rem(24px);
+    height: rem(24px);
+    background-color: $white;
+    border: 1px solid $gray-60;
+    top: 0;
+    border-radius: rem(4px);
+  }
+
+  &::after {
+    border-radius: rem(2px);
+  }
+}
+
+.custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+  background-color: $white;
+  border-color: $gray-60;
 }
 
 // Template scss

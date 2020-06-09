@@ -1,16 +1,22 @@
 import React from "react";
 import styled from "styled-components";
-import Button from "core-components/Button";
+import ButtonIcon from "shared-components/ButtonIcon";
+import Icon from "shared-components/Icon";
+import Text from "shared-components/Text";
 
 const BtnEdit = (props) => {
 	return (
-		<Button icon className="btn-edit">E</Button>
+		<ButtonIcon position="absolute" placement="left" left="16">
+			<Icon name="pencil" />
+		</ButtonIcon>
 	);
 };
 
 const BtnDelete = (props) => {
 	return (
-		<Button icon className="btn-delete">D</Button>
+		<ButtonIcon position="absolute" placement="right" right="16">
+			<Icon name="trash" />
+		</ButtonIcon>
 	);
 };
 
@@ -18,7 +24,7 @@ export const Template = (props) => {
 	return (
 		<StyledTemplate {...props}>
 			{props.isEditable && props.isActive ? <BtnEdit /> : ""}
-			<span>{props.title}</span>
+			<Text tag="span" className="text-truncate">{props.title}</Text>
 			{props.isDeletable && props.isActive ? <BtnDelete /> : ""}
 		</StyledTemplate>
 	);
@@ -61,23 +67,4 @@ const StyledTemplate = styled.div.attrs({ className: "template" })`
 	border-radius: 8px;
 	padding: ${(props) => (props.isActive ? "8px 74px" : "8px 16px")};
 	overflow: hidden;
-
-	span {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.btn {
-		position: absolute;
-		z-index: 2;
-	}
-
-	.btn-edit {
-		left: 16px;
-	}
-
-	.btn-delete {
-		right: 16px;
-	}
 `;

@@ -7,6 +7,7 @@ import Button from 'core-components/Button';
 import Select from 'core-components/Select';
 import { TargetList, TargetListItem } from "components/Target";
 import CheckBox from "core-components/Checkbox";
+import Text from "shared-components/Text";
 
 const TemplateListContainer = props => {
 	return (
@@ -62,34 +63,78 @@ const TargetListContainer = (props) => {
 			<Col className="mh-100">
 				<TargetList className="mh-100">
 					<TargetListItem>
-						<p />
-						<p className="-target">Target</p>
-						<p className="-threshold">Threshold</p>
+						<Text tag="p" />
+						<Text tag="p" className="-target">
+							Target
+						</Text>
+						<Text tag="p" className="-threshold">
+							Threshold
+						</Text>
 					</TargetListItem>
 					<TargetListItem>
 						<CheckBox id="target1" />
-						<Select wrapperClassName="-target" options={TargetOptions} />
-						<Select wrapperClassName="-threshold" options={ThresholdOptions} />
+						<Select
+							wrapperClassName="-target"
+							options={TargetOptions}
+							placeholder=""
+						/>
+						<Select
+							wrapperClassName="-threshold"
+							options={ThresholdOptions}
+							placeholder=""
+						/>
 					</TargetListItem>
 					<TargetListItem>
 						<CheckBox id="target2" />
-						<Select wrapperClassName="-target" options={TargetOptions} />
-						<Select wrapperClassName="-threshold" options={ThresholdOptions} />
+						<Select
+							wrapperClassName="-target"
+							options={TargetOptions}
+							placeholder=""
+						/>
+						<Select
+							wrapperClassName="-threshold"
+							options={ThresholdOptions}
+							placeholder=""
+						/>
 					</TargetListItem>
 					<TargetListItem>
 						<CheckBox id="target3" />
-						<Select wrapperClassName="-target" options={TargetOptions} />
-						<Select wrapperClassName="-threshold" options={ThresholdOptions} />
+						<Select
+							wrapperClassName="-target"
+							options={TargetOptions}
+							placeholder=""
+						/>
+						<Select
+							wrapperClassName="-threshold"
+							options={ThresholdOptions}
+							placeholder=""
+						/>
 					</TargetListItem>
 					<TargetListItem>
 						<CheckBox id="target4" />
-						<Select wrapperClassName="-target" options={TargetOptions} />
-						<Select wrapperClassName="-threshold" options={ThresholdOptions} />
+						<Select
+							wrapperClassName="-target"
+							options={TargetOptions}
+							placeholder=""
+						/>
+						<Select
+							wrapperClassName="-threshold"
+							options={ThresholdOptions}
+							placeholder=""
+						/>
 					</TargetListItem>
 					<TargetListItem>
 						<CheckBox id="target5" />
-						<Select wrapperClassName="-target" options={TargetOptions} />
-						<Select wrapperClassName="-threshold" options={ThresholdOptions} />
+						<Select
+							wrapperClassName="-target"
+							options={TargetOptions}
+							placeholder=""
+						/>
+						<Select
+							wrapperClassName="-threshold"
+							options={ThresholdOptions}
+							placeholder=""
+						/>
 					</TargetListItem>
 				</TargetList>
 			</Col>
