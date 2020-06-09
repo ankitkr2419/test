@@ -10,7 +10,7 @@ import {
   saveTargetFailed,
   fetchMasterTargetsFailed,
   fetchTargetsByTemplateIDFailed,
-} from "actionCreators/targetActionCreators";
+} from "action-creators/targetActionCreators";
 
 export function* fetchMasterTargets() {
   const { successAction, failureAction } = listTargetActions;
