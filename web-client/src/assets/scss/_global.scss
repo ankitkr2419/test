@@ -12,11 +12,6 @@ html, body {
   height: 100vh;
 }
 
-// Button
-.btn:focus, .btn.focus {
-  box-shadow: 0 2px 6px #00000029;
-}
-
 .ml-content {
   position: relative;
   flex: 1;
@@ -62,6 +57,10 @@ a.btn {
 	box-shadow: rem(0 2px 6px) #00000029;
 }
 
+.btn:focus, .btn.focus {
+  box-shadow: 0 2px 6px #00000029;
+}
+
 button:focus {
   outline: none;
 }
@@ -80,9 +79,12 @@ button:focus {
   background-color: $pale;
 }
 
-.custom-control-input:focus ~ .custom-control-label::before {
-  box-shadow: none;
-  border-color: $gray-60;
+.custom-control-input:focus, .custom-control-input:focus:not(:checked) {
+
+  ~ .custom-control-label::before {
+    box-shadow: none;
+    border-color: $gray-60;
+  }
 }
 
 .custom-control-label {
