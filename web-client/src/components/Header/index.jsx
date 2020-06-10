@@ -15,7 +15,7 @@ const StyledHeader = styled.header`
 const Header = (props) => {
 	return (
 		<StyledHeader className="ml-header">
-			<Logo sm />
+			<Logo isSmall />
 		</StyledHeader>
 	);
 };
