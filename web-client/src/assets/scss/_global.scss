@@ -51,15 +51,26 @@ html, body {
 }
 
 // Button
+a.btn {
+  width: rem(202px);
+	height: rem(40px);
+	font-size: rem(16px);
+	line-height: rem(19px);
+	font-weight: bold;
+	padding: rem(10px 20px);
+	border-radius: rem(27px);
+	box-shadow: rem(0 2px 6px) #00000029;
+}
+
 button:focus {
   outline: none;
 }
 
-.btn-primary {
+.btn-primary, .btn-primary.disabled, .btn-primary:disabled {
   color: $white;
 }
 
-.btn-secondary {
+.btn-secondary, .btn-secondary.disabled, .btn-secondary:disabled {
   color: $gray-40;
 }
 
