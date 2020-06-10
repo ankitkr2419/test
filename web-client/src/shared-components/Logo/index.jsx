@@ -1,21 +1,27 @@
 import React from "react";
 import styled from "styled-components";
-import imgLogo from "assets/images/mylab-logo.png";
 import { Link } from "react-router-dom";
+import imgLogo from "assets/images/mylab-logo.png";
+import imgSymbol from "assets/images/mylab-symbol.png";
 
 const StyledLogo = styled(Link)`
 	display: flex;
-	width: 150px;
+	width: ${(props) => (props.sm ? "58px" : "150px")};
 	height: 48px;
 	align-items: center;
 	justify-content: center;
+	margin: ${(props) => (props.sm ? "0 12px" : "")};
 `;
 
 const Logo = (props) => {
 	return (
-    <StyledLogo to="/" className="logo">
-      <img src={imgLogo} alt="Mylab" className="w-100" />
-    </StyledLogo>
+		<StyledLogo {...props} to="/" className="logo">
+			{props.sm ? (
+				<img src={imgSymbol} alt="Mylab" className="h-100" />
+			) : (
+				<img src={imgLogo} alt="Mylab" className="w-100" />
+			)}
+		</StyledLogo>
 	);
 };
 
