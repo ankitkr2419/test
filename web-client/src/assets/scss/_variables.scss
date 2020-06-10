@@ -1,0 +1,26 @@
+$tango: #F3811F;
+$lime-green: #3FC13A;
+$burnt-sienna: #F06666;
+
+$gray-98: #FAFAFA;
+$gray-97: #F8F8F8;
+$gray-94: #F0F0F0;
+$gray-44: #707070;
+$gray-40: #666666;
+
+
+$primary:       $tango;
+$secondary:     $gray-94;
+$success:       $lime-green;
+$danger:        $burnt-sienna;
+
+$theme-colors: ();
+$theme-colors: map-merge(
+  (
+    "primary":    $primary,
+    "secondary":  $secondary,
+    "success":    $success,
+    "danger":     $danger,
+  ),
+  $theme-colors
+);
