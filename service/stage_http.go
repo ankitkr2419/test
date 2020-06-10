@@ -55,9 +55,7 @@ func createStageHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(t)
 		if !valid {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write(respBytes)
+			responseBadRequest(rw, respBytes)
 			return
 		}
 
@@ -102,9 +100,7 @@ func updateStageHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(t)
 		if !valid {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write(respBytes)
+			responseBadRequest(rw, respBytes)
 			return
 		}
 

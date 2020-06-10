@@ -2,9 +2,9 @@ package db
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"time"
 )
 
 const (
@@ -43,7 +43,7 @@ type Step struct {
 	StageID           uuid.UUID `db:"stage_id" json:"stage_id"`
 	RampRate          float64   `db:"ramp_rate" json:"ramp_rate"`
 	TargetTemperature float64   `db:"target_temp" json:"target_temp"`
-	HoldTime          int       `db:"hold_time" json:"hold_time"`
+	HoldTime          time.Time `db:"hold_time" json:"hold_time"`
 	DataCapture       bool      `db:"data_capture" json:"data_capture"`
 }
 

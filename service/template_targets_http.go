@@ -64,9 +64,7 @@ func updateTempTargetsHandler(deps Dependencies) http.HandlerFunc {
 		for _, tt := range t {
 			valid, respBytes := validate(tt)
 			if !valid {
-				rw.Header().Add("Content-Type", "application/json")
-				rw.WriteHeader(http.StatusBadRequest)
-				rw.Write(respBytes)
+				responseBadRequest(rw, respBytes)
 				return
 			}
 		}

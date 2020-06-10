@@ -49,9 +49,7 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(t)
 		if !valid {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write(respBytes)
+			responseBadRequest(rw, respBytes)
 			return
 		}
 
@@ -96,9 +94,7 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(t)
 		if !valid {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write(respBytes)
+			responseBadRequest(rw, respBytes)
 			return
 		}
 
