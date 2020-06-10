@@ -1,7 +1,7 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { CardBody, Row, Col } from "reactstrap";
-import Button from 'core-components/Button';
 import Card from 'core-components/Card';
 
 const ButtonGroup = styled.div`
@@ -14,17 +14,21 @@ const LoginContainer = (props) => {
   return (
 		<>
 			<ButtonGroup>
-				<Button className="mr-4">Admin</Button>
-				<Button className="mr-4">Supervisor</Button>
+				<Link to="/" className="btn btn-secondary mr-4">
+					Admin
+				</Link>
+				<Link to="/" className="btn btn-secondary mr-4">Supervisor</Link>
 			</ButtonGroup>
 			<Card className="ml-card">
 				<CardBody>
 					<Row>
 						<Col>
 							<h1 className="card-title">Compact 32</h1>
-							<Button color="primary">Login as Operator</Button>
+							<Link to="/templates" className="btn btn-primary">
+								Login as Operator
+							</Link>
 						</Col>
-						<Col/>
+						<Col />
 					</Row>
 				</CardBody>
 			</Card>

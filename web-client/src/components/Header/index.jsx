@@ -1,14 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import imgLogo from "assets/images/mylab-logo.png";
-
-const Logo = styled.div`
-  display: flex;
-	width: 150px;
-  height: 48px;
-  align-items: center;
-  justify-content: center;
-`;
+import Logo from "shared-components/Logo";
 
 const StyledHeader = styled.header`
 	position: relative;
@@ -23,9 +15,7 @@ const StyledHeader = styled.header`
 const Header = (props) => {
 	return (
 		<StyledHeader className="ml-header">
-			<Logo className="logo">
-				<img src={imgLogo} alt="Mylab" className="w-100" />
-			</Logo>
+			<Logo />
 		</StyledHeader>
 	);
 };
