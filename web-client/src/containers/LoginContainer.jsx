@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardBody, Row, Col } from "reactstrap";
+import { CardBody } from "reactstrap";
 import Card from 'core-components/Card';
 import ButtonGroup from 'shared-components/ButtonGroup';
 import Link from 'shared-components/Link';
@@ -15,17 +15,15 @@ const LoginContainer = (props) => {
 					Supervisor
 				</Link>
 			</ButtonGroup>
-			<Card className="ml-card">
-				<CardBody>
-					<Row>
-						<Col>
-							<h1 className="card-title">Compact 32</h1>
-							<Link to="/templates" className="btn-primary">
-								Login as Operator
-							</Link>
-						</Col>
-						<Col />
-					</Row>
+			<Card className="card-login">
+				<CardBody className="d-flex scroll-y">
+					<div className="flex-100">
+						<h1 className="card-title">Compact 32</h1>
+						<Link to="/templates" className="btn-primary">
+							Login as Operator
+						</Link>
+					</div>
+					<div className="flex-100" />
 				</CardBody>
 			</Card>
 		</>
