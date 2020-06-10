@@ -7,19 +7,6 @@ const StyledCard = styled(Card)`
 	box-shadow: 0px 3px 16px #0000000f;
 	border: 1px solid #e5e5e5;
 	border-radius: 36px;
-
-	.card-body {
-		padding: 24px 48px 24px 72px;
-		overflow-x: hidden;
-		overflow-y: auto;
-	}
-
-	.card-title {
-		font-weight: normal;
-		color: #666666;
-		padding-top: 48px;
-		margin: 0 0 222px;
-	}
 `;
 
 export default StyledCard;

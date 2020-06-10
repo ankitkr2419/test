@@ -1,17 +1,21 @@
 import React from "react";
-import { Row, Col } from "reactstrap";
+import { CardBody } from "reactstrap";
 import { Step, StepItem, StepLink } from "core-components/StepBar";
 import Card from 'core-components/Card';
-import { TemplateList, TemplateListItem, Template } from "components/Template";
 import Button from 'core-components/Button';
 import Select from 'core-components/Select';
-import { TargetList, TargetListItem } from "components/Target";
 import CheckBox from "core-components/Checkbox";
+import {
+	TemplateList,
+	TemplateListItem,
+	Template,
+} from "shared-components/Template";
+import { TargetList, TargetListHeader, TargetListItem } from "shared-components/Target";
 import Text from "shared-components/Text";
 
 const TemplateListContainer = props => {
 	return (
-		<>
+		<div className="d-flex flex-column pt-4">
 			<TemplateList>
 				<TemplateListItem>
 					<Template title="Template Name" />
@@ -38,10 +42,12 @@ const TemplateListContainer = props => {
 					<Template title="Template Name" />
 				</TemplateListItem>
 			</TemplateList>
-			<Button color="primary" className="mx-auto">
-				Next
-			</Button>
-		</>
+			<div className="d-flex">
+				<Button color="primary" className="mx-auto">
+					Next
+				</Button>
+			</div>
+		</div>
 	);
 };
 
@@ -59,93 +65,104 @@ const TargetListContainer = (props) => {
 	];
 
 	return (
-		<Row className="mh-100">
-			<Col className="mh-100">
-				<TargetList className="mh-100">
-					<TargetListItem>
-						<Text tag="p" />
-						<Text tag="p" className="-target">
+		<>
+			<div className="flex-100 scroll-y p-1">
+				<TargetList className="list-target">
+					<TargetListHeader>
+						<Text tag="p" className="mb-2 mr-2" />
+						<Text tag="p" className="flex-100 mb-2 px-4">
 							Target
 						</Text>
-						<Text tag="p" className="-threshold">
+						<Text tag="p" className="flex-40 mb-2 px-4">
 							Threshold
 						</Text>
-					</TargetListItem>
+					</TargetListHeader>
 					<TargetListItem>
-						<CheckBox id="target1" />
+						<CheckBox className="mr-2" id="target1" />
 						<Select
-							wrapperClassName="-target"
+							className="flex-100 px-2"
 							options={TargetOptions}
 							placeholder=""
 						/>
 						<Select
-							wrapperClassName="-threshold"
+							className="flex-40 pl-2"
 							options={ThresholdOptions}
 							placeholder=""
 						/>
 					</TargetListItem>
 					<TargetListItem>
-						<CheckBox id="target2" />
+						<CheckBox className="mr-2" id="target2" />
 						<Select
-							wrapperClassName="-target"
+							className="flex-100 px-2"
 							options={TargetOptions}
 							placeholder=""
 						/>
 						<Select
-							wrapperClassName="-threshold"
+							className="flex-40 pl-2"
 							options={ThresholdOptions}
 							placeholder=""
 						/>
 					</TargetListItem>
 					<TargetListItem>
-						<CheckBox id="target3" />
+						<CheckBox className="mr-2" id="target3" />
 						<Select
-							wrapperClassName="-target"
+							className="flex-100 px-2"
 							options={TargetOptions}
 							placeholder=""
 						/>
 						<Select
-							wrapperClassName="-threshold"
+							className="flex-40 pl-2"
 							options={ThresholdOptions}
 							placeholder=""
 						/>
 					</TargetListItem>
 					<TargetListItem>
-						<CheckBox id="target4" />
+						<CheckBox className="mr-2" id="target4" />
 						<Select
-							wrapperClassName="-target"
+							className="flex-100 px-2"
 							options={TargetOptions}
 							placeholder=""
 						/>
 						<Select
-							wrapperClassName="-threshold"
+							className="flex-40 pl-2"
 							options={ThresholdOptions}
 							placeholder=""
 						/>
 					</TargetListItem>
 					<TargetListItem>
-						<CheckBox id="target5" />
+						<CheckBox className="mr-2" id="target5" />
 						<Select
-							wrapperClassName="-target"
+							className="flex-100 px-2"
 							options={TargetOptions}
 							placeholder=""
 						/>
 						<Select
-							wrapperClassName="-threshold"
+							className="flex-40 pl-2"
+							options={ThresholdOptions}
+							placeholder=""
+						/>
+					</TargetListItem>
+					<TargetListItem>
+						<CheckBox className="mr-2" id="target6" />
+						<Select
+							className="flex-100 px-2"
+							options={TargetOptions}
+							placeholder=""
+						/>
+						<Select
+							className="flex-40 pl-2"
 							options={ThresholdOptions}
 							placeholder=""
 						/>
 					</TargetListItem>
 				</TargetList>
-			</Col>
-			<Col sm={4}>
-				<div className="d-flex align-items-end h-100">
-					<Button color="primary" className="mx-auto" disabled>
-						Save
-					</Button>
-				</div>
-			</Col>
-		</Row>
+			</div>
+			<div className="d-flex flex-30 align-items-end p-1">
+				<Button color="primary" className="mx-auto mb-3" disabled>
+					Save
+				</Button>
+			</div>
+		</>
 	);
 };
 
@@ -160,9 +177,11 @@ const TemplateContainer = props => {
 					<StepLink to="/login">View Target</StepLink>
 				</StepItem>
 			</Step>
-			<Card className="card-template">
-				{/* <TemplateListContainer /> */}
-				<TargetListContainer />
+			<Card>
+				<CardBody className="d-flex flex-unset overflow-hidden">
+					{/* <TemplateListContainer /> */}
+					<TargetListContainer />
+				</CardBody>
 			</Card>
 		</>
 	);

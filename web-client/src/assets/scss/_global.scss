@@ -6,6 +6,10 @@ html, body {
   height: 100vh;
 }
 
+body {
+  background: $gray-97 0% 0% no-repeat padding-box;
+}
+
 #root {
   display: flex;
   flex-direction: column;
@@ -14,7 +18,7 @@ html, body {
 
 .ml-content {
   position: relative;
-  flex: 1;
+  @extend .flex-100;
   padding: rem(40px 64px);
   overflow-x: hidden;
   overflow-y: auto;
@@ -47,7 +51,7 @@ html, body {
 
 // Button
 .btn:focus, .btn.focus {
-  box-shadow: 0 2px 6px #00000029;
+  box-shadow: 0 rem(2px 6px) #00000029;
 }
 
 button:focus {
@@ -62,46 +66,40 @@ button:focus {
   color: $gray-40;
 }
 
-// Custom Checkbox
-.custom-control-input:checked ~ .custom-control-label::after {
-  background-image: none;
-  background-color: $pale;
+// Helper Classes
+.scroll-y {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-.custom-control-input:focus, .custom-control-input:focus:not(:checked) {
-
-  ~ .custom-control-label::before {
-    box-shadow: none;
-    border-color: $gray-60;
-  }
+.scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-.custom-control-label {
-  font-size: rem(18px);
-  line-height: rem(23px);
-  color: $gray-44;
-  
-  &::before {
-    width: rem(24px);
-    height: rem(24px);
-    background-color: $white;
-    border: 1px solid $gray-60;
-    top: 0;
-    border-radius: rem(4px);
+// Cards
+// Login
+.card-login {
+
+  .card-body {
+    padding: rem(24px 48px 24px 72px);
   }
 
-  &::after {
-    border-radius: rem(2px);
+  .card-title {
+		font-weight: normal;
+		color: $gray-40;
+		padding-top: rem(48px);
+		margin: 0 0 rem(222px);
+	}
+}
+
+// Target
+.list-target {
+
+  p {
+    font-size: rem(14px);
+    line-height: rem(16px);
+    color: $gray-60;
+    min-width: rem(24px);
   }
-}
-
-.custom-control-input:checked ~ .custom-control-label::before,
-.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
-  background-color: $white;
-  border-color: $gray-60;
-}
-
-// Template scss
-.card-template {
-  padding: rem(48px 60px);
 }

@@ -20,8 +20,9 @@ const customStyles = {
 const StyledSelect = (props) => {
 	return (
 		<Select
+			menuPosition="fixed"
 			styles={customStyles}
-			className={`ml-select ${props.wrapperClassName}`}
+			className={props.className}
 			{...props}
 		/>
 	);
