@@ -15,7 +15,7 @@ import Text from "shared-components/Text";
 
 const TemplateListContainer = props => {
 	return (
-		<div className="d-flex flex-column pt-4">
+		<div className="d-flex flex-100 flex-column pt-4">
 			<TemplateList>
 				<TemplateListItem>
 					<Template title="Template Name" />
