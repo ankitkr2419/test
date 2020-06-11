@@ -1,6 +1,5 @@
 import React from "react";
 import { CardBody } from "reactstrap";
-import { Step, StepItem, StepLink } from "core-components/StepBar";
 import Card from 'core-components/Card';
 import Button from 'core-components/Button';
 import Select from 'core-components/Select';
@@ -11,6 +10,7 @@ import {
 	Template,
 } from "shared-components/Template";
 import { TargetList, TargetListHeader, TargetListItem } from "shared-components/Target";
+import { Step, StepItem, StepLink } from "shared-components/StepBar";
 import Text from "shared-components/Text";
 
 const TemplateListContainer = props => {
