@@ -2,7 +2,8 @@ import React from "react";
 import { CardBody } from "reactstrap";
 import Card from 'core-components/Card';
 import { Step, StepItem, StepLink } from "shared-components/StepBar";
-import { TemplateListContainer } from "components/Template";
+import Stage from "components/Stage";
+// import { TemplateListContainer } from "components/Template";
 // import { TargetListContainer } from "components/Target";
 
 const Steps = [
@@ -36,8 +37,9 @@ const TemplateContainer = props => {
 			</Step>
 			<Card>
 				<CardBody className="d-flex flex-unset overflow-hidden p-0">
-					<TemplateListContainer />
+					{/* <TemplateListContainer /> */}
 					{/* <TargetListContainer /> */}
+					<Stage />
 				</CardBody>
 			</Card>
 		</div>

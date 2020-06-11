@@ -1,0 +1,31 @@
+@import "../../assets/scss/core";
+
+.table {
+  margin: 0;
+
+  th, td {
+    line-height: 1.25;
+    color: $gray-44;
+
+    &:first-child {
+      padding-left: rem(56px);
+    }
+
+    &:last-child {
+      padding-right: rem(56px);
+    }
+  }
+
+  thead th {
+    font-size: rem(14px);
+    border-top: 0 none;
+    vertical-align: middle;
+    padding: rem(32px 16px);
+  }
+
+  tbody td{
+      font-size: rem(18px);
+    vertical-align: middle;
+    padding: rem(16px);
+  }
+}
