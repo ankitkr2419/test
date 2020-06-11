@@ -30,6 +30,8 @@ Logo.propTypes = {
 	isSmall: PropTypes.bool,
 };
 
-Logo.defaultProps = {};
+Logo.defaultProps = {
+	isSmall: false
+};
 
 export default Logo;

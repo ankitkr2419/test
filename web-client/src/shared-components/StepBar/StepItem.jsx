@@ -24,4 +24,6 @@ StepItem.propTypes = {
 	isDisable: PropTypes.bool,
 };
 
-StepItem.defaultProps = {};
+StepItem.defaultProps = {
+	isDisable: false
+};
