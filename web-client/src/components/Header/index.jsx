@@ -9,6 +9,14 @@ const Header = styled.header`
 	padding: 16px 48px;
 	box-shadow: 0 4px 16px #00000029;
 	z-index: 1;
+
+	.btn-exit {
+		color: #707070;
+
+		i {
+			font-size: 32px;
+		}
+	}
 `;
 
 export default Header;
