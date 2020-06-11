@@ -88,7 +88,7 @@ export const TargetListContainer = (props) => {
 
 	return (
 		<>
-			<div className="flex-100 scroll-y p-1">
+			<div className="flex-100 scroll-y p-4">
 				<TargetList className="list-target">
 					<TargetListHeader>
 						<Text className="mb-2 mr-2" />
@@ -112,7 +112,7 @@ export const TargetListContainer = (props) => {
 					))}
 				</TargetList>
 			</div>
-			<div className="d-flex flex-30 align-items-end p-1">
+			<div className="d-flex flex-30 align-items-end p-4">
 				<Button color="primary" className="mx-auto mb-3" disabled>
 					Save
 				</Button>
