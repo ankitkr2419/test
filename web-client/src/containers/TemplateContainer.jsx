@@ -69,11 +69,11 @@ const TargetListContainer = (props) => {
 			<div className="flex-100 scroll-y p-1">
 				<TargetList className="list-target">
 					<TargetListHeader>
-						<Text tag="p" className="mb-2 mr-2" />
-						<Text tag="p" className="flex-100 mb-2 px-4">
+						<Text className="mb-2 mr-2" />
+						<Text className="flex-100 mb-2 px-4">
 							Target
 						</Text>
-						<Text tag="p" className="flex-40 mb-2 px-4">
+						<Text className="flex-40 mb-2 px-4">
 							Threshold
 						</Text>
 					</TargetListHeader>
@@ -179,8 +179,8 @@ const TemplateContainer = props => {
 			</Step>
 			<Card>
 				<CardBody className="d-flex flex-unset overflow-hidden">
-					{/* <TemplateListContainer /> */}
-					<TargetListContainer />
+					<TemplateListContainer />
+					{/* <TargetListContainer /> */}
 				</CardBody>
 			</Card>
 		</>

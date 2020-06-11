@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import ButtonIcon from "shared-components/ButtonIcon";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
@@ -49,4 +50,16 @@ export const Template = (props) => {
 			{props.isDeletable && props.isActive ? <BtnDelete /> : ""}
 		</StyledTemplate>
 	);
+};
+
+Template.propTypes = {
+	isActive: PropTypes.bool,
+	isEditable: PropTypes.bool,
+	isDeletable: PropTypes.bool,
+};
+
+Template.defaultProps = {
+	isActive: false,
+	isEditable: false,
+	isDeletable: false,
 };

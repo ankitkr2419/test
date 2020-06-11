@@ -6,6 +6,7 @@ const StyledIcon = styled.i`
 	line-height: 1.1875;
 `;
 
+//* Important: Refer "_fonts.scss" for icon names
 const Icon = (props) => {
   return(
     <StyledIcon className={`icon-${props.name}`} />
