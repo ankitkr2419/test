@@ -62,8 +62,28 @@ a:focus, button:focus {
   color: $white;
 }
 
+.btn-outline-primary:not(:disabled):not(.disabled):active, 
+.btn-outline-primary:not(:disabled):not(.disabled).active, 
+.show > .btn-outline-primary.dropdown-toggle, 
+.btn-outline-primary:hover, 
+.btn-outline-primary.disabled, 
+.btn-outline-primary:disabled {
+  color: $white;
+}
+
 .btn-secondary, .btn-secondary.disabled, .btn-secondary:disabled {
   color: $gray-40;
+}
+
+.btn-outline-secondary {
+  border-color: $gray-85;
+  color: $gray-44;
+}
+
+.btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
+  border-color: $gray-85;
+  color: $gray-44;
+  opacity: 0.35;
 }
 
 // Helper Classes

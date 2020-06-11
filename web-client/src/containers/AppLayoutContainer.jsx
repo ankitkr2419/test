@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Redirect, Link } from "react-router-dom";
 import RouteWithSubRoutes from "RouteHelper";
 import Header from "components/Header";
 import Logo from "shared-components/Logo";
@@ -9,6 +9,8 @@ import {
 	NavItem,
 	NavLink,
 } from "core-components/Nav";
+import Button from "core-components/Button";
+import Icon from "shared-components/Icon";
 
 const AppLayoutContainer = (props) => {
   // AppLayoutContainer Will contain headers, sub-headers, notification etc.
@@ -29,10 +31,22 @@ const AppLayoutContainer = (props) => {
 						<NavLink to="/activity">Activity Log</NavLink>
 					</NavItem>
 				</Nav>
+				<Button
+					color="secondary"
+					size="sm"
+					className="ml-auto mr-5"
+					outline
+					disabled
+				>
+					Run
+				</Button>
+				<Link to="/" className="d-flex btn-exit text-decoration-none ml-2">
+					<Icon name="cross" />
+				</Link>
 			</Header>
 			<section className="ml-content">
 				<Switch>
-					<Redirect exact from='/' to='/login' />
+					<Redirect exact from="/" to="/login" />
 					{routes.map((route) => {
 						return <RouteWithSubRoutes key={route.key} {...route} />;
 					})}
