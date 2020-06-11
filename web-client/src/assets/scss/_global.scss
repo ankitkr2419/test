@@ -23,7 +23,7 @@ body {
 }
 
 // Page Content Class
-.template-content, .login-content {
+.template-content, .login-content, .activity-content {
   position: relative;
   @extend .flex-100;
   padding: rem(40px 64px);
