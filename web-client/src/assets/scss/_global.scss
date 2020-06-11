@@ -17,22 +17,18 @@ body {
 }
 
 .ml-content {
+  @extend .flex-100;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+// Page Content Class
+.template-content, .login-content {
   position: relative;
   @extend .flex-100;
   padding: rem(40px 64px);
   overflow-x: hidden;
   overflow-y: auto;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: $gray-97 0% 0% no-repeat padding-box;
-    z-index: -2;
-  }
 
   &::after {
     content: "";

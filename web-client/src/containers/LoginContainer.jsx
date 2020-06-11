@@ -6,7 +6,7 @@ import Link from 'shared-components/Link';
 
 const LoginContainer = (props) => {
   return (
-		<>
+		<div className="login-content">
 			<ButtonGroup>
 				<Link to="/" className="btn-secondary mr-4">
 					Admin
@@ -26,7 +26,7 @@ const LoginContainer = (props) => {
 					<div className="flex-100" />
 				</CardBody>
 			</Card>
-		</>
+		</div>
 	);
 };
 

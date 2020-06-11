@@ -168,7 +168,7 @@ const TargetListContainer = (props) => {
 
 const TemplateContainer = props => {
   return (
-		<>
+		<div className="template-content">
 			<Step>
 				<StepItem>
 					<StepLink href="/templates">Template</StepLink>
@@ -179,11 +179,11 @@ const TemplateContainer = props => {
 			</Step>
 			<Card>
 				<CardBody className="d-flex flex-unset overflow-hidden">
-					<TemplateListContainer />
-					{/* <TargetListContainer /> */}
+					{/* <TemplateListContainer /> */}
+					<TargetListContainer />
 				</CardBody>
 			</Card>
-		</>
+		</div>
 	);
 };
 
