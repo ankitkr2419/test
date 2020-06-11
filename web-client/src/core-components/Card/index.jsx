@@ -7,6 +7,10 @@ const StyledCard = styled(Card)`
 	box-shadow: 0px 3px 16px #0000000f;
 	border: 1px solid #e5e5e5;
 	border-radius: 36px;
+
+	.card-body {
+		border-radius: 36px;
+	}
 `;
 
 export default StyledCard;
