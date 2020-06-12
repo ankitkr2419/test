@@ -36,7 +36,7 @@ export const fetchTemplatesFailed = (errorResponse) => ({
 });
 
 export const updateTemplate = (templateID, body) => ({
-  type: updateTemplateActions.updateTemplate,
+  type: updateTemplateActions.updateAction,
   payload: {
     templateID,
     body,
@@ -59,7 +59,7 @@ export const deleteTemplate = (templateID) => ({
 });
 
 export const deleteTemplateFailed = (errorResponse) => ({
-  type: deleteTemplateActions.deleteTemplateFailed,
+  type: deleteTemplateActions.failureAction,
   payload: {
     ...errorResponse,
     error: true,

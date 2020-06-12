@@ -11,7 +11,7 @@ import {
   fetchTemplatesFailed,
   updateTemplateFailed,
   deleteTemplateFailed,
-} from "actionCreators/templateActionCreators";
+} from "action-creators/templateActionCreators";
 import { HTTP_METHODS } from "../constants";
 // WIP Mock testing
 // import listJson from 'mockJson/listTemplates'
