@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -49,16 +48,11 @@ func (s *pgStore) ListTemplateTargets(ctx context.Context, templateID uuid.UUID)
 
 func (s *pgStore) UpsertTemplateTarget(ctx context.Context, t []TemplateTarget, temp_id uuid.UUID) (createdTT []TemplateTarget, err error) {
 
-	stmt, args := makeQuery(t)
+	stmt := makeQuery(t)
 
-	// prepare query approach used as to avoid repetitive parse analysis work, optimizes bulk insert
-	st, err := s.db.Prepare(stmt)
-	if err != nil {
-		logger.WithField("error in prep query", err.Error()).Error("Query Failed")
-		return
-	}
-
-	_, err = st.Exec(args...)
+	_, err = s.db.Exec(
+		stmt,
+	)
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
@@ -73,37 +67,18 @@ func (s *pgStore) UpsertTemplateTarget(ctx context.Context, t []TemplateTarget, 
 }
 
 // prepare bulk insert query statement
-func makeQuery(tt []TemplateTarget) (string, []interface{}) {
+func makeQuery(tt []TemplateTarget) string {
 
 	values := make([]string, 0, len(tt))
-	args := make([]interface{}, 0, len(tt)*3)
 
 	for _, t := range tt {
-		values = append(values, "(?, ?, ?)")
-		args = append(args, t.TemplateID, t.TargetID, t.Threshold)
+		// single quotes used to insert uuid
+		values = append(values, fmt.Sprintf("('%v', '%v',%v)", t.TemplateID, t.TargetID, t.Threshold))
 	}
 
 	stmt := fmt.Sprintf(upsertTempTargetQuery1+" %s",
 		strings.Join(values, ","))
 
-	stmt = replaceSQL(stmt, "(?, ?, ?)", len(values))
-
 	stmt += upsertTempTargetQuery2
-	return stmt, args
-}
-
-func replaceSQL(stmt, pattern string, len int) string {
-	pattern += ","
-	n := 0
-
-	// for loop exits when all ? replaced by $n
-	for strings.IndexByte(stmt, '?') != -1 {
-		n++
-		param := "$" + strconv.Itoa(n)
-		stmt = strings.Replace(stmt, "?", param, 1)
-	}
-
-	// trim last comma from stmt
-	stmt = strings.TrimSuffix(stmt, ",)")
 	return stmt
 }
