@@ -3,29 +3,68 @@
 .table {
   margin: 0;
 
+  tbody tr {
+    transition: all 0.25s ease;
+
+    &.active {
+      background: #FFFFFF 0% 0% no-repeat padding-box;
+      box-shadow: rem(0 0 16px) #00000029;
+      transition: all 0.25s ease;
+
+      td.td-actions {
+        opacity: 1;
+        pointer-events: all;
+        transition: all 0.3s ease;
+      }
+    }
+  }
+
   th, td {
-    line-height: 1.25;
     color: $gray-44;
 
     &:first-child {
-      padding-left: rem(56px);
-    }
-
-    &:last-child {
-      padding-right: rem(56px);
+      padding-left: rem(48px);
     }
   }
 
   thead th {
     font-size: rem(14px);
+    line-height: rem(17px);
     border-top: 0 none;
     vertical-align: middle;
-    padding: rem(32px 16px);
+    padding: rem(24px 16px);
   }
 
   tbody td{
-      font-size: rem(18px);
+    font-size: rem(18px);
+    line-height: rem(23px);
     vertical-align: middle;
-    padding: rem(16px);
+    padding: rem(18px 16px);
+
+    &.td-actions {
+      padding: rem(8px 16px);
+    }
+  }
+
+  .td-actions {
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    text-align: right;
+
+    button {
+      display: inline-flex;
+      background-color: $pale;
+      border-color: $pale;
+      box-shadow: none;
+
+      + button {
+        margin-left: rem(24px);
+      }
+
+      i {
+        font-size: rem(32px);
+      }
+    }
   }
 }

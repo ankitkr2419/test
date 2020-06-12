@@ -2,11 +2,12 @@ import React from "react";
 import { CardBody } from "reactstrap";
 import Card from 'core-components/Card';
 import { Step, StepItem, StepLink } from "shared-components/StepBar";
-import Stage from "components/Stage";
 // import { TemplateListContainer } from "components/Template";
 // import { TargetListContainer } from "components/Target";
+// import Stage from "components/Stage";
+import Steps from "components/Steps";
 
-const Steps = [
+const StepList = [
 	{
 		name: "Template",
 		disable: false,
@@ -29,7 +30,7 @@ const TemplateContainer = props => {
   return (
 		<div className="template-content">
 			<Step>
-				{Steps.map((step, i) => (
+				{StepList.map((step, i) => (
 					<StepItem key={i} isDisable={step.disable}>
 						<StepLink>{step.name}</StepLink>
 					</StepItem>
@@ -39,7 +40,8 @@ const TemplateContainer = props => {
 				<CardBody className="d-flex flex-unset overflow-hidden p-0">
 					{/* <TemplateListContainer /> */}
 					{/* <TargetListContainer /> */}
-					<Stage />
+					{/* <Stage /> */}
+					<Steps />
 				</CardBody>
 			</Card>
 		</div>
