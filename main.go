@@ -1,8 +1,9 @@
 package main
 
-// @APITitle Main
-// @APIDescription Main API for Microservices in Go!
-
+// API REST CPAGENT
+//     Schemes: https
+//     Host: localhost:8080
+//     Version: 0.1.0
 import (
 	"fmt"
 	"mylab/cpagent/config"

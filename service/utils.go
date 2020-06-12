@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -46,5 +47,12 @@ func parseUUID(s string) (validUUID uuid.UUID, err error) {
 		return
 	}
 
+	return
+}
+
+func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
+	rw.Header().Add("Content-Type", "application/json")
+	rw.WriteHeader(http.StatusBadRequest)
+	rw.Write(respBytes)
 	return
 }

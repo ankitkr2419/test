@@ -9,9 +9,15 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func listTemplateHandler(deps Dependencies) http.HandlerFunc {
+func listStagesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		t, err := deps.Store.ListTemplates(req.Context())
+		vars := mux.Vars(req)
+		template_id, err := parseUUID(vars["template_id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		t, err := deps.Store.ListStages(req.Context(), template_id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -20,7 +26,7 @@ func listTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		respBytes, err := json.Marshal(t)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling templates data")
+			logger.WithField("err", err.Error()).Error("Error marshaling stages data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -31,19 +37,19 @@ func listTemplateHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-// @Title createTemplateHandler
-// @Description Create createTemplateHandler
-// @Router /template [post]
+// @Title createStageHandler
+// @Description Create createStageHandler
+// @Router /stage [post]
 // @Accept  json
 // @Success 200 {object}
 // @Failure 400 {object}
-func createTemplateHandler(deps Dependencies) http.HandlerFunc {
+func createStageHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var t db.Template
+		var t db.Stage
 		err := json.NewDecoder(req.Body).Decode(&t)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding template data")
+			logger.WithField("err", err.Error()).Error("Error while decoding stage data")
 			return
 		}
 
@@ -53,8 +59,8 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var createdTemp db.Template
-		createdTemp, err = deps.Store.CreateTemplate(req.Context(), t)
+		var createdTemp db.Stage
+		createdTemp, err = deps.Store.CreateStage(req.Context(), t)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error create target")
@@ -74,7 +80,7 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
+func updateStageHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -83,12 +89,12 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var t db.Template
+		var t db.Stage
 
 		err = json.NewDecoder(req.Body).Decode(&t)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding template data")
+			logger.WithField("err", err.Error()).Error("Error while decoding stage data")
 			return
 		}
 
@@ -100,20 +106,20 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		t.ID = id
 
-		err = deps.Store.UpdateTemplate(req.Context(), t)
+		err = deps.Store.UpdateStage(req.Context(), t)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update template")
+			logger.WithField("err", err.Error()).Error("Error update stage")
 			return
 		}
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte("template updated successfully"))
+		rw.Write([]byte("stage updated successfully"))
 	})
 }
 
-func showTemplateHandler(deps Dependencies) http.HandlerFunc {
+func showStageHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
@@ -123,18 +129,18 @@ func showTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var latestT db.Template
+		var latestT db.Stage
 
-		latestT, err = deps.Store.ShowTemplate(req.Context(), id)
+		latestT, err = deps.Store.ShowStage(req.Context(), id)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error show template")
+			logger.WithField("err", err.Error()).Error("Error show stage")
 			return
 		}
 
 		respBytes, err := json.Marshal(latestT)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling template data")
+			logger.WithField("err", err.Error()).Error("Error marshaling stage data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -145,7 +151,7 @@ func showTemplateHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
+func deleteStageHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -154,9 +160,9 @@ func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Store.DeleteTemplate(req.Context(), id)
+		err = deps.Store.DeleteStage(req.Context(), id)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while deleting template")
+			logger.WithField("err", err.Error()).Error("Error while deleting stage")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}

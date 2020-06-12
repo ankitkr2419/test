@@ -97,6 +97,8 @@ func (s *pgStore) ShowTemplate(ctx context.Context, id uuid.UUID) (dbTemp Templa
 }
 
 func (s *pgStore) DeleteTemplate(ctx context.Context, id uuid.UUID) (err error) {
+
+	// TBD: add delete cascade here
 	result, err := s.db.Exec(
 		deleteTemplateQuery,
 		id,
