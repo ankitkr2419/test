@@ -1,12 +1,13 @@
 import React from 'react';
 import Table from 'core-components/Table';
 import { Button as IconButton } from 'reactstrap';
+import Button from "core-components/Button";
 import Icon from 'shared-components/Icon';
 import {
 	TableWrapper,
 	TableWrapperFooter,
 } from "shared-components/TableWrapper";
-import Button from "core-components/Button";
+import ButtonIcon from "shared-components/ButtonIcon";
 
 const StageList = [
 	{
@@ -46,12 +47,20 @@ const Stage = props => {
 		<div className="d-flex flex-column flex-100">
 			<TableWrapper>
 				<Table striped>
+					<colgroup>
+						<col width="17%" />
+						<col width="17%" />
+						<col width="19%" />
+						<col width="17%" />
+						<col />
+					</colgroup>
 					<thead>
 						<tr>
 							<th>Stage</th>
 							<th>Type</th>
 							<th>Repeat Count</th>
 							<th>Steps</th>
+							<th />
 						</tr>
 					</thead>
 					<tbody>
@@ -61,6 +70,17 @@ const Stage = props => {
 								<td>{stage.type}</td>
 								<td>{stage.count}</td>
 								<td>{stage.steps}</td>
+								<td className="td-actions">
+									<ButtonIcon>
+										<Icon name="steps" />
+									</ButtonIcon>
+									<ButtonIcon>
+										<Icon name="pencil" />
+									</ButtonIcon>
+									<ButtonIcon>
+										<Icon name="trash" />
+									</ButtonIcon>
+								</td>
 							</tr>
 						))}
 					</tbody>
