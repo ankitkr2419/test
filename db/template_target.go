@@ -13,12 +13,6 @@ const (
 	getTempTargetListQuery = `SELECT * FROM template_targets
 		where template_id = $1`
 
-	updateTempTargetQuery = `UPDATE template_targets SET
-		threshold = $1
-		WHERE template_id = $2 and target_id = $3`
-
-	deleteTempTargetQuery = `DELETE FROM template_targets WHERE template_id = $1 and target_id = $2`
-
 	upsertTempTargetQuery1 = `INSERT INTO template_targets (
 		template_id,
 		target_id,
