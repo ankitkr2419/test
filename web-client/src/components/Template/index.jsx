@@ -61,11 +61,11 @@ export const TemplateListContainer = (props) => {
 	return (
 		<div className="d-flex flex-100 flex-column p-4 mt-3">
 			<TemplateList>
-        {Templates.map((template, i) => 
-            <TemplateListItem key={i}>
-              <Template title={template.name} isActive={template.active} isEditable={template.editable} isDeletable={template.deletable} />
-            </TemplateListItem>
-        )}
+				{Templates.map((template, i) => 
+					<TemplateListItem key={i}>
+						<Template title={template.name} isActive={template.active} isEditable={template.editable} isDeletable={template.deletable} />
+					</TemplateListItem>
+				)}
 			</TemplateList>
 			<div className="d-flex">
 				<Button color="primary" className="mx-auto">

@@ -1,15 +1,23 @@
-import styled from "styled-components";
-import { NavLink } from "reactstrap";
+import React from "react";
+import PropTypes from "prop-types";
+import classNames from 'classnames';
+import { NavLink } from "react-router-dom";
+import "./StepLink.scss";
 
-export const StepLink = styled(NavLink)`
-	font-size: 16px;
-	line-height: 24px;
-	color: #707070;
-	padding: 8px 0;
-	border-radius: 4px;
+export const StepLink = (props) => {
+	
+	const stepLinkClass = classNames("step-link", props.className);
 
-	&:hover,
-	&:focus {
-		color: #707070;
+	if(props.tag === "a") {
+		return <NavLink {...props} className={stepLinkClass} />;
 	}
-`;
+	return <props.tag {...props} className={stepLinkClass} />;
+};
+
+StepLink.propTypes = {
+	tag: PropTypes.oneOf(["a", "button"]),
+};
+
+StepLink.defaultProps = {
+	tag: "button",
+};

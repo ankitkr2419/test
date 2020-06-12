@@ -13,15 +13,15 @@ const Steps = [
 	},
 	{
 		name: "View Target",
-		disable: false,
+		disable: true,
 	},
 	{
 		name: "Add Stage",
-		disable: false,
+		disable: true,
 	},
 	{
 		name: "Add Step",
-		disable: false,
+		disable: true,
 	},
 ];
 
@@ -31,7 +31,7 @@ const TemplateContainer = props => {
 			<Step>
 				{Steps.map((step, i) => (
 					<StepItem key={i} isDisable={step.disable}>
-						<StepLink href="/">{step.name}</StepLink>
+						<StepLink>{step.name}</StepLink>
 					</StepItem>
 				))}
 			</Step>

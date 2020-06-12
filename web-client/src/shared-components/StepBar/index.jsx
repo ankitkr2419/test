@@ -1,3 +1,5 @@
+import StepLink from "./StepLink";
+
 export { Step } from "./Step";
-export { StepLink } from "./StepLink";
 export { StepItem } from "./StepItem";
+export { StepLink } from "./StepLink";
