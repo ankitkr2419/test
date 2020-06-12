@@ -11,38 +11,38 @@ import PlateContainer from "containers/PlateContainer";
 import ActivityContainer from "containers/ActivityContainer";
 
 export const routeDefinitions = [
-					{
-						path: ROOT_URL_PATH,
-						component: AppLayoutContainer,
-						key: 1,
-						routes: [
-							{
-								path: `${ROOT_URL_PATH}templates`,
-								exact: true,
-								component: TemplateContainer,
-								key: 2,
-							},
-							{
-								path: `${ROOT_URL_PATH}login`,
-								exact: true,
-								component: LoginContainer,
-								key: 2,
-							},
-							{
-								path: `${ROOT_URL_PATH}plate`,
-								exact: true,
-								component: PlateContainer,
-								key: 2,
-							},
-							{
-								path: `${ROOT_URL_PATH}activity`,
-								exact: true,
-								component: ActivityContainer,
-								key: 2,
-							},
-						],
-					},
-				];;
+	{
+		path: ROOT_URL_PATH,
+		component: AppLayoutContainer,
+		key: 1,
+		routes: [
+			{
+				path: `${ROOT_URL_PATH}templates`,
+				exact: true,
+				component: TemplateContainer,
+				key: 2,
+			},
+			{
+				path: `${ROOT_URL_PATH}login`,
+				exact: true,
+				component: LoginContainer,
+				key: 2,
+			},
+			{
+				path: `${ROOT_URL_PATH}plate`,
+				exact: true,
+				component: PlateContainer,
+				key: 2,
+			},
+			{
+				path: `${ROOT_URL_PATH}activity`,
+				exact: true,
+				component: ActivityContainer,
+				key: 2,
+			},
+		],
+	},
+];
 
 const Routes = props => {
   const routesList = props.routesList || routeDefinitions;
