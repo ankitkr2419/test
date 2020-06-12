@@ -51,10 +51,10 @@ export const updateStageFailed = (errorResponse) => ({
   },
 });
 
-export const deleteStage = (templateID) => ({
+export const deleteStage = (stageID) => ({
   type: deleteStageActions.deleteAction,
   payload: {
-    templateID,
+    stageID,
   },
 });
 
