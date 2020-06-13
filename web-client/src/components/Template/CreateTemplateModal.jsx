@@ -21,9 +21,13 @@ const CreateTemplateModal = (props) => {
 	return (
 		<>
 			<Button color="primary" onClick={toggleCreateTemplateModal}>
-				Add
+				Create New
 			</Button>
-			<Modal isOpen={createTemplateModal} toggle={toggleCreateTemplateModal} centered>
+			<Modal
+				isOpen={createTemplateModal}
+				toggle={toggleCreateTemplateModal}
+				centered
+			>
 				<ModalBody>
 					<Text tag="h4" className="modal-title">
 						Create New Template
