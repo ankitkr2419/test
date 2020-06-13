@@ -76,7 +76,7 @@ const AddStageModal = props => {
 							</Col>
 						</Row>
 						<ButtonGroup className="text-center p-0 m-0 pt-5">
-							<Button color="primary">Add</Button>
+							<Button color="primary" disabled>Add</Button>
 						</ButtonGroup>
 					</Form>
 				</ModalBody>
