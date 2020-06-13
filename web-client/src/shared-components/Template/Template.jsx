@@ -26,7 +26,13 @@ const StyledTemplate = styled.div`
 
 const BtnEdit = (props) => {
 	return (
-		<ButtonIcon position="absolute" placement="left" left="16">
+		<ButtonIcon
+			position="absolute"
+			placement="left"
+			left="16"
+			isShadow
+			className="text-reset"
+		>
 			<Icon name="pencil" />
 		</ButtonIcon>
 	);
@@ -34,7 +40,13 @@ const BtnEdit = (props) => {
 
 const BtnDelete = (props) => {
 	return (
-		<ButtonIcon position="absolute" placement="right" right="16">
+		<ButtonIcon
+			position="absolute"
+			placement="right"
+			right="16"
+			isShadow
+			className="text-reset"
+		>
 			<Icon name="trash" />
 		</ButtonIcon>
 	);
