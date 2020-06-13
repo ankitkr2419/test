@@ -1,9 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Redirect, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Redirect } from "react-router-dom";
 import RouteWithSubRoutes from "RouteHelper";
 import Header from "components/Header";
 import Logo from "shared-components/Logo";
-import "../assets/scss/default.scss";
 import {
 	Nav,
 	NavItem,
@@ -11,6 +10,8 @@ import {
 } from "core-components/Nav";
 import Button from "core-components/Button";
 import Icon from "shared-components/Icon";
+import Link from "shared-components/Link";
+import "../assets/scss/default.scss";
 
 const AppLayoutContainer = (props) => {
   // AppLayoutContainer Will contain headers, sub-headers, notification etc.
@@ -40,7 +41,7 @@ const AppLayoutContainer = (props) => {
 				>
 					Run
 				</Button>
-				<Link to="/" className="d-flex btn-exit text-decoration-none ml-2">
+				<Link to="/" className="ml-2" isIcon>
 					<Icon name="cross" />
 				</Link>
 			</Header>
