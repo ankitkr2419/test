@@ -19,6 +19,7 @@ const Icon = (props) => {
 
 Icon.propTypes = {
   name: PropTypes.string.isRequired,
+  size: PropTypes.number,
 };
 
 

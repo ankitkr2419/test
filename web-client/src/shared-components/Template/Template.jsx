@@ -33,7 +33,7 @@ const BtnEdit = (props) => {
 			isShadow
 			className="text-reset"
 		>
-			<Icon size="28" name="pencil" />
+			<Icon size={28} name="pencil" />
 		</ButtonIcon>
 	);
 };
@@ -47,7 +47,7 @@ const BtnDelete = (props) => {
 			isShadow
 			className="text-reset"
 		>
-			<Icon size="28" name="trash" />
+			<Icon size={28} name="trash" />
 		</ButtonIcon>
 	);
 };

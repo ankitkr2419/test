@@ -72,13 +72,13 @@ const Stage = props => {
 								<td>{stage.steps}</td>
 								<td className="td-actions">
 									<ButtonIcon>
-										<Icon size="28" name="steps" />
+										<Icon size={28} name="steps" />
 									</ButtonIcon>
 									<ButtonIcon>
-										<Icon size="28" name="pencil" />
+										<Icon size={28} name="pencil" />
 									</ButtonIcon>
 									<ButtonIcon>
-										<Icon size="28" name="trash" />
+										<Icon size={28} name="trash" />
 									</ButtonIcon>
 								</td>
 							</tr>

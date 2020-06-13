@@ -29,7 +29,7 @@ const AddStageModal = props => {
 				className="btn-plus p-0"
 				onClick={toggleStageModal}
 			>
-				<Icon size="40" name="plus-2" />
+				<Icon size={40} name="plus-2" />
 			</IconButton>
 			<Modal isOpen={stageModal} toggle={toggleStageModal} centered>
 				<ModalBody>
