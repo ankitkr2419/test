@@ -4,8 +4,8 @@ import Card from 'core-components/Card';
 import { Step, StepItem, StepLink } from "shared-components/StepBar";
 // import { TemplateListContainer } from "components/Template";
 // import { TargetListContainer } from "components/Target";
-import Stage from "components/Stage";
-// import Steps from "components/Steps";
+// import Stage from "components/Stage";
+import Steps from "components/Steps";
 
 const StepList = [
 	{
@@ -40,8 +40,8 @@ const TemplateContainer = props => {
 				<CardBody className="d-flex flex-unset overflow-hidden p-0">
 					{/* <TemplateListContainer /> */}
 					{/* <TargetListContainer /> */}
-					<Stage />
-					{/* <Steps /> */}
+					{/* <Stage /> */}
+					<Steps />
 				</CardBody>
 			</Card>
 		</div>

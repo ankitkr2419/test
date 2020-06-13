@@ -1,6 +1,5 @@
 import React from "react";
 import Table from "core-components/Table";
-import { Button as IconButton } from "reactstrap";
 import Icon from "shared-components/Icon";
 import {
 	TableWrapper,
@@ -8,6 +7,7 @@ import {
 	TableWrapperFooter,
 } from "shared-components/TableWrapper";
 import ButtonIcon from "shared-components/ButtonIcon";
+import AddStepModal from "./AddStepModal";
 
 const StepList = [
 	{
@@ -109,9 +109,7 @@ const Steps = (props) => {
 					</Table>
 				</TableWrapperBody>
 				<TableWrapperFooter>
-					<IconButton color="primary" className="btn-plus p-0">
-						<Icon size="40" name="plus-2" />
-					</IconButton>
+					<AddStepModal />
 				</TableWrapperFooter>
 			</TableWrapper>
 		</div>

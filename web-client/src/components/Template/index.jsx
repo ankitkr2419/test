@@ -5,6 +5,8 @@ import {
 	TemplateListItem,
 	Template,
 } from "shared-components/Template";
+import ButtonGroup from "shared-components/ButtonGroup";
+import CreateTemplateModal from "./CreateTemplateModal";
 
 const Templates = [
 	{
@@ -67,11 +69,12 @@ export const TemplateListContainer = (props) => {
 					</TemplateListItem>
 				)}
 			</TemplateList>
-			<div className="d-flex">
-				<Button color="primary" className="mx-auto">
+			<ButtonGroup className="text-center">
+				<Button color="primary">
 					Next
 				</Button>
-			</div>
+				<CreateTemplateModal />
+			</ButtonGroup>
 		</div>
 	);
 };
