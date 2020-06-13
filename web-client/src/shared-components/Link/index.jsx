@@ -40,8 +40,6 @@ const StyledLink = styled(Link)`
 			justify-content: center;
 
 			i {
-				font-size: 32px;
-				line-height: 1;
 				color: #707070;
 			}
 		`};

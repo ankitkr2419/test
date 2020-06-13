@@ -10,11 +10,6 @@ export const TableWrapperFooter = styled.div`
   margin-top: auto;
 
   .btn-plus {
-    padding: 0 4px;
     border-radius: 8px;
-
-    i {
-      font-size: 40px;
-    }
   }
 `;
