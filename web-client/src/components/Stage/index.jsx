@@ -1,6 +1,5 @@
 import React from 'react';
 import Table from 'core-components/Table';
-import { Button as IconButton } from 'reactstrap';
 import Button from "core-components/Button";
 import Icon from 'shared-components/Icon';
 import {
@@ -8,6 +7,7 @@ import {
 	TableWrapperFooter,
 } from "shared-components/TableWrapper";
 import ButtonIcon from "shared-components/ButtonIcon";
+import AddStageModal from './AddStageModal';
 
 const StageList = [
 	{
@@ -72,13 +72,13 @@ const Stage = props => {
 								<td>{stage.steps}</td>
 								<td className="td-actions">
 									<ButtonIcon>
-										<Icon name="steps" />
+										<Icon size="28" name="steps" />
 									</ButtonIcon>
 									<ButtonIcon>
-										<Icon name="pencil" />
+										<Icon size="28" name="pencil" />
 									</ButtonIcon>
 									<ButtonIcon>
-										<Icon name="trash" />
+										<Icon size="28" name="trash" />
 									</ButtonIcon>
 								</td>
 							</tr>
@@ -86,9 +86,7 @@ const Stage = props => {
 					</tbody>
 				</Table>
 				<TableWrapperFooter>
-					<IconButton color="primary" className="btn-plus">
-						<Icon name="plus-3" />
-					</IconButton>
+					<AddStageModal />
 					<Button color="primary" className="ml-auto">
 						Save
 					</Button>
