@@ -57,13 +57,10 @@
       background-color: $pale;
       border-color: $pale;
       box-shadow: none;
+      color: $white;
 
       + button {
         margin-left: rem(24px);
-      }
-
-      i {
-        font-size: rem(32px);
       }
     }
   }
