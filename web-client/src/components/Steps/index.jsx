@@ -97,10 +97,10 @@ const Steps = (props) => {
 									<td>{step.data_capture}</td>
 									<td className="td-actions">
 										<ButtonIcon>
-											<Icon size="28" name="pencil" />
+											<Icon size={28} name="pencil" />
 										</ButtonIcon>
 										<ButtonIcon>
-											<Icon size="28" name="trash" />
+											<Icon size={28} name="trash" />
 										</ButtonIcon>
 									</td>
 								</tr>
