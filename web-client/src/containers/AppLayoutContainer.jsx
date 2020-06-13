@@ -42,7 +42,7 @@ const AppLayoutContainer = (props) => {
 					Run
 				</Button>
 				<Link to="/" className="ml-2" isIcon>
-					<Icon name="cross" />
+					<Icon size="32" name="cross" />
 				</Link>
 			</Header>
 			<section className="ml-content">

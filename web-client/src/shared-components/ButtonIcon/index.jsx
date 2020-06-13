@@ -30,11 +30,6 @@ const StyledButtonIcon = styled.button`
 		props.placement === "left"
 			? `${props.left}px`
 			: ""};
-
-	i {
-		font-size: 28px;
-		line-height: 1;
-	}
 `;
 
 const ButtonIcon = props => {
