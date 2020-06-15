@@ -1,6 +1,5 @@
 import React from "react";
 import Table from "core-components/Table";
-import Icon from "shared-components/Icon";
 import {
 	TableWrapper,
 	TableWrapperBody,
@@ -96,12 +95,8 @@ const Steps = (props) => {
 									<td>{step.hold_time}</td>
 									<td>{step.data_capture}</td>
 									<td className="td-actions">
-										<ButtonIcon>
-											<Icon size={28} name="pencil" />
-										</ButtonIcon>
-										<ButtonIcon>
-											<Icon size={28} name="trash" />
-										</ButtonIcon>
+										<ButtonIcon size={28} name="pencil" />
+										<ButtonIcon size={28} name="trash" />
 									</td>
 								</tr>
 							))}

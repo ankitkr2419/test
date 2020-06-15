@@ -71,15 +71,9 @@ const Stage = props => {
 								<td>{stage.count}</td>
 								<td>{stage.steps}</td>
 								<td className="td-actions">
-									<ButtonIcon>
-										<Icon size={28} name="steps" />
-									</ButtonIcon>
-									<ButtonIcon>
-										<Icon size={28} name="pencil" />
-									</ButtonIcon>
-									<ButtonIcon>
-										<Icon size={28} name="trash" />
-									</ButtonIcon>
+									<ButtonIcon size={28} name="steps" />
+									<ButtonIcon size={28} name="pencil" />
+									<ButtonIcon size={28} name="trash" />
 								</td>
 							</tr>
 						))}

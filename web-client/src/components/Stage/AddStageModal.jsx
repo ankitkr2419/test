@@ -30,12 +30,12 @@ const AddStageModal = props => {
 					<ButtonIcon
 						position="absolute"
 						placement="right"
-						top="24"
-						right="32"
+						top={24}
+						right={32}
+						size={32}
+						name="cross"
 						onClick={toggleStageModal}
-					>
-						<Icon size={32} name="cross" />
-					</ButtonIcon>
+					/>
 					<Form>
 						<Row form className="mb-5 pb-5">
 							<Col sm={4}>
