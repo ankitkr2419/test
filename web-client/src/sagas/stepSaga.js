@@ -13,7 +13,6 @@ import {
   deleteStepFailed,
 } from "action-creators/stepActionCreators";
 import { HTTP_METHODS } from "../constants";
-import { addStageActions } from "actions/stageActions";
 
 export function* addStep(actions) {
   const {
@@ -104,7 +103,7 @@ export function* deleteStep(actions) {
 }
 
 export function* addStageSaga() {
-  yield takeEvery(addStageActions.addAction, addStep);
+  yield takeEvery(addStepActions.addAction, addStep);
 }
 
 export function* fetchStagesSaga() {
