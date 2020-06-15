@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Button as IconButton } from "reactstrap";
 import { Modal, ModalBody } from "core-components/Modal";
 import { Row, Col } from "core-components/Grid";
 import Form from "core-components/Form";
@@ -18,15 +17,11 @@ const AddStageModal = props => {
   const [stageModal, setStageModal] = useState(false);
   const toggleStageModal = () => setStageModal(!stageModal);
 
-  return (
+  return (	
 		<>
-			<IconButton
-				color="primary"
-				className="btn-plus p-0"
-				onClick={toggleStageModal}
-			>
+			<Button color="primary" isIcon onClick={toggleStageModal}>
 				<Icon size={40} name="plus-2" />
-			</IconButton>
+			</Button>
 			<Modal isOpen={stageModal} toggle={toggleStageModal} centered>
 				<ModalBody>
 					<Text tag="h4" className="modal-title">

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Button as IconButton } from "reactstrap";
 import { Modal, ModalBody } from "core-components/Modal";
 import { Row, Col } from "core-components/Grid";
 import Form from "core-components/Form";
@@ -18,13 +17,9 @@ const AddStepModal = (props) => {
 
 	return (
 		<>
-			<IconButton
-				color="primary"
-				className="btn-plus p-0"
-				onClick={toggleStepModal}
-			>
+			<Button color="primary" isIcon onClick={toggleStepModal}>
 				<Icon size={40} name="plus-2" />
-			</IconButton>
+			</Button>
 			<Modal isOpen={stageModal} toggle={toggleStepModal} centered>
 				<ModalBody>
 					<Text tag="h4" className="modal-title">

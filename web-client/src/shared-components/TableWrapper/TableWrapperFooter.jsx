@@ -8,8 +8,4 @@ export const TableWrapperFooter = styled.div`
   border: 1px solid #e5e5e5;
   padding: 8px 16px;
   margin-top: auto;
-
-  .btn-plus {
-    border-radius: 8px;
-  }
 `;
