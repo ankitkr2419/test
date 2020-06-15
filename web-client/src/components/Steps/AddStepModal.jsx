@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
 	Button as IconButton,
-	ModalBody,
 	Form,
 	Row,
 	Col,
@@ -9,7 +8,7 @@ import {
 	Label,
 	Input,
 } from "reactstrap";
-import Modal from "core-components/Modal";
+import { Modal, ModalBody } from "core-components/Modal";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
 import ButtonClose from "shared-components/ButtonClose";

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-	ModalBody,
 	Form,
 	Row,
 	Col,
@@ -8,7 +7,7 @@ import {
 	Label,
 	Input,
 } from "reactstrap";
-import Modal from "core-components/Modal";
+import { Modal, ModalBody } from "core-components/Modal";
 import Text from "shared-components/Text";
 import ButtonClose from "shared-components/ButtonClose";
 import Button from "core-components/Button";
