@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import {
-	Form,
-	FormGroup,
-	Label,
-	Input,
-} from "reactstrap";
 import { Modal, ModalBody } from "core-components/Modal";
 import { Row, Col} from "core-components/Grid";
+import Form from "core-components/Form";
+import FormGroup from "core-components/FormGroup";
+import Label from "core-components/Label";
+import Input from "core-components/Input";
+import Button from "core-components/Button";
 import Text from "shared-components/Text";
 import ButtonClose from "shared-components/ButtonClose";
-import Button from "core-components/Button";
 import ButtonGroup from "shared-components/ButtonGroup";
 
 const CreateTemplateModal = (props) => {

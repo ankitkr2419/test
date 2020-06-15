@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import {
-	Button as IconButton,
-	Form,
-	FormGroup,
-	Label,
-	Input,
-} from "reactstrap";
+import { Button as IconButton } from "reactstrap";
 import { Modal, ModalBody } from "core-components/Modal";
 import { Row, Col } from "core-components/Grid";
+import Form from "core-components/Form";
+import FormGroup from "core-components/FormGroup";
+import Label from "core-components/Label";
+import Input from "core-components/Input";
+import Button from "core-components/Button";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
 import ButtonClose from "shared-components/ButtonClose";
-import Button from "core-components/Button";
 import ButtonGroup from "shared-components/ButtonGroup";
 
 const AddStepModal = (props) => {
@@ -52,7 +50,7 @@ const AddStepModal = (props) => {
 										id="ramp_rate"
 										placeholder="Type here"
 									/>
-									<Text tag="label">unit °C</Text>
+									<Label>unit °C</Label>
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -66,7 +64,7 @@ const AddStepModal = (props) => {
 										id="target_temperature"
 										placeholder="Type here"
 									/>
-									<Text tag="label">unit °C</Text>
+									<Label>unit °C</Label>
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -80,7 +78,7 @@ const AddStepModal = (props) => {
 										id="hold_time"
 										placeholder="Type here"
 									/>
-									<Text tag="label">unit seconds</Text>
+									<Label>unit seconds</Label>
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -94,7 +92,7 @@ const AddStepModal = (props) => {
 										id="data_capture"
 										placeholder="Type here"
 									/>
-									<Text tag="label">boolean flag</Text>
+									<Label>boolean flag</Label>
 								</FormGroup>
 							</Col>
 						</Row>
