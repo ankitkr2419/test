@@ -8,8 +8,8 @@ import Input from "core-components/Input";
 import Button from "core-components/Button";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
-import ButtonClose from "shared-components/ButtonClose";
 import ButtonGroup from "shared-components/ButtonGroup";
+import ButtonIcon from "shared-components/ButtonIcon";
 
 const AddStepModal = (props) => {
 	const [stageModal, setStepModal] = useState(false);
@@ -25,13 +25,15 @@ const AddStepModal = (props) => {
 					<Text tag="h4" className="modal-title">
 						Add Step
 					</Text>
-					<ButtonClose
+					<ButtonIcon
 						position="absolute"
 						placement="right"
 						top="24"
 						right="32"
 						onClick={toggleStepModal}
-					/>
+					>
+						<Icon size={32} name="cross" />
+					</ButtonIcon>
 					<Form>
 						<Row form className="mb-5 pb-5">
 							<Col sm={3}>

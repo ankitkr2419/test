@@ -9,15 +9,15 @@ import Select from "core-components/Select";
 import Button from "core-components/Button";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
-import ButtonClose from "shared-components/ButtonClose";
 import ButtonGroup from "shared-components/ButtonGroup";
+import ButtonIcon from "shared-components/ButtonIcon";
 
 const AddStageModal = props => {
   
   const [stageModal, setStageModal] = useState(false);
   const toggleStageModal = () => setStageModal(!stageModal);
 
-  return (	
+  return (
 		<>
 			<Button color="primary" isIcon onClick={toggleStageModal}>
 				<Icon size={40} name="plus-2" />
@@ -27,13 +27,15 @@ const AddStageModal = props => {
 					<Text tag="h4" className="modal-title">
 						Add Stage
 					</Text>
-					<ButtonClose
+					<ButtonIcon
 						position="absolute"
 						placement="right"
 						top="24"
 						right="32"
 						onClick={toggleStageModal}
-					/>
+					>
+						<Icon size={32} name="cross" />
+					</ButtonIcon>
 					<Form>
 						<Row form className="mb-5 pb-5">
 							<Col sm={4}>
@@ -67,7 +69,9 @@ const AddStageModal = props => {
 							</Col>
 						</Row>
 						<ButtonGroup className="text-center p-0 m-0 pt-5">
-							<Button color="primary" disabled>Add</Button>
+							<Button color="primary" disabled>
+								Add
+							</Button>
 						</ButtonGroup>
 					</Form>
 				</ModalBody>
