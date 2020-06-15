@@ -1,6 +1,5 @@
 import React from "react";
-import { CardBody } from "reactstrap";
-import Card from 'core-components/Card';
+import { Card, CardBody } from 'core-components/Card';
 import { Step, StepItem, StepLink } from "shared-components/StepBar";
 // import { TemplateListContainer } from "components/Template";
 // import { TargetListContainer } from "components/Target";
