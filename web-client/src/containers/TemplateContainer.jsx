@@ -1,22 +1,50 @@
-import React from 'react';
-import { Step, StepItem, StepLink } from "core-components/StepBar";
+import React from "react";
+import { CardBody } from "reactstrap";
 import Card from 'core-components/Card';
+import { Step, StepItem, StepLink } from "shared-components/StepBar";
+// import { TemplateListContainer } from "components/Template";
+// import { TargetListContainer } from "components/Target";
+// import Stage from "components/Stage";
+import Steps from "components/Steps";
+
+const StepList = [
+	{
+		name: "Template",
+		disable: false,
+	},
+	{
+		name: "View Target",
+		disable: true,
+	},
+	{
+		name: "Add Stage",
+		disable: true,
+	},
+	{
+		name: "Add Step",
+		disable: true,
+	},
+];
 
 const TemplateContainer = props => {
   return (
-		<>
+		<div className="template-content">
 			<Step>
-				<StepItem>
-					<StepLink to="/templates">Template</StepLink>
-				</StepItem>
-				<StepItem>
-					<StepLink to="/login" isDisabled>
-						View Target
-					</StepLink>
-				</StepItem>
+				{StepList.map((step, i) => (
+					<StepItem key={i} isDisable={step.disable}>
+						<StepLink>{step.name}</StepLink>
+					</StepItem>
+				))}
 			</Step>
-			<Card></Card>
-		</>
+			<Card>
+				<CardBody className="d-flex flex-unset overflow-hidden p-0">
+					{/* <TemplateListContainer /> */}
+					{/* <TargetListContainer /> */}
+					{/* <Stage /> */}
+					<Steps />
+				</CardBody>
+			</Card>
+		</div>
 	);
 };
 

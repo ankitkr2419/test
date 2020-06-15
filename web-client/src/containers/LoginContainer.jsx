@@ -1,34 +1,32 @@
-import React from 'react';
-import styled from "styled-components";
-import { CardBody, Row, Col } from "reactstrap";
-import Button from 'core-components/Button';
-import Card from 'core-components/Card';
-
-const ButtonGroup = styled.div`
-	margin: 0 0 40px 0;
-	text-align: right;
-	padding: 0 24px 0 24px;
-`;
+import React from "react";
+import { CardBody } from "reactstrap";
+import Card from "core-components/Card";
+import ButtonGroup from "shared-components/ButtonGroup";
+import Link from "shared-components/Link";
 
 const LoginContainer = (props) => {
   return (
-		<>
+		<div className="login-content">
 			<ButtonGroup>
-				<Button className="mr-4">Admin</Button>
-				<Button className="mr-4">Supervisor</Button>
+				<Link to="/" className="btn-secondary mr-4">
+					Admin
+				</Link>
+				<Link to="/" className="btn-secondary mr-4">
+					Supervisor
+				</Link>
 			</ButtonGroup>
-			<Card className="ml-card">
-				<CardBody>
-					<Row>
-						<Col>
-							<h1 className="card-title">Compact 32</h1>
-							<Button color="primary">Login as Operator</Button>
-						</Col>
-						<Col/>
-					</Row>
+			<Card className="card-login">
+				<CardBody className="d-flex scroll-y">
+					<div className="flex-100">
+						<h1 className="card-title">Compact 32</h1>
+						<Link to="/templates" className="btn-primary">
+							Login as Operator
+						</Link>
+					</div>
+					<div className="flex-100" />
 				</CardBody>
 			</Card>
-		</>
+		</div>
 	);
 };
 

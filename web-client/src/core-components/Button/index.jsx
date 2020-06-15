@@ -2,22 +2,16 @@ import styled from "styled-components";
 import { Button } from "reactstrap";
 
 const StyledButton = styled(Button)`
-	width: 202px;
+	width: ${(props) => (props.size === "sm" ? "" : "202px")};
+	min-width: ${(props) => (props.size === "sm" ? "84px" : "")};
 	height: 40px;
 	font-size: 16px;
 	line-height: 19px;
-	font-weight: bold;
-	padding: 10px 20px;
+	font-weight: ${(props) => (props.outline ? "normal" : "bold")};
+	padding: ${(props) => (props.size === "sm" ? "8px 24px" : "10px 20px")};
 	border-radius: 27px;
-	box-shadow: 0 2px 6px #00000029;
-
-	&.btn-primary {
-		color: white;
-	}
-
-	&.btn-secondary {
-		color: #666666;
-	}
+	box-shadow: ${(props) => (props.outline ? "none" : "0 2px 6px #00000029")};
+	border-width: ${(props) => (props.outline ? "2px" : "")};
 `;
 
 export default StyledButton;

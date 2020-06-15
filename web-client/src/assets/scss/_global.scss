@@ -6,34 +6,29 @@ html, body {
   height: 100vh;
 }
 
+body {
+  background: $gray-97 0% 0% no-repeat padding-box;
+}
+
 #root {
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-// Button
-.btn:focus, .btn.focus {
-  box-shadow: 0 2px 6px #00000029;
+.ml-content {
+  @extend .flex-100;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-.ml-content {
+// Page Content Class
+.template-content, .login-content, .activity-content {
   position: relative;
-  flex: 1;
+  @extend .flex-100;
   padding: rem(40px 64px);
   overflow-x: hidden;
   overflow-y: auto;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: $gray-97 0% 0% no-repeat padding-box;
-    z-index: -2;
-  }
 
   &::after {
     content: "";
@@ -42,22 +37,108 @@ html, body {
     right: 0;
     left: 0;
     height: rem(225px);
-    background: transparent -moz-linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
-    background: transparent -webkit-linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
-    background: transparent linear-gradient(110deg, #AEDBD5 0%, #F2BB7B 58%, #F3811F 100%) 0% 0% no-repeat padding-box;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#aedbd5",endColorstr="#f3811f",GradientType=1);
+    background: transparent -moz-linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+    background: transparent -webkit-linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+    background: transparent linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="$pale",endColorstr="$tango",GradientType=1);
     z-index: -1;
   }
 }
 
-.ml-card {
+// Button
+.btn:focus, .btn.focus {
+  box-shadow: 0 rem(2px 6px) #00000029;
+}
+
+a:focus, button:focus {
+  outline: none;
+}
+
+.btn-primary, .btn-primary.disabled, .btn-primary:disabled {
+  color: $white;
+}
+
+.btn-outline-primary:not(:disabled):not(.disabled):active, 
+.btn-outline-primary:not(:disabled):not(.disabled).active, 
+.show > .btn-outline-primary.dropdown-toggle, 
+.btn-outline-primary:hover, 
+.btn-outline-primary.disabled, 
+.btn-outline-primary:disabled {
+  color: $white;
+}
+
+.btn-secondary, .btn-secondary.disabled, .btn-secondary:disabled {
+  color: $gray-40;
+}
+
+.btn-outline-secondary {
+  border-color: $gray-85;
+  color: $gray-44;
+}
+
+.btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
+  border-color: $gray-85;
+  color: $gray-44;
+  opacity: 0.35;
+}
+
+// Form
+label, .control-label {
+  font-size: rem(14px);
+  line-height: rem(16px);
+  font-weight: normal;
+  color: $gray-40;
+  padding: 0 rem(12px);
+}
+
+.form-control {
+  padding: rem(4px 10px);
+}
+
+.form-row {
+  margin-right: rem(-8px);
+  margin-left: rem(-8px);
+
+  > .col, > [class*="col-"] {
+    padding-right: rem(8px);
+    padding-left: rem(8px);
+  }
+}
+
+// Helper Classes
+.scroll-y {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+// Cards
+// Login
+.card-login {
+
+  .card-body {
+    padding: rem(24px 48px 24px 72px);
+  }
 
   .card-title {
-    font-size: rem(41px);
-    line-height: rem(49px);
-    font-weight: normal;
-    color: $gray-40;
-    padding-top: rem(48px);
-    margin: rem(0 0 222px);
+		font-weight: normal;
+		color: $gray-40;
+		padding-top: rem(48px);
+		margin: 0 0 rem(222px);
+	}
+}
+
+// Target
+.list-target {
+
+  p {
+    font-size: rem(14px);
+    line-height: rem(16px);
+    color: $gray-60;
+    min-width: rem(24px);
   }
 }
