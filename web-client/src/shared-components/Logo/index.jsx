@@ -6,32 +6,35 @@ import imgLogo from "assets/images/mylab-logo.png";
 import imgSymbol from "assets/images/mylab-symbol.png";
 
 const StyledLogo = styled(Link)`
-	display: flex;
-	width: ${(props) => (props.isSmall ? "58px" : "150px")};
-	height: 48px;
-	align-items: center;
-	justify-content: center;
-	margin: ${(props) => (props.isSmall ? "0 12px" : "")};
+  display: flex;
+  width: ${(props) => (props.size === "sm" ? "58px" : "150px")};
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  margin: ${(props) => (props.size === "sm" ? "0 12px" : "")};
 `;
 
 const Logo = (props) => {
-	return (
-		<StyledLogo {...props} to="/" className="logo">
-			{props.isSmall ? (
-				<img src={imgSymbol} alt="Mylab" className="h-100" />
-			) : (
-				<img src={imgLogo} alt="Mylab" className="w-100" />
-			)}
-		</StyledLogo>
-	);
+  const { isSmall } = props;
+  const size = isSmall ? "sm" : "lg";
+
+  return (
+    <StyledLogo size={size} to="/" className="logo">
+      {isSmall ? (
+        <img src={imgSymbol} alt="Mylab" className="h-100" />
+      ) : (
+        <img src={imgLogo} alt="Mylab" className="w-100" />
+      )}
+    </StyledLogo>
+  );
 };
 
 Logo.propTypes = {
-	isSmall: PropTypes.bool,
+  isSmall: PropTypes.bool,
 };
 
 Logo.defaultProps = {
-	isSmall: false
+  isSmall: false,
 };
 
 export default Logo;

@@ -30,7 +30,7 @@ const TemplateContainer = props => {
 		<div className="template-content">
 			<Step>
 				{StepList.map((step, i) => (
-					<StepItem key={i} isDisable={step.disable}>
+					<StepItem key={i} disabled={step.disable}>
 						<StepLink>{step.name}</StepLink>
 					</StepItem>
 				))}
