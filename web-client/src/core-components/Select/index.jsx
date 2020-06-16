@@ -1,6 +1,5 @@
 import React from "react";
 import Select from "react-select";
-import "./Select.scss";
 
 const customStyles = {
 	singleValue: (provided, state) => {

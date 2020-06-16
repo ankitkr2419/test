@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import { Modal, ModalBody } from "core-components/Modal";
-import { Row, Col} from "core-components/Grid";
-import Form from "core-components/Form";
-import FormGroup from "core-components/FormGroup";
-import Label from "core-components/Label";
-import Input from "core-components/Input";
-import Button from "core-components/Button";
+import { Button, Form, FormGroup, Row, Col, Input, Label, Modal, ModalBody } from "core-components";
 import Text from "shared-components/Text";
 import ButtonGroup from "shared-components/ButtonGroup";
 import ButtonIcon from "shared-components/ButtonIcon";
@@ -23,9 +17,10 @@ const CreateTemplateModal = (props) => {
 				isOpen={createTemplateModal}
 				toggle={toggleCreateTemplateModal}
 				centered
+				size="lg"
 			>
 				<ModalBody>
-					<Text tag="h4" className="modal-title">
+					<Text tag="h4" className="modal-title text-center text-truncate font-weight-bold">
 						Create New Template
 					</Text>
 					<ButtonIcon

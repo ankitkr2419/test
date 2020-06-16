@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { Modal, ModalBody } from "core-components/Modal";
-import { Row, Col } from "core-components/Grid";
-import Form from "core-components/Form";
-import FormGroup from "core-components/FormGroup";
-import Label from "core-components/Label";
-import Input from "core-components/Input";
-import Button from "core-components/Button";
+import {
+	Button,
+	Form,
+	FormGroup,
+	Row,
+	Col,
+	Input,
+	Label,
+	Modal,
+	ModalBody,
+} from "core-components";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
 import ButtonGroup from "shared-components/ButtonGroup";

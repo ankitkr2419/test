@@ -1,6 +1,5 @@
 import React from "react";
-import Table from "core-components/Table";
-import Button from "core-components/Button";
+import { Button, Table } from "core-components";
 import {
 	TableWrapper,
 	TableWrapperFooter,
