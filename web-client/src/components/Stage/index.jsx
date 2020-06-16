@@ -1,13 +1,11 @@
-import React from 'react';
-import Table from 'core-components/Table';
-import Button from "core-components/Button";
-import Icon from 'shared-components/Icon';
+import React from "react";
+import { Button, Table } from "core-components";
 import {
 	TableWrapper,
 	TableWrapperFooter,
 } from "shared-components/TableWrapper";
 import ButtonIcon from "shared-components/ButtonIcon";
-import AddStageModal from './AddStageModal';
+import AddStageModal from "./AddStageModal";
 
 const StageList = [
 	{
@@ -71,15 +69,9 @@ const Stage = props => {
 								<td>{stage.count}</td>
 								<td>{stage.steps}</td>
 								<td className="td-actions">
-									<ButtonIcon>
-										<Icon size={28} name="steps" />
-									</ButtonIcon>
-									<ButtonIcon>
-										<Icon size={28} name="pencil" />
-									</ButtonIcon>
-									<ButtonIcon>
-										<Icon size={28} name="trash" />
-									</ButtonIcon>
+									<ButtonIcon size={28} name="steps" />
+									<ButtonIcon size={28} name="pencil" />
+									<ButtonIcon size={28} name="trash" />
 								</td>
 							</tr>
 						))}

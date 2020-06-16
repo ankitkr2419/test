@@ -1,21 +1,20 @@
 import React, { useState } from "react";
 import {
-	Button as IconButton,
-	ModalBody,
+	Button,
 	Form,
+	FormGroup,
 	Row,
 	Col,
-	FormGroup,
+	Input,
 	Label,
-	Input
-} from "reactstrap";
-import Modal from "core-components/Modal";
+	Modal,
+	ModalBody,
+	Select,
+} from "core-components";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
-import ButtonClose from "shared-components/ButtonClose";
-import Select from "core-components/Select";
-import Button from "core-components/Button";
 import ButtonGroup from "shared-components/ButtonGroup";
+import ButtonIcon from "shared-components/ButtonIcon";
 
 const AddStageModal = props => {
   
@@ -24,23 +23,24 @@ const AddStageModal = props => {
 
   return (
 		<>
-			<IconButton
-				color="primary"
-				className="btn-plus p-0"
-				onClick={toggleStageModal}
-			>
+			<Button color="primary" isIcon onClick={toggleStageModal}>
 				<Icon size={40} name="plus-2" />
-			</IconButton>
-			<Modal isOpen={stageModal} toggle={toggleStageModal} centered>
+			</Button>
+			<Modal isOpen={stageModal} toggle={toggleStageModal} centered size="lg">
 				<ModalBody>
-					<Text tag="h4" className="modal-title">
+					<Text
+						tag="h4"
+						className="modal-title text-center text-truncate font-weight-bold"
+					>
 						Add Stage
 					</Text>
-					<ButtonClose
+					<ButtonIcon
 						position="absolute"
 						placement="right"
-						top="24"
-						right="32"
+						top={24}
+						right={32}
+						size={32}
+						name="cross"
 						onClick={toggleStageModal}
 					/>
 					<Form>
@@ -76,7 +76,9 @@ const AddStageModal = props => {
 							</Col>
 						</Row>
 						<ButtonGroup className="text-center p-0 m-0 pt-5">
-							<Button color="primary" disabled>Add</Button>
+							<Button color="primary" disabled>
+								Add
+							</Button>
 						</ButtonGroup>
 					</Form>
 				</ModalBody>

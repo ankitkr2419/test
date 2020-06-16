@@ -3,12 +3,7 @@ import { BrowserRouter as Router, Switch, Redirect } from "react-router-dom";
 import RouteWithSubRoutes from "RouteHelper";
 import Header from "components/Header";
 import Logo from "shared-components/Logo";
-import {
-	Nav,
-	NavItem,
-	NavLink,
-} from "core-components/Nav";
-import Button from "core-components/Button";
+import { Button, Nav, NavItem, NavLink } from "core-components";
 import Icon from "shared-components/Icon";
 import Link from "shared-components/Link";
 import "../assets/scss/default.scss";

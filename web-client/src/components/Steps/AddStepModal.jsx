@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import {
-	Button as IconButton,
-	ModalBody,
+	Button,
 	Form,
+	FormGroup,
 	Row,
 	Col,
-	FormGroup,
-	Label,
 	Input,
-} from "reactstrap";
-import Modal from "core-components/Modal";
+	Label,
+	Modal,
+	ModalBody,
+} from "core-components";
 import Icon from "shared-components/Icon";
 import Text from "shared-components/Text";
-import ButtonClose from "shared-components/ButtonClose";
-import Button from "core-components/Button";
 import ButtonGroup from "shared-components/ButtonGroup";
+import ButtonIcon from "shared-components/ButtonIcon";
 
 const AddStepModal = (props) => {
 	const [stageModal, setStepModal] = useState(false);
@@ -22,23 +21,21 @@ const AddStepModal = (props) => {
 
 	return (
 		<>
-			<IconButton
-				color="primary"
-				className="btn-plus p-0"
-				onClick={toggleStepModal}
-			>
+			<Button color="primary" isIcon onClick={toggleStepModal}>
 				<Icon size={40} name="plus-2" />
-			</IconButton>
-			<Modal isOpen={stageModal} toggle={toggleStepModal} centered>
+			</Button>
+			<Modal isOpen={stageModal} toggle={toggleStepModal} centered size="lg">
 				<ModalBody>
-					<Text tag="h4" className="modal-title">
+					<Text tag="h4" className="modal-title text-center text-truncate font-weight-bold">
 						Add Step
 					</Text>
-					<ButtonClose
+					<ButtonIcon
 						position="absolute"
 						placement="right"
-						top="24"
-						right="32"
+						top={24}
+						right={32}
+						size={32}
+						name="cross"
 						onClick={toggleStepModal}
 					/>
 					<Form>
@@ -54,7 +51,7 @@ const AddStepModal = (props) => {
 										id="ramp_rate"
 										placeholder="Type here"
 									/>
-									<Text tag="label">unit °C</Text>
+									<Label>unit °C</Label>
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -68,7 +65,7 @@ const AddStepModal = (props) => {
 										id="target_temperature"
 										placeholder="Type here"
 									/>
-									<Text tag="label">unit °C</Text>
+									<Label>unit °C</Label>
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -82,7 +79,7 @@ const AddStepModal = (props) => {
 										id="hold_time"
 										placeholder="Type here"
 									/>
-									<Text tag="label">unit seconds</Text>
+									<Label>unit seconds</Label>
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -96,7 +93,7 @@ const AddStepModal = (props) => {
 										id="data_capture"
 										placeholder="Type here"
 									/>
-									<Text tag="label">boolean flag</Text>
+									<Label>boolean flag</Label>
 								</FormGroup>
 							</Col>
 						</Row>
