@@ -114,6 +114,32 @@ func (d *Simulator) Stop() (err error) {
 	return
 }
 
+func (d *Simulator) simulate() {
+	//set wells with goals
+	d.setWells()
+
+	//start holding stage
+	d.holdingStage()
+
+	for {
+		select {
+		case msg := <-d.exitCh:
+			if msg == "stop" {
+				d.errCh <- errors.New("PCR Stopped")
+				return
+			}
+			if msg == "abort" {
+				//TBD
+			}
+			if msg == "pause" {
+				//TBD
+			}
+		default:
+			d.cycleStage()
+		}
+	}
+}
+
 func (d *Simulator) setWells() {
 	// Reading simulator configurations
 	//env := config.ReadEnvInt("environment") - TBD
@@ -172,33 +198,6 @@ func (d *Simulator) setWells() {
 		d.wells = append(d.wells, well)
 		i++
 	}
-}
-
-func (d *Simulator) simulate() {
-	//set wells with goals
-	d.setWells()
-
-	//start holding stage
-	d.holdingStage()
-
-	for {
-		select {
-		case msg := <-d.exitCh:
-			if msg == "stop" {
-				d.errCh <- errors.New("PCR Stopped")
-				return
-			}
-			if msg == "abort" {
-				//TBD
-			}
-			if msg == "pause" {
-				//TBD
-			}
-		default:
-			d.cycleStage()
-		}
-	}
-
 }
 
 // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
