@@ -2,6 +2,7 @@ package simulator
 
 import (
 	"errors"
+	"mylab/cpagent/config"
 	"mylab/cpagent/plc"
 	"sync"
 	"time"
@@ -9,13 +10,20 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+type Well struct {
+	// emissions plc.Emissions // dye emmissions.
+	control string    // "", positive, negative, internal or no_template
+	goals   [6]string // "", "high", "low"
+}
+
 type Simulator struct {
 	sync.RWMutex
 	plcIO     plcRegistors
 	config    plc.Stage
 	emissions []plc.Emissions
 	exitCh    chan string
-	ExitCh    chan error
+	errCh     chan error
+	wells     []Well
 }
 
 func NewSimulator(exit chan error) plc.Driver {
@@ -23,7 +31,7 @@ func NewSimulator(exit chan error) plc.Driver {
 
 	s := Simulator{}
 	s.exitCh = ex
-	s.ExitCh = exit
+	s.errCh = exit
 	s.pcrHeartBeat()
 	return &s
 }
@@ -60,7 +68,7 @@ func (d *Simulator) HeartBeat() {
 
 		// something went wrong. Signal parent process
 		logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-		d.ExitCh <- err
+		d.errCh <- err
 		return
 	}()
 }
@@ -106,21 +114,78 @@ func (d *Simulator) Stop() (err error) {
 	return
 }
 
+func (d *Simulator) setWells() {
+	// Reading simulator configurations
+	//env := config.ReadEnvInt("environment") - TBD
+
+	// wells count
+	wc := config.ReadEnvInt("wells.count")
+
+	// controls
+	pc := config.ReadEnvInt("controls.positive")
+	nc := config.ReadEnvInt("controls.negative")
+	ic := config.ReadEnvInt("controls.internal")
+	ntc := config.ReadEnvInt("controls.no_template")
+
+	/* TBD, the logic needs to be optimised, too many conditions,
+	also by this logic pcr wont run only with control wells - need to fix */
+	for i := 1; i <= wc; {
+		well := Well{}
+
+		if i == pc {
+			well.control = "positive"
+			for i := 0; i < 6; i++ {
+				well.goals[i] = "high"
+			}
+			wc++ // incrementing well count as it is control well
+		} else if i == nc {
+			well.control = "negative"
+			for i := 0; i < 6; i++ {
+				well.goals[i] = ""
+			}
+			wc++
+		} else if i == ic {
+			well.control = "internal"
+			well.goals = [6]string{"", "", "", "", "", "high"} //TODO: discuss
+
+			wc++
+		} else if i == ntc {
+			well.control = "no_template"
+			for i := 0; i < 6; i++ {
+				well.goals[i] = "0"
+			}
+			wc++
+		} else {
+			well.control = "" // patient sample
+
+			for i := 0; i < 6; i++ {
+				switch goal := jitter(0, 1, 4); goal { // randomization of goals
+				case 1:
+					well.goals[i] = "" // negative
+				case 2:
+					well.goals[i] = "high"
+				case 3:
+					well.goals[i] = "low"
+				}
+			}
+		}
+		d.wells = append(d.wells, well)
+		i++
+	}
+}
+
 func (d *Simulator) simulate() {
-	var wg sync.WaitGroup
-	wg.Add(1)
+	//set wells with goals
+	d.setWells()
 
 	//start holding stage
-	d.holdingStage(&wg)
-
-	//wait until holding stage is over
-	wg.Wait()
+	d.holdingStage()
 
 	for {
 		select {
 		case msg := <-d.exitCh:
 			if msg == "stop" {
-				d.ExitCh <- errors.New("PCR Stopped")
+				d.errCh <- errors.New("PCR Stopped")
 				return
 			}
 			if msg == "abort" {
