@@ -3,6 +3,7 @@ $lime-green: #3FC13A;
 $burnt-sienna: #F06666;
 $pale: #AEDBD5;
 $tacao: #F2BB7B;
+$ink-blue: #3C70FF;
 
 $gray-98: #FAFAFA;
 $gray-97: #F8F8F8;
@@ -35,6 +36,8 @@ $theme-colors: map-merge(
   ),
   $theme-colors
 );
+
+$link-color: $ink-blue;
 
 $input-placeholder-color: rgba($gray-44, 0.45);
 $input-border-color: $gray-90;

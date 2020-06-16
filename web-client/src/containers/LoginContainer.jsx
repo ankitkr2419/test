@@ -21,7 +21,7 @@ const LoginContainer = (props) => {
 							Login as Operator
 						</Link>
 					</div>
-					<div className="flex-100" />
+					<Login />
 				</CardBody>
 			</Card>
 		</div>
