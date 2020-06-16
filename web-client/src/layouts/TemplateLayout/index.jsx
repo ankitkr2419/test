@@ -3,6 +3,7 @@ import React, { useCallback, useReducer } from 'react';
 import { CardBody } from 'reactstrap';
 import { Card } from 'core-components';
 import Wizard from 'shared-components/Wizard';
+import { TargetListContainer } from 'components/Target';
 import TemplateContainer from 'containers/TemplateContainer';
 import templateLayoutReducer, {
 	templateInitialState,
@@ -17,16 +18,14 @@ const TemplateLayout = (props) => {
 	);
 
 	// Here we have stored id for active widget
-	const activeWidgetID = templateLayoutState
-		.get('wizardList')
-		.find(obj => obj.get('isDisable') === false).get('id');
+	const activeWidgetID = templateLayoutState.get('activeWidgetID');
 
 	// Wizard click handler
-	const onWizardIemClicked = useCallback((selectedWizard) => {
+	const updateSelectedWizard = useCallback((selectedWizard) => {
 		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_ACTIVE_WIDGET,
-			value: 'stage',
+			value: selectedWizard,
 		});
 	}, []);
 
@@ -34,12 +33,15 @@ const TemplateLayout = (props) => {
 		<div className="template-content">
 			<Wizard
 				list={templateLayoutState.get('wizardList')}
-				onClickHandler={onWizardIemClicked}
+				onClickHandler={updateSelectedWizard}
 			/>
 			<Card>
 				{/* TODO move CardBody to core-components */}
 				<CardBody className="d-flex flex-unset overflow-hidden p-0">
-					{activeWidgetID === 'template' && <TemplateContainer />}
+					{activeWidgetID === 'template' && (
+						<TemplateContainer updateSelectedWizard={updateSelectedWizard} />
+					)}
+					{activeWidgetID === 'target' && <TargetListContainer />}
 					{/* <TargetListContainer /> */}
 					{/* <Stage /> */}
 					{/* <Steps /> */}

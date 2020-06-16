@@ -13,6 +13,7 @@ const listTemplateInitialState = fromJS({
 
 const createTemplateInitialState = {
 	data: {},
+	isLoading: true,
 };
 
 const updateTemplateInitialState = {
@@ -31,7 +32,7 @@ export const listTemplatesReducer = (
 	case listTemplateActions.listAction:
 		return state.setIn(['isLoading'], true);
 	case listTemplateActions.successAction:
-		return state.merge({ list: fromJS(action.payload.response), isLoading: false });
+		return state.merge({ list: fromJS(action.payload.response || []), isLoading: false });
 	case listTemplateActions.failureAction:
 		return state.merge({
 			error: fromJS(action.payload.error),

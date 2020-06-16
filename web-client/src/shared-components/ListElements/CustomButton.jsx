@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { ButtonIcon } from 'shared-components';
-import Icon from 'shared-components/Icon';
+import ButtonIcon from 'shared-components/ButtonIcon';
 import Text from 'shared-components/Text';
 
 const StyledTemplate = styled.div`
@@ -21,8 +20,8 @@ const StyledTemplate = styled.div`
   border: 1px solid #e5e5e5;
   border-radius: 8px;
   padding: ${props => (props.isActive ? '8px 74px' : '8px 16px')};
-	overflow: hidden;
-	cursor: pointer;
+  overflow: hidden;
+  cursor: pointer;
 `;
 
 const EditButton = ({ onClickHandler }) => (
@@ -35,9 +34,7 @@ const EditButton = ({ onClickHandler }) => (
 		isShadow
 		className="text-reset"
 		onClick={onClickHandler}
-	>
-		<Icon size={28} name="pencil" />
-	</ButtonIcon>
+	/>
 );
 
 const DeleteButton = ({ onClickHandler }) => (
@@ -50,9 +47,7 @@ const DeleteButton = ({ onClickHandler }) => (
 		name="trash"
 		className="text-reset"
 		onClick={onClickHandler}
-	>
-		<Icon size={28} name="trash" />
-	</ButtonIcon>
+	/>
 );
 
 export const CustomButton = ({

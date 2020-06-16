@@ -1,27 +1,44 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
-	Button, Form, FormGroup, Row, Col, Input, Label, Modal, ModalBody,
+	Button,
+	Form,
+	FormGroup,
+	Row,
+	Col,
+	Input,
+	Label,
+	Modal,
+	ModalBody,
 } from 'core-components';
 import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
 
 const CreateTemplateModal = (props) => {
-	const [createTemplateModal, setCreateTemplateModal] = useState(false);
-	const toggleCreateTemplateModal = () => setCreateTemplateModal(!createTemplateModal);
+	const {
+		isCreateTemplateModalVisible,
+		toggleCreateTemplateModal,
+		templateDescription,
+		setTemplateDescription,
+		templateName,
+		setTemplateName,
+		addClickHandler,
+		isFormValid,
+	} = props;
 
 	return (
 		<>
-			<Button color="primary" onClick={toggleCreateTemplateModal}>
-				Create New
-			</Button>
 			<Modal
-				isOpen={createTemplateModal}
+				isOpen={isCreateTemplateModalVisible}
 				toggle={toggleCreateTemplateModal}
 				centered
 				size="lg"
 			>
 				<ModalBody>
-					<Text tag="h4" className="modal-title text-center text-truncate font-weight-bold">
-						Create New Template
+					<Text
+						tag="h4"
+						className="modal-title text-center text-truncate font-weight-bold"
+					>
+            Create New Template
 					</Text>
 					<ButtonIcon
 						position="absolute"
@@ -37,13 +54,17 @@ const CreateTemplateModal = (props) => {
 							<Col sm={3}>
 								<FormGroup>
 									<Label for="template_name" className="font-weight-bold">
-										Template Name
+                    Template Name
 									</Label>
 									<Input
 										type="text"
 										name="template_name"
 										id="template_name"
 										placeholder="Type here"
+										value={templateName}
+										onChange={(event) => {
+											setTemplateName(event.target.value);
+										}}
 									/>
 								</FormGroup>
 							</Col>
@@ -53,20 +74,28 @@ const CreateTemplateModal = (props) => {
 										for="template_description"
 										className="font-weight-bold"
 									>
-										Description
+                    Description
 									</Label>
 									<Input
 										type="text"
 										name="template_description"
 										id="template_description"
 										placeholder="Type here"
+										value={templateDescription}
+										onChange={(event) => {
+											setTemplateDescription(event.target.value);
+										}}
 									/>
 								</FormGroup>
 							</Col>
 						</Row>
 						<ButtonGroup className="text-center p-0 m-0 pt-5">
-							<Button color="primary" disabled>
-								Add
+							<Button
+								onClick={addClickHandler}
+								color="primary"
+								disabled={isFormValid === false}
+							>
+                Add
 							</Button>
 						</ButtonGroup>
 					</Form>
@@ -76,6 +105,15 @@ const CreateTemplateModal = (props) => {
 	);
 };
 
-CreateTemplateModal.propTypes = {};
+CreateTemplateModal.propTypes = {
+	isCreateTemplateModalVisible : PropTypes.bool.isRequired,
+	toggleCreateTemplateModal : PropTypes.func.isRequired,
+	templateDescription : PropTypes.string.isRequired,
+	setTemplateDescription : PropTypes.func.isRequired,
+	templateName : PropTypes.string.isRequired,
+	setTemplateName : PropTypes.func.isRequired,
+	addClickHandler : PropTypes.func.isRequired,
+	isFormValid : PropTypes.bool.isRequired,
+};
 
 export default CreateTemplateModal;

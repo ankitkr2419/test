@@ -15,7 +15,7 @@ const Wizard = (props) => {
         <StepItem key={step.get('id')} disabled={step.get('isDisable')}>
           <StepLink
             onClick={() => {
-              onClickHandler(step);
+              onClickHandler(step.get('id'));
             }}
           >
             {step.get('name')}
