@@ -1,6 +1,5 @@
 import React from "react";
-import { CardBody } from "reactstrap";
-import Card from "core-components/Card";
+import { Card, CardBody } from "core-components";
 import ButtonGroup from "shared-components/ButtonGroup";
 import Link from "shared-components/Link";
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { CustomInput } from "reactstrap";
 import styled from "styled-components";
-import "./Checkbox.scss";
 
 const StyledCheckBox = styled(CustomInput)`
 	padding-left: ${(props) => (props.label ? "40px" : "24px")};

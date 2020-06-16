@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import Icon from "shared-components/Icon";
 
 const StyledButtonIcon = styled.button`
 	width: 40px;
@@ -36,7 +37,7 @@ const ButtonIcon = props => {
 
 	return (
 		<StyledButtonIcon {...props}>
-			{props.children}
+			<Icon size={props.size} name={props.name} />
 		</StyledButtonIcon>
 	)
 }
@@ -44,14 +45,17 @@ const ButtonIcon = props => {
 ButtonIcon.propTypes = {
 	position: PropTypes.string,
 	placement: PropTypes.oneOf(["left", "right"]),
-	top: PropTypes.string,
-	right: PropTypes.string,
-	left: PropTypes.string,
+	top: PropTypes.number,
+	right: PropTypes.number,
+	left: PropTypes.number,
 	isShadow: PropTypes.bool,
+	name: PropTypes.string.isRequired,
+	size: PropTypes.number,
 };
 
 ButtonIcon.defaultProps = {
 	isShadow: false,
+	size: 24
 };
 
 export default ButtonIcon;

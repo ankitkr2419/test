@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "core-components/Button";
+import { Button } from "core-components";
 import {
 	TemplateList,
 	TemplateListItem,

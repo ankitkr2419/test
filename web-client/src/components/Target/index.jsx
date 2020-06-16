@@ -1,7 +1,5 @@
 import React from "react";
-import Button from "core-components/Button";
-import Select from "core-components/Select";
-import CheckBox from "core-components/Checkbox";
+import { Button, CheckBox, Select } from "core-components";
 import {
 	TargetList,
 	TargetListHeader,

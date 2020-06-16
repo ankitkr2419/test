@@ -1,11 +1,10 @@
 import React from "react";
-import { CardBody } from "reactstrap";
-import Card from 'core-components/Card';
+import { Card, CardBody } from 'core-components';
 import { Step, StepItem, StepLink } from "shared-components/StepBar";
-// import { TemplateListContainer } from "components/Template";
+import { TemplateListContainer } from "components/Template";
 // import { TargetListContainer } from "components/Target";
 // import Stage from "components/Stage";
-import Steps from "components/Steps";
+// import Steps from "components/Steps";
 
 const StepList = [
 	{
@@ -38,10 +37,10 @@ const TemplateContainer = props => {
 			</Step>
 			<Card>
 				<CardBody className="d-flex flex-unset overflow-hidden p-0">
-					{/* <TemplateListContainer /> */}
+					<TemplateListContainer />
 					{/* <TargetListContainer /> */}
 					{/* <Stage /> */}
-					<Steps />
+					{/* <Steps /> */}
 				</CardBody>
 			</Card>
 		</div>

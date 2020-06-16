@@ -39,3 +39,7 @@ $theme-colors: map-merge(
 $input-placeholder-color: rgba($gray-44, 0.45);
 $input-border-color: $gray-90;
 $input-border-radius: 8px;
+
+$modal-lg: 900px;
+$modal-content-border-radius: 36px;
+$modal-backdrop-opacity: 0.3;
