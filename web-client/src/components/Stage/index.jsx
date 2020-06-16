@@ -1,13 +1,12 @@
-import React from 'react';
-import Table from 'core-components/Table';
+import React from "react";
+import Table from "core-components/Table";
 import Button from "core-components/Button";
-import Icon from 'shared-components/Icon';
 import {
 	TableWrapper,
 	TableWrapperFooter,
 } from "shared-components/TableWrapper";
 import ButtonIcon from "shared-components/ButtonIcon";
-import AddStageModal from './AddStageModal';
+import AddStageModal from "./AddStageModal";
 
 const StageList = [
 	{

@@ -1,13 +1,15 @@
-import React from 'react';
-import { Table } from 'reactstrap';
-import "./Table.scss";
+import React from "react";
+import { Table } from "reactstrap";
+import styled from "styled-components";
 
-const StyledTable = props => {
-  return (
-    <Table {...props} />
-  );
+const StyledTable = styled(Table)`
+	margin: 0;
+`;
+
+const CustomTable = (props) => {
+	return <StyledTable {...props} />;
 };
 
-StyledTable.propTypes = {};
+CustomTable.propTypes = {};
 
-export default StyledTable;
+export default CustomTable;

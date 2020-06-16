@@ -22,9 +22,12 @@ const AddStageModal = props => {
 			<Button color="primary" isIcon onClick={toggleStageModal}>
 				<Icon size={40} name="plus-2" />
 			</Button>
-			<Modal isOpen={stageModal} toggle={toggleStageModal} centered>
+			<Modal isOpen={stageModal} toggle={toggleStageModal} centered size="lg">
 				<ModalBody>
-					<Text tag="h4" className="modal-title">
+					<Text
+						tag="h4"
+						className="modal-title text-center text-truncate font-weight-bold"
+					>
 						Add Stage
 					</Text>
 					<ButtonIcon

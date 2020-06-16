@@ -20,9 +20,9 @@ const AddStepModal = (props) => {
 			<Button color="primary" isIcon onClick={toggleStepModal}>
 				<Icon size={40} name="plus-2" />
 			</Button>
-			<Modal isOpen={stageModal} toggle={toggleStepModal} centered>
+			<Modal isOpen={stageModal} toggle={toggleStepModal} centered size="lg">
 				<ModalBody>
-					<Text tag="h4" className="modal-title">
+					<Text tag="h4" className="modal-title text-center text-truncate font-weight-bold">
 						Add Step
 					</Text>
 					<ButtonIcon
