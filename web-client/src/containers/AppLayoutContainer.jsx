@@ -2,10 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Redirect } from "react-router-dom";
 import RouteWithSubRoutes from "RouteHelper";
 import Header from "components/Header";
-import Logo from "shared-components/Logo";
 import { Button, Nav, NavItem, NavLink } from "core-components";
-import Icon from "shared-components/Icon";
-import Link from "shared-components/Link";
+import { Icon, Link, Logo } from "shared-components";
 import "../assets/scss/default.scss";
 
 const AppLayoutContainer = (props) => {

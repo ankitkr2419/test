@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, CardBody } from "core-components";
-import ButtonGroup from "shared-components/ButtonGroup";
-import Link from "shared-components/Link";
+import { ButtonGroup, Link } from "shared-components";
 
 const LoginContainer = (props) => {
   return (

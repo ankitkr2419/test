@@ -1,11 +1,6 @@
 import React from "react";
 import { Table } from "core-components";
-import {
-	TableWrapper,
-	TableWrapperBody,
-	TableWrapperFooter,
-} from "shared-components/TableWrapper";
-import ButtonIcon from "shared-components/ButtonIcon";
+import { ButtonIcon, TableWrapper, TableWrapperBody, TableWrapperFooter } from "shared-components";
 import AddStepModal from "./AddStepModal";
 
 const StepList = [
