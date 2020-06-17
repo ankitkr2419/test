@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
 	Button,
 	Form,
@@ -10,15 +10,16 @@ import {
 	Modal,
 	ModalBody,
 	Select,
-} from "core-components";
-import { ButtonGroup, ButtonIcon, Icon, Text } from "shared-components";
+} from 'core-components';
+import {
+	ButtonGroup, ButtonIcon, Icon, Text,
+} from 'shared-components';
 
-const AddStageModal = props => {
-  
-  const [stageModal, setStageModal] = useState(false);
-  const toggleStageModal = () => setStageModal(!stageModal);
+const AddStageModal = (props) => {
+	const [stageModal, setStageModal] = useState(false);
+	const toggleStageModal = () => setStageModal(!stageModal);
 
-  return (
+	return (
 		<>
 			<Button color="primary" isIcon onClick={toggleStageModal}>
 				<Icon size={40} name="plus-2" />

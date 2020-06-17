@@ -1,50 +1,17 @@
-import React from "react";
-import { Card, CardBody } from 'core-components';
-import { Step, StepItem, StepLink } from "shared-components";
-// import { TemplateListContainer } from "components/Template";
-import { TargetListContainer } from "components/Target";
-// import Stage from "components/Stage";
-// import Steps from "components/Steps";
+import React, { useEffect } from 'react';
+import TemplateComponent from 'components/Template';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTemplates } from 'action-creators/templateActionCreators';
 
-const StepList = [
-	{
-		name: "Template",
-		disable: false,
-	},
-	{
-		name: "View Target",
-		disable: true,
-	},
-	{
-		name: "Add Stage",
-		disable: true,
-	},
-	{
-		name: "Add Step",
-		disable: true,
-	},
-];
+const TemplateContainer = (props) => {
+	const dispatch = useDispatch();
+	const templates = useSelector(state => state.listTemplatesReducer);
 
-const TemplateContainer = props => {
-  return (
-		<div className="template-content">
-			<Step>
-				{StepList.map((step, i) => (
-					<StepItem key={i} disabled={step.disable}>
-						<StepLink>{step.name}</StepLink>
-					</StepItem>
-				))}
-			</Step>
-			<Card>
-				<CardBody className="d-flex flex-unset overflow-hidden p-0">
-					{/* <TemplateListContainer /> */}
-					<TargetListContainer />
-					{/* <Stage /> */}
-					{/* <Steps /> */}
-				</CardBody>
-			</Card>
-		</div>
-	);
+	useEffect(() => {
+		dispatch(fetchTemplates());
+	}, [dispatch]);
+
+	return <TemplateComponent templates={templates.get('list')}/>;
 };
 
 TemplateContainer.propTypes = {};

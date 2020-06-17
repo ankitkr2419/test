@@ -1,20 +1,18 @@
-import { takeEvery, put, call } from "redux-saga/effects";
-import { callApi } from "apis/apiHelper";
+import { takeEvery, put, call } from 'redux-saga/effects';
+import { callApi } from 'apis/apiHelper';
 import {
   createTemplateActions,
   listTemplateActions,
   updateTemplateActions,
   deleteTemplateActions,
-} from "actions/templateActions";
+} from 'actions/templateActions';
 import {
   createTemplateFailed,
   fetchTemplatesFailed,
   updateTemplateFailed,
   deleteTemplateFailed,
-} from "action-creators/templateActionCreators";
-import { HTTP_METHODS } from "../constants";
-// WIP Mock testing
-// import listJson from 'mockJson/listTemplates'
+} from 'action-creators/templateActionCreators';
+import { HTTP_METHODS } from '../constants';
 
 export function* createTemplate(actions) {
   const {
@@ -27,14 +25,14 @@ export function* createTemplate(actions) {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.POST,
-        body: body,
-        reqPath: "template",
+        body,
+        reqPath: 'template',
         successAction,
         failureAction,
       },
     });
   } catch (error) {
-    console.error("error in create template ", error);
+    console.error('error in create template ', error);
     yield put(createTemplateFailed(error));
   }
 }
@@ -45,18 +43,13 @@ export function* fetchTemplates() {
     yield call(callApi, {
       payload: {
         body: null,
-        reqPath: "templates",
+        reqPath: 'templates',
         successAction,
         failureAction,
       },
     });
-    // WIP Mock testing
-    // yield put({
-    //   type: successAction,
-    //   payload: listJson,
-    // })
   } catch (error) {
-    console.error("error in fetch template ", error);
+    console.error('error in fetch template ', error);
     yield put(fetchTemplatesFailed(error));
   }
 }
@@ -72,14 +65,14 @@ export function* updateTemplate(actions) {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.PUT,
-        body: body,
+        body,
         reqPath: `template/${templateID}`,
         successAction,
         failureAction,
       },
     });
   } catch (error) {
-    console.error("error while updating template ", error);
+    console.error('error while updating template ', error);
     yield put(updateTemplateFailed(error));
   }
 }
@@ -101,7 +94,7 @@ export function* deleteTemplate(actions) {
       },
     });
   } catch (error) {
-    console.error("error while deleting template ", error);
+    console.error('error while deleting template ', error);
     yield put(deleteTemplateFailed(error));
   }
 }

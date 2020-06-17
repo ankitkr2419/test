@@ -1,75 +1,45 @@
-import React from "react";
-import { Button } from "core-components";
-import { ButtonGroup, TemplateList, TemplateListItem, Template } from "shared-components";
-import CreateTemplateModal from "./CreateTemplateModal";
+import React from 'react';
+import PropTypes from 'prop-types';
+import {
+	StyledUl,
+	StyledLi,
+	CustomButton,
+	ButtonGroup,
+} from 'shared-components';
+import CreateTemplateModal from './CreateTemplateModal';
+// import { Button } from 'core-components';
 
-const Templates = [
-	{
-		name: "Template Name",
-		active: false,
-		editable: false,
-		deletable: false,
-	},
-	{
-		name: "Template Name",
-		active: false,
-		editable: false,
-		deletable: false,
-	},
-	{
-		name: "Template Name",
-		active: true,
-		editable: true,
-		deletable: true,
-	},
-	{
-		name: "Template Name",
-		active: false,
-		editable: false,
-		deletable: false,
-	},
-	{
-		name: "Template Name",
-		active: false,
-		editable: false,
-		deletable: false,
-	},
-	{
-		name: "Template Name",
-		active: false,
-		editable: false,
-		deletable: false,
-	},
-	{
-		name: "Template Name",
-		active: false,
-		editable: false,
-		deletable: false,
-	},
-	{
-		name: "Template Name",
-		active: false,
-		editable: false,
-		deletable: false,
-	},
-];
+const TemplateComponent = (props) => {
+	const { templates } = props;
 
-export const TemplateListContainer = (props) => {
 	return (
 		<div className="d-flex flex-100 flex-column p-4 mt-3">
-			<TemplateList>
-				{Templates.map((template, i) => 
-					<TemplateListItem key={i}>
-						<Template title={template.name} isActive={template.active} isEditable={template.editable} isDeletable={template.deletable} />
-					</TemplateListItem>
-				)}
-			</TemplateList>
+			<StyledUl>
+				{templates.map(template => (
+					<StyledLi key={template.get('id')}>
+						<CustomButton
+							title={template.get('name')}
+							isEditable
+							onEditClickHandler={() => {}}
+							isDeletable
+							onDeleteClickHandler={() => {}}
+						/>
+					</StyledLi>
+				))}
+			</StyledUl>
 			<ButtonGroup className="text-center">
-				<Button color="primary">
-					Next
-				</Button>
+				{/*
+          TODO Handle login flow when operator
+          <Button color="primary">Next</Button>
+        */}
 				<CreateTemplateModal />
 			</ButtonGroup>
 		</div>
 	);
 };
+
+TemplateComponent.propTypes = {
+	templates: PropTypes.shape({}).isRequired,
+};
+
+export default React.memo(TemplateComponent);

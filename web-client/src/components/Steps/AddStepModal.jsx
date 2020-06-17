@@ -23,7 +23,11 @@ const AddStepModal = (props) => {
 			</Button>
 			<Modal isOpen={stageModal} toggle={toggleStepModal} centered size="lg">
 				<ModalBody>
+<<<<<<< HEAD
 					<Text tag="h4" className="modal-title text-center text-truncate font-weight-bold">
+=======
+					<Text Tag="h4" className="modal-title">
+>>>>>>> Template list integration with api.
 						Add Step
 					</Text>
 					<ButtonIcon
@@ -62,7 +66,11 @@ const AddStepModal = (props) => {
 										id="target_temperature"
 										placeholder="Type here"
 									/>
+<<<<<<< HEAD
 									<Label>unit °C</Label>
+=======
+									<Text Tag="label">unit °C</Text>
+>>>>>>> Template list integration with api.
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -76,7 +84,11 @@ const AddStepModal = (props) => {
 										id="hold_time"
 										placeholder="Type here"
 									/>
+<<<<<<< HEAD
 									<Label>unit seconds</Label>
+=======
+									<Text Tag="label">unit seconds</Text>
+>>>>>>> Template list integration with api.
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -90,7 +102,11 @@ const AddStepModal = (props) => {
 										id="data_capture"
 										placeholder="Type here"
 									/>
+<<<<<<< HEAD
 									<Label>boolean flag</Label>
+=======
+									<Text Tag="label">boolean flag</Text>
+>>>>>>> Template list integration with api.
 								</FormGroup>
 							</Col>
 						</Row>
