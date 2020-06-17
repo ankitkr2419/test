@@ -7,6 +7,7 @@ const LoginContainer = (props) => {
   return (
 		<div className="login-content">
 			<ButtonGroup>
+				{/* TODO: Add "active" class to <Link> to highlight active state */}
 				<Link to="/" className="btn-secondary mr-4">
 					Admin
 				</Link>

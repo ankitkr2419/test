@@ -87,6 +87,13 @@ a:focus, button:focus {
   color: $gray-40;
 }
 
+.btn-secondary:not(:disabled):not(.disabled).active {
+  background: $white 0% 0% no-repeat padding-box;
+  color: $gray-40;
+  border: rem(2px) solid $tango;
+  box-shadow: rem(0 2px 8px) #00000029;
+}
+
 .btn-outline-secondary {
   border-color: $gray-85;
   color: $gray-44;

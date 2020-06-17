@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Button, Form, FormGroup, Input, Label } from "core-components";
+import { Button, Form, FormGroup, FormError, Input, Label } from "core-components";
 import { Center } from "shared-components";
 
 const LoginForm = () => {
@@ -13,7 +13,9 @@ const LoginForm = () => {
 					name="username"
 					id="username"
 					placeholder="Type here"
+					invalid
 				/>
+				<FormError>Oh noes! that name is already taken</FormError>
 			</FormGroup>
 			<FormGroup>
 				<Label for="password">Password</Label>
