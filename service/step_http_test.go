@@ -41,8 +41,8 @@ func (suite *StepHandlerTestSuite) TestListStepsSuccess() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/stages/{stage_id}",
-		"/stages/"+stgUUID.String(),
+		"/stages/{stage_id}/steps}",
+		"/stages/"+stgUUID.String()+"/steps",
 		"",
 		listStepsHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -61,8 +61,8 @@ func (suite *StepHandlerTestSuite) TestListStepsFail() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/stages/{stage_id}",
-		"/stages/"+stgUUID.String(),
+		"/stages/{stage_id}/steps}",
+		"/stages/"+stgUUID.String()+"/steps",
 		"",
 		listStepsHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -81,8 +81,8 @@ func (suite *StepHandlerTestSuite) TestCreateStepSuccess() {
 
 	body := fmt.Sprintf(`{"stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}`, stgUUID)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/stage",
-		"/stage",
+		"/steps",
+		"/steps",
 		body,
 		createStepHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -103,8 +103,8 @@ func (suite *StepHandlerTestSuite) TestUpdateStepSuccess() {
 	body := fmt.Sprintf(`{"stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}`, stgUUID)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/stage/{id}",
-		"/stage/"+testUUID.String(),
+		"/steps/{id}",
+		"/steps/"+testUUID.String(),
 		body,
 		updateStepHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -122,8 +122,8 @@ func (suite *StepHandlerTestSuite) TestDeleteStepSuccess() {
 		nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
-		"/stage/{id}",
-		"/stage/"+testUUID.String(),
+		"/steps/{id}",
+		"/steps/"+testUUID.String(),
 		"",
 		deleteStepHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -141,8 +141,8 @@ func (suite *StepHandlerTestSuite) TestShowStepSuccess() {
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/stage/{id}",
-		"/stage/"+testUUID.String(),
+		"/steps/{id}",
+		"/steps/"+testUUID.String(),
 		"",
 		showStepHandler(Dependencies{Store: suite.dbMock}),
 	)

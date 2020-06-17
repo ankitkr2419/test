@@ -81,8 +81,8 @@ func (suite *TemplateHandlerTestSuite) TestCreateTemplateSuccess() {
 	body := `{"name":"test template","description":"blah blah"}`
 
 	recorder := makeHTTPCall(http.MethodPost,
-		"/template",
-		"/template",
+		"/templates",
+		"/templates",
 		body,
 		createTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -103,8 +103,8 @@ func (suite *TemplateHandlerTestSuite) TestUpdateTemplateSuccess() {
 	body := `{"name":"test template","description":"blah blah"}`
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/template/{id}",
-		"/template/"+testUUID.String(),
+		"/templates/{id}",
+		"/templates/"+testUUID.String(),
 		body,
 		updateTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -122,8 +122,8 @@ func (suite *TemplateHandlerTestSuite) TestDeleteTemplateSuccess() {
 		nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
-		"/template/{id}",
-		"/template/"+testUUID.String(),
+		"/templates/{id}",
+		"/templates/"+testUUID.String(),
 		"",
 		deleteTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -142,8 +142,8 @@ func (suite *TemplateHandlerTestSuite) TestShowTemplateSuccess() {
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/template/{id}",
-		"/template/"+testUUID.String(),
+		"/templates/{id}",
+		"/templates/"+testUUID.String(),
 		"",
 		showTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
