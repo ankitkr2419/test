@@ -91,12 +91,37 @@ func (m *DBMockStore) ShowStep(ctx context.Context, id uuid.UUID) (s Step, err e
 	return args.Get(0).(Step), args.Error(1)
 }
 
-func (m *DBMockStore) UpsertTemplateTarget(ctx context.Context,tt []TemplateTarget,id uuid.UUID) (t []TemplateTarget, err error) {
-	args := m.Called(ctx,tt, id)
+func (m *DBMockStore) UpsertTemplateTarget(ctx context.Context, tt []TemplateTarget, id uuid.UUID) (t []TemplateTarget, err error) {
+	args := m.Called(ctx, tt, id)
 	return args.Get(0).([]TemplateTarget), args.Error(1)
 }
 
 func (m *DBMockStore) ListTemplateTargets(ctx context.Context, id uuid.UUID) (t []TemplateTarget, err error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).([]TemplateTarget), args.Error(1)
+}
+
+func (m *DBMockStore) ListExperiments(ctx context.Context) (t []Experiment, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Experiment), args.Error(1)
+}
+
+func (m *DBMockStore) CreateExperiment(ctx context.Context, tp Experiment) (t Experiment, err error) {
+	args := m.Called(ctx, tp)
+	return args.Get(0).(Experiment), args.Error(1)
+}
+
+func (m *DBMockStore) ShowExperiment(ctx context.Context, id uuid.UUID) (t Experiment, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Experiment), args.Error(1)
+}
+
+func (m *DBMockStore) UpsertExpTemplateTarget(ctx context.Context, tt []ExpTemplateTarget, id uuid.UUID) (t []ExpTemplateTarget, err error) {
+	args := m.Called(ctx, tt, id)
+	return args.Get(0).([]ExpTemplateTarget), args.Error(1)
+}
+
+func (m *DBMockStore) ListExpTemplateTargets(ctx context.Context, id uuid.UUID) (t []ExpTemplateTarget, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]ExpTemplateTarget), args.Error(1)
 }

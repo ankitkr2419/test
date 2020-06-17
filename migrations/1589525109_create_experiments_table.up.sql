@@ -6,5 +6,6 @@ CREATE TABLE experiments (
   template_id uuid,
   operator_name varchar(50),
   start_time timestamp,
-  end_time timestamp
+  end_time timestamp,
+  FOREIGN KEY (template_id) REFERENCES templates(id)
 );
