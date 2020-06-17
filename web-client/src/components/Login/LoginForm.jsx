@@ -1,11 +1,7 @@
 import React from 'react';
-import { Form } from "core-components";
-import { FormGroup } from "core-components";
-import { Label } from "core-components";
-import { Input } from "core-components";
-import { Button } from "core-components";
 import { Link } from "react-router-dom";
-import Center from "shared-components/Center";
+import { Button, Form, FormGroup, Input, Label } from "core-components";
+import { Center } from "shared-components";
 
 const LoginForm = () => {
   return (

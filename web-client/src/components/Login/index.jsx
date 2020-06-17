@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Text from 'shared-components/Text';
-import { Card } from 'core-components';
-import { CardBody } from 'core-components';
+import { Card, CardBody } from "core-components";
+import { Text } from "shared-components";
 import LoginForm from './LoginForm';
 
 const StyledLogin = styled.div``;
