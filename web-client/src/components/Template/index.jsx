@@ -17,6 +17,7 @@ const TemplateComponent = (props) => {
 		createTemplate,
 		deleteTemplate,
 		updateSelectedWizard,
+		updateTemplateID,
 	} = props;
 
 	// Local state to manage create template modal
@@ -59,7 +60,8 @@ const TemplateComponent = (props) => {
 	};
 
 	const editClickHandler = (templateID) => {
-		updateSelectedWizard('target', templateID);
+		updateTemplateID(templateID);
+		updateSelectedWizard('target');
 	};
 
 	return (
@@ -116,6 +118,7 @@ TemplateComponent.propTypes = {
 	createTemplate: PropTypes.func.isRequired,
 	deleteTemplate: PropTypes.func.isRequired,
 	updateSelectedWizard: PropTypes.func.isRequired,
+	updateTemplateID: PropTypes.func.isRequired,
 };
 
 export default React.memo(TemplateComponent);

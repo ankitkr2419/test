@@ -9,7 +9,7 @@ import {
 } from 'action-creators/templateActionCreators';
 
 const TemplateContainer = (props) => {
-	const { updateSelectedWizard } = props;
+	const { updateSelectedWizard, updateTemplateID } = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
@@ -36,12 +36,14 @@ const TemplateContainer = (props) => {
 			createTemplate={createTemplate}
 			deleteTemplate={deleteTemplate}
 			updateSelectedWizard={updateSelectedWizard}
+			updateTemplateID={updateTemplateID}
 		/>
 	);
 };
 
 TemplateContainer.propTypes = {
 	updateSelectedWizard: PropTypes.func.isRequired,
+	updateTemplateID: PropTypes.func.isRequired,
 };
 
 export default TemplateContainer;

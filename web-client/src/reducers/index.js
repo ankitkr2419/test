@@ -1,18 +1,20 @@
-import { combineReducers } from "redux";
+import { combineReducers } from 'redux';
 import {
-  createTemplateReducer,
-  listTemplatesReducer,
-} from "reducers/templateReducer";
+	createTemplateReducer,
+	listTemplatesReducer,
+} from 'reducers/templateReducer';
 import {
-  listTargetReducer,
-  listTargetByTemplateIDReducer,
-} from "reducers/targetReducer";
+	listTargetReducer,
+	listTargetByTemplateIDReducer,
+	saveTargetReducer,
+} from 'reducers/targetReducer';
 
 const rootReducer = combineReducers({
-  createTemplateReducer,
-  listTemplatesReducer,
-  listTargetReducer,
-  listTargetByTemplateIDReducer,
+	createTemplateReducer,
+	listTemplatesReducer,
+	listTargetReducer,
+	listTargetByTemplateIDReducer,
+	saveTargetReducer,
 });
 
 export default rootReducer;
