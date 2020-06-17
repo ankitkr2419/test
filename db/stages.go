@@ -16,7 +16,6 @@ const (
 		VALUES ($1, $2, $3, $4) RETURNING id`
 
 	getStageListQuery = `SELECT * FROM stages
-		ORDER BY name ASC
 		where template_id = $1`
 
 	getStageQuery = `SELECT id,
