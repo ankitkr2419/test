@@ -5,6 +5,7 @@ import { Card } from 'core-components';
 import Wizard from 'shared-components/Wizard';
 import TemplateContainer from 'containers/TemplateContainer';
 import TargetContainer from 'containers/TargetContainer';
+import StageContainer from 'containers/StageContainer';
 import templateLayoutReducer, {
 	templateInitialState,
 	templateLayoutActions,
@@ -16,7 +17,6 @@ const TemplateLayout = (props) => {
 		templateLayoutReducer,
 		templateInitialState,
 	);
-
 	// Here we have stored id for active widget
 	const activeWidgetID = templateLayoutState.get('activeWidgetID');
 	const templateID = templateLayoutState.get('templateID');
@@ -35,6 +35,14 @@ const TemplateLayout = (props) => {
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_TEMPLATE_ID,
 			value: templateID,
+		});
+	}, []);
+
+	const updateStageID = useCallback((stageId) => {
+		// TODO add validation before updating wizard
+		templateLayoutDispatch({
+			type: templateLayoutActions.SET_STAGE_ID,
+			value: stageId,
 		});
 	}, []);
 
@@ -57,6 +65,14 @@ const TemplateLayout = (props) => {
 						<TargetContainer
 							updateSelectedWizard={updateSelectedWizard}
 							templateID={templateID}/>)
+					}
+
+					{activeWidgetID === 'stage' && (
+						<StageContainer
+							updateSelectedWizard={updateSelectedWizard}
+							templateID={templateID}
+							updateStageID={updateStageID}
+							/>)
 					}
 					{/* <TargetListContainer /> */}
 					{/* <Stage /> */}

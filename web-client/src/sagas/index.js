@@ -11,6 +11,13 @@ import {
 	fetchTargetsByTemplateIDSaga,
 } from 'sagas/targetSaga';
 
+import {
+	fetchStagesSaga,
+	addStageSaga,
+	deleteStageSaga,
+	updateStageSaga,
+} from 'sagas/stageSaga';
+
 const allSagas = [
 	createTemplateSaga(),
 	fetchTemplatesSaga(),
@@ -19,6 +26,10 @@ const allSagas = [
 	fetchMasterTargetsSaga(),
 	fetchTargetsByTemplateIDSaga(),
 	deleteTemplateSaga(),
+	fetchStagesSaga(),
+	addStageSaga(),
+	deleteStageSaga(),
+	updateStageSaga(),
 ];
 
 export default function* rootSaga() {

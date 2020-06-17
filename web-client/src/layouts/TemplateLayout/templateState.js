@@ -11,7 +11,7 @@ export const templateLayoutActions = {
 // Initial state wrap with fromJS for immutability
 export const templateInitialState = fromJS({
 	// active wizard id
-	activeWidgetID: 'target',
+	activeWidgetID: 'stage',
 	// Pre-filled template initial list with saved wizard list
 	wizardList,
 	templateID: 'df4914e9-41e1-4d51-8655-23de1bffdc86',
@@ -36,7 +36,7 @@ const templateLayoutReducer = (state, action) => {
 		return getUpdatedList(state, action.value);
 	case templateLayoutActions.SET_TEMPLATE_ID:
 		return state.setIn(['templateID'], action.value);
-	case templateLayoutActions.SET_STAGE:
+	case templateLayoutActions.SET_STAGE_ID:
 		return state.setIn(['stageID'], action.value);
 	default:
 		throw new Error('Invalid action type');
