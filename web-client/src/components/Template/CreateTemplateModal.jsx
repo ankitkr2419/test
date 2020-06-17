@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Button, Form, FormGroup, Row, Col, Input, Label, Modal, ModalBody } from "core-components";
-import Text from "shared-components/Text";
-import ButtonGroup from "shared-components/ButtonGroup";
-import ButtonIcon from "shared-components/ButtonIcon";
+import { ButtonGroup, ButtonIcon, Text } from "shared-components";
 
 const CreateTemplateModal = (props) => {
 	const [createTemplateModal, setCreateTemplateModal] = useState(false);

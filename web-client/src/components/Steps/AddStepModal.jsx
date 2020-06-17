@@ -10,10 +10,7 @@ import {
 	Modal,
 	ModalBody,
 } from "core-components";
-import Icon from "shared-components/Icon";
-import Text from "shared-components/Text";
-import ButtonGroup from "shared-components/ButtonGroup";
-import ButtonIcon from "shared-components/ButtonIcon";
+import { ButtonGroup, ButtonIcon, Icon, Text } from "shared-components";
 
 const AddStepModal = (props) => {
 	const [stageModal, setStepModal] = useState(false);
