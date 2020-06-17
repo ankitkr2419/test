@@ -1,11 +1,6 @@
 import React from "react";
 import { Button } from "core-components";
-import {
-	TemplateList,
-	TemplateListItem,
-	Template,
-} from "shared-components/Template";
-import ButtonGroup from "shared-components/ButtonGroup";
+import { ButtonGroup, TemplateList, TemplateListItem, Template } from "shared-components";
 import CreateTemplateModal from "./CreateTemplateModal";
 
 const Templates = [

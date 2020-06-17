@@ -4,8 +4,8 @@ import {
 	TargetList,
 	TargetListHeader,
 	TargetListItem,
-} from "shared-components/Target";
-import Text from "shared-components/Text";
+	Text
+} from "shared-components";
 
 export const TargetListContainer = (props) => {
 
