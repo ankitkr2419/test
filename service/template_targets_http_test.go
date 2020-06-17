@@ -40,7 +40,7 @@ func (suite *TempTargetHandlerTestSuite) TestListTempTargetSuccess() {
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/targets/{template_id}",
-		"/targets/" + tempUUID.String(),
+		"/targets/"+tempUUID.String(),
 		"",
 		listTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -60,7 +60,7 @@ func (suite *TempTargetHandlerTestSuite) TestListTemplatesFail() {
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/targets/{template_id}",
-		"/targets/" + tempUUID.String(),
+		"/targets/"+tempUUID.String(),
 		"",
 		listTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -73,7 +73,7 @@ func (suite *TempTargetHandlerTestSuite) TestListTemplatesFail() {
 func (suite *TempTargetHandlerTestSuite) TestUpsertTempTargetSuccess() {
 	targetUUID := uuid.New()
 	tempUUID := uuid.New()
-	suite.dbMock.On("UpsertTemplateTarget", mock.Anything, mock.Anything,mock.Anything).Return(
+	suite.dbMock.On("UpsertTemplateTarget", mock.Anything, mock.Anything, mock.Anything).Return(
 		[]db.TemplateTarget{
 			db.TemplateTarget{TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
 		},
@@ -82,10 +82,9 @@ func (suite *TempTargetHandlerTestSuite) TestUpsertTempTargetSuccess() {
 
 	body := fmt.Sprintf(`[{"template_id":"%s","target_id":"%s","threshold":10.5}]`, tempUUID, targetUUID)
 
-
 	recorder := makeHTTPCall(http.MethodPost,
 		"/target/{template_id}",
-		"/target/" + tempUUID.String(),
+		"/target/"+tempUUID.String(),
 		body,
 		updateTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)

@@ -67,7 +67,7 @@ func createExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		// add targets to experiment template
 
-		exptargets  := make([]db.ExpTemplateTarget,0)
+		exptargets := make([]db.ExpTemplateTarget, 0)
 
 		for _, t := range tt {
 			ett := db.ExpTemplateTarget{}
@@ -77,7 +77,7 @@ func createExperimentHandler(deps Dependencies) http.HandlerFunc {
 			ett.TargetID = t.TargetID
 			ett.Threshold = t.Threshold
 
-			exptargets = append(exptargets,ett)
+			exptargets = append(exptargets, ett)
 		}
 
 		// insert in exp template

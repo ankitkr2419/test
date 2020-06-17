@@ -71,28 +71,41 @@ func (suite *ExperimentHandlerTestSuite) TestListExperimentsFail() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-// func (suite *ExperimentHandlerTestSuite) TestCreateExperimentSuccess() {
-// 	testUUID := uuid.New()
-// 	tempUUID := uuid.New()
-// 	suite.dbMock.On("CreateExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
-// 		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
-// 	}, nil)
+func (suite *ExperimentHandlerTestSuite) TestCreateExperimentSuccess() {
+	testUUID := uuid.New()
+	tempUUID := uuid.New()
+	targetUUID := uuid.New()
+	suite.dbMock.On("UpsertExpTemplateTarget", mock.Anything, mock.Anything, mock.Anything).Return(
+		[]db.ExpTemplateTarget{
+			db.ExpTemplateTarget{ExperimentID: testUUID, TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
+		},
+		nil,
+	)
+	suite.dbMock.On("ListTemplateTargets", mock.Anything, mock.Anything).Return(
+		[]db.TemplateTarget{
+			db.TemplateTarget{TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
+		},
+		nil,
+	)
+	suite.dbMock.On("CreateExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
+		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
+	}, nil)
 
-// 	body := fmt.Sprintf(`{"description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`,tempUUID)
+	body := fmt.Sprintf(`{"description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, tempUUID)
 
-// 	recorder := makeHTTPCall(http.MethodPost,
-// 		"/experiments",
-// 		"/experiments",
-// 		body,
-// 		createExperimentHandler(Dependencies{Store: suite.dbMock}),
-// 	)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/experiments",
+		"/experiments",
+		body,
+		createExperimentHandler(Dependencies{Store: suite.dbMock}),
+	)
 
-// 	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`,testUUID,tempUUID)
-// 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-// 	assert.Equal(suite.T(), output, recorder.Body.String())
+	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
+	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
 
-// 	suite.dbMock.AssertExpectations(suite.T())
-// }
+	suite.dbMock.AssertExpectations(suite.T())
+}
 func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()

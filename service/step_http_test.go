@@ -34,7 +34,7 @@ func (suite *StepHandlerTestSuite) TestListStepsSuccess() {
 	stgUUID := uuid.New()
 	suite.dbMock.On("ListSteps", mock.Anything, mock.Anything).Return(
 		[]db.Step{
-			db.Step{ID: testUUID, TargetTemperature: 25.5, RampRate: 5.5,DataCapture: true, StageID: stgUUID},
+			db.Step{ID: testUUID, TargetTemperature: 25.5, RampRate: 5.5, DataCapture: true, StageID: stgUUID},
 		},
 		nil,
 	)
@@ -76,7 +76,7 @@ func (suite *StepHandlerTestSuite) TestCreateStepSuccess() {
 	testUUID := uuid.New()
 	stgUUID := uuid.New()
 	suite.dbMock.On("CreateStep", mock.Anything, mock.Anything).Return(db.Step{
-		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5,DataCapture: true,
+		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, DataCapture: true,
 	}, nil)
 
 	body := fmt.Sprintf(`{"stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}`, stgUUID)
