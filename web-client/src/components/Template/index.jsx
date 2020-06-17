@@ -5,11 +5,10 @@ import {
 	StyledUl,
 	StyledLi,
 	CustomButton,
-	ButtonGroup,
+	Center,
 	Text,
 } from 'shared-components';
 import CreateTemplateModal from './CreateTemplateModal';
-// import { Button } from 'core-components';
 
 const TemplateComponent = (props) => {
 	const {
@@ -80,22 +79,22 @@ const TemplateComponent = (props) => {
 				{/* templates size check before iteration */}
 				{templates.size !== 0
           && templates.map(template => (
-          	<StyledLi key={template.get('id')}>
-          		<CustomButton
-          			title={template.get('name')}
-          			isEditable
-          			onEditClickHandler={() => {
-          				editClickHandler(template.get('id'));
-          			}}
-          			isDeletable
-          			onDeleteClickHandler={() => {
-          				deleteClickHandler(template.get('id'));
-          			}}
-          		/>
-          	</StyledLi>
+					<StyledLi key={template.get('id')}>
+						<CustomButton
+							title={template.get('name')}
+							isEditable
+							onEditClickHandler={() => {
+								editClickHandler(template.get('id'));
+							}}
+							isDeletable
+							onDeleteClickHandler={() => {
+								deleteClickHandler(template.get('id'));
+							}}
+						/>
+					</StyledLi>
           ))}
 			</StyledUl>
-			<ButtonGroup className="text-center">
+			<Center className="text-center">
 				{/*
           TODO Handle login flow when operator
           <Button color="primary">Next</Button>
@@ -103,7 +102,7 @@ const TemplateComponent = (props) => {
 				<Button color="primary" onClick={toggleCreateTemplateModal}>
           Create New
 				</Button>
-			</ButtonGroup>
+			</Center>
 			{isCreateTemplateModalVisible && (
 				<CreateTemplateModal
 					isCreateTemplateModalVisible={isCreateTemplateModalVisible}
