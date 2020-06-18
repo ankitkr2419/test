@@ -6,7 +6,7 @@ CREATE TABLE steps
     stage_id uuid,
     ramp_rate float,
     target_temp float,
-    hold_time time,
+    hold_time integer,
     data_capture boolean,
     FOREIGN KEY (stage_id) REFERENCES stages(id) ON DELETE CASCADE
 );

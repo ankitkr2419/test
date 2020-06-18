@@ -18,12 +18,7 @@ $ make test
 
 ### DB Support
 
-For SQLite use following commands:
-./mylabdiscoveries start dev
-./mylabdiscoveries migrate dev
-./mylabdiscoveries create_migrattion filename dev
-
 For PostgreSQL use following commands
-./mylabdiscoveries start prod
-./mylabdiscoveries migrate prod
-./mylabdiscoveries create_migrattion filename prod
+./cpagent start --plc simulator
+./cpagent migrate
+./cpagent create_migration filename

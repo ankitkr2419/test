@@ -25,4 +25,9 @@ type Storer interface {
 	DeleteStep(context.Context, uuid.UUID) error
 	ListTemplateTargets(context.Context, uuid.UUID) ([]TemplateTarget, error)
 	UpsertTemplateTarget(context.Context, []TemplateTarget, uuid.UUID) ([]TemplateTarget, error)
+	ListExperiments(context.Context) ([]Experiment, error)
+	CreateExperiment(context.Context, Experiment) (Experiment, error)
+	ShowExperiment(context.Context, uuid.UUID) (Experiment, error)
+	ListExpTemplateTargets(context.Context, uuid.UUID) ([]ExpTemplateTarget, error)
+	UpsertExpTemplateTarget(context.Context, []ExpTemplateTarget, uuid.UUID) ([]ExpTemplateTarget, error)
 }
