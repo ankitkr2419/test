@@ -40,7 +40,7 @@ func (suite *TempTargetHandlerTestSuite) TestListTempTargetSuccess() {
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/templates/{template_id}/targets",
-		"/templates/"+tempUUID.String()+"targets",
+		"/templates/"+tempUUID.String()+"/targets",
 		"",
 		listTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -60,7 +60,7 @@ func (suite *TempTargetHandlerTestSuite) TestListTemplatesFail() {
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/templates/{template_id}/targets",
-		"/templates/"+tempUUID.String()+"targets",
+		"/templates/"+tempUUID.String()+"/targets",
 		"",
 		listTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -84,7 +84,7 @@ func (suite *TempTargetHandlerTestSuite) TestUpsertTempTargetSuccess() {
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/templates/{template_id}/targets",
-		"/templates/"+tempUUID.String()+"targets",
+		"/templates/"+tempUUID.String()+"/targets",
 		body,
 		updateTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)

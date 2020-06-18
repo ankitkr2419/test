@@ -128,7 +128,7 @@ func (suite *TemplateHandlerTestSuite) TestDeleteTemplateSuccess() {
 		deleteTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), "template deleted successfully", recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

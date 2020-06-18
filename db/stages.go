@@ -31,7 +31,7 @@ const (
 		name,
 		type,
 		repeat_count,
-		template_id =
+		template_id) =
 		($1, $2, $3, $4) where id = $5`
 
 	deleteStageQuery = `DELETE FROM stages WHERE id = $1`

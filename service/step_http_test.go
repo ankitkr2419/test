@@ -34,19 +34,19 @@ func (suite *StepHandlerTestSuite) TestListStepsSuccess() {
 	stgUUID := uuid.New()
 	suite.dbMock.On("ListSteps", mock.Anything, mock.Anything).Return(
 		[]db.Step{
-			db.Step{ID: testUUID, TargetTemperature: 25.5, RampRate: 5.5, DataCapture: true, StageID: stgUUID},
+			db.Step{ID: testUUID, TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true, StageID: stgUUID},
 		},
 		nil,
 	)
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/stages/{stage_id}/steps}",
+		"/stages/{stage_id}/steps",
 		"/stages/"+stgUUID.String()+"/steps",
 		"",
 		listStepsHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}]`, testUUID, stgUUID)
+	output := fmt.Sprintf(`[{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}]`, testUUID, stgUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -61,7 +61,7 @@ func (suite *StepHandlerTestSuite) TestListStepsFail() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/stages/{stage_id}/steps}",
+		"/stages/{stage_id}/steps",
 		"/stages/"+stgUUID.String()+"/steps",
 		"",
 		listStepsHandler(Dependencies{Store: suite.dbMock}),
@@ -76,18 +76,17 @@ func (suite *StepHandlerTestSuite) TestCreateStepSuccess() {
 	testUUID := uuid.New()
 	stgUUID := uuid.New()
 	suite.dbMock.On("CreateStep", mock.Anything, mock.Anything).Return(db.Step{
-		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, DataCapture: true,
+		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true,
 	}, nil)
 
-	body := fmt.Sprintf(`{"stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}`, stgUUID)
+	body := fmt.Sprintf(`{"stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}`, stgUUID)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/steps",
 		"/steps",
 		body,
 		createStepHandler(Dependencies{Store: suite.dbMock}),
 	)
-	fmt.Println(body)
-	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}`, testUUID, stgUUID)
+	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}`, testUUID, stgUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -97,10 +96,10 @@ func (suite *StepHandlerTestSuite) TestUpdateStepSuccess() {
 	testUUID := uuid.New()
 	stgUUID := uuid.New()
 	suite.dbMock.On("UpdateStep", mock.Anything, mock.Anything).Return(db.Step{
-		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, DataCapture: true,
+		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true,
 	}, nil)
 
-	body := fmt.Sprintf(`{"stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}`, stgUUID)
+	body := fmt.Sprintf(`{"stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}`, stgUUID)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/steps/{id}",
@@ -128,7 +127,7 @@ func (suite *StepHandlerTestSuite) TestDeleteStepSuccess() {
 		deleteStepHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), "step deleted successfully", recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -137,7 +136,7 @@ func (suite *StepHandlerTestSuite) TestShowStepSuccess() {
 	testUUID := uuid.New()
 	stgUUID := uuid.New()
 	suite.dbMock.On("ShowStep", mock.Anything, mock.Anything).Return(db.Step{
-		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, DataCapture: true,
+		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true,
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -146,7 +145,7 @@ func (suite *StepHandlerTestSuite) TestShowStepSuccess() {
 		"",
 		showStepHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":"0001-01-01T00:00:00Z","data_capture":true}`, testUUID, stgUUID)
+	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}`, testUUID, stgUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
