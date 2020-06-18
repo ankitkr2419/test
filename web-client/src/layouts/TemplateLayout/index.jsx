@@ -6,6 +6,7 @@ import Wizard from 'shared-components/Wizard';
 import TemplateContainer from 'containers/TemplateContainer';
 import TargetContainer from 'containers/TargetContainer';
 import StageContainer from 'containers/StageContainer';
+import StepContainer from 'containers/StepContainer';
 import templateLayoutReducer, {
 	templateInitialState,
 	templateLayoutActions,
@@ -20,6 +21,7 @@ const TemplateLayout = (props) => {
 	// Here we have stored id for active widget
 	const activeWidgetID = templateLayoutState.get('activeWidgetID');
 	const templateID = templateLayoutState.get('templateID');
+	const stageId = templateLayoutState.get('stageId');
 
 	// Wizard click handler
 	const updateSelectedWizard = useCallback((selectedWizard) => {
@@ -70,13 +72,16 @@ const TemplateLayout = (props) => {
 					{activeWidgetID === 'stage' && (
 						<StageContainer
 							updateSelectedWizard={updateSelectedWizard}
-							templateID={templateID}
 							updateStageID={updateStageID}
-							/>)
+							templateID={templateID}
+						/>)
 					}
-					{/* <TargetListContainer /> */}
-					{/* <Stage /> */}
-					{/* <Steps /> */}
+					{activeWidgetID === 'step' && (
+						<StepContainer
+							updateSelectedWizard={updateSelectedWizard}
+							stageId={stageId}
+						/>)
+					}
 				</CardBody>
 			</Card>
 		</div>

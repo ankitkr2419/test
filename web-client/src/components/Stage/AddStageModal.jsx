@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import {
 	Button,
 	Form,
@@ -18,28 +19,35 @@ const AddStageModal = (props) => {
 	const {
 		toggleCreateStageModal,
 		isCreateStageModalVisible,
-		stageName,
-		stageType,
-		stageRepeatCount,
-		setStageName,
-		setStageType,
-		setStageRepeatCount,
 		addClickHandler,
 		isFormValid,
 		resetModalState,
 		saveClickHandler,
-		updateStageId,
+		stageFormStateJS,
+		updateStageFormStateWrapper,
 	} = props;
 
-	const isUpdateForm = updateStageId !== null;
+	const {
+		stageId,
+		stageName,
+		stageType,
+		stageRepeatCount,
+	} = stageFormStateJS;
 
-	useEffect(
-		() => () => {
-			// clear modal state on un-mount
+	// stageId will be present when we are updating stage
+	const isUpdateForm = stageId !== null;
+
+	// eslint-disable-next-line arrow-body-style
+	useEffect(() => {
+		return () => {
+			// reset from state
 			resetModalState();
-		},
-		[resetModalState],
-	);
+		};
+	}, [resetModalState]);
+
+	const onChangeHandler = ({ target: { name, value } }) => {
+		updateStageFormStateWrapper(name, value);
+	};
 
 	return (
 		<>
@@ -74,13 +82,11 @@ const AddStageModal = (props) => {
 									</Label>
 									<Input
 										type="text"
-										name="stage"
+										name="stageName"
 										id="stage"
 										placeholder="Type here"
 										value={stageName}
-										onChange={(event) => {
-											setStageName(event.target.value);
-										}}
+										onChange={onChangeHandler}
 									/>
 								</FormGroup>
 							</Col>
@@ -92,7 +98,7 @@ const AddStageModal = (props) => {
 									<Select
 										options={stageTypeOptions}
 										onChange={(selectedStageType) => {
-											setStageType(selectedStageType);
+											updateStageFormStateWrapper('stageType', selectedStageType);
 										}}
 										value={stageType}
 									/>
@@ -106,7 +112,7 @@ const AddStageModal = (props) => {
 									<Select
 										options={countTypeOptions}
 										onChange={(selectedRepeatCount) => {
-											setStageRepeatCount(selectedRepeatCount);
+											updateStageFormStateWrapper('stageRepeatCount', selectedRepeatCount);
 										}}
 										value={stageRepeatCount}
 									/>
@@ -126,7 +132,7 @@ const AddStageModal = (props) => {
 							{isUpdateForm === true && (
 								<Button
 									color="primary"
-									onClick={() => saveClickHandler(updateStageId)}
+									onClick={saveClickHandler}
 									disabled={isFormValid === false}
 								>
                   Save
@@ -140,6 +146,15 @@ const AddStageModal = (props) => {
 	);
 };
 
-AddStageModal.propTypes = {};
+AddStageModal.propTypes = {
+	toggleCreateStageModal: PropTypes.func.isRequired,
+	isCreateStageModalVisible: PropTypes.bool.isRequired,
+	addClickHandler: PropTypes.func.isRequired,
+	isFormValid: PropTypes.bool.isRequired,
+	resetModalState: PropTypes.func.isRequired,
+	saveClickHandler: PropTypes.func.isRequired,
+	stageFormStateJS: PropTypes.object.isRequired,
+	updateStageFormStateWrapper: PropTypes.func.isRequired,
+};
 
 export default AddStageModal;

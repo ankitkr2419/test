@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Table } from 'core-components';
 import {
 	ButtonIcon,
@@ -7,11 +8,16 @@ import {
 	Icon,
 } from 'shared-components';
 import AddStageModal from './AddStageModal';
+import stageStateReducer, {
+	stageStateInitialState,
+	stageStateActions,
+} from './stageState';
+import { stageTableHeader } from './stageConstants';
 
 const StageComponent = (props) => {
 	const {
 		templateID,
-		stages,
+		stages, // list of stages
 		addStage,
 		onStageRowClicked,
 		selectedStageId,
@@ -19,33 +25,44 @@ const StageComponent = (props) => {
 		saveStage,
 		goToStepWizard,
 	} = props;
-	// Local state to manage create stage modal
-	const [isCreateStageModalVisible, setCreateStageModalVisibility] = useState(
-		false,
+
+	// local state to save form data and modal state flag
+	const [stageFormState, updateStageFormState] = useReducer(
+		stageStateReducer,
+		stageStateInitialState,
 	);
-	// Local state to store stage name/count
-	const [stageName, setStageName] = useState('');
-	// Local state to store stage type
-	const [stageType, setStageType] = useState('');
-	// Local state to store stage repeat count
-	const [stageRepeatCount, setStageRepeatCount] = useState('');
-	// Local state to store selected stage for update
-	const [updateStageId, setUpdateStageId] = useState(null);
+	// immutable => js
+	const stageFormStateJS = stageFormState.toJS();
+	const { isCreateStageModalVisible } = stageFormStateJS;
+
+	// helper function to update local state
+	const updateStageFormStateWrapper = (key, value) => {
+		updateStageFormState({
+			type: stageStateActions.SET_STAGE_VALUES,
+			key,
+			value,
+		});
+	};
 
 	// helper method to toggle create template modal
 	const toggleCreateStageModal = () => {
-		setCreateStageModalVisibility(!isCreateStageModalVisible);
+		updateStageFormStateWrapper(
+			'isCreateStageModalVisible',
+			!isCreateStageModalVisible,
+		);
 	};
 
 	// Validate create stage form
-	const validateStageForm = () => {
+	const validateStageForm = ({ stageName, stageType, stageRepeatCount }) => {
 		if ((stageName !== '' && stageType !== '', stageRepeatCount !== '')) {
 			return true;
 		}
 		return false;
 	};
 
+	// create stage handler
 	const addClickHandler = () => {
+		const { stageName, stageType, stageRepeatCount } = stageFormStateJS;
 		addStage({
 			template_id: templateID,
 			name: stageName,
@@ -56,7 +73,14 @@ const StageComponent = (props) => {
 		// TODO show error notification
 	};
 
-	const saveClickHandler = (stageId) => {
+	// update stage handler
+	const saveClickHandler = () => {
+		const {
+			stageId,
+			stageName,
+			stageType,
+			stageRepeatCount,
+		} = stageFormStateJS;
 		saveStage(stageId, {
 			template_id: templateID,
 			name: stageName,
@@ -66,28 +90,28 @@ const StageComponent = (props) => {
 		toggleCreateStageModal();
 	};
 
+	// edit stage handler
 	const editStage = (stage) => {
 		const {
 			id, name, type, repeat_count,
 		} = stage.toJS();
-		setUpdateStageId(id);
-		setStageName(name);
-		setStageType({
-			label: type,
-			value: type,
-		});
-		setStageRepeatCount({
-			label: repeat_count,
-			value: repeat_count,
+		updateStageFormState({
+			type: stageStateActions.UPDATE_STAGE_STATE,
+			value: {
+				stageId: id,
+				stageName: name,
+				stageType: { label: type, value: type },
+				stageRepeatCount: { label: repeat_count, value: repeat_count },
+			},
 		});
 		toggleCreateStageModal();
 	};
 
-	const resetModalState = (stage) => {
-		setStageName('');
-		setStageType('');
-		setStageRepeatCount('');
-		setUpdateStageId(null);
+	// resetModalState will clear out form values
+	const resetModalState = () => {
+		updateStageFormState({
+			type: stageStateActions.RESET_STAGE_VALUES,
+		});
 	};
 
 	return (
@@ -95,18 +119,17 @@ const StageComponent = (props) => {
 			<TableWrapper>
 				<Table striped>
 					<colgroup>
-						<col width="17%" />
-						<col width="17%" />
-						<col width="19%" />
-						<col width="17%" />
+						{stageTableHeader.map(ele => (
+							<col key={ele.name} width={ele.width} />
+						))}
 						<col />
 					</colgroup>
+
 					<thead>
 						<tr>
-							<th>Stage</th>
-							<th>Type</th>
-							<th>Repeat Count</th>
-							<th>Steps</th>
+							{stageTableHeader.map(ele => (
+								<th key={ele.name}>{ele.name}</th>
+							))}
 							<th />
 						</tr>
 					</thead>
@@ -155,35 +178,36 @@ const StageComponent = (props) => {
 					</tbody>
 				</Table>
 				<TableWrapperFooter>
-					<Button color="primary" icon onClick={toggleCreateStageModal}>
+					<Button color="primary" isIcon onClick={toggleCreateStageModal}>
 						<Icon size={40} name="plus-2" />
 					</Button>
 					{isCreateStageModalVisible && (
 						<AddStageModal
 							toggleCreateStageModal={toggleCreateStageModal}
 							isCreateStageModalVisible={isCreateStageModalVisible}
-							stageName={stageName}
-							stageType={stageType}
-							stageRepeatCount={stageRepeatCount}
-							setStageName={setStageName}
-							setStageType={setStageType}
-							setStageRepeatCount={setStageRepeatCount}
+							stageFormStateJS={stageFormStateJS}
+							updateStageFormStateWrapper={updateStageFormStateWrapper}
 							addClickHandler={addClickHandler}
-							isFormValid={validateStageForm()}
+							isFormValid={validateStageForm(stageFormStateJS)}
 							resetModalState={resetModalState}
 							saveClickHandler={saveClickHandler}
-							updateStageId={updateStageId}
 						/>
 					)}
-					{/* <Button color="primary" className="ml-auto">
-            Save
-					</Button> */}
 				</TableWrapperFooter>
 			</TableWrapper>
 		</div>
 	);
 };
 
-StageComponent.propTypes = {};
+StageComponent.propTypes = {
+	templateID: PropTypes.string.isRequired,
+	stages: PropTypes.object.isRequired,
+	addStage: PropTypes.func.isRequired,
+	onStageRowClicked: PropTypes.func.isRequired,
+	selectedStageId: PropTypes.string.isRequired,
+	deleteStage: PropTypes.func.isRequired,
+	saveStage: PropTypes.func.isRequired,
+	goToStepWizard: PropTypes.func.isRequired,
+};
 
 export default StageComponent;

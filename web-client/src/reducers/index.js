@@ -16,6 +16,13 @@ import {
 	updateStageReducer,
 } from 'reducers/stageReducer';
 
+import {
+	listStepsReducer,
+	createStepReducer,
+	deleteStepReducer,
+	updateStepReducer,
+} from 'reducers/stepReducer';
+
 const rootReducer = combineReducers({
 	createTemplateReducer,
 	listTemplatesReducer,
@@ -26,6 +33,10 @@ const rootReducer = combineReducers({
 	createStageReducer,
 	deleteStageReducer,
 	updateStageReducer,
+	listStepsReducer,
+	createStepReducer,
+	deleteStepReducer,
+	updateStepReducer,
 });
 
 export default rootReducer;

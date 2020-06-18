@@ -34,9 +34,7 @@ const TargetContainer = (props) => {
 	);
 	const selectedTargets = listTargetByTemplateIDReducer.get('selectedTargets');
 	// isTargetSaved flag will get update when targets are saved successfully over server
-	const { isTargetSaved } = useSelector(
-		state => state.saveTargetReducer,
-	);
+	const { isTargetSaved } = useSelector(state => state.saveTargetReducer);
 
 	// useReducer section
 	// local state to manage selected target data
@@ -139,15 +137,22 @@ const TargetContainer = (props) => {
 			templateID,
 		);
 		// if Capacity exceeds for target selection will redirect to stage wizard
-		if (checkedTargets.length === TARGET_CAPACITY
-			|| checkedTargets.length === selectedTargets.size
+		if (
+			(checkedTargets !== null && checkedTargets.length === TARGET_CAPACITY)
+      || checkedTargets.length === selectedTargets.size
 		) {
 			updateSelectedWizard('stage');
 		} else {
-		// save call to server
+			// save call to server
 			dispatch(saveTarget(templateID, checkedTargets));
 		}
-	}, [selectedTargetState, templateID, selectedTargets, updateSelectedWizard, dispatch]);
+	}, [
+		selectedTargetState,
+		templateID,
+		selectedTargets,
+		updateSelectedWizard,
+		dispatch,
+	]);
 
 	return (
 		<TargetComponent
