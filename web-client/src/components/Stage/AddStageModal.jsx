@@ -43,7 +43,8 @@ const AddStageModal = (props) => {
 			// reset from state
 			resetModalState();
 		};
-	}, [resetModalState]);
+		// eslint-disable-next-line
+	}, []);
 
 	const onChangeHandler = ({ target: { name, value } }) => {
 		updateStageFormStateWrapper(name, value);

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import {
 	Button,
 	FormGroup,
@@ -10,12 +11,10 @@ import {
 	ModalBody,
 	CheckBox,
 } from 'core-components';
-import {
-	ButtonGroup, ButtonIcon, Text,
-} from 'shared-components';
+import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
 
 const AddStepModal = (props) => {
-	const  {
+	const {
 		isCreateStepModalVisible,
 		toggleCreateStepModal,
 		stepFormState,
@@ -23,21 +22,27 @@ const AddStepModal = (props) => {
 		isFormValid,
 		addClickHandler,
 		resetFormValues,
+		saveClickHandler,
 	} = props;
 
 	const {
+		stepId,
 		rampRate,
 		targetTemperature,
 		holdTime,
 		dataCapture,
 	} = stepFormState;
 
+	// stageId will be present when we are updating stage
+	const isUpdateForm = stepId !== null;
+
 	// eslint-disable-next-line arrow-body-style
 	useEffect(() => {
 		return () => {
 			resetFormValues();
 		};
-	}, [resetFormValues]);
+		// eslint-disable-next-line
+  }, []);
 
 	const onChangeHandler = ({ target: { name, value } }) => {
 		updateStepFormStateWrapper(name, value);
@@ -45,10 +50,18 @@ const AddStepModal = (props) => {
 
 	return (
 		<>
-			<Modal isOpen={isCreateStepModalVisible} toggle={toggleCreateStepModal} centered size="lg">
+			<Modal
+				isOpen={isCreateStepModalVisible}
+				toggle={toggleCreateStepModal}
+				centered
+				size="lg"
+			>
 				<ModalBody>
-					<Text tag="h4" className="modal-title text-center text-truncate font-weight-bold">
-						Add Step
+					<Text
+						tag="h4"
+						className="modal-title text-center text-truncate font-weight-bold"
+					>
+            Add Step
 					</Text>
 					<ButtonIcon
 						position="absolute"
@@ -63,7 +76,7 @@ const AddStepModal = (props) => {
 						<Col sm={3}>
 							<FormGroup>
 								<Label for="ramp_rate" className="font-weight-bold">
-										Ramp Rate
+                  Ramp Rate
 								</Label>
 								<Input
 									type="text"
@@ -79,7 +92,7 @@ const AddStepModal = (props) => {
 						<Col sm={3}>
 							<FormGroup>
 								<Label for="target_temperature" className="font-weight-bold">
-										Target Temperature
+                  Target Temperature
 								</Label>
 								<Input
 									type="text"
@@ -95,7 +108,7 @@ const AddStepModal = (props) => {
 						<Col sm={3}>
 							<FormGroup>
 								<Label for="hold_time" className="font-weight-bold">
-										Hold Time
+                  Hold Time
 								</Label>
 								<Input
 									type="time"
@@ -111,24 +124,42 @@ const AddStepModal = (props) => {
 						<Col sm={3}>
 							<FormGroup>
 								<Label for="data_capture" className="font-weight-bold">
-										Data Capture
+                  Data Capture
 								</Label>
 								<CheckBox
 									name="dataCapture"
 									id="dataCapture"
 									onChange={(event) => {
-										updateStepFormStateWrapper(event.target.name, event.target.checked);
+										updateStepFormStateWrapper(
+											event.target.name,
+											event.target.checked,
+										);
 									}}
-									className="mr-2"
+									className="mr-2 ml-3"
 									checked={dataCapture}
 								/>
 							</FormGroup>
 						</Col>
 					</Row>
 					<ButtonGroup className="text-center p-0 m-0 pt-5">
-						<Button onClick={addClickHandler} color="primary" disabled={isFormValid === false}>
-								Add
-						</Button>
+						{isUpdateForm === false && (
+							<Button
+								onClick={addClickHandler}
+								color="primary"
+								disabled={isFormValid === false}
+							>
+                Add
+							</Button>
+						)}
+						{isUpdateForm === true && (
+							<Button
+								onClick={saveClickHandler}
+								color="primary"
+								disabled={isFormValid === false}
+							>
+                Save
+							</Button>
+						)}
 					</ButtonGroup>
 				</ModalBody>
 			</Modal>
@@ -136,6 +167,15 @@ const AddStepModal = (props) => {
 	);
 };
 
-AddStepModal.propTypes = {};
+AddStepModal.propTypes = {
+	isCreateStepModalVisible: PropTypes.bool.isRequired,
+	toggleCreateStepModal: PropTypes.func.isRequired,
+	stepFormState: PropTypes.object.isRequired,
+	updateStepFormStateWrapper: PropTypes.func.isRequired,
+	isFormValid: PropTypes.bool.isRequired,
+	addClickHandler: PropTypes.func.isRequired,
+	resetFormValues: PropTypes.func.isRequired,
+	saveClickHandler: PropTypes.func.isRequired,
+};
 
 export default AddStepModal;

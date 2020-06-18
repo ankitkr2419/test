@@ -14,6 +14,7 @@ const listTemplateInitialState = fromJS({
 const createTemplateInitialState = {
 	data: {},
 	isLoading: true,
+	isTemplateCreated: false,
 };
 
 const updateTemplateInitialState = {
@@ -22,6 +23,7 @@ const updateTemplateInitialState = {
 
 const deleteTemplateInitialState = {
 	data: {},
+	isTemplateDeleted: false,
 };
 
 export const listTemplatesReducer = (
@@ -32,7 +34,10 @@ export const listTemplatesReducer = (
 	case listTemplateActions.listAction:
 		return state.setIn(['isLoading'], true);
 	case listTemplateActions.successAction:
-		return state.merge({ list: fromJS(action.payload.response || []), isLoading: false });
+		return state.merge({
+			list: fromJS(action.payload.response || []),
+			isLoading: false,
+		});
 	case listTemplateActions.failureAction:
 		return state.merge({
 			error: fromJS(action.payload.error),
@@ -49,11 +54,23 @@ export const createTemplateReducer = (
 ) => {
 	switch (action.type) {
 	case createTemplateActions.createAction:
-		return { ...state, isLoading: true };
+		return { ...state, isLoading: true, isTemplateCreated: false };
 	case createTemplateActions.successAction:
-		return { ...state, ...action.payload, isLoading: false };
+		return {
+			...state,
+			...action.payload,
+			isLoading: false,
+			isTemplateCreated: true,
+		};
 	case createTemplateActions.failureAction:
-		return { ...state, ...action.payload, isLoading: false };
+		return {
+			...state,
+			...action.payload,
+			isLoading: false,
+			isTemplateCreated: true,
+		};
+	case createTemplateActions.createTemplateReset:
+		return deleteTemplateInitialState;
 	default:
 		return state;
 	}
@@ -67,9 +84,17 @@ export const updateTemplateReducer = (
 	case updateTemplateActions.updateAction:
 		return { ...state, isLoading: true };
 	case updateTemplateActions.successAction:
-		return { ...state, ...action.payload, isLoading: false };
+		return {
+			...state,
+			...action.payload,
+			isLoading: false,
+		};
 	case updateTemplateActions.failureAction:
-		return { ...state, ...action.payload, isLoading: false };
+		return {
+			...state,
+			...action.payload,
+			isLoading: false,
+		};
 	default:
 		return state;
 	}
@@ -81,11 +106,23 @@ export const deleteTemplateReducer = (
 ) => {
 	switch (action.type) {
 	case deleteTemplateActions.deleteAction:
-		return { ...state, isLoading: true };
+		return { ...state, isLoading: true, isTemplateDeleted: false };
 	case deleteTemplateActions.successAction:
-		return { ...state, ...action.payload, isLoading: false };
+		return {
+			...state,
+			...action.payload,
+			isLoading: false,
+			isTemplateDeleted: true,
+		};
 	case deleteTemplateActions.failureAction:
-		return { ...state, ...action.payload, isLoading: false };
+		return {
+			...state,
+			...action.payload,
+			isLoading: false,
+			isTemplateDeleted: true,
+		};
+	case deleteTemplateActions.deleteTemplateReset:
+		return deleteTemplateInitialState;
 	default:
 		return state;
 	}

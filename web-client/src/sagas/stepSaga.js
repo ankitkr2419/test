@@ -59,7 +59,7 @@ export function* fetchSteps(actions) {
 
 export function* updateStep(actions) {
 	const {
-		payload: { stepID, body },
+		payload: { stepId, body },
 	} = actions;
 
 	const { successAction, failureAction } = updateStepActions;
@@ -69,7 +69,7 @@ export function* updateStep(actions) {
 			payload: {
 				method: HTTP_METHODS.PUT,
 				body,
-				reqPath: `step/${stepID}`,
+				reqPath: `steps/${stepId}`,
 				successAction,
 				failureAction,
 			},

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
 	Button,
@@ -23,7 +23,16 @@ const CreateTemplateModal = (props) => {
 		setTemplateName,
 		addClickHandler,
 		isFormValid,
+		resetFormValues,
 	} = props;
+
+	// eslint-disable-next-line arrow-body-style
+	useEffect(() => {
+		return () => {
+			resetFormValues();
+		};
+		// eslint-disable-next-line
+		}, []);
 
 	return (
 		<>

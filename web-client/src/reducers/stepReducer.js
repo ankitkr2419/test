@@ -80,7 +80,7 @@ export const updateStepReducer = (
 		};
 	case updateStepActions.failureAction:
 		return {
-			...state, ...action.payload, isLoading: false, isStepUpdated: false,
+			...state, ...action.payload, isLoading: false, isStepUpdated: true,
 		};
 	case updateStepActions.updateStepReset:
 		return updateStepInitialState;

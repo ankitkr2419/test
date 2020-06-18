@@ -15,7 +15,7 @@ export const listTargetReducer = (state = listTargetInitialState, action) => {
 	case listTargetActions.listAction:
 		return state.setIn(['isLoading'], true);
 	case listTargetActions.successAction:
-		return state.merge({ list: fromJS(action.payload.response), isLoading: false });
+		return state.merge({ list: fromJS(action.payload.response || []), isLoading: false });
 	case listTargetActions.failureAction:
 		return state.merge({
 			error: fromJS(action.payload.error),

@@ -20,6 +20,10 @@ export const createTemplateFailed = errorResponse => ({
 	},
 });
 
+export const addTemplateReset = () => ({
+	type: createTemplateActions.createTemplateReset,
+});
+
 export const fetchTemplates = () => ({
 	type: listTemplateActions.listAction,
 });
@@ -61,4 +65,8 @@ export const deleteTemplateFailed = errorResponse => ({
 		...errorResponse,
 		error: true,
 	},
+});
+
+export const deleteTemplateReset = () => ({
+	type: deleteTemplateActions.deleteTemplateReset,
 });

@@ -138,8 +138,11 @@ const TargetContainer = (props) => {
 		);
 		// if Capacity exceeds for target selection will redirect to stage wizard
 		if (
-			(checkedTargets !== null && checkedTargets.length === TARGET_CAPACITY)
-      || checkedTargets.length === selectedTargets.size
+			(checkedTargets !== null
+        && selectedTargets !== null
+        && checkedTargets.length === TARGET_CAPACITY)
+      || (selectedTargets !== null
+        && checkedTargets.length === selectedTargets.size)
 		) {
 			updateSelectedWizard('stage');
 		} else {

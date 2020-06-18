@@ -64,6 +64,11 @@ const TemplateComponent = (props) => {
 		updateSelectedWizard('target');
 	};
 
+	const resetFormValues = () => {
+		setTemplateDescription('');
+		setTemplateName('');
+	};
+
 	return (
 		<div className="d-flex flex-100 flex-column p-4 mt-3">
 			{templates.size === 0 && (
@@ -99,16 +104,19 @@ const TemplateComponent = (props) => {
           Create New
 				</Button>
 			</ButtonGroup>
-			<CreateTemplateModal
-				isCreateTemplateModalVisible={isCreateTemplateModalVisible}
-				toggleCreateTemplateModal={toggleCreateTemplateModal}
-				templateDescription={templateDescription}
-				setTemplateDescription={setTemplateDescription}
-				templateName={templateName}
-				setTemplateName={setTemplateName}
-				addClickHandler={addClickHandler}
-				isFormValid={validateTemplateForm()}
-			/>
+			{isCreateTemplateModalVisible && (
+				<CreateTemplateModal
+					isCreateTemplateModalVisible={isCreateTemplateModalVisible}
+					toggleCreateTemplateModal={toggleCreateTemplateModal}
+					templateDescription={templateDescription}
+					setTemplateDescription={setTemplateDescription}
+					templateName={templateName}
+					setTemplateName={setTemplateName}
+					addClickHandler={addClickHandler}
+					isFormValid={validateTemplateForm()}
+					resetFormValues={resetFormValues}
+				/>
+			)}
 		</div>
 	);
 };

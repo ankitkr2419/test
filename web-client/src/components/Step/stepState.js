@@ -8,6 +8,7 @@ export const stepStateActions = {
 };
 
 export const stepStateInitialState = fromJS({
+	stepId: null,
 	rampRate: '',
 	targetTemperature: '',
 	holdTime: '',

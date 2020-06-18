@@ -9,7 +9,7 @@ import {
 	Icon,
 } from 'shared-components';
 import stepStateReducer, { stepStateInitialState } from 'components/Step/stepState';
-import { convertStringToSeconds } from 'utils/helpers';
+import { convertStringToSeconds, convertSecondsToString } from 'utils/helpers';
 import AddStepModal from './AddStepModal';
 import { stepStateActions } from './stepState';
 
@@ -21,7 +21,7 @@ const StepComponent = (props) => {
 		deleteStep,
 		onStepRowClicked,
 		selectedStepId,
-		// saveStep, // update api cal
+		saveStep, // update api cal
 	} = props;
 
 	// local state to save form data and modal state flag
@@ -64,9 +64,11 @@ const StepComponent = (props) => {
 		if (rampRate !== '' && targetTemperature !== '' && holdTime !== '') {
 			return true;
 		}
+
 		return false;
 	};
 
+	// create step handler
 	const addClickHandler = () => {
 		const {
 			rampRate,
@@ -78,7 +80,25 @@ const StepComponent = (props) => {
 			stage_id: stageId,
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
-			// hold_time: new Date(),
+			hold_time: convertStringToSeconds(holdTime),
+			data_capture: dataCapture,
+		});
+		toggleCreateStepModal();
+	};
+
+	// update step handler
+	const saveClickHandler = () => {
+		const {
+			stepId,
+			rampRate,
+			targetTemperature,
+			holdTime,
+			dataCapture,
+		} = stepFormStateJS;
+		saveStep(stepId, {
+			stage_id: stageId,
+			ramp_rate: parseFloat(rampRate),
+			target_temp: parseFloat(targetTemperature),
 			hold_time: convertStringToSeconds(holdTime),
 			data_capture: dataCapture,
 		});
@@ -87,7 +107,6 @@ const StepComponent = (props) => {
 
 	const editStep = ({
 		id,
-		stage_id,
 		ramp_rate,
 		target_temp,
 		hold_time,
@@ -101,7 +120,7 @@ const StepComponent = (props) => {
 				stepId: id,
 				rampRate: ramp_rate,
 				targetTemperature: target_temp,
-				holdTime: hold_time,
+				holdTime: convertSecondsToString(hold_time),
 				dataCapture: data_capture,
 			},
 		});
@@ -140,8 +159,7 @@ const StepComponent = (props) => {
                   (unit seconds)
 								</th>
 								<th>
-                  Data Capture <br />
-                  (boolean flag)
+                  Data Capture
 								</th>
 								<th />
 							</tr>
@@ -161,7 +179,8 @@ const StepComponent = (props) => {
 										<td>{index + 1}</td>
 										<td>{step.get('ramp_rate')}</td>
 										<td>{step.get('target_temp')}</td>
-										<td>{step.get('hold_time')}</td>
+										<td>{convertSecondsToString(step.get('hold_time'))}</td>
+										{/* <td>{step.get('hold_time')}</td> */}
 										<td>{step.get('data_capture').toString()}</td>
 										<td className="td-actions">
 											<ButtonIcon
@@ -186,7 +205,7 @@ const StepComponent = (props) => {
 					</Table>
 				</TableWrapperBody>
 				<TableWrapperFooter>
-					<Button color="primary" isIcon onClick={toggleCreateStepModal}>
+					<Button color="primary" icon onClick={toggleCreateStepModal}>
 						<Icon size={40} name="plus-2" />
 					</Button>
 					{isCreateStepModalVisible && (
@@ -197,6 +216,7 @@ const StepComponent = (props) => {
 							updateStepFormStateWrapper={updateStepFormStateWrapper}
 							isFormValid={validateStepForm(stepFormStateJS)}
 							addClickHandler={addClickHandler}
+							saveClickHandler={saveClickHandler}
 							resetFormValues={resetFormValues}
 						/>
 					)}

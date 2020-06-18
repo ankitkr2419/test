@@ -22,6 +22,7 @@ import {
 	fetchStepsSaga,
 	addStepSaga,
 	deleteStepSaga,
+	updateStepSaga,
 } from 'sagas/stepSaga';
 
 const allSagas = [
@@ -39,6 +40,7 @@ const allSagas = [
 	fetchStepsSaga(),
 	addStepSaga(),
 	deleteStepSaga(),
+	updateStepSaga(),
 ];
 
 export default function* rootSaga() {

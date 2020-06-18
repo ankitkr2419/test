@@ -38,7 +38,6 @@ export const getSelectedTargetsToLocal = (
 			return null;
 		});
 	}
-	// console.table(arr);
 	return arr;
 };
 

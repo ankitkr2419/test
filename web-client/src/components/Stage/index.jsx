@@ -178,7 +178,7 @@ const StageComponent = (props) => {
 					</tbody>
 				</Table>
 				<TableWrapperFooter>
-					<Button color="primary" isIcon onClick={toggleCreateStageModal}>
+					<Button color="primary" icon onClick={toggleCreateStageModal}>
 						<Icon size={40} name="plus-2" />
 					</Button>
 					{isCreateStageModalVisible && (
@@ -204,7 +204,7 @@ StageComponent.propTypes = {
 	stages: PropTypes.object.isRequired,
 	addStage: PropTypes.func.isRequired,
 	onStageRowClicked: PropTypes.func.isRequired,
-	selectedStageId: PropTypes.string.isRequired,
+	selectedStageId: PropTypes.string,
 	deleteStage: PropTypes.func.isRequired,
 	saveStage: PropTypes.func.isRequired,
 	goToStepWizard: PropTypes.func.isRequired,

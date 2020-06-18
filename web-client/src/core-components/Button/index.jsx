@@ -11,11 +11,11 @@ const StyledButton = styled(Button)`
 	line-height: 19px;
 	font-weight: ${props => (props.outline ? 'normal' : 'bold')};
 	padding: ${props => (props.size === 'sm' ? '8px 24px' : '10px 20px')};
-	border-radius: ${props => (props.isIcon ? '8px' : '27px')};
+	border-radius: ${props => (props.icon === "true" ? '8px' : '27px')};
 	box-shadow: ${props => (props.outline ? 'none' : '0 2px 6px #00000029')};
 	border-width: ${props => (props.outline ? '2px' : '')};
 
-	${props => props.isIcon
+	${props => props.icon === "true"
 		&& css`
 			display: flex;
 			align-items: center;

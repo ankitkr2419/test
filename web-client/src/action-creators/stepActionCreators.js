@@ -39,10 +39,10 @@ export const fetchStepsFailed = errorResponse => ({
 	},
 });
 
-export const updateStep = (stepID, body) => ({
+export const updateStep = (stepId, body) => ({
 	type: updateStepActions.updateAction,
 	payload: {
-		stepID,
+		stepId,
 		body,
 	},
 });

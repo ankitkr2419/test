@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import {
 	createTemplateReducer,
 	listTemplatesReducer,
+	deleteTemplateReducer,
 } from 'reducers/templateReducer';
 import {
 	listTargetReducer,
@@ -26,6 +27,7 @@ import {
 const rootReducer = combineReducers({
 	createTemplateReducer,
 	listTemplatesReducer,
+	deleteTemplateReducer,
 	listTargetReducer,
 	listTargetByTemplateIDReducer,
 	saveTargetReducer,

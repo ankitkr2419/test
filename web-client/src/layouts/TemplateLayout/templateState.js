@@ -14,10 +14,10 @@ export const templateInitialState = fromJS({
 	activeWidgetID: 'template',
 	// Pre-filled template initial list with saved wizard list
 	wizardList,
-	// templateID: null,
-	// stageId: null,
-	templateID: 'df4914e9-41e1-4d51-8655-23de1bffdc86',
-	stageId: '6b3eb88a-0ab3-4c4c-bfe7-4263a1076db4',
+	// templateID: '948297f7-4166-49af-bad0-4a1742d9ca8a',
+	// stageId: 'd57185b8-952b-4369-a4a3-6317de7f35dd',
+	templateID: null,
+	stageId: null,
 });
 
 // getUpdateList will update all disabled to true and set false to selected wizard

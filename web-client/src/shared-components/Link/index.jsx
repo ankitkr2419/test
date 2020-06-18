@@ -1,22 +1,22 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-import styled, { css } from "styled-components";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
 const StyledLink = styled(Link)`
-  display: ${(props) => (props.icon ? "flex" : "inline-block")};
-  width: ${(props) => (props.icon ? "40px" : "202px")};
+  display: ${props => (props.icon === 'true' ? 'flex' : 'inline-block')};
+  width: ${props => (props.icon === 'true' ? '40px' : '202px')};
   height: 40px;
   font-size: 16px;
   line-height: 19px;
   font-weight: bold;
   text-align: center;
   vertical-align: middle;
-  padding: ${(props) => (props.icon ? "4px" : "10px 20px")};
-  border-radius: ${(props) => (props.icon ? "50%" : "27px")};
-  border-width: ${(props) => (props.icon ? "" : "1px")};
-  border-style: ${(props) => (props.icon ? "" : "solid")};
-  box-shadow: ${(props) => (props.icon ? "" : "0 2px 6px #00000029")};
+  padding: ${props => (props.icon === 'true' ? '4px' : '10px 20px')};
+  border-radius: ${props => (props.icon === 'true' ? '50%' : '27px')};
+  border-width: ${props => (props.icon === 'true' ? '' : '1px')};
+  border-style: ${props => (props.icon === 'true' ? '' : 'solid')};
+  box-shadow: ${props => (props.icon === 'true' ? '' : '0 2px 6px #00000029')};
   user-select: none;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -26,16 +26,15 @@ const StyledLink = styled(Link)`
 
   &:focus {
     outline: none;
-    box-shadow: ${(props) => (props.icon ? "" : "0 2px 6px #00000029")};
+    box-shadow: ${props => (props.icon === 'true' ? '' : '0 2px 6px #00000029')};
   }
 
   &:hover {
     text-decoration: none;
   }
 
-  ${(props) =>
-    props.icon &&
-    css`
+  ${props => props.icon
+    && css`
       align-items: center;
       justify-content: center;
 
@@ -46,20 +45,20 @@ const StyledLink = styled(Link)`
 `;
 
 const CustomLink = (props) => {
-  const { icon, ...rest } = props;
-  return (
-    <StyledLink icon={icon.toString()} {...rest}>
-      {props.children}
-    </StyledLink>
-  );
+	const { icon, ...rest } = props;
+	return (
+		<StyledLink icon={icon.toString()} {...rest}>
+			{props.children}
+		</StyledLink>
+	);
 };
 
 CustomLink.propTypes = {
-  icon: PropTypes.bool,
+	icon: PropTypes.bool,
 };
 
 CustomLink.defaultProps = {
-  icon: false,
+	icon: false,
 };
 
 export default CustomLink;

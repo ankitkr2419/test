@@ -64,13 +64,12 @@ const StepContainer = (props) => {
 	};
 
 	const deleteStep = (stepId) => {
-		console.log('in delete stepId: ', stepId);
 		// deleting step though api
 		dispatch(deleteStepAction(stepId));
 	};
 
 	const saveStep = (stepId, step) => {
-		dispatch(updateStepAction(stepId, { ...step, stage_id: stageId }));
+		dispatch(updateStepAction(stepId, step));
 	};
 
 	// Here will update selected step id
