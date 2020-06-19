@@ -5,10 +5,10 @@ import { withRouter } from "react-router";
 import RouteWithSubRoutes from "RouteHelper";
 import { ROOT_URL_PATH } from "./constants";
 import AppLayoutContainer from 'containers/AppLayoutContainer';
-import TemplateContainer from "containers/TemplateContainer";
 import LoginContainer from "containers/LoginContainer";
 import PlateContainer from "containers/PlateContainer";
 import ActivityContainer from "containers/ActivityContainer";
+import TemplateLayout from "layouts/TemplateLayout";
 
 export const routeDefinitions = [
 	{
@@ -19,7 +19,7 @@ export const routeDefinitions = [
 			{
 				path: `${ROOT_URL_PATH}templates`,
 				exact: true,
-				component: TemplateContainer,
+				component: TemplateLayout,
 				key: 2,
 			},
 			{

@@ -1,88 +1,75 @@
-import React from "react";
-import { Button, CheckBox, Select } from "core-components";
+import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
+import {
+	Button, CheckBox, Select, Input,
+} from 'core-components';
 import {
 	TargetList,
 	TargetListHeader,
 	TargetListItem,
-	Text
-} from "shared-components";
+	Text,
+} from 'shared-components';
 
-export const TargetListContainer = (props) => {
+import { covertToSelectOption } from 'utils/helpers';
 
-  const Targets = [
-		{
-			selectionOption1: [
-				{ value: "option 1", label: "Option 1" },
-				{ value: "option 2", label: "Option 2" },
-				{ value: "option 3", label: "Option 3" },
-			],
-			selectionOption2: [
-				{ value: "0.1", label: "0.1" },
-				{ value: "0.2", label: "0.2" },
-				{ value: "0.3", label: "0.3" },
-			],
-		},
-		{
-			selectionOption1: [
-				{ value: "option 1", label: "Option 1" },
-				{ value: "option 2", label: "Option 2" },
-				{ value: "option 3", label: "Option 3" },
-			],
-			selectionOption2: [
-				{ value: "0.1", label: "0.1" },
-				{ value: "0.2", label: "0.2" },
-				{ value: "0.3", label: "0.3" },
-			],
-		},
-		{
-			selectionOption1: [
-				{ value: "option 1", label: "Option 1" },
-				{ value: "option 2", label: "Option 2" },
-				{ value: "option 3", label: "Option 3" },
-			],
-			selectionOption2: [
-				{ value: "0.1", label: "0.1" },
-				{ value: "0.2", label: "0.2" },
-				{ value: "0.3", label: "0.3" },
-			],
-		},
-		{
-			selectionOption1: [
-				{ value: "option 1", label: "Option 1" },
-				{ value: "option 2", label: "Option 2" },
-				{ value: "option 3", label: "Option 3" },
-			],
-			selectionOption2: [
-				{ value: "0.1", label: "0.1" },
-				{ value: "0.2", label: "0.2" },
-				{ value: "0.3", label: "0.3" },
-			],
-		},
-		{
-			selectionOption1: [
-				{ value: "option 1", label: "Option 1" },
-				{ value: "option 2", label: "Option 2" },
-				{ value: "option 3", label: "Option 3" },
-			],
-			selectionOption2: [
-				{ value: "0.1", label: "0.1" },
-				{ value: "0.2", label: "0.2" },
-				{ value: "0.3", label: "0.3" },
-			],
-		},
-		{
-			selectionOption1: [
-				{ value: "option 1", label: "Option 1" },
-				{ value: "option 2", label: "Option 2" },
-				{ value: "option 3", label: "Option 3" },
-			],
-			selectionOption2: [
-				{ value: "0.1", label: "0.1" },
-				{ value: "0.2", label: "0.2" },
-				{ value: "0.3", label: "0.3" },
-			],
-		},
-	];
+const TargetComponent = (props) => {
+	const {
+		// master target list
+		listTargetReducer,
+		// local state target list used for manipulation
+		selectedTargetState,
+		onCheckedHandler,
+		onTargetSelect,
+		onThresholdSelect,
+		onSaveClick,
+		getCheckedTargetCount,
+	} = props;
+
+	// Extracting targetList from immutable target state
+	const targetList = selectedTargetState.get('targetList');
+	// selected target count will help us in validating save button
+	const selectedTargetCount = getCheckedTargetCount();
+
+	const isTargetDisabled = (ele) => {
+		if (ele.selectedTarget === undefined || ele.threshold === undefined) {
+			return true;
+		}
+		return false;
+	};
+
+	const getTargetRows = useMemo(() => targetList.map((ele, index) => (
+		<TargetListItem key={index}>
+			<CheckBox
+				onChange={(event) => {
+					onCheckedHandler(event, index);
+				}}
+				className="mr-2"
+				id={`target${index}`}
+				checked={ele.isChecked}
+				disabled={isTargetDisabled(ele)}
+			/>
+			<Select
+				className="flex-100 px-2"
+				options={covertToSelectOption(listTargetReducer, 'name', 'id')}
+				placeholder="Please select target."
+				onChange={(selectedTarget) => {
+					onTargetSelect(selectedTarget, index);
+				}}
+				value={ele.selectedTarget}
+			/>
+			<Input
+				className="flex-40 pl-2"
+				type="number"
+				name="threshold"
+				id="threshold"
+				placeholder="Type here..."
+				value={ele.threshold || ''}
+				onChange={(event) => {
+					onThresholdSelect(event.target.value, index);
+				}}
+			/>
+		</TargetListItem>
+	)), [listTargetReducer, onCheckedHandler, onTargetSelect, onThresholdSelect, targetList]);
 
 	return (
 		<>
@@ -93,28 +80,31 @@ export const TargetListContainer = (props) => {
 						<Text className="flex-100 mb-2 px-4">Target</Text>
 						<Text className="flex-40 mb-2 px-4">Threshold</Text>
 					</TargetListHeader>
-					{Targets.map((target, i) => (
-						<TargetListItem key={i}>
-							<CheckBox className="mr-2" id={`target${i}`} />
-							<Select
-								className="flex-100 px-2"
-								options={target.selectionOption1}
-								placeholder=""
-							/>
-							<Select
-								className="flex-40 pl-2"
-								options={target.selectionOption2}
-								placeholder=""
-							/>
-						</TargetListItem>
-					))}
+					{getTargetRows}
 				</TargetList>
 			</div>
 			<div className="d-flex flex-30 align-items-end p-4">
-				<Button color="primary" className="mx-auto mb-3" disabled>
-					Save
+				<Button
+					color="primary"
+					onClick={onSaveClick}
+					className="mx-auto mb-3"
+					disabled={selectedTargetCount === 0}
+				>
+          Save
 				</Button>
 			</div>
 		</>
 	);
 };
+
+TargetComponent.propTypes = {
+	listTargetReducer: PropTypes.object.isRequired,
+	selectedTargetState: PropTypes.object.isRequired,
+	onCheckedHandler: PropTypes.func.isRequired,
+	onTargetSelect: PropTypes.func.isRequired,
+	onThresholdSelect: PropTypes.func.isRequired,
+	onSaveClick: PropTypes.func.isRequired,
+	getCheckedTargetCount: PropTypes.func.isRequired,
+};
+
+export default TargetComponent;

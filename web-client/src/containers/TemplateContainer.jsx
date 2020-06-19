@@ -1,52 +1,72 @@
-import React from "react";
-import { Card, CardBody } from 'core-components';
-import { Step, StepItem, StepLink } from "shared-components";
-// import { TemplateListContainer } from "components/Template";
-import { TargetListContainer } from "components/Target";
-// import Stage from "components/Stage";
-// import Steps from "components/Steps";
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import TemplateComponent from 'components/Template';
+import {
+	fetchTemplates,
+	createTemplate as createTemplateAction,
+	deleteTemplate as deleteTemplateAction,
+	addTemplateReset,
+	deleteTemplateReset,
+} from 'action-creators/templateActionCreators';
 
-const StepList = [
-	{
-		name: "Template",
-		disable: false,
-	},
-	{
-		name: "View Target",
-		disable: true,
-	},
-	{
-		name: "Add Stage",
-		disable: true,
-	},
-	{
-		name: "Add Step",
-		disable: true,
-	},
-];
+const TemplateContainer = (props) => {
+	const { updateSelectedWizard, updateTemplateID } = props;
+	const dispatch = useDispatch();
+	// reading templates from redux
+	const templates = useSelector(state => state.listTemplatesReducer);
+	// isTemplateCreated = true means template created successfully
+	const { isTemplateCreated } = useSelector(state => state.createTemplateReducer);
+	// isTemplateDeleted = true means template deleted successfully
+	const { isTemplateDeleted } = useSelector(state => state.deleteTemplateReducer);
 
-const TemplateContainer = props => {
-  return (
-		<div className="template-content">
-			<Step>
-				{StepList.map((step, i) => (
-					<StepItem key={i} isDisable={step.disable}>
-						<StepLink>{step.name}</StepLink>
-					</StepItem>
-				))}
-			</Step>
-			<Card>
-				<CardBody className="d-flex flex-unset overflow-hidden p-0">
-					{/* <TemplateListContainer /> */}
-					<TargetListContainer />
-					{/* <Stage /> */}
-					{/* <Steps /> */}
-				</CardBody>
-			</Card>
-		</div>
+	useEffect(() => {
+		// Once we create template will fetch updated template list
+		if (isTemplateCreated === true) {
+			dispatch(addTemplateReset());
+			dispatch(fetchTemplates());
+		}
+	}, [isTemplateCreated, dispatch]);
+
+	useEffect(() => {
+		// Once we delete template will fetch updated template list
+		if (isTemplateDeleted === true) {
+			dispatch(deleteTemplateReset());
+			dispatch(fetchTemplates());
+		}
+	}, [isTemplateDeleted, dispatch]);
+
+
+	useEffect(() => {
+		// getting templates through api.
+		dispatch(fetchTemplates());
+	}, [dispatch]);
+
+	const createTemplate = (template) => {
+		// creating template though api
+		dispatch(createTemplateAction(template));
+	};
+
+	const deleteTemplate = (templateID) => {
+		// deleting template though api
+		dispatch(deleteTemplateAction(templateID));
+	};
+
+	return (
+		<TemplateComponent
+			// Extracting list before passing down to component ref. Immutable
+			templates={templates.get('list')}
+			createTemplate={createTemplate}
+			deleteTemplate={deleteTemplate}
+			updateSelectedWizard={updateSelectedWizard}
+			updateTemplateID={updateTemplateID}
+		/>
 	);
 };
 
-TemplateContainer.propTypes = {};
+TemplateContainer.propTypes = {
+	updateSelectedWizard: PropTypes.func.isRequired,
+	updateTemplateID: PropTypes.func.isRequired,
+};
 
 export default TemplateContainer;

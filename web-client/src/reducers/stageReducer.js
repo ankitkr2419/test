@@ -1,91 +1,115 @@
-import { fromJS } from "immutable";
+import { fromJS } from 'immutable';
 import {
-  addStageActions,
-  listStageActions,
-  updateStageActions,
-  deleteStageActions,
-} from "actions/stageActions";
+	addStageActions,
+	listStageActions,
+	updateStageActions,
+	deleteStageActions,
+} from 'actions/stageActions';
 
 const listStageInitialState = fromJS({
-  isLoading: true,
-  list: [],
+	isLoading: true,
+	list: [],
+	// selectedStageId: null,
 });
 
 const createStageInitialState = {
-  data: {},
+	data: {},
+	isStageSaved: false,
 };
 
 const updateStageInitialState = {
-  data: {},
+	data: {},
+	isStageUpdated: false,
 };
 
 const deleteStageInitialState = {
-  data: {},
+	data: {},
+	isStageDeleted: false,
 };
 
 export const listStagesReducer = (
-  state = listStageInitialState,
-  action
+	state = listStageInitialState,
+	action,
 ) => {
-  switch (action.type) {
-    case listStageActions.listAction:
-      return state.setIn(["isLoading"], true);
-    case listStageActions.successAction:
-      return state.merge({ list: fromJS(action.payload), isLoading: false });
-    case listStageActions.failureAction:
-      return state.merge({
-        error: fromJS(action.payload.error),
-        isLoading: false,
-      });
-    default:
-      return state;
-  }
+	switch (action.type) {
+	case listStageActions.listAction:
+		return state.setIn(['isLoading'], true);
+	case listStageActions.successAction:
+		return state.merge({ list: fromJS(action.payload.response || []), isLoading: false });
+	case listStageActions.failureAction:
+		return state.merge({
+			error: fromJS(action.payload.error),
+			isLoading: false,
+		});
+	// case listStageActions.setSelectedStageId:
+	// 	return state.setIn(['selectedStageId'], action.payload.stageId);
+	default:
+		return state;
+	}
 };
 
 export const createStageReducer = (
-  state = createStageInitialState,
-  action
+	state = createStageInitialState,
+	action,
 ) => {
-  switch (action.type) {
-    case addStageActions.addAction:
-      return { ...state, isLoading: true };
-    case addStageActions.successAction:
-      return { ...state, ...action.payload, isLoading: false };
-    case addStageActions.failureAction:
-      return { ...state, ...action.payload, isLoading: false };
-    default:
-      return state;
-  }
+	switch (action.type) {
+	case addStageActions.addAction:
+		return { ...state, isLoading: true, isStageSaved: false };
+	case addStageActions.successAction:
+		return {
+			...state, ...action.payload, isLoading: false, isStageSaved: true,
+		};
+	case addStageActions.failureAction:
+		return {
+			...state, ...action.payload, isLoading: false, isStageSaved: false,
+		};
+	case addStageActions.addStageReset:
+		return createStageInitialState;
+	default:
+		return state;
+	}
 };
 
 export const updateStageReducer = (
-  state = updateStageInitialState,
-  action
+	state = updateStageInitialState,
+	action,
 ) => {
-  switch (action.type) {
-    case updateStageActions.updateAction:
-      return { ...state, isLoading: true };
-    case updateStageActions.successAction:
-      return { ...state, ...action.payload, isLoading: false };
-    case updateStageActions.failureAction:
-      return { ...state, ...action.payload, isLoading: false };
-    default:
-      return state;
-  }
+	switch (action.type) {
+	case updateStageActions.updateAction:
+		return { ...state, isLoading: true, isStageUpdated: false };
+	case updateStageActions.successAction:
+		return {
+			...state, ...action.payload, isLoading: false, isStageUpdated: true,
+		};
+	case updateStageActions.failureAction:
+		return {
+			...state, ...action.payload, isLoading: false, isStageUpdated: true,
+		};
+	case updateStageActions.updateStageReset:
+		return updateStageInitialState;
+	default:
+		return state;
+	}
 };
 
 export const deleteStageReducer = (
-  state = deleteStageInitialState,
-  action
+	state = deleteStageInitialState,
+	action,
 ) => {
-  switch (action.type) {
-    case deleteStageActions.deleteAction:
-      return { ...state, isLoading: true };
-    case deleteStageActions.successAction:
-      return { ...state, ...action.payload, isLoading: false };
-    case deleteStageActions.failureAction:
-      return { ...state, ...action.payload, isLoading: false };
-    default:
-      return state;
-  }
+	switch (action.type) {
+	case deleteStageActions.deleteAction:
+		return { ...state, isLoading: true, isStageDeleted: false };
+	case deleteStageActions.successAction:
+		return {
+			...state, ...action.payload, isLoading: false, isStageDeleted: true,
+		};
+	case deleteStageActions.failureAction:
+		return {
+			...state, ...action.payload, isLoading: false, isStageDeleted: true,
+		};
+	case deleteStageActions.deleteStageReset:
+		return deleteStageInitialState;
+	default:
+		return state;
+	}
 };

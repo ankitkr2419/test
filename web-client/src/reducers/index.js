@@ -1,18 +1,44 @@
-import { combineReducers } from "redux";
+import { combineReducers } from 'redux';
 import {
-  createTemplateReducer,
-  listTemplatesReducer,
-} from "reducers/templateReducer";
+	createTemplateReducer,
+	listTemplatesReducer,
+	deleteTemplateReducer,
+} from 'reducers/templateReducer';
 import {
-  listTargetReducer,
-  listTargetByTemplateIDReducer,
-} from "reducers/targetReducer";
+	listTargetReducer,
+	listTargetByTemplateIDReducer,
+	saveTargetReducer,
+} from 'reducers/targetReducer';
+
+import {
+	listStagesReducer,
+	createStageReducer,
+	deleteStageReducer,
+	updateStageReducer,
+} from 'reducers/stageReducer';
+
+import {
+	listStepsReducer,
+	createStepReducer,
+	deleteStepReducer,
+	updateStepReducer,
+} from 'reducers/stepReducer';
 
 const rootReducer = combineReducers({
-  createTemplateReducer,
-  listTemplatesReducer,
-  listTargetReducer,
-  listTargetByTemplateIDReducer,
+	createTemplateReducer,
+	listTemplatesReducer,
+	deleteTemplateReducer,
+	listTargetReducer,
+	listTargetByTemplateIDReducer,
+	saveTargetReducer,
+	listStagesReducer,
+	createStageReducer,
+	deleteStageReducer,
+	updateStageReducer,
+	listStepsReducer,
+	createStepReducer,
+	deleteStepReducer,
+	updateStepReducer,
 });
 
 export default rootReducer;
