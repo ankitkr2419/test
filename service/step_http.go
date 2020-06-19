@@ -169,5 +169,6 @@ func deleteStepHandler(deps Dependencies) http.HandlerFunc {
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
+		rw.Write([]byte("step deleted successfully"))
 	})
 }

@@ -16,8 +16,8 @@ const (
 		VALUES ($1, $2, $3, $4) RETURNING id`
 
 	getStageListQuery = `SELECT * FROM stages
-		ORDER BY name ASC
-		where template_id = $1`
+		where template_id = $1
+		ORDER BY name ASC`
 
 	getStageQuery = `SELECT id,
 		name,
@@ -31,7 +31,7 @@ const (
 		name,
 		type,
 		repeat_count,
-		template_id =
+		template_id) =
 		($1, $2, $3, $4) where id = $5`
 
 	deleteStageQuery = `DELETE FROM stages WHERE id = $1`

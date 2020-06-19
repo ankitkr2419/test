@@ -1,0 +1,44 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "react/jsx-filename-extension": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/label-has-for": "off",
+    "camelcase": "off",
+    "func-names": ["error", "never"],
+    "import/prefer-default-export": "off",
+    "no-unused-vars": "off",
+    "import/no-extraneous-dependencies": "off",
+    "no-multi-spaces": "off",
+    "class-methods-use-this": "off",
+    "no-class-assign": "off",
+    "key-spacing": "off",
+    "lines-between-class-members": "off",
+    "no-param-reassign": "off",
+    "no-console": "off",
+    "consistent-return": "off",
+    "jsx-a11y/href-no-hash": "off",
+    "import/no-unresolved": "off",
+    "indent": [2, "tab"],
+    "no-tabs": 0
+  },
+  "plugins": [
+    "react"
+  ],
+  "parser": "babel-eslint",
+  "settings": {
+    "react": {
+      "version": "16.2.0"
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      }
+    }
+  }
+}

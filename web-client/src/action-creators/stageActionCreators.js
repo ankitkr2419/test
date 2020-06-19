@@ -1,67 +1,79 @@
 import {
-  addStageActions,
-  listStageActions,
-  updateStageActions,
-  deleteStageActions,
-} from "actions/stageActions";
+	addStageActions,
+	listStageActions,
+	updateStageActions,
+	deleteStageActions,
+} from 'actions/stageActions';
 
-export const addStage = (body) => ({
-  type: addStageActions.addAction,
-  payload: {
-    body,
-  },
+export const addStage = body => ({
+	type: addStageActions.addAction,
+	payload: {
+		body,
+	},
 });
 
-export const addStageFailed = (errorResponse) => ({
-  type: addStageActions.failureAction,
-  payload: {
-    ...errorResponse,
-    error: true,
-  },
+export const addStageFailed = errorResponse => ({
+	type: addStageActions.failureAction,
+	payload: {
+		...errorResponse,
+		error: true,
+	},
 });
 
-export const fetchStages = (body) => ({
-  type: listStageActions.listAction,
-  payload: {
-    body,
-  },
+export const addStageReset = () => ({
+	type: addStageActions.addStageReset,
 });
 
-export const fetchStagesFailed = (errorResponse) => ({
-  type: listStageActions.failureAction,
-  payload: {
-    ...errorResponse,
-    error: true,
-  },
+export const fetchStages = templateID => ({
+	type: listStageActions.listAction,
+	payload: {
+		templateID,
+	},
 });
 
-export const updateStage = (stageID, body) => ({
-  type: updateStageActions.updateAction,
-  payload: {
-    stageID,
-    body,
-  },
+export const fetchStagesFailed = errorResponse => ({
+	type: listStageActions.failureAction,
+	payload: {
+		...errorResponse,
+		error: true,
+	},
 });
 
-export const updateStageFailed = (errorResponse) => ({
-  type: updateStageActions.failureAction,
-  payload: {
-    ...errorResponse,
-    error: true,
-  },
+export const updateStage = (stageId, body) => ({
+	type: updateStageActions.updateAction,
+	payload: {
+		stageId,
+		body,
+	},
 });
 
-export const deleteStage = (stageID) => ({
-  type: deleteStageActions.deleteAction,
-  payload: {
-    stageID,
-  },
+export const updateStageReset = () => ({
+	type: updateStageActions.updateStageReset,
 });
 
-export const deleteStageFailed = (errorResponse) => ({
-  type: deleteStageActions.failureAction,
-  payload: {
-    ...errorResponse,
-    error: true,
-  },
+export const updateStageFailed = errorResponse => ({
+	type: updateStageActions.failureAction,
+	payload: {
+		...errorResponse,
+		error: true,
+	},
+});
+
+export const deleteStage = stageId => ({
+	type: deleteStageActions.deleteAction,
+	payload: {
+		stageId,
+	},
+});
+
+export const deleteStageReset = () => ({
+	type: deleteStageActions.deleteStageReset,
+});
+
+export const deleteStageFailed = errorResponse => ({
+	type: deleteStageActions.failureAction,
+	payload: {
+		...errorResponse,
+		error: true,
+	},
 });

@@ -12,18 +12,20 @@ export const StepItem = styled(NavItem)`
 	margin: 0;
 	padding: 0 23px;
 	text-align: center;
-	opacity: ${(props) => (props.isDisable ? "0.53" : "")};
-	pointer-events: ${(props) => (props.isDisable ? "none" : "")};
+	opacity: ${(props) => (props.disabled ? "0.53" : "")};
+	pointer-events: ${(props) => (props.disabled ? "none" : "")};
 
 	+ .nav-item {
 		margin: 0 0 0 -16px;
 	}
 `;
 
+StepItem.passProps = false;
+
 StepItem.propTypes = {
-	isDisable: PropTypes.bool,
+	disabled: PropTypes.bool,
 };
 
 StepItem.defaultProps = {
-	isDisable: false
+	disabled: false
 };

@@ -2,9 +2,9 @@ package db
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"time"
 )
 
 const (
@@ -28,12 +28,12 @@ const (
 		FROM steps WHERE id = $1`
 
 	updateStepQuery = `UPDATE steps SET (
-		stage_id = $1,
-		ramp_rate = $2,
-		target_temp = $3,
-		hold_time = $4,
-		data_capture = $5)
-		where id = $6`
+		stage_id,
+		ramp_rate,
+		target_temp,
+		hold_time,
+		data_capture) =
+		($1, $2, $3, $4, $5) where id = $6`
 
 	deleteStepQuery = `DELETE FROM steps WHERE id = $1`
 )
@@ -43,7 +43,7 @@ type Step struct {
 	StageID           uuid.UUID `db:"stage_id" json:"stage_id"`
 	RampRate          float64   `db:"ramp_rate" json:"ramp_rate"`
 	TargetTemperature float64   `db:"target_temp" json:"target_temp"`
-	HoldTime          time.Time `db:"hold_time" json:"hold_time"`
+	HoldTime          int       `db:"hold_time" json:"hold_time"`
 	DataCapture       bool      `db:"data_capture" json:"data_capture"`
 }
 
@@ -84,7 +84,7 @@ func (s *pgStore) CreateStep(ctx context.Context, st Step) (createdStep Step, er
 func (s *pgStore) UpdateStep(ctx context.Context, st Step) (err error) {
 
 	_, err = s.db.Exec(
-		updateStageQuery,
+		updateStepQuery,
 		st.StageID,
 		st.RampRate,
 		st.TargetTemperature,

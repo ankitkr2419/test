@@ -1,15 +1,48 @@
-import { all } from "redux-saga/effects";
-import { createTemplateSaga, fetchTemplatesSaga } from "sagas/templateSaga";
-import { saveTargetSaga, fetchMasterTargetsSaga, fetchTargetsByTemplateIDSaga } from "sagas/targetSaga";
+import { all } from 'redux-saga/effects';
+import {
+	createTemplateSaga,
+	fetchTemplatesSaga,
+	createTemplateSuccessSaga,
+	deleteTemplateSaga,
+} from 'sagas/templateSaga';
+import {
+	saveTargetSaga,
+	fetchMasterTargetsSaga,
+	fetchTargetsByTemplateIDSaga,
+} from 'sagas/targetSaga';
+
+import {
+	fetchStagesSaga,
+	addStageSaga,
+	deleteStageSaga,
+	updateStageSaga,
+} from 'sagas/stageSaga';
+
+import {
+	fetchStepsSaga,
+	addStepSaga,
+	deleteStepSaga,
+	updateStepSaga,
+} from 'sagas/stepSaga';
 
 const allSagas = [
-  createTemplateSaga(),
-  fetchTemplatesSaga(),
-  saveTargetSaga(),
-  fetchMasterTargetsSaga(),
-  fetchTargetsByTemplateIDSaga(),
+	createTemplateSaga(),
+	fetchTemplatesSaga(),
+	createTemplateSuccessSaga(),
+	saveTargetSaga(),
+	fetchMasterTargetsSaga(),
+	fetchTargetsByTemplateIDSaga(),
+	deleteTemplateSaga(),
+	fetchStagesSaga(),
+	addStageSaga(),
+	deleteStageSaga(),
+	updateStageSaga(),
+	fetchStepsSaga(),
+	addStepSaga(),
+	deleteStepSaga(),
+	updateStepSaga(),
 ];
 
 export default function* rootSaga() {
-  yield all(allSagas);
+	yield all(allSagas);
 }

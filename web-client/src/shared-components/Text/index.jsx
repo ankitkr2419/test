@@ -1,16 +1,29 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const Text = props => {
-  return <props.tag className={props.className}>{props.children}</props.tag>;
-};
+/**
+ * Text component can be used for multi purpose by passing tag as prop
+ * e.g tag can be span.
+ * @param {*} props
+ */
 
-export default Text;
+const Text = ({
+	Tag, onClick, className, children,
+}) => (
+	<Tag onClick={onClick} className={className}>
+		{children}
+	</Tag>
+);
 
 Text.propTypes = {
-	tag: PropTypes.string,
+	Tag: PropTypes.string,
+	className: PropTypes.string,
+	onClick: PropTypes.func,
+	children: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
 };
 
 Text.defaultProps = {
-  tag: "p"
+	Tag: 'p',
 };
+
+export default Text;

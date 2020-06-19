@@ -41,8 +41,8 @@ func (suite *StageHandlerTestSuite) TestListStagesSuccess() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/stages/{template_id}",
-		"/stages/"+tempUUID.String(),
+		"/templates/{template_id}/stages",
+		"/templates/"+tempUUID.String()+"/stages",
 		"",
 		listStagesHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -61,8 +61,8 @@ func (suite *StageHandlerTestSuite) TestListStagesFail() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/stages/{template_id}",
-		"/stages/"+tempUUID.String(),
+		"/templates/{template_id}/stages",
+		"/templates/"+tempUUID.String()+"/stages",
 		"",
 		listStagesHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -81,8 +81,8 @@ func (suite *StageHandlerTestSuite) TestCreateStageSuccess() {
 
 	body := fmt.Sprintf(`{"name":"test-stage","type":"Repeat", "repeat_count":3, "template_id":"%s"}`, tempUUID)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/stage",
-		"/stage",
+		"/stages",
+		"/stages",
 		body,
 		createStageHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -102,8 +102,8 @@ func (suite *StageHandlerTestSuite) TestUpdateStageSuccess() {
 	body := fmt.Sprintf(`{"name":"test-stage","type":"Repeat", "repeat_count":3, "template_id":"%s"}`, tempUUID)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/stage/{id}",
-		"/stage/"+testUUID.String(),
+		"/stages/{id}",
+		"/stages/"+testUUID.String(),
 		body,
 		updateStageHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -121,13 +121,13 @@ func (suite *StageHandlerTestSuite) TestDeleteStageSuccess() {
 		nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
-		"/stage/{id}",
-		"/stage/"+testUUID.String(),
+		"/stages/{id}",
+		"/stages/"+testUUID.String(),
 		"",
 		deleteStageHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), "stage deleted successfully", recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -140,8 +140,8 @@ func (suite *StageHandlerTestSuite) TestShowStageSuccess() {
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/stage/{id}",
-		"/stage/"+testUUID.String(),
+		"/stages/{id}",
+		"/stages/"+testUUID.String(),
 		"",
 		showStageHandler(Dependencies{Store: suite.dbMock}),
 	)
