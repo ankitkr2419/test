@@ -123,6 +123,7 @@ func startApp(plcName string, test bool) (err error) {
 	// cors configuration for front-end
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedMethods: []string{"PUT", "DELETE", "POST", "GET"},
 	})
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

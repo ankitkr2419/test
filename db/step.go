@@ -28,12 +28,12 @@ const (
 		FROM steps WHERE id = $1`
 
 	updateStepQuery = `UPDATE steps SET (
-		stage_id = $1,
-		ramp_rate = $2,
-		target_temp = $3,
-		hold_time = $4,
-		data_capture = $5)
-		where id = $6`
+		stage_id,
+		ramp_rate,
+		target_temp,
+		hold_time,
+		data_capture) =
+		($1, $2, $3, $4, $5) where id = $6`
 
 	deleteStepQuery = `DELETE FROM steps WHERE id = $1`
 )
@@ -84,7 +84,7 @@ func (s *pgStore) CreateStep(ctx context.Context, st Step) (createdStep Step, er
 func (s *pgStore) UpdateStep(ctx context.Context, st Step) (err error) {
 
 	_, err = s.db.Exec(
-		updateStageQuery,
+		updateStepQuery,
 		st.StageID,
 		st.RampRate,
 		st.TargetTemperature,
