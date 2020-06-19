@@ -1,0 +1,10 @@
+environment: normal  # normal | error
+
+controls:
+  positive: 1
+  negative: 0
+  internal: 0
+  no_template: 2
+
+wells:
+  count: 1
