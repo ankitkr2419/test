@@ -22,7 +22,7 @@ func Load(configFile string) {
 	viper.AddConfigPath("./")
 	viper.AddConfigPath("./..")
 	viper.AddConfigPath("./../..")
-	viper.ReadInConfig()
+	viper.MergeInConfig()
 	viper.AutomaticEnv()
 }
 

@@ -16,9 +16,10 @@ type Step struct {
 
 // We can have at most 4 Holding steps and 6 Cycling steps.
 type Stage struct {
-	Holding    []Step // 4 steps
-	Cycle      []Step // 6 steps
-	CycleCount uint16 // number of cycles to run
+	Holding      []Step // 4 steps
+	Cycle        []Step // 6 steps
+	CycleCount   uint16 // number of cycles to run
+	IdealLidTemp uint16 // ideal lid temp
 }
 
 type Emissions [6]uint16
