@@ -26,6 +26,7 @@ const CreateTemplateModal = (props) => {
 		resetFormValues,
 	} = props;
 
+	// disabled as we only need effect to be run while component is un-mounting
 	// eslint-disable-next-line arrow-body-style
 	useEffect(() => {
 		return () => {

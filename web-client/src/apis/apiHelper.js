@@ -26,7 +26,7 @@ const getRequestUrl = (reqPath, params) => {
 	if (params !== null) {
 		queryParams = getQueryString(params);
 	}
-	// If API_HOST_URL is present return prefix with it( API_HOST_URL can be configures from .env)
+	// If API_HOST_URL is present return prefix with it( API_HOST_URL can be configured from .env)
 	if (API_HOST_URL) {
 		return `${API_HOST_URL}/${reqPath}${queryParams}`;
 	}
@@ -44,7 +44,7 @@ const defaultHeaders = () => ({
 // Rest success status check
 export const isSuccessResponse = status => status >= 200 && status < 300;
 
-// dispatcherHelper is generic method which requires actions and payload that is to be dispatched
+// dispatcherHelper is a method which requires actions and payload that is to be dispatched
 const dispatcherHelper = (action, parsedResponse, error = false) => ({
 	type: action,
 	payload: {
@@ -75,7 +75,7 @@ export function* callApi(actions) {
 			params = null,
 		},
 	} = actions;
-
+	// request url formation
 	const fetchUrl = getRequestUrl(reqPath, params);
 	try {
 		const fetchOptions = {

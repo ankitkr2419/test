@@ -1,7 +1,5 @@
 import React, { useCallback, useReducer } from 'react';
-// import PropTypes from "prop-types";
-import { CardBody } from 'reactstrap';
-import { Card } from 'core-components';
+import { CardBody, Card } from 'core-components';
 import Wizard from 'shared-components/Wizard';
 import TemplateContainer from 'containers/TemplateContainer';
 import TargetContainer from 'containers/TargetContainer';
@@ -12,7 +10,7 @@ import templateLayoutReducer, {
 	templateLayoutActions,
 } from './templateState';
 
-const TemplateLayout = (props) => {
+const TemplateLayout = () => {
 	// Local state to manage selected wizard
 	const [templateLayoutState, templateLayoutDispatch] = useReducer(
 		templateLayoutReducer,
@@ -32,19 +30,19 @@ const TemplateLayout = (props) => {
 		});
 	}, []);
 
-	const updateTemplateID = useCallback((templateID) => {
+	const updateTemplateID = useCallback((selectedTemplateID) => {
 		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_TEMPLATE_ID,
-			value: templateID,
+			value: selectedTemplateID,
 		});
 	}, []);
 
-	const updateStageID = useCallback((stageId) => {
+	const updateStageID = useCallback((selectedStageId) => {
 		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_STAGE_ID,
-			value: stageId,
+			value: selectedStageId,
 		});
 	}, []);
 
@@ -87,7 +85,5 @@ const TemplateLayout = (props) => {
 		</div>
 	);
 };
-
-TemplateLayout.propTypes = {};
 
 export default TemplateLayout;

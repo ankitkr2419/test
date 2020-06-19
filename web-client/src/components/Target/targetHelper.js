@@ -10,12 +10,6 @@ export const getTargetOption = () => {
 	return arr;
 };
 
-export const covertToSelectOption = (list) => {
-	const arr = [];
-	list.map(ele => arr.push({ label: ele.get('name'), value: ele.get('id') }));
-	return arr;
-};
-
 export const getSelectedTargetsToLocal = (
 	selectedTargets,
 	listTargetReducer,
@@ -49,6 +43,5 @@ export const isTargetAlreadySelected = (selectedTargetState, selectedTarget) => 
 	const foundElement = list.find(
 		ele => (ele.selectedTarget && ele.selectedTarget.value === selectedTarget.value),
 	);
-
 	return foundElement !== undefined;
 };
