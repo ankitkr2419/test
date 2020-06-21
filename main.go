@@ -30,6 +30,9 @@ func main() {
 
 	config.Load("application")
 
+	// config file to configure dye & targets
+	config.Load("config")
+
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
 	cliApp.Version = "1.0.0"
@@ -115,6 +118,13 @@ func startApp(plcName string, test bool) (err error) {
 	deps := service.Dependencies{
 		Store: store,
 		Plc:   driver,
+	}
+
+	// setup Db with dyes & targets
+	err = db.DBSetup(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Dyes & Targets failed")
+		return
 	}
 
 	// mux router

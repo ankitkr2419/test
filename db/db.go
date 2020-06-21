@@ -7,6 +7,8 @@ import (
 )
 
 type Storer interface {
+	InsertDyes(context.Context, []Dye) ([]Dye, error)
+	InsertTargets(context.Context, []Target) error
 	ListTargets(context.Context) ([]Target, error)
 	ListTemplates(context.Context) ([]Template, error)
 	CreateTemplate(context.Context, Template) (Template, error)
