@@ -1,11 +1,13 @@
 import React from "react";
 import { Card, CardBody } from "core-components";
 import { ButtonGroup, Link } from "shared-components";
+import Login from "components/Login";
 
 const LoginContainer = (props) => {
   return (
 		<div className="login-content">
 			<ButtonGroup>
+				{/* TODO: Add "active" class to <Link> to highlight active state */}
 				<Link to="/" className="btn-secondary mr-4">
 					Admin
 				</Link>
@@ -21,7 +23,7 @@ const LoginContainer = (props) => {
 							Login as Operator
 						</Link>
 					</div>
-					<div className="flex-100" />
+					<Login />
 				</CardBody>
 			</Card>
 		</div>

@@ -1,0 +1,111 @@
+import React, { useState } from "react";
+import {
+	Button,
+	Form,
+	FormGroup,
+	Row,
+	Col,
+	Input,
+	Label,
+	Modal,
+	ModalBody,
+} from "core-components";
+import { Center, ButtonIcon, Icon, Text } from "shared-components";
+
+const AddStepModal = (props) => {
+	const [stageModal, setStepModal] = useState(false);
+	const toggleStepModal = () => setStepModal(!stageModal);
+
+	return (
+		<>
+			<Button color="primary" isIcon onClick={toggleStepModal}>
+				<Icon size={40} name="plus-2" />
+			</Button>
+			<Modal isOpen={stageModal} toggle={toggleStepModal} centered size="lg">
+				<ModalBody>
+					<Text tag="h4" className="modal-title text-center text-truncate font-weight-bold">
+						Add Step
+					</Text>
+					<ButtonIcon
+						position="absolute"
+						placement="right"
+						top={24}
+						right={32}
+						size={32}
+						name="cross"
+						onClick={toggleStepModal}
+					/>
+					<Form>
+						<Row form className="mb-5 pb-5">
+							<Col sm={3}>
+								<FormGroup>
+									<Label for="ramp_rate" className="font-weight-bold">
+										Ramp Rate
+									</Label>
+									<Input
+										type="text"
+										name="ramp_rate"
+										id="ramp_rate"
+										placeholder="Type here"
+									/>
+									<Label>unit °C</Label>
+								</FormGroup>
+							</Col>
+							<Col sm={3}>
+								<FormGroup>
+									<Label for="target_temperature" className="font-weight-bold">
+										Target Temperature
+									</Label>
+									<Input
+										type="text"
+										name="target_temperature"
+										id="target_temperature"
+										placeholder="Type here"
+									/>
+									<Label>unit °C</Label>
+								</FormGroup>
+							</Col>
+							<Col sm={3}>
+								<FormGroup>
+									<Label for="hold_time" className="font-weight-bold">
+										Hold Time
+									</Label>
+									<Input
+										type="text"
+										name="hold_time"
+										id="hold_time"
+										placeholder="Type here"
+									/>
+									<Label>unit seconds</Label>
+								</FormGroup>
+							</Col>
+							<Col sm={3}>
+								<FormGroup>
+									<Label for="data_capture" className="font-weight-bold">
+										Data Capture
+									</Label>
+									<Input
+										type="text"
+										name="data_capture"
+										id="data_capture"
+										placeholder="Type here"
+									/>
+									<Label>boolean flag</Label>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Center className="pt-5">
+							<Button color="primary" disabled>
+								Add
+							</Button>
+						</Center>
+					</Form>
+				</ModalBody>
+			</Modal>
+		</>
+	);
+};
+
+AddStepModal.propTypes = {};
+
+export default AddStepModal;

@@ -1,5 +1,6 @@
 import ButtonGroup from './ButtonGroup';
 import ButtonIcon from './ButtonIcon';
+import Center from "./Center";
 import Icon from './Icon';
 import Link from './Link';
 import Logo from './Logo';
@@ -15,19 +16,20 @@ import Text from './Text';
 
 export {
 	ButtonGroup,
-	ButtonIcon,
-	Icon,
-	Link,
-	Logo,
-	Step,
-	StepItem,
-	StepLink,
-	TableWrapper,
-	TableWrapperBody,
-	TableWrapperFooter,
-	TargetList,
-	TargetListHeader,
-	TargetListItem,
+  ButtonIcon,
+  Center,
+  Icon,
+  Link,
+  Logo,
+  Step, 
+  StepItem,
+  StepLink,
+  TableWrapper,
+  TableWrapperBody,
+  TableWrapperFooter,
+  TargetList, 
+  TargetListHeader, 
+  TargetListItem,
 	Text,
 	StyledUl,
 	StyledLi,
