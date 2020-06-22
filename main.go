@@ -121,7 +121,7 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	// setup Db with dyes & targets
-	err = db.DBSetup(store)
+	err = db.Setup(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Dyes & Targets failed")
 		return

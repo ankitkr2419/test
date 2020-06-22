@@ -24,8 +24,6 @@ type Target struct {
 	ID    uuid.UUID `db:"id" json:"id"`
 	Name  string    `db:"name" json:"name" validate:"required"`
 	DyeID uuid.UUID `db:"dye_id" json:"dye_id" validate:"required"`
-	// position added to link dye with target from config but this field is not added in DB.
-	Position int
 }
 
 func (s *pgStore) ListTargets(ctx context.Context) (t []Target, err error) {

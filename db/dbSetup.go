@@ -7,12 +7,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config is used to get data from config file
 type Config struct {
-	Dyes    []Dye
-	Targets []Target
+	Dyes []struct {
+		Name     string
+		Position int
+		Targets  []string
+	}
 }
 
-func DBSetup(s Storer) (err error) {
+// DBSetup initializes dye & targets in DB
+func Setup(s Storer) (err error) {
 	var config Config
 	err = viper.Unmarshal(&config)
 	if err != nil {
@@ -20,8 +25,11 @@ func DBSetup(s Storer) (err error) {
 		return
 	}
 
+	//create dye list
+	DyeList := makeDyeList(config)
+
 	// add dye to DB
-	InsertedDyes, err := s.InsertDyes(context.Background(), config.Dyes)
+	InsertedDyes, err := s.InsertDyes(context.Background(), DyeList)
 	if err != nil {
 		return
 	}
@@ -29,7 +37,7 @@ func DBSetup(s Storer) (err error) {
 	logger.Info("Dyes Added in Database")
 
 	//create target list with dye Id
-	newTargets := makeTargetList(InsertedDyes, config.Targets)
+	newTargets := makeTargetList(InsertedDyes, config)
 
 	//add target to DB
 	err = s.InsertTargets(context.Background(), newTargets)
@@ -42,14 +50,28 @@ func DBSetup(s Storer) (err error) {
 	return
 }
 
-func makeTargetList(dyes []Dye, targets []Target) (newTargets []Target) {
-	for _, t := range targets {
+func makeTargetList(dyes []Dye, config Config) (newTargets []Target) {
+	for _, c := range config.Dyes {
 		for _, d := range dyes {
-			if t.Position == d.Position {
-				t.DyeID = d.ID
-				newTargets = append(newTargets, t)
+			if c.Name == d.Name && c.Position == d.Position {
+				for _, name := range c.Targets {
+					t := Target{}
+					t.DyeID = d.ID
+					t.Name = name
+					newTargets = append(newTargets, t)
+				}
 			}
 		}
+	}
+	return
+}
+
+func makeDyeList(configDyes Config) (Dyes []Dye) {
+	dye := Dye{}
+	for _, d := range configDyes.Dyes {
+		dye.Name = d.Name
+		dye.Position = d.Position
+		Dyes = append(Dyes, dye)
 	}
 	return
 }
