@@ -125,3 +125,13 @@ func (m *DBMockStore) ListExpTemplateTargets(ctx context.Context, id uuid.UUID) 
 	args := m.Called(ctx, id)
 	return args.Get(0).([]ExpTemplateTarget), args.Error(1)
 }
+
+func (m *DBMockStore) InsertDyes(ctx context.Context, d []Dye) (dyes []Dye, err error) {
+	args := m.Called(ctx, d)
+	return args.Get(0).([]Dye), args.Error(1)
+}
+
+func (m *DBMockStore) InsertTargets(ctx context.Context, t []Target) (err error) {
+	args := m.Called(ctx, t)
+	return args.Error(1)
+}

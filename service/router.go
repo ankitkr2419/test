@@ -7,6 +7,7 @@ import (
 	"mylab/cpagent/config"
 
 	"github.com/gorilla/mux"
+	logger "github.com/sirupsen/logrus"
 )
 
 const (
@@ -22,7 +23,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 
 	// Version 1 API management
 	v1 := fmt.Sprintf("application/vnd.%s.v1", config.AppName())
-	fmt.Println("v1", v1)
+	logger.WithField("v1", v1).Info("Accept Header")
 
 	router.HandleFunc("/targets", listTargetHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/templates/{id}", updateTemplateHandler(deps)).Methods(http.MethodPut).Headers(versionHeader, v1)

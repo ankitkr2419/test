@@ -110,7 +110,7 @@ func (suite *TemplateHandlerTestSuite) TestUpdateTemplateSuccess() {
 	)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), "template updated successfully", recorder.Body.String())
+	assert.Equal(suite.T(), `{"msg":"template updated successfully"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -128,7 +128,7 @@ func (suite *TemplateHandlerTestSuite) TestDeleteTemplateSuccess() {
 		deleteTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), "template deleted successfully", recorder.Body.String())
+	assert.Equal(suite.T(), `{"msg":"template deleted successfully"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

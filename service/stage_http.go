@@ -115,7 +115,7 @@ func updateStageHandler(deps Dependencies) http.HandlerFunc {
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte("stage updated successfully"))
+		rw.Write([]byte(`{"msg":"stage updated successfully"}`))
 	})
 }
 
@@ -169,6 +169,6 @@ func deleteStageHandler(deps Dependencies) http.HandlerFunc {
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte("stage deleted successfully"))
+		rw.Write([]byte(`{"msg":"stage deleted successfully"}`))
 	})
 }

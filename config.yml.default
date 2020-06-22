@@ -1,0 +1,18 @@
+dyes:
+  - name: "FAM"
+    position: 2
+    targets: ["HIV","COVID"]
+  - name: "CY5"
+    position: 1
+    targets: ["DENGUE","HCV"]
+  - name: "VIC"
+    position: 3
+  - name: "NED"
+    position: 4
+    targets: ["COVID"]
+  - name: "ROX"
+    position: 6
+    targets: ["CANCER"]
+  - name: "SYBR"
+    position: 5
+    targets: ["TB"]

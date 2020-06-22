@@ -109,7 +109,7 @@ func (suite *StepHandlerTestSuite) TestUpdateStepSuccess() {
 	)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), "step updated successfully", recorder.Body.String())
+	assert.Equal(suite.T(), `{"msg":"step updated successfully"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -127,7 +127,7 @@ func (suite *StepHandlerTestSuite) TestDeleteStepSuccess() {
 		deleteStepHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), "step deleted successfully", recorder.Body.String())
+	assert.Equal(suite.T(), `{"msg":"step deleted successfully"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
