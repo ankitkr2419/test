@@ -12,7 +12,7 @@ import {
 	ModalBody,
 	Select,
 } from 'core-components';
-import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
+import { Center, ButtonIcon, Text } from 'shared-components';
 import { stageTypeOptions, countTypeOptions } from './stageConstants';
 
 const AddStageModal = (props) => {
@@ -120,7 +120,7 @@ const AddStageModal = (props) => {
 								</FormGroup>
 							</Col>
 						</Row>
-						<ButtonGroup className="text-center p-0 m-0 pt-5">
+						<Center className="text-center p-0 m-0 pt-5">
 							{isUpdateForm === false && (
 								<Button
 									color="primary"
@@ -139,7 +139,7 @@ const AddStageModal = (props) => {
                   Save
 								</Button>
 							)}
-						</ButtonGroup>
+						</Center>
 					</Form>
 				</ModalBody>
 			</Modal>
