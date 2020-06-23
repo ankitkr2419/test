@@ -17,6 +17,8 @@ const TemplateComponent = (props) => {
 		deleteTemplate,
 		updateSelectedWizard,
 		updateTemplateID,
+		isLoginTypeOperator,
+		isLoginTypeAdmin,
 	} = props;
 
 	// Local state to manage create template modal
@@ -28,6 +30,8 @@ const TemplateComponent = (props) => {
 	const [templateDescription, setTemplateDescription] = useState('');
 	// Local state to store template name
 	const [templateName, setTemplateName] = useState('');
+	// Local state to store template name
+	const [selectedTemplateId, setSelectedTemplateId] = useState(null);
 
 	// helper method to toggle create template modal
 	const toggleCreateTemplateModal = () => {
@@ -54,13 +58,26 @@ const TemplateComponent = (props) => {
 		// TODO show error notification
 	};
 
-	const deleteClickHandler = (templateID) => {
-		deleteTemplate(templateID);
+	const deleteClickHandler = () => {
+		// Delete api call
+		deleteTemplate(selectedTemplateId);
 	};
 
-	const editClickHandler = (templateID) => {
-		updateTemplateID(templateID);
+	const editClickHandler = () => {
+		// Updates template id to templateState maintain over templateLayout
+		updateTemplateID(selectedTemplateId);
+		// navigate to next wizard
 		updateSelectedWizard('target');
+	};
+
+	const onTemplateButtonClickHandler = (templateId) => {
+		setSelectedTemplateId(templateId);
+		if (isLoginTypeAdmin === false) {
+			// Updates template id to templateState maintain over templateLayout
+			updateTemplateID(templateId);
+			// navigate to next wizard
+			updateSelectedWizard('target');
+		}
 	};
 
 	const resetFormValues = () => {
@@ -79,29 +96,27 @@ const TemplateComponent = (props) => {
 				{/* templates size check before iteration */}
 				{templates.size !== 0
           && templates.map(template => (
-					<StyledLi key={template.get('id')}>
-						<CustomButton
-							title={template.get('name')}
-							isEditable
-							onEditClickHandler={() => {
-								editClickHandler(template.get('id'));
-							}}
-							isDeletable
-							onDeleteClickHandler={() => {
-								deleteClickHandler(template.get('id'));
-							}}
-						/>
-					</StyledLi>
+          	<StyledLi key={template.get('id')}>
+          		<CustomButton
+          			title={template.get('name')}
+          			isActive={template.get('id') === selectedTemplateId}
+          			isEditable={isLoginTypeAdmin === true && isLoginTypeOperator === false}
+          			onButtonClickHandler={() => {
+          				onTemplateButtonClickHandler(template.get('id'));
+          			}}
+          			onEditClickHandler={editClickHandler}
+          			isDeletable={isLoginTypeAdmin === true && isLoginTypeOperator === false}
+          			onDeleteClickHandler={deleteClickHandler}
+          		/>
+          	</StyledLi>
           ))}
 			</StyledUl>
 			<Center className="text-center">
-				{/*
-          TODO Handle login flow when operator
-          <Button color="primary">Next</Button>
-        */}
-				<Button color="primary" onClick={toggleCreateTemplateModal}>
-          Create New
-				</Button>
+				{isLoginTypeAdmin === true && (
+					<Button color="primary" onClick={toggleCreateTemplateModal}>
+            Create New
+					</Button>
+				)}
 			</Center>
 			{isCreateTemplateModalVisible && (
 				<CreateTemplateModal
@@ -126,6 +141,8 @@ TemplateComponent.propTypes = {
 	deleteTemplate: PropTypes.func.isRequired,
 	updateSelectedWizard: PropTypes.func.isRequired,
 	updateTemplateID: PropTypes.func.isRequired,
+	isLoginTypeOperator: PropTypes.bool.isRequired,
+	isLoginTypeAdmin: PropTypes.bool.isRequired,
 };
 
 export default React.memo(TemplateComponent);

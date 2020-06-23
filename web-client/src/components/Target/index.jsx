@@ -20,9 +20,11 @@ const TargetComponent = (props) => {
 		selectedTargetState,
 		onCheckedHandler,
 		onTargetSelect,
-		onThresholdSelect,
+		onThresholdChange,
 		onSaveClick,
 		getCheckedTargetCount,
+		isLoginTypeAdmin,
+		isLoginTypeOperator,
 	} = props;
 
 	// Extracting targetList from immutable target state
@@ -37,40 +39,64 @@ const TargetComponent = (props) => {
 		return false;
 	};
 
-	const getTargetRows = useMemo(() => targetList.map((ele, index) => (
-		<TargetListItem key={index}>
-			<CheckBox
-				onChange={(event) => {
-					onCheckedHandler(event, index);
-				}}
-				className="mr-2"
-				id={`target${index}`}
-				checked={ele.isChecked}
-				disabled={isTargetDisabled(ele)}
-			/>
-			<Select
-				className="flex-100 px-2"
-				options={covertToSelectOption(listTargetReducer, 'name', 'id')}
-				placeholder="Please select target."
-				onChange={(selectedTarget) => {
-					onTargetSelect(selectedTarget, index);
-				}}
-				value={ele.selectedTarget}
-			/>
-			<Input
-				className="flex-40 pl-2"
-				type="number"
-				name="threshold"
-				id="threshold"
-				placeholder="Type here..."
-				value={ele.threshold || ''}
-				onChange={(event) => {
-					onThresholdSelect(event.target.value, index);
-				}}
-			/>
-		</TargetListItem>
-	)), [listTargetReducer, onCheckedHandler, onTargetSelect, onThresholdSelect, targetList]);
-
+	const getTargetRows = useMemo(
+		() => targetList.map((ele, index) => (
+			<TargetListItem key={index}>
+				<CheckBox
+					onChange={(event) => {
+						onCheckedHandler(event, index);
+					}}
+					className="mr-2"
+					id={`target${index}`}
+					checked={ele.isChecked}
+					disabled={isTargetDisabled(ele)}
+				/>
+				{isLoginTypeAdmin === true && (
+					// if it's a admin he can select targets from master targets
+					<Select
+						className="flex-100 px-2"
+						options={covertToSelectOption(listTargetReducer, 'name', 'id')}
+						placeholder="Please select target."
+						onChange={(selectedTarget) => {
+							onTargetSelect(selectedTarget, index);
+						}}
+						value={ele.selectedTarget}
+					/>
+				)}
+				{isLoginTypeOperator === true && (
+					// for operator will show in disabled state
+					<Input
+						className="flex-100 mr-2"
+						type="text"
+						placeholder="Type here..."
+						defaultValue={ele.selectedTarget && ele.selectedTarget.label}
+						disabled
+					/>
+				)}
+				<Input
+					className="flex-40 pl-2"
+					type="number"
+					name={`threshold${index}`}
+					index={`threshold${index}`}
+					placeholder="Type here..."
+					value={ele.threshold || ''}
+					min="0"
+					onChange={(event) => {
+						onThresholdChange(event.target.value, index);
+					}}
+				/>
+			</TargetListItem>
+		)),
+		[
+			listTargetReducer,
+			onCheckedHandler,
+			onTargetSelect,
+			onThresholdChange,
+			targetList,
+			isLoginTypeOperator,
+			isLoginTypeAdmin,
+		],
+	);
 	return (
 		<>
 			<div className="flex-100 scroll-y p-4">
@@ -88,7 +114,8 @@ const TargetComponent = (props) => {
 					color="primary"
 					onClick={onSaveClick}
 					className="mx-auto mb-3"
-					disabled={selectedTargetCount === 0}
+					// TODO Enabled it once operator new design is in place
+					disabled={selectedTargetCount === 0 || isLoginTypeOperator === true}
 				>
           Save
 				</Button>
@@ -102,9 +129,11 @@ TargetComponent.propTypes = {
 	selectedTargetState: PropTypes.object.isRequired,
 	onCheckedHandler: PropTypes.func.isRequired,
 	onTargetSelect: PropTypes.func.isRequired,
-	onThresholdSelect: PropTypes.func.isRequired,
+	onThresholdChange: PropTypes.func.isRequired,
 	onSaveClick: PropTypes.func.isRequired,
 	getCheckedTargetCount: PropTypes.func.isRequired,
+	isLoginTypeAdmin: PropTypes.bool.isRequired,
+	isLoginTypeOperator: PropTypes.bool.isRequired,
 };
 
 export default TargetComponent;

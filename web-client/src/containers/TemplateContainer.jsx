@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Redirect } from 'react-router';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import TemplateComponent from 'components/Template';
@@ -12,17 +11,20 @@ import {
 } from 'action-creators/templateActionCreators';
 
 const TemplateContainer = (props) => {
-	const { updateSelectedWizard, updateTemplateID } = props;
+	const {
+		isLoginTypeOperator, isLoginTypeAdmin, updateSelectedWizard, updateTemplateID,
+	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
 	// isTemplateCreated = true means template created successfully
-	const { isTemplateCreated } = useSelector(state => state.createTemplateReducer);
+	const { isTemplateCreated } = useSelector(
+		state => state.createTemplateReducer,
+	);
 	// isTemplateDeleted = true means template deleted successfully
-	const { isTemplateDeleted } = useSelector(state => state.deleteTemplateReducer);
-	// loginReducer will listen to get logged in state with type of use logged in
-	const loginReducer = useSelector(state => state.loginReducer);
-	const { isUserLoggedIn, isLoginTypeOperator } = loginReducer.toJS();
+	const { isTemplateDeleted } = useSelector(
+		state => state.deleteTemplateReducer,
+	);
 
 	useEffect(() => {
 		// Once we create template will fetch updated template list
@@ -40,7 +42,6 @@ const TemplateContainer = (props) => {
 		}
 	}, [isTemplateDeleted, dispatch]);
 
-
 	useEffect(() => {
 		// getting templates through api.
 		dispatch(fetchTemplates());
@@ -56,10 +57,6 @@ const TemplateContainer = (props) => {
 		dispatch(deleteTemplateAction(templateID));
 	};
 
-	if (isUserLoggedIn === false) {
-		return <Redirect to='/login'/>;
-	}
-
 	return (
 		<TemplateComponent
 			// Extracting list before passing down to component reference=>Immutable
@@ -68,6 +65,7 @@ const TemplateContainer = (props) => {
 			deleteTemplate={deleteTemplate}
 			updateSelectedWizard={updateSelectedWizard}
 			updateTemplateID={updateTemplateID}
+			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
 		/>
 	);
@@ -78,4 +76,4 @@ TemplateContainer.propTypes = {
 	updateTemplateID: PropTypes.func.isRequired,
 };
 
-export default TemplateContainer;
+export default React.memo(TemplateContainer);

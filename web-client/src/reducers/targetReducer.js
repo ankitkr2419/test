@@ -29,6 +29,7 @@ export const listTargetReducer = (state = listTargetInitialState, action) => {
 const listTargetByTemplateIDInitialState = fromJS({
 	selectedTargets: [],
 	error: false,
+	isLoading: true,
 });
 
 export const listTargetByTemplateIDReducer = (

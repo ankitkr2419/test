@@ -22,7 +22,9 @@ import { TARGET_CAPACITY } from '../constants';
 
 const TargetContainer = (props) => {
 	// constants
-	const { updateSelectedWizard, templateID } = props;
+	const {
+		updateSelectedWizard, templateID, isLoginTypeAdmin, isLoginTypeOperator,
+	} = props;
 	const dispatch = useDispatch();
 
 	// useSelector section
@@ -33,6 +35,7 @@ const TargetContainer = (props) => {
 		state => state.listTargetByTemplateIDReducer,
 	);
 	const selectedTargets = listTargetByTemplateIDReducer.get('selectedTargets');
+
 	// isTargetSaved flag will get update when targets are saved successfully over server
 	const { isTargetSaved } = useSelector(state => state.saveTargetReducer);
 
@@ -58,11 +61,16 @@ const TargetContainer = (props) => {
 	useEffect(() => {
 		// Update selected targets from server to local state
 		// getSelectedTargetsToLocal will return merge list of selected targets
+		const value = getSelectedTargetsToLocal(
+			selectedTargets,
+			listTargetReducer,
+			isLoginTypeOperator,
+		);
 		updateTargetState({
 			type: targetStateActions.UPDATE_LIST,
-			value: getSelectedTargetsToLocal(selectedTargets, listTargetReducer),
+			value,
 		});
-	}, [selectedTargets, listTargetReducer]);
+	}, [selectedTargets, listTargetReducer, isLoginTypeOperator]);
 
 	useEffect(() => {
 		// get master targets from server
@@ -112,7 +120,7 @@ const TargetContainer = (props) => {
 		[selectedTargetState],
 	);
 
-	const onThresholdSelect = useCallback((selectedThreshold, index) => {
+	const onThresholdChange = useCallback((selectedThreshold, index) => {
 		// save to local state
 		updateTargetState({
 			type: targetStateActions.ADD_THRESHOLD_VALUE,
@@ -140,9 +148,11 @@ const TargetContainer = (props) => {
 		if (
 			(checkedTargets !== null
         && selectedTargets !== null
-        && checkedTargets.length === TARGET_CAPACITY)
+				&& checkedTargets.length === TARGET_CAPACITY)
+			// if selected targets is equal to TARGET_CAPACITY
       || (selectedTargets !== null
-        && checkedTargets.length === selectedTargets.size)
+				&& checkedTargets.length === selectedTargets.size)
+		// this condition is to verify that nothing is changed
 		) {
 			updateSelectedWizard('stage');
 		} else {
@@ -164,9 +174,11 @@ const TargetContainer = (props) => {
 			updateTargetState={updateTargetState}
 			onCheckedHandler={onCheckedHandler}
 			onTargetSelect={onTargetSelect}
-			onThresholdSelect={onThresholdSelect}
+			onThresholdChange={onThresholdChange}
 			onSaveClick={onSaveClick}
 			getCheckedTargetCount={getCheckedTargetCount}
+			isLoginTypeAdmin={isLoginTypeAdmin}
+			isLoginTypeOperator={isLoginTypeOperator}
 		/>
 	);
 };

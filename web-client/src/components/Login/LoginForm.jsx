@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 import {
 	Button,
 	Form,
@@ -73,9 +72,10 @@ const LoginForm = (props) => {
                 Login
 							</Button>
 						</Center>
-						<Center>
+						{/* TBD */}
+						{/* <Center>
 							<Link to="/">Forgot username or password?</Link>
-						</Center>
+						</Center> */}
 					</Form>
 				</CardBody>
 			</Card>

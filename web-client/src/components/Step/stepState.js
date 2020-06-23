@@ -12,6 +12,7 @@ export const stepStateInitialState = fromJS({
 	rampRate: '',
 	targetTemperature: '',
 	holdTime: '',
+	holdTimeError: false,
 	dataCapture: '',
 	isCreateStepModalVisible: false,
 });

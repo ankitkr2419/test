@@ -20,6 +20,7 @@ const StageContainer = (props) => {
 
 	// reading stages from redux
 	const stages = useSelector(state => state.listStagesReducer);
+	const isStagesLoading = stages.get('isLoading');
 
 	// isStageSaved = true means stage created successfully
 	const { isStageSaved } = useSelector(state => state.createStageReducer);
@@ -99,6 +100,7 @@ const StageContainer = (props) => {
 			selectedStageId={selectedStageId}
 			saveStage={saveStage}
 			goToStepWizard={goToStepWizard}
+			isStagesLoading={isStagesLoading}
 		/>
 	);
 };

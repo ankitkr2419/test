@@ -86,6 +86,7 @@ const StepContainer = (props) => {
 		<StepComponent
 			stageId={stageId}
 			steps={steps.get('list')}
+			isStepsLoading={steps.get('isLoading')}
 			addStep={addStep}
 			deleteStep={deleteStep}
 			onStepRowClicked={onStepRowClicked}

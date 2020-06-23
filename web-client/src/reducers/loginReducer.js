@@ -15,28 +15,28 @@ export const loginReducer = (state = loginInitialState, action) => {
 		return state.merge({
 			isLoading: true,
 			isUserLoggedIn: false,
-			isAdmin: false,
+			isLoginTypeAdmin: false,
 			isError: false,
 		});
 	case loginActions.successAction:
 		return state.merge({
 			isLoading: false,
 			isUserLoggedIn: true,
-			isAdmin: true,
+			isLoginTypeAdmin: true,
 			isError: false,
 		});
 	case loginActions.failureAction:
 		return state.merge({
 			isLoading: true,
 			isUserLoggedIn: false,
-			isAdmin: false,
+			isLoginTypeAdmin: false,
 			isError: true,
 		});
 	case loginActions.setLoginTypeAsOperator:
 		return state.merge({
 			isLoginTypeOperator: true,
 			isUserLoggedIn: true,
-			isAdmin: false,
+			isLoginTypeAdmin: false,
 		});
 	case loginActions.loginReset:
 		return loginInitialState;

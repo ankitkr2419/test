@@ -8,7 +8,6 @@ export const stageStateActions = {
 };
 
 export const stageStateInitialState = fromJS({
-	stageName: '',
 	stageType: '',
 	stageRepeatCount: '',
 	stageId: null,

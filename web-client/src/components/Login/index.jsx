@@ -20,15 +20,16 @@ const LoginComponent = (props) => {
 		<div className="login-content">
 			<ButtonGroup>
 				<Button
-					color="primary"
+					color="secondary"
 					onClick={() => {
 						setIsAdminFormVisibility(true);
 					}}
-					className="btn-secondary mr-4"
+					className="mr-4"
+					active={isAdminFormVisible}
 				>
           Admin
 				</Button>
-				<Button color="primary" className="btn-secondary mr-4">
+				<Button color="secondary" className="mr-4">
           Supervisor
 				</Button>
 			</ButtonGroup>
@@ -50,8 +51,7 @@ const LoginComponent = (props) => {
 								onClick={() => {
 									setIsAdminFormVisibility(false);
 								}}
-								color="primary"
-								className="btn-secondary mr-4"
+								color="secondary"
 							>
                 Back
 							</Button>
