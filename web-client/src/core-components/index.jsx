@@ -1,6 +1,7 @@
 import Button from "./Button";
 import { Card, CardBody } from "./Card";
 import CheckBox from "./Checkbox";
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from "./Dropdown";
 import { Modal, ModalBody } from "./Modal";
 import Form from "./Form";
 import FormGroup from "./FormGroup";
@@ -16,7 +17,11 @@ export {
 	Button,
 	Card,
   CardBody,
-  CheckBox,
+	CheckBox,
+	Dropdown, 
+	DropdownToggle, 
+	DropdownMenu, 
+	DropdownItem,
 	Form,
 	FormGroup,
 	FormError,

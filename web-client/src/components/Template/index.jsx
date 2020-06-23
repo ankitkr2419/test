@@ -9,6 +9,7 @@ import {
 	Text,
 } from 'shared-components';
 import CreateTemplateModal from './CreateTemplateModal';
+import imgNoTemplate from "assets/images/no-template-available.svg";
 
 const TemplateComponent = (props) => {
 	const {
@@ -88,9 +89,12 @@ const TemplateComponent = (props) => {
 	return (
 		<div className="d-flex flex-100 flex-column p-4 mt-3">
 			{templates.size === 0 && (
-				<Text className="d-flex justify-content-center" Tag="h4">
-          No templates available
-				</Text>
+				<Center className="no-template-wrap">
+					<img src={imgNoTemplate} alt="No templates available" className="img-no-template" />
+					<Text className="d-flex justify-content-center" Tag="p">
+						No templates available
+					</Text>
+				</Center>
 			)}
 			<StyledUl>
 				{/* templates size check before iteration */}

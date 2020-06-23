@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from "react";
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Logo } from 'shared-components';
 import {
-	Button, Nav, NavItem, NavLink,
+	Button, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Nav, NavItem, NavLink,
 } from 'core-components';
 import { NAV_ITEMS } from './constants';
 
@@ -20,13 +20,16 @@ const Header = styled.header`
 
 const AppHeader = (props) => {
 	const { isUserLoggedIn } = props;
+	const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+	const toggleUserDropdown = () =>
+		setUserDropdownOpen((prevState) => !prevState);
 
 	return (
 		<Header>
 			<Logo isUserLoggedIn={isUserLoggedIn} />
 			{isUserLoggedIn && (
 				<Nav className="mx-3">
-					{NAV_ITEMS.map(ele => (
+					{NAV_ITEMS.map((ele) => (
 						<NavItem key={ele.name}>
 							<NavLink to={ele.path}>{ele.name}</NavLink>
 						</NavItem>
@@ -42,8 +45,14 @@ const AppHeader = (props) => {
 						outline
 						disabled
 					>
-            Run
+						Run
 					</Button>
+					<Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
+						<DropdownToggle icon name="user" size={32} />
+						<DropdownMenu right>
+							<DropdownItem>Log out</DropdownItem>
+						</DropdownMenu>
+					</Dropdown>
 					{/* TODO change it to button */}
 					{/* <Link to="/" className="ml-2" icon>
 						<Icon size={32} name="cross" />
