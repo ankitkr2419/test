@@ -13,7 +13,7 @@ import {
 	Select,
 } from 'core-components';
 import { Center, ButtonIcon, Text } from 'shared-components';
-import { stageTypeOptions, countTypeOptions } from './stageConstants';
+import { stageTypeOptions } from './stageConstants';
 
 const AddStageModal = (props) => {
 	const {
@@ -27,12 +27,9 @@ const AddStageModal = (props) => {
 		updateStageFormStateWrapper,
 	} = props;
 
-	const {
-		stageId,
-		stageName,
-		stageType,
-		stageRepeatCount,
-	} = stageFormStateJS;
+	const { stageId, stageType, stageRepeatCount } = stageFormStateJS;
+
+	const isRepeatCountDisabled = stageType && stageType.value === 'hold';
 
 	// stageId will be present when we are updating stage
 	const isUpdateForm = stageId !== null;
@@ -44,7 +41,7 @@ const AddStageModal = (props) => {
 			resetModalState();
 		};
 		// eslint-disable-next-line
-	}, []);
+  }, []);
 
 	const onChangeHandler = ({ target: { name, value } }) => {
 		updateStageFormStateWrapper(name, value);
@@ -56,7 +53,7 @@ const AddStageModal = (props) => {
 				isOpen={isCreateStageModalVisible}
 				toggle={toggleCreateStageModal}
 				centered
-				size="lg"
+				size="md"
 			>
 				<ModalBody>
 					<Text
@@ -75,23 +72,8 @@ const AddStageModal = (props) => {
 						onClick={toggleCreateStageModal}
 					/>
 					<Form>
-						<Row form className="mb-5 pb-5">
-							<Col sm={4}>
-								<FormGroup>
-									<Label for="stage" className="font-weight-bold">
-                    Stage
-									</Label>
-									<Input
-										type="text"
-										name="stageName"
-										id="stage"
-										placeholder="Type here"
-										value={stageName}
-										onChange={onChangeHandler}
-									/>
-								</FormGroup>
-							</Col>
-							<Col sm={4}>
+						<Row form className="mb-4">
+							<Col sm={6}>
 								<FormGroup>
 									<Label for="stageType" className="font-weight-bold">
                     Stage type
@@ -99,23 +81,29 @@ const AddStageModal = (props) => {
 									<Select
 										options={stageTypeOptions}
 										onChange={(selectedStageType) => {
-											updateStageFormStateWrapper('stageType', selectedStageType);
+											updateStageFormStateWrapper(
+												'stageType',
+												selectedStageType,
+											);
 										}}
 										value={stageType}
 									/>
 								</FormGroup>
 							</Col>
-							<Col sm={3}>
+							<Col sm={6}>
 								<FormGroup>
 									<Label for="repeatCount" className="font-weight-bold">
-                    Repeat Count
+                      Repeat Count
 									</Label>
-									<Select
-										options={countTypeOptions}
-										onChange={(selectedRepeatCount) => {
-											updateStageFormStateWrapper('stageRepeatCount', selectedRepeatCount);
-										}}
+									<Input
+										type="number"
+										min="0"
+										name="stageRepeatCount"
+										id="stage"
+										placeholder="Type here"
 										value={stageRepeatCount}
+										onChange={onChangeHandler}
+										disabled={isRepeatCountDisabled}
 									/>
 								</FormGroup>
 							</Col>
@@ -124,6 +112,7 @@ const AddStageModal = (props) => {
 							{isUpdateForm === false && (
 								<Button
 									color="primary"
+									className="mb-3"
 									onClick={addClickHandler}
 									disabled={isFormValid === false}
 								>
@@ -133,6 +122,7 @@ const AddStageModal = (props) => {
 							{isUpdateForm === true && (
 								<Button
 									color="primary"
+									className="mb-3"
 									onClick={saveClickHandler}
 									disabled={isFormValid === false}
 								>

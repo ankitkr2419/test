@@ -11,16 +11,26 @@ export const getTargetOption = () => {
 };
 
 export const getSelectedTargetsToLocal = (
-	selectedTargets,
-	listTargetReducer,
+	selectedTargets, // Selected targets from server
+	listTargetReducer, // list targets from server
+	isLoginTypeOperator,
 ) => {
-	const arr = getTargetOption();
+	// getTargetOption will return array[size=TARGET_CAPACITY] of object with initial isChecked=false
+	let arr = getTargetOption(); // Default all option for admin
+	// if it's Operator will show all available option to edit target
+	if (isLoginTypeOperator === true) {
+		arr = [];
+	}
+	// check before merging if selectedTargets are present
 	if (selectedTargets !== null && selectedTargets.size !== 0) {
 		selectedTargets.map((selectedTarget, index) => {
 			const selectedTargetID = selectedTarget.get('target_id');
+			// check selected target is present in master list
+			// It will present for sure
 			const masterSelectedEl = listTargetReducer
 				.get('list')
 				.find(ele => ele.get('id') === selectedTargetID);
+			// extract name from masterSelectedEl add add to our arr
 			arr[index] = {
 				isChecked: true,
 				selectedTarget: {
@@ -44,4 +54,21 @@ export const isTargetAlreadySelected = (selectedTargetState, selectedTarget) => 
 		ele => (ele.selectedTarget && ele.selectedTarget.value === selectedTarget.value),
 	);
 	return foundElement !== undefined;
+};
+
+export const isTargetsModified = (checkedTargets, selectedTargets, isLoginTypeAdmin) => {
+	// if selected targets is equal to TARGET_CAPACITY
+	if (checkedTargets !== null
+		&& selectedTargets !== null
+		&& checkedTargets.length === TARGET_CAPACITY) {
+		return false;
+	}
+
+	// this condition is to verify that nothing is changed
+	if (selectedTargets !== null
+			&& checkedTargets.length === selectedTargets.size) {
+		return false;
+	}
+
+	return true;
 };

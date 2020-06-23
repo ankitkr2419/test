@@ -8,33 +8,33 @@ import PropTypes from 'prop-types';
  */
 
 const Wizard = (props) => {
-  const { list, onClickHandler } = props;
+	const { list, onClickHandler } = props;
 
-  const widgetList = useMemo(
-    () => list.map(step => (
-        <StepItem key={step.get('id')} disabled={step.get('isDisable')}>
-          <StepLink
-            onClick={() => {
-              onClickHandler(step.get('id'));
-            }}
-          >
-            {step.get('name')}
-          </StepLink>
-        </StepItem>
-    )),
-    [list, onClickHandler],
-  );
+	const widgetList = useMemo(
+		() => list.map(step => (
+			<StepItem key={step.get('id')} disabled={step.get('isDisable')}>
+				<StepLink
+					onClick={() => {
+						onClickHandler(step.get('id'));
+					}}
+				>
+					{step.get('name')}
+				</StepLink>
+			</StepItem>
+		)),
+		[list, onClickHandler],
+	);
 
-  return <Step>{widgetList}</Step>;
+	return <Step>{widgetList}</Step>;
 };
 
 Wizard.propTypes = {
-  list: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    isDisable: PropTypes.bool,
-    name: PropTypes.string,
-  }),
-  onClickHandler: PropTypes.func.isRequired,
+	list: PropTypes.shape({
+		id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		isDisable: PropTypes.bool,
+		name: PropTypes.string,
+	}),
+	onClickHandler: PropTypes.func.isRequired,
 };
 
-export default Wizard;
+export default React.memo(Wizard);

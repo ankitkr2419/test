@@ -24,6 +24,8 @@ import {
 	updateStepReducer,
 } from 'reducers/stepReducer';
 
+import { loginReducer } from 'reducers/loginReducer';
+
 const rootReducer = combineReducers({
 	createTemplateReducer,
 	listTemplatesReducer,
@@ -39,6 +41,7 @@ const rootReducer = combineReducers({
 	createStepReducer,
 	deleteStepReducer,
 	updateStepReducer,
+	loginReducer,
 });
 
 export default rootReducer;

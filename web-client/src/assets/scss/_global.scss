@@ -277,3 +277,16 @@ a:focus, button:focus {
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, 0.03);
 }
+
+.no-template-wrap {
+  margin: 0 0 rem(64px);
+
+  .img-no-template {
+    width: rem(248px);
+  }
+
+  > p {
+    color: $gray-40;
+    margin: rem(-64px 0 0 -40px);
+  }
+}

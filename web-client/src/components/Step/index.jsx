@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button } from 'core-components';
 import {
@@ -12,6 +12,7 @@ import stepStateReducer, { stepStateInitialState } from 'components/Step/stepSta
 import { convertStringToSeconds, convertSecondsToString } from 'utils/helpers';
 import AddStepModal from './AddStepModal';
 import { stepStateActions } from './stepState';
+import { validateStepForm } from './stepHelper';
 
 const StepComponent = (props) => {
 	const {
@@ -21,7 +22,8 @@ const StepComponent = (props) => {
 		deleteStep,
 		onStepRowClicked,
 		selectedStepId,
-		saveStep, // update api cal
+		saveStep, // update api call
+		isStepsLoading,
 	} = props;
 
 	// local state to save form data and modal state flag
@@ -53,19 +55,6 @@ const StepComponent = (props) => {
 			'isCreateStepModalVisible',
 			!isCreateStepModalVisible,
 		);
-	};
-
-	// Validate create step form
-	const validateStepForm = ({
-		rampRate,
-		targetTemperature,
-		holdTime,
-	}) => {
-		if (rampRate !== '' && targetTemperature !== '' && holdTime !== '') {
-			return true;
-		}
-
-		return false;
 	};
 
 	// create step handler
@@ -127,6 +116,22 @@ const StepComponent = (props) => {
 		toggleCreateStepModal();
 	};
 
+	useEffect(() => {
+		// make creat modal open if no data is available
+		// isStagesLoading will tell us weather api calling is finish or not
+		// stages.size = 0  will tell us there is no records present
+		// isCreateStageModalVisible is check as we have to make modal visible only once
+		if (
+			isStepsLoading === false
+      && steps.size === 0
+      && isCreateStepModalVisible === false
+		) {
+			toggleCreateStepModal();
+		}
+		// isCreateStepModalVisible skipped in dependency because its causing issue with modal state
+		// eslint-disable-next-line
+	}, [isStepsLoading, steps]);
+
 	return (
 		<div className="d-flex flex-column flex-100">
 			<TableWrapper>
@@ -181,7 +186,7 @@ const StepComponent = (props) => {
 										<td>{step.get('target_temp')}</td>
 										<td>{convertSecondsToString(step.get('hold_time'))}</td>
 										{/* <td>{step.get('hold_time')}</td> */}
-										<td>{step.get('data_capture').toString()}</td>
+										<td>{step.get('data_capture') ? 'Yes' : 'No'}</td>
 										<td className="td-actions">
 											<ButtonIcon
 												onClick={() => {
@@ -234,6 +239,7 @@ StepComponent.propTypes = {
 	onStepRowClicked: PropTypes.func.isRequired,
 	selectedStepId: PropTypes.string,
 	saveStep: PropTypes.func.isRequired,
+	isStepsLoading: PropTypes.bool.isRequired,
 };
 
 export default React.memo(StepComponent);

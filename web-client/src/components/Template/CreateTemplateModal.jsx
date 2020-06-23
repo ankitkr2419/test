@@ -71,6 +71,7 @@ const CreateTemplateModal = (props) => {
 										name="template_name"
 										id="template_name"
 										placeholder="Type here"
+										maxLength={100}
 										value={templateName}
 										onChange={(event) => {
 											setTemplateName(event.target.value);
@@ -95,6 +96,7 @@ const CreateTemplateModal = (props) => {
 										onChange={(event) => {
 											setTemplateDescription(event.target.value);
 										}}
+										maxLength={300}
 									/>
 								</FormGroup>
 							</Col>

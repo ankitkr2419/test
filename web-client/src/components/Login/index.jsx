@@ -1,26 +1,84 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Card, CardBody } from "core-components";
-import { Text } from "shared-components";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { Card, CardBody, Button } from 'core-components';
+import { ButtonGroup } from 'shared-components';
 import LoginForm from './LoginForm';
 
-const StyledLogin = styled.div``;
+const LoginComponent = (props) => {
+	const {
+		isAdminFormVisible,
+		setIsAdminFormVisibility,
+		loginAsOperator,
+		loginAsAdmin,
+		isLoginError,
+	} = props;
 
-const Login = props => {
-  return (
-		<StyledLogin className="flex-100">
-			<Text tag="h6" className="text-center font-weight-bold text-default pt-5">
-				Admin Login
-			</Text>
-			<Card default>
-				<CardBody className="p-4">
-					<LoginForm />
+	const [username, setUsername] = useState('');
+	const [password, setPassword] = useState('');
+
+	return (
+		<div className="login-content">
+			<ButtonGroup>
+				<Button
+					color="secondary"
+					onClick={() => {
+						setIsAdminFormVisibility(true);
+					}}
+					className="mr-4"
+					active={isAdminFormVisible}
+				>
+          Admin
+				</Button>
+				<Button color="secondary" className="mr-4">
+          Supervisor
+				</Button>
+			</ButtonGroup>
+			<Card className="card-login">
+				<CardBody className="d-flex scroll-y">
+					<div className="flex-100">
+						<h1 className="card-title">Compact 32</h1>
+						{isAdminFormVisible === false && (
+							<Button
+								onClick={loginAsOperator}
+								color="primary"
+								className="mx-auto"
+							>
+                Login as Operator
+							</Button>
+						)}
+						{isAdminFormVisible === true && (
+							<Button
+								onClick={() => {
+									setIsAdminFormVisibility(false);
+								}}
+								color="secondary"
+							>
+                Back
+							</Button>
+						)}
+					</div>
+					{isAdminFormVisible && (
+						<LoginForm
+							username={username}
+							setUsername={setUsername}
+							password={password}
+							setPassword={setPassword}
+							loginAsAdmin={loginAsAdmin}
+							isLoginError={isLoginError}
+						/>
+					)}
 				</CardBody>
 			</Card>
-		</StyledLogin>
+		</div>
 	);
 };
 
-Login.propTypes = {};
+LoginComponent.propTypes = {
+	isAdminFormVisible: PropTypes.bool.isRequired,
+	setIsAdminFormVisibility: PropTypes.func.isRequired,
+	loginAsOperator: PropTypes.func.isRequired,
+	loginAsAdmin: PropTypes.func.isRequired,
+	isLoginError: PropTypes.bool.isRequired,
+};
 
-export default Login;
+export default React.memo(LoginComponent);
