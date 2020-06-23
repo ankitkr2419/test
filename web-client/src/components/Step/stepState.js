@@ -13,7 +13,7 @@ export const stepStateInitialState = fromJS({
 	targetTemperature: '',
 	holdTime: '',
 	holdTimeError: false,
-	dataCapture: '',
+	dataCapture: false,
 	isCreateStepModalVisible: false,
 });
 

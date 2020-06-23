@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Logo } from 'shared-components';
+import { loginReset } from 'action-creators/loginActionCreators';
 import {
 	Button, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Nav, NavItem, NavLink,
 } from 'core-components';
@@ -20,9 +22,13 @@ const Header = styled.header`
 
 const AppHeader = (props) => {
 	const { isUserLoggedIn } = props;
+	const dispatch = useDispatch();
 	const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-	const toggleUserDropdown = () =>
-		setUserDropdownOpen((prevState) => !prevState);
+	const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
+
+	const logoutClickHandler = () => {
+		dispatch(loginReset());
+	};
 
 	return (
 		<Header>
@@ -50,7 +56,7 @@ const AppHeader = (props) => {
 					<Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
 						<DropdownToggle icon name="user" size={32} />
 						<DropdownMenu right>
-							<DropdownItem>Log out</DropdownItem>
+							<DropdownItem onClick={logoutClickHandler}>Log out</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
 					{/* TODO change it to button */}
