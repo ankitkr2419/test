@@ -11,14 +11,20 @@ import {
 } from 'action-creators/templateActionCreators';
 
 const TemplateContainer = (props) => {
-	const { updateSelectedWizard, updateTemplateID } = props;
+	const {
+		isLoginTypeOperator, isLoginTypeAdmin, updateSelectedWizard, updateTemplateID,
+	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
 	// isTemplateCreated = true means template created successfully
-	const { isTemplateCreated } = useSelector(state => state.createTemplateReducer);
+	const { isTemplateCreated } = useSelector(
+		state => state.createTemplateReducer,
+	);
 	// isTemplateDeleted = true means template deleted successfully
-	const { isTemplateDeleted } = useSelector(state => state.deleteTemplateReducer);
+	const { isTemplateDeleted } = useSelector(
+		state => state.deleteTemplateReducer,
+	);
 
 	useEffect(() => {
 		// Once we create template will fetch updated template list
@@ -35,7 +41,6 @@ const TemplateContainer = (props) => {
 			dispatch(fetchTemplates());
 		}
 	}, [isTemplateDeleted, dispatch]);
-
 
 	useEffect(() => {
 		// getting templates through api.
@@ -54,12 +59,14 @@ const TemplateContainer = (props) => {
 
 	return (
 		<TemplateComponent
-			// Extracting list before passing down to component ref. Immutable
+			// Extracting list before passing down to component reference=>Immutable
 			templates={templates.get('list')}
 			createTemplate={createTemplate}
 			deleteTemplate={deleteTemplate}
 			updateSelectedWizard={updateSelectedWizard}
 			updateTemplateID={updateTemplateID}
+			isLoginTypeAdmin={isLoginTypeAdmin}
+			isLoginTypeOperator={isLoginTypeOperator}
 		/>
 	);
 };
@@ -69,4 +76,4 @@ TemplateContainer.propTypes = {
 	updateTemplateID: PropTypes.func.isRequired,
 };
 
-export default TemplateContainer;
+export default React.memo(TemplateContainer);

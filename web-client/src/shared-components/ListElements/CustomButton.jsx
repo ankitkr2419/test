@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import ButtonIcon from 'shared-components/ButtonIcon';
@@ -56,9 +56,11 @@ export const CustomButton = ({
 	title,
 	onEditClickHandler,
 	onDeleteClickHandler,
+	onButtonClickHandler,
+	isActive,
 	...rest
 }) => {
-	const [isActive, setActiveState] = useState(false);
+	// const [isActive, setActiveState] = useState(false);
 
 	return (
 		<StyledTemplate {...rest} isActive={isActive}>
@@ -69,9 +71,7 @@ export const CustomButton = ({
 			)}
 			<Text
 				Tag="span"
-				onClick={() => {
-					setActiveState(!isActive);
-				}}
+				onClick={onButtonClickHandler}
 				className="text-truncate"
 			>
 				{title}
@@ -87,7 +87,8 @@ export const CustomButton = ({
 
 CustomButton.propTypes = {
 	title: PropTypes.string.isRequired,
-	isActive: PropTypes.bool,
+	isActive: PropTypes.bool.isRequired,
+	onButtonClickHandler: PropTypes.func.isRequired,
 	isEditable: PropTypes.bool,
 	onEditClickHandler: (props, propName, componentName) => {
 		if (

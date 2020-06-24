@@ -16,10 +16,19 @@ const Text = ({
 );
 
 Text.propTypes = {
-	Tag: PropTypes.string,
+	Tag: PropTypes.oneOf([
+		"h1",
+		"h2",
+		"h3",
+		"h4",
+		"h5",
+		"h6",
+		"p",
+		"span"
+	]),
 	className: PropTypes.string,
 	onClick: PropTypes.func,
-	children: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+	children: PropTypes.oneOfType([PropTypes.element, PropTypes.string])
 };
 
 Text.defaultProps = {

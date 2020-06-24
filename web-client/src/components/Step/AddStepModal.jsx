@@ -10,8 +10,10 @@ import {
 	Modal,
 	ModalBody,
 	CheckBox,
+	FormError,
 } from 'core-components';
 import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
+import { validateHoldTime } from './stepHelper';
 
 const AddStepModal = (props) => {
 	const {
@@ -31,6 +33,7 @@ const AddStepModal = (props) => {
 		targetTemperature,
 		holdTime,
 		dataCapture,
+		holdTimeError,
 	} = stepFormState;
 
 	// stageId will be present when we are updating stage
@@ -46,6 +49,16 @@ const AddStepModal = (props) => {
 
 	const onChangeHandler = ({ target: { name, value } }) => {
 		updateStepFormStateWrapper(name, value);
+	};
+
+	const onHoldTimeBlurHandler = () => {
+		if (validateHoldTime(holdTime) === null) {
+			updateStepFormStateWrapper('holdTimeError', true);
+		}
+	};
+
+	const onHoldTimeFocusHandler = () => {
+		updateStepFormStateWrapper('holdTimeError', false);
 	};
 
 	return (
@@ -79,7 +92,9 @@ const AddStepModal = (props) => {
                   Ramp Rate
 								</Label>
 								<Input
-									type="text"
+									type="number"
+									min="-273.15"
+									max="1000"
 									name="rampRate"
 									id="ramp_rate"
 									placeholder="Type here"
@@ -95,7 +110,9 @@ const AddStepModal = (props) => {
                   Target Temperature
 								</Label>
 								<Input
-									type="text"
+									type="number"
+									min="-273.15"
+									max="1000"
 									name="targetTemperature"
 									id="target_temperature"
 									placeholder="Type here"
@@ -111,14 +128,17 @@ const AddStepModal = (props) => {
                   Hold Time
 								</Label>
 								<Input
-									type="time"
+									type="text"
 									name="holdTime"
 									id="hold_time"
 									placeholder="mm:ss"
 									value={holdTime}
+									onBlur={onHoldTimeBlurHandler}
+									onFocus={onHoldTimeFocusHandler}
 									onChange={onChangeHandler}
+									invalid={holdTimeError}
 								/>
-								<Label>mm:ss</Label>
+								<FormError>Invalid hold time</FormError>
 							</FormGroup>
 						</Col>
 						<Col sm={3}>

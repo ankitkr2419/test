@@ -5,11 +5,11 @@ import {
 	StyledUl,
 	StyledLi,
 	CustomButton,
-	ButtonGroup,
+	Center,
 	Text,
 } from 'shared-components';
 import CreateTemplateModal from './CreateTemplateModal';
-// import { Button } from 'core-components';
+import imgNoTemplate from "assets/images/no-template-available.svg";
 
 const TemplateComponent = (props) => {
 	const {
@@ -18,6 +18,8 @@ const TemplateComponent = (props) => {
 		deleteTemplate,
 		updateSelectedWizard,
 		updateTemplateID,
+		isLoginTypeOperator,
+		isLoginTypeAdmin,
 	} = props;
 
 	// Local state to manage create template modal
@@ -29,6 +31,8 @@ const TemplateComponent = (props) => {
 	const [templateDescription, setTemplateDescription] = useState('');
 	// Local state to store template name
 	const [templateName, setTemplateName] = useState('');
+	// Local state to store template name
+	const [selectedTemplateId, setSelectedTemplateId] = useState(null);
 
 	// helper method to toggle create template modal
 	const toggleCreateTemplateModal = () => {
@@ -55,13 +59,26 @@ const TemplateComponent = (props) => {
 		// TODO show error notification
 	};
 
-	const deleteClickHandler = (templateID) => {
-		deleteTemplate(templateID);
+	const deleteClickHandler = () => {
+		// Delete api call
+		deleteTemplate(selectedTemplateId);
 	};
 
-	const editClickHandler = (templateID) => {
-		updateTemplateID(templateID);
+	const editClickHandler = () => {
+		// Updates template id to templateState maintain over templateLayout
+		updateTemplateID(selectedTemplateId);
+		// navigate to next wizard
 		updateSelectedWizard('target');
+	};
+
+	const onTemplateButtonClickHandler = (templateId) => {
+		setSelectedTemplateId(templateId);
+		if (isLoginTypeAdmin === false) {
+			// Updates template id to templateState maintain over templateLayout
+			updateTemplateID(templateId);
+			// navigate to next wizard
+			updateSelectedWizard('target');
+		}
 	};
 
 	const resetFormValues = () => {
@@ -72,9 +89,12 @@ const TemplateComponent = (props) => {
 	return (
 		<div className="d-flex flex-100 flex-column p-4 mt-3">
 			{templates.size === 0 && (
-				<Text className="d-flex justify-content-center" Tag="h4">
-          No templates available
-				</Text>
+				<Center className="no-template-wrap">
+					<img src={imgNoTemplate} alt="No templates available" className="img-no-template" />
+					<Text className="d-flex justify-content-center" Tag="p">
+						No templates available
+					</Text>
+				</Center>
 			)}
 			<StyledUl>
 				{/* templates size check before iteration */}
@@ -83,27 +103,25 @@ const TemplateComponent = (props) => {
           	<StyledLi key={template.get('id')}>
           		<CustomButton
           			title={template.get('name')}
-          			isEditable
-          			onEditClickHandler={() => {
-          				editClickHandler(template.get('id'));
+          			isActive={template.get('id') === selectedTemplateId}
+          			isEditable={isLoginTypeAdmin === true && isLoginTypeOperator === false}
+          			onButtonClickHandler={() => {
+          				onTemplateButtonClickHandler(template.get('id'));
           			}}
-          			isDeletable
-          			onDeleteClickHandler={() => {
-          				deleteClickHandler(template.get('id'));
-          			}}
+          			onEditClickHandler={editClickHandler}
+          			isDeletable={isLoginTypeAdmin === true && isLoginTypeOperator === false}
+          			onDeleteClickHandler={deleteClickHandler}
           		/>
           	</StyledLi>
           ))}
 			</StyledUl>
-			<ButtonGroup className="text-center">
-				{/*
-          TODO Handle login flow when operator
-          <Button color="primary">Next</Button>
-        */}
-				<Button color="primary" onClick={toggleCreateTemplateModal}>
-          Create New
-				</Button>
-			</ButtonGroup>
+			<Center className="text-center">
+				{isLoginTypeAdmin === true && (
+					<Button color="primary" onClick={toggleCreateTemplateModal}>
+            Create New
+					</Button>
+				)}
+			</Center>
 			{isCreateTemplateModalVisible && (
 				<CreateTemplateModal
 					isCreateTemplateModalVisible={isCreateTemplateModalVisible}
@@ -127,6 +145,8 @@ TemplateComponent.propTypes = {
 	deleteTemplate: PropTypes.func.isRequired,
 	updateSelectedWizard: PropTypes.func.isRequired,
 	updateTemplateID: PropTypes.func.isRequired,
+	isLoginTypeOperator: PropTypes.bool.isRequired,
+	isLoginTypeAdmin: PropTypes.bool.isRequired,
 };
 
 export default React.memo(TemplateComponent);

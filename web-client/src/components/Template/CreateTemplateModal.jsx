@@ -11,7 +11,7 @@ import {
 	Modal,
 	ModalBody,
 } from 'core-components';
-import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
+import { Center, ButtonIcon, Text } from 'shared-components';
 
 const CreateTemplateModal = (props) => {
 	const {
@@ -48,7 +48,7 @@ const CreateTemplateModal = (props) => {
 						tag="h4"
 						className="modal-title text-center text-truncate font-weight-bold"
 					>
-            Create New Template
+						Create New Template
 					</Text>
 					<ButtonIcon
 						position="absolute"
@@ -64,13 +64,14 @@ const CreateTemplateModal = (props) => {
 							<Col sm={3}>
 								<FormGroup>
 									<Label for="template_name" className="font-weight-bold">
-                    Template Name
+										Template Name
 									</Label>
 									<Input
 										type="text"
 										name="template_name"
 										id="template_name"
 										placeholder="Type here"
+										maxLength={100}
 										value={templateName}
 										onChange={(event) => {
 											setTemplateName(event.target.value);
@@ -84,7 +85,7 @@ const CreateTemplateModal = (props) => {
 										for="template_description"
 										className="font-weight-bold"
 									>
-                    Description
+										Description
 									</Label>
 									<Input
 										type="text"
@@ -95,19 +96,20 @@ const CreateTemplateModal = (props) => {
 										onChange={(event) => {
 											setTemplateDescription(event.target.value);
 										}}
+										maxLength={300}
 									/>
 								</FormGroup>
 							</Col>
 						</Row>
-						<ButtonGroup className="text-center p-0 m-0 pt-5">
+						<Center className="text-center p-0 m-0 pt-5">
 							<Button
 								onClick={addClickHandler}
 								color="primary"
 								disabled={isFormValid === false}
 							>
-                Add
+								Add
 							</Button>
-						</ButtonGroup>
+						</Center>
 					</Form>
 				</ModalBody>
 			</Modal>

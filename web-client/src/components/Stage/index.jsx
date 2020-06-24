@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Table } from 'core-components';
 import {
@@ -24,6 +24,7 @@ const StageComponent = (props) => {
 		deleteStage,
 		saveStage,
 		goToStepWizard,
+		isStagesLoading,
 	} = props;
 
 	// local state to save form data and modal state flag
@@ -53,8 +54,11 @@ const StageComponent = (props) => {
 	};
 
 	// Validate create stage form
-	const validateStageForm = ({ stageName, stageType, stageRepeatCount }) => {
-		if ((stageName !== '' && stageType !== '', stageRepeatCount !== '')) {
+	const validateStageForm = ({ stageType, stageRepeatCount }) => {
+		if (stageType.value === 'cycle' && stageRepeatCount !== '') {
+			return true;
+		}
+		if (stageType !== '' && stageType.value === 'hold') {
 			return true;
 		}
 		return false;
@@ -67,7 +71,7 @@ const StageComponent = (props) => {
 			template_id: templateID,
 			name: stageName,
 			type: stageType.value,
-			repeat_count: stageRepeatCount.value,
+			repeat_count: parseInt(stageRepeatCount, 10),
 		});
 		toggleCreateStageModal();
 		// TODO show error notification
@@ -85,7 +89,7 @@ const StageComponent = (props) => {
 			template_id: templateID,
 			name: stageName,
 			type: stageType.value,
-			repeat_count: stageRepeatCount.value,
+			repeat_count: parseInt(stageRepeatCount, 10),
 		});
 		toggleCreateStageModal();
 	};
@@ -113,6 +117,25 @@ const StageComponent = (props) => {
 			type: stageStateActions.RESET_STAGE_VALUES,
 		});
 	};
+
+	useEffect(() => {
+		// make creat modal open if no data is available
+		// isStagesLoading will tell us weather api calling is finish or not
+		// stages.size = 0  will tell us there is no records present
+		// isCreateStageModalVisible is check as we have to make modal visible only once
+		if (
+			isStagesLoading === false
+      && stages.size === 0
+      && isCreateStageModalVisible === false
+		) {
+			updateStageFormStateWrapper(
+				'isCreateStageModalVisible',
+				true,
+			);
+		}
+		// isCreateStageModalVisible skipped in dependency because its causing issue with modal state
+		// eslint-disable-next-line
+	}, [isStagesLoading, stages]);
 
 	return (
 		<div className="d-flex flex-column flex-100">
@@ -146,9 +169,9 @@ const StageComponent = (props) => {
 									key={stageId}
 								>
 									<td>{i + 1}</td>
-									<td>{stage.get('name')}</td>
 									<td>{stage.get('type')}</td>
 									<td>{stage.get('repeat_count')}</td>
+									<td>{stage.get('step_count') || '-'}</td>
 									<td className="td-actions">
 										<ButtonIcon
 											onClick={() => {
@@ -208,6 +231,7 @@ StageComponent.propTypes = {
 	deleteStage: PropTypes.func.isRequired,
 	saveStage: PropTypes.func.isRequired,
 	goToStepWizard: PropTypes.func.isRequired,
+	isStagesLoading: PropTypes.bool.isRequired,
 };
 
 export default StageComponent;

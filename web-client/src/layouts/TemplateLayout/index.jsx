@@ -8,14 +8,22 @@ import StepContainer from 'containers/StepContainer';
 import templateLayoutReducer, {
 	templateInitialState,
 	templateLayoutActions,
+	getWizardListByLoginType,
 } from './templateState';
 
-const TemplateLayout = () => {
+const TemplateLayout = (props) => {
+	const { isLoginTypeOperator, isLoginTypeAdmin } = props;
 	// Local state to manage selected wizard
 	const [templateLayoutState, templateLayoutDispatch] = useReducer(
 		templateLayoutReducer,
 		templateInitialState,
 	);
+	const wizardList = getWizardListByLoginType(
+		templateLayoutState.get('wizardList'),
+		isLoginTypeAdmin,
+		isLoginTypeOperator,
+	);
+
 	// Here we have stored id for active widget
 	const activeWidgetID = templateLayoutState.get('activeWidgetID');
 	const templateID = templateLayoutState.get('templateID');
@@ -49,41 +57,47 @@ const TemplateLayout = () => {
 	return (
 		<div className="template-content">
 			<Wizard
-				list={templateLayoutState.get('wizardList')}
+				list={wizardList}
 				onClickHandler={updateSelectedWizard}
+				isLoginTypeAdmin={isLoginTypeAdmin}
 			/>
 			<Card>
 				{/* TODO move CardBody to core-components */}
 				<CardBody className="d-flex flex-unset overflow-hidden p-0">
 					{activeWidgetID === 'template' && (
 						<TemplateContainer
+							isLoginTypeOperator={isLoginTypeOperator}
+							isLoginTypeAdmin={isLoginTypeAdmin}
 							updateSelectedWizard={updateSelectedWizard}
 							updateTemplateID={updateTemplateID}
 						/>
 					)}
 					{activeWidgetID === 'target' && (
 						<TargetContainer
+							isLoginTypeOperator={isLoginTypeOperator}
+							isLoginTypeAdmin={isLoginTypeAdmin}
 							updateSelectedWizard={updateSelectedWizard}
-							templateID={templateID}/>)
-					}
+							templateID={templateID}
+						/>
+					)}
 
 					{activeWidgetID === 'stage' && (
 						<StageContainer
 							updateSelectedWizard={updateSelectedWizard}
 							updateStageID={updateStageID}
 							templateID={templateID}
-						/>)
-					}
+						/>
+					)}
 					{activeWidgetID === 'step' && (
 						<StepContainer
 							updateSelectedWizard={updateSelectedWizard}
 							stageId={stageId}
-						/>)
-					}
+						/>
+					)}
 				</CardBody>
 			</Card>
 		</div>
 	);
 };
 
-export default TemplateLayout;
+export default React.memo(TemplateLayout);

@@ -109,7 +109,7 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte("template updated successfully"))
+		rw.Write([]byte(`{"msg":"template updated successfully"}`))
 	})
 }
 
@@ -163,6 +163,6 @@ func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte("template deleted successfully"))
+		rw.Write([]byte(`{"msg":"template deleted successfully"}`))
 	})
 }
