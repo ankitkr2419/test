@@ -15,6 +15,8 @@ import {
 	NavLink,
 } from 'core-components';
 import { NAV_ITEMS } from './constants';
+import PrintDataModal from './PrintDataModal';
+import ExportDataModal from './ExportDataModal';
 
 const Header = styled.header`
 	position: relative;
@@ -52,8 +54,8 @@ const AppHeader = (props) => {
 			)}
 			{isUserLoggedIn && (
 				<div className='d-flex align-items-center'>
-					<ButtonIcon size={34} name='print' className='mx-2' />
-					<ButtonIcon size={34} name='external-link' className='mx-2' />
+					<PrintDataModal />
+					<ExportDataModal />
 					<div className='experiment-info text-right mx-3'>
 						{/* TODO: Add "show" class to <Text> component when experiment starts and remove it when experiment ends */}
 						<Text size={12} className='text-default mb-1'>

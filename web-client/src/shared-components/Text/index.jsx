@@ -8,9 +8,7 @@ import styled from 'styled-components';
  * @param {*} props
  */
 
-const StyledText = ({
-	Tag, onClick, className, size, children,
-}) => (
+const StyledText = ({ Tag, onClick, className, size, children }) => (
 	<Tag size={size} onClick={onClick} className={className}>
 		{children}
 	</Tag>
@@ -22,25 +20,25 @@ const Text = styled(StyledText)`
 
 Text.propTypes = {
 	Tag: PropTypes.oneOf([
-		"h1",
-		"h2",
-		"h3",
-		"h4",
-		"h5",
-		"h6",
-		"p",
-		"span",
-		"label",
+		'h1',
+		'h2',
+		'h3',
+		'h4',
+		'h5',
+		'h6',
+		'p',
+		'span',
+		'label',
 	]),
 	className: PropTypes.string,
 	onClick: PropTypes.func,
-	children: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+	children: PropTypes.any,
 	size: PropTypes.number,
 };
 
 Text.defaultProps = {
 	Tag: 'p',
-	size: 16
+	size: 16,
 };
 
 export default Text;
