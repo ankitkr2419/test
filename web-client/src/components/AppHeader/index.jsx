@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { Logo } from 'shared-components';
+import { Logo, ButtonIcon } from 'shared-components';
 import { loginReset } from 'action-creators/loginActionCreators';
 import {
 	Button,
@@ -67,10 +67,12 @@ const AppHeader = (props) => {
 							<DropdownItem onClick={logoutClickHandler}>Log out</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
-					{/* TODO change it to button */}
-					{/* <Link to="/" className="ml-2" icon>
-						<Icon size={32} name="cross" />
-					</Link> */}
+					<ButtonIcon
+						size={34}
+						name='cross'
+						className='ml-2'
+						onClick={logoutClickHandler}
+					/>
 				</>
 			)}
 		</Header>
