@@ -1,145 +1,150 @@
-$icon-font-family: "mylab-icons";
-$icon-font-path: "../fonts";
-$icon-font-code: "pb6hce";
+$icon-font-family: 'mylab-icons';
+$icon-font-path: '../fonts';
+$icon-font-code: 'pb6hce';
 
-$icon-angle-down: "\e900";
-$icon-angle-left: "\e901";
-$icon-angle-right: "\e902";
-$icon-angle-up: "\e903";
-$icon-cross: "\e904";
-$icon-external-link: "\e905";
-$icon-graph: "\e906";
-$icon-info: "\e907";
-$icon-minus-1: "\e908";
-$icon-minus-2: "\e909";
-$icon-move: "\e90a";
-$icon-pencil: "\e90b";
-$icon-plus-1: "\e90c";
-$icon-plus-2: "\e90d";
-$icon-plus-3: "\e90e";
-$icon-print: "\e90f";
-$icon-trash: "\e910";
-$icon-user: "\e911";
-$icon-steps: "\e912";
+$icon-angle-down: '\e900';
+$icon-angle-left: '\e901';
+$icon-angle-right: '\e902';
+$icon-angle-up: '\e903';
+$icon-cross: '\e904';
+$icon-external-link: '\e905';
+$icon-graph: '\e906';
+$icon-info: '\e907';
+$icon-minus-1: '\e908';
+$icon-minus-2: '\e909';
+$icon-move: '\e90a';
+$icon-pencil: '\e90b';
+$icon-plus-1: '\e90c';
+$icon-plus-2: '\e90d';
+$icon-plus-3: '\e90e';
+$icon-print: '\e90f';
+$icon-trash: '\e910';
+$icon-user: '\e911';
+$icon-steps: '\e912';
 
 @font-face {
-  font-family: '#{$icon-font-family}';
-  src:  url('#{$icon-font-path}/#{$icon-font-family}.eot?#{$icon-font-code}');
-  src:  url('#{$icon-font-path}/#{$icon-font-family}.eot?#{$icon-font-code}#iefix') format('embedded-opentype'),
-    url('#{$icon-font-path}/#{$icon-font-family}.ttf?#{$icon-font-code}') format('truetype'),
-    url('#{$icon-font-path}/#{$icon-font-family}.woff?#{$icon-font-code}') format('woff'),
-    url('#{$icon-font-path}/#{$icon-font-family}.svg?#{$icon-font-code}##{$icon-font-family}') format('svg');
-  font-weight: normal;
-  font-style: normal;
-  font-display: block;
+	font-family: '#{$icon-font-family}';
+	src: url('#{$icon-font-path}/#{$icon-font-family}.eot?#{$icon-font-code}');
+	src: url('#{$icon-font-path}/#{$icon-font-family}.eot?#{$icon-font-code}#iefix')
+			format('embedded-opentype'),
+		url('#{$icon-font-path}/#{$icon-font-family}.ttf?#{$icon-font-code}')
+			format('truetype'),
+		url('#{$icon-font-path}/#{$icon-font-family}.woff?#{$icon-font-code}')
+			format('woff'),
+		url('#{$icon-font-path}/#{$icon-font-family}.svg?#{$icon-font-code}##{$icon-font-family}')
+			format('svg');
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
 }
 
-[class^="icon-"], [class*=" icon-"] {
-  /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: '#{$icon-font-family}' !important;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
+[class^='icon-'],
+[class*=' icon-'] {
+	/* use !important to prevent issues with browser extensions that change fonts */
+	font-family: '#{$icon-font-family}' !important;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
 
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 .icon-angle-down {
-  &:before {
-    content: $icon-angle-down; 
-  }
+	&:before {
+		content: $icon-angle-down;
+	}
 }
 .icon-angle-left {
-  &:before {
-    content: $icon-angle-left; 
-  }
+	&:before {
+		content: $icon-angle-left;
+	}
 }
 .icon-angle-right {
-  &:before {
-    content: $icon-angle-right; 
-  }
+	&:before {
+		content: $icon-angle-right;
+	}
 }
 .icon-angle-up {
-  &:before {
-    content: $icon-angle-up; 
-  }
+	&:before {
+		content: $icon-angle-up;
+	}
 }
 .icon-cross {
-  &:before {
-    content: $icon-cross; 
-  }
+	&:before {
+		content: $icon-cross;
+	}
 }
 .icon-external-link {
-  &:before {
-    content: $icon-external-link; 
-  }
+	&:before {
+		content: $icon-external-link;
+	}
 }
 .icon-graph {
-  &:before {
-    content: $icon-graph; 
-  }
+	&:before {
+		content: $icon-graph;
+	}
 }
 .icon-info {
-  &:before {
-    content: $icon-info; 
-  }
+	&:before {
+		content: $icon-info;
+	}
 }
 .icon-minus-1 {
-  &:before {
-    content: $icon-minus-1; 
-  }
+	&:before {
+		content: $icon-minus-1;
+	}
 }
 .icon-minus-2 {
-  &:before {
-    content: $icon-minus-2; 
-  }
+	&:before {
+		content: $icon-minus-2;
+	}
 }
 .icon-move {
-  &:before {
-    content: $icon-move; 
-  }
+	&:before {
+		content: $icon-move;
+	}
 }
 .icon-pencil {
-  &:before {
-    content: $icon-pencil; 
-  }
+	&:before {
+		content: $icon-pencil;
+	}
 }
 .icon-plus-1 {
-  &:before {
-    content: $icon-plus-1; 
-  }
+	&:before {
+		content: $icon-plus-1;
+	}
 }
 .icon-plus-2 {
-  &:before {
-    content: $icon-plus-2; 
-  }
+	&:before {
+		content: $icon-plus-2;
+	}
 }
 .icon-plus-3 {
-  &:before {
-    content: $icon-plus-3; 
-  }
+	&:before {
+		content: $icon-plus-3;
+	}
 }
 .icon-print {
-  &:before {
-    content: $icon-print; 
-  }
+	&:before {
+		content: $icon-print;
+	}
 }
 .icon-trash {
-  &:before {
-    content: $icon-trash; 
-  }
+	&:before {
+		content: $icon-trash;
+	}
 }
 .icon-user {
-  &:before {
-    content: $icon-user; 
-  }
+	&:before {
+		content: $icon-user;
+	}
 }
 .icon-steps {
-  &:before {
-    content: $icon-steps; 
-  }
+	&:before {
+		content: $icon-steps;
+	}
 }
