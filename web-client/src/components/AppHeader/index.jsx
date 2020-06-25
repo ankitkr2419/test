@@ -59,7 +59,13 @@ const AppHeader = (props) => {
 						<Text size={12} className='text-default mb-1'>
 							Experiment started at 12:39 PM
 						</Text>
-						<Button color='secondary' size='sm' outline disabled>
+						<Button
+							color='secondary'
+							size='sm'
+							className='font-weight-light'
+							outline
+							disabled
+						>
 							Run
 						</Button>
 					</div>
