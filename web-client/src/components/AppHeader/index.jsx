@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { Logo, ButtonIcon } from 'shared-components';
+import { Logo, ButtonIcon, Text } from 'shared-components';
 import { loginReset } from 'action-creators/loginActionCreators';
 import {
 	Button,
@@ -22,7 +22,7 @@ const Header = styled.header`
 	align-items: center;
 	height: 80px;
 	background: white 0% 0% no-repeat padding-box;
-	padding: 16px 48px;
+	padding: 16px 24px 16px 48px;
 	box-shadow: 0 4px 16px #00000029;
 	z-index: 1;
 `;
@@ -42,7 +42,7 @@ const AppHeader = (props) => {
 		<Header>
 			<Logo isUserLoggedIn={isUserLoggedIn} />
 			{isUserLoggedIn && (
-				<Nav className='mx-3'>
+				<Nav className='ml-3 mr-auto'>
 					{NAV_ITEMS.map((ele) => (
 						<NavItem key={ele.name}>
 							<NavLink to={ele.path}>{ele.name}</NavLink>
@@ -51,17 +51,23 @@ const AppHeader = (props) => {
 				</Nav>
 			)}
 			{isUserLoggedIn && (
-				<>
-					<Button
-						color='secondary'
-						size='sm'
-						className='ml-auto mr-5'
-						outline
-						disabled
+				<div className='d-flex align-items-center'>
+					<ButtonIcon size={34} name='print' className='mx-2' />
+					<ButtonIcon size={34} name='external-link' className='mx-2' />
+					<div className='experiment-info text-right mx-3'>
+						{/* TODO: Add "show" class to <Text> component when experiment starts and remove it when experiment ends */}
+						<Text size={12} className='text-default mb-1'>
+							Experiment started at 12:39 PM
+						</Text>
+						<Button color='secondary' size='sm' outline disabled>
+							Run
+						</Button>
+					</div>
+					<Dropdown
+						isOpen={userDropdownOpen}
+						toggle={toggleUserDropdown}
+						className='ml-2'
 					>
-						Run
-					</Button>
-					<Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
 						<DropdownToggle icon name='user' size={32} />
 						<DropdownMenu right>
 							<DropdownItem onClick={logoutClickHandler}>Log out</DropdownItem>
@@ -73,7 +79,7 @@ const AppHeader = (props) => {
 						className='ml-2'
 						onClick={logoutClickHandler}
 					/>
-				</>
+				</div>
 			)}
 		</Header>
 	);

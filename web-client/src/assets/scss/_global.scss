@@ -23,6 +23,24 @@ body {
 	overflow-y: auto;
 }
 
+// Page Header CSS
+.experiment-info {
+	position: relative;
+	.text-default {
+		width: rem(192px);
+		position: absolute;
+		top: rem(-16px);
+		right: 0;
+		line-height: rem(14px);
+		@include fade(hide);
+		@extend .text-truncate;
+
+		&.show {
+			@include fade(show);
+		}
+	}
+}
+
 // Page Content Class
 .template-content,
 .login-content,
@@ -57,6 +75,19 @@ body {
 			padding-box;
 		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="$pale",endColorstr="$tango",GradientType=1);
 		z-index: -1;
+	}
+}
+
+// Login Content
+.login-content {
+	.btn-secondary:not(:disabled):not(.disabled) {
+		transition: all 0.5s ease;
+
+		&.active {
+			border-color: $tango;
+			transform: scale(1.15);
+			transition: all 0.5s ease;
+		}
 	}
 }
 
@@ -112,7 +143,11 @@ button:focus {
 .btn-secondary:not(:disabled):not(.disabled).active {
 	background: $white 0% 0% no-repeat padding-box;
 	color: $gray-40;
-	border: rem(2px) solid $tango;
+	box-shadow: rem(0 2px 8px) #00000029;
+}
+
+.btn-secondary:not(:disabled):not(.disabled):active:focus,
+.btn-secondary:not(:disabled):not(.disabled).active:focus {
 	box-shadow: rem(0 2px 8px) #00000029;
 }
 
