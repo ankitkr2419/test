@@ -40,7 +40,7 @@ func (suite *WellHandlerTestSuite) TestListWellsSuccess() {
 				{WellID: testUUID,
 					TargetID: targetID,
 					CT:       "45"},
-			}},
+			}, SampleName: ""},
 		},
 		nil,
 	)
@@ -52,7 +52,7 @@ func (suite *WellHandlerTestSuite) TestListWellsSuccess() {
 		"",
 		listWellsHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","ct":"45"}]}]`, testUUID, experimentID, sampleID, testUUID, targetID)
+	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","ct":"45"}],"sample_name":""}]`, testUUID, experimentID, sampleID, testUUID, targetID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -100,19 +100,20 @@ func (suite *WellHandlerTestSuite) TestUpsertWellSuccess() {
 				{WellID: testUUID,
 					TargetID: targetID,
 					CT:       "45"},
-			}},
+			}, SampleName: ""},
 		},
 		nil,
 	)
 
-	body := fmt.Sprintf(`[{"position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"target_id":"%s","ct":""}]}]`, experimentID, sampleID, targetID)
+	body := fmt.Sprintf(`{"position":[1],"sample":{"id":"%s","name":"sush"},"task":"UNKNOWN","targets":["%s"]}`, sampleID, targetID)
+	fmt.Println(body)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/experiments/{experiment_id}/wells",
 		"/experiments/"+experimentID.String()+"/wells",
 		body,
 		upsertWellHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","ct":"45"}]}]`, testUUID, experimentID, sampleID, testUUID, targetID)
+	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","ct":"45"},{"well_id":"%s","target_id":"%s","ct":""}],"sample_name":""}]`, testUUID, experimentID, sampleID, testUUID, targetID, testUUID, targetID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -157,7 +158,7 @@ func (suite *WellHandlerTestSuite) TestShowWellSuccess() {
 			{WellID: testUUID,
 				TargetID: targetID,
 				CT:       "45"},
-		}}, nil)
+		}, SampleName: ""}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/Wells/{id}",
@@ -165,7 +166,7 @@ func (suite *WellHandlerTestSuite) TestShowWellSuccess() {
 		"",
 		showWellHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","ct":"45"}]}`, testUUID, experimentID, sampleID, testUUID, targetID)
+	output := fmt.Sprintf(`{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","ct":"45"}],"sample_name":""}`, testUUID, experimentID, sampleID, testUUID, targetID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 

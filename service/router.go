@@ -47,19 +47,10 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments", createExperimentHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{experiment_id}/targets", listExpTempTargetsHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{experiment_id}/targets", updateExpTempTargetsHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
-	router.HandleFunc("/samples/{id}", updateSampleHandler(deps)).Methods(http.MethodPut).Headers(versionHeader, v1)
-	router.HandleFunc("/samples/{id}", showSampleHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/samples/{id}", deleteSampleHandler(deps)).Methods(http.MethodDelete).Headers(versionHeader, v1)
-	router.HandleFunc("/samples", listSamplesHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/samples", createSampleHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
-	router.HandleFunc("/samples/{text:[a-z]+}/name", findSamplesHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/samples/{id}", updateSampleHandler(deps)).Methods(http.MethodPut).Headers(versionHeader, v1)
-	router.HandleFunc("/samples/{id}", showSampleHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/samples/{id}", deleteSampleHandler(deps)).Methods(http.MethodDelete).Headers(versionHeader, v1)
+	router.HandleFunc("/samples/{text:[a-z]+}", findSamplesHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{experiment_id}/wells", listWellsHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{experiment_id}/wells", upsertWellHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
 	router.HandleFunc("/wells/{id}", showWellHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/wells/{id}", deleteWellHandler(deps)).Methods(http.MethodDelete).Headers(versionHeader, v1)
-
 	return
 }

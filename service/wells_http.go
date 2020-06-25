@@ -46,37 +46,55 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var w []db.Well
-		err = json.NewDecoder(req.Body).Decode(&w)
+		var wc db.WellConfig
+		err = json.NewDecoder(req.Body).Decode(&wc)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding Well data")
 			return
 		}
 
-		for _, well := range w {
-			valid, respBytes := validate(well)
-			if !valid {
-				responseBadRequest(rw, respBytes)
-				return
+		valid, respBytes := validate(wc)
+		if !valid {
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		// create sample if sample_id not present
+		if !isvalidID(wc.Sample.ID) {
+			wc.Sample, err = deps.Store.CreateSample(req.Context(), wc.Sample)
+		}
+
+		// create wells
+		var wells []db.Well
+		for _, p := range wc.Position {
+			w := db.Well{
+				Position:     p,
+				ExperimentID: expID,
+				SampleID:     wc.Sample.ID,
+				Task:         wc.Task,
 			}
+			wells = append(wells, w)
 		}
 
 		var createdWell []db.Well
-		createdWell, err = deps.Store.UpsertWells(req.Context(), w, expID)
+		createdWell, err = deps.Store.UpsertWells(req.Context(), wells, expID)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
 			return
 		}
 
-		// targets are same for all the selected wells
-		targets := w[0].Targets
-
+		// create well targets
+		var targets []db.WellTarget
 		for w := 0; w < len(createdWell); w++ {
-			for t := 0; t < len(targets); t++ {
-				targets[t].WellID = createdWell[w].ID
-				createdWell[w].Targets = append(createdWell[w].Targets, targets[t])
+			for t := 0; t < len(wc.Targets); t++ {
+				t := db.WellTarget{
+					WellID:   createdWell[w].ID,
+					TargetID: wc.Targets[t],
+				}
+				targets = append(targets, t)
+				createdWell[w].Targets = append(createdWell[w].Targets, t)
 			}
 		}
 
@@ -87,7 +105,7 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		respBytes, err := json.Marshal(createdWell)
+		respBytes, err = json.Marshal(createdWell)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling wells data")
 			rw.WriteHeader(http.StatusInternalServerError)

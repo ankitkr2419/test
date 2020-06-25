@@ -99,7 +99,7 @@ func delWellTargetQuery(WellTargets []WellTarget) string {
 		values = append(values, fmt.Sprintf("'%v'", t.WellID))
 	}
 
-	stmt := fmt.Sprintf(deleteWellTargetQuery ,
+	stmt := fmt.Sprintf(deleteWellTargetQuery,
 		strings.Join(values, ","))
 
 	return stmt
