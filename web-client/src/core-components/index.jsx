@@ -10,7 +10,9 @@ import { Row, Col } from "./Grid";
 import Input from "./Input";
 import Label from "./Label";
 import { Nav, NavItem, NavLink } from "./Nav";
+import { Popover, PopoverHeader, PopoverBody } from "./Popover";
 import Select from "./Select";
+import Switch from "./Switch";
 import Table from "./Table";
 
 export {
@@ -33,7 +35,11 @@ export {
 	ModalBody,
 	Nav,
 	NavItem,
-  NavLink,
-  Select,
+	NavLink,
+	Popover,
+	PopoverHeader,
+	PopoverBody,
+	Select,
+	Switch,
 	Table,
 };

@@ -13,6 +13,7 @@ $gray-94: #F0F0F0;
 $gray-90: #E5E5E5;
 $gray-85: #D9D9D9;
 $gray-80: #CBCBCB;
+$gray-68: #AEAEAE;
 $gray-60: #999999;
 $gray-44: #707070;
 $gray-40: #666666;
@@ -80,3 +81,19 @@ $modal-lg: 900px;
 $modal-md: 600px;
 $modal-content-border-radius: 36px;
 $modal-backdrop-opacity: 0.3;
+
+// Popover
+$popover-max-width: 346px;
+$popover-border-color: $pale;
+$popover-border-radius: 8px;
+$popover-inner-border-radius: 7px;
+
+$popover-header-bg: $pale;
+$popover-header-color: $white;
+$popover-header-padding-y: 8px;
+$popover-header-padding-x: 24px;
+
+$popover-body-padding-y: 24px;
+$popover-body-padding-x: 24px;
+
+$popover-arrow-outer-color: $pale;
