@@ -135,3 +135,68 @@ func (m *DBMockStore) InsertTargets(ctx context.Context, t []Target) (err error)
 	args := m.Called(ctx, t)
 	return args.Error(1)
 }
+
+func (m *DBMockStore) ListSamples(ctx context.Context) (s []Sample, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Sample), args.Error(1)
+}
+
+func (m *DBMockStore) CreateSample(ctx context.Context, stg Sample) (s Sample, err error) {
+	args := m.Called(ctx, stg)
+	return args.Get(0).(Sample), args.Error(1)
+}
+
+func (m *DBMockStore) UpdateSample(ctx context.Context, s Sample) (err error) {
+	args := m.Called(ctx, s)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) DeleteSample(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ShowSample(ctx context.Context, id uuid.UUID) (s Sample, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Sample), args.Error(1)
+}
+
+func (m *DBMockStore) FindSamples(ctx context.Context, text string) (s []Sample, err error) {
+	args := m.Called(ctx, text)
+	return args.Get(0).([]Sample), args.Error(1)
+}
+
+func (m *DBMockStore) ListWells(ctx context.Context, experimentID uuid.UUID) (w []Well, err error) {
+	args := m.Called(ctx, experimentID)
+	return args.Get(0).([]Well), args.Error(1)
+}
+
+func (m *DBMockStore) UpsertWells(ctx context.Context, w []Well, id uuid.UUID) (wdb []Well, err error) {
+	args := m.Called(ctx, w, id)
+	return args.Get(0).([]Well), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteWell(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ShowWell(ctx context.Context, id uuid.UUID) (w Well, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Well), args.Error(1)
+}
+
+func (m *DBMockStore) UpdateStepCount(ctx context.Context) (err error) {
+	args := m.Called(ctx)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (w []WellTarget, err error) {
+	args := m.Called(ctx, wellID)
+	return args.Get(0).([]WellTarget), args.Error(1)
+}
+
+func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget) (err error) {
+	args := m.Called(ctx, w)
+	return args.Error(1)
+}

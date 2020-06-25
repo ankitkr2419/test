@@ -6,5 +6,6 @@ CREATE TABLE wells (
   experiment_id uuid,
   sample_id uuid,
   task varchar(50),
-  color_code float
+  color_code varchar(50) DEFAULT '',
+  CONSTRAINT unqwell UNIQUE (experiment_id, position)
 );

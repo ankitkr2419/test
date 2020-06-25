@@ -9,15 +9,9 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func listStepsHandler(deps Dependencies) http.HandlerFunc {
+func listSamplesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
-		stage_id, err := parseUUID(vars["stage_id"])
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		t, err := deps.Store.ListSteps(req.Context(), stage_id)
+		t, err := deps.Store.ListSamples(req.Context())
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -26,7 +20,7 @@ func listStepsHandler(deps Dependencies) http.HandlerFunc {
 
 		respBytes, err := json.Marshal(t)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling steps data")
+			logger.WithField("err", err.Error()).Error("Error marshaling Samples data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -37,13 +31,13 @@ func listStepsHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func createStepHandler(deps Dependencies) http.HandlerFunc {
+func createSampleHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var t db.Step
+		var t db.Sample
 		err := json.NewDecoder(req.Body).Decode(&t)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding step data")
+			logger.WithField("err", err.Error()).Error("Error while decoding Sample data")
 			return
 		}
 
@@ -53,23 +47,15 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var createdTemp db.Step
-		createdTemp, err = deps.Store.CreateStep(req.Context(), t)
+		var createdSp db.Sample
+		createdSp, err = deps.Store.CreateSample(req.Context(), t)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error create target")
 			return
 		}
 
-		// update step count in stages
-		err = deps.Store.UpdateStepCount(req.Context())
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error in updating step count")
-			return
-		}
-
-		respBytes, err = json.Marshal(createdTemp)
+		respBytes, err = json.Marshal(createdSp)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling targets data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -82,7 +68,7 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func updateStepHandler(deps Dependencies) http.HandlerFunc {
+func updateSampleHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -91,12 +77,12 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var t db.Step
+		var t db.Sample
 
 		err = json.NewDecoder(req.Body).Decode(&t)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding step data")
+			logger.WithField("err", err.Error()).Error("Error while decoding Sample data")
 			return
 		}
 
@@ -108,20 +94,20 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 
 		t.ID = id
 
-		err = deps.Store.UpdateStep(req.Context(), t)
+		err = deps.Store.UpdateSample(req.Context(), t)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update step")
+			logger.WithField("err", err.Error()).Error("Error update Sample")
 			return
 		}
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"step updated successfully"}`))
+		rw.Write([]byte(`{"msg":"Sample updated successfully"}`))
 	})
 }
 
-func showStepHandler(deps Dependencies) http.HandlerFunc {
+func showSampleHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
@@ -131,18 +117,18 @@ func showStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var latestT db.Step
+		var latestT db.Sample
 
-		latestT, err = deps.Store.ShowStep(req.Context(), id)
+		latestT, err = deps.Store.ShowSample(req.Context(), id)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error show step")
+			logger.WithField("err", err.Error()).Error("Error show Sample")
 			return
 		}
 
 		respBytes, err := json.Marshal(latestT)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling step data")
+			logger.WithField("err", err.Error()).Error("Error marshaling Sample data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -153,7 +139,7 @@ func showStepHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func deleteStepHandler(deps Dependencies) http.HandlerFunc {
+func deleteSampleHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -162,23 +148,40 @@ func deleteStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Store.DeleteStep(req.Context(), id)
+		err = deps.Store.DeleteSample(req.Context(), id)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while deleting step")
+			logger.WithField("err", err.Error()).Error("Error while deleting Sample")
 			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		// update step count in stages
-		err = deps.Store.UpdateStepCount(req.Context())
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error in updating step count")
 			return
 		}
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"step deleted successfully"}`))
+		rw.Write([]byte(`{"msg":"Sample deleted successfully"}`))
+	})
+}
+
+func findSamplesHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		searchText := vars["text"]
+
+		t, err := deps.Store.FindSamples(req.Context(), searchText)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		respBytes, err := json.Marshal(t)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling Samples data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(respBytes)
 	})
 }

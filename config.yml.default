@@ -4,9 +4,10 @@ dyes:
     targets: ["HIV","COVID"]
   - name: "CY5"
     position: 1
-    targets: ["DENGUE","HCV"]
+    targets: ["DENGUE","HBV"]
   - name: "VIC"
-    position: 3
+    position: 3,
+    targets: ["HCV"]
   - name: "NED"
     position: 4
     targets: ["COVID"]

@@ -29,3 +29,7 @@ db/application_test\.yml
 /web-client/yarn-error.log*
 
 config\.yml
+
+swaggerui/
+
+rice-box\.go
