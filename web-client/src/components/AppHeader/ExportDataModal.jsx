@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 import { ButtonIcon, Text, Center, Icon } from 'shared-components';
 import { Modal, ModalBody, Button, CheckBox } from 'core-components';
+
+const CheckBoxGroup = styled.div`
+	height: 340px;
+`;
 
 const ExportDataModal = (props) => {
 	const [exportDataModal, setExportDataModal] = useState(false);
@@ -36,38 +41,56 @@ const ExportDataModal = (props) => {
 						name='cross'
 						onClick={toggleExportDataModal}
 					/>
-					<div className='mb-5 pb-3'>
+					<CheckBoxGroup className='d-flex flex-column flex-wrap scroll-x mb-5 pb-3'>
 						<CheckBox
 							id='sample1'
 							name='sample1'
 							label='ID-xx-xxx'
-							className='mb-3'
+							className='mb-3 mr-4'
 						/>
 						<CheckBox
 							id='sample2'
 							name='sample2'
 							label='ID-xx-xxx'
-							className='mb-3'
+							className='mb-3 mr-4'
 						/>
 						<CheckBox
 							id='sample3'
 							name='sample3'
 							label='ID-xx-xxx'
-							className='mb-3'
+							className='mb-3 mr-4'
 						/>
 						<CheckBox
 							id='sample4'
 							name='sample4'
 							label='ID-xx-xxx'
-							className='mb-3'
+							className='mb-3 mr-4'
 						/>
 						<CheckBox
 							id='sample5'
 							name='sample5'
 							label='ID-xx-xxx'
-							className='mb-3'
+							className='mb-3 mr-4'
 						/>
-					</div>
+						<CheckBox
+							id='sample6'
+							name='sample6'
+							label='ID-xx-xxx'
+							className='mb-3 mr-4'
+						/>
+						<CheckBox
+							id='sample7'
+							name='sample7'
+							label='ID-xx-xxx'
+							className='mb-3 mr-4'
+						/>
+						<CheckBox
+							id='sample8'
+							name='sample8'
+							label='ID-xx-xxx'
+							className='mb-3 mr-4'
+						/>
+					</CheckBoxGroup>
 					<Center>
 						<Button color='primary' className='mb-2'>
 							Export
