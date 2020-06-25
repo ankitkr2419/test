@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 /**
  * Text component can be used for multi purpose by passing tag as prop
@@ -7,13 +8,17 @@ import PropTypes from 'prop-types';
  * @param {*} props
  */
 
-const Text = ({
-	Tag, onClick, className, children,
+const StyledText = ({
+	Tag, onClick, className, size, children,
 }) => (
-	<Tag onClick={onClick} className={className}>
+	<Tag size={size} onClick={onClick} className={className}>
 		{children}
 	</Tag>
 );
+
+const Text = styled(StyledText)`
+	font-size: ${(props) => props.size}px;
+`;
 
 Text.propTypes = {
 	Tag: PropTypes.oneOf([
@@ -24,15 +29,18 @@ Text.propTypes = {
 		"h5",
 		"h6",
 		"p",
-		"span"
+		"span",
+		"label",
 	]),
 	className: PropTypes.string,
 	onClick: PropTypes.func,
-	children: PropTypes.oneOfType([PropTypes.element, PropTypes.string])
+	children: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+	size: PropTypes.number,
 };
 
 Text.defaultProps = {
 	Tag: 'p',
+	size: 16
 };
 
 export default Text;

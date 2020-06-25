@@ -45,6 +45,7 @@ ButtonIcon.propTypes = {
 	isShadow: PropTypes.bool,
 	name: PropTypes.string.isRequired,
 	size: PropTypes.number,
+	id: PropTypes.string,
 };
 
 ButtonIcon.defaultProps = {

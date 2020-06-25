@@ -1,12 +1,9 @@
 import React from "react";
+import Plate from "components/Plate";
 
 const PlateContainer = (props) => {
 	return (
-		<>
-			<div className="d-flex align-items-center justify-content-center">
-				<h4 className="text-center text-uppercase my-5 py-5">Plate</h4>
-			</div>
-		</>
+		<Plate />
 	);
 };
 
