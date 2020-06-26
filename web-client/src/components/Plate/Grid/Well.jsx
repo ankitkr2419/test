@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from "classnames";
-import styled from "styled-components";
+import classNames from 'classnames';
+import styled from 'styled-components';
 
 const StyledWell = styled.div`
-	background-color: ${(props) =>
-		props.isSelected && !props.isRunning ? "#aedbd5" : "#ffffff"};
+	background-color: ${props => (props.isSelected && !props.isRunning ? '#aedbd5' : '#ffffff')};
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -15,15 +14,13 @@ const StyledWell = styled.div`
 	font-size: 20px;
 	line-height: 24px;
 	color: #666666;
-	border: ${(props) =>
-		props.isSelected && props.isRunning
-			? "2px solid #707070"
-			: "1px solid #aeaeae"};
+	border: ${props => (props.isSelected && props.isRunning
+		? '2px solid #707070'
+		: '1px solid #aeaeae')};
 	border-radius: 8px;
 	margin: 0 16px 16px 0;
 	padding: 20px 4px 4px;
-	box-shadow: ${(props) =>
-		props.isSelected && props.isRunning ? "0 3px 6px #00000029" : ""};
+	box-shadow: ${props => (props.isSelected && props.isRunning ? '0 3px 6px #00000029' : '')};
 
 	&.selected {
 		&:active,
@@ -58,18 +55,18 @@ const StyledWell = styled.div`
 		left: 0;
 		height: 16px;
 		border-radius: 6px 6px 0 0;
-		background-color: ${(props) =>
-			(props.status === "green" ? "#3FC13A" : "") ||
-			(props.status === "red" ? "#F06666" : "")};
+		background-color: ${props => (props.status === 'green' ? '#3FC13A' : '')
+			|| (props.status === 'red' ? '#F06666' : '')};
 	}
 `;
 
-const Well = ({ id, className, status, isRunning, isSelected, taskInitials }) => {
-
-		const wellClassnames = classNames(className, {
-			running: isRunning,
-			selected: isSelected,
-		});
+const Well = ({
+	id, className, status, isRunning, isSelected, taskInitials, onClickHandler,
+}) => {
+	const wellClassnames = classNames(className, {
+		running: isRunning,
+		selected: isSelected,
+	});
 
 	return (
 		<StyledWell
@@ -78,6 +75,7 @@ const Well = ({ id, className, status, isRunning, isSelected, taskInitials }) =>
 			isSelected={isSelected}
 			status={status}
 			className={wellClassnames}
+			onClick={onClickHandler}
 		>
 			{taskInitials}
 		</StyledWell>
@@ -91,13 +89,14 @@ Well.propTypes = {
 	taskInitials: PropTypes.string,
 	isSelected: PropTypes.bool,
 	isRunning: PropTypes.bool,
+	onClickHandler: PropTypes.func.isRequired,
 };
 
 Well.defaultProps = {
-	id: "",
-	className: "",
-	status: "",
-	taskInitials: "",
+	id: '',
+	className: '',
+	status: '',
+	taskInitials: '',
 	isSelected: false,
 	isRunning: false,
 };

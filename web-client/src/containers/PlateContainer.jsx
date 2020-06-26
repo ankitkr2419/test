@@ -1,11 +1,9 @@
-import React from "react";
-import Plate from "components/Plate";
+import React from 'react';
+import Plate from 'components/Plate';
 
-const PlateContainer = (props) => {
-	return (
-		<Plate />
-	);
-};
+const PlateContainer = props => (
+	<Plate />
+);
 
 PlateContainer.propTypes = {};
 

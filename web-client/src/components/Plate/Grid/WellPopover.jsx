@@ -4,12 +4,14 @@ import {
 	Popover,
 	PopoverHeader,
 	PopoverBody,
-} from "core-components";
-import { Text, Center, ButtonIcon } from "shared-components";
+} from 'core-components';
+import { Text, Center, ButtonIcon } from 'shared-components';
 
 const WellPopover = (props) => {
-	const {status, text, index, ...rest} = props;
-  return (
+	const {
+		status, text, index, ...rest
+	} = props;
+	return (
 		<Popover
 			trigger="legacy"
 			target={`PopoverWell${index}`}
