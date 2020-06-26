@@ -14,14 +14,14 @@ export const Shadow = styled.div`
 	z-index: 1;
 
 	&::after {
-		content: "";
+		content: '';
 		position: absolute;
 		top: 50%;
 		transform: translate(0%, -50%);
-		width: 18px;
+		width: 20px;
 		height: 184px;
 		background-color: #aedbd5;
-		left: -6px;
+		left: -8px;
 		z-index: 2;
 	}
 `;
@@ -49,7 +49,12 @@ const StyledSidebarHandle = styled.button`
 `;
 
 const SidebarHandle = ({ icon, size, clickHandler }) => (
-	<StyledSidebarHandle onClick={clickHandler} className="sidebar-handle" icon={icon} size={size}>
+	<StyledSidebarHandle
+		onClick={clickHandler}
+		className='sidebar-handle'
+		icon={icon}
+		size={size}
+	>
 		<Icon name={icon} size={size} />
 		<Shadow />
 	</StyledSidebarHandle>

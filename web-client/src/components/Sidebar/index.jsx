@@ -13,14 +13,13 @@ const StyledSidebar = styled.aside`
 	min-width: 408px;
 	top: 0;
 	bottom: 0;
-	left: -332px;
-	padding: 0 56px 0 0;
-	overflow: hidden;
-	transition: left 1s ease;
+	left: -388px;
 	z-index: 0;
+	transition: left 1s ease;
 
 	&.open {
 		left: 0;
+		z-index: 1;
 	}
 
 	&.close {
@@ -45,12 +44,12 @@ const Sidebar = ({
 	);
 	return (
 		<StyledSidebar className={classes}>
+			<SidebarHandle
+				clickHandler={toggleSideBar}
+				icon={handleIcon}
+				size={handleIconSize}
+			/>
 			<SidebarContent className='flex-100'>
-				<SidebarHandle
-					clickHandler={toggleSideBar}
-					icon={handleIcon}
-					size={handleIconSize}
-				/>
 				<SidebarBody className='flex-100'>{children}</SidebarBody>
 			</SidebarContent>
 		</StyledSidebar>
