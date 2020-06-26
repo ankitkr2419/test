@@ -61,15 +61,24 @@ const AppHeader = (props) => {
 						<Text size={12} className='text-default mb-1'>
 							Experiment started at 12:39 PM
 						</Text>
+						{/* TODO: When user clicks on Run button remove outline, disabled props and change value of color prop to "primary" */}
 						<Button
 							color='secondary'
 							size='sm'
-							className='font-weight-light'
+							className='font-weight-light border-2 border-gray shadow-none'
 							outline
 							disabled
 						>
 							Run
 						</Button>
+						{/* TODO: Show this button after experiment ends, depending on result change value of color prop to "success" or "failure"  */}
+						{/* <Button
+							color='success'
+							size='sm'
+							className='font-weight-light border-2 border-gray shadow-none'
+						>
+							Result - Successful
+						</Button> */}
 					</div>
 					<Dropdown
 						isOpen={userDropdownOpen}

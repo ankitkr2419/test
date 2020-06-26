@@ -328,10 +328,12 @@ button:focus {
 	pointer-events: none;
 }
 
-.text-inform {
-	font-size: rem(12px);
-	line-height: rem(14px);
-	color: $gray-40;
+.border-2 {
+	border-width: 2px !important;
+}
+
+.border-gray {
+	border-color: $gray-85 !important;
 }
 
 // Cards

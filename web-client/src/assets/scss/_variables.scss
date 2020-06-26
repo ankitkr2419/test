@@ -35,6 +35,7 @@ $theme-colors: map-merge(
 		'danger': $danger,
 		'light': $light,
 		'dark': $dark,
+		'failure': $burnt-sienna,
 	),
 	$theme-colors
 );
