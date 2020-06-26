@@ -3,6 +3,7 @@ module mylab/cpagent
 go 1.14
 
 require (
+	github.com/GeertJohan/go.rice v1.0.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/goburrow/modbus v0.1.0
 	github.com/goburrow/serial v0.1.0 // indirect

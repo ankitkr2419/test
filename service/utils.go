@@ -50,6 +50,14 @@ func parseUUID(s string) (validUUID uuid.UUID, err error) {
 	return
 }
 
+func isvalidID(id uuid.UUID) bool {
+	_, err := parseUUID(id.String())
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusBadRequest)

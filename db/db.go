@@ -20,6 +20,7 @@ type Storer interface {
 	UpdateStage(context.Context, Stage) error
 	ShowStage(context.Context, uuid.UUID) (Stage, error)
 	DeleteStage(context.Context, uuid.UUID) error
+	UpdateStepCount(context.Context) error
 	ListSteps(context.Context, uuid.UUID) ([]Step, error)
 	CreateStep(context.Context, Step) (Step, error)
 	UpdateStep(context.Context, Step) error
@@ -32,4 +33,12 @@ type Storer interface {
 	ShowExperiment(context.Context, uuid.UUID) (Experiment, error)
 	ListExpTemplateTargets(context.Context, uuid.UUID) ([]ExpTemplateTarget, error)
 	UpsertExpTemplateTarget(context.Context, []ExpTemplateTarget, uuid.UUID) ([]ExpTemplateTarget, error)
+	CreateSample(context.Context, Sample) (Sample, error)
+	FindSamples(context.Context, string) ([]Sample, error)
+	ListWells(context.Context, uuid.UUID) ([]Well, error)
+	UpsertWells(context.Context, []Well, uuid.UUID) ([]Well, error)
+	ShowWell(context.Context, uuid.UUID) (Well, error)
+	DeleteWell(context.Context, uuid.UUID) error
+	ListWellTargets(context.Context, uuid.UUID) ([]WellTarget, error)
+	UpsertWellTargets(context.Context, []WellTarget) error
 }

@@ -1,10 +1,8 @@
 package main
 
-// API REST CPAGENT
-//     Schemes: https
-//     Host: localhost:8080
-//     Version: 0.1.0
 import (
+	rice "github.com/GeertJohan/go.rice"
+
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
@@ -129,6 +127,8 @@ func startApp(plcName string, test bool) (err error) {
 
 	// mux router
 	router := service.InitRouter(deps)
+	// to embed react build with go rice
+	router.PathPrefix("/").Handler(http.FileServer(rice.MustFindBox("./web-client/build").HTTPBox()))
 
 	// cors configuration for front-end
 	c := cors.New(cors.Options{

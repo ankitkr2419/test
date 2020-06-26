@@ -37,12 +37,6 @@ func listStepsHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-// @Title createStepHandler
-// @Description Create createStepHandler
-// @Router /step [post]
-// @Accept  json
-// @Success 200 {object}
-// @Failure 400 {object}
 func createStepHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var t db.Step
@@ -64,6 +58,14 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error create target")
+			return
+		}
+
+		// update step count in stages
+		err = deps.Store.UpdateStepCount(req.Context())
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error in updating step count")
 			return
 		}
 
@@ -164,6 +166,14 @@ func deleteStepHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error while deleting step")
 			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// update step count in stages
+		err = deps.Store.UpdateStepCount(req.Context())
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error in updating step count")
 			return
 		}
 

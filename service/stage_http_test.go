@@ -34,7 +34,7 @@ func (suite *StageHandlerTestSuite) TestListStagesSuccess() {
 	tempUUID := uuid.New()
 	suite.dbMock.On("ListStages", mock.Anything, mock.Anything).Return(
 		[]db.Stage{
-			db.Stage{Name: "test-stage", ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID},
+			db.Stage{ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0},
 		},
 		nil,
 	)
@@ -46,7 +46,7 @@ func (suite *StageHandlerTestSuite) TestListStagesSuccess() {
 		"",
 		listStagesHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","name":"test-stage","type":"Repeat","repeat_count":3,"template_id":"%s"}]`, testUUID, tempUUID)
+	output := fmt.Sprintf(`[{"id":"%s","type":"Repeat","repeat_count":3,"template_id":"%s","step_count":0}]`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -76,30 +76,29 @@ func (suite *StageHandlerTestSuite) TestCreateStageSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()
 	suite.dbMock.On("CreateStage", mock.Anything, mock.Anything).Return(db.Stage{
-		Name: "test-stage", ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID,
+		ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0,
 	}, nil)
 
-	body := fmt.Sprintf(`{"name":"test-stage","type":"Repeat", "repeat_count":3, "template_id":"%s"}`, tempUUID)
+	body := fmt.Sprintf(`{"type":"Repeat", "repeat_count":3, "template_id":"%s","step_count":0}`, tempUUID)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/stages",
 		"/stages",
 		body,
 		createStageHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"test-stage","type":"Repeat","repeat_count":3,"template_id":"%s"}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","type":"Repeat","repeat_count":3,"template_id":"%s","step_count":0}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
-
 	suite.dbMock.AssertExpectations(suite.T())
 }
 func (suite *StageHandlerTestSuite) TestUpdateStageSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()
 	suite.dbMock.On("UpdateStage", mock.Anything, mock.Anything).Return(db.Stage{
-		Name: "test-stage", ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID,
+		ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0,
 	}, nil)
 
-	body := fmt.Sprintf(`{"name":"test-stage","type":"Repeat", "repeat_count":3, "template_id":"%s"}`, tempUUID)
+	body := fmt.Sprintf(`{"type":"Repeat", "repeat_count":3, "template_id":"%s","step_count":0}`, tempUUID)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/stages/{id}",
@@ -136,7 +135,7 @@ func (suite *StageHandlerTestSuite) TestShowStageSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()
 	suite.dbMock.On("ShowStage", mock.Anything, mock.Anything).Return(db.Stage{
-		Name: "test-stage", ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID,
+		ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0,
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -145,7 +144,7 @@ func (suite *StageHandlerTestSuite) TestShowStageSuccess() {
 		"",
 		showStageHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"test-stage","type":"Repeat","repeat_count":3,"template_id":"%s"}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","type":"Repeat","repeat_count":3,"template_id":"%s","step_count":0}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 

@@ -75,6 +75,10 @@ func (suite *StepHandlerTestSuite) TestListStepsFail() {
 func (suite *StepHandlerTestSuite) TestCreateStepSuccess() {
 	testUUID := uuid.New()
 	stgUUID := uuid.New()
+	suite.dbMock.On("UpdateStepCount", mock.Anything).Return(
+		nil,
+		nil,
+	)
 	suite.dbMock.On("CreateStep", mock.Anything, mock.Anything).Return(db.Step{
 		ID: testUUID, StageID: stgUUID, TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true,
 	}, nil)
@@ -116,6 +120,10 @@ func (suite *StepHandlerTestSuite) TestUpdateStepSuccess() {
 
 func (suite *StepHandlerTestSuite) TestDeleteStepSuccess() {
 	testUUID := uuid.New()
+	suite.dbMock.On("UpdateStepCount", mock.Anything).Return(
+		nil,
+		nil,
+	)
 	suite.dbMock.On("DeleteStep", mock.Anything, mock.Anything).Return(
 		testUUID,
 		nil)

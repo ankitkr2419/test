@@ -22,3 +22,10 @@ For PostgreSQL use following commands
 ./cpagent start --plc simulator
 ./cpagent migrate
 ./cpagent create_migration filename
+
+### RICE
+
+For embedding react build with Go binary
+
+$ rice embed
+$ go build

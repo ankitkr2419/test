@@ -4,4 +4,4 @@ CREATE TABLE experiment_template_targets
     template_id uuid,
     target_id uuid,
     threshold float,
-    CONSTRAINT unqexp UNIQUE (template_id, target_id));
+    CONSTRAINT unqexp UNIQUE (template_id, target_id,experiment_id));

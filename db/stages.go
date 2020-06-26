@@ -9,40 +9,47 @@ import (
 
 const (
 	createStageQuery = `INSERT INTO stages (
-		name,
 		type,
 		repeat_count,
-		template_id)
+		template_id,
+		step_count)
 		VALUES ($1, $2, $3, $4) RETURNING id`
 
 	getStageListQuery = `SELECT * FROM stages
-		where template_id = $1
-		ORDER BY name ASC`
+		where template_id = $1`
 
 	getStageQuery = `SELECT id,
-		name,
 		type,
 		repeat_count,
-		template_id
+		template_id,
+		step_count
 		FROM stages
 		WHERE id = $1`
 
 	updateStageQuery = `UPDATE stages SET (
-		name,
 		type,
 		repeat_count,
 		template_id) =
-		($1, $2, $3, $4) where id = $5`
+		($1, $2, $3) where id = $4`
 
 	deleteStageQuery = `DELETE FROM stages WHERE id = $1`
+
+	updateStepCountQuery = `UPDATE stages
+		SET step_count = subquery.no_of_steps
+			FROM (
+    			SELECT count(stage_id) AS no_of_steps, stage_id
+    			FROM   steps
+    			GROUP  BY stage_id
+    		) AS subquery
+		Where stages.id = subquery.stage_id`
 )
 
 type Stage struct {
 	ID          uuid.UUID `db:"id" json:"id"`
-	Name        string    `db:"name" json:"name"`
-	Type        string    `db:"type" json:"type"`
+	Type        string    `db:"type" json:"type"  validate:"required"`
 	RepeatCount int       `db:"repeat_count" json:"repeat_count"`
-	TemplateID  uuid.UUID `db:"template_id" json:"template_id"`
+	TemplateID  uuid.UUID `db:"template_id" json:"template_id" validate:"required"`
+	StepCount   int       `db:"step_count" json:"step_count"`
 }
 
 func (s *pgStore) ListStages(ctx context.Context, template_id uuid.UUID) (stgs []Stage, err error) {
@@ -59,10 +66,10 @@ func (s *pgStore) CreateStage(ctx context.Context, stg Stage) (createdStage Stag
 	var lastInsertId uuid.UUID
 	err = s.db.QueryRow(
 		createStageQuery,
-		stg.Name,
 		stg.Type,
 		stg.RepeatCount,
 		stg.TemplateID,
+		0, //initial step count = 0
 	).Scan(&lastInsertId)
 
 	if err != nil {
@@ -81,7 +88,6 @@ func (s *pgStore) CreateStage(ctx context.Context, stg Stage) (createdStage Stag
 func (s *pgStore) UpdateStage(ctx context.Context, stg Stage) (err error) {
 	_, err = s.db.Exec(
 		updateStageQuery,
-		stg.Name,
 		stg.Type,
 		stg.RepeatCount,
 		stg.TemplateID,
@@ -116,5 +122,16 @@ func (s *pgStore) DeleteStage(ctx context.Context, id uuid.UUID) (err error) {
 		return
 	}
 
+	return
+}
+
+func (s *pgStore) UpdateStepCount(ctx context.Context) (err error) {
+	_, err = s.db.Exec(
+		updateStepCountQuery,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating Stage")
+		return
+	}
 	return
 }

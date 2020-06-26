@@ -13,15 +13,14 @@ const (
 	getTempTargetListQuery = `SELECT * FROM template_targets
 		where template_id = $1`
 
-	upsertTempTargetQuery1 = `INSERT INTO template_targets (
+	upsertTempTargetQuery = `INSERT INTO template_targets (
 		template_id,
 		target_id,
 		threshold)
 		VALUES `
 
-	upsertTempTargetQuery2 = ` ON CONFLICT (template_id, target_id) DO UPDATE
-			SET threshold=excluded.threshold
-			WHERE template_targets.template_id = excluded.template_id AND template_targets.target_id = excluded.target_id`
+	deleteTempTargetsQuery = `DELETE FROM template_targets
+		where template_id = $1`
 )
 
 //TemplateTarget is used to store target mapped to template
@@ -44,13 +43,31 @@ func (s *pgStore) UpsertTemplateTarget(ctx context.Context, t []TemplateTarget, 
 
 	stmt := makeQuery(t)
 
-	_, err = s.db.Exec(
+	tx, err := s.db.Begin()
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in creating transaction")
+		return
+	}
+	_, err = tx.Exec(
+		deleteTempTargetsQuery,
+		temp_id,
+	)
+	if err != nil {
+		tx.Rollback()
+		logger.WithField("err", err.Error()).Error("Error deleting previous template targets")
+		return
+	}
+
+	_, err = tx.Exec(
 		stmt,
 	)
 	if err != nil {
+		tx.Rollback()
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
 	}
+
+	tx.Commit()
 
 	err = s.db.Select(&createdTT, getTempTargetListQuery, temp_id)
 	if err != nil {
@@ -70,9 +87,8 @@ func makeQuery(tt []TemplateTarget) string {
 		values = append(values, fmt.Sprintf("('%v', '%v',%v)", t.TemplateID, t.TargetID, t.Threshold))
 	}
 
-	stmt := fmt.Sprintf(upsertTempTargetQuery1+" %s",
+	stmt := fmt.Sprintf(upsertTempTargetQuery+" %s",
 		strings.Join(values, ","))
 
-	stmt += upsertTempTargetQuery2
 	return stmt
 }
