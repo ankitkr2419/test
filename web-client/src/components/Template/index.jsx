@@ -8,8 +8,8 @@ import {
 	Center,
 	Text,
 } from 'shared-components';
+import imgNoTemplate from 'assets/images/no-template-available.svg';
 import CreateTemplateModal from './CreateTemplateModal';
-import imgNoTemplate from "assets/images/no-template-available.svg";
 
 const TemplateComponent = (props) => {
 	const {
@@ -20,6 +20,7 @@ const TemplateComponent = (props) => {
 		updateTemplateID,
 		isLoginTypeOperator,
 		isLoginTypeAdmin,
+		createExperiment,
 	} = props;
 
 	// Local state to manage create template modal
@@ -71,13 +72,23 @@ const TemplateComponent = (props) => {
 		updateSelectedWizard('target');
 	};
 
-	const onTemplateButtonClickHandler = (templateId) => {
+	const onTemplateButtonClickHandler = ({ id: templateId, description }) => {
+		console.log('onTemplateButtonClickHandler: ');
+		// if its admin save template id and show edit & delete options on button
+		// if its operator save template id an navigate to target wizard
+
+		// set selected template id to local state for maintaining active state of button
 		setSelectedTemplateId(templateId);
-		if (isLoginTypeAdmin === false) {
+		if (isLoginTypeOperator === true) {
+			// make api call to save experiments
+			createExperiment({
+				template_id: templateId,
+				description,
+			});
 			// Updates template id to templateState maintain over templateLayout
 			updateTemplateID(templateId);
 			// navigate to next wizard
-			updateSelectedWizard('target');
+			// updateSelectedWizard('target');
 		}
 	};
 
@@ -106,7 +117,7 @@ const TemplateComponent = (props) => {
           			isActive={template.get('id') === selectedTemplateId}
           			isEditable={isLoginTypeAdmin === true && isLoginTypeOperator === false}
           			onButtonClickHandler={() => {
-          				onTemplateButtonClickHandler(template.get('id'));
+          				onTemplateButtonClickHandler(template.toJS());
           			}}
           			onEditClickHandler={editClickHandler}
           			isDeletable={isLoginTypeAdmin === true && isLoginTypeOperator === false}

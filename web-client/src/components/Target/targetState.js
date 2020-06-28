@@ -13,6 +13,7 @@ export const targetStateActions = {
 export const targetInitialState = fromJS({
 	// getTargetOption will return fixed size array with object initialize with isChecked false
 	targetList: List(getTargetOption()),
+	originalTargetList: List([]),
 });
 
 // isCheckable will validate weather target and threshold value is present for given index
@@ -52,8 +53,29 @@ export const getCheckedTargets = (list, templateID) => {
 	}));
 };
 
+export const getCheckedExperimentTargets = (list) => {
+	const targetList = list.filter(ele => ele.isChecked === true).toJSON();
+	// if we don't found any items selected will return empty list
+	// Used to set save button disabled on target page
+	if (targetList.length === 0) {
+		return targetList;
+	}
+	// below object manipulation is done for sending data to server
+	return targetList.map(ele => ({
+		experiment_id: ele.experiment_id,
+		template_id: ele.template_id,
+		target_id: ele.selectedTarget.value,
+		threshold: parseFloat(ele.threshold),
+	}));
+};
+
 // function will replace the existing local target list with new
-const updateList = (state, list) => state.merge({ targetList: List(list) });
+const updateList = (state, list) => state.merge({ targetList: List(list), originalTargetList: List(list) });
+
+export const isTargetListUpdated = (state) => {
+	const { targetList, originalTargetList } = state.toJS();
+	return JSON.stringify(targetList) !== JSON.stringify(originalTargetList);
+};
 
 const targetStateReducer = (state, action) => {
 	switch (action.type) {

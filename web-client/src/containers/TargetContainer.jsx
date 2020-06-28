@@ -131,12 +131,6 @@ const TargetContainer = (props) => {
 		});
 	}, []);
 
-	// getCheckedTargetCount will return the count of selected checkbox
-	const getCheckedTargetCount = useCallback(
-		() => getCheckedTargets(selectedTargetState.get('targetList')).length,
-		[selectedTargetState],
-	);
-
 	// onSaveClick Save data on server
 	const onSaveClick = useCallback(() => {
 		// get list of selected targets
@@ -170,15 +164,15 @@ const TargetContainer = (props) => {
 	return (
 		<TargetComponent
 			listTargetReducer={listTargetReducer.get('list')}
-			selectedTargetState={selectedTargetState}
+			selectedTargetState={selectedTargetState.get('targetList')}
 			updateTargetState={updateTargetState}
 			onCheckedHandler={onCheckedHandler}
 			onTargetSelect={onTargetSelect}
 			onThresholdChange={onThresholdChange}
 			onSaveClick={onSaveClick}
-			getCheckedTargetCount={getCheckedTargetCount}
 			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
+			isTargetListUpdated
 		/>
 	);
 };

@@ -10,6 +10,11 @@ import {
 	deleteTemplateReset,
 } from 'action-creators/templateActionCreators';
 
+import {
+	createExperiment as createExperimentAction,
+	createExperimentReset,
+} from 'action-creators/experimentActionCreators';
+
 const TemplateContainer = (props) => {
 	const {
 		isLoginTypeOperator, isLoginTypeAdmin, updateSelectedWizard, updateTemplateID,
@@ -24,6 +29,11 @@ const TemplateContainer = (props) => {
 	// isTemplateDeleted = true means template deleted successfully
 	const { isTemplateDeleted } = useSelector(
 		state => state.deleteTemplateReducer,
+	);
+
+	// isTemplateDeleted = true means template deleted successfully
+	const { isExperimentSaved, id } = useSelector(
+		state => state.createExperimentReducer,
 	);
 
 	useEffect(() => {
@@ -47,6 +57,18 @@ const TemplateContainer = (props) => {
 		dispatch(fetchTemplates());
 	}, [dispatch]);
 
+	/**
+	 * if login type is operator
+	 * once he select template will create experiment by calling experiment post rest call
+	 * once its successful will navigate to target-operator wizard
+	 */
+	useEffect(() => {
+		if (isExperimentSaved === true) {
+			updateSelectedWizard('target-operator');
+			dispatch(createExperimentReset());
+		}
+	}, [updateSelectedWizard, dispatch, isExperimentSaved, id]);
+
 	const createTemplate = (template) => {
 		// creating template though api
 		dispatch(createTemplateAction(template));
@@ -55,6 +77,14 @@ const TemplateContainer = (props) => {
 	const deleteTemplate = (templateID) => {
 		// deleting template though api
 		dispatch(deleteTemplateAction(templateID));
+	};
+
+	/**
+	 * createExperiment belongs to operator flow
+	 */
+	const createExperiment = (experimentBody) => {
+		// console.log('experimentBody: ', experimentBody);
+		dispatch(createExperimentAction(experimentBody));
 	};
 
 	return (
@@ -67,6 +97,7 @@ const TemplateContainer = (props) => {
 			updateTemplateID={updateTemplateID}
 			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
+			createExperiment={createExperiment}
 		/>
 	);
 };

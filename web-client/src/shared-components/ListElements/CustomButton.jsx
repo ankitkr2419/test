@@ -59,31 +59,27 @@ export const CustomButton = ({
 	onButtonClickHandler,
 	isActive,
 	...rest
-}) => {
-	// const [isActive, setActiveState] = useState(false);
-
-	return (
-		<StyledTemplate {...rest} isActive={isActive}>
-			{isEditable && isActive ? (
-				<EditButton onClickHandler={onEditClickHandler} />
-			) : (
-				''
-			)}
-			<Text
-				Tag="span"
-				onClick={onButtonClickHandler}
-				className="text-truncate"
-			>
-				{title}
-			</Text>
-			{isDeletable && isActive ? (
-				<DeleteButton onClickHandler={onDeleteClickHandler} />
-			) : (
-				''
-			)}
-		</StyledTemplate>
-	);
-};
+}) => (
+	<StyledTemplate onClick={isActive ? null : onButtonClickHandler} {...rest} isActive={isActive}>
+		{isEditable && isActive ? (
+			<EditButton onClickHandler={onEditClickHandler} />
+		) : (
+			''
+		)}
+		<Text
+			Tag="span"
+			// onClick={onButtonClickHandler}
+			className="text-truncate"
+		>
+			{title}
+		</Text>
+		{isDeletable && isActive ? (
+			<DeleteButton onClickHandler={onDeleteClickHandler} />
+		) : (
+			''
+		)}
+	</StyledTemplate>
+);
 
 CustomButton.propTypes = {
 	title: PropTypes.string.isRequired,

@@ -72,3 +72,29 @@ export const isTargetsModified = (checkedTargets, selectedTargets, isLoginTypeAd
 
 	return true;
 };
+
+export const getSelectedTargetExperiment = (
+	selectedTargets, // Selected targets from server
+) => {
+	if (selectedTargets === null || selectedTargets.size === 0) {
+		return null;
+	}
+	const arr = [];
+	// check before merging if selectedTargets are present
+	if (selectedTargets !== null && selectedTargets.size !== 0) {
+		selectedTargets.map((selectedTarget, index) => {
+			arr[index] = {
+				isChecked: true,
+				selectedTarget: {
+					label: 'target name',
+					value: selectedTarget.get('target_id'),
+				},
+				threshold: selectedTarget.get('threshold'),
+				experiment_id: selectedTarget.get('experiment_id'),
+				template_id: selectedTarget.get('template_id'),
+			};
+			return null;
+		});
+	}
+	return arr;
+};

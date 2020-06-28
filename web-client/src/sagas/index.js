@@ -29,6 +29,15 @@ import {
 	loginSaga,
 } from 'sagas/loginSaga';
 
+import {
+	createExperimentSaga,
+} from 'sagas/experimentSaga';
+
+import {
+	fetchExperimentTargetsSaga,
+	createExperimentTargetSaga,
+} from 'sagas/experimentTargetSaga';
+
 const allSagas = [
 	createTemplateSaga(),
 	fetchTemplatesSaga(),
@@ -46,6 +55,9 @@ const allSagas = [
 	deleteStepSaga(),
 	updateStepSaga(),
 	loginSaga(),
+	createExperimentSaga(),
+	fetchExperimentTargetsSaga(),
+	createExperimentTargetSaga(),
 ];
 
 export default function* rootSaga() {

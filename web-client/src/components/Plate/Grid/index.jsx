@@ -9,9 +9,9 @@ import PlateData from './PlateData.json';
 
 const { YCoordinates } = PlateData;
 const { XCoordinates } = PlateData;
-const { Wells } = PlateData;
+// const { Wells } = PlateData;
 
-const GridComponent = ({ onWellClickHandler }) => (
+const GridComponent = ({ onWellClickHandler, wells }) => (
 	<div className="d-flex flex-column flex-100">
 		<Coordinate direction="horizontal">
 			{YCoordinates.map((value, i) => (
@@ -25,19 +25,24 @@ const GridComponent = ({ onWellClickHandler }) => (
 				))}
 			</Coordinate>
 			<WellGrid>
-				{Wells.map((well, i) => (
-					<div key={i}>
-						<Well
-							isRunning={well.isRunning}
-							isSelected={well.isSelected}
-							status={well.status}
-							taskInitials={well.text}
-							id={`PopoverWell${i}`}
-							onClickHandler={(event) => { onWellClickHandler(well, i, event); }}
-						/>
-						{well.isRunning && <WellPopover status={well.status} text={well.text} index={i} />}
-					</div>
-				))}
+				{wells.map((well, index) => {
+					const {
+						isRunning, isSelected, status, initial, text,
+					} = well.toJS();
+					return (
+						<div key={index}>
+							<Well
+								isRunning={isRunning}
+								isSelected={isSelected}
+								status={status}
+								taskInitials={initial}
+								id={`PopoverWell${index}`}
+								onClickHandler={(event) => { onWellClickHandler(well, index, event); }}
+							/>
+							{isRunning && <WellPopover status={status} text={text} index={index} />}
+						</div>
+					);
+				})}
 			</WellGrid>
 		</div>
 	</div>

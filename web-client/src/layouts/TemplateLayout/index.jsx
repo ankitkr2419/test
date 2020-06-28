@@ -5,6 +5,7 @@ import TemplateContainer from 'containers/TemplateContainer';
 import TargetContainer from 'containers/TargetContainer';
 import StageContainer from 'containers/StageContainer';
 import StepContainer from 'containers/StepContainer';
+import TargetExperimentContainer from 'containers/TargetExperimentContainer';
 import templateLayoutReducer, {
 	templateInitialState,
 	templateLayoutActions,
@@ -74,6 +75,15 @@ const TemplateLayout = (props) => {
 					)}
 					{activeWidgetID === 'target' && (
 						<TargetContainer
+							isLoginTypeOperator={isLoginTypeOperator}
+							isLoginTypeAdmin={isLoginTypeAdmin}
+							updateSelectedWizard={updateSelectedWizard}
+							templateID={templateID}
+						/>
+					)}
+
+					{activeWidgetID === 'target-operator' && (
+						<TargetExperimentContainer
 							isLoginTypeOperator={isLoginTypeOperator}
 							isLoginTypeAdmin={isLoginTypeAdmin}
 							updateSelectedWizard={updateSelectedWizard}

@@ -10,10 +10,14 @@ import SidebarGraph from './Sidebar/Graph/SidebarGraph';
 import './Plate.scss';
 
 const Plate = (props) => {
-	const onWellClickHandler = (well) => {
-		console.log('well clicked', well);
+	const { wells, setWellSelected } = props;
+
+	const onWellClickHandler = (well, index) => {
+		const { isSelected } = well.toJS();
 		// if well is blank
-		// then just select it
+		// then select it
+		// TODO find well empty condition
+		setWellSelected(index, !isSelected);
 
 		// if well is filled with data
 		// then open pop-over
@@ -27,7 +31,7 @@ const Plate = (props) => {
 			<Header />
 			<GridWrapper className="plate-body flex-100">
 				<WellGridHeader />
-				<GridComponent onWellClickHandler={onWellClickHandler}/>
+				<GridComponent wells={wells} onWellClickHandler={onWellClickHandler}/>
 			</GridWrapper>
 			<SidebarSample />
 			<SidebarGraph />

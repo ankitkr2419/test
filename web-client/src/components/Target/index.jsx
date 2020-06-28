@@ -22,15 +22,11 @@ const TargetComponent = (props) => {
 		onTargetSelect,
 		onThresholdChange,
 		onSaveClick,
-		getCheckedTargetCount,
+		onNextClick,
 		isLoginTypeAdmin,
 		isLoginTypeOperator,
+		isTargetListUpdated,
 	} = props;
-
-	// Extracting targetList from immutable target state
-	const targetList = selectedTargetState.get('targetList');
-	// selected target count will help us in validating save button
-	const selectedTargetCount = getCheckedTargetCount();
 
 	const isTargetDisabled = (ele) => {
 		if (ele.selectedTarget === undefined || ele.threshold === undefined) {
@@ -40,7 +36,7 @@ const TargetComponent = (props) => {
 	};
 
 	const getTargetRows = useMemo(
-		() => targetList.map((ele, index) => (
+		() => selectedTargetState.map((ele, index) => (
 			<TargetListItem key={index}>
 				<CheckBox
 					onChange={(event) => {
@@ -92,14 +88,14 @@ const TargetComponent = (props) => {
 			onCheckedHandler,
 			onTargetSelect,
 			onThresholdChange,
-			targetList,
+			selectedTargetState,
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
 		],
 	);
 	return (
 		<>
-			<div className="flex-100 scroll-y p-4">
+			<div className="flex-70 scroll-y p-3">
 				<TargetList className="list-target">
 					<TargetListHeader>
 						<Text className="mb-2 mr-2" />
@@ -109,31 +105,55 @@ const TargetComponent = (props) => {
 					{getTargetRows}
 				</TargetList>
 			</div>
-			<div className="d-flex flex-30 align-items-end p-4">
+			<div className="d-flex flex-10 align-items-end p-1">
 				<Button
 					color="primary"
 					onClick={onSaveClick}
 					className="mx-auto mb-3"
-					// TODO Enabled it once operator new design is in place
-					disabled={selectedTargetCount === 0 || isLoginTypeOperator === true}
+					disabled={isTargetListUpdated === false}
 				>
           Save
 				</Button>
 			</div>
+			{/* {isLoginTypeAdmin === true && (
+				<div className="d-flex flex-20 align-items-end p-1">
+					<Button
+						color="primary"
+						onClick={onNextClick}
+						className="mx-auto mb-3"
+						disabled={isTargetListUpdated}
+					>
+            View Stages
+					</Button>
+				</div>
+			)} */}
+			{isLoginTypeOperator === true && (
+				<div className="d-flex flex-10 align-items-end p-1">
+					<Button
+						color="primary"
+						onClick={onNextClick}
+						className="mx-auto mb-3"
+						disabled={isTargetListUpdated}
+					>
+            Next
+					</Button>
+				</div>
+			)}
 		</>
 	);
 };
 
 TargetComponent.propTypes = {
-	listTargetReducer: PropTypes.object.isRequired,
 	selectedTargetState: PropTypes.object.isRequired,
 	onCheckedHandler: PropTypes.func.isRequired,
-	onTargetSelect: PropTypes.func.isRequired,
 	onThresholdChange: PropTypes.func.isRequired,
 	onSaveClick: PropTypes.func.isRequired,
-	getCheckedTargetCount: PropTypes.func.isRequired,
 	isLoginTypeAdmin: PropTypes.bool.isRequired,
 	isLoginTypeOperator: PropTypes.bool.isRequired,
+	isTargetListUpdated: PropTypes.bool.isRequired,
+	listTargetReducer: PropTypes.object,
+	onTargetSelect: PropTypes.func,
+	onNextClick: PropTypes.func,
 };
 
 export default TargetComponent;
