@@ -342,21 +342,6 @@ button:focus {
 	-webkit-box-orient: vertical;
 }
 
-// Cards
-// Login
-.card-login {
-	> .card-body {
-		padding: rem(24px 48px 24px 72px);
-	}
-
-	.card-title {
-		font-weight: normal;
-		color: $gray-40;
-		padding-top: rem(48px);
-		margin: 0 0 rem(222px);
-	}
-}
-
 // Target
 .list-target {
 	p {
