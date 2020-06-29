@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import SampleTarget from './SampleTarget';
 
@@ -8,25 +8,21 @@ const StyledSampleTargetList = styled.div`
   margin: 0 0 8px;
 `;
 
-const SampleTargetList = ({className}) => {
-  return (
-    <StyledSampleTargetList className={className}>
-      <SampleTarget title="Target 1" />
-      <SampleTarget title="Target 1" />
-      <SampleTarget title="Target 1" />
-      <SampleTarget title="Target 1" />
-      <SampleTarget title="Target 1" />
-      <SampleTarget title="Target 1" />
-    </StyledSampleTargetList>
-  );
-};
+const SampleTargetList = ({ list, onCrossClickHandler }) => (
+	<StyledSampleTargetList>
+		{list.map((ele, index) => (
+			<SampleTarget
+				key={ele.get('target_id')}
+				onClickHandler={() => onCrossClickHandler(index, ele)}
+				label={ele.get('target_id')}
+			/>
+		))}
+	</StyledSampleTargetList>
+);
 
 SampleTargetList.propTypes = {
-	className: PropTypes.string,
-};
-
-SampleTargetList.defaultProps = {
-	className: "",
+	list: PropTypes.object.isRequired,
+	onCrossClickHandler: PropTypes.func.isRequired,
 };
 
 export default SampleTargetList;

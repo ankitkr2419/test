@@ -73,7 +73,6 @@ const TemplateComponent = (props) => {
 	};
 
 	const onTemplateButtonClickHandler = ({ id: templateId, description }) => {
-		console.log('onTemplateButtonClickHandler: ');
 		// if its admin save template id and show edit & delete options on button
 		// if its operator save template id an navigate to target wizard
 

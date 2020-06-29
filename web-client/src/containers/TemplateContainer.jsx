@@ -14,6 +14,7 @@ import {
 	createExperiment as createExperimentAction,
 	createExperimentReset,
 } from 'action-creators/experimentActionCreators';
+import { getIsExperimentSaved } from 'selectors/experimentSelector';
 
 const TemplateContainer = (props) => {
 	const {
@@ -34,10 +35,8 @@ const TemplateContainer = (props) => {
 		(state) => state.deleteTemplateReducer
 	);
 
-	// isTemplateDeleted = true means template deleted successfully
-	const { isExperimentSaved, id } = useSelector(
-		(state) => state.createExperimentReducer
-	);
+	// isTemplateDeleted = true means experiment created successfully
+	const isExperimentSaved = useSelector(getIsExperimentSaved);
 
 	useEffect(() => {
 		// Once we create template will fetch updated template list
@@ -70,7 +69,7 @@ const TemplateContainer = (props) => {
 			updateSelectedWizard('target-operator');
 			dispatch(createExperimentReset());
 		}
-	}, [updateSelectedWizard, dispatch, isExperimentSaved, id]);
+	}, [updateSelectedWizard, dispatch, isExperimentSaved]);
 
 	const createTemplate = (template) => {
 		// creating template though api

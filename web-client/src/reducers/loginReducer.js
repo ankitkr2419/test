@@ -3,9 +3,9 @@ import loginActions from 'actions/loginActions';
 
 const loginInitialState = fromJS({
 	isLoading: true,
-	isUserLoggedIn: true,
+	isUserLoggedIn: false,
 	isLoginTypeAdmin: false,
-	isLoginTypeOperator: true,
+	isLoginTypeOperator: false,
 	isError: false,
 });
 

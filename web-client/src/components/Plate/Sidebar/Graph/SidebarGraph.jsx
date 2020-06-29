@@ -16,13 +16,12 @@ const GraphCard = styled.div`
 const SidebarGraph = (props) => {
 	const [isSidebarOpen, setSideBarState] = useState(false);
 	const toggleSideBar = () => {
-		setSideBarState((isOpen) => !isOpen);
+		setSideBarState(isOpen => !isOpen);
 	};
 
 	return (
 		<Sidebar
 			isOpen={isSidebarOpen}
-			isClose
 			toggleSideBar={toggleSideBar}
 			className='graph'
 			handleIcon='graph'

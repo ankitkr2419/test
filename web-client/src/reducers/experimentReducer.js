@@ -9,12 +9,12 @@ const listExperimentInitialState = fromJS({
 	list: [],
 });
 
-const createExperimentInitialState = {
+const createExperimentInitialState = fromJS({
 	data: {},
 	isExperimentSaved: false,
 	id: '178aa3ff-6ee3-4dd2-8276-f19d9df0330a',
 	description: null,
-};
+});
 
 
 export const listExperimentsReducer = (
@@ -42,19 +42,17 @@ export const createExperimentReducer = (
 ) => {
 	switch (action.type) {
 	case createExperimentActions.createAction:
-		return { ...state, isLoading: true, isExperimentSaved: false };
+		return state.merge({ isExperimentSaved: false, isLoading: true });
 	case createExperimentActions.successAction:
-		return {
-			...state, ...action.payload.response, isLoading: false, isExperimentSaved: true,
-		};
+		// return {
+		// 	...state, ...action.payload.response, isLoading: false, isExperimentSaved: true,
+		// };
+		return state.merge({ isExperimentSaved: true, isLoading: false, ...action.payload.response });
+
 	case createExperimentActions.failureAction:
-		return {
-			...state, ...action.payload, isLoading: false, isExperimentSaved: true,
-		};
+		return state.merge({ isExperimentSaved: true, isLoading: true, isError: true });
 	case createExperimentActions.createExperimentReset:
-		return {
-			...state, isExperimentSaved: false,
-		};
+		return createExperimentInitialState;
 	default:
 		return state;
 	}

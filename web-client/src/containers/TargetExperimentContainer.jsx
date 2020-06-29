@@ -15,6 +15,7 @@ import {
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { getSelectedTargetExperiment } from 'components/Target/targetHelper';
 import { Redirect } from 'react-router';
+import { getExperimentId } from 'selectors/experimentSelector';
 
 const TargetExperimentContainer = (props) => {
 	// constants
@@ -22,9 +23,7 @@ const TargetExperimentContainer = (props) => {
 	const dispatch = useDispatch();
 	// useSelector section
 	// extracting experiment id
-	const { id: experimentId } = useSelector(
-		(state) => state.createExperimentReducer
-	);
+	const experimentId = useSelector(getExperimentId);
 	// list of experiment targets
 	const listExperimentTargetsReducer = useSelector(getExperimentTargets);
 	const experimentTargets = listExperimentTargetsReducer.get('list');
@@ -35,7 +34,6 @@ const TargetExperimentContainer = (props) => {
 		targetStateReducer,
 		fromJS({ targetList: [], originalTargetList: [] })
 	);
-	console.table(selectedTargetState.toJS().targetList);
 	const [isRedirectToPlate, setRedirectToPlate] = useState(false);
 
 	useEffect(() => {

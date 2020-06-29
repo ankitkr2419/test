@@ -10,7 +10,7 @@ import SidebarGraph from './Sidebar/Graph/SidebarGraph';
 import './Plate.scss';
 
 const Plate = (props) => {
-	const { wells, setWellSelected } = props;
+	const { wells, setWellSelected, experimentTargetsList } = props;
 
 	const onWellClickHandler = (well, index) => {
 		const { isSelected } = well.toJS();
@@ -33,7 +33,7 @@ const Plate = (props) => {
 				<WellGridHeader />
 				<GridComponent wells={wells} onWellClickHandler={onWellClickHandler}/>
 			</GridWrapper>
-			<SidebarSample />
+			<SidebarSample experimentTargetsList={experimentTargetsList}/>
 			<SidebarGraph />
 		</div>
 	);
