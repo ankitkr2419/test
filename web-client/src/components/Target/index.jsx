@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import {
-	Button, CheckBox, Select, Input,
-} from 'core-components';
+import { Button, CheckBox, Select, Input } from 'core-components';
 import {
 	TargetList,
 	TargetListHeader,
@@ -11,6 +9,13 @@ import {
 } from 'shared-components';
 
 import { covertToSelectOption } from 'utils/helpers';
+import TargetHeader from './TargetHeader';
+import styled from 'styled-components';
+
+const TargetActions = styled.div`
+	justify-content: space-between;
+	padding: 39px 48px 37px 16px;
+`;
 
 const TargetComponent = (props) => {
 	const {
@@ -36,53 +41,54 @@ const TargetComponent = (props) => {
 	};
 
 	const getTargetRows = useMemo(
-		() => selectedTargetState.map((ele, index) => (
-			<TargetListItem key={index}>
-				<CheckBox
-					onChange={(event) => {
-						onCheckedHandler(event, index);
-					}}
-					className="mr-2"
-					id={`target${index}`}
-					checked={ele.isChecked}
-					disabled={isTargetDisabled(ele)}
-				/>
-				{isLoginTypeAdmin === true && (
-					// if it's a admin he can select targets from master targets
-					<Select
-						className="flex-100 px-2"
-						options={covertToSelectOption(listTargetReducer, 'name', 'id')}
-						placeholder="Please select target."
-						onChange={(selectedTarget) => {
-							onTargetSelect(selectedTarget, index);
+		() =>
+			selectedTargetState.map((ele, index) => (
+				<TargetListItem key={index}>
+					<CheckBox
+						onChange={(event) => {
+							onCheckedHandler(event, index);
 						}}
-						value={ele.selectedTarget}
+						className='mr-2'
+						id={`target${index}`}
+						checked={ele.isChecked}
+						disabled={isTargetDisabled(ele)}
 					/>
-				)}
-				{isLoginTypeOperator === true && (
-					// for operator will show in disabled state
+					{isLoginTypeAdmin === true && (
+						// if it's a admin he can select targets from master targets
+						<Select
+							className='flex-100 px-2'
+							options={covertToSelectOption(listTargetReducer, 'name', 'id')}
+							placeholder='Please select target.'
+							onChange={(selectedTarget) => {
+								onTargetSelect(selectedTarget, index);
+							}}
+							value={ele.selectedTarget}
+						/>
+					)}
+					{isLoginTypeOperator === true && (
+						// for operator will show in disabled state
+						<Input
+							className='flex-100 mr-2'
+							type='text'
+							placeholder='Type here...'
+							defaultValue={ele.selectedTarget && ele.selectedTarget.label}
+							disabled
+						/>
+					)}
 					<Input
-						className="flex-100 mr-2"
-						type="text"
-						placeholder="Type here..."
-						defaultValue={ele.selectedTarget && ele.selectedTarget.label}
-						disabled
+						className='flex-40 pl-2'
+						type='number'
+						name={`threshold${index}`}
+						index={`threshold${index}`}
+						placeholder='Type here...'
+						value={ele.threshold || ''}
+						min='0'
+						onChange={(event) => {
+							onThresholdChange(event.target.value, index);
+						}}
 					/>
-				)}
-				<Input
-					className="flex-40 pl-2"
-					type="number"
-					name={`threshold${index}`}
-					index={`threshold${index}`}
-					placeholder="Type here..."
-					value={ele.threshold || ''}
-					min="0"
-					onChange={(event) => {
-						onThresholdChange(event.target.value, index);
-					}}
-				/>
-			</TargetListItem>
-		)),
+				</TargetListItem>
+			)),
 		[
 			listTargetReducer,
 			onCheckedHandler,
@@ -91,55 +97,57 @@ const TargetComponent = (props) => {
 			selectedTargetState,
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
-		],
+		]
 	);
 	return (
-		<>
-			<div className="flex-70 scroll-y p-3">
-				<TargetList className="list-target">
-					<TargetListHeader>
-						<Text className="mb-2 mr-2" />
-						<Text className="flex-100 mb-2 px-4">Target</Text>
-						<Text className="flex-40 mb-2 px-4">Threshold</Text>
-					</TargetListHeader>
-					{getTargetRows}
-				</TargetList>
-			</div>
-			<div className="d-flex flex-10 align-items-end p-1">
-				<Button
-					color="primary"
-					onClick={onSaveClick}
-					className="mx-auto mb-3"
-					disabled={isTargetListUpdated === false}
-				>
-          Save
-				</Button>
-			</div>
-			{/* {isLoginTypeAdmin === true && (
-				<div className="d-flex flex-20 align-items-end p-1">
-					<Button
-						color="primary"
-						onClick={onNextClick}
-						className="mx-auto mb-3"
-						disabled={isTargetListUpdated}
-					>
-            View Stages
-					</Button>
+		<div className='d-flex flex-column overflow-hidden flex-100 py-5'>
+			<TargetHeader
+				isLoginTypeAdmin={isLoginTypeAdmin}
+				isLoginTypeOperator={isLoginTypeOperator}
+			/>
+			<div className='d-flex overflow-hidden'>
+				<div className='flex-70 scroll-y p-3'>
+					<TargetList className='list-target'>
+						<TargetListHeader>
+							<Text className='mb-2 mr-2' />
+							<Text className='flex-100 mb-2 px-4'>Target</Text>
+							<Text className='flex-40 mb-2 px-4'>Threshold</Text>
+						</TargetListHeader>
+						{getTargetRows}
+					</TargetList>
 				</div>
-			)} */}
-			{isLoginTypeOperator === true && (
-				<div className="d-flex flex-10 align-items-end p-1">
+				<TargetActions className='d-flex flex-column flex-30'>
+					{isLoginTypeAdmin === true && (
+						<Button
+							color='primary'
+							onClick={onNextClick}
+							className='mx-auto mb-3'
+							disabled={isTargetListUpdated}
+						>
+							View Stages
+						</Button>
+					)}
+					{isLoginTypeOperator === true && (
+						<Button
+							color='primary'
+							onClick={onNextClick}
+							className='mx-auto mb-3'
+							disabled={isTargetListUpdated}
+						>
+							Next
+						</Button>
+					)}
 					<Button
-						color="primary"
-						onClick={onNextClick}
-						className="mx-auto mb-3"
-						disabled={isTargetListUpdated}
+						color='primary'
+						onClick={onSaveClick}
+						className='mx-auto'
+						disabled={isTargetListUpdated === false}
 					>
-            Next
+						Save
 					</Button>
-				</div>
-			)}
-		</>
+				</TargetActions>
+			</div>
+		</div>
 	);
 };
 

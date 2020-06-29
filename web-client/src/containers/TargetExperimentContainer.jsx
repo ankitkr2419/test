@@ -1,6 +1,4 @@
-import React, {
-	useReducer, useEffect, useCallback, useState,
-} from 'react';
+import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { fromJS } from 'immutable';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,15 +18,12 @@ import { Redirect } from 'react-router';
 
 const TargetExperimentContainer = (props) => {
 	// constants
-	const {
-		isLoginTypeAdmin,
-		isLoginTypeOperator,
-	} = props;
+	const { isLoginTypeAdmin, isLoginTypeOperator } = props;
 	const dispatch = useDispatch();
 	// useSelector section
 	// extracting experiment id
 	const { id: experimentId } = useSelector(
-		state => state.createExperimentReducer,
+		(state) => state.createExperimentReducer
 	);
 	// list of experiment targets
 	const listExperimentTargetsReducer = useSelector(getExperimentTargets);
@@ -38,7 +33,7 @@ const TargetExperimentContainer = (props) => {
 	// local state to manage selected target data
 	const [selectedTargetState, updateTargetState] = useReducer(
 		targetStateReducer,
-		fromJS({ targetList: [], originalTargetList: [] }),
+		fromJS({ targetList: [], originalTargetList: [] })
 	);
 	console.table(selectedTargetState.toJS().targetList);
 	const [isRedirectToPlate, setRedirectToPlate] = useState(false);
@@ -89,7 +84,7 @@ const TargetExperimentContainer = (props) => {
 	const onSaveClick = useCallback(() => {
 		// get list of selected targets
 		const checkedTargets = getCheckedExperimentTargets(
-			selectedTargetState.get('targetList'),
+			selectedTargetState.get('targetList')
 		);
 		console.log('checkedTargets: ', checkedTargets);
 		dispatch(createExperimentTarget(checkedTargets, experimentId));
@@ -100,7 +95,7 @@ const TargetExperimentContainer = (props) => {
 	};
 
 	if (isRedirectToPlate === true) {
-		return <Redirect to="/plate" />;
+		return <Redirect to='/plate' />;
 	}
 
 	return (

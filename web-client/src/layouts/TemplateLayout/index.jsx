@@ -17,12 +17,12 @@ const TemplateLayout = (props) => {
 	// Local state to manage selected wizard
 	const [templateLayoutState, templateLayoutDispatch] = useReducer(
 		templateLayoutReducer,
-		templateInitialState,
+		templateInitialState
 	);
 	const wizardList = getWizardListByLoginType(
 		templateLayoutState.get('wizardList'),
 		isLoginTypeAdmin,
-		isLoginTypeOperator,
+		isLoginTypeOperator
 	);
 
 	// Here we have stored id for active widget
@@ -56,15 +56,14 @@ const TemplateLayout = (props) => {
 	}, []);
 
 	return (
-		<div className="template-content">
+		<div className='template-content'>
 			<Wizard
 				list={wizardList}
 				onClickHandler={updateSelectedWizard}
 				isLoginTypeAdmin={isLoginTypeAdmin}
 			/>
 			<Card>
-				{/* TODO move CardBody to core-components */}
-				<CardBody className="d-flex flex-unset overflow-hidden p-0">
+				<CardBody className='d-flex flex-unset overflow-hidden p-0'>
 					{activeWidgetID === 'template' && (
 						<TemplateContainer
 							isLoginTypeOperator={isLoginTypeOperator}

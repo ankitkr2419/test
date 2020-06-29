@@ -98,38 +98,46 @@ const TemplateComponent = (props) => {
 	};
 
 	return (
-		<div className="d-flex flex-100 flex-column p-4 mt-3">
+		<div className='d-flex flex-100 flex-column p-4 mt-3'>
 			{templates.size === 0 && (
-				<Center className="no-template-wrap">
-					<img src={imgNoTemplate} alt="No templates available" className="img-no-template" />
-					<Text className="d-flex justify-content-center" Tag="p">
+				<Center className='no-template-wrap'>
+					<img
+						src={imgNoTemplate}
+						alt='No templates available'
+						className='img-no-template'
+					/>
+					<Text className='d-flex justify-content-center' Tag='p'>
 						No templates available
 					</Text>
 				</Center>
 			)}
 			<StyledUl>
 				{/* templates size check before iteration */}
-				{templates.size !== 0
-          && templates.map(template => (
-          	<StyledLi key={template.get('id')}>
-          		<CustomButton
-          			title={template.get('name')}
-          			isActive={template.get('id') === selectedTemplateId}
-          			isEditable={isLoginTypeAdmin === true && isLoginTypeOperator === false}
-          			onButtonClickHandler={() => {
-          				onTemplateButtonClickHandler(template.toJS());
-          			}}
-          			onEditClickHandler={editClickHandler}
-          			isDeletable={isLoginTypeAdmin === true && isLoginTypeOperator === false}
-          			onDeleteClickHandler={deleteClickHandler}
-          		/>
-          	</StyledLi>
-          ))}
+				{templates.size !== 0 &&
+					templates.map((template) => (
+						<StyledLi key={template.get('id')}>
+							<CustomButton
+								title={template.get('name')}
+								isActive={template.get('id') === selectedTemplateId}
+								isEditable={
+									isLoginTypeAdmin === true && isLoginTypeOperator === false
+								}
+								onButtonClickHandler={() => {
+									onTemplateButtonClickHandler(template.toJS());
+								}}
+								onEditClickHandler={editClickHandler}
+								isDeletable={
+									isLoginTypeAdmin === true && isLoginTypeOperator === false
+								}
+								onDeleteClickHandler={deleteClickHandler}
+							/>
+						</StyledLi>
+					))}
 			</StyledUl>
-			<Center className="text-center">
+			<Center className='mb-5'>
 				{isLoginTypeAdmin === true && (
-					<Button color="primary" onClick={toggleCreateTemplateModal}>
-            Create New
+					<Button color='primary' onClick={toggleCreateTemplateModal}>
+						Create New
 					</Button>
 				)}
 			</Center>
