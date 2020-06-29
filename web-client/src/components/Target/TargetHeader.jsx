@@ -31,7 +31,7 @@ const TargetHeader = (props) => {
 			)}
 			{isLoginTypeAdmin === true && (
 				<div className='d-flex'>
-					<ButtonIcon name='pencil' size={28} className='px-0' />
+					<ButtonIcon name='pencil' size={28} className='px-0 border-0' />
 					<Text
 						size={14}
 						className='flex-25 text-default text-truncate-multi-line font-weight-light mb-0 pl-3 pr-2 py-1'

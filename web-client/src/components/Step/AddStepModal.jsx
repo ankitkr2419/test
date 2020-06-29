@@ -45,7 +45,7 @@ const AddStepModal = (props) => {
 			resetFormValues();
 		};
 		// eslint-disable-next-line
-  }, []);
+	}, []);
 
 	const onChangeHandler = ({ target: { name, value } }) => {
 		updateStepFormStateWrapper(name, value);
@@ -67,37 +67,37 @@ const AddStepModal = (props) => {
 				isOpen={isCreateStepModalVisible}
 				toggle={toggleCreateStepModal}
 				centered
-				size="lg"
+				size='lg'
 			>
 				<ModalBody>
 					<Text
-						tag="h4"
-						className="modal-title text-center text-truncate font-weight-bold"
+						tag='h4'
+						className='modal-title text-center text-truncate font-weight-bold'
 					>
-            Add Step
+						Add Step
 					</Text>
 					<ButtonIcon
-						position="absolute"
-						placement="right"
+						position='absolute'
+						placement='right'
 						top={24}
 						right={32}
 						size={32}
-						name="cross"
+						name='cross'
 						onClick={toggleCreateStepModal}
 					/>
-					<Row form className="mb-5 pb-5">
+					<Row form className='mb-5 pb-5'>
 						<Col sm={3}>
 							<FormGroup>
-								<Label for="ramp_rate" className="font-weight-bold">
-                  Ramp Rate
+								<Label for='ramp_rate' className='font-weight-bold'>
+									Ramp Rate
 								</Label>
 								<Input
-									type="number"
-									min="-273.15"
-									max="1000"
-									name="rampRate"
-									id="ramp_rate"
-									placeholder="Type here"
+									type='number'
+									min='-273.15'
+									max='1000'
+									name='rampRate'
+									id='ramp_rate'
+									placeholder='Type here'
 									value={rampRate}
 									onChange={onChangeHandler}
 								/>
@@ -106,16 +106,16 @@ const AddStepModal = (props) => {
 						</Col>
 						<Col sm={3}>
 							<FormGroup>
-								<Label for="target_temperature" className="font-weight-bold">
-                  Target Temperature
+								<Label for='target_temperature' className='font-weight-bold'>
+									Target Temperature
 								</Label>
 								<Input
-									type="number"
-									min="-273.15"
-									max="1000"
-									name="targetTemperature"
-									id="target_temperature"
-									placeholder="Type here"
+									type='number'
+									min='-273.15'
+									max='1000'
+									name='targetTemperature'
+									id='target_temperature'
+									placeholder='Type here'
 									value={targetTemperature}
 									onChange={onChangeHandler}
 								/>
@@ -124,14 +124,14 @@ const AddStepModal = (props) => {
 						</Col>
 						<Col sm={3}>
 							<FormGroup>
-								<Label for="hold_time" className="font-weight-bold">
-                  Hold Time
+								<Label for='hold_time' className='font-weight-bold'>
+									Hold Time
 								</Label>
 								<Input
-									type="text"
-									name="holdTime"
-									id="hold_time"
-									placeholder="mm:ss"
+									type='text'
+									name='holdTime'
+									id='hold_time'
+									placeholder='mm:ss'
 									value={holdTime}
 									onBlur={onHoldTimeBlurHandler}
 									onFocus={onHoldTimeFocusHandler}
@@ -143,41 +143,41 @@ const AddStepModal = (props) => {
 						</Col>
 						<Col sm={3}>
 							<FormGroup>
-								<Label for="data_capture" className="font-weight-bold">
-                  Data Capture
+								<Label for='data_capture' className='font-weight-bold'>
+									Data Capture
 								</Label>
 								<CheckBox
-									name="dataCapture"
-									id="dataCapture"
+									name='dataCapture'
+									id='dataCapture'
 									onChange={(event) => {
 										updateStepFormStateWrapper(
 											event.target.name,
-											event.target.checked,
+											event.target.checked
 										);
 									}}
-									className="mr-2 ml-3"
+									className='mr-2 ml-3 py-2'
 									checked={dataCapture}
 								/>
 							</FormGroup>
 						</Col>
 					</Row>
-					<ButtonGroup className="text-center p-0 m-0 pt-5">
+					<ButtonGroup className='text-center p-0 m-0 pt-5'>
 						{isUpdateForm === false && (
 							<Button
 								onClick={addClickHandler}
-								color="primary"
+								color='primary'
 								disabled={isFormValid === false}
 							>
-                Add
+								Add
 							</Button>
 						)}
 						{isUpdateForm === true && (
 							<Button
 								onClick={saveClickHandler}
-								color="primary"
+								color='primary'
 								disabled={isFormValid === false}
 							>
-                Save
+								Save
 							</Button>
 						)}
 					</ButtonGroup>
