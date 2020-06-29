@@ -1,6 +1,6 @@
 $icon-font-family: 'mylab-icons';
 $icon-font-path: '../fonts';
-$icon-font-code: '5td3qm';
+$icon-font-code: 'mhi343';
 
 $icon-angle-down: '\e900';
 $icon-angle-left: '\e901';
@@ -14,6 +14,7 @@ $icon-minus-1: '\e908';
 $icon-minus-2: '\e909';
 $icon-move: '\e90a';
 $icon-pencil: '\e90b';
+$icon-edit: '\e90b';
 $icon-plus-1: '\e90c';
 $icon-plus-2: '\e90d';
 $icon-plus-3: '\e90e';
@@ -111,6 +112,11 @@ $icon-steps: '\e912';
 .icon-pencil {
 	&:before {
 		content: $icon-pencil;
+	}
+}
+.icon-edit {
+	&:before {
+		content: $icon-edit;
 	}
 }
 .icon-plus-1 {

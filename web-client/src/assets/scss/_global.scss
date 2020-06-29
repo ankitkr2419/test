@@ -336,6 +336,12 @@ button:focus {
 	border-color: $gray-85 !important;
 }
 
+.text-truncate-multi-line {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
 // Cards
 // Login
 .card-login {
