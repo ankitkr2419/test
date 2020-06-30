@@ -1,13 +1,8 @@
-import React from "react";
+import React from 'react';
+import ActivityComponent from 'components/ActivityLog';
 
 const ActivityContainer = (props) => {
-	return (
-		<div className="activity-content h-100">
-			<div className="d-flex align-items-center justify-content-center">
-				<h4 className="text-center text-uppercase py-5">Activity Log</h4>
-			</div>
-		</div>
-	);
+	return <ActivityComponent />;
 };
 
 ActivityContainer.propTypes = {};
