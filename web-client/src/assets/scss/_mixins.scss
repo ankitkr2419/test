@@ -1,29 +1,39 @@
 // Placeholders {Usage => @include input-placeholder {color: $grey;}}
 @mixin input-placeholder {
-    &.placeholder { @content; }
-    &:-moz-placeholder { @content; }
-    &::-moz-placeholder { @content; }
-    &:-ms-input-placeholder { @content; }
-    &::-webkit-input-placeholder { @content; }
+	&.placeholder {
+		@content;
+	}
+	&:-moz-placeholder {
+		@content;
+	}
+	&::-moz-placeholder {
+		@content;
+	}
+	&:-ms-input-placeholder {
+		@content;
+	}
+	&::-webkit-input-placeholder {
+		@content;
+	}
 }
 
 // Opacity {Usage => @include opacity(.4);}
 @mixin opacity($opacity) {
-  opacity: $opacity;
-  $opacity-ie: $opacity * 100;
-  filter: alpha(opacity = $opacity-ie); //IE8
+	opacity: $opacity;
+	$opacity-ie: $opacity * 100;
+	filter: alpha(opacity = $opacity-ie); //IE8
 }
 
 // Vertical centering {Usage => @include center-vertically;}
 @mixin center-vertically {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  @include prefix(transform, translate(-50%, -50%), 'webkit' 'ms');
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	@include prefix(transform, translate(-50%, -50%), 'webkit' 'ms');
 }
 
 // CSS3 Keyframes
-// 
+//
 /* Usage
 @include keyframes(animate) {
   50% {
@@ -35,32 +45,59 @@
 }
 */
 @mixin keyframes($name) {
-  @-webkit-keyframes #{$name} {
-    @content;
-  }
+	@-webkit-keyframes #{$name} {
+		@content;
+	}
 
-  @-moz-keyframes #{$name} {
-    @content;
-  }
+	@-moz-keyframes #{$name} {
+		@content;
+	}
 
-  @keyframes #{$name} {
-    @content;
-  }
+	@keyframes #{$name} {
+		@content;
+	}
 }
 
 // Hiding and Showing Elements with a Transition {Usage => @include fade(hide); OR @include fade(show);}
 @mixin fade($type) {
+	@if $type == 'hide' {
+		visibility: hidden;
+		opacity: 0;
+		transition: visibility 1s, opacity 1s;
+	} @else if $type == 'show' {
+		visibility: visible;
+		opacity: 1;
+		transition: visibility 1s, opacity 1s;
+	}
+}
 
-  @if $type == 'hide' {
-    visibility: hidden;
-    opacity: 0;
-    transition: visibility 1s, opacity 1s;
-  }
+// Custom Scrollbars
+//
+/* Usage
+@include scrollbars(10px, pink, red);
+*/
+@mixin scrollbars(
+	$size,
+	$foreground-color,
+	$background-color: mix($foreground-color, white, 50%)
+) {
+	// For Google Chrome
+	&::-webkit-scrollbar {
+		width: $size;
+		height: $size;
+	}
 
-  @else if $type == 'show' {
-    visibility: visible;
-    opacity: 1;
-    transition: visibility 1s, opacity 1s;
-  }
+	&::-webkit-scrollbar-thumb {
+		background: $foreground-color;
+	}
 
+	&::-webkit-scrollbar-track {
+		background: $background-color;
+	}
+
+	// For Internet Explorer
+	& {
+		scrollbar-face-color: $foreground-color;
+		scrollbar-track-color: $background-color;
+	}
 }

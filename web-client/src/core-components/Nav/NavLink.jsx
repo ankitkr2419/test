@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { NavLink } from "react-router-dom";
+import styled from 'styled-components';
+import { NavLink } from 'react-router-dom';
 
-const StyledNavLink = styled(NavLink).attrs({ className: "nav-link" })`
+const StyledNavLink = styled(NavLink).attrs({ className: 'nav-link' })`
 	font-size: 16px;
 	line-height: 18px;
 	color: #707070;
@@ -9,13 +9,13 @@ const StyledNavLink = styled(NavLink).attrs({ className: "nav-link" })`
 
 	&:hover {
 		color: #707070;
-  }
+	}
 
 	&.active {
 		position: relative;
 
 		&::before {
-			content: "";
+			content: '';
 			position: absolute;
 			background: #666666 0% 0% no-repeat padding-box;
 			left: 0;

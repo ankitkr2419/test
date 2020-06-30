@@ -1,6 +1,6 @@
-import React from "react";
-import PropTypes from "prop-types";
-import styled from "styled-components";
+import React from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 const StyledIcon = styled.i`
 	display: inline-block;
@@ -11,19 +11,22 @@ const StyledIcon = styled.i`
 
 //* Important: Refer "_fonts.scss" for icon names
 const Icon = (props) => {
-  return(
-    <StyledIcon className={`icon-${props.name}`} size={props.size} />
-  )
+	return (
+		<StyledIcon
+			className={`icon-${props.name} ${props.className}`}
+			size={props.size}
+		/>
+	);
 };
-
 
 Icon.propTypes = {
-  name: PropTypes.string.isRequired,
-  size: PropTypes.number,
+	className: PropTypes.string,
+	name: PropTypes.string.isRequired,
+	size: PropTypes.number,
 };
 
-
 Icon.defaultProps = {
+	className: '',
 	size: 24,
 };
 
