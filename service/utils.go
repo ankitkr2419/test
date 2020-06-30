@@ -2,11 +2,18 @@ package service
 
 import (
 	"encoding/json"
+	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"net/http"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
+)
+
+var (
+	plcStage     plc.Stage
+	experimentID uuid.UUID
 )
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
@@ -51,8 +58,8 @@ func parseUUID(s string) (validUUID uuid.UUID, err error) {
 }
 
 func isvalidID(id uuid.UUID) bool {
-	_, err := parseUUID(id.String())
-	if err != nil {
+	// 00000000-0000-0000-0000-000000000000 is default value of uuid
+	if id.String() == "00000000-0000-0000-0000-000000000000" {
 		return false
 	}
 	return true
@@ -62,5 +69,45 @@ func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusBadRequest)
 	rw.Write(respBytes)
+	return
+}
+
+// makePLCStage return plc.Stage from stagesteps
+func makePLCStage(ss []db.StageStep) plc.Stage {
+	var plcStage plc.Stage
+
+	for _, s := range ss {
+		var step plc.Step
+		step.RampUpTemp = s.RampRate
+		step.TargetTemp = s.TargetTemperature
+		step.HoldTime = s.HoldTime
+
+		switch s.Type {
+		case "hold":
+			plcStage.Holding = append(plcStage.Holding, step)
+		case "cycle":
+			plcStage.Cycle = append(plcStage.Cycle, step)
+			plcStage.CycleCount = s.RepeatCount
+		default:
+			logger.WithField("Unknown stage type", s.Type).Error("Error in configuring plc stages")
+			return plcStage
+		}
+	}
+	return plcStage
+}
+
+// makeResult return result from plc.scan
+func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID uuid.UUID) (result []db.Result) {
+	for _, w := range aw {
+		var r db.Result
+		r.WellPosition = w
+		r.ExperimentID = experimentID
+		r.Cycle = scan.Cycle
+		for _, t := range td {
+			r.TargetID = t.TargetID
+			r.FValue = scan.Wells[w][t.DyePosition]
+			result = append(result, r)
+		}
+	}
 	return
 }

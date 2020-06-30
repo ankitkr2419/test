@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -39,6 +40,11 @@ type Storer interface {
 	UpsertWells(context.Context, []Well, uuid.UUID) ([]Well, error)
 	ShowWell(context.Context, uuid.UUID) (Well, error)
 	DeleteWell(context.Context, uuid.UUID) error
-	ListWellTargets(context.Context, uuid.UUID) ([]WellTarget, error)
+	GetWellTarget(context.Context, uuid.UUID) ([]WellTarget, error)
 	UpsertWellTargets(context.Context, []WellTarget) error
+	ListStageSteps(context.Context, uuid.UUID) ([]StageStep, error)
+	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID) error
+	ListConfTargets(context.Context, uuid.UUID) ([]TargetDetails, error)
+	InsertResult(context.Context, []Result) error
+	ListWellTargets(context.Context, []uuid.UUID) ([]WellTarget, error)
 }

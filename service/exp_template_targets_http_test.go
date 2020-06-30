@@ -45,7 +45,7 @@ func (suite *ExpTempTargetHandlerTestSuite) TestListExpTempTargetSuccess() {
 		"",
 		listExpTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"experiment_id":"%s","template_id":"%s","target_id":"%s","threshold":10.5}]`, expID, tempUUID, targetUUID)
+	output := fmt.Sprintf(`[{"experiment_id":"%s","template_id":"%s","target_id":"%s","threshold":10.5,"target_name":""}]`, expID, tempUUID, targetUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -91,7 +91,7 @@ func (suite *ExpTempTargetHandlerTestSuite) TestUpsertExpTempTargetSuccess() {
 		updateExpTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`[{"experiment_id":"%s","template_id":"%s","target_id":"%s","threshold":10.5}]`, expID, tempUUID, targetUUID)
+	output := fmt.Sprintf(`[{"experiment_id":"%s","template_id":"%s","target_id":"%s","threshold":10.5,"target_name":""}]`, expID, tempUUID, targetUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 

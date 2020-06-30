@@ -10,8 +10,14 @@ import (
 )
 
 const (
-	getExpTempTargetListQuery = `SELECT * FROM experiment_template_targets
-		where experiment_id = $1`
+	getExpTempTargetListQuery = `SELECT e.experiment_id,
+		e.template_id,
+		e.target_id,
+		e.threshold,
+		t.name as target_name
+		FROM experiment_template_targets as e , targets as t
+		WHERE
+		e.target_id = t.id AND e.experiment_id = $1`
 
 	upsertExpTempTargetQuery = `INSERT INTO experiment_template_targets (
 		experiment_id,
@@ -33,6 +39,7 @@ type ExpTemplateTarget struct {
 	TemplateID   uuid.UUID `db:"template_id" json:"template_id" validate:"required"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id" validate:"required"`
 	Threshold    float64   `db:"threshold" json:"threshold" validate:"required"`
+	TargetName   string    `db:"target_name" json:"target_name"`
 }
 
 func (s *pgStore) ListExpTemplateTargets(ctx context.Context, experimentID uuid.UUID) (t []ExpTemplateTarget, err error) {

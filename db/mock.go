@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -191,7 +192,7 @@ func (m *DBMockStore) UpdateStepCount(ctx context.Context) (err error) {
 	return args.Error(1)
 }
 
-func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (w []WellTarget, err error) {
+func (m *DBMockStore) GetWellTarget(ctx context.Context, wellID uuid.UUID) (w []WellTarget, err error) {
 	args := m.Called(ctx, wellID)
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
@@ -199,4 +200,26 @@ func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (w 
 func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget) (err error) {
 	args := m.Called(ctx, w)
 	return args.Error(1)
+}
+func (m *DBMockStore) ListStageSteps(ctx context.Context, id uuid.UUID) (s []StageStep, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]StageStep), args.Error(1)
+}
+func (m *DBMockStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID) (err error) {
+	args := m.Called(ctx, t, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ListConfTargets(ctx context.Context, id uuid.UUID) (t []TargetDetails, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]TargetDetails), args.Error(1)
+}
+func (m *DBMockStore) InsertResult(ctx context.Context, r []Result) (err error) {
+	args := m.Called(ctx, r)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID []uuid.UUID) (w []WellTarget, err error) {
+	args := m.Called(ctx, wellID)
+	return args.Get(0).([]WellTarget), args.Error(1)
 }

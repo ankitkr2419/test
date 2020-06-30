@@ -31,6 +31,8 @@ func main() {
 	// config file to configure dye & targets
 	config.Load("config")
 
+	config.Load("simulator")
+
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
 	cliApp.Version = "1.0.0"

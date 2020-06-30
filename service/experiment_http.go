@@ -2,12 +2,17 @@ package service
 
 import (
 	"encoding/json"
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
 )
+
+var upgrader = websocket.Upgrader{} // use default options
 
 func listExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -131,5 +136,121 @@ func showExperimentHandler(deps Dependencies) http.HandlerFunc {
 		rw.WriteHeader(http.StatusOK)
 		rw.Write(respBytes)
 		rw.Header().Add("Content-Type", "application/json")
+	})
+}
+
+func runExperimentHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		experimentID, err := parseUUID(vars["experiment_id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		e, err := deps.Store.ShowExperiment(req.Context(), experimentID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		ss, err := deps.Store.ListStageSteps(req.Context(), e.TemplateID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		plcStage = makePLCStage(ss)
+
+		err = deps.Plc.ConfigureRun(plcStage)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
+			return
+		}
+
+		err = deps.Plc.Start()
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error in plc start")
+			return
+		}
+
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), experimentID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"msg":"experiment started"}`))
+	})
+}
+
+func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		c, err := upgrader.Upgrade(rw, req, nil)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
+			return
+		}
+		defer c.Close()
+
+		vars := mux.Vars(req)
+		experimentID, err := parseUUID(vars["experiment_id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching target data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		activeWells := config.ActiveWells("activeWells")
+
+		var cycle uint16
+
+		for {
+			scan, err := deps.Plc.Monitor(cycle)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in plc monitor")
+				return
+			}
+
+			if scan.CycleComplete {
+				// write to db & serve
+				result := makeResult(activeWells, scan, targetDetails, experimentID)
+				err := deps.Store.InsertResult(req.Context(), result)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error inserting result data")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+
+				respBytes, err := json.Marshal(result)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				err = c.WriteMessage(1, respBytes)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Websocket failed to write")
+					break
+				}
+
+				if scan.Cycle == plcStage.CycleCount {
+					// last cycle
+					break
+				}
+
+				cycle++
+			}
+		}
 	})
 }

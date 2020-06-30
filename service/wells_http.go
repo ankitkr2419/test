@@ -2,9 +2,11 @@ package service
 
 import (
 	"encoding/json"
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -17,14 +19,34 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		t, err := deps.Store.ListWells(req.Context(), expID)
+
+		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		respBytes, err := json.Marshal(t)
+		wellID := make([]uuid.UUID, 0)
+		for _, w := range wells {
+			wellID = append(wellID, w.ID)
+		}
+
+		welltargets, err := deps.Store.ListWellTargets(req.Context(), wellID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		for i, w := range wells {
+			for _, t := range welltargets {
+				if w.ID == t.WellID {
+					wells[i].Targets = append(w.Targets, t)
+				}
+			}
+		}
+		respBytes, err := json.Marshal(wells)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling Wells data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -137,7 +159,7 @@ func showWellHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		latestT.Targets, err = deps.Store.ListWellTargets(req.Context(), id)
+		latestT.Targets, err = deps.Store.GetWellTarget(req.Context(), id)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error show Well")
@@ -176,5 +198,28 @@ func deleteWellHandler(deps Dependencies) http.HandlerFunc {
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
 		rw.Write([]byte(`{"msg":"Well deleted successfully"}`))
+	})
+}
+
+func listActiveWellsHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		activeWells := config.ActiveWells("activeWells")
+
+		if len(activeWells) == 0 {
+			logger.WithField("err", "active wells not set in config").Error("Error marshaling Wells data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		respBytes, err := json.Marshal(activeWells)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling active Wells")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(respBytes)
 	})
 }

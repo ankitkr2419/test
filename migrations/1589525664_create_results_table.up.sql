@@ -1,6 +1,7 @@
 CREATE TABLE results (
-  well_id uuid,
+  experiment_id uuid,
   target_id uuid,
+  well_position integer,
   cycle integer,
-  fluorescence_value float
+  f_value float
 );
