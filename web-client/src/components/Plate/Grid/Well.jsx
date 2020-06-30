@@ -3,6 +3,28 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import styled from 'styled-components';
 
+const Well = ({
+	id, className, status, isRunning, isSelected, taskInitials, onClickHandler,
+}) => {
+	const wellClassnames = classNames(className, {
+		running: isRunning,
+		selected: isSelected,
+	});
+
+	return (
+		<StyledWell
+			id={id}
+			isRunning={isRunning}
+			isSelected={isSelected}
+			status={status}
+			className={wellClassnames}
+			onClick={onClickHandler}
+		>
+			{taskInitials}
+		</StyledWell>
+	);
+};
+
 const StyledWell = styled.div`
 	background-color: ${props => (props.isSelected && !props.isRunning ? '#aedbd5' : '#ffffff')};
 	position: relative;
@@ -59,28 +81,6 @@ const StyledWell = styled.div`
 			|| (props.status === 'red' ? '#F06666' : '')};
 	}
 `;
-
-const Well = ({
-	id, className, status, isRunning, isSelected, taskInitials, onClickHandler,
-}) => {
-	const wellClassnames = classNames(className, {
-		running: isRunning,
-		selected: isSelected,
-	});
-
-	return (
-		<StyledWell
-			id={id}
-			isRunning={isRunning}
-			isSelected={isSelected}
-			status={status}
-			className={wellClassnames}
-			onClick={onClickHandler}
-		>
-			{taskInitials}
-		</StyledWell>
-	);
-};
 
 Well.propTypes = {
 	id: PropTypes.string,

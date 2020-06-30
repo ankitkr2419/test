@@ -25,9 +25,10 @@ import {
 } from 'reducers/stepReducer';
 
 import { loginReducer } from 'reducers/loginReducer';
-import { wellListReducer } from 'reducers/wellReducer';
+import { wellListReducer, addWellsReducer } from 'reducers/wellReducer';
 import { listExperimentsReducer, createExperimentReducer } from 'reducers/experimentReducer';
 import { listExperimentTargetsReducer, createExperimentTargetReducer } from 'reducers/experimentTargetReducer';
+import { listSamplesReducer } from 'reducers/samplesReducer';
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -50,6 +51,8 @@ const rootReducer = combineReducers({
 	createExperimentReducer,
 	listExperimentTargetsReducer,
 	createExperimentTargetReducer,
+	listSamplesReducer,
+	addWellsReducer,
 });
 
 export default rootReducer;

@@ -9,6 +9,10 @@ export const listWellActions =  {
 	listAction: 'FETCH_WELLS_INITIATED',
 	successAction: 'FETCH_WELLS_SUCCEEDED',
 	failureAction: 'FETCH_WELLS_FAILURE',
-	setWellSelected: 'SET_WELL_SELECTED',
+	setSelectedWell: 'SET_SELECTED_WELL',
+	resetSelectedWell: 'RESET_SELECTED_WELL',
+	setMultiSelectedWell: 'SET_MULTI_SELECT_WELL',
+	resetMultiSelectedWell: 'RESET_MULTI_SELECT_WELL',
+	toggleMultiSelectOption: 'TOGGLE_MULTI_SELECT_OPTION',
 	resetWells: 'RESET_WELLS',
 };

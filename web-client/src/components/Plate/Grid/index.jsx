@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { YCoordinates, XCoordinates} from 'components/Plate/plateConstant';
 import Coordinate from './Coordinate';
 import CoordinateItem from './CoordinateItem';
 import WellGrid from './WellGrid';
 import Well from './Well';
 import WellPopover from './WellPopover';
-import PlateData from './PlateData.json';
 
-const { YCoordinates } = PlateData;
-const { XCoordinates } = PlateData;
-// const { Wells } = PlateData;
-
-const GridComponent = ({ onWellClickHandler, wells }) => (
+const GridComponent = ({
+	wells,
+	onWellClickHandler,
+	onWellUpdateClickHandler,
+	isGroupSelectionOn,
+}) => (
 	<div className="d-flex flex-column flex-100">
 		<Coordinate direction="horizontal">
 			{YCoordinates.map((value, i) => (
@@ -27,20 +28,44 @@ const GridComponent = ({ onWellClickHandler, wells }) => (
 			<WellGrid>
 				{wells.map((well, index) => {
 					const {
-						isRunning, isSelected, status, initial, text,
+						isWellFilled,
+						isRunning,
+						isSelected,
+						isMultiSelected,
+						status,
+						initial,
+						text,
+						sample,
+						task,
+						targets,
 					} = well.toJS();
 					return (
-						<div key={index}>
+						<React.Fragment key={index}>
 							<Well
 								isRunning={isRunning}
-								isSelected={isSelected}
+								isSelected={isSelected || isMultiSelected}
 								status={status}
 								taskInitials={initial}
 								id={`PopoverWell${index}`}
-								onClickHandler={(event) => { onWellClickHandler(well, index, event); }}
+								onClickHandler={(event) => {
+									onWellClickHandler(well, index, event);
+								}}
 							/>
-							{isRunning && <WellPopover status={status} text={text} index={index} />}
-						</div>
+							{/* popover will only visible when its filled and group selection is off */}
+							{(isWellFilled && isGroupSelectionOn === false) && (
+								<WellPopover
+									sample={sample}
+									status={status}
+									text={text}
+									task={task}
+									targets={targets}
+									index={index}
+									onEditClickHandler={(event) => {
+										onWellUpdateClickHandler(well, index, event);
+									}}
+								/>
+							)}
+						</React.Fragment>
 					);
 				})}
 			</WellGrid>
@@ -50,6 +75,9 @@ const GridComponent = ({ onWellClickHandler, wells }) => (
 
 GridComponent.propTypes = {
 	onWellClickHandler: PropTypes.func.isRequired,
+	wells: PropTypes.object.isRequired,
+	onWellUpdateClickHandler: PropTypes.func.isRequired,
+	isGroupSelectionOn: PropTypes.bool.isRequired,
 };
 
 export default GridComponent;

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "48908e1d-568e-4abe-be41-458f605d1e4b",
+    "position": 2,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "c64f62c6-634b-4299-a0bd-06fc327e6932",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": [
+      {
+        "well_id": "48908e1d-568e-4abe-be41-458f605d1e4b",
+        "target_id": "1e3523e0-7685-488b-89fd-9be41dffcd70",
+        "ct": ""
+      },
+      {
+        "well_id": "48908e1d-568e-4abe-be41-458f605d1e4b",
+        "target_id": "00e25125-6f39-4463-aa52-39242ae4f761",
+        "ct": ""
+      },
+      {
+        "well_id": "48908e1d-568e-4abe-be41-458f605d1e4b",
+        "target_id": "d49b1bb4-9d41-4ef5-9ce8-bf7d079b1650",
+        "ct": ""
+      },
+      {
+        "well_id": "48908e1d-568e-4abe-be41-458f605d1e4b",
+        "target_id": "6db3a8a8-2914-461c-9459-2d644dcb11a2",
+        "ct": ""
+      },
+      {
+        "well_id": "48908e1d-568e-4abe-be41-458f605d1e4b",
+        "target_id": "288d3119-dcf5-408a-870d-12d3db231ff3",
+        "ct": ""
+      }
+    ],
+    "sample_name": "sample no 3"
+  }
+]

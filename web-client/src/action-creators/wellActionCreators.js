@@ -3,10 +3,11 @@ import {
 	listWellActions,
 } from 'actions/wellActions';
 
-export const addWell = body => ({
+export const addWell = (experimentId, body) => ({
 	type: addWellActions.addAction,
 	payload: {
 		body,
+		experimentId,
 	},
 });
 
@@ -22,10 +23,10 @@ export const addWellReset = () => ({
 	type: addWellActions.addWellReset,
 });
 
-export const fetchWells = templateID => ({
+export const fetchWells = experimentId => ({
 	type: listWellActions.listAction,
 	payload: {
-		templateID,
+		experimentId,
 	},
 });
 
@@ -37,10 +38,30 @@ export const fetchWellsFailed = errorResponse => ({
 	},
 });
 
-export const setWellSelected = (index, isSelected) => ({
-	type: listWellActions.setWellSelected,
+export const setSelectedWell = (index, isSelected) => ({
+	type: listWellActions.setSelectedWell,
 	payload: {
 		isSelected,
 		index,
 	},
+});
+
+export const resetSelectedWells = () => ({
+	type: listWellActions.resetSelectedWell,
+});
+
+export const setMultiSelectedWell = (index, isMultiSelected) => ({
+	type: listWellActions.setMultiSelectedWell,
+	payload: {
+		isMultiSelected,
+		index,
+	},
+});
+
+export const resetMultiSelectedWells = () => ({
+	type: listWellActions.resetMultiSelectedWell,
+});
+
+export const toggleMultiSelectOption = () => ({
+	type: listWellActions.toggleMultiSelectOption,
 });

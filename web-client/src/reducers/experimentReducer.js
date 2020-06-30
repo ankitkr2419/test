@@ -12,7 +12,8 @@ const listExperimentInitialState = fromJS({
 const createExperimentInitialState = fromJS({
 	data: {},
 	isExperimentSaved: false,
-	id: '178aa3ff-6ee3-4dd2-8276-f19d9df0330a',
+	// id: '5e006837-f163-4523-96e7-f39450472a6f',
+	id: null,
 	description: null,
 });
 
@@ -44,15 +45,11 @@ export const createExperimentReducer = (
 	case createExperimentActions.createAction:
 		return state.merge({ isExperimentSaved: false, isLoading: true });
 	case createExperimentActions.successAction:
-		// return {
-		// 	...state, ...action.payload.response, isLoading: false, isExperimentSaved: true,
-		// };
 		return state.merge({ isExperimentSaved: true, isLoading: false, ...action.payload.response });
-
 	case createExperimentActions.failureAction:
 		return state.merge({ isExperimentSaved: true, isLoading: true, isError: true });
 	case createExperimentActions.createExperimentReset:
-		return createExperimentInitialState;
+		return createExperimentInitialState.setIn(['id'], state.get('id'));
 	default:
 		return state;
 	}

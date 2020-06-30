@@ -48,12 +48,15 @@ const StyledSidebarHandle = styled.button`
 	}
 `;
 
-const SidebarHandle = ({ icon, size, clickHandler }) => (
+const SidebarHandle = ({
+	icon, size, clickHandler, isDisabled,
+}) => (
 	<StyledSidebarHandle
 		onClick={clickHandler}
 		className='sidebar-handle'
 		icon={icon}
 		size={size}
+		disabled={isDisabled}
 	>
 		<Icon name={icon} size={size} />
 		<Shadow />

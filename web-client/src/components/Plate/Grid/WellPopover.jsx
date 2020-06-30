@@ -1,16 +1,25 @@
+/* eslint-disable no-undef */
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
-	Button,
-	Popover,
-	PopoverHeader,
-	PopoverBody,
+	Button, Popover, PopoverHeader, PopoverBody,
 } from 'core-components';
 import { Text, Center, ButtonIcon } from 'shared-components';
 
 const WellPopover = (props) => {
 	const {
-		status, text, index, ...rest
+		status,
+		text,
+		index,
+		sample,
+		task,
+		targets,
+		onEditClickHandler,
+		...rest
 	} = props;
+
+	const simulateOutSideClick = () => document.body.click();
+
 	return (
 		<Popover
 			trigger="legacy"
@@ -30,40 +39,55 @@ const WellPopover = (props) => {
 					size={32}
 					name="cross"
 					className="btn-close"
+					onClick={simulateOutSideClick}
 				/>
 			</PopoverHeader>
 			<PopoverBody className="flex-100 scroll-y">
 				<ul className="well-info flex-90 mx-auto mb-4 p-0">
 					<li className="d-flex py-1">
 						<Text className="flex-40 label mb-0">Sample</Text>
-						<Text className="mb-0">ID-xx-xxx</Text>
+						<Text className="mb-0">{sample}</Text>
 					</li>
 					<li className="d-flex py-1">
 						<Text className="flex-40 label mb-0">Target</Text>
 						<div className="target-list">
-							<Text className={`mb-1 ${status}`}>Target 1</Text>
-							<Text className={`mb-1 ${status}`}>Target 2</Text>
-							<Text className={`mb-1 ${status}`}>Target 6</Text>
+							{targets === null && (
+								<Text className={`mb-1 ${status}`}>---</Text>
+							)}
+							{targets !== null
+                && targets.map(ele => (
+                	<Text key={ele.target_id} className={`mb-1 ${status}`}>
+                		{ele.target_id}
+                	</Text>
+                ))}
 						</div>
 					</li>
 					<li className="d-flex py-1">
 						<Text className="flex-40 label mb-0">Task</Text>
-						<Text className="mb-0">Unknown</Text>
+						<Text className="mb-0">{task}</Text>
 					</li>
 					<li className="d-flex py-1">
 						<Text className="flex-40 label mb-0">Comment</Text>
-						<Text className="mb-0">(If any)</Text>
+						<Text className="mb-0">(No comments)</Text>
 					</li>
 				</ul>
 				<Center>
 					<Button className="mb-4">Show on Graph</Button>
-					<Button>Edit Info</Button>
+					<Button onClick={onEditClickHandler}>Edit Info</Button>
 				</Center>
 			</PopoverBody>
 		</Popover>
 	);
 };
 
-WellPopover.propTypes = {};
+WellPopover.propTypes = {
+	status: PropTypes.string,
+	text: PropTypes.string,
+	index: PropTypes.number,
+	sample: PropTypes.string,
+	task: PropTypes.string,
+	targets: PropTypes.array,
+	onEditClickHandler: PropTypes.func,
+};
 
 export default WellPopover;

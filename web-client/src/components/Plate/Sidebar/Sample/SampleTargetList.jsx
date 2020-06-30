@@ -13,7 +13,7 @@ const SampleTargetList = ({ list, onCrossClickHandler }) => (
 		{list.map((ele, index) => (
 			<SampleTarget
 				key={ele.get('target_id')}
-				onClickHandler={() => onCrossClickHandler(index, ele)}
+				onClickHandler={() => onCrossClickHandler(ele.get('target_id'))}
 				label={ele.get('target_id')}
 			/>
 		))}

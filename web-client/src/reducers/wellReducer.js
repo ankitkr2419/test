@@ -1,13 +1,18 @@
 import { fromJS } from 'immutable';
 import { addWellActions, listWellActions } from 'actions/wellActions';
 import {
-	getDefaultPlatesList,
+	getDefaultWellsList,
 	setSelectedToList,
+	setMultiSelectedToList,
+	resetWellDefaultList,
+	resetMultiWellDefaultList,
+	updateWellListSelector,
 } from 'selectors/wellSelectors';
 
 const listWellInitialState = fromJS({
 	isLoading: true,
-	defaultList: getDefaultPlatesList(),
+	isMultiSelectionOptionOn: false,
+	defaultList: getDefaultWellsList(),
 	list: [],
 });
 
@@ -16,46 +21,61 @@ export const wellListReducer = (state = listWellInitialState, action) => {
 	case listWellActions.listAction:
 		return state.setIn(['isLoading'], true);
 	case listWellActions.successAction:
-		return state.merge({
-			list: fromJS(action.payload.response || []),
-			isLoading: false,
-		});
+		return updateWellListSelector(state, action);
 	case listWellActions.failureAction:
 		return state.merge({
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
-	case listWellActions.setWellSelected:
+	case listWellActions.setSelectedWell:
 		return setSelectedToList(state, action.payload);
+	case listWellActions.resetSelectedWell:
+		return resetWellDefaultList(state);
+	case listWellActions.setMultiSelectedWell:
+		return setMultiSelectedToList(state, action.payload);
+	case listWellActions.resetMultiSelectedWell:
+		return resetMultiWellDefaultList(state);
+	case listWellActions.toggleMultiSelectOption:
+		if (state.get('isMultiSelectionOptionOn') === true) {
+			// if group selection is set to false then clear group selection
+			return resetMultiWellDefaultList(state).setIn(['isMultiSelectionOptionOn'], !state.get('isMultiSelectionOptionOn'));
+		}
+		// clear selected wells if any and update toggle value
+		return resetWellDefaultList(state).setIn(['isMultiSelectionOptionOn'], !state.get('isMultiSelectionOptionOn'));
+
+	// Update wells list when new wells are added
+	case addWellActions.successAction:
+		return updateWellListSelector(state, action);
 	default:
 		return state;
 	}
 };
 
-const addWellInitialState = {
+const addWellInitialState = fromJS({
 	data: {},
-	isStageSaved: false,
-};
+	isWellSaved: false,
+});
 
-export const createStageReducer = (state = addWellInitialState, action) => {
+export const addWellsReducer = (state = addWellInitialState, action) => {
 	switch (action.type) {
 	case addWellActions.addAction:
-		return { ...state, isLoading: true, isStageSaved: false };
+		return state.merge({
+			isLoading: true,
+			isWellSaved: false,
+		});
 	case addWellActions.successAction:
-		return {
-			...state,
-			...action.payload,
+		return state.merge({
 			isLoading: false,
-			isStageSaved: true,
-		};
+			isWellSaved: true,
+			data: action.payload.response,
+		});
 	case addWellActions.failureAction:
-		return {
-			...state,
-			...action.payload,
+		return state.merge({
 			isLoading: false,
-			isStageSaved: false,
-		};
-	case addWellActions.addStageReset:
+			isWellSaved: true,
+			error: action.payload.error,
+		});
+	case addWellActions.addWellReset:
 		return addWellInitialState;
 	default:
 		return state;

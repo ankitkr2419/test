@@ -1,0 +1,132 @@
+[
+  {
+    "id": "6776bd86-13db-4354-a18a-46c63bcab800",
+    "position": 0,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "b0250cda-b211-42f7-b64b-32d7aa3562ad",
+    "task": "NC",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "remo"
+  },
+  {
+    "id": "3376eb9d-316e-488b-b330-6e080775b66c",
+    "position": 1,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "f6df8003-1064-4413-aaa9-b1e5cb0281fe",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "new sample"
+  },
+  {
+    "id": "4e5dcf70-1ea4-4054-99bb-9c94a828b611",
+    "position": 3,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "f6df8003-1064-4413-aaa9-b1e5cb0281fe",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "new sample"
+  },
+  {
+    "id": "c6560078-ab7a-4383-99a8-ce41a3daf523",
+    "position": 9,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "f6df8003-1064-4413-aaa9-b1e5cb0281fe",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "new sample"
+  },
+  {
+    "id": "166cb122-6fd9-4263-9d00-d6bdbe2519d2",
+    "position": 21,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "4beaca51-ccf6-4669-8b9d-98e216f3c064",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "new sample 2"
+  },
+  {
+    "id": "d6c06d02-911e-4079-a122-2ff4de4bb22b",
+    "position": 22,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "4beaca51-ccf6-4669-8b9d-98e216f3c064",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "new sample 2"
+  },
+  {
+    "id": "f2a577e3-3c85-4a82-a2b4-716e47ec3366",
+    "position": 38,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "4daa6a80-e1fe-42e6-830e-f9b1a9d310fa",
+    "task": "NC",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "sample6"
+  },
+  {
+    "id": "3668d5d6-c4b0-4233-b63b-f03cb9d0fd09",
+    "position": 39,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "4daa6a80-e1fe-42e6-830e-f9b1a9d310fa",
+    "task": "NC",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "sample6"
+  },
+  {
+    "id": "a3d78d38-0f12-4841-afc8-f58bb873d00a",
+    "position": 40,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "462d4566-58ef-469d-9b49-2f4a770ce6a1",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "one target"
+  },
+  {
+    "id": "998d22f4-3731-473e-8dd8-657550f5b22e",
+    "position": 52,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "90c7c271-7424-4d3a-8b96-777360c04cb2",
+    "task": "NTC",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "53sample"
+  },
+  {
+    "id": "7bf0b548-8d75-4a49-a968-98f050d044e0",
+    "position": 70,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "70e0a2d5-fbde-4cec-b96c-e8bfd27bf725",
+    "task": "Unknown",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "h1"
+  },
+  {
+    "id": "e65dd1d4-7a57-47b2-ae7b-f6220f797c1c",
+    "position": 78,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "81e893f9-c4eb-4ae3-bd59-3222cb647ac5",
+    "task": "PC",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "part"
+  },
+  {
+    "id": "72ea1de1-b9ad-4a6e-9825-98215dab9192",
+    "position": 79,
+    "experiment_id": "5e006837-f163-4523-96e7-f39450472a6f",
+    "sample_id": "1cd5bd95-b222-4108-a3f6-d69f9e1559e6",
+    "task": "PC",
+    "color_code": "",
+    "targets": null,
+    "sample_name": "qp"
+  }
+]

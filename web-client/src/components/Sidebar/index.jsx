@@ -6,6 +6,37 @@ import SidebarContent from './SidebarContent';
 import SidebarBody from './SidebarBody';
 import SidebarHandle from './SidebarHandle';
 
+const Sidebar = ({
+	className,
+	handleIcon,
+	handleIconSize,
+	children,
+	isOpen,
+	isClose,
+	toggleSideBar,
+	isDisabled,
+}) => {
+	const classes = classNames(
+		'sidebar',
+		`sidebar-${className}`,
+		{ open: isOpen },
+		{ close: isClose },
+	);
+	return (
+		<StyledSidebar className={classes}>
+			<SidebarHandle
+				clickHandler={toggleSideBar}
+				icon={handleIcon}
+				size={handleIconSize}
+				isDisabled={isDisabled}
+			/>
+			<SidebarContent className='flex-100'>
+				<SidebarBody className='flex-100'>{children}</SidebarBody>
+			</SidebarContent>
+		</StyledSidebar>
+	);
+};
+
 const StyledSidebar = styled.aside`
 	display: flex;
 	flex-direction: column;
@@ -27,41 +58,14 @@ const StyledSidebar = styled.aside`
 	}
 `;
 
-const Sidebar = ({
-	className,
-	handleIcon,
-	handleIconSize,
-	children,
-	isOpen,
-	isClose,
-	toggleSideBar,
-}) => {
-	const classes = classNames(
-		'sidebar',
-		`sidebar-${className}`,
-		{ open: isOpen },
-		{ close: isClose }
-	);
-	return (
-		<StyledSidebar className={classes}>
-			<SidebarHandle
-				clickHandler={toggleSideBar}
-				icon={handleIcon}
-				size={handleIconSize}
-			/>
-			<SidebarContent className='flex-100'>
-				<SidebarBody className='flex-100'>{children}</SidebarBody>
-			</SidebarContent>
-		</StyledSidebar>
-	);
-};
-
 Sidebar.propTypes = {
 	className: PropTypes.string,
-	handleIcon: PropTypes.string.isRequired,
 	handleIconSize: PropTypes.number,
 	isOpen: PropTypes.bool,
 	isClose: PropTypes.bool,
+	isDisabled: PropTypes.bool,
+	children: PropTypes.any,
+	handleIcon: PropTypes.string.isRequired,
 	toggleSideBar: PropTypes.func.isRequired,
 };
 

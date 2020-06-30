@@ -32,7 +32,6 @@ const TemplateLayout = (props) => {
 
 	// Wizard click handler
 	const updateSelectedWizard = useCallback((selectedWizard) => {
-		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_ACTIVE_WIDGET,
 			value: selectedWizard,
@@ -40,7 +39,6 @@ const TemplateLayout = (props) => {
 	}, []);
 
 	const updateTemplateID = useCallback((selectedTemplateID) => {
-		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_TEMPLATE_ID,
 			value: selectedTemplateID,
@@ -48,7 +46,6 @@ const TemplateLayout = (props) => {
 	}, []);
 
 	const updateStageID = useCallback((selectedStageId) => {
-		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_STAGE_ID,
 			value: selectedStageId,

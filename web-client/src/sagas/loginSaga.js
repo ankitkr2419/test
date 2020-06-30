@@ -20,17 +20,6 @@ export function* login(actions) {
 		} else {
 			yield put(loginFailed(null));
 		}
-
-		// TODO enable once backend api is available
-		// yield call(callApi, {
-		// 	payload: {
-		// 		method: HTTP_METHODS.POST,
-		// 		body,
-		// 		reqPath: 'login',
-		// 		successAction,
-		// 		failureAction,
-		// 	},
-		// });
 	} catch (error) {
 		console.error('error in login ', error);
 		yield put(loginFailed(error));
