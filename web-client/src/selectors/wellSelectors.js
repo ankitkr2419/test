@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+
 const PLATE_CAPACITY = 96;
 
 const getWellListSelector = state => state.wellListReducer;

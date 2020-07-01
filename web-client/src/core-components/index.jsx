@@ -17,6 +17,7 @@ import Select from './Select';
 import Switch from './Switch';
 import Table from './Table';
 import CreatableSelect from './CreatableSelect';
+import LineChart from './Chart/Line';
 
 export {
 	Button,
@@ -46,4 +47,5 @@ export {
 	Switch,
 	Table,
 	CreatableSelect,
+	LineChart,
 };

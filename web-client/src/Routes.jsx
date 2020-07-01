@@ -32,7 +32,7 @@ export const routeDefinitions = [
 			{
 				path: `${ROOT_URL_PATH}plate`,
 				exact: true,
-				component: PrivateRoute(PlateContainer),
+				component: PlateContainer,
 				key: 4,
 			},
 			{
