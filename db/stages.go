@@ -47,7 +47,8 @@ const (
 		FROM stages , steps
 		WHERE
 		stages.id = steps.stage_id
-		AND stages.template_id = $1`
+		AND stages.template_id = $1
+		ORDER BY steps.id ASC`
 )
 
 type Stage struct {

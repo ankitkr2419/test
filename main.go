@@ -31,6 +31,8 @@ func main() {
 	// config file to configure dye & targets
 	config.Load("config")
 
+
+	// simulator config file to configure controls & wells in simulator
 	config.Load("simulator")
 
 	cliApp := cli.NewApp()
