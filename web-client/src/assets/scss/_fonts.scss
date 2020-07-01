@@ -1,6 +1,6 @@
 $icon-font-family: 'mylab-icons';
 $icon-font-path: '../fonts';
-$icon-font-code: 'mhi343';
+$icon-font-code: 'rq9qmd';
 
 $icon-angle-down: '\e900';
 $icon-angle-left: '\e901';
@@ -22,6 +22,8 @@ $icon-print: '\e90f';
 $icon-trash: '\e910';
 $icon-user: '\e911';
 $icon-steps: '\e912';
+$icon-expand: '\e913';
+$icon-bell: '\e914';
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -152,5 +154,15 @@ $icon-steps: '\e912';
 .icon-steps {
 	&:before {
 		content: $icon-steps;
+	}
+}
+.icon-expand {
+	&:before {
+		content: $icon-expand;
+	}
+}
+.icon-bell {
+	&:before {
+		content: $icon-bell;
 	}
 }
