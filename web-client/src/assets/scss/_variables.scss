@@ -1,43 +1,43 @@
 // Colors
-$tango: #F3811F;
-$lime-green: #3FC13A;
-$burnt-sienna: #F06666;
-$pale: #AEDBD5;
-$tacao: #F2BB7B;
-$ink-blue: #3C70FF;
-$red: #FF0000;
+$tango: #f3811f;
+$lime-green: #3fc13a;
+$burnt-sienna: #f06666;
+$pale: #aedbd5;
+$tacao: #f2bb7b;
+$ink-blue: #3c70ff;
+$red: #ff0000;
 
-$gray-98: #FAFAFA;
-$gray-97: #F8F8F8;
-$gray-94: #F0F0F0;
-$gray-90: #E5E5E5;
-$gray-85: #D9D9D9;
-$gray-80: #CBCBCB;
-$gray-68: #AEAEAE;
+$gray-98: #fafafa;
+$gray-97: #f8f8f8;
+$gray-94: #f0f0f0;
+$gray-90: #e5e5e5;
+$gray-85: #d9d9d9;
+$gray-80: #cbcbcb;
+$gray-68: #aeaeae;
 $gray-60: #999999;
 $gray-44: #707070;
 $gray-40: #666666;
 
-
-$primary:       $tango;
-$secondary:     $gray-94;
-$success:       $lime-green;
-$danger:        $red;
+$primary: $tango;
+$secondary: $gray-94;
+$success: $lime-green;
+$danger: $red;
 
 $theme-colors: ();
 
 $theme-colors: map-merge(
-  (
-    "primary":    $primary,
-    "secondary":  $secondary,
-    "success":    $success,
-    "info":       $info,
-    "warning":    $warning,
-    "danger":     $danger,
-    "light":      $light,
-    "dark":       $dark
-  ),
-  $theme-colors
+	(
+		'primary': $primary,
+		'secondary': $secondary,
+		'success': $success,
+		'info': $info,
+		'warning': $warning,
+		'danger': $danger,
+		'light': $light,
+		'dark': $dark,
+		'failure': $burnt-sienna,
+	),
+	$theme-colors
 );
 
 // Link
@@ -53,8 +53,8 @@ $enable-validation-icons: false;
 // Form validation
 $form-feedback-margin-top: 0;
 $form-feedback-font-size: 12px;
-$form-feedback-valid-color: theme-color("success");
-$form-feedback-invalid-color: theme-color("danger");
+$form-feedback-valid-color: theme-color('success');
+$form-feedback-invalid-color: theme-color('danger');
 
 $form-feedback-icon-valid-color: $form-feedback-valid-color;
 $form-feedback-icon-valid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/></svg>");
@@ -63,17 +63,17 @@ $form-feedback-icon-invalid: url("data:image/svg+xml,<svg xmlns='http://www.w3.o
 
 $form-validation-states: ();
 $form-validation-states: map-merge(
-  (
-    "valid": (
-      "color": $form-feedback-valid-color,
-      "icon": $form-feedback-icon-valid
-    ),
-    "invalid": (
-      "color": $form-feedback-invalid-color,
-      "icon": $form-feedback-icon-invalid
-    ),
-  ),
-  $form-validation-states
+	(
+		'valid': (
+			'color': $form-feedback-valid-color,
+			'icon': $form-feedback-icon-valid,
+		),
+		'invalid': (
+			'color': $form-feedback-invalid-color,
+			'icon': $form-feedback-icon-invalid,
+		),
+	),
+	$form-validation-states
 );
 
 // Modal
