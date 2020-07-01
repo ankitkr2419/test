@@ -42,14 +42,27 @@ const (
     			GROUP  BY stage_id
     		) AS subquery
 		Where stages.id = subquery.stage_id`
+
+	getStageStepQuery = `SELECT *
+		FROM stages , steps
+		WHERE
+		stages.id = steps.stage_id
+		AND stages.template_id = $1
+		ORDER BY steps.id ASC`
 )
 
 type Stage struct {
 	ID          uuid.UUID `db:"id" json:"id"`
 	Type        string    `db:"type" json:"type"  validate:"required"`
-	RepeatCount int       `db:"repeat_count" json:"repeat_count"`
+	RepeatCount uint16    `db:"repeat_count" json:"repeat_count"`
 	TemplateID  uuid.UUID `db:"template_id" json:"template_id" validate:"required"`
 	StepCount   int       `db:"step_count" json:"step_count"`
+}
+
+// StageStep used to get data for particular template
+type StageStep struct {
+	Stage
+	Step
 }
 
 func (s *pgStore) ListStages(ctx context.Context, template_id uuid.UUID) (stgs []Stage, err error) {
@@ -133,5 +146,15 @@ func (s *pgStore) UpdateStepCount(ctx context.Context) (err error) {
 		logger.WithField("err", err.Error()).Error("Error updating Stage")
 		return
 	}
+	return
+}
+
+func (s *pgStore) ListStageSteps(ctx context.Context, templateID uuid.UUID) (ss []StageStep, err error) {
+	err = s.db.Select(&ss, getStageStepQuery, templateID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing stage steps")
+		return
+	}
+
 	return
 }

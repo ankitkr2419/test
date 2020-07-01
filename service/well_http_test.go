@@ -45,6 +45,15 @@ func (suite *WellHandlerTestSuite) TestListWellsSuccess() {
 		nil,
 	)
 
+	suite.dbMock.On("ListWellTargets", mock.Anything, mock.Anything).Return(
+		[]db.WellTarget{
+			{WellID: testUUID,
+				TargetID: targetID,
+				CT:       "45"},
+		},
+		nil,
+	)
+
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/experiments/{experiment_id}/wells",
@@ -60,6 +69,7 @@ func (suite *WellHandlerTestSuite) TestListWellsSuccess() {
 
 func (suite *WellHandlerTestSuite) TestListWellsFail() {
 	experimentID := uuid.New()
+
 	suite.dbMock.On("ListWells", mock.Anything, mock.Anything).Return(
 		[]db.Well{},
 		errors.New("error fetching Wells"),
@@ -106,7 +116,6 @@ func (suite *WellHandlerTestSuite) TestUpsertWellSuccess() {
 	)
 
 	body := fmt.Sprintf(`{"position":[1],"sample":{"id":"%s","name":"sush"},"task":"UNKNOWN","targets":["%s"]}`, sampleID, targetID)
-	fmt.Println(body)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/experiments/{experiment_id}/wells",
 		"/experiments/"+experimentID.String()+"/wells",
@@ -143,7 +152,7 @@ func (suite *WellHandlerTestSuite) TestShowWellSuccess() {
 	sampleID := uuid.New()
 	experimentID := uuid.New()
 	targetID := uuid.New()
-	suite.dbMock.On("ListWellTargets", mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("GetWellTarget", mock.Anything, mock.Anything).Return(
 		[]db.WellTarget{
 			{
 				WellID:   testUUID,

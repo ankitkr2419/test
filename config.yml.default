@@ -17,3 +17,5 @@ dyes:
   - name: "SYBR"
     position: 5
     targets: ["TB"]
+
+activeWells: [7,1,5,32,51,87]

@@ -40,6 +40,15 @@ func AppPort() int {
 	return appPort
 }
 
+func ActiveWells(key string) (activeWells []int32) {
+	checkIfSet(key)
+	wells := viper.GetIntSlice(key)
+	for _, w := range wells {
+		activeWells = append(activeWells, int32(w))
+	}
+	return
+}
+
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))

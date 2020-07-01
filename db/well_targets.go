@@ -25,15 +25,26 @@ const (
 		well_id,
 		target_id)
 		VALUES %s`
+
+	getWellTargetListQuery = `SELECT wt.well_id,
+		wt.target_id,
+		wt.ct,
+		t.name as target_name
+		FROM well_targets as wt , targets as t
+		WHERE
+		wt.target_id = t.id
+		AND
+		well_id IN (%s)`
 )
 
 type WellTarget struct {
-	WellID   uuid.UUID `db:"well_id" json:"well_id"`
-	TargetID uuid.UUID `db:"target_id" json:"target_id" validate:"required"`
-	CT       string    `db:"ct" json:"ct"`
+	WellID     uuid.UUID `db:"well_id" json:"well_id"`
+	TargetID   uuid.UUID `db:"target_id" json:"target_id" validate:"required"`
+	TargetName string    `db:"target_name" json:"target_name"`
+	CT         string    `db:"ct" json:"ct"`
 }
 
-func (s *pgStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (WellTargets []WellTarget, err error) {
+func (s *pgStore) GetWellTarget(ctx context.Context, wellID uuid.UUID) (WellTargets []WellTarget, err error) {
 	err = s.db.Select(&WellTargets, getWellTargetsListQuery, wellID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing WellTargets")
@@ -46,8 +57,7 @@ func (s *pgStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (WellTa
 func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarget) (err error) {
 
 	stmt := makeWellTargetQuery(WellTargets)
-	delstmt := delWellTargetQuery(WellTargets)
-
+	delstmt := delWellTargetQuery(WellTargets, deleteWellTargetQuery)
 	tx, err := s.db.Begin()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in creating transaction")
@@ -75,6 +85,18 @@ func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarge
 	return
 }
 
+func (s *pgStore) ListWellTargets(ctx context.Context, wellID []uuid.UUID) (WellTargets []WellTarget, err error) {
+	stmt := getWellTargetQuery(wellID, getWellTargetListQuery)
+
+	err = s.db.Select(&WellTargets, stmt)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing WellTargets")
+		return
+	}
+
+	return
+}
+
 // prepare bulk insert query statement
 func makeWellTargetQuery(WellTargets []WellTarget) string {
 
@@ -90,8 +112,8 @@ func makeWellTargetQuery(WellTargets []WellTarget) string {
 	return stmt
 }
 
-// prepare bulk insert query statement
-func delWellTargetQuery(WellTargets []WellTarget) string {
+// prepare bulk delete query statement
+func delWellTargetQuery(WellTargets []WellTarget, q string) string {
 
 	values := make([]string, 0, len(WellTargets))
 
@@ -99,7 +121,22 @@ func delWellTargetQuery(WellTargets []WellTarget) string {
 		values = append(values, fmt.Sprintf("'%v'", t.WellID))
 	}
 
-	stmt := fmt.Sprintf(deleteWellTargetQuery,
+	stmt := fmt.Sprintf(q,
+		strings.Join(values, ","))
+
+	return stmt
+}
+
+// prepare bulk insert query statement
+func getWellTargetQuery(WellTargets []uuid.UUID, q string) string {
+
+	values := make([]string, 0, len(WellTargets))
+
+	for _, t := range WellTargets {
+		values = append(values, fmt.Sprintf("'%v'", t))
+	}
+
+	stmt := fmt.Sprintf(q,
 		strings.Join(values, ","))
 
 	return stmt

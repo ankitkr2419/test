@@ -26,6 +26,10 @@ const (
 		start_time,
  		end_time
 		FROM experiments WHERE id = $1`
+
+	updateStartTimeQuery = `UPDATE experiments
+		SET start_time = $1
+		WHERE id = $2`
 )
 
 type Experiment struct {
@@ -77,5 +81,18 @@ func (s *pgStore) ShowExperiment(ctx context.Context, id uuid.UUID) (e Experimen
 		return
 	}
 
+	return
+}
+
+func (s *pgStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID) (err error) {
+	_, err = s.db.Exec(
+		updateStartTimeQuery,
+		t,
+		experimentID,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating experiments")
+		return
+	}
 	return
 }

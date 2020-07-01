@@ -41,9 +41,9 @@ const (
 type Step struct {
 	ID                uuid.UUID `db:"id" json:"id"`
 	StageID           uuid.UUID `db:"stage_id" json:"stage_id"`
-	RampRate          float64   `db:"ramp_rate" json:"ramp_rate"`
-	TargetTemperature float64   `db:"target_temp" json:"target_temp"`
-	HoldTime          int       `db:"hold_time" json:"hold_time"`
+	RampRate          float32   `db:"ramp_rate" json:"ramp_rate"`
+	TargetTemperature float32   `db:"target_temp" json:"target_temp"`
+	HoldTime          int32     `db:"hold_time" json:"hold_time"`
 	DataCapture       bool      `db:"data_capture" json:"data_capture"`
 }
 

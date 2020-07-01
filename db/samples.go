@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	getSampleQuery = `SELECT * FROM samples WHERE
+	getSampleQuery = `SELECT * FROM samples
 		WHERE id = $1`
 	createSampleQuery = `INSERT INTO samples (
 		name)
@@ -38,7 +38,7 @@ func (s *pgStore) CreateSample(ctx context.Context, sp Sample) (createdSample Sa
 
 	err = s.db.Get(&createdSample, getSampleQuery, lastInsertID)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting Stage")
+		logger.WithField("err", err.Error()).Error("Error in getting sample")
 		return
 	}
 	return
