@@ -26,23 +26,24 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		if len(wells) > 0 {
+			wellID := make([]uuid.UUID, 0)
+			for _, w := range wells {
+				wellID = append(wellID, w.ID)
+			}
 
-		wellID := make([]uuid.UUID, 0)
-		for _, w := range wells {
-			wellID = append(wellID, w.ID)
-		}
+			welltargets, err := deps.Store.ListWellTargets(req.Context(), wellID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 
-		welltargets, err := deps.Store.ListWellTargets(req.Context(), wellID)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		for i, w := range wells {
-			for _, t := range welltargets {
-				if w.ID == t.WellID {
-					wells[i].Targets = append(w.Targets, t)
+			for i, w := range wells {
+				for _, t := range welltargets {
+					if w.ID == t.WellID {
+						wells[i].Targets = append(w.Targets, t)
+					}
 				}
 			}
 		}
