@@ -149,8 +149,6 @@ func startApp(plcName string, test bool) (err error) {
 	server.Use(c)
 	server.UseHandler(router)
 
-	// port := config.AppPort() // This can be changed to the service port number via environment variable.
-	// addr := fmt.Sprintf(":%s", strconv.Itoa(port))
 	flag.Parse()
 	server.Run(*addr)
 	return
