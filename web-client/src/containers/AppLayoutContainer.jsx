@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
+import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import RouteWithSubRoutes from 'RouteHelper';
 import { useSelector, useDispatch } from 'react-redux';
 import AppHeader from 'components/AppHeader';
