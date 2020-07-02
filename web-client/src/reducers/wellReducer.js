@@ -7,7 +7,9 @@ import {
 	resetWellDefaultList,
 	resetMultiWellDefaultList,
 	updateWellListSelector,
+	setActiveWells,
 } from 'selectors/wellSelectors';
+import activeWellActions from 'actions/activeWellActions';
 
 const listWellInitialState = fromJS({
 	isLoading: true,
@@ -47,6 +49,10 @@ export const wellListReducer = (state = listWellInitialState, action) => {
 	// Update wells list when new wells are added
 	case addWellActions.successAction:
 		return updateWellListSelector(state, action);
+
+	// Update wells list when new wells are added
+	case activeWellActions.successAction:
+		return setActiveWells(state, action);
 	default:
 		return state;
 	}

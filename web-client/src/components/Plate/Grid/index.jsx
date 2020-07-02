@@ -8,6 +8,7 @@ import Well from './Well';
 import WellPopover from './WellPopover';
 
 const GridComponent = ({
+	activeWells,
 	wells,
 	onWellClickHandler,
 	onWellUpdateClickHandler,
@@ -38,6 +39,7 @@ const GridComponent = ({
 						sample,
 						task,
 						targets,
+						isWellActive,
 					} = well.toJS();
 					return (
 						<React.Fragment key={index}>
@@ -50,6 +52,7 @@ const GridComponent = ({
 								onClickHandler={(event) => {
 									onWellClickHandler(well, index, event);
 								}}
+								isDisabled={isWellActive === false}
 							/>
 							{/* popover will only visible when its filled and group selection is off */}
 							{(isWellFilled && isGroupSelectionOn === false) && (
@@ -74,6 +77,7 @@ const GridComponent = ({
 );
 
 GridComponent.propTypes = {
+	activeWells: PropTypes.object.isRequired,
 	onWellClickHandler: PropTypes.func.isRequired,
 	wells: PropTypes.object.isRequired,
 	onWellUpdateClickHandler: PropTypes.func.isRequired,

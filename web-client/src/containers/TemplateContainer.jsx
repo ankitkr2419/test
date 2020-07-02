@@ -85,7 +85,6 @@ const TemplateContainer = (props) => {
 	 * createExperiment belongs to operator flow
 	 */
 	const createExperiment = (experimentBody) => {
-		// console.log('experimentBody: ', experimentBody);
 		dispatch(createExperimentAction(experimentBody));
 	};
 

@@ -12,7 +12,7 @@ const listExperimentInitialState = fromJS({
 const createExperimentInitialState = fromJS({
 	data: {},
 	isExperimentSaved: false,
-	// id: '1241d175-b934-493d-bd6d-5e68fcab20a1',
+	// id: '86c5699c-d7fc-4bbd-b168-59f3fb80f429',
 	id: null,
 	description: null,
 });

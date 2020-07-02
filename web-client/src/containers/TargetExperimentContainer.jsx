@@ -93,7 +93,6 @@ const TargetExperimentContainer = (props) => {
 		const checkedTargets = getCheckedExperimentTargets(
 			selectedTargetState.get('targetList'),
 		);
-		console.log('checkedTargets: ', checkedTargets);
 		dispatch(createExperimentTarget(checkedTargets, experimentId));
 	}, [selectedTargetState, experimentId, dispatch]);
 

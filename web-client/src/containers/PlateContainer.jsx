@@ -12,28 +12,30 @@ import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { fetchExperimentTargets } from 'action-creators/experimentTargetActionCreators';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { setIsPlateRoute } from 'action-creators/loginActionCreators';
+import { getActiveLoadedWells } from 'selectors/activeWellSelector';
 
 const PlateContainer = () => {
 	const dispatch = useDispatch();
+	// experiment targets
 	const experimentTargets = useSelector(getExperimentTargets);
-	const wellListReducer = useSelector(getWells);
-	const experimentId = useSelector(getExperimentId);
-	const positions = getWellsPosition(wellListReducer);
 	const experimentTargetsList = experimentTargets.get('list');
+	// get wells data from server
+	const wellListReducer = useSelector(getWells);
+	// running experiment id
+	const experimentId = useSelector(getExperimentId);
+	// selected wells positions
+	const positions = getWellsPosition(wellListReducer);
+	// activeWells means the well which are allowed to configure
+	const activeWells = useSelector(getActiveLoadedWells);
 
 	useEffect(() => {
 		if (experimentId !== null) {
 			dispatch(fetchWells(experimentId));
+			dispatch(fetchExperimentTargets(experimentId));
 		}
 		return () => {
 			dispatch(setIsPlateRoute(false));
 		};
-	}, [experimentId, dispatch]);
-
-	useEffect(() => {
-		if (experimentId !== null) {
-			dispatch(fetchExperimentTargets(experimentId));
-		}
 	}, [experimentId, dispatch]);
 
 	const setSelectedWell = (index, isWellSelected) => {
@@ -58,6 +60,7 @@ const PlateContainer = () => {
 			setMultiSelectedWell={setMultiSelectedWell}
 			isMultiSelectionOptionOn={wellListReducer.get('isMultiSelectionOptionOn')}
 			toggleMultiSelectOption={toggleMultiSelectOption}
+			activeWells={activeWells}
 		/>
 	);
 };

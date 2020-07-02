@@ -3,8 +3,8 @@ import loginActions from 'actions/loginActions';
 
 const loginInitialState = fromJS({
 	isLoading: true,
-	isUserLoggedIn: true,
-	isLoginTypeAdmin: true,
+	isUserLoggedIn: false,
+	isLoginTypeAdmin: false,
 	isLoginTypeOperator: false,
 	isError: false,
 	isPlateRoute: false,

@@ -20,6 +20,7 @@ const Plate = (props) => {
 		experimentId,
 		isMultiSelectionOptionOn,
 		toggleMultiSelectOption,
+		activeWells,
 	} = props;
 
 	// local state to maintain well data which is selected for update
@@ -52,6 +53,7 @@ const Plate = (props) => {
 					toggleMultiSelectOption={toggleMultiSelectOption}
 				/>
 				<GridComponent
+					activeWells={activeWells}
 					wells={wells}
 					isGroupSelectionOn={isMultiSelectionOptionOn}
 					onWellClickHandler={onWellClickHandler}
@@ -83,6 +85,7 @@ Plate.propTypes = {
 	experimentId: PropTypes.string.isRequired,
 	isMultiSelectionOptionOn: PropTypes.bool.isRequired,
 	toggleMultiSelectOption: PropTypes.func.isRequired,
+	activeWells: PropTypes.object.isRequired,
 };
 
 export default Plate;

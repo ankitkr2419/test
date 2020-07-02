@@ -17,12 +17,12 @@ const TemplateLayout = (props) => {
 	// Local state to manage selected wizard
 	const [templateLayoutState, templateLayoutDispatch] = useReducer(
 		templateLayoutReducer,
-		templateInitialState
+		templateInitialState,
 	);
 	const wizardList = getWizardListByLoginType(
 		templateLayoutState.get('wizardList'),
 		isLoginTypeAdmin,
-		isLoginTypeOperator
+		isLoginTypeOperator,
 	);
 
 	// Here we have stored id for active widget

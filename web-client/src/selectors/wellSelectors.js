@@ -49,6 +49,7 @@ export const getDefaultWellsList = createSelector(() => {
 		status: '', // red, green, orange
 		initial: '',
 		id: null,
+		isWellActive: false,
 	};
 
 	for (let i = 0; i !== PLATE_CAPACITY; i += 1) {
@@ -107,5 +108,26 @@ export const updateWellListSelector = createSelector(
 			return tempState.merge({ isLoading: false, isWellFilled: true });
 		}
 		return state.merge({ isLoading: false, isWellFilled: false });
+	},
+);
+
+export const setActiveWells = createSelector(
+	state => state,
+	(state, action) => action,
+	(state, action) => {
+		if (action.payload.response !== null) {
+			const activeWellsPositions = action.payload.response;
+			const tempState = state.updateIn(['defaultList'], myDefaultList => myDefaultList.map((ele, index) => {
+				// find the index present in response data
+				if (activeWellsPositions.includes(index)) {
+					return ele.merge({
+						isWellActive: true,
+					});
+				}
+				return ele;
+			}));
+			return tempState;
+		}
+		return state;
 	},
 );

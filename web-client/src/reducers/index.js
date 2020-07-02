@@ -30,6 +30,7 @@ import { listExperimentsReducer, createExperimentReducer } from 'reducers/experi
 import { listExperimentTargetsReducer, createExperimentTargetReducer } from 'reducers/experimentTargetReducer';
 import { listSamplesReducer } from 'reducers/samplesReducer';
 import { runExperimentReducer } from 'reducers/runExperimentReducer';
+import { activeWellReducer } from 'reducers/actionWellReducer';
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -55,6 +56,7 @@ const rootReducer = combineReducers({
 	listSamplesReducer,
 	addWellsReducer,
 	runExperimentReducer,
+	activeWellReducer,
 });
 
 export default rootReducer;
