@@ -57,7 +57,7 @@ func createExperimentHandler(deps Dependencies) http.HandlerFunc {
 		createdExp, err = deps.Store.CreateExperiment(req.Context(), e)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create template")
+			logger.WithField("err", err.Error()).Error("Error create experiment")
 			return
 		}
 
@@ -142,13 +142,13 @@ func showExperimentHandler(deps Dependencies) http.HandlerFunc {
 func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
-		experimentID, err := parseUUID(vars["experiment_id"])
+		expID, err := parseUUID(vars["experiment_id"])
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		e, err := deps.Store.ShowExperiment(req.Context(), experimentID)
+		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -175,12 +175,15 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), experimentID)
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		// experimentID set
+		experimentID = expID
 
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
@@ -190,19 +193,16 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		// if origin not allowed it returns 403
+		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+
 		c, err := upgrader.Upgrade(rw, req, nil)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
 			return
 		}
 		defer c.Close()
-
-		vars := mux.Vars(req)
-		experimentID, err := parseUUID(vars["experiment_id"])
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
 
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
 		if err != nil {

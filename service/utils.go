@@ -13,7 +13,10 @@ import (
 
 var (
 	plcStage     plc.Stage
-	experimentID uuid.UUID
+	experimentID uuid.UUID   //set experimentID which is currently running
+	green        = "#3FC13A" // All CT values for the well are below threshold,
+	red          = "#F06666" //Even a single value crosses threshold for target
+	orange       = "#F3811F" // If the CT values are close to threshold (delta)
 )
 
 func validate(i interface{}) (valid bool, respBytes []byte) {

@@ -3,7 +3,7 @@ package main
 import (
 	rice "github.com/GeertJohan/go.rice"
 
-	"fmt"
+	"flag"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -30,7 +30,6 @@ func main() {
 
 	// config file to configure dye & targets
 	config.Load("config")
-
 
 	// simulator config file to configure controls & wells in simulator
 	config.Load("simulator")
@@ -106,7 +105,7 @@ func startApp(plcName string, test bool) (err error) {
 	// The exit plan incase there is a feedback from the driver to abort/exit
 	go func() {
 		err = <-exit
-		logger.WithField("err", err.Error()).Error("PLC Driver has requested exi")
+		logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 		// TODO: Handle exit gracefully
 		// We need to call the API on the Web to display the error and restart, abort or call service!
 	}()
@@ -129,6 +128,7 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
+	var addr = flag.String("addr", "localhost:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
 	router := service.InitRouter(deps)
 	// to embed react build with go rice
@@ -149,9 +149,9 @@ func startApp(plcName string, test bool) (err error) {
 	server.Use(c)
 	server.UseHandler(router)
 
-	port := config.AppPort() // This can be changed to the service port number via environment variable.
-	addr := fmt.Sprintf(":%s", strconv.Itoa(port))
-
-	server.Run(addr)
+	// port := config.AppPort() // This can be changed to the service port number via environment variable.
+	// addr := fmt.Sprintf(":%s", strconv.Itoa(port))
+	flag.Parse()
+	server.Run(*addr)
 	return
 }

@@ -40,7 +40,8 @@ const (
 		position,
 		experiment_id,
 		sample_id,
-		task)
+		task,
+		color_code)
 		VALUES %s`
 
 	upsertWellQuery2 = ` ON CONFLICT (position, experiment_id) DO UPDATE
@@ -142,7 +143,7 @@ func makeWellQuery(w Well) string {
 
 	values := make([]string, 0, 1)
 
-	values = append(values, fmt.Sprintf("(%v,'%v', '%v', '%v')", w.Position, w.ExperimentID, w.SampleID, w.Task))
+	values = append(values, fmt.Sprintf("(%v,'%v', '%v', '%v','%v')", w.Position, w.ExperimentID, w.SampleID, w.Task, w.ColorCode))
 
 	stmt := fmt.Sprintf(upsertWellQuery1,
 		strings.Join(values, ","))

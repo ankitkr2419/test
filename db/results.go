@@ -11,13 +11,18 @@ import (
 
 const (
 	getwellsConfigured = `SELECT
-             experiments.id as experiment_id,template_targets.template_id,template_targets.target_id,template_targets.threshold,dyes.position as dye_position,targets.name as target_name
+			e.id as experiment_id,
+			ett.template_id,ett.target_id,ett.threshold,
+			d.position as dye_position,
+			w.id as well_id,w.position as well_position,
+			t.name as target_name
 			FROM
-			experiments
-            INNER JOIN template_targets ON template_targets.template_id = experiments.template_id
-			INNER JOIN targets ON targets.id = template_targets.target_id
-			INNER JOIN dyes ON dyes.id = targets.dye_id
-			WHERE experiments.id = $1`
+			experiments e
+            INNER JOIN experiment_template_targets ett ON ett.experiment_id = e.id
+			INNER JOIN wells w ON w.experiment_id = e.id
+			INNER JOIN targets t ON t.id = ett.target_id
+			INNER JOIN dyes d ON d.id = t.dye_id
+			WHERE e.id = $1`
 
 	insertResultQuery = `INSERT INTO results (
 		experiment_id,
@@ -32,11 +37,21 @@ const (
 		experiment_id = $1
 		AND
 		cycle = $2`
+
+	getResultWellTargetsQuery = `SELECT
+		r.experiment_id,r.target_id,w.id as well_d,r.f_value,e.threshold
+			FROM
+			results r
+			INNER JOIN experiment_template_targets e ON e.target_id = r.target_id
+			AND r.experiment_id = e.experiment_id
+            INNER JOIN wells w ON r.experiment_id = w.experiment_id
+			AND r.well_position = w.position
+			WHERE r.experiment_id = $1 AND r.cycle = $2`
 )
 
 type Result struct {
 	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id"`
-	WellPosition int32     `db:"well_id" json:"well_id"`
+	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
 	Cycle        uint16    `db:"cycle" json:"cycle"`
 	FValue       uint16    `db:"f_value" json:"f_value"`
@@ -49,10 +64,34 @@ type TargetDetails struct {
 	Threshold    float32   `db:"threshold" json:"threshold"`
 	TargetName   string    `db:"target_name" json:"target_name"`
 	DyePosition  int32     `db:"dye_position" json:"dye_position"`
+	WellID       uuid.UUID `db:"well_id" json:"well_id"`
+	WellPosition int32     `db:"well_position" json:"well_position"`
+}
+
+type WellTargetResults struct {
+	WellTarget
+	Cycle     uint16  `db:"cycle" json:"cycle"`
+	FValue    uint16  `db:"f_value" json:"f_value"`
+	Threshold float32 `db:"threshold" json:"threshold"`
+}
+
+type WellResults struct {
+	Well
+	Cycle  uint16 `db:"cycle" json:"cycle"`
+	FValue uint16 `db:"f_value" json:"f_value"`
 }
 
 func (s *pgStore) ListConfTargets(ctx context.Context, experimentID uuid.UUID) (w []TargetDetails, err error) {
 	err = s.db.Select(&w, getwellsConfigured, experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing well details")
+		return
+	}
+	return
+}
+
+func (s *pgStore) ListWellTargetsResult(ctx context.Context, r Result) (w []WellTargetResults, err error) {
+	err = s.db.Select(&w, getResultWellTargetsQuery, r.ExperimentID, r.Cycle)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing well details")
 		return
