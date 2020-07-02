@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Logo, ButtonIcon, Text } from 'shared-components';
@@ -14,64 +14,106 @@ import {
 	NavItem,
 	NavLink,
 } from 'core-components';
+// import { getExperimentId } from 'selectors/experimentSelector';
+import { getWells } from 'selectors/wellSelectors';
+import { runExperiment } from 'action-creators/runExperimentActionCreators';
+import { getExperimentId } from 'selectors/experimentSelector';
+import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
+// import PrintDataModal from './PrintDataModal';
+// import ExportDataModal from './ExportDataModal';
 import { NAV_ITEMS } from './constants';
-import PrintDataModal from './PrintDataModal';
-import ExportDataModal from './ExportDataModal';
 
 const Header = styled.header`
-	position: relative;
-	display: flex;
-	align-items: center;
-	height: 80px;
-	background: white 0% 0% no-repeat padding-box;
-	padding: 16px 24px 16px 48px;
-	box-shadow: 0 4px 16px #00000029;
-	z-index: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 80px;
+  background: white 0% 0% no-repeat padding-box;
+  padding: 16px 24px 16px 48px;
+  box-shadow: 0 4px 16px #00000029;
+  z-index: 1;
 `;
 
 const AppHeader = (props) => {
-	const { isUserLoggedIn } = props;
+	const { isUserLoggedIn, isPlateRoute, isLoginTypeAdmin } = props;
 	const dispatch = useDispatch();
+	const experimentId = useSelector(getExperimentId);
+	const runExperimentReducer = useSelector(getRunExperimentReducer);
+	const wellListReducer = useSelector(getWells);
+	const isWellFilled = wellListReducer.get('isWellFilled');
+	const isExperimentRunning =    runExperimentReducer.get('experimentStatus') === 'running';
+
 	const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-	const toggleUserDropdown = () =>
-		setUserDropdownOpen((prevState) => !prevState);
+	const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
 
 	const logoutClickHandler = () => {
 		dispatch(loginReset());
+	};
+
+	const startExperiment = () => {
+		if (isExperimentRunning === false) {
+			dispatch(runExperiment(experimentId));
+		}
+	};
+
+	const onNavLinkClickHandler = (event, pathname) => {
+		if (pathname === '/plate' && isLoginTypeAdmin === true) {
+			event.preventDefault();
+		}
 	};
 
 	return (
 		<Header>
 			<Logo isUserLoggedIn={isUserLoggedIn} />
 			{isUserLoggedIn && (
-				<Nav className='ml-3 mr-auto'>
-					{NAV_ITEMS.map((ele) => (
+				<Nav className="ml-3 mr-auto">
+					{NAV_ITEMS.map(ele => (
 						<NavItem key={ele.name}>
-							<NavLink to={ele.path}>{ele.name}</NavLink>
+							<NavLink
+								onClick={(event) => {
+									onNavLinkClickHandler(event, ele.path);
+								}}
+								to={ele.path}
+								disabled={(ele.path === '/plate' && isLoginTypeAdmin === true) || (isPlateRoute === true && ele.path === '/templates')}
+							>
+								{ele.name}
+							</NavLink>
 						</NavItem>
 					))}
 				</Nav>
 			)}
 			{isUserLoggedIn && (
-				<div className='d-flex align-items-center'>
-					<PrintDataModal />
-					<ExportDataModal />
-					<div className='experiment-info text-right mx-3'>
-						{/* TODO: Add "show" class to <Text> component when experiment starts and remove it when experiment ends */}
-						<Text size={12} className='text-default mb-1'>
-							Experiment started at 12:39 PM
-						</Text>
-						{/* TODO: When user clicks on Run button remove outline, disabled props and change value of color prop to "primary" */}
-						<Button
-							color='secondary'
-							size='sm'
-							className='font-weight-light border-2 border-gray shadow-none'
-							outline
-							disabled
+				<div className="d-flex align-items-center">
+					{/* <PrintDataModal /> */}
+					{/* <ExportDataModal /> */}
+					<div className="experiment-info text-right mx-3">
+						{/* TODO: Add "show" class to <Text> component when experiment
+						 starts and remove it when experiment ends */}
+						<Text
+							size={12}
+							className={`text-default mb-1 ${
+								isExperimentRunning ? 'show' : ''
+							}`}
 						>
-							Run
-						</Button>
-						{/* TODO: Show this button after experiment ends, depending on result change value of color prop to "success" or "failure"  */}
+							{`Experiment started at ${runExperimentReducer.get(
+								'experimentStartedTime',
+							)}`}
+						</Text>
+						{isPlateRoute === true && (
+							<Button
+								color={isExperimentRunning ? 'primary' : 'secondary'}
+								size="sm"
+								className="font-weight-light border-2 border-gray shadow-none"
+								outline={isExperimentRunning === false}
+								disabled={isWellFilled === false}
+								onClick={startExperiment}
+							>
+                Run
+							</Button>
+						)}
+						{/* TODO: Show this button after experiment ends,
+						depending on result change value of color prop to
+						"success" or "failure"  */}
 						{/* <Button
 							color='success'
 							size='sm'
@@ -83,19 +125,16 @@ const AppHeader = (props) => {
 					<Dropdown
 						isOpen={userDropdownOpen}
 						toggle={toggleUserDropdown}
-						className='ml-2'
+						className="ml-2"
 					>
-						<DropdownToggle icon name='user' size={32} />
+						<DropdownToggle icon name="user" size={32} />
 						<DropdownMenu right>
 							<DropdownItem onClick={logoutClickHandler}>Log out</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
-					<ButtonIcon
-						size={34}
-						name='cross'
-						className='ml-2'
-						onClick={logoutClickHandler}
-					/>
+					{isPlateRoute === true && (
+						<ButtonIcon size={34} name="cross" className="ml-2" />
+					)}
 				</div>
 			)}
 		</Header>

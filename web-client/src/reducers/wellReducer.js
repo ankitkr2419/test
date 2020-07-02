@@ -14,6 +14,7 @@ const listWellInitialState = fromJS({
 	isMultiSelectionOptionOn: false,
 	defaultList: getDefaultWellsList(),
 	list: [],
+	isWellFilled: false,
 });
 
 export const wellListReducer = (state = listWellInitialState, action) => {

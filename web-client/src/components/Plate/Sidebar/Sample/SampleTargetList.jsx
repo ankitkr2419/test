@@ -14,7 +14,7 @@ const SampleTargetList = ({ list, onCrossClickHandler }) => (
 			<SampleTarget
 				key={ele.get('target_id')}
 				onClickHandler={() => onCrossClickHandler(ele.get('target_id'))}
-				label={ele.get('target_id')}
+				label={ele.get('target_name')}
 			/>
 		))}
 	</StyledSampleTargetList>

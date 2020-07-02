@@ -1,4 +1,6 @@
-import React, { useReducer, useEffect, useCallback, useState } from 'react';
+import React, {
+	useReducer, useEffect, useCallback, useState,
+} from 'react';
 import { fromJS } from 'immutable';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +10,7 @@ import targetStateReducer, {
 	targetStateActions,
 	isTargetListUpdated,
 } from 'components/Target/targetState';
+import { getTemplateById } from 'reducers/templateReducer';
 import {
 	fetchExperimentTargets,
 	createExperimentTarget,
@@ -16,10 +19,11 @@ import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { getSelectedTargetExperiment } from 'components/Target/targetHelper';
 import { Redirect } from 'react-router';
 import { getExperimentId } from 'selectors/experimentSelector';
+import { setIsPlateRoute } from 'action-creators/loginActionCreators';
 
 const TargetExperimentContainer = (props) => {
 	// constants
-	const { isLoginTypeAdmin, isLoginTypeOperator } = props;
+	const { isLoginTypeAdmin, isLoginTypeOperator, templateID } = props;
 	const dispatch = useDispatch();
 	// useSelector section
 	// extracting experiment id
@@ -28,11 +32,16 @@ const TargetExperimentContainer = (props) => {
 	const listExperimentTargetsReducer = useSelector(getExperimentTargets);
 	const experimentTargets = listExperimentTargetsReducer.get('list');
 
+	// extracting selected template
+	const templates = useSelector(state => state.listTemplatesReducer);
+	const selectedTemplateDetails = getTemplateById(templates, templateID);
+
+
 	// useReducer section
 	// local state to manage selected target data
 	const [selectedTargetState, updateTargetState] = useReducer(
 		targetStateReducer,
-		fromJS({ targetList: [], originalTargetList: [] })
+		fromJS({ targetList: [], originalTargetList: [] }),
 	);
 	const [isRedirectToPlate, setRedirectToPlate] = useState(false);
 
@@ -82,13 +91,14 @@ const TargetExperimentContainer = (props) => {
 	const onSaveClick = useCallback(() => {
 		// get list of selected targets
 		const checkedTargets = getCheckedExperimentTargets(
-			selectedTargetState.get('targetList')
+			selectedTargetState.get('targetList'),
 		);
 		console.log('checkedTargets: ', checkedTargets);
 		dispatch(createExperimentTarget(checkedTargets, experimentId));
 	}, [selectedTargetState, experimentId, dispatch]);
 
 	const onNextClick = () => {
+		dispatch(setIsPlateRoute(true));
 		setRedirectToPlate(true);
 	};
 
@@ -98,6 +108,7 @@ const TargetExperimentContainer = (props) => {
 
 	return (
 		<TargetComponent
+			selectedTemplateDetails={selectedTemplateDetails}
 			selectedTargetState={selectedTargetState.get('targetList')}
 			onCheckedHandler={onTargetCheckedHandler}
 			onThresholdChange={onThresholdChange}

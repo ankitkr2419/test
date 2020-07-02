@@ -11,15 +11,21 @@ import '../assets/scss/default.scss';
  */
 const AppLayoutContainer = (props) => {
 	const { routes } = props;
-	const loginReducer  = useSelector(state => state.loginReducer);
+	const loginReducer = useSelector(state => state.loginReducer);
 
 	return (
 		<Router>
-			<AppHeader isUserLoggedIn={loginReducer.get('isUserLoggedIn')}/>
+			<AppHeader
+				isPlateRoute={loginReducer.get('isPlateRoute')}
+				isUserLoggedIn={loginReducer.get('isUserLoggedIn')}
+				isLoginTypeAdmin={loginReducer.get('isLoginTypeAdmin')}
+			/>
 			<section className="ml-content">
 				<Switch>
 					<Redirect exact from="/" to="/login" />
-					{routes.map(route => <RouteWithSubRoutes key={route.key} {...route} />)}
+					{routes.map(route => (
+						<RouteWithSubRoutes key={route.key} {...route} />
+					))}
 				</Switch>
 			</section>
 		</Router>

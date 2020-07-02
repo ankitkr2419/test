@@ -1,3 +1,4 @@
+/* eslint-disable arrow-body-style */
 import React, { useEffect, useReducer, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,12 +14,13 @@ import targetStateReducer, {
 	targetStateActions,
 	isCheckable,
 	getCheckedTargets,
+	isTargetListUpdatedAdmin,
 } from 'components/Target/targetState';
+import { getTemplateById } from 'reducers/templateReducer';
 import {
 	getSelectedTargetsToLocal,
 	isTargetAlreadySelected,
 } from 'components/Target/targetHelper';
-import { TARGET_CAPACITY } from '../constants';
 
 const TargetContainer = (props) => {
 	// constants
@@ -35,6 +37,10 @@ const TargetContainer = (props) => {
 		state => state.listTargetByTemplateIDReducer,
 	);
 	const selectedTargets = listTargetByTemplateIDReducer.get('selectedTargets');
+
+	// extracting selected template
+	const templates = useSelector(state => state.listTemplatesReducer);
+	const selectedTemplateDetails = getTemplateById(templates, templateID);
 
 	// isTargetSaved flag will get update when targets are saved successfully over server
 	const { isTargetSaved } = useSelector(state => state.saveTargetReducer);
@@ -53,10 +59,9 @@ const TargetContainer = (props) => {
 			// isTargetSaved = true means targets saved successfully
 			// reset save target reducer to avoid multiple re-renders
 			dispatch(resetSaveTarget());
-			// navigate to next wizard
-			updateSelectedWizard('stage');
+			dispatch(fetchTargetsByTemplateID(templateID));
 		}
-	}, [dispatch, isTargetSaved, updateSelectedWizard]);
+	}, [dispatch, isTargetSaved, updateSelectedWizard, templateID]);
 
 	useEffect(() => {
 		// Update selected targets from server to local state
@@ -138,31 +143,34 @@ const TargetContainer = (props) => {
 			selectedTargetState.get('targetList'),
 			templateID,
 		);
-		// if Capacity exceeds for target selection will redirect to stage wizard
-		if (
-			(checkedTargets !== null
-        && selectedTargets !== null
-				&& checkedTargets.length === TARGET_CAPACITY)
-			// if selected targets is equal to TARGET_CAPACITY
-      || (selectedTargets !== null
-				&& checkedTargets.length === selectedTargets.size)
-		// this condition is to verify that nothing is changed
-		) {
-			updateSelectedWizard('stage');
-		} else {
-			// save call to server
-			dispatch(saveTarget(templateID, checkedTargets));
-		}
+		dispatch(saveTarget(templateID, checkedTargets));
 	}, [
 		selectedTargetState,
 		templateID,
-		selectedTargets,
-		updateSelectedWizard,
 		dispatch,
 	]);
 
+	const navigateToStageWizard = useCallback(() => {
+		return updateSelectedWizard('stage');
+	}, [updateSelectedWizard]);
+
+	// this function will check weather our local state is changed or not
+	const getIsTargetListUpdatedAdmin = useCallback(() => {
+		return isTargetListUpdatedAdmin(selectedTargetState);
+	}, [selectedTargetState]);
+
+	// getIsViewStagesEnabled check if we have at least one selected target
+	const getIsViewStagesEnabled = useCallback(() => {
+		const selectedTargetList = listTargetByTemplateIDReducer.get('selectedTargets');
+		if (selectedTargetList.size === 0) {
+			return false;
+		}
+		return true;
+	}, [listTargetByTemplateIDReducer]);
+
 	return (
 		<TargetComponent
+			selectedTemplateDetails={selectedTemplateDetails}
 			listTargetReducer={listTargetReducer.get('list')}
 			selectedTargetState={selectedTargetState.get('targetList')}
 			updateTargetState={updateTargetState}
@@ -172,7 +180,9 @@ const TargetContainer = (props) => {
 			onSaveClick={onSaveClick}
 			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
-			isTargetListUpdated
+			isTargetListUpdated={getIsTargetListUpdatedAdmin()}
+			isViewStagesEnabled={getIsViewStagesEnabled()}
+			navigateToStageWizard={navigateToStageWizard}
 		/>
 	);
 };

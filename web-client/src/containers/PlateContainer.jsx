@@ -11,6 +11,7 @@ import {
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { fetchExperimentTargets } from 'action-creators/experimentTargetActionCreators';
 import { getExperimentId } from 'selectors/experimentSelector';
+import { setIsPlateRoute } from 'action-creators/loginActionCreators';
 
 const PlateContainer = () => {
 	const dispatch = useDispatch();
@@ -24,6 +25,9 @@ const PlateContainer = () => {
 		if (experimentId !== null) {
 			dispatch(fetchWells(experimentId));
 		}
+		return () => {
+			dispatch(setIsPlateRoute(false));
+		};
 	}, [experimentId, dispatch]);
 
 	useEffect(() => {

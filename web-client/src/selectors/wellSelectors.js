@@ -5,7 +5,6 @@ const PLATE_CAPACITY = 96;
 const getWellListSelector = state => state.wellListReducer;
 const getAddWellsSelector = state => state.addWellsReducer;
 
-
 export const getWells = createSelector(
 	getWellListSelector,
 	wellListReducer => wellListReducer,
@@ -16,12 +15,18 @@ export const getWells = createSelector(
  */
 export const getWellsPosition = createSelector(
 	wellListReducer => wellListReducer,
-	wellListReducer => wellListReducer.get('defaultList').map((ele, index) => {
-		if (ele.get('isSelected') === true || ele.get('isMultiSelected') === true) {
-			return index;
-		}
-		return null;
-	}).filter(ele => ele !== null),
+	wellListReducer => wellListReducer
+		.get('defaultList')
+		.map((ele, index) => {
+			if (
+				ele.get('isSelected') === true
+          || ele.get('isMultiSelected') === true
+			) {
+				return index;
+			}
+			return null;
+		})
+		.filter(ele => ele !== null),
 );
 
 export const setSelectedToList = (state, { isSelected, index }) => state.setIn(['defaultList', index, 'isSelected'], isSelected);
@@ -34,25 +39,23 @@ export const resetMultiWellDefaultList = state => state.updateIn(['defaultList']
 /**
  * getDefaultPlatesList return wells default data w.r.t PLATE_CAPACITY.
  */
-export const getDefaultWellsList = createSelector(
-	() => {
-		const arr = [];
-		const initialPlateState = {
-			isSelected: false,
-			isWellFilled: false,
-			isRunning: false,
-			isMultiSelected: false,
-			status: '', // red, green, orange
-			initial: '',
-			id: null,
-		};
+export const getDefaultWellsList = createSelector(() => {
+	const arr = [];
+	const initialPlateState = {
+		isSelected: false,
+		isWellFilled: false,
+		isRunning: false,
+		isMultiSelected: false,
+		status: '', // red, green, orange
+		initial: '',
+		id: null,
+	};
 
-		for (let i = 0; i !== PLATE_CAPACITY; i += 1) {
-			arr.push(initialPlateState);
-		}
-		return arr;
-	},
-);
+	for (let i = 0; i !== PLATE_CAPACITY; i += 1) {
+		arr.push(initialPlateState);
+	}
+	return arr;
+});
 
 /**
  * Return isWellSaved flag from addWellReducer
@@ -101,8 +104,8 @@ export const updateWellListSelector = createSelector(
 				}
 				return ele;
 			}));
-			return tempState.setIn(['isLoading'], false);
+			return tempState.merge({ isLoading: false, isWellFilled: true });
 		}
-		return state.setIn(['isLoading'], false);
+		return state.merge({ isLoading: false, isWellFilled: false });
 	},
 );

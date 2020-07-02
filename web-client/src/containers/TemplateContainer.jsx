@@ -25,14 +25,14 @@ const TemplateContainer = (props) => {
 	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
-	const templates = useSelector((state) => state.listTemplatesReducer);
+	const templates = useSelector(state => state.listTemplatesReducer);
 	// isTemplateCreated = true means template created successfully
 	const { isTemplateCreated } = useSelector(
-		(state) => state.createTemplateReducer
+		state => state.createTemplateReducer,
 	);
 	// isTemplateDeleted = true means template deleted successfully
 	const { isTemplateDeleted } = useSelector(
-		(state) => state.deleteTemplateReducer
+		state => state.deleteTemplateReducer,
 	);
 
 	// isTemplateDeleted = true means experiment created successfully

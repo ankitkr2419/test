@@ -97,7 +97,7 @@ const AddStageModal = (props) => {
 									</Label>
 									<Input
 										type='number'
-										min='0'
+										min='1'
 										name='stageRepeatCount'
 										id='stage'
 										placeholder='Type here'

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { ExperimentGraphContainer } from 'containers/ExperimentGraphContainer';
 import SampleSideBarContainer from 'containers/SampleSideBarContainer';
 import Header from './Header';
 
@@ -7,7 +8,6 @@ import GridWrapper from './Grid/GridWrapper';
 import GridComponent from './Grid';
 import WellGridHeader from './Grid/WellGridHeader';
 
-import SidebarGraph from './Sidebar/Graph/SidebarGraph';
 import './Plate.scss';
 
 const Plate = (props) => {
@@ -64,7 +64,10 @@ const Plate = (props) => {
 				experimentTargetsList={experimentTargetsList}
 				updateWell={updateWell}
 			/>
-			<SidebarGraph />
+			<ExperimentGraphContainer
+				experimentId={experimentId}
+				experimentTargetsList={experimentTargetsList}
+			/>
 		</div>
 	);
 };

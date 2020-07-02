@@ -3,10 +3,11 @@ import loginActions from 'actions/loginActions';
 
 const loginInitialState = fromJS({
 	isLoading: true,
-	isUserLoggedIn: false,
-	isLoginTypeAdmin: false,
+	isUserLoggedIn: true,
+	isLoginTypeAdmin: true,
 	isLoginTypeOperator: false,
 	isError: false,
+	isPlateRoute: false,
 });
 
 export const loginReducer = (state = loginInitialState, action) => {
@@ -38,6 +39,8 @@ export const loginReducer = (state = loginInitialState, action) => {
 			isUserLoggedIn: true,
 			isLoginTypeAdmin: false,
 		});
+	case loginActions.setIsPlateRoute:
+		return state.setIn(['isPlateRoute'], action.payload.isPlateRoute);
 	case loginActions.loginReset:
 		return loginInitialState;
 	default:

@@ -1,33 +1,31 @@
-import { fromJS } from 'immutable';
+import { fromJS, List } from 'immutable';
 
 // const action types
 export const graphFilterActions = {
 	UPDATE_GRAPH_FILTER_STATE: 'UPDATE_GRAPH_FILTER_VALUES',
 	SET_GRAPH_FILTER_VALUES: 'SET_GRAPH_FILTER_VALUES',
 	RESET_GRAPH_FILTER_STATE: 'RESET_GRAPH_FILTER_STATE',
+	UPDATE_TARGET_LIST: 'UPDATE_TARGET_LIST',
 };
 
-export const stepStateInitialState = fromJS({
-	isGraphBarOpen: false,
-	target1: '',
-	target2: '',
-	target3: '',
-	target4: '',
-	target5: '',
-	target6: '',
+export const graphFilterInitialState = fromJS({
+	isSidebarOpen: false,
+	targets:  List([]),
 });
 
-const stepStateReducer = (state, action) => {
+const graphFilterState = (state, action) => {
 	switch (action.type) {
 	case graphFilterActions.SET_GRAPH_FILTER_VALUES:
 		return state.setIn([action.key], action.value);
 	case graphFilterActions.UPDATE_GRAPH_FILTER_STATE:
 		return state.merge(action.value);
+	case graphFilterActions.UPDATE_TARGET_LIST:
+		return state.setIn(['targets', action.index, 'threshold'], action.threshold);
 	case graphFilterActions.RESET_GRAPH_FILTER_STATE:
-		return stepStateInitialState;
+		return graphFilterInitialState;
 	default:
 		throw new Error('Invalid action type');
 	}
 };
 
-export default stepStateReducer;
+export default graphFilterState;

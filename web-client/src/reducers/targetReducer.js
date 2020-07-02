@@ -40,7 +40,7 @@ export const listTargetByTemplateIDReducer = (
 	case listTargetByTemplateIDActions.listAction:
 		return state.setIn(['isLoading'], true);
 	case listTargetByTemplateIDActions.successAction:
-		return state.merge({ selectedTargets: fromJS(action.payload.response), isLoading: false });
+		return state.merge({ selectedTargets: fromJS(action.payload.response || []), isLoading: false });
 	case listTargetByTemplateIDActions.failureAction:
 		return state.merge({
 			error: fromJS(action.payload.error),

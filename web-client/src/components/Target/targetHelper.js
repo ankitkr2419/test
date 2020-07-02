@@ -3,9 +3,7 @@ import { TARGET_CAPACITY } from '../../constants';
 export const getTargetOption = () => {
 	const arr = [];
 	for (let i = 0; i !== TARGET_CAPACITY; i += 1) {
-		arr.push({
-			isChecked : false,
-		});
+		arr.push({});
 	}
 	return arr;
 };
@@ -32,7 +30,7 @@ export const getSelectedTargetsToLocal = (
 				.find(ele => ele.get('id') === selectedTargetID);
 			// extract name from masterSelectedEl add add to our arr
 			arr[index] = {
-				isChecked: true,
+				// isChecked: true,
 				selectedTarget: {
 					label: masterSelectedEl.get('name'),
 					value: selectedTarget.get('target_id'),
@@ -86,7 +84,7 @@ export const getSelectedTargetExperiment = (
 			arr[index] = {
 				isChecked: true,
 				selectedTarget: {
-					label: 'target name',
+					label: selectedTarget.get('target_name'),
 					value: selectedTarget.get('target_id'),
 				},
 				threshold: selectedTarget.get('threshold'),

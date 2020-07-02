@@ -1,3 +1,4 @@
+/* eslint-disable implicit-arrow-linebreak */
 import { fromJS, List } from 'immutable';
 import { getTargetOption } from './targetHelper';
 
@@ -33,13 +34,13 @@ export const isCheckable = (state, index) => {
 const addTargetId = (state, { targetId, index }) => state.setIn(['targetList', index, 'selectedTarget'], targetId);
 
 // function will set threshold flag w.r.t index
-const addThresholdValue = (state, { threshold, index }) => state.setIn(['targetList', index, 'threshold'], threshold);
+const addThresholdValue = (state, { threshold, index }) => state.setIn(['targetList', index, 'threshold'], parseFloat(threshold));
 
 // function will set isChecked flag w.r.t index
 const setCheckedState = (state, { checked, index }) => state.setIn(['targetList', index, 'isChecked'], checked);
 
 export const getCheckedTargets = (list, templateID) => {
-	const targetList = list.filter(ele => ele.isChecked === true).toJSON();
+	const targetList = list.filter(ele => ele.selectedTarget && ele.threshold).toJSON();
 	// if we don't found any items selected will return empty list
 	// Used to set save button disabled on target page
 	if (targetList.length === 0) {
@@ -70,10 +71,20 @@ export const getCheckedExperimentTargets = (list) => {
 };
 
 // function will replace the existing local target list with new
-const updateList = (state, list) => state.merge({ targetList: List(list), originalTargetList: List(list) });
+const updateList = (state, list) =>
+	state.merge({ targetList: List(list), originalTargetList: List(list) });
 
 export const isTargetListUpdated = (state) => {
 	const { targetList, originalTargetList } = state.toJS();
+	return JSON.stringify(targetList) !== JSON.stringify(originalTargetList);
+};
+
+export const isTargetListUpdatedAdmin = (state) => {
+	const targetList = state.get('targetList').filter(ele => ele.selectedTarget && ele.threshold);
+	if (targetList.size === 0) {
+		return false;
+	}
+	const originalTargetList = state.get('originalTargetList').filter(ele => ele.selectedTarget && ele.threshold);
 	return JSON.stringify(targetList) !== JSON.stringify(originalTargetList);
 };
 

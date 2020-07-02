@@ -17,7 +17,7 @@ const StyledTargetHeader = styled.header`
 `;
 
 const TargetHeader = (props) => {
-	const { isLoginTypeAdmin, isLoginTypeOperator } = props;
+	const { isLoginTypeAdmin, isLoginTypeOperator, selectedTemplateDetails } = props;
 	return (
 		<StyledTargetHeader className='target-header'>
 			{isLoginTypeOperator === true && (
@@ -26,7 +26,7 @@ const TargetHeader = (props) => {
 					size={18}
 					className='text-default font-weight-light mb-0'
 				>
-					Template Name
+					{selectedTemplateDetails.get('name')}
 				</Text>
 			)}
 			{isLoginTypeAdmin === true && (
@@ -36,16 +36,13 @@ const TargetHeader = (props) => {
 						size={14}
 						className='flex-25 text-default text-truncate-multi-line font-weight-light mb-0 pl-3 pr-2 py-1'
 					>
-						Template Name
+						{selectedTemplateDetails.get('name')}
 					</Text>
 					<Text
 						size={14}
 						className='flex-100 text-default text-truncate-multi-line font-weight-light mb-0 px-2 py-1'
 					>
-						Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere,
-						quo autem? Veniam eligendi sit cum! Ratione pariatur dolorem impedit
-						dolorum perferendis temporibus, quam veritatis ducimus nesciunt,
-						nihil blanditiis eius nobis.
+						{selectedTemplateDetails.get('description')}
 					</Text>
 				</div>
 			)}

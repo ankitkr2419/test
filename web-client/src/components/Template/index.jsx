@@ -97,23 +97,24 @@ const TemplateComponent = (props) => {
 	};
 
 	return (
-		<div className='d-flex flex-100 flex-column p-4 mt-3'>
+		<div className="d-flex flex-100 flex-column p-4 mt-3">
 			{templates.size === 0 && (
-				<Center className='no-template-wrap'>
+				<Center className="no-template-wrap">
 					<img
 						src={imgNoTemplate}
-						alt='No templates available'
-						className='img-no-template'
+						alt="No templates available"
+						className="img-no-template"
 					/>
-					<Text className='d-flex justify-content-center' Tag='p'>
-						No templates available
+					<Text className="d-flex justify-content-center" Tag="p">
+            No templates available
 					</Text>
 				</Center>
 			)}
-			<StyledUl>
-				{/* templates size check before iteration */}
-				{templates.size !== 0 &&
-					templates.map((template) => (
+
+			{/* templates size check before iteration */}
+			{templates.size !== 0 && (
+				<StyledUl>
+					{templates.map(template => (
 						<StyledLi key={template.get('id')}>
 							<CustomButton
 								title={template.get('name')}
@@ -132,11 +133,12 @@ const TemplateComponent = (props) => {
 							/>
 						</StyledLi>
 					))}
-			</StyledUl>
-			<Center className='mb-5'>
+				</StyledUl>
+			)}
+			<Center className="mb-5">
 				{isLoginTypeAdmin === true && (
-					<Button color='primary' onClick={toggleCreateTemplateModal}>
-						Create New
+					<Button color="primary" onClick={toggleCreateTemplateModal}>
+            Create New
 					</Button>
 				)}
 			</Center>

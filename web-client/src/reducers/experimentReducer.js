@@ -12,8 +12,8 @@ const listExperimentInitialState = fromJS({
 const createExperimentInitialState = fromJS({
 	data: {},
 	isExperimentSaved: false,
-	id: '5e006837-f163-4523-96e7-f39450472a6f',
-	// id: null,
+	// id: '1241d175-b934-493d-bd6d-5e68fcab20a1',
+	id: null,
 	description: null,
 });
 
