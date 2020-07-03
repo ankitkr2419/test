@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
@@ -162,7 +163,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		plcStage = makePLCStage(ss)
-
+		fmt.Printf("plcStage: %+v ",plcStage)
 		err = deps.Plc.ConfigureRun(plcStage)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
@@ -214,7 +215,10 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 		activeWells := config.ActiveWells("activeWells")
 
 		var cycle uint16
+		var previousCycle uint16
 
+		cycle = 0
+        fmt.Println("Monitor Invoked with cycle:" ,cycle)
 		for {
 			scan, err := deps.Plc.Monitor(cycle)
 			if err != nil {
@@ -222,17 +226,25 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 				return
 			}
 
-			if scan.CycleComplete {
+			if scan.CycleComplete && scan.Cycle != previousCycle {
 				// write to db & serve
+				fmt.Println("cycle: ",cycle,)
+				fmt.Println("previousCycle: ",previousCycle)
+				fmt.Println("scan cycle:",scan.Cycle)
+				fmt.Printf("scan: %+v ",scan)
 				result := makeResult(activeWells, scan, targetDetails, experimentID)
-				err := deps.Store.InsertResult(req.Context(), result)
+				// fmt.Printf("%+v",result)
+				DBResult,err := deps.Store.InsertResult(req.Context(), result)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error inserting result data")
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				fmt.Printf("call analyseResult ac %v tr %v db %v",len(activeWells),len(targetDetails),len(DBResult))
 
-				respBytes, err := json.Marshal(result)
+				Finalresult := analyseResult(activeWells,targetDetails, DBResult,plcStage.CycleCount)
+
+				respBytes, err := json.Marshal(Finalresult)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -246,10 +258,14 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 				if scan.Cycle == plcStage.CycleCount {
 					// last cycle
+					fmt.Println("socket closed")
 					break
 				}
-
+               // if scan.Cycle == 2 {
+		//			break
+		//		}
 				cycle++
+				previousCycle++
 			}
 		}
 	})

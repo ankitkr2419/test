@@ -45,6 +45,6 @@ type Storer interface {
 	ListStageSteps(context.Context, uuid.UUID) ([]StageStep, error)
 	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID) error
 	ListConfTargets(context.Context, uuid.UUID) ([]TargetDetails, error)
-	InsertResult(context.Context, []Result) error
+	InsertResult(context.Context, []Result) ([]Result, error)
 	ListWellTargets(context.Context, []uuid.UUID) ([]WellTarget, error)
 }

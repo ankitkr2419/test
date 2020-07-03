@@ -53,7 +53,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/wells/{id}", showWellHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/wells/{id}", deleteWellHandler(deps)).Methods(http.MethodDelete).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{experiment_id}/run", runExperimentHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/monitor", monitorExperimentHandler(deps)).Headers(versionHeader, v1)
+	router.HandleFunc("/monitor", monitorExperimentHandler(deps))
 	router.HandleFunc("/activewells", listActiveWellsHandler()).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	return
