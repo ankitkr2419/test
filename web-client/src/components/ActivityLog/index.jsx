@@ -3,6 +3,7 @@ import { Table } from 'core-components';
 import { ButtonIcon } from 'shared-components';
 import './activity.scss';
 import ActivityData from './ActivityData.json';
+import SearchBar from './SearchBar';
 
 const headers = ActivityData.headers;
 const experiments = ActivityData.experiments;
@@ -10,6 +11,7 @@ const experiments = ActivityData.experiments;
 const ActivityComponent = (props) => {
 	return (
 		<div className='activity-content h-100 py-0'>
+			<SearchBar id='search' name='search' placeholder='Search' />
 			<div className='table-responsive'>
 				<Table striped className='table-log'>
 					<colgroup>

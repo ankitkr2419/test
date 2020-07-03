@@ -1,6 +1,6 @@
 $icon-font-family: 'mylab-icons';
 $icon-font-path: '../fonts';
-$icon-font-code: 'rq9qmd';
+$icon-font-code: 'aovyn';
 
 $icon-angle-down: '\e900';
 $icon-angle-left: '\e901';
@@ -24,6 +24,7 @@ $icon-user: '\e911';
 $icon-steps: '\e912';
 $icon-expand: '\e913';
 $icon-bell: '\e914';
+$icon-search: '\e915';
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -164,5 +165,10 @@ $icon-bell: '\e914';
 .icon-bell {
 	&:before {
 		content: $icon-bell;
+	}
+}
+.icon-search {
+	&:before {
+		content: $icon-search;
 	}
 }
