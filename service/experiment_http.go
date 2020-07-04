@@ -163,7 +163,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		plcStage = makePLCStage(ss)
-		fmt.Printf("plcStage: %+v ",plcStage)
+		fmt.Printf("plcStage: %+v ", plcStage)
 		err = deps.Plc.ConfigureRun(plcStage)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
@@ -205,6 +205,7 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
+		// retruns all targets configured for experiment
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
@@ -218,33 +219,44 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 		var previousCycle uint16
 
 		cycle = 0
-        fmt.Println("Monitor Invoked with cycle:" ,cycle)
+		fmt.Println("Monitor Invoked with cycle:", cycle)
 		for {
 			scan, err := deps.Plc.Monitor(cycle)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error in plc monitor")
 				return
 			}
-
+			// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
 			if scan.CycleComplete && scan.Cycle != previousCycle {
+
 				// write to db & serve
-				fmt.Println("cycle: ",cycle,)
-				fmt.Println("previousCycle: ",previousCycle)
-				fmt.Println("scan cycle:",scan.Cycle)
-				fmt.Printf("scan: %+v ",scan)
+				fmt.Println("cycle: ", cycle)
+				fmt.Println("previousCycle: ", previousCycle)
+				fmt.Println("scan cycle:", scan.Cycle)
+				fmt.Printf("scan: %+v ", scan)
+
+				// makeResult returns data in DB result format
 				result := makeResult(activeWells, scan, targetDetails, experimentID)
 				// fmt.Printf("%+v",result)
-				DBResult,err := deps.Store.InsertResult(req.Context(), result)
+
+				// insert current cycle result into Database
+				DBResult, err := deps.Store.InsertResult(req.Context(), result)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error inserting result data")
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				fmt.Printf("call analyseResult ac %v tr %v db %v",len(activeWells),len(targetDetails),len(DBResult))
 
-				Finalresult := analyseResult(activeWells,targetDetails, DBResult,plcStage.CycleCount)
+				fmt.Printf("call analyseResult ac %v tr %v db %v\n", len(activeWells), len(targetDetails), len(DBResult))
 
-				respBytes, err := json.Marshal(Finalresult)
+				// analyseResult returns data required for ploting graph
+				Finalresult := analyseResult(activeWells, targetDetails, DBResult, plcStage.CycleCount)
+
+				var Result db.FinalResult
+				Result.MaxThreshold = maxThreshold
+				Result.Data = append(Result.Data, Finalresult...)
+
+				respBytes, err := json.Marshal(Result)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -261,9 +273,9 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 					fmt.Println("socket closed")
 					break
 				}
-               // if scan.Cycle == 2 {
-		//			break
-		//		}
+				// if scan.Cycle == 2 {
+				//			break
+				//		}
 				cycle++
 				previousCycle++
 			}

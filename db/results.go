@@ -56,7 +56,7 @@ const (
 
 type Result struct {
 	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id"`
-	TemplateID     uuid.UUID `db:"template_id" json:"template_id"`
+	TemplateID   uuid.UUID `db:"template_id" json:"template_id"`
 	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
 	Cycle        uint16    `db:"cycle" json:"cycle"`
@@ -74,13 +74,18 @@ type TargetDetails struct {
 }
 
 type FinalResult struct {
+	MaxThreshold float32    `json:"max_threshold"`
+	Data         []WellData `json:"data"`
+}
+
+type WellData struct {
 	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
 	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id"`
-	TotalCycles  uint16     `db:"total_cycles" json:"total_cycles"`
-	Cycle        []uint16    `db:"cycle" json:"cycle"`
-	FValue       []uint16    `db:"f_value" json:"f_value"`
-    Threshold    float32   `db:"threshold" json:"threshold"`
+	TotalCycles  uint16    `db:"total_cycles" json:"total_cycles"`
+	Cycle        []uint16  `db:"cycle" json:"cycle"`
+	FValue       []uint16  `db:"f_value" json:"f_value"`
+	Threshold    float32   `db:"threshold" json:"threshold"`
 }
 
 type WellTargetResults struct {
@@ -139,7 +144,7 @@ func makeResultQuery(results []Result) string {
 	values := make([]string, 0, len(results))
 
 	for _, r := range results {
-		fmt.Printf("result: %+v",r)
+		fmt.Printf("result: %+v", r)
 		values = append(values, fmt.Sprintf("('%v', '%v', %v,%v,%v)", r.ExperimentID, r.TargetID, r.WellPosition, r.Cycle, r.FValue))
 	}
 

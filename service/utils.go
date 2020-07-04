@@ -14,10 +14,11 @@ import (
 
 var (
 	plcStage     plc.Stage
-	experimentID uuid.UUID   //set experimentID which is currently running
-	green        = "#3FC13A" // All CT values for the well are below threshold,
-	red          = "#F06666" //Even a single value crosses threshold for target
-	orange       = "#F3811F" // If the CT values are close to threshold (delta)
+	experimentID uuid.UUID             //set experimentID which is currently running
+	green                  = "#3FC13A" // All CT values for the well are below threshold,
+	red                    = "#F06666" //Even a single value crosses threshold for target
+	orange                 = "#F3811F" // If the CT values are close to threshold (delta)
+	maxThreshold float32   = 32000     // max threshold
 )
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
@@ -108,40 +109,55 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 		r.ExperimentID = experimentID
 		r.Cycle = scan.Cycle
 		for _, t := range td {
-			t.DyePosition = t.DyePosition - 1   // -1 dye position starts with 1
+			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
-			r.FValue = scan.Wells[w][t.DyePosition]
-//			fmt.Println("FValue",scan.Wells[w][t.DyePosition])
+			r.FValue = scan.Wells[w][t.DyePosition]      // for 5th well & target 2 = scanWells[5][1]
+			//	fmt.Println("FValue",scan.Wells[w][t.DyePosition])
 			result = append(result, r)
 		}
 	}
 	return
 }
 
-func analyseResult(activeWells []int32,td []db.TargetDetails,result []db.Result,TotalCycles uint16) (finalResult []db.FinalResult) {
+func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Result, TotalCycles uint16) (finalResult []db.WellData) {
 	fmt.Printf("IN analyseResult: \n")
+
+	// ex: for 8 active wells * 6 targets * no of cycle
 	for _, aw := range activeWells {
-		var wellResult db.FinalResult
+		var wellResult db.WellData
 		wellResult.WellPosition = aw
 
-			for _, t := range td {
-				for _, r := range result {
+		for _, t := range td {
+			for _, r := range result {
 				if r.WellPosition == wellResult.WellPosition && r.TargetID == t.TargetID {
 					wellResult.ExperimentID = r.ExperimentID
 					wellResult.TargetID = r.TargetID
 					wellResult.Threshold = r.Threshold
 					wellResult.TotalCycles = TotalCycles
-					wellResult.Cycle = append(wellResult.Cycle,r.Cycle)
-					wellResult.FValue = append(wellResult.FValue,r.FValue)
-			}
+
+					// if cycle found do not add again!
+					if !found(r.Cycle,wellResult.Cycle) {
+						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
+						wellResult.FValue = append(wellResult.FValue, r.FValue)
+					}
+				}
 
 			}
-	finalResult = append(finalResult, wellResult)
-	fmt.Printf("wellResult : %+v \n", wellResult)
-break
-	}
+			finalResult = append(finalResult, wellResult)
+			fmt.Printf("wellResult : %+v \n", wellResult)
+		}
 
 	}
 	fmt.Printf("finalResult : %+v \n", finalResult)
+	return
+}
+
+func found(key uint16 , search []uint16) (found bool) {
+	for _, v := range search {
+		if v == key {
+			found = true
+			return
+		}
+	}
 	return
 }
