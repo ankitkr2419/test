@@ -106,6 +106,8 @@ func startApp(plcName string, test bool) (err error) {
 	go func() {
 		err = <-exit
 		logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
+		service.ExperimentRunning = false // on pre-emptive stop
+
 		// TODO: Handle exit gracefully
 		// We need to call the API on the Web to display the error and restart, abort or call service!
 	}()

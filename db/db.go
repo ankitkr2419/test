@@ -47,4 +47,5 @@ type Storer interface {
 	ListConfTargets(context.Context, uuid.UUID) ([]TargetDetails, error)
 	InsertResult(context.Context, []Result) ([]Result, error)
 	ListWellTargets(context.Context, []uuid.UUID) ([]WellTarget, error)
+	UpdateStopTimeExperiments(context.Context, time.Time, uuid.UUID) error
 }

@@ -13,12 +13,13 @@ import (
 )
 
 var (
-	plcStage     plc.Stage
-	experimentID uuid.UUID             //set experimentID which is currently running
-	green                  = "#3FC13A" // All CT values for the well are below threshold,
-	red                    = "#F06666" //Even a single value crosses threshold for target
-	orange                 = "#F3811F" // If the CT values are close to threshold (delta)
-	maxThreshold float32   = 32000     // max threshold
+	plcStage          plc.Stage
+	experimentID      uuid.UUID             //set experimentID which is currently running
+	green                       = "#3FC13A" // All CT values for the well are below threshold,
+	red                         = "#F06666" //Even a single value crosses threshold for target
+	orange                      = "#F3811F" // If the CT values are close to threshold (delta)
+	maxThreshold      float32   = 32000     // max threshold
+	ExperimentRunning           = false     // In case of pre-emptive stop we need to send signal to monitor through this flag
 )
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
@@ -111,7 +112,7 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 		for _, t := range td {
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
-			r.FValue = scan.Wells[w][t.DyePosition]      // for 5th well & target 2 = scanWells[5][1]
+			r.FValue = scan.Wells[w][t.DyePosition] // for 5th well & target 2 = scanWells[5][1]
 			//	fmt.Println("FValue",scan.Wells[w][t.DyePosition])
 			result = append(result, r)
 		}
@@ -136,7 +137,7 @@ func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Resul
 					wellResult.TotalCycles = TotalCycles
 
 					// if cycle found do not add again!
-					if !found(r.Cycle,wellResult.Cycle) {
+					if !found(r.Cycle, wellResult.Cycle) {
 						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
 						wellResult.FValue = append(wellResult.FValue, r.FValue)
 					}
@@ -152,7 +153,7 @@ func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Resul
 	return
 }
 
-func found(key uint16 , search []uint16) (found bool) {
+func found(key uint16, search []uint16) (found bool) {
 	for _, v := range search {
 		if v == key {
 			found = true

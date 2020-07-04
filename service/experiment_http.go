@@ -188,6 +188,9 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		// experimentID set
 		experimentID = expID
 
+		//ExperimentRunning set true
+		ExperimentRunning = true
+
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`{"msg":"experiment started"}`))
@@ -222,7 +225,9 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		cycle = 0
 		fmt.Println("Monitor Invoked with cycle:", cycle)
-		for {
+
+		// ExperimentRunning is set when experiment started & if stopped then set to false
+		for ExperimentRunning {
 			scan, err := deps.Plc.Monitor(cycle)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error in plc monitor")
@@ -272,6 +277,7 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 				if scan.Cycle == plcStage.CycleCount {
 					// last cycle
+					ExperimentRunning = false
 					fmt.Println("socket closed")
 					break
 				}
@@ -282,5 +288,36 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 				previousCycle++
 			}
 		}
+	})
+}
+
+func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		vars := mux.Vars(req)
+		expID, err := parseUUID(vars["experiment_id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		// instruct plc to stop the experiment: stops if experiment is already running else returns error
+		err = deps.Plc.Stop()
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error in plc stop")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"msg":"experiment stopped"}`))
+
 	})
 }
