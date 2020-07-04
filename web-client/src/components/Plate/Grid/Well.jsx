@@ -99,8 +99,7 @@ const StyledWell = styled.div`
     left: 0;
     height: 16px;
     border-radius: 6px 6px 0 0;
-    background-color: ${props => (props.status === 'green' ? '#3FC13A' : '')
-      || (props.status === 'red' ? '#F06666' : '')};
+    background-color: ${props => props.status}
   }
 `;
 

@@ -1,5 +1,6 @@
 import { fromJS } from 'immutable';
 import runExperimentActions from 'actions/runExperimentActions';
+import loginActions from 'actions/loginActions';
 
 const runInitialState = fromJS({
 	isLoading: false,
@@ -30,6 +31,8 @@ export const runExperimentReducer = (state = runInitialState, action) => {
 			experimentStartedTime: getTimeNow(),
 		});
 	case runExperimentActions.failureAction:
+		return runInitialState;
+	case loginActions.loginReset:
 		return runInitialState;
 	default:
 		return state;

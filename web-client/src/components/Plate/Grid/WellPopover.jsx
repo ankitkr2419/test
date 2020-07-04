@@ -57,7 +57,7 @@ const WellPopover = (props) => {
 							{targets !== null
                 && targets.map(ele => (
                 	<Text key={ele.target_id} className={`mb-1 ${status}`}>
-                		{ele.target_id}
+                		{ele.target_name || 'target_name'}
                 	</Text>
                 ))}
 						</div>

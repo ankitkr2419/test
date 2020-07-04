@@ -4,6 +4,7 @@ import {
 	saveTargetActions,
 	listTargetByTemplateIDActions,
 } from 'actions/targetActions';
+import loginActions from 'actions/loginActions';
 
 const listTargetInitialState = fromJS({
 	list: [],
@@ -46,6 +47,8 @@ export const listTargetByTemplateIDReducer = (
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
+	case loginActions.loginReset:
+		return listTargetByTemplateIDInitialState;
 	default:
 		return state;
 	}

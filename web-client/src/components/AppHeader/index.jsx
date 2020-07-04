@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -15,10 +15,10 @@ import {
 	NavLink,
 } from 'core-components';
 // import { getExperimentId } from 'selectors/experimentSelector';
-import { getWells } from 'selectors/wellSelectors';
 import { runExperiment } from 'action-creators/runExperimentActionCreators';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
+import { connectSocket } from 'web-socket';
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
 import { NAV_ITEMS } from './constants';
@@ -39,12 +39,17 @@ const AppHeader = (props) => {
 	const dispatch = useDispatch();
 	const experimentId = useSelector(getExperimentId);
 	const runExperimentReducer = useSelector(getRunExperimentReducer);
-	const wellListReducer = useSelector(getWells);
-	const isWellFilled = wellListReducer.get('isWellFilled');
 	const isExperimentRunning =    runExperimentReducer.get('experimentStatus') === 'running';
 
 	const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 	const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
+
+	useEffect(() => {
+		if (isExperimentRunning === true) {
+			connectSocket(dispatch);
+		}
+	}, [isExperimentRunning, dispatch]);
+
 
 	const logoutClickHandler = () => {
 		dispatch(loginReset());
@@ -105,7 +110,6 @@ const AppHeader = (props) => {
 								size="sm"
 								className="font-weight-light border-2 border-gray shadow-none"
 								outline={isExperimentRunning === false}
-								disabled={isWellFilled === false}
 								onClick={startExperiment}
 							>
                 Run

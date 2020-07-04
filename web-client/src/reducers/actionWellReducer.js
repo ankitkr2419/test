@@ -1,5 +1,6 @@
 import { fromJS, List } from 'immutable';
 import activeWellActions from 'actions/activeWellActions';
+import loginActions from 'actions/loginActions';
 
 const runInitialState = fromJS({
 	isLoading: true,
@@ -19,6 +20,8 @@ export const activeWellReducer = (state = runInitialState, action) => {
 		});
 	case activeWellActions.failureAction:
 		return state.merge({ isError: true, isLoading: false });
+	case loginActions.loginReset:
+		return runInitialState;
 	default:
 		return state;
 	}

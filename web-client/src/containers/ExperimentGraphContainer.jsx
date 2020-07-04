@@ -5,9 +5,15 @@ import graphFilterState, {
 	graphFilterInitialState,
 	graphFilterActions,
 } from 'components/Plate/Sidebar/Graph/graphFilterState';
+import { useSelector } from 'react-redux';
+import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
 
 const ExperimentGraphContainer = (props) => {
-	const { experimentTargetsList, experimentId } = props;
+	const { experimentTargetsList } = props;
+
+	const wellGraphReducer = useSelector(state => state.wellGraphReducer);
+	const runExperimentReducer = useSelector(getRunExperimentReducer);
+	const isExperimentRunning =    runExperimentReducer.get('experimentStatus') === 'running';
 
 	// local state to save filter graph data
 	const [filterState, updateGraphFilterState] = useReducer(
@@ -42,14 +48,24 @@ const ExperimentGraphContainer = (props) => {
 		});
 	};
 
+	const toggleGraphFilterActive = (index, isActive) => {
+		updateGraphFilterState({
+			type: graphFilterActions.UPDATE_GRAPH_FILTER_ACTIVE_STATE,
+			index,
+			isActive: !isActive,
+		});
+	};
+
 	return (
 		<SidebarGraph
-			experimentId={experimentId}
+			isExperimentRunning={isExperimentRunning}
+			wellGraphReducer={wellGraphReducer}
 			experimentTargetsList={experimentTargetsList}
 			isSidebarOpen={isSidebarOpen}
 			toggleSideBar={toggleSideBar}
 			filterState={filterState}
 			onThresholdChangeHandler={onThresholdChangeHandler}
+			toggleGraphFilterActive={toggleGraphFilterActive}
 		/>
 	);
 };

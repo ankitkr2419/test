@@ -55,7 +55,6 @@ const StageComponent = (props) => {
 
 	// Validate create stage form
 	const validateStageForm = ({ stageType, stageRepeatCount }) => {
-		debugger
 		if (stageType.value === 'cycle' && stageRepeatCount !== '' && parseInt(stageRepeatCount, 10) > 0) {
 			return true;
 		}

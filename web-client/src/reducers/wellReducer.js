@@ -1,5 +1,6 @@
 import { fromJS } from 'immutable';
 import { addWellActions, listWellActions } from 'actions/wellActions';
+import loginActions from 'actions/loginActions';
 import {
 	getDefaultWellsList,
 	setSelectedToList,
@@ -53,6 +54,8 @@ export const wellListReducer = (state = listWellInitialState, action) => {
 	// Update wells list when new wells are added
 	case activeWellActions.successAction:
 		return setActiveWells(state, action);
+	case loginActions.loginReset:
+		return listWellInitialState;
 	default:
 		return state;
 	}

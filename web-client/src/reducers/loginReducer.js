@@ -1,6 +1,15 @@
 import { fromJS } from 'immutable';
 import loginActions from 'actions/loginActions';
 
+// const loginInitialState = fromJS({
+// 	isLoading: true,
+// 	isUserLoggedIn: true,
+// 	isLoginTypeAdmin: false,
+// 	isLoginTypeOperator: true,
+// 	isError: false,
+// 	isPlateRoute: true,
+// });
+
 const loginInitialState = fromJS({
 	isLoading: true,
 	isUserLoggedIn: false,

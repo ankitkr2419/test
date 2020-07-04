@@ -3,6 +3,7 @@ import {
 	createExperimentActions,
 	listExperimentActions,
 } from 'actions/experimentActions';
+import loginActions from 'actions/loginActions';
 
 const listExperimentInitialState = fromJS({
 	isLoading: true,
@@ -12,7 +13,7 @@ const listExperimentInitialState = fromJS({
 const createExperimentInitialState = fromJS({
 	data: {},
 	isExperimentSaved: false,
-	// id: '86c5699c-d7fc-4bbd-b168-59f3fb80f429',
+	// id: '98f26854-d52c-4a14-8d96-09bcc89c3f86',
 	id: null,
 	description: null,
 });
@@ -50,6 +51,8 @@ export const createExperimentReducer = (
 		return state.merge({ isExperimentSaved: true, isLoading: true, isError: true });
 	case createExperimentActions.createExperimentReset:
 		return createExperimentInitialState.setIn(['id'], state.get('id'));
+	case loginActions.loginReset:
+		return createExperimentInitialState;
 	default:
 		return state;
 	}

@@ -67,7 +67,6 @@ const Plate = (props) => {
 				updateWell={updateWell}
 			/>
 			<ExperimentGraphContainer
-				experimentId={experimentId}
 				experimentTargetsList={experimentTargetsList}
 			/>
 		</div>
