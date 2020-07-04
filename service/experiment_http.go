@@ -167,12 +167,14 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		err = deps.Plc.ConfigureRun(plcStage)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
+			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		err = deps.Plc.Start()
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc start")
+			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
