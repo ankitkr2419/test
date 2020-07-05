@@ -1,10 +1,10 @@
 environment: normal  # normal | error
 
 controls:
-  positive: 1
-  negative: 0
-  internal: 0
-  no_template: 2
+  positive: 5
+  negative: 5
+  internal: 5
+  no_template: 5
 
 wells:
-  count: 1
+  count: 56

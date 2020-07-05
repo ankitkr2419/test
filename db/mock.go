@@ -214,12 +214,17 @@ func (m *DBMockStore) ListConfTargets(ctx context.Context, id uuid.UUID) (t []Ta
 	args := m.Called(ctx, id)
 	return args.Get(0).([]TargetDetails), args.Error(1)
 }
-func (m *DBMockStore) InsertResult(ctx context.Context, r []Result) (err error) {
+func (m *DBMockStore) InsertResult(ctx context.Context, r []Result) (dbR []Result, err error) {
 	args := m.Called(ctx, r)
-	return args.Error(1)
+	return args.Get(0).([]Result), args.Error(1)
 }
 
 func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID []uuid.UUID) (w []WellTarget, err error) {
 	args := m.Called(ctx, wellID)
 	return args.Get(0).([]WellTarget), args.Error(1)
+}
+
+func (m *DBMockStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID) (err error) {
+	args := m.Called(ctx, t, id)
+	return args.Error(1)
 }

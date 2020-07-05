@@ -57,7 +57,7 @@ func createExperimentHandler(deps Dependencies) http.HandlerFunc {
 		createdExp, err = deps.Store.CreateExperiment(req.Context(), e)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create template")
+			logger.WithField("err", err.Error()).Error("Error create experiment")
 			return
 		}
 
@@ -142,13 +142,13 @@ func showExperimentHandler(deps Dependencies) http.HandlerFunc {
 func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
-		experimentID, err := parseUUID(vars["experiment_id"])
+		expID, err := parseUUID(vars["experiment_id"])
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		e, err := deps.Store.ShowExperiment(req.Context(), experimentID)
+		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -166,21 +166,29 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		err = deps.Plc.ConfigureRun(plcStage)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
+			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		err = deps.Plc.Start()
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc start")
+			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), experimentID)
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		// experimentID set
+		experimentID = expID
+
+		//ExperimentRunning set true
+		ExperimentRunning = true
 
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
@@ -190,6 +198,10 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		// if origin not allowed it returns 403
+		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+
 		c, err := upgrader.Upgrade(rw, req, nil)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
@@ -197,13 +209,7 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
-		vars := mux.Vars(req)
-		experimentID, err := parseUUID(vars["experiment_id"])
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
+		// retruns all targets configured for experiment
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
@@ -214,25 +220,41 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 		activeWells := config.ActiveWells("activeWells")
 
 		var cycle uint16
+		var previousCycle uint16
 
-		for {
+		cycle = 0
+
+		// ExperimentRunning is set when experiment started & if stopped then set to false
+		for ExperimentRunning {
 			scan, err := deps.Plc.Monitor(cycle)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error in plc monitor")
 				return
 			}
+			// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
+			if scan.CycleComplete && scan.Cycle != previousCycle {
 
-			if scan.CycleComplete {
 				// write to db & serve
+				// makeResult returns data in DB result format
 				result := makeResult(activeWells, scan, targetDetails, experimentID)
-				err := deps.Store.InsertResult(req.Context(), result)
+
+				// insert current cycle result into Database
+				DBResult, err := deps.Store.InsertResult(req.Context(), result)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error inserting result data")
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
 
-				respBytes, err := json.Marshal(result)
+
+				// analyseResult returns data required for ploting graph
+				Finalresult := analyseResult(activeWells, targetDetails, DBResult, plcStage.CycleCount)
+
+				var Result db.FinalResult
+				Result.MaxThreshold = maxThreshold
+				Result.Data = append(Result.Data, Finalresult...)
+
+				respBytes, err := json.Marshal(Result)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -245,12 +267,47 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 				}
 
 				if scan.Cycle == plcStage.CycleCount {
-					// last cycle
+					// last cycle socket closed
+					ExperimentRunning = false
 					break
 				}
-
+				// if scan.Cycle == 2 {
+				//			break
+				//		}
 				cycle++
+				previousCycle++
 			}
 		}
+	})
+}
+
+func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		vars := mux.Vars(req)
+		expID, err := parseUUID(vars["experiment_id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		// instruct plc to stop the experiment: stops if experiment is already running else returns error
+		err = deps.Plc.Stop()
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error in plc stop")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"msg":"experiment stopped"}`))
+
 	})
 }

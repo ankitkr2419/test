@@ -39,7 +39,7 @@ func (suite *ExperimentHandlerTestSuite) TestListExperimentsSuccess() {
 	tempUUID := uuid.New()
 	suite.dbMock.On("ListExperiments", mock.Anything).Return(
 		[]db.Experiment{
-			db.Experiment{ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC"},
+			db.Experiment{ID: testUUID, Description: "blah blah", TemplateID: tempUUID, TemplateName: "test", OperatorName: "ABC"},
 		},
 		nil,
 	)
@@ -51,7 +51,7 @@ func (suite *ExperimentHandlerTestSuite) TestListExperimentsSuccess() {
 		"",
 		listExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}]`, testUUID, tempUUID)
+	output := fmt.Sprintf(`[{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}]`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -93,7 +93,7 @@ func (suite *ExperimentHandlerTestSuite) TestCreateExperimentSuccess() {
 		nil,
 	)
 	suite.dbMock.On("CreateExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
-		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
+		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, TemplateName: "test", OperatorName: "ABC",
 	}, nil)
 
 	body := fmt.Sprintf(`{"description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, tempUUID)
@@ -105,7 +105,7 @@ func (suite *ExperimentHandlerTestSuite) TestCreateExperimentSuccess() {
 		createExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -115,7 +115,7 @@ func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()
 	suite.dbMock.On("ShowExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
-		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
+		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, TemplateName: "test", OperatorName: "ABC",
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -124,7 +124,7 @@ func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 		"",
 		showExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -166,6 +166,28 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), `{"msg":"experiment started"}`, recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ExperimentHandlerTestSuite) TestStopExperimentSuccess() {
+	expUUID := uuid.New()
+
+	exit := make(chan error)
+
+	config.Load("simulator_test")
+
+	suite.dbMock.On("UpdateStopTimeExperiments", mock.Anything, mock.Anything, mock.Anything).Return(
+		nil, nil)
+	recorder := makeHTTPCall(http.MethodGet,
+		"/experiments/{experiment_id}/stop",
+		"/experiments/"+expUUID.String()+"/stop",
+		"",
+		stopExperimentHandler(Dependencies{Store: suite.dbMock, Plc: simulator.NewSimulator(exit)}),
+	)
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), `{"msg":"experiment stopped"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

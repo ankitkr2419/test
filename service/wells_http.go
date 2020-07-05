@@ -96,6 +96,7 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 				ExperimentID: expID,
 				SampleID:     wc.Sample.ID,
 				Task:         wc.Task,
+				ColorCode:    green, //initially all wells will be green
 			}
 			wells = append(wells, w)
 		}
