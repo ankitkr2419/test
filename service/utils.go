@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
@@ -113,7 +112,7 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
 			r.FValue = scan.Wells[w][t.DyePosition] // for 5th well & target 2 = scanWells[5][1]
-			//	fmt.Println("FValue",scan.Wells[w][t.DyePosition])
+
 			result = append(result, r)
 		}
 	}
@@ -121,7 +120,6 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 }
 
 func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Result, TotalCycles uint16) (finalResult []db.WellData) {
-	fmt.Printf("IN analyseResult: \n")
 
 	// ex: for 8 active wells * 6 targets * no of cycle
 	for _, aw := range activeWells {
@@ -145,11 +143,9 @@ func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Resul
 
 			}
 			finalResult = append(finalResult, wellResult)
-			fmt.Printf("wellResult : %+v \n", wellResult)
 		}
 
 	}
-	fmt.Printf("finalResult : %+v \n", finalResult)
 	return
 }
 
