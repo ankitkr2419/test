@@ -144,7 +144,7 @@ func makeResultQuery(results []Result) string {
 	values := make([]string, 0, len(results))
 
 	for _, r := range results {
-		fmt.Printf("result: %+v", r)
+		
 		values = append(values, fmt.Sprintf("('%v', '%v', %v,%v,%v)", r.ExperimentID, r.TargetID, r.WellPosition, r.Cycle, r.FValue))
 	}
 
