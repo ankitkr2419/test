@@ -74,9 +74,10 @@ func (d *Simulator) HeartBeat() {
 }
 
 func (d *Simulator) ConfigureRun(s plc.Stage) error {
-	if d.config.CycleCount != 0 {
-		return errors.New("PLC is already configured")
-	}
+	// NOTE: commented to run new exp when stop
+	// if d.config.CycleCount != 0 {
+	// 	return errors.New("PLC is already configured")
+	// }
 
 	// setting config with stage data
 	d.config = s
