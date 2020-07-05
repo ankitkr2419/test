@@ -55,15 +55,25 @@ const SidebarGraph = (props) => {
 		.toJS();
 	const { total_cycles: totalCycles = 0 } =    tableData.length !== 0 && tableData[0];
 
+	const targets = filterState.get('targets').toJS();
+
 	const datasets = tableData
 		.map((ele, index) => {
 			if (nullableCheck(ele.f_value) === false) {
+				const lineColorFiltered = targets.filter(
+          (target) => target.target_id === ele.target_id
+        );
+        let lineColor = "rgba(148,147,147,1)";
+        if (lineColorFiltered && lineColorFiltered.length !== 0) {
+          lineColor = lineColorFiltered[0].lineColor;
+        }
+
 				return {
 					label: `index-${index}`,
 					fill: false,
 					borderWidth: 2,
 					pointRadius: 0,
-					borderColor: 'rgba(148,147,147,1)',
+					borderColor: lineColor,
 					pointBorderColor: 'rgba(148,147,147,1)',
 					pointBackgroundColor: '#fff',
 					pointBorderWidth: 0,
