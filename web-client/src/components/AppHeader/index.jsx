@@ -92,7 +92,11 @@ const AppHeader = (props) => {
 	const confirmationClickHandler = (isConfirmed) => {
 		setExitModalVisibility(false);
 		if (isConfirmed) {
-			dispatch(stopExperiment(experimentId));
+			if (isExperimentRunning === true) {
+				dispatch(stopExperiment(experimentId));
+			} else {
+				dispatch(loginReset());
+			}
 		}
 	};
 

@@ -66,10 +66,10 @@ const WellPopover = (props) => {
 						<Text className="flex-40 label mb-0">Task</Text>
 						<Text className="mb-0">{task}</Text>
 					</li>
-					<li className="d-flex py-1">
+					{/* <li className="d-flex py-1">
 						<Text className="flex-40 label mb-0">Comment</Text>
 						<Text className="mb-0">(No comments)</Text>
-					</li>
+					</li> */}
 				</ul>
 				<Center>
 					<Button className="mb-4">Show on Graph</Button>

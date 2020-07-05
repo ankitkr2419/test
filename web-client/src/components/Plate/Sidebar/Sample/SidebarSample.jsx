@@ -87,7 +87,7 @@ const SidebarSample = (props) => {
 				onCrossClickHandler={onCrossClickHandler}
 			/>
 			<Select
-				placeholder="Task - Unknown"
+				placeholder="Select Task"
 				className="mb-3"
 				size="md"
 				options={taskOptions}
