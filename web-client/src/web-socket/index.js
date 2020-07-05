@@ -16,7 +16,6 @@ export const connectSocket = (dispatch) => {
 		dispatch(webSocketOpened());
 	};
 	webSocket.onmessage = (event) => {
-		console.info('message received socket', event);
 		if (event.data) {
 			dispatch(webSocketMessage(JSON.parse(event.data)));
 		}
@@ -31,4 +30,9 @@ export const connectSocket = (dispatch) => {
 		console.error('socket error : ', event);
 		dispatch(webSocketError());
 	};
+};
+export const disConnectSocket = () => {
+	if (webSocket !== null) {
+		webSocket.close();
+	}
 };

@@ -16,15 +16,15 @@ const StyledSubHeader = styled.div`
 	}
 `;
 
-const SubHeader = props => (
+const SubHeader = ({ experimentTemplate }) => (
 	<StyledSubHeader className="plate-subheader">
 		<Text Tag="h6" className="mb-0">
-				ID002
+			{experimentTemplate.templateId}
 		</Text>
 		<Text Tag="h6" className="mb-0 mx-5">
-				Template Name
+			{experimentTemplate.templateName}
 		</Text>
-		<Text Tag="h6" className="mb-0 ml-5">
+		{/* <Text Tag="h6" className="mb-0 ml-5">
 				22/06/2020
 		</Text>
 		<Text Tag="h6" className="mb-0 ml-3">
@@ -32,7 +32,7 @@ const SubHeader = props => (
 		</Text>
 		<Text Tag="h6" className="mb-0 ml-5">
 				No. of wells - 5
-		</Text>
+		</Text> */}
 		<TemplatePopover className="ml-auto" />
 	</StyledSubHeader>
 );

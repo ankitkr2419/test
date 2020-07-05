@@ -21,6 +21,7 @@ const Plate = (props) => {
 		isMultiSelectionOptionOn,
 		toggleMultiSelectOption,
 		activeWells,
+		experimentTemplate,
 	} = props;
 
 	// local state to maintain well data which is selected for update
@@ -46,7 +47,7 @@ const Plate = (props) => {
 
 	return (
 		<div className="plate-content d-flex flex-column h-100 position-relative">
-			<Header />
+			<Header experimentTemplate={experimentTemplate}/>
 			<GridWrapper className="plate-body flex-100">
 				<WellGridHeader
 					isGroupSelectionOn={isMultiSelectionOptionOn}
@@ -85,6 +86,7 @@ Plate.propTypes = {
 	isMultiSelectionOptionOn: PropTypes.bool.isRequired,
 	toggleMultiSelectOption: PropTypes.func.isRequired,
 	activeWells: PropTypes.object.isRequired,
+	experimentTemplate: PropTypes.object.isRequired,
 };
 
 export default Plate;

@@ -13,6 +13,14 @@ export const getExperimentId = createSelector(
 	createExperimentReducer => createExperimentReducer.get('id'),
 );
 
+export const getExperimentTemplate = createSelector(
+	getCreateExperimentReducer,
+	createExperimentReducer => ({
+		templateName : createExperimentReducer.get('template_name'),
+		templateId: createExperimentReducer.get('template_id'),
+	}),
+);
+
 export const getIsExperimentSaved = createSelector(
 	getCreateExperimentReducer,
 	createExperimentReducer => createExperimentReducer.get('isExperimentSaved'),

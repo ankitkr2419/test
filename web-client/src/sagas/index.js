@@ -40,7 +40,7 @@ import {
 
 import { fetchSamplesSaga } from './samplesSaga';
 import { addWellsSaga, fetchWellsSaga } from './wellSaga';
-import { runExperimentsSaga } from './runExperimentSaga';
+import { runExperimentSaga, stopExperimentSaga } from './runExperimentSaga';
 import { fetchActiveWellsSaga } from './actionWellSaga';
 
 const allSagas = [
@@ -66,7 +66,8 @@ const allSagas = [
 	fetchSamplesSaga(),
 	addWellsSaga(),
 	fetchWellsSaga(),
-	runExperimentsSaga(),
+	runExperimentSaga(),
+	stopExperimentSaga(),
 	fetchActiveWellsSaga(),
 ];
 

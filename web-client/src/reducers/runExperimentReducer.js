@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable';
-import runExperimentActions from 'actions/runExperimentActions';
+import { runExperimentActions, stopExperimentActions } from 'actions/runExperimentActions';
 import loginActions from 'actions/loginActions';
 
 const runInitialState = fromJS({
@@ -22,7 +22,7 @@ const getTimeNow = () => {
 
 export const runExperimentReducer = (state = runInitialState, action) => {
 	switch (action.type) {
-	case runExperimentActions.listAction:
+	case runExperimentActions.runExperiment:
 		return runInitialState;
 	case runExperimentActions.successAction:
 		return state.merge({
@@ -31,6 +31,21 @@ export const runExperimentReducer = (state = runInitialState, action) => {
 			experimentStartedTime: getTimeNow(),
 		});
 	case runExperimentActions.failureAction:
+		return state.merge({
+			isLoading: false,
+			experimentStatus: 'run-failed',
+			experimentStartedTime: getTimeNow(),
+		});
+	// stop experiment actions
+	case stopExperimentActions.stopExperiment:
+		return state;
+	case stopExperimentActions.successAction:
+		return state.merge({
+			isLoading: false,
+			experimentStatus: 'stopped',
+			experimentStoppedTime: getTimeNow(),
+		});
+	case stopExperimentActions.failureAction:
 		return runInitialState;
 	case loginActions.loginReset:
 		return runInitialState;

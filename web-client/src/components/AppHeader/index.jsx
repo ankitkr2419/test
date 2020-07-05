@@ -15,12 +15,13 @@ import {
 	NavLink,
 } from 'core-components';
 // import { getExperimentId } from 'selectors/experimentSelector';
-import { runExperiment } from 'action-creators/runExperimentActionCreators';
+import { runExperiment, stopExperiment } from 'action-creators/runExperimentActionCreators';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
-import { connectSocket } from 'web-socket';
+import { connectSocket, disConnectSocket } from 'web-socket';
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
+import ConfirmationModal from 'components/modals/ConfirmationModal';
 import { NAV_ITEMS } from './constants';
 
 const Header = styled.header`
@@ -35,12 +36,22 @@ const Header = styled.header`
 `;
 
 const AppHeader = (props) => {
-	const { isUserLoggedIn, isPlateRoute, isLoginTypeAdmin } = props;
+	const {
+		isUserLoggedIn,
+		isPlateRoute,
+		isLoginTypeAdmin,
+		isLoginTypeOperator,
+	} = props;
+
 	const dispatch = useDispatch();
 	const experimentId = useSelector(getExperimentId);
 	const runExperimentReducer = useSelector(getRunExperimentReducer);
-	const isExperimentRunning =    runExperimentReducer.get('experimentStatus') === 'running';
+	const experimentStatus = runExperimentReducer.get('experimentStatus');
+	const isExperimentRunning = experimentStatus === 'running';
+	const isExperimentStopped = experimentStatus === 'stopped';
+	const isRunFailed = experimentStatus === 'run-failed';
 
+	const [isExitModalVisible, setExitModalVisibility] = useState(false);
 	const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 	const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
 
@@ -50,6 +61,12 @@ const AppHeader = (props) => {
 		}
 	}, [isExperimentRunning, dispatch]);
 
+	useEffect(() => {
+		if (isExperimentStopped === true) {
+			disConnectSocket();
+			dispatch(loginReset());
+		}
+	}, [isExperimentStopped, dispatch]);
 
 	const logoutClickHandler = () => {
 		dispatch(loginReset());
@@ -67,6 +84,18 @@ const AppHeader = (props) => {
 		}
 	};
 
+	const onCrossClick = () => {
+		setExitModalVisibility(true);
+	};
+
+	// Exit modal confirmation click handler
+	const confirmationClickHandler = (isConfirmed) => {
+		setExitModalVisibility(false);
+		if (isConfirmed) {
+			dispatch(stopExperiment(experimentId));
+		}
+	};
+
 	return (
 		<Header>
 			<Logo isUserLoggedIn={isUserLoggedIn} />
@@ -79,7 +108,10 @@ const AppHeader = (props) => {
 									onNavLinkClickHandler(event, ele.path);
 								}}
 								to={ele.path}
-								disabled={(ele.path === '/plate' && isLoginTypeAdmin === true) || (isPlateRoute === true && ele.path === '/templates')}
+								disabled={
+									(ele.path === '/plate' && isLoginTypeAdmin === true)
+                  || (isPlateRoute === true && ele.path === '/templates')
+								}
 							>
 								{ele.name}
 							</NavLink>
@@ -92,8 +124,6 @@ const AppHeader = (props) => {
 					{/* <PrintDataModal /> */}
 					{/* <ExportDataModal /> */}
 					<div className="experiment-info text-right mx-3">
-						{/* TODO: Add "show" class to <Text> component when experiment
-						 starts and remove it when experiment ends */}
 						<Text
 							size={12}
 							className={`text-default mb-1 ${
@@ -103,6 +133,14 @@ const AppHeader = (props) => {
 							{`Experiment started at ${runExperimentReducer.get(
 								'experimentStartedTime',
 							)}`}
+						</Text>
+						<Text
+							size={12}
+							className={`text-error mb-1 ${
+								isRunFailed ? 'show' : ''
+							}`}
+						>
+							Experiment failed to run.
 						</Text>
 						{isPlateRoute === true && (
 							<Button
@@ -126,18 +164,33 @@ const AppHeader = (props) => {
 							Result - Successful
 						</Button> */}
 					</div>
-					<Dropdown
-						isOpen={userDropdownOpen}
-						toggle={toggleUserDropdown}
-						className="ml-2"
-					>
-						<DropdownToggle icon name="user" size={32} />
-						<DropdownMenu right>
-							<DropdownItem onClick={logoutClickHandler}>Log out</DropdownItem>
-						</DropdownMenu>
-					</Dropdown>
-					{isPlateRoute === true && (
-						<ButtonIcon size={34} name="cross" className="ml-2" />
+					{isLoginTypeAdmin === true && (
+						<Dropdown
+							isOpen={userDropdownOpen}
+							toggle={toggleUserDropdown}
+							className="ml-2"
+						>
+							<DropdownToggle icon name="user" size={32} />
+							<DropdownMenu right>
+								<DropdownItem onClick={logoutClickHandler}>
+                  Log out
+								</DropdownItem>
+							</DropdownMenu>
+						</Dropdown>
+					)}
+					{isLoginTypeOperator === true && (
+						<ButtonIcon
+							size={34}
+							name="cross"
+							onClick={onCrossClick}
+							className="ml-2"
+						/>
+					)}
+					{isExitModalVisible === true && (
+						<ConfirmationModal
+							isOpen={isExitModalVisible}
+							confirmationClickHandler={confirmationClickHandler}
+						/>
 					)}
 				</div>
 			)}

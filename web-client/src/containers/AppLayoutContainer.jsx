@@ -31,6 +31,7 @@ const AppLayoutContainer = (props) => {
 				isPlateRoute={loginReducer.get('isPlateRoute')}
 				isUserLoggedIn={loginReducer.get('isUserLoggedIn')}
 				isLoginTypeAdmin={loginReducer.get('isLoginTypeAdmin')}
+				isLoginTypeOperator={loginReducer.get('isLoginTypeOperator')}
 			/>
 			<section className="ml-content">
 				<Switch>

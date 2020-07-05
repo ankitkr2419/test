@@ -50,7 +50,7 @@ export const createExperimentReducer = (
 	case createExperimentActions.failureAction:
 		return state.merge({ isExperimentSaved: true, isLoading: true, isError: true });
 	case createExperimentActions.createExperimentReset:
-		return createExperimentInitialState.setIn(['id'], state.get('id'));
+		return state.setIn(['isExperimentSaved'], false);
 	case loginActions.loginReset:
 		return createExperimentInitialState;
 	default:

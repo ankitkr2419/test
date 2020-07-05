@@ -10,7 +10,7 @@ import {
 } from 'action-creators/wellActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { fetchExperimentTargets } from 'action-creators/experimentTargetActionCreators';
-import { getExperimentId } from 'selectors/experimentSelector';
+import { getExperimentId, getExperimentTemplate } from 'selectors/experimentSelector';
 import { setIsPlateRoute } from 'action-creators/loginActionCreators';
 import { getActiveLoadedWells } from 'selectors/activeWellSelector';
 
@@ -23,6 +23,8 @@ const PlateContainer = () => {
 	const wellListReducer = useSelector(getWells);
 	// running experiment id
 	const experimentId = useSelector(getExperimentId);
+	// running template details
+	const experimentTemplate = useSelector(getExperimentTemplate);
 	// selected wells positions
 	const positions = getWellsPosition(wellListReducer);
 	// activeWells means the well which are allowed to configure
@@ -61,6 +63,7 @@ const PlateContainer = () => {
 			isMultiSelectionOptionOn={wellListReducer.get('isMultiSelectionOptionOn')}
 			toggleMultiSelectOption={toggleMultiSelectOption}
 			activeWells={activeWells}
+			experimentTemplate={experimentTemplate}
 		/>
 	);
 };

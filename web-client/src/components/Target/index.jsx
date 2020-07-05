@@ -139,7 +139,7 @@ const TargetComponent = (props) => {
 							color="primary"
 							onClick={onNextClick}
 							className="mx-auto mb-3"
-							// disabled={isTargetListUpdated}
+							disabled={isTargetListUpdated}
 						>
               Next
 						</Button>

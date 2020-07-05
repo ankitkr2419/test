@@ -39,6 +39,21 @@ body {
 			@include fade(show);
 		}
 	}
+
+	.text-error {
+		color: red;
+		width: rem(192px);
+		position: absolute;
+		top: rem(-16px);
+		right: 0;
+		line-height: rem(14px);
+		@include fade(hide);
+		@extend .text-truncate;
+
+		&.show {
+			@include fade(show);
+		}
+	}
 }
 
 // Page Content Class

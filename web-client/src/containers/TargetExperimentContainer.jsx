@@ -14,6 +14,7 @@ import { getTemplateById } from 'reducers/templateReducer';
 import {
 	fetchExperimentTargets,
 	createExperimentTarget,
+	createExperimentTargetReset,
 } from 'action-creators/experimentTargetActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { getSelectedTargetExperiment } from 'components/Target/targetHelper';
@@ -36,6 +37,8 @@ const TargetExperimentContainer = (props) => {
 	const templates = useSelector(state => state.listTemplatesReducer);
 	const selectedTemplateDetails = getTemplateById(templates, templateID);
 
+	// extracting selected targets
+	const { isExperimentTargetSaved } = useSelector(state => state.createExperimentTargetReducer);
 
 	// useReducer section
 	// local state to manage selected target data
@@ -61,6 +64,18 @@ const TargetExperimentContainer = (props) => {
 			});
 		}
 	}, [experimentTargets]);
+
+	useEffect(() => {
+		if (isExperimentTargetSaved === true) {
+			// fetching list of experiment targets
+			// dispatch(fetchExperimentTargets(experimentId));
+			dispatch(createExperimentTargetReset());
+			updateTargetState({
+				type: targetStateActions.UPDATE_LIST,
+				value: selectedTargetState.get('targetList'),
+			});
+		}
+	}, [isExperimentTargetSaved, dispatch, selectedTargetState]);
 
 	// handler function section
 	// checkbox handler for target list
