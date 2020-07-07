@@ -54,10 +54,12 @@ func (s *pgStore) GetWellTarget(ctx context.Context, wellID uuid.UUID) (WellTarg
 	return
 }
 
-func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarget) (err error) {
+func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarget) (targets []WellTarget, err error) {
 
 	stmt := makeWellTargetQuery(WellTargets)
-	delstmt := delWellTargetQuery(WellTargets, deleteWellTargetQuery)
+	delstmt := wellTargetQuery(WellTargets, deleteWellTargetQuery)
+	getstmt := wellTargetQuery(WellTargets, getWellTargetListQuery)
+
 	tx, err := s.db.Begin()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in creating transaction")
@@ -78,6 +80,24 @@ func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarge
 	if err != nil {
 		tx.Rollback()
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
+		return
+	}
+
+	rows,err := tx.Query(
+		getstmt,
+	)
+
+       for rows.Next() {
+		var r WellTarget
+		if err := rows.Scan(&r.WellID,&r.TargetID,&r.CT,&r.TargetName); err != nil {
+			logger.WithField("err", err.Error()).Error("Error getting new well targets")
+		}
+		targets = append(targets, r)
+	}
+
+	if err != nil {
+		tx.Rollback()
+		logger.WithField("err", err.Error()).Error("Error getting new well targets")
 		return
 	}
 
@@ -112,8 +132,8 @@ func makeWellTargetQuery(WellTargets []WellTarget) string {
 	return stmt
 }
 
-// prepare bulk delete query statement
-func delWellTargetQuery(WellTargets []WellTarget, q string) string {
+// prepare bulk delete/select query statement
+func wellTargetQuery(WellTargets []WellTarget, q string) string {
 
 	values := make([]string, 0, len(WellTargets))
 

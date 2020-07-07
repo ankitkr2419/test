@@ -5,7 +5,6 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
-
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -118,17 +117,23 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 					TargetID: wc.Targets[t],
 				}
 				targets = append(targets, t)
-				createdWell[w].Targets = append(createdWell[w].Targets, t)
 			}
 		}
 
-		err = deps.Store.UpsertWellTargets(req.Context(), targets)
+		createdTargets,err := deps.Store.UpsertWellTargets(req.Context(), targets)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
 			return
 		}
 
+		for _, t := range createdTargets {
+			for i, w := range  createdWell{
+				if w.ID == t.WellID {
+					createdWell[i].Targets = append(createdWell[i].Targets,t)
+				}
+			}
+		}
 		respBytes, err = json.Marshal(createdWell)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling wells data")
