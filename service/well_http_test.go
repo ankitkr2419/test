@@ -126,7 +126,7 @@ func (suite *WellHandlerTestSuite) TestUpsertWellSuccess() {
 		body,
 		upsertWellHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"},{"well_id":"%s","target_id":"%s","target_name":"","ct":""}],"sample_name":""}]`, testUUID, experimentID, sampleID, testUUID, targetID, testUUID, targetID)
+	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"},{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"}],"sample_name":""}]`, testUUID, experimentID, sampleID, testUUID, targetID, testUUID, targetID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
