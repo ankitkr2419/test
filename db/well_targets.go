@@ -57,8 +57,8 @@ func (s *pgStore) GetWellTarget(ctx context.Context, wellID uuid.UUID) (WellTarg
 func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarget) (targets []WellTarget, err error) {
 
 	stmt := makeWellTargetQuery(WellTargets)
-	delstmt := WellTargetQuery(WellTargets, deleteWellTargetQuery)
-	getstmt := WellTargetQuery(WellTargets, getWellTargetListQuery)
+	delstmt := wellTargetQuery(WellTargets, deleteWellTargetQuery)
+	getstmt := wellTargetQuery(WellTargets, getWellTargetListQuery)
 
 	tx, err := s.db.Begin()
 	if err != nil {
@@ -133,7 +133,7 @@ func makeWellTargetQuery(WellTargets []WellTarget) string {
 }
 
 // prepare bulk delete/select query statement
-func WellTargetQuery(WellTargets []WellTarget, q string) string {
+func wellTargetQuery(WellTargets []WellTarget, q string) string {
 
 	values := make([]string, 0, len(WellTargets))
 
