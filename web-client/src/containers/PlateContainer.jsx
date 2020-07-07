@@ -25,17 +25,20 @@ const PlateContainer = () => {
 	const experimentId = useSelector(getExperimentId);
 	// running template details
 	const experimentTemplate = useSelector(getExperimentTemplate);
-	// selected wells positions
+	// selected wells positions i.e wells with isSelected/isMultiSelected flag
 	const positions = getWellsPosition(wellListReducer);
 	// activeWells means the well which are allowed to configure
 	const activeWells = useSelector(getActiveLoadedWells);
 
 	useEffect(() => {
 		if (experimentId !== null) {
+			// fetching configured wells data
 			dispatch(fetchWells(experimentId));
+			// fetching experiment targets to show while configuring sample and graph filter
 			dispatch(fetchExperimentTargets(experimentId));
 		}
 		return () => {
+			// isPlateRoute use in appHeader to manage visibility of header buttons
 			dispatch(setIsPlateRoute(false));
 		};
 	}, [experimentId, dispatch]);
@@ -49,6 +52,7 @@ const PlateContainer = () => {
 	};
 
 	const toggleMultiSelectOption = () => {
+		// multi selection option for well selection to view it on graph
 		dispatch(toggleMultiSelectOptionAction());
 	};
 

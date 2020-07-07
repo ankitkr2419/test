@@ -1,77 +1,52 @@
-import React, { useEffect, useReducer } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import SidebarGraph from 'components/Plate/Sidebar/Graph/SidebarGraph';
-import graphFilterState, {
-	graphFilterInitialState,
-	graphFilterActions,
-} from 'components/Plate/Sidebar/Graph/graphFilterState';
-import { useSelector } from 'react-redux';
-import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
+import { useSelector, useDispatch } from 'react-redux';
+import { getExperimentStatus } from 'selectors/runExperimentSelector';
+import { getLineChartData } from 'selectors/wellGraphSelector';
+import { getExperimentGraphTargets } from 'selectors/experimentTargetSelector';
+import { updateExperimentTargetFilters } from 'action-creators/experimentTargetActionCreators';
 
-const ExperimentGraphContainer = (props) => {
-	const { experimentTargetsList } = props;
+const ExperimentGraphContainer = () => {
+	const dispatch = useDispatch();
+	// getExperimentStatus will return us current experiment status
+	const experimentStatus = useSelector(getExperimentStatus);
 
-	const wellGraphReducer = useSelector(state => state.wellGraphReducer);
-	const runExperimentReducer = useSelector(getRunExperimentReducer);
-	const isExperimentRunning =    runExperimentReducer.get('experimentStatus') === 'running';
+	// get targets from experiment target reducer(graph : target filters)
+	const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
+
+	// Extracting graph data, Which is populated from websocket
+	const lineChartData = useSelector(getLineChartData);
+
+	const isExperimentRunning = experimentStatus === 'running';
 
 	// local state to save filter graph data
-	const [filterState, updateGraphFilterState] = useReducer(
-		graphFilterState,
-		graphFilterInitialState,
-	);
-	const { isSidebarOpen } = filterState.toJS();
-	// helper function to update local state
-	const updateGraphFilterStateWrapper = (key, value) => {
-		updateGraphFilterState({
-			type: graphFilterActions.SET_GRAPH_FILTER_VALUES,
-			key,
-			value,
-		});
-	};
-
-	useEffect(() => {
-		if (experimentTargetsList !== null && experimentTargetsList.size !== 0) {
-			updateGraphFilterStateWrapper('targets', experimentTargetsList);
-		}
-	}, [experimentTargetsList]);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	const toggleSideBar = () => {
-		updateGraphFilterStateWrapper('isSidebarOpen', !isSidebarOpen);
+		setIsSidebarOpen(toggleStateValue => !toggleStateValue);
 	};
 
 	const onThresholdChangeHandler = (threshold, index) => {
-		updateGraphFilterState({
-			type: graphFilterActions.UPDATE_TARGET_LIST,
-			index,
-			threshold: parseFloat(threshold),
-		});
+		dispatch(updateExperimentTargetFilters(index, 'threshold', parseFloat(threshold)));
 	};
 
 	const toggleGraphFilterActive = (index, isActive) => {
-		updateGraphFilterState({
-			type: graphFilterActions.UPDATE_GRAPH_FILTER_ACTIVE_STATE,
-			index,
-			isActive: !isActive,
-		});
+		dispatch(updateExperimentTargetFilters(index, 'isActive', !isActive));
 	};
 
 	return (
 		<SidebarGraph
 			isExperimentRunning={isExperimentRunning}
-			wellGraphReducer={wellGraphReducer}
-			experimentTargetsList={experimentTargetsList}
+			lineChartData={lineChartData}
+			experimentGraphTargetsList={experimentGraphTargetsList}
 			isSidebarOpen={isSidebarOpen}
 			toggleSideBar={toggleSideBar}
-			filterState={filterState}
 			onThresholdChangeHandler={onThresholdChangeHandler}
 			toggleGraphFilterActive={toggleGraphFilterActive}
 		/>
 	);
 };
 
-ExperimentGraphContainer.propTypes = {
-	experimentTargetsList: PropTypes.object.isRequired,
-};
+ExperimentGraphContainer.propTypes = {};
 
 export { ExperimentGraphContainer };

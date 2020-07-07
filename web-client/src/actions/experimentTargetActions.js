@@ -10,4 +10,5 @@ export const listExperimentTargetActions =  {
 	successAction: 'FETCH_EXPERIMENTS_TARGETS_SUCCEEDED',
 	failureAction: 'FETCH_EXPERIMENTS_TARGETS_FAILURE',
 	resetExperimentTargets: 'RESET_EXPERIMENTS_TARGETS',
+	updateGraphFilters: 'UPDATE_GRAPH_FILTERS',
 };

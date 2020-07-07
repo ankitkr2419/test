@@ -12,3 +12,12 @@ export const HTTP_METHODS = {
 	PUT: 'PUT',
 	DELETE: 'DELETE',
 };
+
+export const TARGET_LINE_COLORS = [
+	'#9eff48',
+	'#889accf7',
+	'#fd5d55',
+	'yellow',
+	'#666666',
+	'#f3811f',
+];

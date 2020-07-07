@@ -8,7 +8,6 @@ import Well from './Well';
 import WellPopover from './WellPopover';
 
 const GridComponent = ({
-	activeWells,
 	wells,
 	onWellClickHandler,
 	onWellUpdateClickHandler,
@@ -77,7 +76,6 @@ const GridComponent = ({
 );
 
 GridComponent.propTypes = {
-	activeWells: PropTypes.object.isRequired,
 	onWellClickHandler: PropTypes.func.isRequired,
 	wells: PropTypes.object.isRequired,
 	onWellUpdateClickHandler: PropTypes.func.isRequired,

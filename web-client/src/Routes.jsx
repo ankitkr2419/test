@@ -9,7 +9,7 @@ import PlateContainer from 'containers/PlateContainer';
 import ActivityContainer from 'containers/ActivityContainer';
 import TemplateLayout from 'layouts/TemplateLayout';
 import PrivateRoute from 'components/HOC/PrivateRoute';
-import { ROOT_URL_PATH } from './constants';
+import { ROOT_URL_PATH } from './appConstants';
 
 export const routeDefinitions = [
 	{

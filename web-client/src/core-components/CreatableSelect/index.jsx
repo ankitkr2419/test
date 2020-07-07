@@ -38,4 +38,4 @@ CreatableSelect.defaultProps = {
 	size: '',
 };
 
-export default CreatableSelect;
+export default React.memo(CreatableSelect);

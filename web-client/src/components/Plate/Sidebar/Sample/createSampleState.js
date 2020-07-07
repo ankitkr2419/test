@@ -9,7 +9,7 @@ export const createSampleActions = {
 
 export const createSampleInitialState = fromJS({
 	isSideBarOpen: false,
-	sample: undefined,
+	sample: null,
 	targets: List([]),
 	task: null,
 	isEdit: false,

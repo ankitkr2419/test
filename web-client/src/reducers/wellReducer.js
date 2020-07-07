@@ -51,7 +51,7 @@ export const wellListReducer = (state = listWellInitialState, action) => {
 	case addWellActions.successAction:
 		return updateWellListSelector(state, action);
 
-	// Update wells list when new wells are added
+	// configuring active wells with existing wells data
 	case activeWellActions.successAction:
 		return setActiveWells(state, action);
 	case loginActions.loginReset:

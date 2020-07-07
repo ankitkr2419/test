@@ -1,13 +1,13 @@
 import { createSelector } from 'reselect';
 
-const getActiveWellReducerReducer = state => state.activeWellReducer;
+const getActiveWellReducer = state => state.activeWellReducer;
 
 export const getActiveLoadedWellFlag = createSelector(
-	getActiveWellReducerReducer,
+	getActiveWellReducer,
 	activeWellReducer => activeWellReducer.get('isDataLoaded'),
 );
 
 export const getActiveLoadedWells = createSelector(
-	getActiveWellReducerReducer,
+	getActiveWellReducer,
 	activeWellReducer => activeWellReducer.get('list'),
 );

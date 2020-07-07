@@ -24,25 +24,39 @@ const Plate = (props) => {
 		experimentTemplate,
 	} = props;
 
-	// local state to maintain well data which is selected for update
+	// local state to maintain well data which is selected for updation
 	const [updateWell, setUpdateWell] = useState(null);
+
+	/**
+	 *
+	 * @param {*} well => selected well details
+	 * @param {*} index => selected well index
+	 *
+	 */
 	const onWellClickHandler = (well, index) => {
-		const { isSelected, isWellFilled } = well.toJS();
-		// if well is blank and multi-select checkbox is un-checked
+		const { isSelected, isWellFilled, isMultiSelected } = well.toJS();
+		/**
+		 * if well is not filled and if multi selection option is not checked
+		 * 				then we can make well selected
+		 */
 		if (isMultiSelectionOptionOn === false && isWellFilled === false) {
 			setSelectedWell(index, !isSelected);
 		}
 
-		// if multi-select checkbox is checked, will allow to select filled wells
+		/**
+		 * TODO CHANGE IT for non filled wells also
+		 * if multi-select checkbox is checked, will allow to select filled wells
+		 */
 		if (isMultiSelectionOptionOn === true) {
-			if (isWellFilled === true) {
-				setMultiSelectedWell(index, !isSelected);
-			}
+			// if (isWellFilled === true) {
+			setMultiSelectedWell(index, !isMultiSelected);
+			// }
 		}
 	};
 
-	const onWellUpdateClickHandler = (well, index) => {
-		setUpdateWell(well.toJS());
+	const onWellUpdateClickHandler = (selectedWell) => {
+		// update local state with selected well which is selected for updation
+		setUpdateWell(selectedWell.toJS());
 	};
 
 	return (
@@ -67,9 +81,7 @@ const Plate = (props) => {
 				experimentTargetsList={experimentTargetsList}
 				updateWell={updateWell}
 			/>
-			<ExperimentGraphContainer
-				experimentTargetsList={experimentTargetsList}
-			/>
+			<ExperimentGraphContainer />
 		</div>
 	);
 };

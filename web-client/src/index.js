@@ -4,14 +4,13 @@ import { Provider } from 'react-redux';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 
 import store from 'store';
-import history from 'history.js';
 import Routes from 'Routes';
 
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
 	<Provider store={store}>
-		<Router history={history}>
+		<Router>
 			<Switch>
 				<Route path="/" component={Routes} />
 			</Switch>

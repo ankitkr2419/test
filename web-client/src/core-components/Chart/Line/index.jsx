@@ -3,9 +3,15 @@ import { Line } from 'react-chartjs-2';
 
 const LineChart = (props) => {
 	const { data, width, height } = props;
+
 	const options = {
 		legend: {
-			display: false,
+			labels: {
+				filter(item, chart) {
+					// Logic to remove a particular legend item goes here
+					return !item.text.includes('index');
+				},
+			},
 		},
 	};
 

@@ -6,3 +6,8 @@ export const getRunExperimentReducer = createSelector(
 	runExperimentSelector,
 	runExperimentReducer => runExperimentReducer,
 );
+
+export const getExperimentStatus = createSelector(
+	runExperimentSelector,
+	runExperimentReducer => runExperimentReducer.get('experimentStatus'),
+);

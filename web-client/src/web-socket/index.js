@@ -5,7 +5,7 @@ import {
 	webSocketClosed,
 	webSocketError,
 } from 'action-creators/webSocketActionCreators';
-import { WS_HOST_URL } from '../constants';
+import { WS_HOST_URL } from 'appConstants';
 
 let webSocket = null;
 

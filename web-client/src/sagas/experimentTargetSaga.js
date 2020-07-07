@@ -8,7 +8,7 @@ import {
 	createExperimentTargetFailed,
 	fetchExperimentTargetsFailed,
 } from 'action-creators/experimentTargetActionCreators';
-import { HTTP_METHODS } from '../constants';
+import { HTTP_METHODS } from 'appConstants';
 
 export function* createExperimentTarget(actions) {
 	const {

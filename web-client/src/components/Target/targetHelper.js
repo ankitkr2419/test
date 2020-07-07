@@ -1,4 +1,4 @@
-import { TARGET_CAPACITY } from '../../constants';
+import { TARGET_CAPACITY } from 'appConstants';
 
 export const getTargetOption = () => {
 	const arr = [];

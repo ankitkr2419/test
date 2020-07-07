@@ -7,7 +7,11 @@ const wellGraphInitialState = fromJS({
 	isOpened: false,
 	isClosed: false,
 	isError: false,
-	data: fromJS([]),
+	chartData: fromJS({
+		data: [],
+		max_threshold: 0,
+	}),
+	// chartData: fromJS(graphData),
 });
 
 export const wellGraphReducer = (state = wellGraphInitialState, action) => {
@@ -19,7 +23,7 @@ export const wellGraphReducer = (state = wellGraphInitialState, action) => {
 	case webSocketActions.onError:
 		return state.setIn(['isError'], true);
 	case webSocketActions.onMessage:
-		return state.setIn(['data'], fromJS(action.payload.data));
+		return state.setIn(['chartData'], fromJS(action.payload.data));
 	case loginActions.loginReset:
 		return wellGraphInitialState;
 	default:

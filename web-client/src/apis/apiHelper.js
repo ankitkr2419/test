@@ -1,7 +1,7 @@
 import { takeEvery, put } from 'redux-saga/effects';
 
 import fetchAction from 'actions/fetchActions';
-import { API_HOST_URL, API_HOST_VERSION } from '../constants';
+import { API_HOST_URL, API_HOST_VERSION } from 'appConstants';
 
 /**
  * getQueryString with form query string from given object

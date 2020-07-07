@@ -1,99 +1,31 @@
 import React from 'react';
 import Sidebar from 'components/Sidebar';
+import PropTypes from 'prop-types';
 import { LineChart } from 'core-components';
 import { Text } from 'shared-components';
 import styled from 'styled-components';
+import { getXAxis } from 'selectors/wellGraphSelector';
 import GraphFilters from './GraphFilters';
-
-const getXAxis = (count) => {
-	const arr = [];
-	for (let x = 1; x <= count; x += 1) {
-		arr.push(x);
-	}
-	return arr;
-};
-
-const getThresholdLineData = (value, count) => {
-	const arr = [];
-	for (let x = 1; x <= count; x += 1) {
-		arr.push(value);
-	}
-	return arr;
-};
-
-const nullableCheck = arr => arr.every(item => item === 0);
-
-const getThresholdLine = (max_threshold, count) => ({
-	label: 'threshold',
-	fill: false,
-	borderWidth: 2,
-	pointRadius: 0,
-	borderColor: '#a2ee95',
-	pointBorderColor: '#a2ee95',
-	pointBackgroundColor: '#fff',
-	pointBorderWidth: 0,
-	pointHoverRadius: 0,
-	pointHoverBackgroundColor: '#a2ee95',
-	pointHoverBorderColor: '#a2ee95',
-	pointHoverBorderWidth: 0,
-	data: getThresholdLineData(max_threshold, count),
-});
 
 const SidebarGraph = (props) => {
 	const {
 		isExperimentRunning,
-		wellGraphReducer,
-		filterState,
+		lineChartData,
 		isSidebarOpen,
 		toggleSideBar,
 		onThresholdChangeHandler,
 		toggleGraphFilterActive,
+		experimentGraphTargetsList,
 	} = props;
 
-	const { data: tableData = [], max_threshold = 0 } = wellGraphReducer
-		.get('data')
-		.toJS();
-	const { total_cycles: totalCycles = 0 } =    tableData.length !== 0 && tableData[0];
-
-	const targets = filterState.get('targets').toJS();
-
-	const datasets = tableData
-		.map((ele, index) => {
-			if (nullableCheck(ele.f_value) === false) {
-				const lineColorFiltered = targets.filter(
-          (target) => target.target_id === ele.target_id
-        );
-        let lineColor = "rgba(148,147,147,1)";
-        if (lineColorFiltered && lineColorFiltered.length !== 0) {
-          lineColor = lineColorFiltered[0].lineColor;
-        }
-
-				return {
-					label: `index-${index}`,
-					fill: false,
-					borderWidth: 2,
-					pointRadius: 0,
-					borderColor: lineColor,
-					pointBorderColor: 'rgba(148,147,147,1)',
-					pointBackgroundColor: '#fff',
-					pointBorderWidth: 0,
-					pointHoverRadius: 0,
-					pointHoverBackgroundColor: 'rgba(148,147,147,1)',
-					pointHoverBorderColor: 'rgba(148,147,147,1)',
-					pointHoverBorderWidth: 0,
-					lineTension: 0.1,
-					borderCapStyle: 'butt',
-					data: ele.f_value,
-				};
-			}
-			return null;
-		})
-		.filter(ele => ele !== null);
-	datasets.push(getThresholdLine(max_threshold, totalCycles));
-
+	let noOfCycles = 0;
+	// below case can happen if user selects all filter we might get empty chart data
+	if (lineChartData.size !== 0) {
+		noOfCycles = lineChartData.first().totalCycles;
+	}
 	const data = {
-		labels: getXAxis(totalCycles),
-		datasets,
+		labels: getXAxis(noOfCycles),
+		datasets: lineChartData.toJS(),
 	};
 
 	if (isExperimentRunning === true) {
@@ -112,7 +44,7 @@ const SidebarGraph = (props) => {
 					<LineChart data={data} />
 				</GraphCard>
 				<GraphFilters
-					targets={filterState.get('targets')}
+					targets={experimentGraphTargetsList}
 					onThresholdChangeHandler={onThresholdChangeHandler}
 					toggleGraphFilterActive={toggleGraphFilterActive}
 				/>
@@ -134,6 +66,14 @@ const GraphCard = styled.div`
   margin: 0 0 40px 0;
 `;
 
-SidebarGraph.propTypes = {};
+SidebarGraph.propTypes = {
+	isExperimentRunning: PropTypes.bool.isRequired,
+	lineChartData: PropTypes.object.isRequired,
+	isSidebarOpen: PropTypes.bool.isRequired,
+	toggleSideBar: PropTypes.func.isRequired,
+	onThresholdChangeHandler: PropTypes.func.isRequired,
+	toggleGraphFilterActive: PropTypes.func.isRequired,
+	experimentGraphTargetsList: PropTypes.object.isRequired,
+};
 
-export default SidebarGraph;
+export default React.memo(SidebarGraph);

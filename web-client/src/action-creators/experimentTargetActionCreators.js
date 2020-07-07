@@ -37,3 +37,12 @@ export const fetchExperimentTargetsFailed = errorResponse => ({
 		error: true,
 	},
 });
+
+export const updateExperimentTargetFilters = (index, key, value) => ({
+	type: listExperimentTargetActions.updateGraphFilters,
+	payload: {
+		index,
+		key,
+		value,
+	},
+});

@@ -23,3 +23,5 @@ export const fetchSamplesFailed = errorResponse => ({
 		error: true,
 	},
 });
+
+export const resetSamples = () => ({ type: listSampleActions.resetSamples });

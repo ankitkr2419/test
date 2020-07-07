@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import { Text } from 'shared-components';
 import TemplatePopover from 'components/Plate/Popover';
@@ -36,5 +37,12 @@ const SubHeader = ({ experimentTemplate }) => (
 		<TemplatePopover className="ml-auto" />
 	</StyledSubHeader>
 );
+
+SubHeader.propTypes = {
+	experimentTemplate: PropTypes.shape({
+		templateId: PropTypes.string,
+		templateName: PropTypes.string,
+	}).isRequired,
+};
 
 export default SubHeader;

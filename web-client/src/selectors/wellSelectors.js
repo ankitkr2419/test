@@ -29,11 +29,13 @@ export const getWellsPosition = createSelector(
 		.filter(ele => ele !== null),
 );
 
+// set isSelected flag to true for given index
 export const setSelectedToList = (state, { isSelected, index }) => state.setIn(['defaultList', index, 'isSelected'], isSelected);
-
+// set isMultiSelected flag to true for given index
 export const setMultiSelectedToList = (state, { isMultiSelected, index }) => state.setIn(['defaultList', index, 'isMultiSelected'], isMultiSelected);
-
+// makes all wells isSelected flag to  false
 export const resetWellDefaultList = state => state.updateIn(['defaultList'], myDefaultList => myDefaultList.map(ele => ele.setIn(['isSelected'], false)));
+// makes all wells isMultiSelected flag to  false
 export const resetMultiWellDefaultList = state => state.updateIn(['defaultList'], myDefaultList => myDefaultList.map(ele => ele.setIn(['isMultiSelected'], false)));
 
 /**
@@ -111,6 +113,7 @@ export const updateWellListSelector = createSelector(
 	},
 );
 
+// configuring active wells with existing wells data
 export const setActiveWells = createSelector(
 	state => state,
 	(state, action) => action,
