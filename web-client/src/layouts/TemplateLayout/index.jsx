@@ -5,6 +5,7 @@ import TemplateContainer from 'containers/TemplateContainer';
 import TargetContainer from 'containers/TargetContainer';
 import StageContainer from 'containers/StageContainer';
 import StepContainer from 'containers/StepContainer';
+import TargetExperimentContainer from 'containers/TargetExperimentContainer';
 import templateLayoutReducer, {
 	templateInitialState,
 	templateLayoutActions,
@@ -31,7 +32,6 @@ const TemplateLayout = (props) => {
 
 	// Wizard click handler
 	const updateSelectedWizard = useCallback((selectedWizard) => {
-		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_ACTIVE_WIDGET,
 			value: selectedWizard,
@@ -39,7 +39,6 @@ const TemplateLayout = (props) => {
 	}, []);
 
 	const updateTemplateID = useCallback((selectedTemplateID) => {
-		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_TEMPLATE_ID,
 			value: selectedTemplateID,
@@ -47,7 +46,6 @@ const TemplateLayout = (props) => {
 	}, []);
 
 	const updateStageID = useCallback((selectedStageId) => {
-		// TODO add validation before updating wizard
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_STAGE_ID,
 			value: selectedStageId,
@@ -55,15 +53,14 @@ const TemplateLayout = (props) => {
 	}, []);
 
 	return (
-		<div className="template-content">
+		<div className='template-content'>
 			<Wizard
 				list={wizardList}
 				onClickHandler={updateSelectedWizard}
 				isLoginTypeAdmin={isLoginTypeAdmin}
 			/>
 			<Card>
-				{/* TODO move CardBody to core-components */}
-				<CardBody className="d-flex flex-unset overflow-hidden p-0">
+				<CardBody className='d-flex flex-unset overflow-hidden p-0'>
 					{activeWidgetID === 'template' && (
 						<TemplateContainer
 							isLoginTypeOperator={isLoginTypeOperator}
@@ -74,6 +71,15 @@ const TemplateLayout = (props) => {
 					)}
 					{activeWidgetID === 'target' && (
 						<TargetContainer
+							isLoginTypeOperator={isLoginTypeOperator}
+							isLoginTypeAdmin={isLoginTypeAdmin}
+							updateSelectedWizard={updateSelectedWizard}
+							templateID={templateID}
+						/>
+					)}
+
+					{activeWidgetID === 'target-operator' && (
+						<TargetExperimentContainer
 							isLoginTypeOperator={isLoginTypeOperator}
 							isLoginTypeAdmin={isLoginTypeAdmin}
 							updateSelectedWizard={updateSelectedWizard}

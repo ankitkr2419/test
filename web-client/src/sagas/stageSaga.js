@@ -12,7 +12,7 @@ import {
 	updateStageFailed,
 	deleteStageFailed,
 } from 'action-creators/stageActionCreators';
-import { HTTP_METHODS } from '../constants';
+import { HTTP_METHODS } from 'appConstants';
 
 export function* addStage(actions) {
 	const {

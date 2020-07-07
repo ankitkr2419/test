@@ -13,7 +13,7 @@ import {
 	updateTemplateFailed,
 	deleteTemplateFailed,
 } from 'action-creators/templateActionCreators';
-import { HTTP_METHODS } from '../constants';
+import { HTTP_METHODS } from 'appConstants';
 
 export function* createTemplate(actions) {
 	const {

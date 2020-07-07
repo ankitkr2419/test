@@ -8,7 +8,9 @@ import {
 	TableWrapperFooter,
 	Icon,
 } from 'shared-components';
-import stepStateReducer, { stepStateInitialState } from 'components/Step/stepState';
+import stepStateReducer, {
+	stepStateInitialState,
+} from 'components/Step/stepState';
 import { convertStringToSeconds, convertSecondsToString } from 'utils/helpers';
 import AddStepModal from './AddStepModal';
 import { stepStateActions } from './stepState';
@@ -27,7 +29,10 @@ const StepComponent = (props) => {
 	} = props;
 
 	// local state to save form data and modal state flag
-	const [stepFormState, updateStepFormState] = useReducer(stepStateReducer, stepStateInitialState);
+	const [stepFormState, updateStepFormState] = useReducer(
+		stepStateReducer,
+		stepStateInitialState
+	);
 
 	// immutable => js
 	const stepFormStateJS = stepFormState.toJS();
@@ -53,7 +58,7 @@ const StepComponent = (props) => {
 	const toggleCreateStepModal = () => {
 		updateStepFormStateWrapper(
 			'isCreateStepModalVisible',
-			!isCreateStepModalVisible,
+			!isCreateStepModalVisible
 		);
 	};
 
@@ -122,9 +127,9 @@ const StepComponent = (props) => {
 		// stages.size = 0  will tell us there is no records present
 		// isCreateStageModalVisible is check as we have to make modal visible only once
 		if (
-			isStepsLoading === false
-      && steps.size === 0
-      && isCreateStepModalVisible === false
+			isStepsLoading === false &&
+			steps.size === 0 &&
+			isCreateStepModalVisible === false
 		) {
 			toggleCreateStepModal();
 		}
@@ -133,39 +138,37 @@ const StepComponent = (props) => {
 	}, [isStepsLoading, steps]);
 
 	return (
-		<div className="d-flex flex-column flex-100">
+		<div className='d-flex flex-column flex-100'>
 			<TableWrapper>
 				<TableWrapperBody>
 					<Table striped>
 						<colgroup>
-							<col width="16%" />
-							<col width="12%" />
+							<col width='16%' />
+							<col width='12%' />
 							<col />
-							<col width="16%" />
-							<col width="16%" />
-							<col width="156px" />
+							<col width='16%' />
+							<col width='16%' />
+							<col width='156px' />
 						</colgroup>
 						<thead>
 							<tr>
 								<th>
-                  Steps <br />
-                  (Count/Name)
+									Steps <br />
+									(Count/Name)
 								</th>
 								<th>
-                  Ramp rate <br />
-                  (unit °C)
+									Ramp rate <br />
+									(unit °C)
 								</th>
 								<th>
-                  Target Temperature <br />
-                  (unit °C)
+									Target Temperature <br />
+									(unit °C)
 								</th>
 								<th>
-                  Hold Time <br />
-                  (unit seconds)
+									Hold Time <br />
+									(unit seconds)
 								</th>
-								<th>
-                  Data Capture
-								</th>
+								<th>Data Capture</th>
 								<th />
 							</tr>
 						</thead>
@@ -187,20 +190,20 @@ const StepComponent = (props) => {
 										<td>{convertSecondsToString(step.get('hold_time'))}</td>
 										{/* <td>{step.get('hold_time')}</td> */}
 										<td>{step.get('data_capture') ? 'Yes' : 'No'}</td>
-										<td className="td-actions">
+										<td className='td-actions'>
 											<ButtonIcon
 												onClick={() => {
 													editStep(step.toJS());
 												}}
 												size={28}
-												name="pencil"
+												name='pencil'
 											/>
 											<ButtonIcon
 												onClick={() => {
 													deleteStep(stepId);
 												}}
 												size={28}
-												name="trash"
+												name='trash'
 											/>
 										</td>
 									</tr>
@@ -210,8 +213,13 @@ const StepComponent = (props) => {
 					</Table>
 				</TableWrapperBody>
 				<TableWrapperFooter>
-					<Button color="primary" icon onClick={toggleCreateStepModal}>
-						<Icon size={40} name="plus-2" />
+					<ButtonIcon
+						name='angle-left'
+						size={32}
+						className='mr-auto border-0'
+					/>
+					<Button color='primary' icon onClick={toggleCreateStepModal}>
+						<Icon size={40} name='plus-2' />
 					</Button>
 					{isCreateStepModalVisible && (
 						<AddStepModal

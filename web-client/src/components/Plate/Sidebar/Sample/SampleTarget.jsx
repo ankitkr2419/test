@@ -23,23 +23,16 @@ const StyledSampleTarget = styled.div`
 	}
 `;
 
-const SampleTarget = ({title, className}) => {
-  return (
-		<StyledSampleTarget className={className}>
-			<Text className="m-0 px-3">{title}</Text>
-			<ButtonIcon name="cross" size={28} className="ml-auto" />
-		</StyledSampleTarget>
-	);
-};
+const SampleTarget = ({ label, onClickHandler }) => (
+	<StyledSampleTarget>
+		<Text className="m-0 px-3">{label}</Text>
+		<ButtonIcon onClick={onClickHandler} name="cross" size={28} className="ml-auto" />
+	</StyledSampleTarget>
+);
 
 SampleTarget.propTypes = {
-	title: PropTypes.string,
-	className: PropTypes.string,
-};
-
-SampleTarget.defaultProps = {
-	title: "",
-	className: "",
+	label: PropTypes.string.isRequired,
+	onClickHandler: PropTypes.func.isRequired,
 };
 
 export default SampleTarget;

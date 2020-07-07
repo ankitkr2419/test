@@ -35,7 +35,7 @@ const getUpdatedList = (state, selectedID) => {
 export const getWizardListByLoginType = (list, isLoginTypeAdmin, isLoginTypeOperator) => {
 	// return all options for admin
 	if (isLoginTypeAdmin === true) {
-		return list;
+		return list.filter(ele => ele.get('isAdmin') === true);
 	}
 	// return option visible to operator
 	return list.filter(ele => ele.get('isOperatorVisible') === isLoginTypeOperator);

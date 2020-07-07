@@ -1,11 +1,9 @@
-import { TARGET_CAPACITY } from '../../constants';
+import { TARGET_CAPACITY } from 'appConstants';
 
 export const getTargetOption = () => {
 	const arr = [];
 	for (let i = 0; i !== TARGET_CAPACITY; i += 1) {
-		arr.push({
-			isChecked : false,
-		});
+		arr.push({});
 	}
 	return arr;
 };
@@ -32,7 +30,7 @@ export const getSelectedTargetsToLocal = (
 				.find(ele => ele.get('id') === selectedTargetID);
 			// extract name from masterSelectedEl add add to our arr
 			arr[index] = {
-				isChecked: true,
+				// isChecked: true,
 				selectedTarget: {
 					label: masterSelectedEl.get('name'),
 					value: selectedTarget.get('target_id'),
@@ -71,4 +69,30 @@ export const isTargetsModified = (checkedTargets, selectedTargets, isLoginTypeAd
 	}
 
 	return true;
+};
+
+export const getSelectedTargetExperiment = (
+	selectedTargets, // Selected targets from server
+) => {
+	if (selectedTargets === null || selectedTargets.size === 0) {
+		return null;
+	}
+	const arr = [];
+	// check before merging if selectedTargets are present
+	if (selectedTargets !== null && selectedTargets.size !== 0) {
+		selectedTargets.map((selectedTarget, index) => {
+			arr[index] = {
+				isChecked: true,
+				selectedTarget: {
+					label: selectedTarget.get('target_name'),
+					value: selectedTarget.get('target_id'),
+				},
+				threshold: selectedTarget.get('threshold'),
+				experiment_id: selectedTarget.get('experiment_id'),
+				template_id: selectedTarget.get('template_id'),
+			};
+			return null;
+		});
+	}
+	return arr;
 };

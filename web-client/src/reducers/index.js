@@ -25,6 +25,13 @@ import {
 } from 'reducers/stepReducer';
 
 import { loginReducer } from 'reducers/loginReducer';
+import { wellListReducer, addWellsReducer } from 'reducers/wellReducer';
+import { listExperimentsReducer, createExperimentReducer } from 'reducers/experimentReducer';
+import { listExperimentTargetsReducer, createExperimentTargetReducer } from 'reducers/experimentTargetReducer';
+import { listSamplesReducer } from 'reducers/samplesReducer';
+import { runExperimentReducer } from 'reducers/runExperimentReducer';
+import { activeWellReducer } from 'reducers/actionWellReducer';
+import { wellGraphReducer } from 'reducers/wellGraphReducer';
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -42,6 +49,16 @@ const rootReducer = combineReducers({
 	deleteStepReducer,
 	updateStepReducer,
 	loginReducer,
+	wellListReducer,
+	listExperimentsReducer,
+	createExperimentReducer,
+	listExperimentTargetsReducer,
+	createExperimentTargetReducer,
+	listSamplesReducer,
+	addWellsReducer,
+	runExperimentReducer,
+	activeWellReducer,
+	wellGraphReducer,
 });
 
 export default rootReducer;

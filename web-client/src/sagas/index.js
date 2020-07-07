@@ -29,6 +29,20 @@ import {
 	loginSaga,
 } from 'sagas/loginSaga';
 
+import {
+	createExperimentSaga,
+} from 'sagas/experimentSaga';
+
+import {
+	fetchExperimentTargetsSaga,
+	createExperimentTargetSaga,
+} from 'sagas/experimentTargetSaga';
+
+import { fetchSamplesSaga } from './samplesSaga';
+import { addWellsSaga, fetchWellsSaga } from './wellSaga';
+import { runExperimentSaga, stopExperimentSaga } from './runExperimentSaga';
+import { fetchActiveWellsSaga } from './actionWellSaga';
+
 const allSagas = [
 	createTemplateSaga(),
 	fetchTemplatesSaga(),
@@ -46,6 +60,15 @@ const allSagas = [
 	deleteStepSaga(),
 	updateStepSaga(),
 	loginSaga(),
+	createExperimentSaga(),
+	fetchExperimentTargetsSaga(),
+	createExperimentTargetSaga(),
+	fetchSamplesSaga(),
+	addWellsSaga(),
+	fetchWellsSaga(),
+	runExperimentSaga(),
+	stopExperimentSaga(),
+	fetchActiveWellsSaga(),
 ];
 
 export default function* rootSaga() {

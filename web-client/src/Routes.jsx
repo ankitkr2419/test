@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch } from 'react-router-dom';
+import { HashRouter as Router, Switch } from 'react-router-dom';
 import { withRouter } from 'react-router';
 
 import RouteWithSubRoutes from 'RouteHelper';
@@ -9,7 +9,7 @@ import PlateContainer from 'containers/PlateContainer';
 import ActivityContainer from 'containers/ActivityContainer';
 import TemplateLayout from 'layouts/TemplateLayout';
 import PrivateRoute from 'components/HOC/PrivateRoute';
-import { ROOT_URL_PATH } from './constants';
+import { ROOT_URL_PATH } from './appConstants';
 
 export const routeDefinitions = [
 	{
@@ -32,7 +32,7 @@ export const routeDefinitions = [
 			{
 				path: `${ROOT_URL_PATH}plate`,
 				exact: true,
-				component: PlateContainer,
+				component: PrivateRoute(PlateContainer),
 				key: 4,
 			},
 			{

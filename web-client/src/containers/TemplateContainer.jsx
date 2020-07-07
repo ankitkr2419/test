@@ -10,9 +10,18 @@ import {
 	deleteTemplateReset,
 } from 'action-creators/templateActionCreators';
 
+import {
+	createExperiment as createExperimentAction,
+	createExperimentReset,
+} from 'action-creators/experimentActionCreators';
+import { getIsExperimentSaved } from 'selectors/experimentSelector';
+
 const TemplateContainer = (props) => {
 	const {
-		isLoginTypeOperator, isLoginTypeAdmin, updateSelectedWizard, updateTemplateID,
+		isLoginTypeOperator,
+		isLoginTypeAdmin,
+		updateSelectedWizard,
+		updateTemplateID,
 	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
@@ -25,6 +34,9 @@ const TemplateContainer = (props) => {
 	const { isTemplateDeleted } = useSelector(
 		state => state.deleteTemplateReducer,
 	);
+
+	// isTemplateDeleted = true means experiment created successfully
+	const isExperimentSaved = useSelector(getIsExperimentSaved);
 
 	useEffect(() => {
 		// Once we create template will fetch updated template list
@@ -47,6 +59,18 @@ const TemplateContainer = (props) => {
 		dispatch(fetchTemplates());
 	}, [dispatch]);
 
+	/**
+	 * if login type is operator
+	 * once he select template will create experiment by calling experiment post rest call
+	 * once its successful will navigate to target-operator wizard
+	 */
+	useEffect(() => {
+		if (isExperimentSaved === true) {
+			updateSelectedWizard('target-operator');
+			dispatch(createExperimentReset());
+		}
+	}, [updateSelectedWizard, dispatch, isExperimentSaved]);
+
 	const createTemplate = (template) => {
 		// creating template though api
 		dispatch(createTemplateAction(template));
@@ -55,6 +79,13 @@ const TemplateContainer = (props) => {
 	const deleteTemplate = (templateID) => {
 		// deleting template though api
 		dispatch(deleteTemplateAction(templateID));
+	};
+
+	/**
+	 * createExperiment belongs to operator flow
+	 */
+	const createExperiment = (experimentBody) => {
+		dispatch(createExperimentAction(experimentBody));
 	};
 
 	return (
@@ -67,6 +98,7 @@ const TemplateContainer = (props) => {
 			updateTemplateID={updateTemplateID}
 			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
+			createExperiment={createExperiment}
 		/>
 	);
 };

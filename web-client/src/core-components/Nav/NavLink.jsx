@@ -7,6 +7,9 @@ const StyledNavLink = styled(NavLink).attrs({ className: 'nav-link' })`
 	color: #707070;
 	padding: 8px;
 
+	cursor: ${props => (props.disabled === true ? 'not-allowed' : 'pointer')};
+	opacity: ${props => (props.disabled === true ? '0.6' : '1')};
+
 	&:hover {
 		color: #707070;
 	}

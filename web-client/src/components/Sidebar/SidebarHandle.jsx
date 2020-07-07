@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from "styled-components";
+import styled from 'styled-components';
 import Icon from 'shared-components/Icon';
 
 export const Shadow = styled.div`
@@ -14,14 +14,14 @@ export const Shadow = styled.div`
 	z-index: 1;
 
 	&::after {
-		content: "";
+		content: '';
 		position: absolute;
 		top: 50%;
 		transform: translate(0%, -50%);
-		width: 18px;
+		width: 20px;
 		height: 184px;
 		background-color: #aedbd5;
-		left: -6px;
+		left: -8px;
 		z-index: 2;
 	}
 `;
@@ -48,23 +48,28 @@ const StyledSidebarHandle = styled.button`
 	}
 `;
 
-const SidebarHandle = ({ className, icon, size }) => {
-	return (
-		<StyledSidebarHandle className="sidebar-handle" icon={icon} size={size}>
-			<Icon name={icon} size={size} />
-			<Shadow />
-		</StyledSidebarHandle>
-	);
-};
+const SidebarHandle = ({
+	icon, size, clickHandler, isDisabled,
+}) => (
+	<StyledSidebarHandle
+		onClick={clickHandler}
+		className='sidebar-handle'
+		icon={icon}
+		size={size}
+		disabled={isDisabled}
+	>
+		<Icon name={icon} size={size} />
+		<Shadow />
+	</StyledSidebarHandle>
+);
 
 SidebarHandle.propTypes = {
-	className: PropTypes.string,
 	icon: PropTypes.string.isRequired,
 	size: PropTypes.number,
+	clickHandler: PropTypes.func.isRequired,
 };
 
 SidebarHandle.defaultProps = {
-	className: "",
 	size: 24,
 };
 

@@ -1,7 +1,7 @@
 import { takeEvery, put } from 'redux-saga/effects';
 
 import fetchAction from 'actions/fetchActions';
-import { API_HOST_URL, API_HOST_VERSION } from '../constants';
+import { API_HOST_URL, API_HOST_VERSION } from 'appConstants';
 
 /**
  * getQueryString with form query string from given object
@@ -36,9 +36,9 @@ const getRequestUrl = (reqPath, params) => {
 };
 
 const defaultHeaders = () => ({
-	'Content-Type'  :  'application/json',
+	'Content-Type': 'application/json',
 	// API_HOST_VERSION is api version is also configured from .env(constants.js)
-	Accept        :  `application/${API_HOST_VERSION}`,
+	Accept: `application/${API_HOST_VERSION}`,
 });
 
 // Rest success status check
@@ -102,3 +102,17 @@ export function* callApi(actions) {
 export function* fetchResponseSaga() {
 	yield takeEvery(fetchAction.fetchResponse, callApi);
 }
+
+// export const getResponse = async (reqPath, method = 'GET', params = null, body = null) => {
+// 	// request url formation
+// 	const fetchUrl = getRequestUrl(reqPath, params);
+// 	const fetchOptions = {
+// 		method,
+// 		headers: defaultHeaders(),
+// 		body: body && JSON.stringify(body),
+// 	};
+
+// 	const response = await fetch(fetchUrl, fetchOptions);
+// 	return response.json();
+
+// };
