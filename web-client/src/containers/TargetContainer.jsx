@@ -25,7 +25,7 @@ import {
 const TargetContainer = (props) => {
 	// constants
 	const {
-		updateSelectedWizard, templateID, isLoginTypeAdmin, isLoginTypeOperator,
+		updateSelectedWizard, templateID, isLoginTypeAdmin, isLoginTypeOperator, setIsTemplateEdited,
 	} = props;
 	const dispatch = useDispatch();
 
@@ -154,6 +154,11 @@ const TargetContainer = (props) => {
 		return updateSelectedWizard('stage');
 	}, [updateSelectedWizard]);
 
+	const editTemplate = useCallback(() => {
+		updateSelectedWizard('template');
+		setIsTemplateEdited(true);
+	}, [updateSelectedWizard]);
+
 	// this function will check weather our local state is changed or not
 	const getIsTargetListUpdatedAdmin = useCallback(() => {
 		return isTargetListUpdatedAdmin(selectedTargetState);
@@ -183,6 +188,7 @@ const TargetContainer = (props) => {
 			isTargetListUpdated={getIsTargetListUpdatedAdmin()}
 			isViewStagesEnabled={getIsViewStagesEnabled()}
 			navigateToStageWizard={navigateToStageWizard}
+			editTemplate={editTemplate}
 		/>
 	);
 };

@@ -52,6 +52,10 @@ export const updateTemplateFailed = errorResponse => ({
 	},
 });
 
+export const updateTemplateReset = () => ({
+	type: updateTemplateActions.updateTemplateReset,
+});
+
 export const deleteTemplate = templateID => ({
 	type: deleteTemplateActions.deleteAction,
 	payload: {

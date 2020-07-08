@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from 'react';
+import React, { useCallback, useReducer, useState } from 'react';
 import { CardBody, Card } from 'core-components';
 import Wizard from 'shared-components/Wizard';
 import TemplateContainer from 'containers/TemplateContainer';
@@ -19,6 +19,9 @@ const TemplateLayout = (props) => {
 		templateLayoutReducer,
 		templateInitialState,
 	);
+
+	const [isTemplateEdited, setIsTemplateEdited] = useState(false);
+
 	const wizardList = getWizardListByLoginType(
 		templateLayoutState.get('wizardList'),
 		isLoginTypeAdmin,
@@ -67,6 +70,9 @@ const TemplateLayout = (props) => {
 							isLoginTypeAdmin={isLoginTypeAdmin}
 							updateSelectedWizard={updateSelectedWizard}
 							updateTemplateID={updateTemplateID}
+							isTemplateEdited={isTemplateEdited}
+							setIsTemplateEdited={setIsTemplateEdited}
+							selectedTemplateID={templateID}
 						/>
 					)}
 					{activeWidgetID === 'target' && (
@@ -75,6 +81,7 @@ const TemplateLayout = (props) => {
 							isLoginTypeAdmin={isLoginTypeAdmin}
 							updateSelectedWizard={updateSelectedWizard}
 							templateID={templateID}
+							setIsTemplateEdited={setIsTemplateEdited}
 						/>
 					)}
 
