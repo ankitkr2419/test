@@ -63,8 +63,8 @@ type WellTarget struct {
 	CT           string    `db:"ct" json:"ct"`
 }
 
-func (s *pgStore) GetWellTarget(ctx context.Context, wellposition int32,experimentID uuid.UUID) (WellTargets []WellTarget, err error) {
-	err = s.db.Select(&WellTargets, getWellTargetsListQuery, wellposition,experimentID)
+func (s *pgStore) GetWellTarget(ctx context.Context, wellposition int32, experimentID uuid.UUID) (WellTargets []WellTarget, err error) {
+	err = s.db.Select(&WellTargets, getWellTargetsListQuery, wellposition, experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing WellTargets")
 		return
@@ -75,12 +75,10 @@ func (s *pgStore) GetWellTarget(ctx context.Context, wellposition int32,experime
 
 func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarget, experimentID uuid.UUID) (targets []WellTarget, err error) {
 
-	stmt := makeWellTargetQuery(WellTargets,experimentID)
-	// delstmt := WellTargetQuery(WellTargets, deleteWellTargetQuery)
-	getstmt := WellTargetQuery(WellTargets, getWellTargetListQuery)
-	fmt.Println(stmt)
-	//fmt.Println(delstmt)
-	fmt.Println(getstmt)
+	stmt := makeWellTargetQuery(WellTargets)
+	delstmt := wellTargetQuery(WellTargets, deleteWellTargetQuery)
+	getstmt := wellTargetQuery(WellTargets, getWellTargetListQuery)
+
 	tx, err := s.db.Begin()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in creating transaction")
@@ -105,12 +103,12 @@ func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarge
 	}
 
 	rows, err := tx.Query(
-		getstmt,experimentID,
+		getstmt, experimentID,
 	)
 
 	for rows.Next() {
 		var r WellTarget
-		if err := rows.Scan(&r.ExperimentID,&r.WellPosition, &r.TargetID, &r.CT, &r.TargetName); err != nil {
+		if err := rows.Scan(&r.ExperimentID, &r.WellPosition, &r.TargetID, &r.CT, &r.TargetName); err != nil {
 			logger.WithField("err", err.Error()).Error("Error getting new well targets")
 		}
 		targets = append(targets, r)
@@ -126,9 +124,6 @@ func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarge
 	return
 }
 
-
-
-
 func (s *pgStore) ListWellTargets(ctx context.Context, experimentID uuid.UUID) (WellTargets []WellTarget, err error) {
 
 	err = s.db.Select(&WellTargets, getWellTargetExpListQuery, experimentID)
@@ -141,12 +136,12 @@ func (s *pgStore) ListWellTargets(ctx context.Context, experimentID uuid.UUID) (
 }
 
 // prepare bulk insert query statement
-func makeWellTargetQuery(WellTargets []WellTarget,experimentID uuid.UUID) string {
+func makeWellTargetQuery(WellTargets []WellTarget, experimentID uuid.UUID) string {
 
 	values := make([]string, 0, len(WellTargets))
 
 	for _, t := range WellTargets {
-		values = append(values, fmt.Sprintf("('%v',%v,'%v')",experimentID, t.WellPosition, t.TargetID))
+		values = append(values, fmt.Sprintf("('%v',%v,'%v')", experimentID, t.WellPosition, t.TargetID))
 	}
 
 	stmt := fmt.Sprintf(insertWellTargetQuery,
