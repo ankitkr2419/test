@@ -26,8 +26,9 @@ const TemplateContainer = (props) => {
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
+	const createdTemplate = useSelector(state => state.createTemplateReducer);
 	// isTemplateCreated = true means template created successfully
-	const { isTemplateCreated } = useSelector(
+	const { isTemplateCreated, response  } = useSelector(
 		state => state.createTemplateReducer,
 	);
 	// isTemplateDeleted = true means template deleted successfully
@@ -41,8 +42,12 @@ const TemplateContainer = (props) => {
 	useEffect(() => {
 		// Once we create template will fetch updated template list
 		if (isTemplateCreated === true) {
+			// update the templateId in templateState maintained in templateLayout with created Id
+			updateTemplateID(response.id);
+			// navigate to next wizard
+			updateSelectedWizard('target');
 			dispatch(addTemplateReset());
-			dispatch(fetchTemplates());
+			// dispatch(fetchTemplates());
 		}
 	}, [isTemplateCreated, dispatch]);
 
