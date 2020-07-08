@@ -1,25 +1,44 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import RouteWithSubRoutes from 'RouteHelper';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import AppHeader from 'components/AppHeader';
 
 import '../assets/scss/default.scss';
+import { fetchActiveWells } from 'action-creators/activeWellActionCreators';
+import { getActiveLoadedWellFlag } from 'selectors/activeWellSelector';
 /**
  * AppLayoutContainer Will contain routes(content), headers, sub-headers, notification etc.
  * @param {*} props
  */
 const AppLayoutContainer = (props) => {
 	const { routes } = props;
-	const loginReducer  = useSelector(state => state.loginReducer);
+	const dispatch = useDispatch();
+	const loginReducer = useSelector(state => state.loginReducer);
+	const isActiveWellDataLoaded = useSelector(getActiveLoadedWellFlag);
+
+	useEffect(() => {
+		if (loginReducer.get('isLoginTypeOperator') === true
+		&& isActiveWellDataLoaded === false
+		) {
+			dispatch(fetchActiveWells());
+		}
+	}, [loginReducer, isActiveWellDataLoaded, dispatch]);
 
 	return (
 		<Router>
-			<AppHeader isUserLoggedIn={loginReducer.get('isUserLoggedIn')}/>
+			<AppHeader
+				isPlateRoute={loginReducer.get('isPlateRoute')}
+				isUserLoggedIn={loginReducer.get('isUserLoggedIn')}
+				isLoginTypeAdmin={loginReducer.get('isLoginTypeAdmin')}
+				isLoginTypeOperator={loginReducer.get('isLoginTypeOperator')}
+			/>
 			<section className="ml-content">
 				<Switch>
 					<Redirect exact from="/" to="/login" />
-					{routes.map(route => <RouteWithSubRoutes key={route.key} {...route} />)}
+					{routes.map(route => (
+						<RouteWithSubRoutes key={route.key} {...route} />
+					))}
 				</Switch>
 			</section>
 		</Router>

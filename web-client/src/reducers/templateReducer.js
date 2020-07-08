@@ -26,6 +26,15 @@ const deleteTemplateInitialState = {
 	isTemplateDeleted: false,
 };
 
+// eslint-disable-next-line arrow-body-style
+export const getTemplateById = (state, templateId) => {
+	const result = state.getIn(['list'], myDefaultList => myDefaultList.map(ele => ele.id === templateId));
+	if (result !== null && result.size !== 0) {
+		return result.get(0);
+	}
+	return null;
+};
+
 export const listTemplatesReducer = (
 	state = listTemplateInitialState,
 	action,

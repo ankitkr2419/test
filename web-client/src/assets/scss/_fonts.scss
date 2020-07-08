@@ -1,6 +1,6 @@
 $icon-font-family: 'mylab-icons';
 $icon-font-path: '../fonts';
-$icon-font-code: '5td3qm';
+$icon-font-code: 'aovyn';
 
 $icon-angle-down: '\e900';
 $icon-angle-left: '\e901';
@@ -14,6 +14,7 @@ $icon-minus-1: '\e908';
 $icon-minus-2: '\e909';
 $icon-move: '\e90a';
 $icon-pencil: '\e90b';
+$icon-edit: '\e90b';
 $icon-plus-1: '\e90c';
 $icon-plus-2: '\e90d';
 $icon-plus-3: '\e90e';
@@ -21,6 +22,9 @@ $icon-print: '\e90f';
 $icon-trash: '\e910';
 $icon-user: '\e911';
 $icon-steps: '\e912';
+$icon-expand: '\e913';
+$icon-bell: '\e914';
+$icon-search: '\e915';
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -113,6 +117,11 @@ $icon-steps: '\e912';
 		content: $icon-pencil;
 	}
 }
+.icon-edit {
+	&:before {
+		content: $icon-edit;
+	}
+}
 .icon-plus-1 {
 	&:before {
 		content: $icon-plus-1;
@@ -146,5 +155,20 @@ $icon-steps: '\e912';
 .icon-steps {
 	&:before {
 		content: $icon-steps;
+	}
+}
+.icon-expand {
+	&:before {
+		content: $icon-expand;
+	}
+}
+.icon-bell {
+	&:before {
+		content: $icon-bell;
+	}
+}
+.icon-search {
+	&:before {
+		content: $icon-search;
 	}
 }

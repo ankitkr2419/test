@@ -4,6 +4,7 @@ import {
 	saveTargetActions,
 	listTargetByTemplateIDActions,
 } from 'actions/targetActions';
+import loginActions from 'actions/loginActions';
 
 const listTargetInitialState = fromJS({
 	list: [],
@@ -40,12 +41,14 @@ export const listTargetByTemplateIDReducer = (
 	case listTargetByTemplateIDActions.listAction:
 		return state.setIn(['isLoading'], true);
 	case listTargetByTemplateIDActions.successAction:
-		return state.merge({ selectedTargets: fromJS(action.payload.response), isLoading: false });
+		return state.merge({ selectedTargets: fromJS(action.payload.response || []), isLoading: false });
 	case listTargetByTemplateIDActions.failureAction:
 		return state.merge({
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
+	case loginActions.loginReset:
+		return listTargetByTemplateIDInitialState;
 	default:
 		return state;
 	}

@@ -22,3 +22,10 @@ export const loginReset = () => ({
 export const loginAsOperator = () => ({
 	type: loginActions.setLoginTypeAsOperator,
 });
+
+export const setIsPlateRoute = isPlateRoute => ({
+	type: loginActions.setIsPlateRoute,
+	payload: {
+		isPlateRoute,
+	},
+});

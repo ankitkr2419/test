@@ -153,7 +153,7 @@ func makeWellTargetQuery(WellTargets []WellTarget, experimentID uuid.UUID) strin
 }
 
 // prepare bulk delete/select query statement
-func WellTargetQuery(WellTargets []WellTarget, q string) string {
+func wellTargetQuery(WellTargets []WellTarget, q string) string {
 
 	values := make([]string, 0, len(WellTargets))
 

@@ -37,7 +37,7 @@
 	}
 
 	&.sidebar-graph {
-		width: rem(1004px);
+		width: rem(948px);
 		left: rem(-928px);
 
 		.sidebar-handle {
@@ -69,25 +69,36 @@
 		font-size: rem(18px);
 		font-weight: bold;
 		box-shadow: rem(0 3px 6px) #00000012;
-		border-width: 2px;
 		border-style: solid;
-		border-color: $pale;
 		border-right-width: 1px;
 		border-radius: rem(9px 0 0 9px);
+		border-width: 1px;
+		border-color: $gray-80;
+
+		&.active {
+			border-width: 2px;
+			border-color: $pale;
+		}
 	}
 
 	.form-control {
 		background: $white 0% 0% no-repeat padding-box;
 		font-size: rem(18px);
 		box-shadow: rem(0 3px 6px) #00000012;
-		border-width: 2px;
 		border-style: solid;
-		border-color: $pale;
+		border-width: 1px;
+		border-color: $gray-80;
 		border-left-width: 1px;
 		border-radius: rem(0 9px 9px 0);
 		text-align: center;
 		transition: transform 0.5s ease;
+		margin-left: 2px;
 
+		&.active {
+			border-width: 2px;
+			border-color: $pale;
+			margin-left: 0;
+		}
 		&:active,
 		&:focus {
 			transform: scale(1.2);

@@ -19,10 +19,6 @@ db/application_test\.yml
 
 # misc
 /web-client/.DS_Store
-/web-client/.env.local
-/web-client/.env.development.local
-/web-client/.env.test.local
-/web-client/.env.production.local
 
 /web-client/npm-debug.log*
 /web-client/yarn-debug.log*

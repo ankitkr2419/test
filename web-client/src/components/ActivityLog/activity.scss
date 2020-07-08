@@ -1,0 +1,46 @@
+@import '../../assets/scss/core';
+
+.table-responsive {
+	box-shadow: 0 3px 16px #0000000f;
+	border: 1px solid $gray-80;
+}
+
+.table-log {
+	th,
+	td {
+		border-left: 1px solid $gray-80;
+		&:first-child {
+			padding-left: rem(16px);
+			border-left: 0 none;
+		}
+
+		&:last-child {
+			border-left: 0 none;
+		}
+	}
+
+	thead th {
+		background-color: rgba(0, 0, 0, 0.15);
+		padding: rem(32px 10px);
+		border-bottom: 0 none;
+		color: $white;
+	}
+
+	tbody {
+		background: #fafafa 0% 0% no-repeat padding-box;
+
+		tr.active {
+			background-color: #f5e8dc;
+		}
+
+		td {
+			font-size: rem(14px);
+			line-height: rem(19px);
+			padding: rem(20px 10px);
+
+			&.td-actions {
+				padding: rem(8px 16px);
+			}
+		}
+	}
+}

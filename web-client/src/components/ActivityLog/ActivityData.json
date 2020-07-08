@@ -1,0 +1,114 @@
+{
+	"headers": [
+		"Exp ID",
+		"Template",
+		"Date",
+		"Start time",
+		"End time",
+		"No. Of Wells",
+		"Repeat Cycles",
+		"Result"
+	],
+	"experiments": [
+		{
+			"id": "ID001",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "5",
+			"result": "Successful"
+		},
+		{
+			"id": "ID002",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "7",
+			"result": "Inconclusive"
+		},
+		{
+			"id": "ID003",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "3",
+			"result": "Error"
+		},
+		{
+			"id": "ID004",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "8",
+			"result": "Successful"
+		},
+		{
+			"id": "ID005",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "2",
+			"result": "Successful"
+		},
+		{
+			"id": "ID006",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "5",
+			"result": "Successful"
+		},
+		{
+			"id": "ID007",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "7",
+			"result": "Successful"
+		},
+		{
+			"id": "ID008",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "3",
+			"result": "Successful"
+		},
+		{
+			"id": "ID009",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "8",
+			"result": "Successful"
+		},
+		{
+			"id": "ID0010",
+			"template": "Template Name",
+			"date": "23/05/2020",
+			"start_time": "23:50 PM",
+			"end_time": "01:21 AM",
+			"no_of_wells": "60",
+			"repeat_cycles": "2",
+			"result": "Successful"
+		}
+	]
+}

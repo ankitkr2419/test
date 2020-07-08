@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import {
 	Button, CheckBox, Select, Input,
 } from 'core-components';
@@ -11,6 +12,12 @@ import {
 } from 'shared-components';
 
 import { covertToSelectOption } from 'utils/helpers';
+import TargetHeader from './TargetHeader';
+
+const TargetActions = styled.div`
+  justify-content: space-between;
+  padding: 39px 48px 37px 16px;
+`;
 
 const TargetComponent = (props) => {
 	const {
@@ -22,15 +29,14 @@ const TargetComponent = (props) => {
 		onTargetSelect,
 		onThresholdChange,
 		onSaveClick,
-		getCheckedTargetCount,
+		onNextClick,
 		isLoginTypeAdmin,
 		isLoginTypeOperator,
+		isTargetListUpdated,
+		selectedTemplateDetails,
+		isViewStagesEnabled,
+		navigateToStageWizard,
 	} = props;
-
-	// Extracting targetList from immutable target state
-	const targetList = selectedTargetState.get('targetList');
-	// selected target count will help us in validating save button
-	const selectedTargetCount = getCheckedTargetCount();
 
 	const isTargetDisabled = (ele) => {
 		if (ele.selectedTarget === undefined || ele.threshold === undefined) {
@@ -40,17 +46,19 @@ const TargetComponent = (props) => {
 	};
 
 	const getTargetRows = useMemo(
-		() => targetList.map((ele, index) => (
+		() => selectedTargetState.map((ele, index) => (
 			<TargetListItem key={index}>
-				<CheckBox
-					onChange={(event) => {
-						onCheckedHandler(event, index);
-					}}
-					className="mr-2"
-					id={`target${index}`}
-					checked={ele.isChecked}
-					disabled={isTargetDisabled(ele)}
-				/>
+				{isLoginTypeOperator === true && (
+					<CheckBox
+						onChange={(event) => {
+							onCheckedHandler(event, index);
+						}}
+						className="mr-2"
+						id={`target${index}`}
+						checked={ele.isChecked}
+						disabled={isTargetDisabled(ele)}
+					/>
+				)}
 				{isLoginTypeAdmin === true && (
 					// if it's a admin he can select targets from master targets
 					<Select
@@ -79,7 +87,7 @@ const TargetComponent = (props) => {
 					name={`threshold${index}`}
 					index={`threshold${index}`}
 					placeholder="Type here..."
-					value={ele.threshold || ''}
+					value={ele.threshold === undefined ? '' : ele.threshold}
 					min="0"
 					onChange={(event) => {
 						onThresholdChange(event.target.value, index);
@@ -92,48 +100,78 @@ const TargetComponent = (props) => {
 			onCheckedHandler,
 			onTargetSelect,
 			onThresholdChange,
-			targetList,
+			selectedTargetState,
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
 		],
 	);
 	return (
-		<>
-			<div className="flex-100 scroll-y p-4">
-				<TargetList className="list-target">
-					<TargetListHeader>
-						<Text className="mb-2 mr-2" />
-						<Text className="flex-100 mb-2 px-4">Target</Text>
-						<Text className="flex-40 mb-2 px-4">Threshold</Text>
-					</TargetListHeader>
-					{getTargetRows}
-				</TargetList>
+		<div className="d-flex flex-column overflow-hidden flex-100 py-5">
+			<TargetHeader
+				isLoginTypeAdmin={isLoginTypeAdmin}
+				isLoginTypeOperator={isLoginTypeOperator}
+				selectedTemplateDetails={selectedTemplateDetails}
+			/>
+			<div className="d-flex overflow-hidden">
+				<div className="flex-70 scroll-y p-3">
+					<TargetList className="list-target">
+						<TargetListHeader>
+							<Text className="mb-2 mr-2" />
+							<Text className="flex-100 mb-2 px-4">Target</Text>
+							<Text className="flex-40 mb-2 px-4">Threshold</Text>
+						</TargetListHeader>
+						{getTargetRows}
+					</TargetList>
+				</div>
+				<TargetActions className="d-flex flex-column flex-30">
+					{isLoginTypeAdmin === true && (
+						<Button
+							color="primary"
+							onClick={navigateToStageWizard}
+							className="mx-auto mb-3"
+							disabled={isTargetListUpdated === true || isViewStagesEnabled === false}
+						>
+              View Stages
+						</Button>
+					)}
+					{isLoginTypeOperator === true && (
+						<Button
+							color="primary"
+							onClick={onNextClick}
+							className="mx-auto mb-3"
+							disabled={isTargetListUpdated}
+						>
+              Next
+						</Button>
+					)}
+					<Button
+						color="primary"
+						onClick={onSaveClick}
+						className="mx-auto"
+						disabled={isTargetListUpdated === false}
+					>
+            Save
+					</Button>
+				</TargetActions>
 			</div>
-			<div className="d-flex flex-30 align-items-end p-4">
-				<Button
-					color="primary"
-					onClick={onSaveClick}
-					className="mx-auto mb-3"
-					// TODO Enabled it once operator new design is in place
-					disabled={selectedTargetCount === 0 || isLoginTypeOperator === true}
-				>
-          Save
-				</Button>
-			</div>
-		</>
+		</div>
 	);
 };
 
 TargetComponent.propTypes = {
-	listTargetReducer: PropTypes.object.isRequired,
 	selectedTargetState: PropTypes.object.isRequired,
+	selectedTemplateDetails: PropTypes.object.isRequired,
 	onCheckedHandler: PropTypes.func.isRequired,
-	onTargetSelect: PropTypes.func.isRequired,
 	onThresholdChange: PropTypes.func.isRequired,
 	onSaveClick: PropTypes.func.isRequired,
-	getCheckedTargetCount: PropTypes.func.isRequired,
 	isLoginTypeAdmin: PropTypes.bool.isRequired,
 	isLoginTypeOperator: PropTypes.bool.isRequired,
+	isTargetListUpdated: PropTypes.bool.isRequired,
+	listTargetReducer: PropTypes.object,
+	onTargetSelect: PropTypes.func,
+	onNextClick: PropTypes.func,
+	isViewStagesEnabled: PropTypes.bool,
+	navigateToStageWizard: PropTypes.func,
 };
 
 export default TargetComponent;

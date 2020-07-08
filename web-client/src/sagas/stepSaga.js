@@ -12,7 +12,7 @@ import {
 	updateStepFailed,
 	deleteStepFailed,
 } from 'action-creators/stepActionCreators';
-import { HTTP_METHODS } from '../constants';
+import { HTTP_METHODS } from 'appConstants';
 
 export function* addStep(actions) {
 	const {

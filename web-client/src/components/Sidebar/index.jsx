@@ -1,9 +1,41 @@
-import React from "react";
-import PropTypes from "prop-types";
-import styled from "styled-components";
-import SidebarContent from "./SidebarContent";
-import SidebarBody from "./SidebarBody";
-import SidebarHandle from "./SidebarHandle";
+import React from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import styled from 'styled-components';
+import SidebarContent from './SidebarContent';
+import SidebarBody from './SidebarBody';
+import SidebarHandle from './SidebarHandle';
+
+const Sidebar = ({
+	className,
+	handleIcon,
+	handleIconSize,
+	children,
+	isOpen,
+	isClose,
+	toggleSideBar,
+	isDisabled,
+}) => {
+	const classes = classNames(
+		'sidebar',
+		`sidebar-${className}`,
+		{ open: isOpen },
+		{ close: isClose },
+	);
+	return (
+		<StyledSidebar className={classes}>
+			<SidebarHandle
+				clickHandler={toggleSideBar}
+				icon={handleIcon}
+				size={handleIconSize}
+				isDisabled={isDisabled}
+			/>
+			<SidebarContent className='flex-100'>
+				<SidebarBody className='flex-100'>{children}</SidebarBody>
+			</SidebarContent>
+		</StyledSidebar>
+	);
+};
 
 const StyledSidebar = styled.aside`
 	display: flex;
@@ -12,14 +44,13 @@ const StyledSidebar = styled.aside`
 	min-width: 408px;
 	top: 0;
 	bottom: 0;
-	left: -332px;
-	padding: 0 56px 0 0;
-	overflow: hidden;
-	transition: left 1s ease;
+	left: -388px;
 	z-index: 0;
+	transition: left 1s ease;
 
 	&.open {
 		left: 0;
+		z-index: 1;
 	}
 
 	&.close {
@@ -27,29 +58,22 @@ const StyledSidebar = styled.aside`
 	}
 `;
 
-const Sidebar = ({ className, handleIcon, handleIconSize, children }) => {
-	return (
-		<StyledSidebar className={`sidebar sidebar-${className}`}>
-			<SidebarContent className="flex-100">
-				<SidebarHandle
-					icon={handleIcon}
-					size={handleIconSize}
-				/>
-				<SidebarBody className="flex-100">{children}</SidebarBody>
-			</SidebarContent>
-		</StyledSidebar>
-	);
-};
-
 Sidebar.propTypes = {
 	className: PropTypes.string,
-	handleIcon: PropTypes.string.isRequired,
 	handleIconSize: PropTypes.number,
+	isOpen: PropTypes.bool,
+	isClose: PropTypes.bool,
+	isDisabled: PropTypes.bool,
+	children: PropTypes.any,
+	handleIcon: PropTypes.string.isRequired,
+	toggleSideBar: PropTypes.func.isRequired,
 };
 
 Sidebar.defaultProps = {
-	className: "",
+	className: '',
 	handleIconSize: 24,
+	isOpen: false,
+	isClose: false,
 };
 
 export default Sidebar;
