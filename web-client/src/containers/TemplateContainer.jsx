@@ -6,8 +6,10 @@ import {
 	fetchTemplates,
 	createTemplate as createTemplateAction,
 	deleteTemplate as deleteTemplateAction,
+	updateTemplate as updateTemplateAction,
 	addTemplateReset,
 	deleteTemplateReset,
+	updateTemplateReset,
 } from 'action-creators/templateActionCreators';
 
 import {
@@ -22,6 +24,9 @@ const TemplateContainer = (props) => {
 		isLoginTypeAdmin,
 		updateSelectedWizard,
 		updateTemplateID,
+		isTemplateEdited,
+		setIsTemplateEdited,
+		selectedTemplateID,
 	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
@@ -36,6 +41,9 @@ const TemplateContainer = (props) => {
 		state => state.deleteTemplateReducer,
 	);
 
+	const { isTemplateUpdated } = useSelector(
+		state => state.updateTemplateReducer,
+	);
 	// isTemplateDeleted = true means experiment created successfully
 	const isExperimentSaved = useSelector(getIsExperimentSaved);
 
@@ -47,7 +55,6 @@ const TemplateContainer = (props) => {
 			// navigate to next wizard
 			updateSelectedWizard('target');
 			dispatch(addTemplateReset());
-			// dispatch(fetchTemplates());
 		}
 	}, [isTemplateCreated, dispatch]);
 
@@ -58,6 +65,13 @@ const TemplateContainer = (props) => {
 			dispatch(fetchTemplates());
 		}
 	}, [isTemplateDeleted, dispatch]);
+
+	useEffect(() => {
+		if (isTemplateUpdated === true) {
+			dispatch(updateTemplateReset());
+			dispatch(fetchTemplates());
+		}
+	}, [isTemplateUpdated, dispatch]);
 
 	useEffect(() => {
 		// getting templates through api.
@@ -81,6 +95,10 @@ const TemplateContainer = (props) => {
 		dispatch(createTemplateAction(template));
 	};
 
+	const updateTemplate = (templateID, template) => {
+		dispatch(updateTemplateAction(templateID, template));
+	};
+
 	const deleteTemplate = (templateID) => {
 		// deleting template though api
 		dispatch(deleteTemplateAction(templateID));
@@ -99,11 +117,15 @@ const TemplateContainer = (props) => {
 			templates={templates.get('list')}
 			createTemplate={createTemplate}
 			deleteTemplate={deleteTemplate}
+			updateTemplate={updateTemplate}
 			updateSelectedWizard={updateSelectedWizard}
 			updateTemplateID={updateTemplateID}
+			templateID={selectedTemplateID}
 			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
 			createExperiment={createExperiment}
+			isTemplateEdited={isTemplateEdited}
+			setIsTemplateEdited={setIsTemplateEdited}
 		/>
 	);
 };

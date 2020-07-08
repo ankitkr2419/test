@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'core-components';
 import PropTypes from 'prop-types';
 import {
@@ -11,16 +11,21 @@ import {
 import imgNoTemplate from 'assets/images/no-template-available.svg';
 import CreateTemplateModal from './CreateTemplateModal';
 
+
 const TemplateComponent = (props) => {
 	const {
 		templates,
 		createTemplate,
 		deleteTemplate,
+		updateTemplate,
 		updateSelectedWizard,
 		updateTemplateID,
 		isLoginTypeOperator,
 		isLoginTypeAdmin,
 		createExperiment,
+		isTemplateEdited,
+		setIsTemplateEdited,
+		templateID,
 	} = props;
 
 	// Local state to manage create template modal
@@ -40,6 +45,19 @@ const TemplateComponent = (props) => {
 		setCreateTemplateModalVisibility(!isCreateTemplateModalVisible);
 	};
 
+	const autofillNameDescription = () => {
+		const template = templates.find(ele => ele.get('id') === templateID);
+		setTemplateName(template.get('name'));
+		setTemplateDescription(template.get('description'));
+	};
+
+	useEffect(() => {
+		if (isTemplateEdited === true && isCreateTemplateModalVisible === false) {
+			autofillNameDescription();
+			toggleCreateTemplateModal();
+		}
+	}, [isTemplateEdited]);
+
 	// Validate create template form
 	const validateTemplateForm = () => {
 		if (templateDescription !== '' && templateName !== '') {
@@ -51,10 +69,18 @@ const TemplateComponent = (props) => {
 	const addClickHandler = () => {
 		if (validateTemplateForm()) {
 			// Create new template rest api call.
-			createTemplate({
-				description: templateDescription,
-				name: templateName,
-			});
+			if (isTemplateEdited) {
+				updateTemplate(templateID, {
+					description: templateDescription,
+					name: templateName,
+				});
+				setIsTemplateEdited(false);
+			} else {
+				createTemplate({
+					description: templateDescription,
+					name: templateName,
+				});
+			}
 			toggleCreateTemplateModal();
 		}
 		// TODO show error notification
@@ -153,6 +179,7 @@ const TemplateComponent = (props) => {
 					addClickHandler={addClickHandler}
 					isFormValid={validateTemplateForm()}
 					resetFormValues={resetFormValues}
+					isTemplateEdited={isTemplateEdited}
 				/>
 			)}
 		</div>

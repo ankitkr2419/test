@@ -37,6 +37,7 @@ const TargetComponent = (props) => {
 		selectedTemplateDetails,
 		isViewStagesEnabled,
 		navigateToStageWizard,
+		editTemplate,
 	} = props;
 
 	const isTargetDisabled = (ele) => {
@@ -47,7 +48,8 @@ const TargetComponent = (props) => {
 	};
 
 	const getFilteredOptionsList = useMemo(
-		() => listTargetReducer.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState)), [listTargetReducer, selectedTargetState],
+		() => listTargetReducer.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState)),
+		[listTargetReducer, selectedTargetState],
 	);
 
 	const getTargetRows = useMemo(
@@ -116,6 +118,7 @@ const TargetComponent = (props) => {
 				isLoginTypeAdmin={isLoginTypeAdmin}
 				isLoginTypeOperator={isLoginTypeOperator}
 				selectedTemplateDetails={selectedTemplateDetails}
+				editTemplate={editTemplate}
 			/>
 			<div className="d-flex overflow-hidden">
 				<div className="flex-70 scroll-y p-3">

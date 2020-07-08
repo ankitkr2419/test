@@ -3,6 +3,7 @@ import {
 	createTemplateReducer,
 	listTemplatesReducer,
 	deleteTemplateReducer,
+	updateTemplateReducer,
 } from 'reducers/templateReducer';
 import {
 	listTargetReducer,
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
 	createTemplateReducer,
 	listTemplatesReducer,
 	deleteTemplateReducer,
+	updateTemplateReducer,
 	listTargetReducer,
 	listTargetByTemplateIDReducer,
 	saveTargetReducer,

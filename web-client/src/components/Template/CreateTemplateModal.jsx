@@ -24,6 +24,7 @@ const CreateTemplateModal = (props) => {
 		addClickHandler,
 		isFormValid,
 		resetFormValues,
+		isTemplateEdited,
 	} = props;
 
 	// disabled as we only need effect to be run while component is un-mounting
@@ -107,7 +108,7 @@ const CreateTemplateModal = (props) => {
 								color="primary"
 								disabled={isFormValid === false}
 							>
-								Add
+								{isTemplateEdited ? 'Save' : 'Add'}
 							</Button>
 						</Center>
 					</Form>
