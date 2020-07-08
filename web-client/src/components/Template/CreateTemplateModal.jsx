@@ -25,6 +25,7 @@ const CreateTemplateModal = (props) => {
 		isFormValid,
 		resetFormValues,
 		isTemplateEdited,
+		setIsTemplateEdited,
 	} = props;
 
 	// disabled as we only need effect to be run while component is un-mounting
@@ -39,6 +40,7 @@ const CreateTemplateModal = (props) => {
 	return (
 		<>
 			<Modal
+				onExit={() => setIsTemplateEdited(false)}
 				isOpen={isCreateTemplateModalVisible}
 				toggle={toggleCreateTemplateModal}
 				centered
