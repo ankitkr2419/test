@@ -21,8 +21,8 @@ type Simulator struct {
 	plcIO     plcRegistors
 	config    plc.Stage
 	emissions []plc.Emissions
-	exitCh    chan string
-	errCh     chan error
+	ExitCh    chan string
+	ErrCh     chan error
 	wells     []Well
 }
 
@@ -30,8 +30,8 @@ func NewSimulator(exit chan error) plc.Driver {
 	ex := make(chan string)
 
 	s := Simulator{}
-	s.exitCh = ex
-	s.errCh = exit
+	s.ExitCh = ex
+	s.ErrCh = exit
 	s.pcrHeartBeat()
 	return &s
 }
@@ -68,7 +68,7 @@ func (d *Simulator) HeartBeat() {
 
 		// something went wrong. Signal parent process
 		logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-		d.errCh <- err
+		d.ErrCh <- err
 		return
 	}()
 }
@@ -109,7 +109,7 @@ func (d *Simulator) Stop() (err error) {
 		}
 
 		d.plcIO.m.startStopCycle = 0
-		d.exitCh <- "stop"
+		d.ExitCh <- "stop"
 	}()
 
 	return
@@ -131,7 +131,7 @@ func (d *Simulator) simulate() {
 		case msg := <-d.exitCh:
 			logger.WithField("msg", msg).Info("simulate: ExitCh received data")
 			if msg == "stop" {
-				d.errCh <- errors.New("PCR Stopped")
+				d.ErrCh <- errors.New("PCR Stopped")
 				return
 			}
 			if msg == "abort" {

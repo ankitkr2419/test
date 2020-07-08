@@ -48,4 +48,5 @@ type Storer interface {
 	InsertResult(context.Context, []Result) ([]Result, error)
 	ListWellTargets(context.Context, []uuid.UUID) ([]WellTarget, error)
 	UpdateStopTimeExperiments(context.Context, time.Time, uuid.UUID) error
+        GetResult(context.Context, uuid.UUID) ([]Result, error)
 }

@@ -62,7 +62,7 @@ func (d *Simulator) cycleStage() {
 		// takes 1 to 3 seconds for cooling down
 		time.Sleep(time.Duration(jitter(1, 1, 3)) * time.Second)
 	}
-	d.exitCh <- "stop"
+	d.ExitCh <- "stop"
 }
 
 func (d *Simulator) performSteps(steps []plc.Step) {
@@ -70,7 +70,7 @@ func (d *Simulator) performSteps(steps []plc.Step) {
 		// ramping up temp
 		for {
 			if d.plcIO.m.startStopCycle == 0 {
-				d.errCh <- errors.New("recieved stop signal")
+				d.ErrCh <- errors.New("recieved stop signal")
 				return
 			}
 

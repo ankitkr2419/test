@@ -76,6 +76,9 @@ type TargetDetails struct {
 type FinalResult struct {
 	MaxThreshold float32    `json:"max_threshold"`
 	Data         []WellData `json:"data"`
+	LidTemperature float32 `json:"lid_temp"`
+	Temperature float32 `json:"temperature"`
+	CurrentCycle uint16    `json:"current_cycle"`
 }
 
 type WellData struct {
@@ -119,6 +122,17 @@ func (s *pgStore) ListWellTargetsResult(ctx context.Context, r Result) (w []Well
 	return
 }
 
+
+func (s *pgStore) GetResult(ctx context.Context, ExperimentID uuid.UUID) (rDB []Result, err error) {
+	err = s.db.Select(&rDB, getAllCyclesResultQuery, ExperimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing well details")
+		return
+	}
+
+	return
+}
+
 func (s *pgStore) InsertResult(ctx context.Context, r []Result) (rDB []Result, err error) {
 	stmt := makeResultQuery(r)
 
@@ -144,7 +158,7 @@ func makeResultQuery(results []Result) string {
 	values := make([]string, 0, len(results))
 
 	for _, r := range results {
-		
+
 		values = append(values, fmt.Sprintf("('%v', '%v', %v,%v,%v)", r.ExperimentID, r.TargetID, r.WellPosition, r.Cycle, r.FValue))
 	}
 
