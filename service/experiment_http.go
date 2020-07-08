@@ -8,11 +8,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
 )
 
-var upgrader = websocket.Upgrader{} // use default options
 
 func listExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -190,6 +188,9 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		//ExperimentRunning set true
 		ExperimentRunning = true
 
+		//invoke monitor
+		go monitorExperiment(deps)
+
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`{"msg":"experiment started"}`))
@@ -311,3 +312,5 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 	})
 }
+
+

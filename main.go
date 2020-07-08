@@ -95,6 +95,7 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	exit := make(chan error)
+
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
 		driver = compact32.NewCompact32Driver(exit, test)
@@ -133,6 +134,7 @@ func startApp(plcName string, test bool) (err error) {
 	var addr = flag.String("addr", "localhost:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
 	router := service.InitRouter(deps)
+
 	// to embed react build with go rice
 	router.PathPrefix("/").Handler(http.FileServer(rice.MustFindBox("./web-client/build").HTTPBox()))
 
