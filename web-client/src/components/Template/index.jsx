@@ -180,6 +180,7 @@ const TemplateComponent = (props) => {
 					isFormValid={validateTemplateForm()}
 					resetFormValues={resetFormValues}
 					isTemplateEdited={isTemplateEdited}
+					setIsTemplateEdited={setIsTemplateEdited}
 				/>
 			)}
 		</div>
