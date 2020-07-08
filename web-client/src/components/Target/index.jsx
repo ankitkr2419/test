@@ -13,6 +13,7 @@ import {
 
 import { covertToSelectOption } from 'utils/helpers';
 import TargetHeader from './TargetHeader';
+import { checkIfIdPresentInList } from './targetHelper';
 
 const TargetActions = styled.div`
   justify-content: space-between;
@@ -45,6 +46,10 @@ const TargetComponent = (props) => {
 		return false;
 	};
 
+	const getFilteredOptionsList = useMemo(
+		() => listTargetReducer.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState)), [listTargetReducer, selectedTargetState],
+	);
+
 	const getTargetRows = useMemo(
 		() => selectedTargetState.map((ele, index) => (
 			<TargetListItem key={index}>
@@ -63,7 +68,7 @@ const TargetComponent = (props) => {
 					// if it's a admin he can select targets from master targets
 					<Select
 						className="flex-100 px-2"
-						options={covertToSelectOption(listTargetReducer, 'name', 'id')}
+						options={covertToSelectOption(getFilteredOptionsList, 'name', 'id')}
 						placeholder="Please select target."
 						onChange={(selectedTarget) => {
 							onTargetSelect(selectedTarget, index);
