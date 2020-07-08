@@ -25,12 +25,13 @@ const StageComponent = (props) => {
 		saveStage,
 		goToStepWizard,
 		isStagesLoading,
+		goToTargetWizard,
 	} = props;
 
 	// local state to save form data and modal state flag
 	const [stageFormState, updateStageFormState] = useReducer(
 		stageStateReducer,
-		stageStateInitialState
+		stageStateInitialState,
 	);
 	// immutable => js
 	const stageFormStateJS = stageFormState.toJS();
@@ -49,7 +50,7 @@ const StageComponent = (props) => {
 	const toggleCreateStageModal = () => {
 		updateStageFormStateWrapper(
 			'isCreateStageModalVisible',
-			!isCreateStageModalVisible
+			!isCreateStageModalVisible,
 		);
 	};
 
@@ -96,7 +97,9 @@ const StageComponent = (props) => {
 
 	// edit stage handler
 	const editStage = (stage) => {
-		const { id, name, type, repeat_count } = stage.toJS();
+		const {
+			id, name, type, repeat_count,
+		} = stage.toJS();
 		updateStageFormState({
 			type: stageStateActions.UPDATE_STAGE_STATE,
 			value: {
@@ -122,9 +125,9 @@ const StageComponent = (props) => {
 		// stages.size = 0  will tell us there is no records present
 		// isCreateStageModalVisible is check as we have to make modal visible only once
 		if (
-			isStagesLoading === false &&
-			stages.size === 0 &&
-			isCreateStageModalVisible === false
+			isStagesLoading === false
+			&& stages.size === 0
+			&& isCreateStageModalVisible === false
 		) {
 			updateStageFormStateWrapper('isCreateStageModalVisible', true);
 		}
@@ -137,7 +140,7 @@ const StageComponent = (props) => {
 			<TableWrapper>
 				<Table striped>
 					<colgroup>
-						{stageTableHeader.map((ele) => (
+						{stageTableHeader.map(ele => (
 							<col key={ele.name} width={ele.width} />
 						))}
 						<col />
@@ -145,7 +148,7 @@ const StageComponent = (props) => {
 
 					<thead>
 						<tr>
-							{stageTableHeader.map((ele) => (
+							{stageTableHeader.map(ele => (
 								<th key={ele.name}>{ele.name}</th>
 							))}
 							<th />
@@ -200,6 +203,7 @@ const StageComponent = (props) => {
 						name='angle-left'
 						size={32}
 						className='mr-auto border-0'
+						onClick={goToTargetWizard}
 					/>
 					<Button color='primary' icon onClick={toggleCreateStageModal}>
 						<Icon size={40} name='plus-2' />
