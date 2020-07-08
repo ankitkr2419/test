@@ -53,7 +53,7 @@ const (
 )
 
 type WellConfig struct {
-	Position []int       `json:"position" validate:"required"`
+	Position []int32     `json:"position" validate:"required"`
 	Sample   Sample      `json:"sample" validate:"required"`
 	Task     string      `json:"task" validate:"required"`
 	Targets  []uuid.UUID `json:"targets" validate:"required"`
@@ -61,7 +61,7 @@ type WellConfig struct {
 
 type Well struct {
 	ID           uuid.UUID    `db:"id" json:"id"`
-	Position     int          `db:"position" json:"position" validate:"required"`
+	Position     int32        `db:"position" json:"position" validate:"required"`
 	ExperimentID uuid.UUID    `db:"experiment_id" json:"experiment_id"validate:"required"`
 	SampleID     uuid.UUID    `db:"sample_id" json:"sample_id"validate:"required"`
 	Task         string       `db:"task" json:"task"validate:"required"`

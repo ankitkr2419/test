@@ -1,6 +1,7 @@
 package service
 
 import (
+	"strconv"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -19,6 +20,7 @@ var (
 	orange                      = "#F3811F" // If the CT values are close to threshold (delta)
 	maxThreshold      float32   = 32000     // max threshold
 	ExperimentRunning           = false     // In case of pre-emptive stop we need to send signal to monitor through this flag
+	Read                        = 0
 )
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
@@ -119,6 +121,57 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 	return
 }
 
+func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget,DBWells []db.Well,currentCycle,totalCycle uint16) ([]db.WellTarget,[]db.Well){
+
+	if len(DBWells) == 0 && len(DBWellTargets) == 0 {
+		for _,r := range Result {
+			var wt db.WellTarget
+			wt.WellPosition = r.WellPosition
+			wt.TargetID = r.TargetID
+
+			wt.ExperimentID = r.ExperimentID
+			if r.Threshold > float32(r.FValue) {
+				// add ct value	
+				wt.CT = strconv.Itoa(int(r.FValue))
+			} else {
+				wt.CT = ""				
+			}
+			DBWellTargets = append(DBWellTargets,wt)	
+		}
+		return DBWellTargets,DBWells
+	} else {				// determine color
+		for _,r := range Result {
+			for i,w := range DBWells {
+				for j, t := range DBWellTargets{
+					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
+						switch {
+							case 5 >= currentCycle && currentCycle <= 25 && float32(r.FValue) > r.Threshold && t.CT == "":
+								// mark red
+								DBWells[i].ColorCode = red
+								DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+
+    							case 25 <= currentCycle && float32(r.FValue) > r.Threshold && t.CT== "":
+								// mark orange
+								DBWells[i].ColorCode = orange
+								DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+			
+							case float32(r.FValue) > r.Threshold && t.CT == "":
+								// only update ct
+								DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+							case float32(r.FValue) > r.Threshold && t.CT != "":
+								// only update ct
+								DBWellTargets[j].CT = "UNDETERMINE"
+								DBWells[i].ColorCode = red
+						}
+
+					}
+				}
+			}
+		}
+		return DBWellTargets,DBWells
+	}
+}
+
 func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Result, TotalCycles uint16) (finalResult []db.WellData) {
 
 	// ex: for 8 active wells * 6 targets * no of cycle
@@ -148,6 +201,8 @@ func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Resul
 	}
 	return
 }
+
+
 
 func found(key uint16, search []uint16) (found bool) {
 	for _, v := range search {

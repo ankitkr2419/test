@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -29,46 +32,59 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		SelfTestPLC(deps)
 		HeartBeatPLC(deps)
 
-		
+		activeWells := config.ActiveWells("activeWells")
+		go func() {
+			err = <-deps.ExitCh
+			logger.WithField("err", err.Error()).Error("PLC failed")
+
+		}()
+		fmt.Println("websocket started")
+
 		for {
 
-			go func() {
-		        	err = <- deps.ExitCh
-				logger.WithField("err", err.Error()).Error("PLC failed")
+			if Read == 10 {
+				fmt.Println("Reading epxp:", experimentID)
 
-			}
-
-			if Read == 1 {
-				DBResult, err := deps.Store.GetResult(req.Context(), ExperimentID)
+				// retruns all targets configured for experiment
+				targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error fetching target data")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				DBResult, err := deps.Store.GetResult(req.Context(), experimentID)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error inserting result data")
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				
+
 				// analyseResult returns data required for ploting graph
 				Finalresult := analyseResult(activeWells, targetDetails, DBResult, plcStage.CycleCount)
 
 				var Result db.FinalResult
 				Result.MaxThreshold = maxThreshold
 				Result.Data = append(Result.Data, Finalresult...)
-
+				
+				
 				respBytes, err := json.Marshal(Result)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				err = c.WriteMessage(1, Result)
+
+				fmt.Println("Reading respBytes:", respBytes)
+				err = c.WriteMessage(1, respBytes)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Websocket failed to write")
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
 
-			}
+				Read = 0
 
-			
+			}
 
 		}
 
@@ -89,12 +105,14 @@ func monitorExperiment(deps Dependencies) {
 	var previousCycle uint16
 
 	cycle = 0
+	fmt.Println("Monitor Invoked")
 
 	// ExperimentRunning is set when experiment started & if stopped then set to false
 	for ExperimentRunning {
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc monitor")
+			// send error
 			return
 		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
@@ -108,14 +126,49 @@ func monitorExperiment(deps Dependencies) {
 			_, err := deps.Store.InsertResult(context.Background(), result)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error inserting result data")
+				// send error
 				return
 			}
+			// color analysis
+			wells, err := deps.Store.ListWells(context.Background(), experimentID)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error fetching data")
+					// send error
+					return
+				}
 
-			if scan.Cycle == plcStage.CycleCount {
+			welltargets, err := deps.Store.ListWellTargets(context.Background(), experimentID)
+					if err != nil {
+						logger.WithField("err", err.Error()).Error("Error fetching data")
+						// send error
+						return
+				}
+
+				// send data to color analysis
+
+				targets,well :=	WellColorAnalysis(result,welltargets,wells,scan.Cycle,plcStage.CycleCount)
+				
+				// update color in well
+				if len(well) > 0 {
+				}
+				
+				// update ct value in DB 
+				fmt.Println("len(targets)",len(targets))
+				_, err := deps.Store.UpsertWellTargets(req.Context(), targets, expID)
+				if err != nil {
+					// send error
+					logger.WithField("err", err.Error()).Error("Error upsert wells")
+				return
+				}
+
+				
+				if scan.Cycle == plcStage.CycleCount {
 				// last cycle socket closed
-				ExperimentRunning = false
-				break
-			}
+					ExperimentRunning = false
+					break
+				}
+			Read = 1
+			fmt.Println("cycle:", scan.Cycle)
 			cycle++
 			previousCycle++
 		}

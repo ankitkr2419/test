@@ -5,7 +5,7 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
-	"github.com/google/uuid"
+
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -26,12 +26,8 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		if len(wells) > 0 {
-			wellID := make([]uuid.UUID, 0)
-			for _, w := range wells {
-				wellID = append(wellID, w.ID)
-			}
-
-			welltargets, err := deps.Store.ListWellTargets(req.Context(), wellID)
+			
+			welltargets, err := deps.Store.ListWellTargets(req.Context(),expID)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error fetching data")
 				rw.WriteHeader(http.StatusInternalServerError)
@@ -40,7 +36,7 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 
 			for i, w := range wells {
 				for _, t := range welltargets {
-					if w.ID == t.WellID {
+					if w.Position == t.WellPosition {
 						wells[i].Targets = append(w.Targets, t)
 					}
 				}
@@ -113,14 +109,14 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 		for w := 0; w < len(createdWell); w++ {
 			for t := 0; t < len(wc.Targets); t++ {
 				t := db.WellTarget{
-					WellID:   createdWell[w].ID,
-					TargetID: wc.Targets[t],
+					WellPosition: createdWell[w].Position,
+					TargetID:     wc.Targets[t],
 				}
 				targets = append(targets, t)
 			}
 		}
 
-		createdTargets,err := deps.Store.UpsertWellTargets(req.Context(), targets)
+		createdTargets, err := deps.Store.UpsertWellTargets(req.Context(), targets, expID)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
@@ -128,9 +124,9 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		for _, t := range createdTargets {
-			for i, w := range  createdWell{
-				if w.ID == t.WellID {
-					createdWell[i].Targets = append(createdWell[i].Targets,t)
+			for i, w := range createdWell {
+				if w.Position == t.WellPosition {
+					createdWell[i].Targets = append(createdWell[i].Targets, t)
 				}
 			}
 		}
@@ -166,7 +162,7 @@ func showWellHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		latestT.Targets, err = deps.Store.GetWellTarget(req.Context(), id)
+		latestT.Targets, err = deps.Store.GetWellTarget(req.Context(),latestT.Position,latestT.ExperimentID)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error show Well")

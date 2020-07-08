@@ -17,7 +17,7 @@ const (
 
 	getStageListQuery = `SELECT * FROM stages
 		where template_id = $1
-		ORDER BY id ASC`
+		ORDER BY id DESC`
 
 	getStageQuery = `SELECT id,
 		type,

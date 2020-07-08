@@ -272,9 +272,7 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 					ExperimentRunning = false
 					break
 				}
-				// if scan.Cycle == 2 {
-				//			break
-				//		}
+
 				cycle++
 				previousCycle++
 			}
