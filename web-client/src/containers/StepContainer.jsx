@@ -13,7 +13,7 @@ import {
 } from 'action-creators/stepActionCreators';
 
 const StepContainer = (props) => {
-	const { stageId } = props;
+	const { stageId, updateSelectedWizard } = props;
 	const dispatch = useDispatch();
 	// local state for storing step id for row selection
 	const [selectedStepId, setSelectedStepId] = useState(null);
@@ -82,6 +82,10 @@ const StepContainer = (props) => {
 		}
 	};
 
+	const goToStageWizard = () => {
+		updateSelectedWizard('stage');
+	};
+
 	return (
 		<StepComponent
 			stageId={stageId}
@@ -92,6 +96,7 @@ const StepContainer = (props) => {
 			onStepRowClicked={onStepRowClicked}
 			selectedStepId={selectedStepId}
 			saveStep={saveStep}
+			goToStageWizard={goToStageWizard}
 		/>
 	);
 };

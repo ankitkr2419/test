@@ -26,12 +26,13 @@ const StepComponent = (props) => {
 		selectedStepId,
 		saveStep, // update api call
 		isStepsLoading,
+		goToStageWizard,
 	} = props;
 
 	// local state to save form data and modal state flag
 	const [stepFormState, updateStepFormState] = useReducer(
 		stepStateReducer,
-		stepStateInitialState
+		stepStateInitialState,
 	);
 
 	// immutable => js
@@ -58,7 +59,7 @@ const StepComponent = (props) => {
 	const toggleCreateStepModal = () => {
 		updateStepFormStateWrapper(
 			'isCreateStepModalVisible',
-			!isCreateStepModalVisible
+			!isCreateStepModalVisible,
 		);
 	};
 
@@ -127,9 +128,9 @@ const StepComponent = (props) => {
 		// stages.size = 0  will tell us there is no records present
 		// isCreateStageModalVisible is check as we have to make modal visible only once
 		if (
-			isStepsLoading === false &&
-			steps.size === 0 &&
-			isCreateStepModalVisible === false
+			isStepsLoading === false
+			&& steps.size === 0
+			&& isCreateStepModalVisible === false
 		) {
 			toggleCreateStepModal();
 		}
@@ -217,6 +218,7 @@ const StepComponent = (props) => {
 						name='angle-left'
 						size={32}
 						className='mr-auto border-0'
+						onClick={goToStageWizard}
 					/>
 					<Button color='primary' icon onClick={toggleCreateStepModal}>
 						<Icon size={40} name='plus-2' />
