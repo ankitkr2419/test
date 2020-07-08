@@ -272,6 +272,10 @@ button:focus {
 		border-color: $gray-80;
 	}
 
+	.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+		background-color: transparent;
+	}
+
 	.custom-control-label {
 		display: flex;
 		align-items: center;

@@ -8,6 +8,7 @@ import SidebarHandle from './SidebarHandle';
 
 const Sidebar = ({
 	className,
+	bodyClassName,
 	handleIcon,
 	handleIconSize,
 	children,
@@ -20,7 +21,7 @@ const Sidebar = ({
 		'sidebar',
 		`sidebar-${className}`,
 		{ open: isOpen },
-		{ close: isClose },
+		{ close: isClose }
 	);
 	return (
 		<StyledSidebar className={classes}>
@@ -31,7 +32,9 @@ const Sidebar = ({
 				isDisabled={isDisabled}
 			/>
 			<SidebarContent className='flex-100'>
-				<SidebarBody className='flex-100'>{children}</SidebarBody>
+				<SidebarBody className={`flex-100 ${bodyClassName}`}>
+					{children}
+				</SidebarBody>
 			</SidebarContent>
 		</StyledSidebar>
 	);
@@ -60,6 +63,7 @@ const StyledSidebar = styled.aside`
 
 Sidebar.propTypes = {
 	className: PropTypes.string,
+	bodyClassName: PropTypes.string,
 	handleIconSize: PropTypes.number,
 	isOpen: PropTypes.bool,
 	isClose: PropTypes.bool,
@@ -71,6 +75,7 @@ Sidebar.propTypes = {
 
 Sidebar.defaultProps = {
 	className: '',
+	bodyClassName: '',
 	handleIconSize: 24,
 	isOpen: false,
 	isClose: false,
