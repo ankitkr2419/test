@@ -51,6 +51,10 @@ export const wellListReducer = (state = listWellInitialState, action) => {
 	case addWellActions.successAction:
 		return updateWellListSelector(state, action);
 
+	// Update wells list through socket
+	case listWellActions.updateWellThroughSocket:
+		return updateWellListSelector(state, action);
+
 	// configuring active wells with existing wells data
 	case activeWellActions.successAction:
 		return setActiveWells(state, action);

@@ -18,7 +18,6 @@ import {
 import { runExperiment, stopExperiment } from 'action-creators/runExperimentActionCreators';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
-import { connectSocket, disConnectSocket } from 'web-socket';
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
 import ConfirmationModal from 'components/modals/ConfirmationModal';
@@ -55,15 +54,15 @@ const AppHeader = (props) => {
 	const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 	const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
 
-	useEffect(() => {
-		if (isExperimentRunning === true) {
-			connectSocket(dispatch);
-		}
-	}, [isExperimentRunning, dispatch]);
+	// useEffect(() => {
+	// 	if (isExperimentRunning === true) {
+	// 		// connectSocket(dispatch);
+	// 	}
+	// }, [isExperimentRunning, dispatch]);
 
 	useEffect(() => {
 		if (isExperimentStopped === true) {
-			disConnectSocket();
+			// disConnectSocket();
 			dispatch(loginReset());
 		}
 	}, [isExperimentStopped, dispatch]);

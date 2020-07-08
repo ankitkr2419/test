@@ -1,11 +1,12 @@
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import {
-	webSocketMessage,
 	webSocketOpened,
 	webSocketClosed,
 	webSocketError,
 } from 'action-creators/webSocketActionCreators';
-import { WS_HOST_URL } from 'appConstants';
+import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from 'appConstants';
+import { updateWellThroughSocket } from 'action-creators/wellActionCreators';
+import { wellGraphSucceeded } from 'action-creators/wellGraphActionCreators';
 
 let webSocket = null;
 
@@ -17,7 +18,17 @@ export const connectSocket = (dispatch) => {
 	};
 	webSocket.onmessage = (event) => {
 		if (event.data) {
-			dispatch(webSocketMessage(JSON.parse(event.data)));
+			const { type, data } = JSON.parse(event.data);
+			switch (type) {
+			case SOCKET_MESSAGE_TYPE.graphData:
+				dispatch(wellGraphSucceeded(data));
+				break;
+			case SOCKET_MESSAGE_TYPE.wellsData:
+				dispatch(updateWellThroughSocket(data));
+				break;
+			default:
+				break;
+			}
 		}
 	};
 
