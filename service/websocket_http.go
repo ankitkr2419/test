@@ -148,7 +148,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					return
 				}
 				var result db.FinalResultOnSuccess
-				result.Type = "OnSuccess"
+				result.Type = "Success"
 				result.Data = latestE
 
 				respBytes, err := json.Marshal(result)
