@@ -40,7 +40,7 @@ func (d *Simulator) cycleStage() {
 	for i := uint16(0); i < d.config.CycleCount; i++ { //for each cycle
 		// Check for Stop signal
 		if d.plcIO.m.startStopCycle == 0 {
-			d.errCh <- errors.New("recieved stop signal")
+			d.ErrCh <- errors.New("recieved stop signal")
 			break
 		}
 
