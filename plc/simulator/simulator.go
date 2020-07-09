@@ -75,9 +75,9 @@ func (d *Simulator) HeartBeat() {
 
 func (d *Simulator) ConfigureRun(s plc.Stage) error {
 	// NOTE: commented to run new exp when stop
-	// if d.config.CycleCount != 0 {
-	// 	return errors.New("PLC is already configured")
-	// }
+	if d.config.CycleCount != 0 {
+		return errors.New("PLC is already configured")
+	}
 
 	// setting config with stage data
 	d.config = s
@@ -132,6 +132,13 @@ func (d *Simulator) simulate() {
 			logger.WithField("msg", msg).Info("simulate: ExitCh received data")
 			if msg == "stop" {
 				d.ErrCh <- errors.New("PCR Stopped")
+				// startStopCycle = 0 reset to start new experiment
+				d.plcIO.m.startStopCycle = 0
+				d.plcIO.d.currentCycle = 0
+				d.plcIO.m.cycleCompleted = 0
+				d.config.CycleCount = 0
+				d.wells = []Well{}
+
 				return
 			}
 			if msg == "abort" {

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
@@ -52,14 +51,11 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 		}()
 
-		fmt.Println("websocket started")
-
 		for {
 
 			msg := <-deps.WsMsgCh
 			switch msg {
 			case "read":
-				fmt.Println("Reading epxp:", experimentID)
 
 				// retruns all targets configured for experiment
 				targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
@@ -111,9 +107,6 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 						return
 					}
 
-					fmt.Println("len wells", len(wells))
-					fmt.Println("len wt", len(welltargets))
-
 					for i, w := range wells {
 						for _, t := range welltargets {
 							if w.Position == t.WellPosition {
@@ -140,7 +133,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				}
 			case "stop":
 				// send exp stop data
-				fmt.Println("stop: exp completed************")
+
 				latestE, err := deps.Store.ShowExperiment(req.Context(), experimentID)
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -163,6 +156,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				break
 
 			}
 
@@ -185,7 +179,6 @@ func monitorExperiment(deps Dependencies) {
 	var previousCycle uint16
 
 	cycle = 0
-	fmt.Println("Monitor Invoked")
 
 	// ExperimentRunning is set when experiment started & if stopped then set to false
 	for ExperimentRunning {
@@ -238,7 +231,6 @@ func monitorExperiment(deps Dependencies) {
 
 			// send data to color analysis
 
-			fmt.Printf("len(LastCycleResult): %v\n len(welltargets): %v\n len(wells): %v \n", len(LastCycleResult), len(welltargets), len(wells))
 			targets, well := WellColorAnalysis(LastCycleResult, welltargets, wells, scan.Cycle, plcStage.CycleCount)
 
 			// update color in well
@@ -255,7 +247,6 @@ func monitorExperiment(deps Dependencies) {
 			}
 
 			// update ct value in DB
-			fmt.Println("Updated len(targets)", len(targets))
 			_, err = deps.Store.UpsertWellTargets(context.Background(), targets, experimentID)
 			if err != nil {
 				// send error
@@ -277,7 +268,7 @@ func monitorExperiment(deps Dependencies) {
 				ExperimentRunning = false
 				break
 			}
-			fmt.Println("cycle:", scan.Cycle)
+
 			cycle++
 			previousCycle++
 		}
