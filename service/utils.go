@@ -2,7 +2,7 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
@@ -114,7 +114,8 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
 			r.FValue = scan.Wells[w][t.DyePosition] // for 5th well & target 2 = scanWells[5][1]
-
+			// fmt.Println("***************************************************************************************************")
+			// fmt.Printf("wellP: %v \t t_id: %v \t d_p: %v \t FV r.FValue %v",r.WellPosition,r.TargetID,t.DyePosition,r.FValue)
 			result = append(result, r)
 		}
 	}
@@ -122,11 +123,6 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 }
 
 func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWells []db.Well, currentCycle, totalCycle uint16) ([]db.WellTarget, []db.Well) {
-	for _, v := range DBWellTargets {
-		if v.WellPosition == 7 {
-			fmt.Printf("welltargets: %+v ", v)
-		}
-	}
 	//if no well configured
 	if len(DBWells) == 0 && len(DBWellTargets) == 0 {
 		for _, r := range Result {
@@ -135,14 +131,14 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			wt.TargetID = r.TargetID
 
 			wt.ExperimentID = r.ExperimentID
-			fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, wt.CT)
+			// fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, wt.CT)
 			if r.Threshold < float32(r.FValue) {
 				// add ct value
 				wt.CT = strconv.Itoa(int(r.FValue))
 			} else {
 				wt.CT = ""
 			}
-			fmt.Println("wt %+v ", wt)
+			// fmt.Println("wt %+v ", wt)
 			DBWellTargets = append(DBWellTargets, wt)
 		}
 		return DBWellTargets, DBWells
@@ -151,7 +147,7 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			for i, t := range DBWellTargets {
 				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID {
 					if t.CT == "" && r.Threshold < float32(r.FValue) {
-						fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, t.CT)
+						// fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, t.CT)
 						// add ct
 						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
 					}
@@ -164,8 +160,8 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			for i, w := range DBWells {
 				for j, t := range DBWellTargets {
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
-						fmt.Printf("welltargets: %+v ", t)
-						fmt.Printf("w.Position %v \t currentCycle %v \t float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n 							", w.Position, currentCycle, float32(r.FValue), r.Threshold, t.CT)
+						// fmt.Printf("welltargets: %+v ", t)
+						// fmt.Printf("w.Position %v \t currentCycle %v \t float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n 							", w.Position, currentCycle, float32(r.FValue), r.Threshold, t.CT)
 						switch {
 						case 5 >= currentCycle && currentCycle <= 25 && float32(r.FValue) > r.Threshold && t.CT == "":
 							// mark red
@@ -185,8 +181,8 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 							DBWellTargets[j].CT = "UNDETERMINE"
 							DBWells[i].ColorCode = red
 						}
-						fmt.Println("color", DBWells[i].ColorCode)
-						fmt.Println("ct", DBWellTargets[j].CT)
+						// fmt.Println("color", DBWells[i].ColorCode)
+						// fmt.Println("ct", DBWellTargets[j].CT)
 
 					}
 				}
@@ -204,8 +200,9 @@ func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Resul
 		wellResult.WellPosition = aw
 
 		for _, t := range td {
+			wellResult.TargetID = t.TargetID
 			for _, r := range result {
-				if r.WellPosition == wellResult.WellPosition && r.TargetID == t.TargetID {
+				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
 					wellResult.ExperimentID = r.ExperimentID
 					wellResult.TargetID = r.TargetID
 					wellResult.Threshold = r.Threshold
@@ -216,10 +213,13 @@ func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Resul
 						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
 						wellResult.FValue = append(wellResult.FValue, r.FValue)
 					}
+
 				}
 
 			}
 			finalResult = append(finalResult, wellResult)
+			wellResult.Cycle = []uint16{}
+			wellResult.FValue = []uint16{}
 		}
 
 	}
