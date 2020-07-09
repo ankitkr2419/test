@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
-
 
 func listExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -197,6 +195,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+/*
 func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
@@ -247,7 +246,6 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 					return
 				}
 
-
 				// analyseResult returns data required for ploting graph
 				Finalresult := analyseResult(activeWells, targetDetails, DBResult, plcStage.CycleCount)
 
@@ -280,6 +278,8 @@ func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+*/
+
 func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
@@ -310,5 +310,3 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 	})
 }
-
-

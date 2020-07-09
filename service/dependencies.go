@@ -6,8 +6,8 @@ import (
 )
 
 type Dependencies struct {
-	Store db.Storer
-	Plc   plc.Driver
-        ExitCh <-chan error
+	Store  db.Storer
+	Plc    plc.Driver
+	ExitCh <-chan error
 	// define other service dependencies
 }

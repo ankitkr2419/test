@@ -24,12 +24,13 @@ const (
 	insertWellTargetQuery = `INSERT INTO well_targets (
 		experiment_id,
 		well_position,
-		target_id)
+		target_id,
+		ct)
 		VALUES %s `
 	insertWellTargetQuery2 = `ON CONFLICT (well_position, experiment_id,target_id) DO UPDATE
 			SET
 			ct = excluded.ct
-			WHERE well_targets.position = excluded.position AND well_targets.experiment_id = excluded.experiment_id AND 				well_targets.target_id = excluded.target_id AND well_targets.CT != ''`
+			WHERE well_targets.well_position = excluded.well_position AND well_targets.experiment_id = excluded.experiment_id AND 				well_targets.target_id = excluded.target_id AND excluded.CT != ''`
 
 	getWellTargetListQuery = `SELECT wt.experiment_id,
 		wt.well_position,
@@ -76,11 +77,9 @@ func (s *pgStore) GetWellTarget(ctx context.Context, wellposition int32, experim
 func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarget, experimentID uuid.UUID) (targets []WellTarget, err error) {
 
 	stmt := makeWellTargetQuery(WellTargets, experimentID)
-	// delstmt := WellTargetQuery(WellTargets, deleteWellTargetQuery)
-	getstmt := WellTargetQuery(WellTargets, getWellTargetListQuery)
-	fmt.Println(stmt)
-	//fmt.Println(delstmt)
-	fmt.Println(getstmt)
+	// delstmt := wellTargetQuery(WellTargets, deleteWellTargetQuery)
+	getstmt := wellTargetQuery(WellTargets, getWellTargetListQuery)
+
 	tx, err := s.db.Begin()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in creating transaction")
@@ -143,7 +142,7 @@ func makeWellTargetQuery(WellTargets []WellTarget, experimentID uuid.UUID) strin
 	values := make([]string, 0, len(WellTargets))
 
 	for _, t := range WellTargets {
-		values = append(values, fmt.Sprintf("('%v',%v,'%v')", experimentID, t.WellPosition, t.TargetID))
+		values = append(values, fmt.Sprintf("('%v',%v,'%v','%v')", experimentID, t.WellPosition, t.TargetID, t.CT))
 	}
 
 	stmt := fmt.Sprintf(insertWellTargetQuery,

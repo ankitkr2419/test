@@ -26,8 +26,8 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		if len(wells) > 0 {
-			
-			welltargets, err := deps.Store.ListWellTargets(req.Context(),expID)
+
+			welltargets, err := deps.Store.ListWellTargets(req.Context(), expID)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error fetching data")
 				rw.WriteHeader(http.StatusInternalServerError)
@@ -162,7 +162,7 @@ func showWellHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		latestT.Targets, err = deps.Store.GetWellTarget(req.Context(),latestT.Position,latestT.ExperimentID)
+		latestT.Targets, err = deps.Store.GetWellTarget(req.Context(), latestT.Position, latestT.ExperimentID)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error show Well")

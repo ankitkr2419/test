@@ -50,6 +50,8 @@ const (
 			task = excluded.task
 			WHERE wells.position = excluded.position AND wells.experiment_id = excluded.experiment_id
 			RETURNING id`
+	updateColorInWellQuery = `UPDATE wells
+			SET color_code = $1 WHERE id = $2`
 )
 
 type WellConfig struct {
@@ -165,4 +167,19 @@ func getWellsQuery(id []uuid.UUID) string {
 		strings.Join(values, ","))
 
 	return stmt
+}
+
+func (s *pgStore) UpdateColorWell(ctx context.Context, color string, id uuid.UUID) (err error) {
+
+	_, err = s.db.Exec(
+		updateColorInWellQuery,
+		color,
+		id,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating Well")
+		return
+	}
+
+	return
 }
