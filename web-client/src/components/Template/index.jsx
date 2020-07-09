@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {
+	useState, useEffect, useCallback, useMemo
+} from 'react';
 import { Button } from 'core-components';
 import PropTypes from 'prop-types';
 import {
@@ -40,23 +42,27 @@ const TemplateComponent = (props) => {
 	// Local state to store template name
 	const [selectedTemplateId, setSelectedTemplateId] = useState(null);
 
-	// helper method to toggle create template modal
-	const toggleCreateTemplateModal = () => {
-		setCreateTemplateModalVisibility(!isCreateTemplateModalVisible);
-	};
+	const prevTemplate = useMemo(() => templates.find(ele => ele.get('id') === templateID),
+		[templates, templateID]);
 
-	const autofillNameDescription = () => {
-		const template = templates.find(ele => ele.get('id') === templateID);
-		setTemplateName(template.get('name'));
-		setTemplateDescription(template.get('description'));
-	};
+	// helper method to toggle create template modal
+	const toggleCreateTemplateModal = useCallback(() => {
+		setCreateTemplateModalVisibility(!isCreateTemplateModalVisible);
+	}, [isCreateTemplateModalVisible]);
+
+	const autofillNameDescription = useCallback(() => {
+		setTemplateName(prevTemplate.get('name'));
+		setTemplateDescription(prevTemplate.get('description'));
+	}, [prevTemplate]);
 
 	useEffect(() => {
 		if (isTemplateEdited === true && isCreateTemplateModalVisible === false) {
 			autofillNameDescription();
 			toggleCreateTemplateModal();
 		}
-	}, [isTemplateEdited]);
+	},
+	[isTemplateEdited, autofillNameDescription, isCreateTemplateModalVisible,
+		toggleCreateTemplateModal]);
 
 	// Validate create template form
 	const validateTemplateForm = () => {
@@ -66,14 +72,27 @@ const TemplateComponent = (props) => {
 		return false;
 	};
 
+	// check if changes are persent by comparing previous values
+	const checkForChanges = () => {
+		if ((templateDescription !== prevTemplate.get('description'))
+		|| (templateName !== prevTemplate.get('name'))) {
+			return true;
+		}
+		return false;
+	};
+
 	const addClickHandler = () => {
 		if (validateTemplateForm()) {
 			// Create new template rest api call.
 			if (isTemplateEdited) {
-				updateTemplate(templateID, {
-					description: templateDescription,
-					name: templateName,
-				});
+				// check if the templateDescriptions and templateName values
+				// are changed from previous values
+				if (checkForChanges()) {
+					updateTemplate(templateID, {
+						description: templateDescription,
+						name: templateName,
+					});
+				}
 				setIsTemplateEdited(false);
 			} else {
 				createTemplate({
