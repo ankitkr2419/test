@@ -13,10 +13,10 @@ import {
 } from 'core-components';
 import { Center, ButtonIcon, Text } from 'shared-components';
 
-const CreateTemplateModal = (props) => {
+const TemplateModal = (props) => {
 	const {
 		isCreateTemplateModalVisible,
-		toggleCreateTemplateModal,
+		toggleTemplateModal,
 		templateDescription,
 		setTemplateDescription,
 		templateName,
@@ -25,7 +25,7 @@ const CreateTemplateModal = (props) => {
 		isFormValid,
 		resetFormValues,
 		isTemplateEdited,
-		setIsTemplateEdited,
+		resetModalState
 	} = props;
 
 	// disabled as we only need effect to be run while component is un-mounting
@@ -40,9 +40,9 @@ const CreateTemplateModal = (props) => {
 	return (
 		<>
 			<Modal
-				onExit={() => setIsTemplateEdited(false)}
+				onClosed={() => resetModalState()}
 				isOpen={isCreateTemplateModalVisible}
-				toggle={toggleCreateTemplateModal}
+				toggle={toggleTemplateModal}
 				centered
 				size="lg"
 			>
@@ -51,7 +51,7 @@ const CreateTemplateModal = (props) => {
 						tag="h4"
 						className="modal-title text-center text-truncate font-weight-bold"
 					>
-						Create New Template
+						{isTemplateEdited ? 'Edit Template' : 'Create New Template'}
 					</Text>
 					<ButtonIcon
 						position="absolute"
@@ -60,7 +60,7 @@ const CreateTemplateModal = (props) => {
 						right={32}
 						size={32}
 						name="cross"
-						onClick={toggleCreateTemplateModal}
+						onClick={toggleTemplateModal}
 					/>
 					<Form>
 						<Row form className="mb-5 pb-5">
@@ -120,15 +120,17 @@ const CreateTemplateModal = (props) => {
 	);
 };
 
-CreateTemplateModal.propTypes = {
+TemplateModal.propTypes = {
 	isCreateTemplateModalVisible : PropTypes.bool.isRequired,
-	toggleCreateTemplateModal : PropTypes.func.isRequired,
+	toggleTemplateModal : PropTypes.func.isRequired,
 	templateDescription : PropTypes.string.isRequired,
 	setTemplateDescription : PropTypes.func.isRequired,
 	templateName : PropTypes.string.isRequired,
 	setTemplateName : PropTypes.func.isRequired,
 	addClickHandler : PropTypes.func.isRequired,
 	isFormValid : PropTypes.bool.isRequired,
+	resetModalState: PropTypes.func.isRequired,
+	isTemplateEdited: PropTypes.bool.isRequired
 };
 
-export default CreateTemplateModal;
+export default TemplateModal;

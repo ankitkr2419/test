@@ -1,6 +1,4 @@
-import React, {
-	useState, useEffect, useCallback, useMemo
-} from 'react';
+import React, { useState } from 'react';
 import { Button } from 'core-components';
 import PropTypes from 'prop-types';
 import {
@@ -11,99 +9,21 @@ import {
 	Text,
 } from 'shared-components';
 import imgNoTemplate from 'assets/images/no-template-available.svg';
-import CreateTemplateModal from './CreateTemplateModal';
-
 
 const TemplateComponent = (props) => {
 	const {
 		templates,
-		createTemplate,
 		deleteTemplate,
-		updateTemplate,
 		updateSelectedWizard,
 		updateTemplateID,
 		isLoginTypeOperator,
 		isLoginTypeAdmin,
 		createExperiment,
-		isTemplateEdited,
-		setIsTemplateEdited,
-		templateID,
+		toggleTemplateModal
 	} = props;
 
-	// Local state to manage create template modal
-	const [
-		isCreateTemplateModalVisible,
-		setCreateTemplateModalVisibility,
-	] = useState(false);
-	// Local state to store template description
-	const [templateDescription, setTemplateDescription] = useState('');
-	// Local state to store template name
-	const [templateName, setTemplateName] = useState('');
 	// Local state to store template name
 	const [selectedTemplateId, setSelectedTemplateId] = useState(null);
-
-	const prevTemplate = useMemo(() => templates.find(ele => ele.get('id') === templateID),
-		[templates, templateID]);
-
-	// helper method to toggle create template modal
-	const toggleCreateTemplateModal = useCallback(() => {
-		setCreateTemplateModalVisibility(!isCreateTemplateModalVisible);
-	}, [isCreateTemplateModalVisible]);
-
-	const autofillNameDescription = useCallback(() => {
-		setTemplateName(prevTemplate.get('name'));
-		setTemplateDescription(prevTemplate.get('description'));
-	}, [prevTemplate]);
-
-	useEffect(() => {
-		if (isTemplateEdited === true && isCreateTemplateModalVisible === false) {
-			autofillNameDescription();
-			toggleCreateTemplateModal();
-		}
-	},
-	[isTemplateEdited, autofillNameDescription, isCreateTemplateModalVisible,
-		toggleCreateTemplateModal]);
-
-	// Validate create template form
-	const validateTemplateForm = () => {
-		if (templateDescription !== '' && templateName !== '') {
-			return true;
-		}
-		return false;
-	};
-
-	// check if changes are persent by comparing previous values
-	const checkForChanges = () => {
-		if ((templateDescription !== prevTemplate.get('description'))
-		|| (templateName !== prevTemplate.get('name'))) {
-			return true;
-		}
-		return false;
-	};
-
-	const addClickHandler = () => {
-		if (validateTemplateForm()) {
-			// Create new template rest api call.
-			if (isTemplateEdited) {
-				// check if the templateDescriptions and templateName values
-				// are changed from previous values
-				if (checkForChanges()) {
-					updateTemplate(templateID, {
-						description: templateDescription,
-						name: templateName,
-					});
-				}
-				setIsTemplateEdited(false);
-			} else {
-				createTemplate({
-					description: templateDescription,
-					name: templateName,
-				});
-			}
-			toggleCreateTemplateModal();
-		}
-		// TODO show error notification
-	};
 
 	const deleteClickHandler = () => {
 		// Delete api call
@@ -120,7 +40,6 @@ const TemplateComponent = (props) => {
 	const onTemplateButtonClickHandler = ({ id: templateId, description }) => {
 		// if its admin save template id and show edit & delete options on button
 		// if its operator save template id an navigate to target wizard
-
 		// set selected template id to local state for maintaining active state of button
 		setSelectedTemplateId(templateId);
 		if (isLoginTypeOperator === true) {
@@ -134,11 +53,6 @@ const TemplateComponent = (props) => {
 			// navigate to next wizard
 			// updateSelectedWizard('target');
 		}
-	};
-
-	const resetFormValues = () => {
-		setTemplateDescription('');
-		setTemplateName('');
 	};
 
 	return (
@@ -182,33 +96,17 @@ const TemplateComponent = (props) => {
 			)}
 			<Center className="mb-5">
 				{isLoginTypeAdmin === true && (
-					<Button color="primary" onClick={toggleCreateTemplateModal}>
+					<Button color="primary" onClick={toggleTemplateModal}>
             Create New
 					</Button>
 				)}
 			</Center>
-			{isCreateTemplateModalVisible && (
-				<CreateTemplateModal
-					isCreateTemplateModalVisible={isCreateTemplateModalVisible}
-					toggleCreateTemplateModal={toggleCreateTemplateModal}
-					templateDescription={templateDescription}
-					setTemplateDescription={setTemplateDescription}
-					templateName={templateName}
-					setTemplateName={setTemplateName}
-					addClickHandler={addClickHandler}
-					isFormValid={validateTemplateForm()}
-					resetFormValues={resetFormValues}
-					isTemplateEdited={isTemplateEdited}
-					setIsTemplateEdited={setIsTemplateEdited}
-				/>
-			)}
 		</div>
 	);
 };
 
 TemplateComponent.propTypes = {
 	templates: PropTypes.shape({}).isRequired,
-	createTemplate: PropTypes.func.isRequired,
 	deleteTemplate: PropTypes.func.isRequired,
 	updateSelectedWizard: PropTypes.func.isRequired,
 	updateTemplateID: PropTypes.func.isRequired,
