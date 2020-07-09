@@ -73,14 +73,18 @@ type TargetDetails struct {
 	DyePosition  int32     `db:"dye_position" json:"dye_position"`
 }
 
-type FinalResult struct {
-	MaxThreshold float32    `json:"max_threshold"`
-	Data         []WellData `json:"data"`
-	LidTemperature float32 `json:"lid_temp"`
-	Temperature float32 `json:"temperature"`
-	CurrentCycle uint16    `json:"current_cycle"`
+type FinalResultGraph struct {
+	Type string     `json:"type"`
+	Data []WellData `json:"data"`
+	// LidTemperature float32 `json:"lid_temp"`
+	// Temperature float32 `json:"temperature"`
+	// CurrentCycle uint16    `json:"current_cycle"`
 }
 
+type FinalResultWells struct {
+	Type string `json:"type"`
+	Data []Well `json:"data"`
+}
 type WellData struct {
 	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
@@ -121,7 +125,6 @@ func (s *pgStore) ListWellTargetsResult(ctx context.Context, r Result) (w []Well
 	}
 	return
 }
-
 
 func (s *pgStore) GetResult(ctx context.Context, ExperimentID uuid.UUID) (rDB []Result, err error) {
 	err = s.db.Select(&rDB, getAllCyclesResultQuery, ExperimentID)

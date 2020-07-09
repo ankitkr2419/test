@@ -1,15 +1,15 @@
 package service
 
 import (
-	"strconv"
 	"encoding/json"
-	"mylab/cpagent/db"
-	"mylab/cpagent/plc"
-	"net/http"
-
+	"fmt"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
+	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
+	"net/http"
+	"strconv"
 )
 
 var (
@@ -121,54 +121,78 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 	return
 }
 
-func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget,DBWells []db.Well,currentCycle,totalCycle uint16) ([]db.WellTarget,[]db.Well){
-
+func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWells []db.Well, currentCycle, totalCycle uint16) ([]db.WellTarget, []db.Well) {
+	for _, v := range DBWellTargets {
+		if v.WellPosition == 7 {
+			fmt.Printf("welltargets: %+v ", v)
+		}
+	}
+	//if no well configured
 	if len(DBWells) == 0 && len(DBWellTargets) == 0 {
-		for _,r := range Result {
+		for _, r := range Result {
 			var wt db.WellTarget
 			wt.WellPosition = r.WellPosition
 			wt.TargetID = r.TargetID
 
 			wt.ExperimentID = r.ExperimentID
-			if r.Threshold > float32(r.FValue) {
-				// add ct value	
+			fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, wt.CT)
+			if r.Threshold < float32(r.FValue) {
+				// add ct value
 				wt.CT = strconv.Itoa(int(r.FValue))
 			} else {
-				wt.CT = ""				
+				wt.CT = ""
 			}
-			DBWellTargets = append(DBWellTargets,wt)	
+			fmt.Println("wt %+v ", wt)
+			DBWellTargets = append(DBWellTargets, wt)
 		}
-		return DBWellTargets,DBWells
-	} else {				// determine color
-		for _,r := range Result {
-			for i,w := range DBWells {
-				for j, t := range DBWellTargets{
+		return DBWellTargets, DBWells
+	} else if len(DBWellTargets) > 0 && len(DBWells) == 0 { //when only targets added in prev cycle
+		for _, r := range Result {
+			for i, t := range DBWellTargets {
+				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID {
+					if t.CT == "" && r.Threshold < float32(r.FValue) {
+						fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, t.CT)
+						// add ct
+						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
+					}
+				}
+			}
+		}
+		return DBWellTargets, DBWells
+	} else { // determine color
+		for _, r := range Result {
+			for i, w := range DBWells {
+				for j, t := range DBWellTargets {
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
+						fmt.Printf("welltargets: %+v ", t)
+						fmt.Printf("w.Position %v \t currentCycle %v \t float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n 							", w.Position, currentCycle, float32(r.FValue), r.Threshold, t.CT)
 						switch {
-							case 5 >= currentCycle && currentCycle <= 25 && float32(r.FValue) > r.Threshold && t.CT == "":
-								// mark red
-								DBWells[i].ColorCode = red
-								DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+						case 5 >= currentCycle && currentCycle <= 25 && float32(r.FValue) > r.Threshold && t.CT == "":
+							// mark red
+							DBWells[i].ColorCode = red
+							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-    							case 25 <= currentCycle && float32(r.FValue) > r.Threshold && t.CT== "":
-								// mark orange
-								DBWells[i].ColorCode = orange
-								DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
-			
-							case float32(r.FValue) > r.Threshold && t.CT == "":
-								// only update ct
-								DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
-							case float32(r.FValue) > r.Threshold && t.CT != "":
-								// only update ct
-								DBWellTargets[j].CT = "UNDETERMINE"
-								DBWells[i].ColorCode = red
+						case 25 <= currentCycle && float32(r.FValue) > r.Threshold && t.CT == "":
+							// mark orange
+							DBWells[i].ColorCode = orange
+							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+
+						case float32(r.FValue) > r.Threshold && t.CT == "":
+							// only update ct
+							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+						case float32(r.FValue) > r.Threshold && t.CT != "":
+							// only update ct
+							DBWellTargets[j].CT = "UNDETERMINE"
+							DBWells[i].ColorCode = red
 						}
+						fmt.Println("color", DBWells[i].ColorCode)
+						fmt.Println("ct", DBWellTargets[j].CT)
 
 					}
 				}
 			}
 		}
-		return DBWellTargets,DBWells
+		return DBWellTargets, DBWells
 	}
 }
 
@@ -201,8 +225,6 @@ func analyseResult(activeWells []int32, td []db.TargetDetails, result []db.Resul
 	}
 	return
 }
-
-
 
 func found(key uint16, search []uint16) (found bool) {
 	for _, v := range search {
