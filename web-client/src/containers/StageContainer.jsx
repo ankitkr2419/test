@@ -11,6 +11,7 @@ import {
 	updateStage as updateStageAction,
 	updateStageReset,
 } from 'action-creators/stageActionCreators';
+import { getStageList } from 'selectors/stageSelector';
 
 const StageContainer = (props) => {
 	const { updateSelectedWizard, templateID, updateStageID } = props;
@@ -19,7 +20,8 @@ const StageContainer = (props) => {
 	const [selectedStageId, setSelectedStageId] = useState(null);
 
 	// reading stages from redux
-	const stages = useSelector(state => state.listStagesReducer);
+	const stages = useSelector(getStageList);
+
 	const isStagesLoading = stages.get('isLoading');
 
 	// isStageSaved = true means stage created successfully

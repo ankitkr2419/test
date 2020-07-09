@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import SidebarGraph from 'components/Plate/Sidebar/Graph/SidebarGraph';
 import { useSelector, useDispatch } from 'react-redux';
-import { getExperimentStatus } from 'selectors/runExperimentSelector';
 import { getLineChartData } from 'selectors/wellGraphSelector';
 import { getExperimentGraphTargets } from 'selectors/experimentTargetSelector';
 import { updateExperimentTargetFilters } from 'action-creators/experimentTargetActionCreators';
+import { EXPERIMENT_STATUS } from 'appConstants';
 
-const ExperimentGraphContainer = () => {
+const ExperimentGraphContainer = ({ experimentStatus }) => {
 	const dispatch = useDispatch();
-	// getExperimentStatus will return us current experiment status
-	const experimentStatus = useSelector(getExperimentStatus);
-
 	// get targets from experiment target reducer(graph : target filters)
 	const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
 
 	// Extracting graph data, Which is populated from websocket
 	const lineChartData = useSelector(getLineChartData);
 
-	const isExperimentRunning = experimentStatus === 'running';
+	const isExperimentRunning = experimentStatus === EXPERIMENT_STATUS.running;
+	const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
 
 	// local state to save filter graph data
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -37,6 +36,7 @@ const ExperimentGraphContainer = () => {
 	return (
 		<SidebarGraph
 			isExperimentRunning={isExperimentRunning}
+			isExperimentSucceeded={isExperimentSucceeded}
 			lineChartData={lineChartData}
 			experimentGraphTargetsList={experimentGraphTargetsList}
 			isSidebarOpen={isSidebarOpen}
@@ -47,6 +47,8 @@ const ExperimentGraphContainer = () => {
 	);
 };
 
-ExperimentGraphContainer.propTypes = {};
+ExperimentGraphContainer.propTypes = {
+	experimentStatus: PropTypes.string,
+};
 
 export { ExperimentGraphContainer };

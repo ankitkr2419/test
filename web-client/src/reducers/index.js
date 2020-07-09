@@ -32,6 +32,7 @@ import { listSamplesReducer } from 'reducers/samplesReducer';
 import { runExperimentReducer } from 'reducers/runExperimentReducer';
 import { activeWellReducer } from 'reducers/actionWellReducer';
 import { wellGraphReducer } from 'reducers/wellGraphReducer';
+import { socketReducer } from 'reducers/socketReducer';
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -59,6 +60,7 @@ const rootReducer = combineReducers({
 	runExperimentReducer,
 	activeWellReducer,
 	wellGraphReducer,
+	socketReducer,
 });
 
 export default rootReducer;

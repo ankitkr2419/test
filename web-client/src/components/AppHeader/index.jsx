@@ -15,13 +15,16 @@ import {
 	NavLink,
 } from 'core-components';
 // import { getExperimentId } from 'selectors/experimentSelector';
-import { runExperiment, stopExperiment } from 'action-creators/runExperimentActionCreators';
+import {
+	runExperiment,
+	stopExperiment,
+} from 'action-creators/runExperimentActionCreators';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
-import { connectSocket, disConnectSocket } from 'web-socket';
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
 import ConfirmationModal from 'components/modals/ConfirmationModal';
+import { EXPERIMENT_STATUS } from 'appConstants';
 import { NAV_ITEMS } from './constants';
 
 const Header = styled.header`
@@ -47,23 +50,24 @@ const AppHeader = (props) => {
 	const experimentId = useSelector(getExperimentId);
 	const runExperimentReducer = useSelector(getRunExperimentReducer);
 	const experimentStatus = runExperimentReducer.get('experimentStatus');
-	const isExperimentRunning = experimentStatus === 'running';
-	const isExperimentStopped = experimentStatus === 'stopped';
-	const isRunFailed = experimentStatus === 'run-failed';
+	const isExperimentRunning = experimentStatus === EXPERIMENT_STATUS.running;
+	const isExperimentStopped = experimentStatus === EXPERIMENT_STATUS.stopped;
+	const isRunFailed = experimentStatus === EXPERIMENT_STATUS.runFailed;
+	const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
 
 	const [isExitModalVisible, setExitModalVisibility] = useState(false);
 	const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 	const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
 
-	useEffect(() => {
-		if (isExperimentRunning === true) {
-			connectSocket(dispatch);
-		}
-	}, [isExperimentRunning, dispatch]);
+	// useEffect(() => {
+	// 	if (isExperimentRunning === true) {
+	// 		// connectSocket(dispatch);
+	// 	}
+	// }, [isExperimentRunning, dispatch]);
 
 	useEffect(() => {
 		if (isExperimentStopped === true) {
-			disConnectSocket();
+			// disConnectSocket();
 			dispatch(loginReset());
 		}
 	}, [isExperimentStopped, dispatch]);
@@ -73,7 +77,7 @@ const AppHeader = (props) => {
 	};
 
 	const startExperiment = () => {
-		if (isExperimentRunning === false) {
+		if (isExperimentRunning === false && isExperimentSucceeded === false) {
 			dispatch(runExperiment(experimentId));
 		}
 	};
@@ -140,33 +144,33 @@ const AppHeader = (props) => {
 						</Text>
 						<Text
 							size={12}
-							className={`text-error mb-1 ${
-								isRunFailed ? 'show' : ''
-							}`}
+							className={`text-error mb-1 ${isRunFailed ? 'show' : ''}`}
 						>
-							Experiment failed to run.
+              Experiment failed to run.
 						</Text>
-						{isPlateRoute === true && (
+						{isExperimentSucceeded === false && isPlateRoute === true && (
 							<Button
 								color={isExperimentRunning ? 'primary' : 'secondary'}
 								size="sm"
 								className="font-weight-light border-2 border-gray shadow-none"
-								outline={isExperimentRunning === false}
+								outline={
+									isExperimentRunning === false
+                  && isExperimentSucceeded === false
+								}
 								onClick={startExperiment}
 							>
                 Run
 							</Button>
 						)}
-						{/* TODO: Show this button after experiment ends,
-						depending on result change value of color prop to
-						"success" or "failure"  */}
-						{/* <Button
-							color='success'
-							size='sm'
-							className='font-weight-light border-2 border-gray shadow-none'
-						>
-							Result - Successful
-						</Button> */}
+						{isExperimentSucceeded === true && (
+							<Button
+								color="success"
+								size="sm"
+								className="font-weight-light border-2 border-gray shadow-none"
+							>
+                Result - Successful
+							</Button>
+						)}
 					</div>
 					{isLoginTypeAdmin === true && (
 						<Dropdown
