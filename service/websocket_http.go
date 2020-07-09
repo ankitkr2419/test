@@ -94,11 +94,14 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 						rw.WriteHeader(http.StatusInternalServerError)
 						return
 					}
+					
+					fmt.Println("len wells",len(wells))
+					fmt.Println("len wt",len(welltargets))
 
 					for i, w := range wells {
 						for _, t := range welltargets {
 							if w.Position == t.WellPosition {
-								wells[i].Targets = append(w.Targets, t)
+								wells[i].Targets = append(wells[i].Targets, t)
 							}
 						}
 					}
