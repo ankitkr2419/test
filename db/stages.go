@@ -2,9 +2,9 @@ package db
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"time"
 )
 
 const (
@@ -17,21 +17,24 @@ const (
 
 	getStageListQuery = `SELECT * FROM stages
 		where template_id = $1
-		ORDER BY id DESC`
+		ORDER BY created_at ASC`
 
 	getStageQuery = `SELECT id,
 		type,
 		repeat_count,
 		template_id,
-		step_count
+		step_count,
+		created_at,
+                updated_at
 		FROM stages
 		WHERE id = $1`
 
 	updateStageQuery = `UPDATE stages SET (
 		type,
 		repeat_count,
-		template_id) =
-		($1, $2, $3) where id = $4`
+		template_id,
+		updated_at) =
+		($1, $2, $3,$4) where id = $5`
 
 	deleteStageQuery = `DELETE FROM stages WHERE id = $1`
 
@@ -49,7 +52,7 @@ const (
 		WHERE
 		stages.id = steps.stage_id
 		AND stages.template_id = $1
-		ORDER BY steps.id ASC`
+		ORDER BY steps.created_at ASC`
 )
 
 type Stage struct {
@@ -58,6 +61,8 @@ type Stage struct {
 	RepeatCount uint16    `db:"repeat_count" json:"repeat_count"`
 	TemplateID  uuid.UUID `db:"template_id" json:"template_id" validate:"required"`
 	StepCount   int       `db:"step_count" json:"step_count"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
 
 // StageStep used to get data for particular template
@@ -105,6 +110,7 @@ func (s *pgStore) UpdateStage(ctx context.Context, stg Stage) (err error) {
 		stg.Type,
 		stg.RepeatCount,
 		stg.TemplateID,
+		time.Now(),
 		stg.ID,
 	)
 	if err != nil {

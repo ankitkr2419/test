@@ -2,9 +2,9 @@ package db
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"time"
 )
 
 const (
@@ -24,7 +24,9 @@ const (
 		ramp_rate,
 		target_temp,
 		hold_time,
-		data_capture
+		data_capture,
+		created_at,
+                updated_at
 		FROM steps WHERE id = $1`
 
 	updateStepQuery = `UPDATE steps SET (
@@ -32,8 +34,9 @@ const (
 		ramp_rate,
 		target_temp,
 		hold_time,
-		data_capture) =
-		($1, $2, $3, $4, $5) where id = $6`
+		data_capture,
+                updated_at) =
+		($1, $2, $3, $4, $5,$6) where id = $7`
 
 	deleteStepQuery = `DELETE FROM steps WHERE id = $1`
 )
@@ -45,6 +48,8 @@ type Step struct {
 	TargetTemperature float32   `db:"target_temp" json:"target_temp"`
 	HoldTime          int32     `db:"hold_time" json:"hold_time"`
 	DataCapture       bool      `db:"data_capture" json:"data_capture"`
+	CreatedAt         time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt         time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) ListSteps(ctx context.Context, stgID uuid.UUID) (steps []Step, err error) {
@@ -90,6 +95,7 @@ func (s *pgStore) UpdateStep(ctx context.Context, st Step) (err error) {
 		st.TargetTemperature,
 		st.HoldTime,
 		st.DataCapture,
+		time.Now(),
 		st.ID,
 	)
 	if err != nil {

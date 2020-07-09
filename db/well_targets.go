@@ -11,7 +11,7 @@ import (
 
 const (
 	getWellTargetsListQuery = `SELECT * FROM well_targets
-		WHEREwell_position = $1 AND experiment_id =$2`
+		WHERE well_position = $1 AND experiment_id =$2`
 
 	getWellTargetsQuery = `SELECT
 		well_position,
