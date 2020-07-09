@@ -16,6 +16,7 @@ const SidebarGraph = (props) => {
 		onThresholdChangeHandler,
 		toggleGraphFilterActive,
 		experimentGraphTargetsList,
+		isExperimentSucceeded,
 	} = props;
 
 	let noOfCycles = 0;
@@ -28,7 +29,7 @@ const SidebarGraph = (props) => {
 		datasets: lineChartData.toJS(),
 	};
 
-	if (isExperimentRunning === true) {
+	if (isExperimentRunning === true || isExperimentSucceeded === true) {
 		return (
 			<Sidebar
 				isOpen={isSidebarOpen}
@@ -75,6 +76,7 @@ SidebarGraph.propTypes = {
 	onThresholdChangeHandler: PropTypes.func.isRequired,
 	toggleGraphFilterActive: PropTypes.func.isRequired,
 	experimentGraphTargetsList: PropTypes.object.isRequired,
+	isExperimentSucceeded: PropTypes.bool.isRequired,
 };
 
 export default React.memo(SidebarGraph);

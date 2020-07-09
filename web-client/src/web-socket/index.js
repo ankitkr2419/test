@@ -7,9 +7,9 @@ import {
 import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from 'appConstants';
 import { updateWellThroughSocket } from 'action-creators/wellActionCreators';
 import { wellGraphSucceeded } from 'action-creators/wellGraphActionCreators';
+import { experimentedCompleted } from 'action-creators/runExperimentActionCreators';
 
 let webSocket = null;
-
 export const connectSocket = (dispatch) => {
 	webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`);
 	webSocket.onopen = (event) => {
@@ -25,6 +25,9 @@ export const connectSocket = (dispatch) => {
 				break;
 			case SOCKET_MESSAGE_TYPE.wellsData:
 				dispatch(updateWellThroughSocket(data));
+				break;
+			case SOCKET_MESSAGE_TYPE.OnSuccess:
+				dispatch(experimentedCompleted(data));
 				break;
 			default:
 				break;

@@ -1,7 +1,7 @@
 import { fromJS } from 'immutable';
 import wellGraphActions from 'actions/wellGraphActions';
 import loginActions from 'actions/loginActions';
-import graphData from '../mock-json/graphData.json';
+// import graphData from '../mock-json/graphData.json';
 
 const wellGraphInitialState = fromJS({
 	chartData: [],

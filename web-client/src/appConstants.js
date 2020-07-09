@@ -25,4 +25,12 @@ export const TARGET_LINE_COLORS = [
 export const SOCKET_MESSAGE_TYPE = {
 	wellsData : 'Wells',
 	graphData: 'Graph',
+	OnSuccess: 'Success',
+};
+
+export const EXPERIMENT_STATUS = {
+	running: 'running',
+	runFailed: 'run-failed',
+	stopped: 'stopped',
+	success: 'success',
 };

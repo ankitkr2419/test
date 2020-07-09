@@ -1,11 +1,21 @@
 import { fromJS } from 'immutable';
-import { runExperimentActions, stopExperimentActions } from 'actions/runExperimentActions';
+import {
+	runExperimentActions,
+	stopExperimentActions,
+	experimentCompleteActions,
+} from 'actions/runExperimentActions';
 import loginActions from 'actions/loginActions';
+import { EXPERIMENT_STATUS } from 'appConstants';
 
 const runInitialState = fromJS({
 	isLoading: false,
 	experimentStatus: null,
 	experimentStartedTime: null,
+	/**
+   * experiment completed details
+   * e.g completion time, no of wells etc
+   */
+	data: {},
 });
 
 const getTimeNow = () => {
@@ -27,22 +37,30 @@ export const runExperimentReducer = (state = runInitialState, action) => {
 	case runExperimentActions.successAction:
 		return state.merge({
 			isLoading: false,
-			experimentStatus: 'running',
+			experimentStatus: EXPERIMENT_STATUS.running,
 			experimentStartedTime: getTimeNow(),
 		});
 	case runExperimentActions.failureAction:
 		return state.merge({
 			isLoading: false,
-			experimentStatus: 'run-failed',
+			experimentStatus: EXPERIMENT_STATUS.runFailed,
 			experimentStartedTime: getTimeNow(),
 		});
-	// stop experiment actions
+
+		// experiment completed
+	case experimentCompleteActions.success:
+		return state.merge({
+			experimentStatus: EXPERIMENT_STATUS.success,
+			data: fromJS(action.payload.data),
+		});
+
+		// stop experiment actions
 	case stopExperimentActions.stopExperiment:
 		return state;
 	case stopExperimentActions.successAction:
 		return state.merge({
 			isLoading: false,
-			experimentStatus: 'stopped',
+			experimentStatus: EXPERIMENT_STATUS.stopped,
 			experimentStoppedTime: getTimeNow(),
 		});
 	case stopExperimentActions.failureAction:
