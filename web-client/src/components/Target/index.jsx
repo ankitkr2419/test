@@ -185,6 +185,7 @@ TargetComponent.propTypes = {
 	onNextClick: PropTypes.func,
 	isViewStagesEnabled: PropTypes.bool,
 	navigateToStageWizard: PropTypes.func,
+	editTemplate: PropTypes.func
 };
 
 export default TargetComponent;

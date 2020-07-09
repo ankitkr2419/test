@@ -55,6 +55,7 @@ const TargetHeader = (props) => {
 TargetHeader.propTypes = {
 	isLoginTypeAdmin: PropTypes.bool.isRequired,
 	isLoginTypeOperator: PropTypes.bool.isRequired,
+	editTemplate: PropTypes.func
 };
 
 export default TargetHeader;
