@@ -11,6 +11,7 @@ import {
 	deleteStepReset,
 	updateStepReset,
 } from 'action-creators/stepActionCreators';
+import { getStepList } from 'selectors/stepSelector';
 
 const StepContainer = (props) => {
 	const { stageId } = props;
@@ -19,7 +20,7 @@ const StepContainer = (props) => {
 	const [selectedStepId, setSelectedStepId] = useState(null);
 
 	// reading steps from redux
-	const steps = useSelector(state => state.listStepsReducer);
+	const steps = useSelector(getStepList);
 
 	// isStepSaved = true means step created successfully
 	const { isStepSaved } = useSelector(state => state.createStepReducer);

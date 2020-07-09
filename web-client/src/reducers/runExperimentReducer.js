@@ -50,7 +50,10 @@ export const runExperimentReducer = (state = runInitialState, action) => {
 		// experiment completed
 	case experimentCompleteActions.success:
 		return state.merge({
-			experimentStatus: EXPERIMENT_STATUS.success,
+			experimentStatus:
+          state.get('experimentStatus') === EXPERIMENT_STATUS.running
+          	? EXPERIMENT_STATUS.success
+          	: null,
 			data: fromJS(action.payload.data),
 		});
 
