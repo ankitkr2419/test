@@ -31,7 +31,6 @@ const TemplateContainer = (props) => {
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
-	const createdTemplate = useSelector(state => state.createTemplateReducer);
 	// isTemplateCreated = true means template created successfully
 	const { isTemplateCreated, response  } = useSelector(
 		state => state.createTemplateReducer,
@@ -56,7 +55,7 @@ const TemplateContainer = (props) => {
 			updateSelectedWizard('target');
 			dispatch(addTemplateReset());
 		}
-	}, [isTemplateCreated, dispatch]);
+	}, [isTemplateCreated, dispatch, response, updateSelectedWizard, updateTemplateID]);
 
 	useEffect(() => {
 		// Once we delete template will fetch updated template list
