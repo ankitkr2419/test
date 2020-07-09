@@ -140,7 +140,7 @@ func (d *Simulator) simulate() {
 			if msg == "pause" {
 				//TBD
 			}
-		case err := <-d.errCh:
+		case err := <-d.ErrCh:
 			// Some error flagged
 			logger.WithField("err", err.Error()).Error("simulate: errCh recevied data")
 			return
