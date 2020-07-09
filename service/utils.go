@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	// "fmt"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
@@ -114,8 +113,7 @@ func makeResult(aw []int32, scan plc.Scan, td []db.TargetDetails, experimentID u
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
 			r.FValue = scan.Wells[w][t.DyePosition] // for 5th well & target 2 = scanWells[5][1]
-			// fmt.Println("***************************************************************************************************")
-			// fmt.Printf("wellP: %v \t t_id: %v \t d_p: %v \t FV r.FValue %v",r.WellPosition,r.TargetID,t.DyePosition,r.FValue)
+
 			result = append(result, r)
 		}
 	}
@@ -131,14 +129,14 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			wt.TargetID = r.TargetID
 
 			wt.ExperimentID = r.ExperimentID
-			// fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, wt.CT)
+
 			if r.Threshold < float32(r.FValue) {
 				// add ct value
 				wt.CT = strconv.Itoa(int(r.FValue))
 			} else {
 				wt.CT = ""
 			}
-			// fmt.Println("wt %+v ", wt)
+
 			DBWellTargets = append(DBWellTargets, wt)
 		}
 		return DBWellTargets, DBWells
@@ -147,7 +145,7 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			for i, t := range DBWellTargets {
 				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID {
 					if t.CT == "" && r.Threshold < float32(r.FValue) {
-						// fmt.Printf("float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n ", float32(r.FValue), r.Threshold, t.CT)
+
 						// add ct
 						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
 					}
@@ -160,8 +158,7 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			for i, w := range DBWells {
 				for j, t := range DBWellTargets {
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
-						// fmt.Printf("welltargets: %+v ", t)
-						// fmt.Printf("w.Position %v \t currentCycle %v \t float32(r.FValue) %v\t r.Threshold %v \t t.CT : %v \n 							", w.Position, currentCycle, float32(r.FValue), r.Threshold, t.CT)
+
 						switch {
 						case 5 >= currentCycle && currentCycle <= 25 && float32(r.FValue) > r.Threshold && t.CT == "":
 							// mark red
@@ -181,8 +178,6 @@ func WellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 							DBWellTargets[j].CT = "UNDETERMINE"
 							DBWells[i].ColorCode = red
 						}
-						// fmt.Println("color", DBWells[i].ColorCode)
-						// fmt.Println("ct", DBWellTargets[j].CT)
 
 					}
 				}
