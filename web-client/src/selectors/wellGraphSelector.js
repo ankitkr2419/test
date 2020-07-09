@@ -46,6 +46,7 @@ const getThresholdLine = (label, max_threshold, count, lineColor) => ({
 	pointRadius: 0,
 	borderColor: lineColor,
 	pointBorderColor: '#a2ee95',
+	borderDash: [10, 5],
 	pointBackgroundColor: '#fff',
 	pointBorderWidth: 0,
 	pointHoverRadius: 0,
@@ -71,7 +72,7 @@ export const getLineChartData = createSelector(
 		const graphTargets = experimentTargets.get('graphTargets');
 		const isMultiSelectionOptionOn = wells.get('isMultiSelectionOptionOn');
 		const selectedPositions = getWellsPosition(wells);
-		let wellGraphData = wellGraphReducer.getIn(['chartData', 'data']);
+		let wellGraphData = wellGraphReducer.get('chartData');
 		// Should apply filter if we have positions selected from viewing graph
 		if (isMultiSelectionOptionOn === true && selectedPositions.size !== 0) {
 			wellGraphData = wellGraphData.filter(ele => selectedPositions.includes(ele.get('well_position')));

@@ -6,12 +6,7 @@ const LineChart = (props) => {
 
 	const options = {
 		legend: {
-			labels: {
-				filter(item, chart) {
-					// Logic to remove a particular legend item goes here
-					return !item.text.includes('index');
-				},
-			},
+			display: false,
 		},
 	};
 
@@ -19,7 +14,7 @@ const LineChart = (props) => {
 };
 
 LineChart.defaultProps = {
-	height: 275,
+	height: 344,
 	width: 830,
 };
 

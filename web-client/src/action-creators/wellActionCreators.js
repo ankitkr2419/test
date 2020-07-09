@@ -38,6 +38,13 @@ export const fetchWellsFailed = errorResponse => ({
 	},
 });
 
+export const updateWellThroughSocket = response => ({
+	type: listWellActions.updateWellThroughSocket,
+	payload: {
+		response,
+	},
+});
+
 export const setSelectedWell = (index, isSelected) => ({
 	type: listWellActions.setSelectedWell,
 	payload: {

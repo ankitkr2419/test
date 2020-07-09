@@ -1,48 +1,65 @@
 import React from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Text } from 'shared-components';
 import TemplatePopover from 'components/Plate/Popover';
+import { formatDate, formatTime } from 'utils/helpers';
 
 const StyledSubHeader = styled.div`
-	display: flex;
-	align-items: center;
-	height: 40px;
-	padding: 8px 16px 8px 88px;
-	color: #707070;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 8px 16px 8px 88px;
+  color: #707070;
 
-	h6 {
-		font-size: 14px;
-		line-height: 1.25;
-	}
+  h6 {
+    font-size: 14px;
+    line-height: 1.25;
+  }
 `;
 
-const SubHeader = ({ experimentTemplate }) => (
-	<StyledSubHeader className="plate-subheader">
-		<Text Tag="h6" className="mb-0">
-			{experimentTemplate.templateId}
-		</Text>
-		<Text Tag="h6" className="mb-0 mx-5">
-			{experimentTemplate.templateName}
-		</Text>
-		{/* <Text Tag="h6" className="mb-0 ml-5">
-				22/06/2020
-		</Text>
-		<Text Tag="h6" className="mb-0 ml-3">
-				23:50 PM to 01:21 AM
-		</Text>
-		<Text Tag="h6" className="mb-0 ml-5">
-				No. of wells - 5
-		</Text> */}
-		<TemplatePopover className="ml-auto" />
-	</StyledSubHeader>
-);
+const SubHeader = (props) => {
+	const {
+		experimentTemplate,
+		isExperimentSucceeded,
+		experimentDetails,
+	} = props;
+
+	const { templateId, templateName } = experimentTemplate;
+	const { start_time, end_time, well_count } = experimentDetails.toJS();
+
+	return (
+		<StyledSubHeader className="plate-subheader">
+			<Text Tag="h6" className="mb-0">
+				{templateId}
+			</Text>
+			<Text Tag="h6" className="mb-0 mx-5">
+				{templateName}
+			</Text>
+			{isExperimentSucceeded === true && (
+				<>
+					<Text Tag="h6" className="mb-0 ml-5">
+						{formatDate(start_time)}
+					</Text>
+					<Text Tag="h6" className="mb-0 ml-3">
+						{`${formatTime(start_time)} to ${formatTime(end_time)}`}
+					</Text>
+					<Text Tag="h6" className="mb-0 ml-5">
+            No. of wells - {well_count}
+					</Text>
+				</>
+			)}
+			<TemplatePopover className="ml-auto" />
+		</StyledSubHeader>
+	);
+};
 
 SubHeader.propTypes = {
 	experimentTemplate: PropTypes.shape({
 		templateId: PropTypes.string,
 		templateName: PropTypes.string,
 	}).isRequired,
+	isExperimentSucceeded: PropTypes.bool,
 };
 
 export default SubHeader;
