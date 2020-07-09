@@ -48,8 +48,13 @@ const TargetComponent = (props) => {
 	};
 
 	const getFilteredOptionsList = useMemo(
-		() => listTargetReducer.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState)),
-		[listTargetReducer, selectedTargetState],
+		() => {
+			if (isLoginTypeAdmin === true) {
+				return listTargetReducer
+					.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState));
+			}
+		},
+		[listTargetReducer, selectedTargetState, isLoginTypeAdmin]
 	);
 
 	const getTargetRows = useMemo(
@@ -103,13 +108,13 @@ const TargetComponent = (props) => {
 			</TargetListItem>
 		)),
 		[
-			listTargetReducer,
 			onCheckedHandler,
 			onTargetSelect,
 			onThresholdChange,
 			selectedTargetState,
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
+			getFilteredOptionsList
 		],
 	);
 	return (
