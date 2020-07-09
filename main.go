@@ -96,6 +96,10 @@ func startApp(plcName string, test bool) (err error) {
 
 	exit := make(chan error)
 
+	websocketMsg := make(chan string)
+
+	websocketErr := make(chan error)
+
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
 		driver = compact32.NewCompact32Driver(exit, test)
@@ -103,7 +107,7 @@ func startApp(plcName string, test bool) (err error) {
 		driver = simulator.NewSimulator(exit)
 	}
 
-	// The exit plan incase there is a feedback from the driver to abort/exit
+	/* // The exit plan incase there is a feedback from the driver to abort/exit
 	go func() {
 		err = <-exit
 		logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
@@ -111,7 +115,7 @@ func startApp(plcName string, test bool) (err error) {
 
 		// TODO: Handle exit gracefully
 		// We need to call the API on the Web to display the error and restart, abort or call service!
-	}()
+	}() */
 
 	store, err = db.Init()
 	if err != nil {
@@ -120,8 +124,11 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	deps := service.Dependencies{
-		Store: store,
-		Plc:   driver,
+		Store:   store,
+		Plc:     driver,
+		ExitCh:  exit,
+		WsErrCh: websocketErr,
+		WsMsgCh: websocketMsg,
 	}
 
 	// setup Db with dyes & targets

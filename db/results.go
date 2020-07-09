@@ -85,6 +85,11 @@ type FinalResultWells struct {
 	Type string `json:"type"`
 	Data []Well `json:"data"`
 }
+
+type FinalResultOnSuccess struct {
+	Type string     `json:"type"`
+	Data Experiment `json:"data"`
+}
 type WellData struct {
 	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`

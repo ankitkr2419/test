@@ -7,6 +7,7 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
@@ -33,16 +34,31 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		HeartBeatPLC(deps)
 
 		activeWells := config.ActiveWells("activeWells")
+
+		// The exit plan incase there is a feedback from the driver to abort/exit
 		go func() {
 			err = <-deps.ExitCh
-			logger.WithField("err", err.Error()).Error("PLC failed")
+			logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
+			ExperimentRunning = false // on pre-emptive stop
+			// TODO: Handle exit gracefully
+			// We need to call the API on the Web to display the error and restart, abort or call service!
 
 		}()
+
+		go func() {
+			// read channel from websocket err
+			err = <-deps.WsErrCh
+			logger.WithField("err", err.Error()).Error("Monitor has requested exit")
+
+		}()
+
 		fmt.Println("websocket started")
 
 		for {
 
-			if Read == 1 {
+			msg := <-deps.WsMsgCh
+			switch msg {
+			case "read":
 				fmt.Println("Reading epxp:", experimentID)
 
 				// retruns all targets configured for experiment
@@ -122,8 +138,31 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 						return
 					}
 				}
+			case "stop":
+				// send exp stop data
+				fmt.Println("stop: exp completed************")
+				latestE, err := deps.Store.ShowExperiment(req.Context(), experimentID)
+				if err != nil {
+					rw.WriteHeader(http.StatusInternalServerError)
+					logger.WithField("err", err.Error()).Error("Error get experiment")
+					return
+				}
+				var result db.FinalResultOnSuccess
+				result.Type = "OnSuccess"
+				result.Data = latestE
 
-				Read = 0
+				respBytes, err := json.Marshal(result)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				err = c.WriteMessage(1, respBytes)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Websocket failed to write")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 
 			}
 
@@ -154,6 +193,7 @@ func monitorExperiment(deps Dependencies) {
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc monitor")
 			// send error
+			deps.WsErrCh <- err
 			return
 		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
@@ -168,6 +208,7 @@ func monitorExperiment(deps Dependencies) {
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error inserting result data")
 				// send error
+				deps.WsErrCh <- err
 				return
 			}
 
@@ -183,12 +224,14 @@ func monitorExperiment(deps Dependencies) {
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error fetching data")
 				// send error
+				deps.WsErrCh <- err
 				return
 			}
 
 			welltargets, err := deps.Store.ListWellTargets(context.Background(), experimentID)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error fetching data")
+				deps.WsErrCh <- err
 				// send error
 				return
 			}
@@ -205,6 +248,7 @@ func monitorExperiment(deps Dependencies) {
 					if err != nil {
 						// send error
 						logger.WithField("err", err.Error()).Error("Error upsert wells")
+						deps.WsErrCh <- err
 						return
 					}
 				}
@@ -216,21 +260,23 @@ func monitorExperiment(deps Dependencies) {
 			if err != nil {
 				// send error
 				logger.WithField("err", err.Error()).Error("Error upsert wells")
+				deps.WsErrCh <- err
 				return
 			}
-
+			deps.WsMsgCh <- "read"
 			if scan.Cycle == plcStage.CycleCount {
 				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentID)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error fetching data")
-					rw.WriteHeader(http.StatusInternalServerError)
+					// send error
+					deps.WsErrCh <- err
 					return
 				}
 				// last cycle socket closed
+				deps.WsMsgCh <- "stop"
 				ExperimentRunning = false
 				break
 			}
-			Read = 1
 			fmt.Println("cycle:", scan.Cycle)
 			cycle++
 			previousCycle++
