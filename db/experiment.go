@@ -19,13 +19,18 @@ const (
  		end_time)
 		VALUES ($1, $2,$3, $4,$5) RETURNING id`
 
-	getExperimentQuery = `SELECT e.id,
+	getExperimentQuery = `SELECT 	e.id,
 		e.description,
 		e.template_id,
 		e.operator_name,
 		e.start_time,
 		e.end_time,
-        t.name as template_name
+        t.name as template_name,
+		 (
+            SELECT COUNT(*)
+            FROM wells
+            WHERE wells.experiment_id=e.id
+       ) AS well_count
 		FROM experiments as e,templates as t
 		WHERE t.id = e.template_id AND e.id = $1`
 
@@ -45,6 +50,7 @@ type Experiment struct {
 	OperatorName string    `db:"operator_name" json:"operator_name"`
 	StartTime    time.Time `db:"start_time" json:"start_time"`
 	EndTime      time.Time `db:"end_time" json:"end_time"`
+	WellCount    int `db:"well_count" json:"well_count"`
 }
 
 func (s *pgStore) ListExperiments(ctx context.Context) (e []Experiment, err error) {
