@@ -94,9 +94,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 						rw.WriteHeader(http.StatusInternalServerError)
 						return
 					}
-					
-					fmt.Println("len wells",len(wells))
-					fmt.Println("len wt",len(welltargets))
+
+					fmt.Println("len wells", len(wells))
+					fmt.Println("len wt", len(welltargets))
 
 					for i, w := range wells {
 						for _, t := range welltargets {
@@ -220,6 +220,12 @@ func monitorExperiment(deps Dependencies) {
 			}
 
 			if scan.Cycle == plcStage.CycleCount {
+				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentID)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error fetching data")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 				// last cycle socket closed
 				ExperimentRunning = false
 				break
