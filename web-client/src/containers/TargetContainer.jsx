@@ -25,7 +25,8 @@ import {
 const TargetContainer = (props) => {
 	// constants
 	const {
-		updateSelectedWizard, templateID, isLoginTypeAdmin, isLoginTypeOperator, setIsTemplateEdited,
+		updateSelectedWizard, templateID, isLoginTypeAdmin, isLoginTypeOperator,
+		setIsTemplateEdited
 	} = props;
 	const dispatch = useDispatch();
 
@@ -154,10 +155,11 @@ const TargetContainer = (props) => {
 		return updateSelectedWizard('stage');
 	}, [updateSelectedWizard]);
 
+	// onEditing a template
 	const editTemplate = useCallback(() => {
-		updateSelectedWizard('template');
+		// Set the template editing flag on to open the template modal
 		setIsTemplateEdited(true);
-	}, [updateSelectedWizard]);
+	}, [setIsTemplateEdited]);
 
 	// this function will check weather our local state is changed or not
 	const getIsTargetListUpdatedAdmin = useCallback(() => {
@@ -196,6 +198,7 @@ const TargetContainer = (props) => {
 TargetContainer.propTypes = {
 	updateSelectedWizard: PropTypes.func.isRequired,
 	templateID: PropTypes.string.isRequired,
+	setIsTemplateEdited: PropTypes.func.isRequired
 };
 
 export default TargetContainer;

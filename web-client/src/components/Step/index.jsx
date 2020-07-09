@@ -26,13 +26,13 @@ const StepComponent = (props) => {
 		selectedStepId,
 		saveStep, // update api call
 		isStepsLoading,
-		goToStageWizard,
+		goToStageWizard
 	} = props;
 
 	// local state to save form data and modal state flag
 	const [stepFormState, updateStepFormState] = useReducer(
 		stepStateReducer,
-		stepStateInitialState,
+		stepStateInitialState
 	);
 
 	// immutable => js
@@ -59,7 +59,7 @@ const StepComponent = (props) => {
 	const toggleCreateStepModal = () => {
 		updateStepFormStateWrapper(
 			'isCreateStepModalVisible',
-			!isCreateStepModalVisible,
+			!isCreateStepModalVisible
 		);
 	};
 
