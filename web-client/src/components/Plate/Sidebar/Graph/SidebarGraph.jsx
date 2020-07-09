@@ -33,12 +33,13 @@ const SidebarGraph = (props) => {
 			<Sidebar
 				isOpen={isSidebarOpen}
 				toggleSideBar={toggleSideBar}
-				className="graph"
-				handleIcon="graph"
+				className='graph'
+				bodyClassName='py-4'
+				handleIcon='graph'
 				handleIconSize={56}
 			>
-				<Text size={20} className="text-default mb-5">
-          Amplification plot
+				<Text size={20} className='text-default mb-4'>
+					Amplification plot
 				</Text>
 				<GraphCard>
 					<LineChart data={data} />
@@ -48,8 +49,8 @@ const SidebarGraph = (props) => {
 					onThresholdChangeHandler={onThresholdChangeHandler}
 					toggleGraphFilterActive={toggleGraphFilterActive}
 				/>
-				<Text size={14} className="text-default mb-0">
-          Note: Click on the threshold number to change it.
+				<Text size={14} className='text-default mb-0'>
+					Note: Click on the threshold number to change it.
 				</Text>
 			</Sidebar>
 		);
@@ -58,12 +59,12 @@ const SidebarGraph = (props) => {
 };
 
 const GraphCard = styled.div`
-  width: 830px;
-  height: 275px;
-  background: #ffffff 0% 0% no-repeat padding-box;
-  border: 1px solid #707070;
-  padding: 8px;
-  margin: 0 0 40px 0;
+	width: 830px;
+	height: 344px;
+	background: #ffffff 0% 0% no-repeat padding-box;
+	border: 1px solid #707070;
+	padding: 8px;
+	margin: 0 0 32px 0;
 `;
 
 SidebarGraph.propTypes = {
