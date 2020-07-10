@@ -8,7 +8,9 @@ import { connectSocket } from 'web-socket';
 
 const LoginContainer = () => {
 	const loginReducer = useSelector(state => state.loginReducer);
+	const socketReducer = useSelector(state => state.socketReducer);
 	const { isUserLoggedIn, isError } = loginReducer.toJS();
+	const isOpened = socketReducer.get('isOpened');
 
 	// isError in case user enters wrong credentials
 	// TODO Extract error message from response once api implemented
@@ -19,7 +21,9 @@ const LoginContainer = () => {
 
 	const loginAsOperator = () => {
 		// TODO check if connection is already opened
-		connectSocket(dispatch);
+		if (isOpened === false) {
+			connectSocket(dispatch);
+		}
 		dispatch(loginAsOperatorAction());
 	};
 
