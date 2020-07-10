@@ -34,7 +34,7 @@ export const isCheckable = (state, index) => {
 const addTargetId = (state, { targetId, index }) => state.setIn(['targetList', index, 'selectedTarget'], targetId);
 
 // function will set threshold flag w.r.t index
-const addThresholdValue = (state, { threshold, index }) => state.setIn(['targetList', index, 'threshold'], parseFloat(threshold));
+const addThresholdValue = (state, { threshold, index }) => state.setIn(['targetList', index, 'threshold'], parseFloat(threshold) || '');
 
 // function will set isChecked flag w.r.t index
 const setCheckedState = (state, { checked, index }) => state.setIn(['targetList', index, 'isChecked'], checked);
