@@ -32,10 +32,10 @@ const StageContainer = (props) => {
 	const { isStageUpdated } = useSelector(state => state.updateStageReducer);
 
 	useEffect(() => {
-		// Once we create stage will fetch updated stage list
 		if (isStageSaved === true) {
 			dispatch(addStageReset());
-			dispatch(fetchStages(templateID));
+			// No need to fetch again as we added the created stage to list in reducer
+			// on create success action
 		}
 	}, [isStageSaved, templateID, dispatch]);
 

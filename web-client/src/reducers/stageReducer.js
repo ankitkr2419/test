@@ -41,6 +41,9 @@ export const listStagesReducer = (
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
+	// Add the created stage to list to avoid an extra get api call
+	case addStageActions.successAction:
+		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response || {})));
 	// case listStageActions.setSelectedStageId:
 	// 	return state.setIn(['selectedStageId'], action.payload.stageId);
 	default:
