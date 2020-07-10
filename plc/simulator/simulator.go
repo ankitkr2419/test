@@ -44,7 +44,7 @@ func (d *Simulator) HeartBeat() {
 
 	LOOP:
 		for {
-			time.Sleep(500 * time.Millisecond) // sleep it off for a bit
+			time.Sleep(5000 * time.Millisecond) // sleep it off for a bit
 
 			// 3 attempts to check for heartbeat of PLC and write ours!
 			for i := 0; i < 3; i++ {
@@ -122,9 +122,14 @@ func (d *Simulator) simulate() {
 	//start holding stage
 	d.holdingStage()
 
+	// Start Cycling stage in a different go-routine and listen for events on exitCh and errCh
+	go d.cycleStage()
+
 	for {
+		// Intentionally don't have a default, so that it blocks on either one of the channels.
 		select {
 		case msg := <-d.exitCh:
+			logger.WithField("msg", msg).Info("simulate: ExitCh received data")
 			if msg == "stop" {
 				d.errCh <- errors.New("PCR Stopped")
 				return
@@ -135,8 +140,10 @@ func (d *Simulator) simulate() {
 			if msg == "pause" {
 				//TBD
 			}
-		default:
-			d.cycleStage()
+		case err := <-d.errCh:
+			// Some error flagged
+			logger.WithField("err", err.Error()).Error("simulate: errCh recevied data")
+			return
 		}
 	}
 }

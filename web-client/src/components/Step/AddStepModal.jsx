@@ -131,7 +131,7 @@ const AddStepModal = (props) => {
 									type='text'
 									name='holdTime'
 									id='hold_time'
-									placeholder='mm:ss'
+									placeholder='seconds'
 									value={holdTime}
 									onBlur={onHoldTimeBlurHandler}
 									onFocus={onHoldTimeFocusHandler}

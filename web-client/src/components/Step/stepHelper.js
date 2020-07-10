@@ -1,4 +1,4 @@
-export const validateHoldTime = holdTime => holdTime.match(/^[0-9][0-9]:[0-9][0-9]$/);
+export const validateHoldTime = holdTime => holdTime.match(/^[1-9]\d{0,4}$/);
 
 // Validate create step form
 export const validateStepForm = ({
@@ -6,7 +6,7 @@ export const validateStepForm = ({
 	targetTemperature,
 	holdTime,
 }) => {
-	if (rampRate !== '' && targetTemperature !== '' && holdTime !== '') {
+	if (rampRate !== '' && targetTemperature !== '' && holdTime !== '' && holdTime !== '0') {
 		if (validateHoldTime(holdTime)) {
 			return true;
 		}

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { ExperimentGraphContainer } from 'containers/ExperimentGraphContainer';
+import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
 import SampleSideBarContainer from 'containers/SampleSideBarContainer';
 import Header from './Header';
 
@@ -9,6 +11,7 @@ import GridComponent from './Grid';
 import WellGridHeader from './Grid/WellGridHeader';
 
 import './Plate.scss';
+import { EXPERIMENT_STATUS } from 'appConstants';
 
 const Plate = (props) => {
 	const {
@@ -23,6 +26,11 @@ const Plate = (props) => {
 		activeWells,
 		experimentTemplate,
 	} = props;
+
+	// getExperimentStatus will return us current experiment status
+	const runExperimentDetails = useSelector(getRunExperimentReducer);
+	const experimentStatus = runExperimentDetails.get('experimentStatus');
+	const experimentDetails = runExperimentDetails.get('data');
 
 	// local state to maintain well data which is selected for updation
 	const [updateWell, setUpdateWell] = useState(null);
@@ -61,7 +69,11 @@ const Plate = (props) => {
 
 	return (
 		<div className="plate-content d-flex flex-column h-100 position-relative">
-			<Header experimentTemplate={experimentTemplate}/>
+			<Header
+				experimentTemplate={experimentTemplate}
+				isExperimentSucceeded={experimentStatus === EXPERIMENT_STATUS.success}
+				experimentDetails={experimentDetails}
+			/>
 			<GridWrapper className="plate-body flex-100">
 				<WellGridHeader
 					isGroupSelectionOn={isMultiSelectionOptionOn}
@@ -81,7 +93,7 @@ const Plate = (props) => {
 				experimentTargetsList={experimentTargetsList}
 				updateWell={updateWell}
 			/>
-			<ExperimentGraphContainer />
+			<ExperimentGraphContainer experimentStatus={experimentStatus} />
 		</div>
 	);
 };

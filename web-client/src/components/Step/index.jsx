@@ -11,7 +11,6 @@ import {
 import stepStateReducer, {
 	stepStateInitialState,
 } from 'components/Step/stepState';
-import { convertStringToSeconds, convertSecondsToString } from 'utils/helpers';
 import AddStepModal from './AddStepModal';
 import { stepStateActions } from './stepState';
 import { validateStepForm } from './stepHelper';
@@ -75,7 +74,7 @@ const StepComponent = (props) => {
 			stage_id: stageId,
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
-			hold_time: convertStringToSeconds(holdTime),
+			hold_time: parseInt(holdTime, 10),
 			data_capture: dataCapture,
 		});
 		toggleCreateStepModal();
@@ -94,7 +93,7 @@ const StepComponent = (props) => {
 			stage_id: stageId,
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
-			hold_time: convertStringToSeconds(holdTime),
+			hold_time: parseInt(holdTime, 10),
 			data_capture: dataCapture,
 		});
 		toggleCreateStepModal();
@@ -115,7 +114,7 @@ const StepComponent = (props) => {
 				stepId: id,
 				rampRate: ramp_rate,
 				targetTemperature: target_temp,
-				holdTime: convertSecondsToString(hold_time),
+				holdTime: hold_time.toString(),
 				dataCapture: data_capture,
 			},
 		});
@@ -188,8 +187,7 @@ const StepComponent = (props) => {
 										<td>{index + 1}</td>
 										<td>{step.get('ramp_rate')}</td>
 										<td>{step.get('target_temp')}</td>
-										<td>{convertSecondsToString(step.get('hold_time'))}</td>
-										{/* <td>{step.get('hold_time')}</td> */}
+										<td>{(step.get('hold_time'))}</td>
 										<td>{step.get('data_capture') ? 'Yes' : 'No'}</td>
 										<td className='td-actions'>
 											<ButtonIcon

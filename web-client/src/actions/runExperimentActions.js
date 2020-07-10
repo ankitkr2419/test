@@ -10,3 +10,7 @@ export const stopExperimentActions = {
 	successAction: 'STOP_EXPERIMENT_SUCCEEDED',
 	failureAction: 'STOP_EXPERIMENT_FAILURE',
 };
+
+export const experimentCompleteActions = {
+	success: 'EXPERIMENT_COMPLETED',
+};

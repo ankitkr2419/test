@@ -1,4 +1,4 @@
-import { runExperimentActions, stopExperimentActions } from 'actions/runExperimentActions';
+import { runExperimentActions, stopExperimentActions, experimentCompleteActions } from 'actions/runExperimentActions';
 
 export const runExperiment = experimentId => ({
 	type: runExperimentActions.runExperiment,
@@ -28,5 +28,12 @@ export const stopExperimentFailed = errorResponse => ({
 	payload: {
 		...errorResponse,
 		error: true,
+	},
+});
+
+export const experimentedCompleted = data => ({
+	type: experimentCompleteActions.success,
+	payload: {
+		data,
 	},
 });

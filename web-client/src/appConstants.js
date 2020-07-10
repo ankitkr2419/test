@@ -14,10 +14,23 @@ export const HTTP_METHODS = {
 };
 
 export const TARGET_LINE_COLORS = [
-	'#9eff48',
-	'#889accf7',
-	'#fd5d55',
-	'yellow',
-	'#666666',
-	'#f3811f',
+	'#F590B2',
+	'#7986CB',
+	'#4FC4F7',
+	'#9D27B0',
+	'#F3811F',
+	'#EFD600',
 ];
+
+export const SOCKET_MESSAGE_TYPE = {
+	wellsData : 'Wells',
+	graphData: 'Graph',
+	OnSuccess: 'Success',
+};
+
+export const EXPERIMENT_STATUS = {
+	running: 'running',
+	runFailed: 'run-failed',
+	stopped: 'stopped',
+	success: 'success',
+};
