@@ -34,7 +34,7 @@ const StepContainer = (props) => {
 		// Once we create step will fetch updated step list
 		if (isStepSaved === true) {
 			dispatch(addStepReset());
-			dispatch(fetchSteps(stageId));
+			// No need to fetch again as we have already added the created step to stepslist in reducer
 		}
 	}, [isStepSaved, stageId, dispatch]);
 
