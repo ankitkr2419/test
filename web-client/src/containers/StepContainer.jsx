@@ -23,7 +23,7 @@ const StepContainer = (props) => {
 	const steps = useSelector(getStepList);
 
 	// isStepSaved = true means step created successfully
-	const { isStepSaved } = useSelector(state => state.createStepReducer);
+	const { isStepSaved, response } = useSelector(state => state.createStepReducer);
 	// isStepDeleted = true means step deleted successfully
 	const { isStepDeleted } = useSelector(state => state.deleteStepReducer);
 	// isStepUpdated = true means step updated successfully
@@ -33,10 +33,12 @@ const StepContainer = (props) => {
 	useEffect(() => {
 		// Once we create step will fetch updated step list
 		if (isStepSaved === true) {
+			// set the newly created step active
+			setSelectedStepId(response.id);
 			dispatch(addStepReset());
 			// No need to fetch again as we have already added the created step to stepslist in reducer
 		}
-	}, [isStepSaved, stageId, dispatch]);
+	}, [isStepSaved, stageId, dispatch, response]);
 
 	useEffect(() => {
 		// Once we delete step will fetch updated step list
