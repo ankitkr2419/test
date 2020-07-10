@@ -94,6 +94,10 @@ const StageContainer = (props) => {
 		updateSelectedWizard('step');
 	};
 
+	const goToTargetWizard = () => {
+		updateSelectedWizard('target');
+	};
+
 	return (
 		<StageComponent
 			templateID={templateID}
@@ -105,6 +109,7 @@ const StageContainer = (props) => {
 			saveStage={saveStage}
 			goToStepWizard={goToStepWizard}
 			isStagesLoading={isStagesLoading}
+			goToTargetWizard={goToTargetWizard}
 		/>
 	);
 };

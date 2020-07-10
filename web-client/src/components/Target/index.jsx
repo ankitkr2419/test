@@ -13,6 +13,7 @@ import {
 
 import { covertToSelectOption } from 'utils/helpers';
 import TargetHeader from './TargetHeader';
+import { checkIfIdPresentInList } from './targetHelper';
 
 const TargetActions = styled.div`
   justify-content: space-between;
@@ -36,6 +37,7 @@ const TargetComponent = (props) => {
 		selectedTemplateDetails,
 		isViewStagesEnabled,
 		navigateToStageWizard,
+		editTemplate,
 	} = props;
 
 	const isTargetDisabled = (ele) => {
@@ -44,6 +46,16 @@ const TargetComponent = (props) => {
 		}
 		return false;
 	};
+
+	const getFilteredOptionsList = useMemo(
+		() => {
+			if (isLoginTypeAdmin === true) {
+				return listTargetReducer
+					.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState));
+			}
+		},
+		[listTargetReducer, selectedTargetState, isLoginTypeAdmin],
+	);
 
 	const getTargetRows = useMemo(
 		() => selectedTargetState.map((ele, index) => (
@@ -63,7 +75,7 @@ const TargetComponent = (props) => {
 					// if it's a admin he can select targets from master targets
 					<Select
 						className="flex-100 px-2"
-						options={covertToSelectOption(listTargetReducer, 'name', 'id')}
+						options={covertToSelectOption(getFilteredOptionsList, 'name', 'id')}
 						placeholder="Please select target."
 						onChange={(selectedTarget) => {
 							onTargetSelect(selectedTarget, index);
@@ -96,13 +108,13 @@ const TargetComponent = (props) => {
 			</TargetListItem>
 		)),
 		[
-			listTargetReducer,
 			onCheckedHandler,
 			onTargetSelect,
 			onThresholdChange,
 			selectedTargetState,
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
+			getFilteredOptionsList,
 		],
 	);
 	return (
@@ -111,6 +123,7 @@ const TargetComponent = (props) => {
 				isLoginTypeAdmin={isLoginTypeAdmin}
 				isLoginTypeOperator={isLoginTypeOperator}
 				selectedTemplateDetails={selectedTemplateDetails}
+				editTemplate={editTemplate}
 			/>
 			<div className="d-flex overflow-hidden">
 				<div className="flex-70 scroll-y p-3">
@@ -172,6 +185,7 @@ TargetComponent.propTypes = {
 	onNextClick: PropTypes.func,
 	isViewStagesEnabled: PropTypes.bool,
 	navigateToStageWizard: PropTypes.func,
+	editTemplate: PropTypes.func,
 };
 
 export default TargetComponent;
