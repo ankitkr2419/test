@@ -11,29 +11,32 @@ import TemplateModal from 'components/TemplateModal/TemplateModal';
 import { templateModalActions } from 'components/TemplateModal/templateModalState';
 
 const TemplateModalContainer = (props) => {
+	// constants
 	const {
-		templateModalState, templateModalDispatch, templateID, toggleTemplateModal
+		templateModalState, templateModalDispatch, templateID, toggleTemplateModal,
 	} = props;
 	const {
 		templateDescription,
 		templateName,
 		isCreateTemplateModalVisible,
-		isTemplateEdited
+		isTemplateEdited,
 	} = templateModalState.toJS();
 
 	const dispatch = useDispatch();
 
+	// useSelector section
 	const { isTemplateUpdated } = useSelector(
 		state => state.updateTemplateReducer,
 	);
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer).get('list');
 
+	// helper method section
 	// helper method to set template name
 	const setTemplateName = useCallback((name) => {
 		templateModalDispatch({
 			type: templateModalActions.SET_TEMPLATE_NAME,
-			value: name
+			value: name,
 		});
 	}, [templateModalDispatch]);
 
@@ -41,15 +44,9 @@ const TemplateModalContainer = (props) => {
 	const setTemplateDescription = useCallback((description) => {
 		templateModalDispatch({
 			type: templateModalActions.SET_TEMPLATE_DESCRIPTION,
-			value: description
+			value: description,
 		});
 	}, [templateModalDispatch]);
-
-	// reset form input values
-	const resetFormValues = () => {
-		setTemplateDescription('');
-		setTemplateName('');
-	};
 
 	// fetch old template values for comparing with the edited values
 	const prevTemplate = useMemo(() => templates.find(ele => ele.get('id') === templateID),
@@ -83,29 +80,23 @@ const TemplateModalContainer = (props) => {
 		dispatch(createTemplateAction(template));
 	};
 
-	useEffect(() => {
-		if (isTemplateEdited === true) {
-			autofillNameDescription();
-			toggleTemplateModal();
-		}
-	}, [isTemplateEdited, autofillNameDescription, toggleTemplateModal]);
-
 	const updateTemplate = (template) => {
 		// updating template though api
 		dispatch(updateTemplateAction(templateID, template));
 	};
 
-	useEffect(() => {
-		if (isTemplateUpdated === true) {
-			dispatch(updateTemplateReset());
-			dispatch(fetchTemplates());
-		}
-	}, [isTemplateUpdated, dispatch]);
-
+	// helper method to reset the local modal state
 	const resetModalState = () => templateModalDispatch({
-		type: templateModalActions.RESET_TEMPLATE_MODAL
+		type: templateModalActions.RESET_TEMPLATE_MODAL,
 	});
 
+	// reset form input values
+	const resetFormValues = () => {
+		setTemplateDescription('');
+		setTemplateName('');
+	};
+
+	// save/edit click handler
 	const addClickHandler = () => {
 		if (validateTemplateForm()) {
 			if (isTemplateEdited) {
@@ -131,6 +122,21 @@ const TemplateModalContainer = (props) => {
 		// TODO show error notification
 	};
 
+	// useEffect Section
+	useEffect(() => {
+		if (isTemplateEdited === true) {
+			autofillNameDescription();
+			toggleTemplateModal();
+		}
+	}, [isTemplateEdited, autofillNameDescription, toggleTemplateModal]);
+
+	useEffect(() => {
+		if (isTemplateUpdated === true) {
+			dispatch(updateTemplateReset());
+			dispatch(fetchTemplates());
+		}
+	}, [isTemplateUpdated, dispatch]);
+
 	return (
 		<TemplateModal
 			isCreateTemplateModalVisible={isCreateTemplateModalVisible}
@@ -152,7 +158,7 @@ TemplateModalContainer.propTypes = {
 	templateModalState: PropTypes.object.isRequired,
 	toggleTemplateModal: PropTypes.func.isRequired,
 	templateModalDispatch: PropTypes.func.isRequired,
-	templateID: PropTypes.string
+	templateID: PropTypes.string,
 };
 
 export default TemplateModalContainer;

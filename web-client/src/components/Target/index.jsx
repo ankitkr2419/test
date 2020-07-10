@@ -54,7 +54,7 @@ const TargetComponent = (props) => {
 					.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState));
 			}
 		},
-		[listTargetReducer, selectedTargetState, isLoginTypeAdmin]
+		[listTargetReducer, selectedTargetState, isLoginTypeAdmin],
 	);
 
 	const getTargetRows = useMemo(
@@ -114,7 +114,7 @@ const TargetComponent = (props) => {
 			selectedTargetState,
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
-			getFilteredOptionsList
+			getFilteredOptionsList,
 		],
 	);
 	return (
@@ -185,7 +185,7 @@ TargetComponent.propTypes = {
 	onNextClick: PropTypes.func,
 	isViewStagesEnabled: PropTypes.bool,
 	navigateToStageWizard: PropTypes.func,
-	editTemplate: PropTypes.func
+	editTemplate: PropTypes.func,
 };
 
 export default TargetComponent;

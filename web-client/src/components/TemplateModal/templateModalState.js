@@ -6,7 +6,7 @@ export const templateModalActions = {
 	SET_TEMPLATE_NAME: 'SET_TEMPLATE_NAME',
 	SET_IS_TEMPLATE_EDITED: 'SET_IS_TEMPLATE_EDITED',
 	RESET_TEMPLATE_MODAL: 'RESET_TEMPLATE_MODAL',
-	TOGGLE_TEMPLATE_MODAL_VISIBLE: 'TOGGLE_TEMPLATE_MODAL_VISIBLE'
+	TOGGLE_TEMPLATE_MODAL_VISIBLE: 'TOGGLE_TEMPLATE_MODAL_VISIBLE',
 };
 
 // Initial state wrap with fromJS for immutability
@@ -14,7 +14,7 @@ export const templateModalInitialState = fromJS({
 	templateDescription: '',
 	templateName: '',
 	isCreateTemplateModalVisible: false,
-	isTemplateEdited: false
+	isTemplateEdited: false,
 });
 
 const templateModalReducer = (state, action) => {

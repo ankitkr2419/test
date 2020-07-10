@@ -26,7 +26,7 @@ const TargetContainer = (props) => {
 	// constants
 	const {
 		updateSelectedWizard, templateID, isLoginTypeAdmin, isLoginTypeOperator,
-		setIsTemplateEdited
+		setIsTemplateEdited,
 	} = props;
 	const dispatch = useDispatch();
 
@@ -198,7 +198,7 @@ const TargetContainer = (props) => {
 TargetContainer.propTypes = {
 	updateSelectedWizard: PropTypes.func.isRequired,
 	templateID: PropTypes.string.isRequired,
-	setIsTemplateEdited: PropTypes.func.isRequired
+	setIsTemplateEdited: PropTypes.func.isRequired,
 };
 
 export default TargetContainer;

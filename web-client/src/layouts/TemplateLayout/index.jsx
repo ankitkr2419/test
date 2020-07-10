@@ -1,5 +1,5 @@
 import React, {
-	useCallback, useReducer
+	useCallback, useReducer,
 } from 'react';
 import { CardBody, Card } from 'core-components';
 import Wizard from 'shared-components/Wizard';
@@ -11,7 +11,7 @@ import TargetExperimentContainer from 'containers/TargetExperimentContainer';
 import TemplateModalContainer from 'containers/TemplateModalContainer';
 import templateModalReducer, {
 	templateModalInitialState,
-	templateModalActions
+	templateModalActions,
 } from 'components/TemplateModal/templateModalState';
 import templateLayoutReducer, {
 	templateInitialState,
@@ -25,13 +25,13 @@ const TemplateLayout = (props) => {
 	// Local state to manage selected wizard
 	const [templateLayoutState, templateLayoutDispatch] = useReducer(
 		templateLayoutReducer,
-		templateInitialState
+		templateInitialState,
 	);
 
 	// Local state to manage template Modal
 	const [templateModalState, templateModalDispatch] = useReducer(
 		templateModalReducer,
-		templateModalInitialState
+		templateModalInitialState,
 	);
 
 	// Here we have stored id for active widget
@@ -48,14 +48,14 @@ const TemplateLayout = (props) => {
 	// helper method to toggle template modal
 	const toggleTemplateModal = useCallback(() => {
 		templateModalDispatch({
-			type: templateModalActions.TOGGLE_TEMPLATE_MODAL_VISIBLE
+			type: templateModalActions.TOGGLE_TEMPLATE_MODAL_VISIBLE,
 		});
 	}, []);
 
 	// helper method to set isTemplateEdited flag true
 	const setIsTemplateEdited = useCallback(() => {
 		templateModalDispatch({
-			type:templateModalActions.SET_IS_TEMPLATE_EDITED
+			type:templateModalActions.SET_IS_TEMPLATE_EDITED,
 		});
 	}, []);
 
@@ -90,6 +90,8 @@ const TemplateLayout = (props) => {
 			/>
 			<Card>
 				<CardBody className='d-flex flex-unset overflow-hidden p-0'>
+					{/* TemplateModal container that provides template modal to create
+							and edit the template from template and target wizards */}
 					<TemplateModalContainer
 						templateModalState={templateModalState}
 						templateModalDispatch={templateModalDispatch}

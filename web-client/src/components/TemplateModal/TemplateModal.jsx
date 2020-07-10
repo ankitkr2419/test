@@ -25,7 +25,7 @@ const TemplateModal = (props) => {
 		isFormValid,
 		resetFormValues,
 		isTemplateEdited,
-		resetModalState
+		resetModalState,
 	} = props;
 
 	// disabled as we only need effect to be run while component is un-mounting
@@ -130,7 +130,7 @@ TemplateModal.propTypes = {
 	addClickHandler : PropTypes.func.isRequired,
 	isFormValid : PropTypes.bool.isRequired,
 	resetModalState: PropTypes.func.isRequired,
-	isTemplateEdited: PropTypes.bool.isRequired
+	isTemplateEdited: PropTypes.bool.isRequired,
 };
 
 export default TemplateModal;

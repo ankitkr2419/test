@@ -19,7 +19,7 @@ const TemplateComponent = (props) => {
 		isLoginTypeOperator,
 		isLoginTypeAdmin,
 		createExperiment,
-		toggleTemplateModal
+		toggleTemplateModal,
 	} = props;
 
 	// Local state to store template name

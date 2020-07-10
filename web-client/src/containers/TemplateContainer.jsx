@@ -21,7 +21,7 @@ const TemplateContainer = (props) => {
 		isLoginTypeAdmin,
 		updateSelectedWizard,
 		updateTemplateID,
-		toggleTemplateModal
+		toggleTemplateModal,
 	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
