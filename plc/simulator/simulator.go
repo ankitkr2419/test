@@ -44,7 +44,7 @@ func (d *Simulator) HeartBeat() {
 
 	LOOP:
 		for {
-			time.Sleep(5000 * time.Millisecond) // sleep it off for a bit
+			time.Sleep(2000 * time.Millisecond) // sleep it off for a bit
 
 			// 3 attempts to check for heartbeat of PLC and write ours!
 			for i := 0; i < 3; i++ {
@@ -147,10 +147,12 @@ func (d *Simulator) simulate() {
 			if msg == "pause" {
 				//TBD
 			}
-		case err := <-d.ErrCh:
-			// Some error flagged
-			logger.WithField("err", err.Error()).Error("simulate: errCh recevied data")
-			return
+			/* This ErrCh will never be used between simulator and PCR
+			case err := <-d.ErrCh:
+				// Some error flagged
+				logger.WithField("err", err.Error()).Error("simulate: errCh recevied data")
+				return
+			*/
 		}
 	}
 }
