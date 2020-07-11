@@ -95,22 +95,30 @@ func (d *Simulator) Start() (err error) {
 		return
 	}
 	d.plcIO.m.startStopCycle = 1
-
+	logger.WithField("msg","set d.plcIO.m.startStopCycle").Info("set d.plcIO.m.startStopCycle = 1")
 	go d.simulate()
 
 	return
 }
 
 func (d *Simulator) Stop() (err error) {
-	go func() {
+	// Abort running process
+	// go func() {
 		if d.plcIO.m.startStopCycle == 0 {
 			err = errors.New("Cannot stop, not yet started")
 			return
 		}
 
 		d.plcIO.m.startStopCycle = 0
-		d.ExitCh <- "stop"
-	}()
+		// startStopCycle = 0 reset to start new experiment
+				// d.plcIO.m.startStopCycle = 0		//stop cycle
+				// d.plcIO.d.currentCycle = 0			//reset cycle
+				// d.plcIO.m.cycleCompleted = 0		//reset completion
+				d.config.CycleCount = 0			// reset cycle count
+				//d.wells = []Well{}			// wells get added if not done
+		logger.WithField("msg", "Stop").Info("user requested to stop")
+		d.ExitCh <- "abort"
+	// }()
 
 	return
 }
@@ -133,16 +141,22 @@ func (d *Simulator) simulate() {
 			if msg == "stop" {
 				d.ErrCh <- errors.New("PCR Stopped")
 				// startStopCycle = 0 reset to start new experiment
-				d.plcIO.m.startStopCycle = 0
+				/*d.plcIO.m.startStopCycle = 0
 				d.plcIO.d.currentCycle = 0
 				d.plcIO.m.cycleCompleted = 0
 				d.config.CycleCount = 0
-				d.wells = []Well{}
+				d.wells = []Well{}*/
 
 				return
 			}
 			if msg == "abort" {
 				//TBD
+				d.ErrCh <- errors.New("PCR Aborted")
+				d.config = plc.Stage{}
+				d.plcIO = plcRegistors{}
+				d.wells = []Well{}
+				
+				return
 			}
 			if msg == "pause" {
 				//TBD

@@ -36,11 +36,14 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 		// The exit plan incase there is a feedback from the driver to abort/exit
 		go func() {
-			err = <-deps.ExitCh
-			logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
-			ExperimentRunning = false // on pre-emptive stop
+			for {
+				err = <-deps.ExitCh
+				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
+				ExperimentRunning = false // on pre-emptive stop
 			// TODO: Handle exit gracefully
 			// We need to call the API on the Web to display the error and restart, abort or call service!
+			}
+			logger.WithField("msg", "Exit").Info("WebSocket Thread Reading PLC Err Channel Exit")
 
 		}()
 
@@ -48,6 +51,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 			// read channel from websocket err
 			err = <-deps.WsErrCh
 			logger.WithField("err", err.Error()).Error("Monitor has requested exit")
+			logger.WithField("msg", "Exit").Info("WebSocket Thread Reading WB Err Channel Exit")
 
 		}()
 
@@ -91,6 +95,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				logger.WithField("msg", "Sent").Info("Graph data")
 				//get well data
 				wells, err := deps.Store.ListWells(req.Context(), experimentID)
 				if err != nil {
@@ -189,8 +194,10 @@ func monitorExperiment(deps Dependencies) {
 			deps.WsErrCh <- err
 			return
 		}
+		
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
 		if scan.CycleComplete && scan.Cycle != previousCycle {
+			logger.Info("Received data for cycle: ",scan.Cycle)
 
 			// write to db
 			// makeResult returns data in DB result format
@@ -256,6 +263,7 @@ func monitorExperiment(deps Dependencies) {
 			}
 			deps.WsMsgCh <- "read"
 			if scan.Cycle == plcStage.CycleCount {
+				logger.Info("Received data for last cycle")
 				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentID)
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error fetching data")
@@ -273,6 +281,7 @@ func monitorExperiment(deps Dependencies) {
 			previousCycle++
 		}
 	}
+	logger.Info("Stop monitoring experiment")
 
 }
 

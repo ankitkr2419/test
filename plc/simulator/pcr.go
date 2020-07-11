@@ -34,12 +34,15 @@ func (d *Simulator) holdingStage() {
 }
 
 func (d *Simulator) cycleStage() {
-	logger.Info("Starting cycleStage")
+	logger.Info("Starting cycleStage: ")
+	logger.Info("d.plcIO.m.startStopCycle: ",d.plcIO.m.startStopCycle)
+	logger.Info("d.config.CycleCount:",d.config.CycleCount)
 	d.plcIO.d.currentCycle = 0
 
 	for i := uint16(0); i < d.config.CycleCount; i++ { //for each cycle
 		// Check for Stop signal
 		if d.plcIO.m.startStopCycle == 0 {
+			logger.Info("Stop from: cyclestage if")
 			d.ErrCh <- errors.New("recieved stop signal")
 			break
 		}

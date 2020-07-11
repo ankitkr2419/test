@@ -173,6 +173,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		logger.Info("start with steps config : ",plcStage)
 		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
