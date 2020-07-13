@@ -48,7 +48,8 @@ const AddStageModal = (props) => {
 	};
 
 	const stageTypeChangeHandler = (selectedStageType) => {
-		// If the selected stage type is hold reset the repeat count values
+		// repeat count is applicable for stage type cycle,
+		// So resetting repeat count in case of stage type hold
 		if (selectedStageType.value === 'hold') {
 			updateStageFormStateWrapper(
 				'stageRepeatCount',
