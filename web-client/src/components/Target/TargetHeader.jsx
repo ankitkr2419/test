@@ -17,7 +17,9 @@ const StyledTargetHeader = styled.header`
 `;
 
 const TargetHeader = (props) => {
-	const { isLoginTypeAdmin, isLoginTypeOperator, selectedTemplateDetails } = props;
+	const {
+		isLoginTypeAdmin, isLoginTypeOperator, selectedTemplateDetails, editTemplate,
+	} = props;
 	return (
 		<StyledTargetHeader className='target-header'>
 			{isLoginTypeOperator === true && (
@@ -31,7 +33,7 @@ const TargetHeader = (props) => {
 			)}
 			{isLoginTypeAdmin === true && (
 				<div className='d-flex'>
-					<ButtonIcon name='pencil' size={28} className='px-0 border-0' />
+					<ButtonIcon name='pencil' size={28} className='px-0 border-0' onClick={editTemplate}/>
 					<Text
 						size={14}
 						className='flex-25 text-default text-truncate-multi-line font-weight-light mb-0 pl-3 pr-2 py-1'
@@ -53,6 +55,7 @@ const TargetHeader = (props) => {
 TargetHeader.propTypes = {
 	isLoginTypeAdmin: PropTypes.bool.isRequired,
 	isLoginTypeOperator: PropTypes.bool.isRequired,
+	editTemplate: PropTypes.func,
 };
 
 export default TargetHeader;

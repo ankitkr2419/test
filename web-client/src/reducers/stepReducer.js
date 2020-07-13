@@ -40,6 +40,9 @@ export const listStepsReducer = (
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
+	// Add the created step to list to avoid an extra get api call
+	case addStepActions.successAction:
+		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response || {})));
 	default:
 		return state;
 	}

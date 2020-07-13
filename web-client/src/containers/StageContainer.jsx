@@ -25,19 +25,21 @@ const StageContainer = (props) => {
 	const isStagesLoading = stages.get('isLoading');
 
 	// isStageSaved = true means stage created successfully
-	const { isStageSaved } = useSelector(state => state.createStageReducer);
+	const { isStageSaved, response } = useSelector(state => state.createStageReducer);
 	// isStageDeleted = true means stage deleted successfully
 	const { isStageDeleted } = useSelector(state => state.deleteStageReducer);
 	// isStageSaved = true means stage updated successfully
 	const { isStageUpdated } = useSelector(state => state.updateStageReducer);
 
 	useEffect(() => {
-		// Once we create stage will fetch updated stage list
 		if (isStageSaved === true) {
+			// set the newly created stage active
+			setSelectedStageId(response.id);
 			dispatch(addStageReset());
-			dispatch(fetchStages(templateID));
+			// No need to fetch again as we added the created stage to list in reducer
+			// on create success action
 		}
-	}, [isStageSaved, templateID, dispatch]);
+	}, [isStageSaved, templateID, dispatch, response]);
 
 	useEffect(() => {
 		// Once we delete stage will fetch updated stage list
@@ -92,6 +94,10 @@ const StageContainer = (props) => {
 		updateSelectedWizard('step');
 	};
 
+	const goToTargetWizard = () => {
+		updateSelectedWizard('target');
+	};
+
 	return (
 		<StageComponent
 			templateID={templateID}
@@ -103,6 +109,7 @@ const StageContainer = (props) => {
 			saveStage={saveStage}
 			goToStepWizard={goToStepWizard}
 			isStagesLoading={isStagesLoading}
+			goToTargetWizard={goToTargetWizard}
 		/>
 	);
 };

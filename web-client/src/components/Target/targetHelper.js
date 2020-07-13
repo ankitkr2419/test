@@ -96,3 +96,9 @@ export const getSelectedTargetExperiment = (
 	}
 	return arr;
 };
+
+export const checkIfIdPresentInList = (id, selectedTargetState) => {
+	const list = selectedTargetState.filter(ele => ele.selectedTarget
+		&& ele.selectedTarget.value === id);
+	return list.size !== 0;
+};

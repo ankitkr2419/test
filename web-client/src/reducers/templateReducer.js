@@ -19,6 +19,7 @@ const createTemplateInitialState = {
 
 const updateTemplateInitialState = {
 	data: {},
+	isTemplateUpdated: false,
 };
 
 const deleteTemplateInitialState = {
@@ -28,7 +29,7 @@ const deleteTemplateInitialState = {
 
 // eslint-disable-next-line arrow-body-style
 export const getTemplateById = (state, templateId) => {
-	const result = state.getIn(['list'], myDefaultList => myDefaultList.map(ele => ele.id === templateId));
+	const result = state.get('list').filter(ele => ele.get('id') === templateId);
 	if (result !== null && result.size !== 0) {
 		return result.get(0);
 	}
@@ -52,6 +53,9 @@ export const listTemplatesReducer = (
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
+		// appending the template list with created template
+	case createTemplateActions.successAction:
+		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response)));
 	default:
 		return state;
 	}
@@ -97,13 +101,17 @@ export const updateTemplateReducer = (
 			...state,
 			...action.payload,
 			isLoading: false,
+			isTemplateUpdated: true,
 		};
 	case updateTemplateActions.failureAction:
 		return {
 			...state,
 			...action.payload,
 			isLoading: false,
+			isTemplateUpdated: true,
 		};
+	case updateTemplateActions.updateTemplateReset:
+		return updateTemplateInitialState;
 	default:
 		return state;
 	}

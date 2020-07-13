@@ -15,6 +15,7 @@ export const updateTemplateActions =  {
 	updateAction: 'UPDATE_TEMPLATE_INITIATED',
 	successAction: 'UPDATE_TEMPLATE_SUCCEEDED',
 	failureAction: 'UPDATE_TEMPLATE_FAILURE',
+	updateTemplateReset: 'UPDATE_TEMPLATE_RESET'
 };
 
 export const deleteTemplateActions =  {

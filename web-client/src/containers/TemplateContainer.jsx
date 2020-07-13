@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import TemplateComponent from 'components/Template';
 import {
 	fetchTemplates,
-	createTemplate as createTemplateAction,
 	deleteTemplate as deleteTemplateAction,
 	addTemplateReset,
 	deleteTemplateReset,
@@ -22,12 +21,13 @@ const TemplateContainer = (props) => {
 		isLoginTypeAdmin,
 		updateSelectedWizard,
 		updateTemplateID,
+		toggleTemplateModal,
 	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
 	// isTemplateCreated = true means template created successfully
-	const { isTemplateCreated } = useSelector(
+	const { isTemplateCreated, response  } = useSelector(
 		state => state.createTemplateReducer,
 	);
 	// isTemplateDeleted = true means template deleted successfully
@@ -41,10 +41,13 @@ const TemplateContainer = (props) => {
 	useEffect(() => {
 		// Once we create template will fetch updated template list
 		if (isTemplateCreated === true) {
+			// update the templateId in templateState maintained in templateLayout with created Id
+			updateTemplateID(response.id);
+			// navigate to next wizard
+			updateSelectedWizard('target');
 			dispatch(addTemplateReset());
-			dispatch(fetchTemplates());
 		}
-	}, [isTemplateCreated, dispatch]);
+	}, [isTemplateCreated, dispatch, response, updateSelectedWizard, updateTemplateID]);
 
 	useEffect(() => {
 		// Once we delete template will fetch updated template list
@@ -71,11 +74,6 @@ const TemplateContainer = (props) => {
 		}
 	}, [updateSelectedWizard, dispatch, isExperimentSaved]);
 
-	const createTemplate = (template) => {
-		// creating template though api
-		dispatch(createTemplateAction(template));
-	};
-
 	const deleteTemplate = (templateID) => {
 		// deleting template though api
 		dispatch(deleteTemplateAction(templateID));
@@ -92,13 +90,13 @@ const TemplateContainer = (props) => {
 		<TemplateComponent
 			// Extracting list before passing down to component reference=>Immutable
 			templates={templates.get('list')}
-			createTemplate={createTemplate}
 			deleteTemplate={deleteTemplate}
 			updateSelectedWizard={updateSelectedWizard}
 			updateTemplateID={updateTemplateID}
 			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
 			createExperiment={createExperiment}
+			toggleTemplateModal={toggleTemplateModal}
 		/>
 	);
 };

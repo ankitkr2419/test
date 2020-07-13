@@ -4,6 +4,7 @@ import {
 	fetchTemplatesSaga,
 	createTemplateSuccessSaga,
 	deleteTemplateSaga,
+	updateTemplateSaga,
 } from 'sagas/templateSaga';
 import {
 	saveTargetSaga,
@@ -51,6 +52,7 @@ const allSagas = [
 	fetchMasterTargetsSaga(),
 	fetchTargetsByTemplateIDSaga(),
 	deleteTemplateSaga(),
+	updateTemplateSaga(),
 	fetchStagesSaga(),
 	addStageSaga(),
 	deleteStageSaga(),

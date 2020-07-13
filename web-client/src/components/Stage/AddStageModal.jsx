@@ -101,7 +101,7 @@ const AddStageModal = (props) => {
 										name='stageRepeatCount'
 										id='stage'
 										placeholder='Type here'
-										value={stageRepeatCount}
+										value={stageRepeatCount.value}
 										onChange={onChangeHandler}
 										disabled={isRepeatCountDisabled}
 									/>
