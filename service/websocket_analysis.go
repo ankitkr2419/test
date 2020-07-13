@@ -1,6 +1,7 @@
 package service
 
 import (
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"strconv"
@@ -16,6 +17,10 @@ func setExperimentValues(aw []int32, TargetDetails []db.TargetDetails, Experimen
 		targets:      TargetDetails,
 		plcStage:     stage,
 	}
+
+	redlowerlimit = config.GetColorLimits("redlowerlimit")
+	redupperlimit = config.GetColorLimits("redupperlimit")
+	orangelowerlimit = config.GetColorLimits("orangelowerlimit")
 
 }
 
@@ -103,12 +108,12 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
 
 						switch {
-						case 5 >= currentCycle && currentCycle <= 25 && float32(r.FValue) > r.Threshold && t.CT == "":
+						case redlowerlimit >= currentCycle && currentCycle < redupperlimit && float32(r.FValue) > r.Threshold && t.CT == "":
 							// mark red
 							DBWells[i].ColorCode = red
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case 25 <= currentCycle && float32(r.FValue) > r.Threshold && t.CT == "":
+						case orangelowerlimit <= currentCycle && float32(r.FValue) > r.Threshold && t.CT == "":
 							// mark orange
 							DBWells[i].ColorCode = orange
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))

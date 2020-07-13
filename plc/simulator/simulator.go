@@ -247,8 +247,6 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
 	// If the invoker has already read this cycle data, don't send it again!
 	if cycle == scan.Cycle {
-		//d.plcIO.m.emissionFlag = 0
-
 		return
 	}
 

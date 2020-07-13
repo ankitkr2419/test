@@ -13,6 +13,9 @@ var (
 	orange            = "#F3811F" // If the CT values are close to threshold (delta)
 	experimentRunning = false     // In case of pre-emptive stop we need to send signal to monitor through this flag
 	experimentValues  experimentResultValues
+	redlowerlimit     uint16
+	redupperlimit     uint16
+	orangelowerlimit  uint16
 )
 
 type experimentResultValues struct {
