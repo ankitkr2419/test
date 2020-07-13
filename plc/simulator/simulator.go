@@ -103,7 +103,7 @@ func (d *Simulator) Start() (err error) {
 
 func (d *Simulator) Stop() (err error) {
 	// Abort running process
-	// go func() {
+
 	if d.plcIO.m.startStopCycle == 0 {
 		err = errors.New("Cannot stop, not yet started")
 		return
@@ -133,21 +133,22 @@ func (d *Simulator) simulate() {
 			logger.WithField("msg", msg).Info("simulate: ExitCh received data")
 			if msg == "stop" {
 				d.ErrCh <- errors.New("PCR Stopped")
+
 				// reset to start new experiment
 				d.config = plc.Stage{}
 				d.plcIO = plcRegistors{}
 				d.wells = []Well{}
-				d.wells = []Well{}
 
-				// return
 			}
 			if msg == "abort" {
-				//TBD
+
 				d.ErrCh <- errors.New("PCR Aborted")
+
+				// reset to start new experiment
 				d.config = plc.Stage{}
 				d.plcIO = plcRegistors{}
 				d.wells = []Well{}
-				// return
+
 			}
 			if msg == "pause" {
 				//TBD

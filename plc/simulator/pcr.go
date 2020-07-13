@@ -74,7 +74,6 @@ func (d *Simulator) performSteps(steps []plc.Step) {
 		for {
 			if d.plcIO.m.startStopCycle == 0 {
 				d.ErrCh <- errors.New("recieved stop signal")
-				logger.Info("Recieved stop signal")
 				break
 			}
 

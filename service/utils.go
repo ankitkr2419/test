@@ -9,21 +9,6 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// var (
-// 	green             = "#3FC13A" // All CT values for the well are below threshold,
-// 	red               = "#F06666" //Even a single value crosses threshold for target
-// 	orange            = "#F3811F" // If the CT values are close to threshold (delta)
-// 	experimentRunning = false     // In case of pre-emptive stop we need to send signal to monitor through this flag
-// 	experimentValues  experimentResultValues
-// )
-
-// type experimentResultValues struct {
-// 	plcStage     plc.Stage
-// 	experimentID uuid.UUID
-// 	activeWells  []uint16
-// 	targets      []db.TargetDetails
-// }
-
 func validate(i interface{}) (valid bool, respBytes []byte) {
 
 	fieldErrors := make(map[string]string)
