@@ -46,7 +46,7 @@ func (suite *StepHandlerTestSuite) TestListStepsSuccess() {
 		"",
 		listStepsHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}]`, testUUID, stgUUID)
+	output := fmt.Sprintf(`[{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, stgUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -90,7 +90,7 @@ func (suite *StepHandlerTestSuite) TestCreateStepSuccess() {
 		body,
 		createStepHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}`, testUUID, stgUUID)
+	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, stgUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -153,7 +153,7 @@ func (suite *StepHandlerTestSuite) TestShowStepSuccess() {
 		"",
 		showStepHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true}`, testUUID, stgUUID)
+	output := fmt.Sprintf(`{"id":"%s","stage_id":"%s","ramp_rate":5.5,"target_temp":25.5,"hold_time":120,"data_capture":true,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, stgUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
