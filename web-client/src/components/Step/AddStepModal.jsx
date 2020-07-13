@@ -13,7 +13,7 @@ import {
 	FormError,
 } from 'core-components';
 import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
-import { validateHoldTime } from './stepHelper';
+import { validateHoldTime, validateRampRate, validateTargetTemperature } from './stepHelper';
 
 const AddStepModal = (props) => {
 	const {
@@ -35,6 +35,8 @@ const AddStepModal = (props) => {
 		holdTime,
 		dataCapture,
 		holdTimeError,
+		rampRateError,
+		targetTemperatureError,
 	} = stepFormState;
 
 	// stageId will be present when we are updating stage
@@ -61,6 +63,26 @@ const AddStepModal = (props) => {
 
 	const onHoldTimeFocusHandler = () => {
 		updateStepFormStateWrapper('holdTimeError', false);
+	};
+
+	const onRampRateBlurHandler = () => {
+		if (validateRampRate(rampRate) === false) {
+			updateStepFormStateWrapper('rampRateError', true);
+		}
+	};
+
+	const onRampRateFocusHandler = () => {
+		updateStepFormStateWrapper('rampRateError', false);
+	};
+
+	const onTargetTemperatureBlurHandler = () => {
+		if (validateTargetTemperature(targetTemperature) === false) {
+			updateStepFormStateWrapper('targetTemperatureError', true);
+		}
+	};
+
+	const onTargetTemperatureFocusHandler = () => {
+		updateStepFormStateWrapper('targetTemperatureError', false);
 	};
 
 	return (
@@ -95,15 +117,17 @@ const AddStepModal = (props) => {
 								</Label>
 								<Input
 									type='number'
-									min='-273.15'
-									max='1000'
 									name='rampRate'
 									id='ramp_rate'
-									placeholder='Type here'
+									placeholder='0.5 - 6'
 									value={rampRate}
 									onChange={onChangeHandler}
+									onBlur={onRampRateBlurHandler}
+									onFocus={onRampRateFocusHandler}
+									invalid={rampRateError}
 								/>
 								<Label>unit °C</Label>
+								<FormError>Invalid ramp rate</FormError>
 							</FormGroup>
 						</Col>
 						<Col sm={colSize}>
@@ -113,15 +137,17 @@ const AddStepModal = (props) => {
 								</Label>
 								<Input
 									type='number'
-									min='-273.15'
-									max='1000'
 									name='targetTemperature'
 									id='target_temperature'
-									placeholder='Type here'
+									placeholder='22 - 120'
 									value={targetTemperature}
 									onChange={onChangeHandler}
+									onBlur={onTargetTemperatureBlurHandler}
+									onFocus={onTargetTemperatureFocusHandler}
+									invalid={targetTemperatureError}
 								/>
 								<Label>unit °C</Label>
+								<FormError>Invalid target temperature</FormError>
 							</FormGroup>
 						</Col>
 						<Col sm={colSize}>
