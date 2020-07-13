@@ -5,6 +5,15 @@ import {
 	Button, Popover, PopoverHeader, PopoverBody,
 } from 'core-components';
 import { Text, Center, ButtonIcon } from 'shared-components';
+import styled from 'styled-components';
+
+
+const StyledPopover = styled(Popover)`
+	border-color: ${props => (props.status)} !important;
+	.popover-header {
+		background-color: ${props => props.status} !important;
+	}
+`;
 
 const WellPopover = (props) => {
 	const {
@@ -21,12 +30,13 @@ const WellPopover = (props) => {
 	const simulateOutSideClick = () => document.body.click();
 
 	return (
-		<Popover
+		<StyledPopover
 			trigger="legacy"
 			target={`PopoverWell${index}`}
 			hideArrow
 			placement="top-start"
-			popperClassName={`popover-well ${status}`}
+			popperClassName='popover-well'
+			status={status}
 			{...rest}
 		>
 			<PopoverHeader>
@@ -76,7 +86,7 @@ const WellPopover = (props) => {
 					<Button onClick={onEditClickHandler}>Edit Info</Button>
 				</Center>
 			</PopoverBody>
-		</Popover>
+		</StyledPopover>
 	);
 };
 
