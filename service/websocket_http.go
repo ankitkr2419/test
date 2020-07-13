@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"mylab/cpagent/config"
+	"errors"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"net/http"
 	"time"
 
@@ -22,6 +23,8 @@ var upgrader = websocket.Upgrader{
 func wsHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
+		logger.Info("WebSocket Invoked")
+
 		c, err := upgrader.Upgrade(rw, req, nil)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
@@ -29,139 +32,43 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
-		SelfTestPLC(deps)
-		HeartBeatPLC(deps)
-
-		activeWells := config.ActiveWells("activeWells")
-
-		// The exit plan incase there is a feedback from the driver to abort/exit
-		go func() {
-			for {
-				err = <-deps.ExitCh
-				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
-				ExperimentRunning = false // on pre-emptive stop
-			// TODO: Handle exit gracefully
-			// We need to call the API on the Web to display the error and restart, abort or call service!
-			}
-			logger.WithField("msg", "Exit").Info("WebSocket Thread Reading PLC Err Channel Exit")
-
-		}()
-
-		go func() {
-			// read channel from websocket err
-			err = <-deps.WsErrCh
-			logger.WithField("err", err.Error()).Error("Monitor has requested exit")
-			logger.WithField("msg", "Exit").Info("WebSocket Thread Reading WB Err Channel Exit")
-
-		}()
+		deps.Plc.SelfTest()
+		deps.Plc.HeartBeat()
 
 		for {
 
-			msg := <-deps.WsMsgCh
-			switch msg {
-			case "read":
+			select {
+			case msg := <-deps.WsMsgCh:
 
-				// retruns all targets configured for experiment
-				targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error fetching target data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				DBResult, err := deps.Store.GetResult(req.Context(), experimentID)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error inserting result data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
+				if msg == "read" {
+
+					sendGraph(deps, rw, c)
+					sendWells(deps, rw, c)
+
+				} else if msg == "stop" {
+
+					sendOnSuccess(deps, rw, c)
+
 				}
 
-				// analyseResult returns data required for ploting graph
-				Finalresult := analyseResult(activeWells, targetDetails, DBResult, plcStage.CycleCount)
+			case err = <-deps.ExitCh:
 
-				var Result db.FinalResultGraph
-				Result.Type = "Graph"
-				Result.Data = append(Result.Data, Finalresult...)
+				if err.Error() == "PCR Aborted" {
 
-				respBytes, err := json.Marshal(Result)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
+					// on pre-emptive stop
+					experimentRunning = false
+
 				}
 
-				err = c.WriteMessage(1, respBytes)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Websocket failed to write")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				logger.WithField("msg", "Sent").Info("Graph data")
-				//get well data
-				wells, err := deps.Store.ListWells(req.Context(), experimentID)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error fetching data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				if len(wells) > 0 {
+				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 
-					welltargets, err := deps.Store.ListWellTargets(req.Context(), experimentID)
-					if err != nil {
-						logger.WithField("err", err.Error()).Error("Error fetching data")
-						rw.WriteHeader(http.StatusInternalServerError)
-						return
-					}
+				sendOnFail(err.Error(), rw, c)
 
-					for i, w := range wells {
-						for _, t := range welltargets {
-							if w.Position == t.WellPosition {
-								wells[i].Targets = append(wells[i].Targets, t)
-							}
-						}
-					}
+			case err = <-deps.WsErrCh:
 
-					var Result db.FinalResultWells
-					Result.Type = "Wells"
-					Result.Data = append(Result.Data, wells...)
-					respBytes, err := json.Marshal(Result)
-					if err != nil {
-						logger.WithField("err", err.Error()).Error("Error marshaling Wells data")
-						rw.WriteHeader(http.StatusInternalServerError)
-						return
-					}
-					err = c.WriteMessage(1, respBytes)
-					if err != nil {
-						logger.WithField("err", err.Error()).Error("Websocket failed to write")
-						rw.WriteHeader(http.StatusInternalServerError)
-						return
-					}
-				}
-			case "stop":
-				// send exp stop data
+				logger.WithField("err", err.Error()).Error("Monitor has requested exit")
 
-				latestE, err := deps.Store.ShowExperiment(req.Context(), experimentID)
-				if err != nil {
-					rw.WriteHeader(http.StatusInternalServerError)
-					logger.WithField("err", err.Error()).Error("Error get experiment")
-					return
-				}
-				var result db.FinalResultOnSuccess
-				result.Type = "Success"
-				result.Data = latestE
-
-				respBytes, err := json.Marshal(result)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				err = c.WriteMessage(1, respBytes)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Websocket failed to write")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				break
+				sendOnFail(err.Error(), rw, c)
 
 			}
 
@@ -170,110 +77,215 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func monitorExperiment(deps Dependencies) {
-	// retruns all targets configured for experiment
-	targetDetails, err := deps.Store.ListConfTargets(context.Background(), experimentID)
+func sendGraph(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
+
+	graphResult, err := getGraph(deps)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching target data")
+		logger.WithField("err", err.Error()).Error("error in fetching data")
+		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	activeWells := config.ActiveWells("activeWells")
+	err = c.WriteMessage(1, graphResult)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	logger.WithField("data", "Graph").Info("Websocket send Data")
+}
+
+func sendWells(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
+
+	WellResult, err := getColorCodedWells(deps)
+	if err != nil {
+		if err.Error() == "Wells not configured" {
+			logger.Info("Wells not configured")
+		} else {
+			logger.WithField("err", err.Error()).Error("error in fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err = c.WriteMessage(1, WellResult)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Websocket failed to write")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		logger.WithField("data", "Well").Info("Websocket send Data")
+	}
+}
+
+func sendOnSuccess(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
+
+	respBytes, err := getExperimentDetails(deps)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("error in fetching data")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	err = c.WriteMessage(1, respBytes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", "Success").Info("Websocket send Data")
+
+}
+
+func sendOnFail(msg string, rw http.ResponseWriter, c *websocket.Conn) {
+
+	r := resultOnFail{
+		Type: "Fail",
+		Data: msg,
+	}
+
+	respBytes, err := json.Marshal(r)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling result data")
+		return
+	}
+	err = c.WriteMessage(1, respBytes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", "Fail").Info("Websocket send Data")
+
+}
+
+func getGraph(deps Dependencies) (respBytes []byte, err error) {
+
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching result data")
+		return
+	}
+
+	// analyseResult returns data required for ploting graph
+	Finalresult := analyseResult(DBResult)
+
+	Result := resultGraph{
+		Type: "Graph",
+		Data: Finalresult,
+	}
+
+	respBytes, err = json.Marshal(Result)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling graph data")
+		return
+	}
+
+	return
+
+}
+
+func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
+
+	// list wells from DB
+	wells, err := deps.Store.ListWells(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching data")
+		return
+	}
+	if len(wells) > 0 {
+		var welltargets []db.WellTarget
+
+		welltargets, err = deps.Store.ListWellTargets(context.Background(), experimentValues.experimentID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			return
+		}
+
+		for i, w := range wells {
+			for _, t := range welltargets {
+				if w.Position == t.WellPosition {
+					wells[i].Targets = append(wells[i].Targets, t)
+				}
+			}
+		}
+
+		Result := resultWells{
+			Type: "Wells",
+			Data: wells,
+		}
+
+		respBytes, err = json.Marshal(Result)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling Wells data")
+			return
+		}
+		return
+	}
+	err = errors.New("Wells not configured")
+	return
+}
+
+func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
+	latestE, err := deps.Store.ShowExperiment(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error get experiment")
+		return
+	}
+
+	result := resultOnSuccess{
+		Type: "Success",
+		Data: latestE,
+	}
+
+	respBytes, err = json.Marshal(result)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
+		return
+	}
+	return
+}
+
+func monitorExperiment(deps Dependencies) {
 
 	var cycle uint16
 	var previousCycle uint16
 
 	cycle = 0
 
-	// ExperimentRunning is set when experiment started & if stopped then set to false
-	for ExperimentRunning {
+	// experimentRunning is set when experiment started & if stopped then set to false
+	for experimentRunning {
+
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc monitor")
-			// send error
 			deps.WsErrCh <- err
 			return
 		}
-		
+
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
 		if scan.CycleComplete && scan.Cycle != previousCycle {
-			logger.Info("Received data for cycle: ",scan.Cycle)
 
-			// write to db
-			// makeResult returns data in DB result format
-			result := makeResult(activeWells, scan, targetDetails, experimentID)
+			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle)
 
-			// insert current cycle result into Database
-			DBResult, err := deps.Store.InsertResult(context.Background(), result)
+			DBResult, err := WriteResult(deps, scan)
 			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error inserting result data")
-				// send error
-				deps.WsErrCh <- err
 				return
 			}
-
-			// getLastCycleResult
-			var LastCycleResult []db.Result
-			for _, r := range DBResult {
-				if r.Cycle == scan.Cycle {
-					LastCycleResult = append(LastCycleResult, r)
-				}
-			}
-			// color analysis
-			wells, err := deps.Store.ListWells(context.Background(), experimentID)
+			WriteColorCTValues(deps, DBResult, scan)
 			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error fetching data")
-				// send error
-				deps.WsErrCh <- err
-				return
-			}
-
-			welltargets, err := deps.Store.ListWellTargets(context.Background(), experimentID)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error fetching data")
-				deps.WsErrCh <- err
-				// send error
-				return
-			}
-
-			// send data to color analysis
-
-			targets, well := WellColorAnalysis(LastCycleResult, welltargets, wells, scan.Cycle, plcStage.CycleCount)
-
-			// update color in well
-			if len(well) > 0 {
-				for _, w := range well {
-					err = deps.Store.UpdateColorWell(context.Background(), w.ColorCode, w.ID)
-					if err != nil {
-						// send error
-						logger.WithField("err", err.Error()).Error("Error upsert wells")
-						deps.WsErrCh <- err
-						return
-					}
-				}
-			}
-
-			// update ct value in DB
-			_, err = deps.Store.UpsertWellTargets(context.Background(), targets, experimentID)
-			if err != nil {
-				// send error
-				logger.WithField("err", err.Error()).Error("Error upsert wells")
-				deps.WsErrCh <- err
 				return
 			}
 			deps.WsMsgCh <- "read"
-			if scan.Cycle == plcStage.CycleCount {
-				logger.Info("Received data for last cycle")
-				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentID)
+			if scan.Cycle == experimentValues.plcStage.CycleCount {
+				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID)
 				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error fetching data")
-					// send error
+					logger.WithField("err", err.Error()).Error("Error updating stop time")
 					deps.WsErrCh <- err
 					return
 				}
-				// last cycle socket closed
 				deps.WsMsgCh <- "stop"
-				ExperimentRunning = false
+				experimentRunning = false
 				break
 			}
 
@@ -285,10 +297,73 @@ func monitorExperiment(deps Dependencies) {
 
 }
 
-func SelfTestPLC(deps Dependencies) {
-	deps.Plc.SelfTest()
+func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err error) {
+
+	// makeResult returns data in DB result format
+	result := makeResult(scan)
+
+	// insert current cycle result into Database
+	DBResult, err = deps.Store.InsertResult(context.Background(), result)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error inserting result data")
+		// send error
+		deps.WsErrCh <- err
+		return
+	}
+	return
 }
 
-func HeartBeatPLC(deps Dependencies) {
-	deps.Plc.HeartBeat()
+func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) (err error) {
+
+	// getLastCycleResult
+	var LastCycleResult []db.Result
+	for _, r := range DBResult {
+		if r.Cycle == scan.Cycle {
+			LastCycleResult = append(LastCycleResult, r)
+		}
+	}
+
+	// color analysis
+	wells, err := deps.Store.ListWells(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching data")
+		// send error
+		deps.WsErrCh <- err
+		return
+	}
+
+	welltargets, err := deps.Store.ListWellTargets(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching data")
+		deps.WsErrCh <- err
+		// send error
+		return
+	}
+
+	// send data to color analysis
+
+	targets, well := wellColorAnalysis(LastCycleResult, welltargets, wells, scan.Cycle)
+
+	// update color in well
+	if len(well) > 0 {
+		for _, w := range well {
+			err = deps.Store.UpdateColorWell(context.Background(), w.ColorCode, w.ID)
+			if err != nil {
+				// send error
+				logger.WithField("err", err.Error()).Error("Error upsert wells")
+				deps.WsErrCh <- err
+				return
+			}
+		}
+	}
+
+	// update ct value in DB
+	_, err = deps.Store.UpsertWellTargets(context.Background(), targets, experimentValues.experimentID)
+	if err != nil {
+		// send error
+		logger.WithField("err", err.Error()).Error("Error upsert wells")
+		deps.WsErrCh <- err
+		return
+	}
+	return
 }

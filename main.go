@@ -107,16 +107,6 @@ func startApp(plcName string, test bool) (err error) {
 		driver = simulator.NewSimulator(exit)
 	}
 
-	/* // The exit plan incase there is a feedback from the driver to abort/exit
-	go func() {
-		err = <-exit
-		logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
-		service.ExperimentRunning = false // on pre-emptive stop
-
-		// TODO: Handle exit gracefully
-		// We need to call the API on the Web to display the error and restart, abort or call service!
-	}() */
-
 	store, err = db.Init()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Database init failed")

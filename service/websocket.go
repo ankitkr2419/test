@@ -1,0 +1,53 @@
+package service
+
+import (
+	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
+
+	"github.com/google/uuid"
+)
+
+var (
+	green             = "#3FC13A" // All CT values for the well are below threshold,
+	red               = "#F06666" //Even a single value crosses threshold for target
+	orange            = "#F3811F" // If the CT values are close to threshold (delta)
+	experimentRunning = false     // In case of pre-emptive stop we need to send signal to monitor through this flag
+	experimentValues  experimentResultValues
+)
+
+type experimentResultValues struct {
+	plcStage     plc.Stage
+	experimentID uuid.UUID
+	activeWells  []int32
+	targets      []db.TargetDetails
+}
+type resultGraph struct {
+	Type string  `json:"type"`
+	Data []graph `json:"data"`
+	// LidTemperature float32 `json:"lid_temp"`
+	// Temperature float32 `json:"temperature"`
+	// CurrentCycle uint16    `json:"current_cycle"`
+}
+type graph struct {
+	WellPosition int32     `db:"well_position" json:"well_position"`
+	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
+	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id"`
+	TotalCycles  uint16    `db:"total_cycles" json:"total_cycles"`
+	Cycle        []uint16  `db:"cycle" json:"cycle"`
+	FValue       []uint16  `db:"f_value" json:"f_value"`
+	Threshold    float32   `db:"threshold" json:"threshold"`
+}
+type resultWells struct {
+	Type string    `json:"type"`
+	Data []db.Well `json:"data"`
+}
+
+type resultOnSuccess struct {
+	Type string        `json:"type"`
+	Data db.Experiment `json:"data"`
+}
+
+type resultOnFail struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
+}

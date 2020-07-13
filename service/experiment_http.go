@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
 	"time"
@@ -157,7 +158,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		plcStage = makePLCStage(ss)
+		plcStage := makePLCStage(ss)
 
 		err = deps.Plc.ConfigureRun(plcStage)
 		if err != nil {
@@ -173,7 +174,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		logger.Info("start with steps config : ",plcStage)
 		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
@@ -181,11 +181,18 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		// experimentID set
-		experimentID = expID
+		// retruns all targets configured for experiment
+		targetDetails, err := deps.Store.ListConfTargets(req.Context(), expID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching target data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-		//ExperimentRunning set true
-		ExperimentRunning = true
+		setExperimentValues(config.ActiveWells("activeWells"), targetDetails, expID, plcStage)
+
+		//experimentRunning set true
+		experimentRunning = true
 
 		//invoke monitor
 		go monitorExperiment(deps)
@@ -195,91 +202,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write([]byte(`{"msg":"experiment started"}`))
 	})
 }
-
-/*
-func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-
-		// if origin not allowed it returns 403
-		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-
-		c, err := upgrader.Upgrade(rw, req, nil)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
-			return
-		}
-		defer c.Close()
-
-		// retruns all targets configured for experiment
-		targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching target data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		activeWells := config.ActiveWells("activeWells")
-
-		var cycle uint16
-		var previousCycle uint16
-
-		cycle = 0
-
-		// ExperimentRunning is set when experiment started & if stopped then set to false
-		for ExperimentRunning {
-			scan, err := deps.Plc.Monitor(cycle)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error in plc monitor")
-				return
-			}
-			// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
-			if scan.CycleComplete && scan.Cycle != previousCycle {
-
-				// write to db & serve
-				// makeResult returns data in DB result format
-				result := makeResult(activeWells, scan, targetDetails, experimentID)
-
-				// insert current cycle result into Database
-				DBResult, err := deps.Store.InsertResult(req.Context(), result)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error inserting result data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				// analyseResult returns data required for ploting graph
-				Finalresult := analyseResult(activeWells, targetDetails, DBResult, plcStage.CycleCount)
-
-				var Result db.FinalResult
-				Result.MaxThreshold = maxThreshold
-				Result.Data = append(Result.Data, Finalresult...)
-
-				respBytes, err := json.Marshal(Result)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				err = c.WriteMessage(1, respBytes)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Websocket failed to write")
-					break
-				}
-
-				if scan.Cycle == plcStage.CycleCount {
-					// last cycle socket closed
-					ExperimentRunning = false
-					break
-				}
-
-				cycle++
-				previousCycle++
-			}
-		}
-	})
-}
-
-*/
 
 func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {

@@ -73,33 +73,6 @@ type TargetDetails struct {
 	DyePosition  int32     `db:"dye_position" json:"dye_position"`
 }
 
-type FinalResultGraph struct {
-	Type string     `json:"type"`
-	Data []WellData `json:"data"`
-	// LidTemperature float32 `json:"lid_temp"`
-	// Temperature float32 `json:"temperature"`
-	// CurrentCycle uint16    `json:"current_cycle"`
-}
-
-type FinalResultWells struct {
-	Type string `json:"type"`
-	Data []Well `json:"data"`
-}
-
-type FinalResultOnSuccess struct {
-	Type string     `json:"type"`
-	Data Experiment `json:"data"`
-}
-type WellData struct {
-	WellPosition int32     `db:"well_position" json:"well_position"`
-	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
-	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id"`
-	TotalCycles  uint16    `db:"total_cycles" json:"total_cycles"`
-	Cycle        []uint16  `db:"cycle" json:"cycle"`
-	FValue       []uint16  `db:"f_value" json:"f_value"`
-	Threshold    float32   `db:"threshold" json:"threshold"`
-}
-
 type WellTargetResults struct {
 	WellTarget
 	Cycle     uint16  `db:"cycle" json:"cycle"`
