@@ -47,6 +47,20 @@ const AddStageModal = (props) => {
 		updateStageFormStateWrapper(name, value);
 	};
 
+	const stageTypeChangeHandler = (selectedStageType) => {
+		// If the selected stage type is hold reset the repeat count values
+		if (selectedStageType.value === 'hold') {
+			updateStageFormStateWrapper(
+				'stageRepeatCount',
+				'',
+			);
+		}
+		updateStageFormStateWrapper(
+			'stageType',
+			selectedStageType,
+		);
+	};
+
 	return (
 		<>
 			<Modal
@@ -80,12 +94,7 @@ const AddStageModal = (props) => {
 									</Label>
 									<Select
 										options={stageTypeOptions}
-										onChange={(selectedStageType) => {
-											updateStageFormStateWrapper(
-												'stageType',
-												selectedStageType
-											);
-										}}
+										onChange={stageTypeChangeHandler}
 										value={stageType}
 									/>
 								</FormGroup>
@@ -101,7 +110,7 @@ const AddStageModal = (props) => {
 										name='stageRepeatCount'
 										id='stage'
 										placeholder='Type here'
-										value={stageRepeatCount.value}
+										value={stageRepeatCount}
 										onChange={onChangeHandler}
 										disabled={isRepeatCountDisabled}
 									/>

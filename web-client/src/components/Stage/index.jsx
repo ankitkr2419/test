@@ -31,7 +31,7 @@ const StageComponent = (props) => {
 	// local state to save form data and modal state flag
 	const [stageFormState, updateStageFormState] = useReducer(
 		stageStateReducer,
-		stageStateInitialState
+		stageStateInitialState,
 	);
 	// immutable => js
 	const stageFormStateJS = stageFormState.toJS();
@@ -50,7 +50,7 @@ const StageComponent = (props) => {
 	const toggleCreateStageModal = () => {
 		updateStageFormStateWrapper(
 			'isCreateStageModalVisible',
-			!isCreateStageModalVisible
+			!isCreateStageModalVisible,
 		);
 	};
 
@@ -98,7 +98,7 @@ const StageComponent = (props) => {
 	// edit stage handler
 	const editStage = (stage) => {
 		const {
-			id, name, type, repeat_count
+			id, name, type, repeat_count,
 		} = stage.toJS();
 		updateStageFormState({
 			type: stageStateActions.UPDATE_STAGE_STATE,
@@ -106,7 +106,7 @@ const StageComponent = (props) => {
 				stageId: id,
 				stageName: name,
 				stageType: { label: type, value: type },
-				stageRepeatCount: { label: repeat_count, value: repeat_count },
+				stageRepeatCount: repeat_count,
 			},
 		});
 		toggleCreateStageModal();
