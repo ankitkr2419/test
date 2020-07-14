@@ -166,3 +166,35 @@ func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write([]byte(`{"msg":"template deleted successfully"}`))
 	})
 }
+
+func publishTemplateHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		id, err := parseUUID(vars["id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		var latestT db.Template
+
+		latestT, err = deps.Store.ShowTemplate(req.Context(), id)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error show template")
+			return
+		}
+
+		respBytes, err := json.Marshal(latestT)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling template data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(respBytes)
+		rw.Header().Add("Content-Type", "application/json")
+	})
+}

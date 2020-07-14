@@ -12,6 +12,10 @@ const (
 	getTemplateListQuery = `SELECT * FROM templates
 		ORDER BY name ASC`
 
+	getPublishedTemplateListQuery = `SELECT * FROM templates
+		ORDER BY name ASC
+		WHERE publish = true`
+
 	createTemplateQuery = `INSERT INTO templates (
 		name,
 		description)
@@ -34,9 +38,19 @@ type Template struct {
 	ID          uuid.UUID `db:"id" json:"id"`
 	Name        string    `db:"name" json:"name" validate:"required"`
 	Description string    `db:"description" json:"description" validate:"required"`
+	Publish     bool      `db:"publish json:"publish"`
 }
 
 func (s *pgStore) ListTemplates(ctx context.Context) (t []Template, err error) {
+	err = s.db.Select(&t, getTemplateListQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing templates")
+		return
+	}
+	return
+}
+
+func (s *pgStore) ListPublishedTemplates(ctx context.Context) (t []Template, err error) {
 	err = s.db.Select(&t, getTemplateListQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing templates")
