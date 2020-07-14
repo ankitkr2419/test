@@ -11,7 +11,7 @@ import {
 	deleteStepReset,
 	updateStepReset,
 } from 'action-creators/stepActionCreators';
-import { getStepList } from 'selectors/stepSelector';
+import { getStepList, getStageType } from 'selectors/stepSelector';
 
 const StepContainer = (props) => {
 	const { stageId, updateSelectedWizard } = props;
@@ -21,7 +21,8 @@ const StepContainer = (props) => {
 
 	// reading steps from redux
 	const steps = useSelector(getStepList);
-
+	// stageType = hold or cycle stage
+	const stageType = useSelector(state => getStageType(state, stageId));
 	// isStepSaved = true means step created successfully
 	const { isStepSaved, response } = useSelector(state => state.createStepReducer);
 	// isStepDeleted = true means step deleted successfully
@@ -100,6 +101,7 @@ const StepContainer = (props) => {
 			selectedStepId={selectedStepId}
 			saveStep={saveStep}
 			goToStageWizard={goToStageWizard}
+			stageType={stageType}
 		/>
 	);
 };
