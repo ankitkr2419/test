@@ -1,14 +1,19 @@
-import React from "react";
-import { Input } from "reactstrap";
-import styled from "styled-components";
+import React from 'react';
+import { Input } from 'reactstrap';
+import styled from 'styled-components';
 
 const StyledInput = styled(Input)`
 	padding: 4px 10px;
 `;
 
-const CustomInput = (props) => {
-	return <StyledInput {...props}>{props.children}</StyledInput>;
-};
+// On focus of input field select the complete text if present
+// This makes it easy to clear
+const selectText = (event) => event.target.select();
+
+const CustomInput = (props) => (
+	<StyledInput {...props} onFocus={selectText}>
+		{props.children}
+	</StyledInput>);
 
 CustomInput.propTypes = {};
 
