@@ -5,19 +5,6 @@ import {
 	Button, Popover, PopoverHeader, PopoverBody,
 } from 'core-components';
 import { Text, Center, ButtonIcon } from 'shared-components';
-import styled from 'styled-components';
-
-
-const StyledPopover = styled(Popover)`
-	border-color: ${props => (props.status) || '#aedbd5'} !important;
-	.popover-header {
-		background-color: ${props => props.status || '#aedbd5'} !important;
-	}
-`;
-
-const StyledText = styled(Text)`
-	color: ${props => (props.positive ? '#3FC13A' : '#F06666') || '#707070'} !important;
-`;
 
 const WellPopover = (props) => {
 	const {
@@ -34,7 +21,7 @@ const WellPopover = (props) => {
 	const simulateOutSideClick = () => document.body.click();
 
 	return (
-		<StyledPopover
+		<Popover
 			trigger="legacy"
 			target={`PopoverWell${index}`}
 			hideArrow
@@ -43,7 +30,7 @@ const WellPopover = (props) => {
 			status={status}
 			{...rest}
 		>
-			<PopoverHeader>
+			<PopoverHeader status={status}>
 				<Text Tag="span">{text}</Text>
 				<ButtonIcon
 					position="absolute"
@@ -70,9 +57,9 @@ const WellPopover = (props) => {
 							)}
 							{targets !== null
                 && targets.map(ele => (
-                		<StyledText key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
+                		<Text key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
                 		{ele.target_name || 'target_name'}{ele.ct === '' ? '' : `, CT ${ele.ct}`}
-                		</StyledText>
+                		</Text>
                 	))
 							}
 						</div>
@@ -91,7 +78,7 @@ const WellPopover = (props) => {
 					<Button onClick={onEditClickHandler}>Edit Info</Button>
 				</Center>
 			</PopoverBody>
-		</StyledPopover>
+		</Popover>
 	);
 };
 

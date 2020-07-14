@@ -7,6 +7,7 @@ const StyledPopoverHeader = styled(PopoverHeader)`
 	height: 36px;
 	line-height: 1.2;
 	font-weight: normal;
+	background-color: ${props => props.status || '#aedbd5'} !important;
 `;
 
 const CustomPopoverHeader = (props) => {
