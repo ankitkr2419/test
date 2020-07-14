@@ -177,18 +177,16 @@ func publishTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var latestT db.Template
-
-		latestT, err = deps.Store.ShowTemplate(req.Context(), id)
+		t, err := deps.Store.ListTemplateTargets(req.Context(), tempID)
 		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error show template")
 			return
 		}
 
-		respBytes, err := json.Marshal(latestT)
+		ss, err := deps.Store.ListStageSteps(req.Context(), e.TemplateID)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling template data")
+			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}

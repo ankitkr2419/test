@@ -40,6 +40,53 @@ type Template struct {
 	Description string    `db:"description" json:"description" validate:"required"`
 	Publish     bool      `db:"publish json:"publish"`
 }
+type ErrorResponse struct {
+	Code    string            `json:"code"`
+	Message string            `json:"message"`
+	Fields  map[string]string `json:"fields"`
+}
+
+// ValidateTemplate to publish
+func ValidateTemplate(targets []TemplateTarget, steps []StageStep) (errorResponse map[string]ErrorResponse, valid bool) {
+	validationErrors := make(map[string]string)
+
+	if len(targets) == 0 {
+		validationErrors["targets"] = "No targets added"
+	}
+
+	if len(steps) == 0 {
+		validationErrors["steps"] = "No steps/stage added"
+	} else {
+		var holdsteps []StageStep
+		var cyclesteps []StageStep
+		var cycles uint16
+		for _, s := range steps {
+			switch s.Type {
+			case "hold":
+				holdsteps = append(holdsteps, s)
+			case "cycle":
+				cyclesteps = append(cyclesteps, s)
+				cycles += s.RepeatCount
+			}
+		}
+		if len(holdsteps) == 0 {
+			validationErrors["steps"] = "No steps added"
+		}
+	}
+	if len(fieldErrors) == 0 {
+		valid = true
+		return
+	}
+
+	errorResponse = map[string]ErrorResponse{"error": ErrorResponse{
+		Code:    "invalid_data",
+		Message: "Please provide valid badge data",
+		Fields:  fieldErrors,
+	},
+	}
+
+	return
+}
 
 func (s *pgStore) ListTemplates(ctx context.Context) (t []Template, err error) {
 	err = s.db.Select(&t, getTemplateListQuery)

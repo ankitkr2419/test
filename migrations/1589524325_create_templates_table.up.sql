@@ -4,5 +4,5 @@ CREATE TABLE  templates(
   id uuid primary key default uuid_generate_v4(),
   name varchar(50),
   description varchar(50),
-  publish boolean
+  publish boolean DEFAULT false
 );
