@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
+	"time"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"time"
 )
 
 const (
@@ -25,7 +26,7 @@ const (
 		template_id,
 		step_count,
 		created_at,
-                updated_at
+        updated_at
 		FROM stages
 		WHERE id = $1`
 
