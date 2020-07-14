@@ -143,6 +143,7 @@ const AddStepModal = (props) => {
 								<FormError>Invalid hold time</FormError>
 							</FormGroup>
 						</Col>
+						{/* If the stage type is hold don't show datacapture checkbox */}
 						{stageType !== 'hold' &&
 						(<Col sm={colSize}>
 							<FormGroup>

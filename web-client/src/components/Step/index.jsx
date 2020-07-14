@@ -189,6 +189,7 @@ const StepComponent = (props) => {
 										<td>{step.get('ramp_rate')}</td>
 										<td>{step.get('target_temp')}</td>
 										<td>{(step.get('hold_time'))}</td>
+										{/* If the stage type is Hold show N/A for data capture property */}
 										{stageType !== 'hold' ?
 											<td>{step.get('data_capture') ? 'Yes' : 'No'}</td> : <td>N/A</td>}
 										<td className='td-actions'>
