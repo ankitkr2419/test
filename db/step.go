@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
+	"time"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"time"
 )
 
 const (
@@ -26,7 +27,7 @@ const (
 		hold_time,
 		data_capture,
 		created_at,
-                updated_at
+        updated_at
 		FROM steps WHERE id = $1`
 
 	updateStepQuery = `UPDATE steps SET (
