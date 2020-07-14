@@ -9,9 +9,9 @@ import styled from 'styled-components';
 
 
 const StyledPopover = styled(Popover)`
-	border-color: ${props => (props.status)} !important;
+	border-color: ${props => (props.status) || '#aedbd5'} !important;
 	.popover-header {
-		background-color: ${props => props.status} !important;
+		background-color: ${props => props.status || '#aedbd5'} !important;
 	}
 `;
 
