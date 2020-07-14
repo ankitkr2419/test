@@ -37,10 +37,11 @@ func (suite *WellHandlerTestSuite) TestListWellsSuccess() {
 	suite.dbMock.On("ListWells", mock.Anything, mock.Anything).Return(
 		[]db.Well{
 			db.Well{ID: testUUID, Position: 1, SampleID: sampleID, ExperimentID: experimentID, Task: "UNKNOWN", ColorCode: "RED", Targets: []db.WellTarget{
-				{WellID: testUUID,
-					TargetID:   targetID,
-					TargetName: "COVID",
-					CT:         "45"},
+				{WellPosition: 1,
+					ExperimentID: experimentID,
+					TargetID:     targetID,
+					TargetName:   "COVID",
+					CT:           "45"},
 			}, SampleName: ""},
 		},
 		nil,
@@ -48,10 +49,11 @@ func (suite *WellHandlerTestSuite) TestListWellsSuccess() {
 
 	suite.dbMock.On("ListWellTargets", mock.Anything, mock.Anything).Return(
 		[]db.WellTarget{
-			{WellID: testUUID,
-				TargetID:   targetID,
-				TargetName: "COVID",
-				CT:         "45"},
+			{WellPosition: 1,
+				ExperimentID: experimentID,
+				TargetID:     targetID,
+				TargetName:   "COVID",
+				CT:           "45"},
 		},
 		nil,
 	)
@@ -63,7 +65,7 @@ func (suite *WellHandlerTestSuite) TestListWellsSuccess() {
 		"",
 		listWellsHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"},{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"}],"sample_name":""}]`, testUUID, experimentID, sampleID, testUUID, targetID, testUUID, targetID)
+	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"experiment_id":"%s","well_position":1,"target_id":"%s","target_name":"COVID","ct":"45"},{"experiment_id":"%s","well_position":1,"target_id":"%s","target_name":"COVID","ct":"45"}],"sample_name":""}]`, testUUID, experimentID, sampleID, experimentID, targetID, experimentID, targetID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -96,13 +98,14 @@ func (suite *WellHandlerTestSuite) TestUpsertWellSuccess() {
 	experimentID := uuid.New()
 	targetID := uuid.New()
 
-	suite.dbMock.On("UpsertWellTargets", mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("UpsertWellTargets", mock.Anything, mock.Anything, mock.Anything).Return(
 		[]db.WellTarget{
 			{
-				WellID:     testUUID,
-				TargetID:   targetID,
-				TargetName: "COVID",
-				CT:         "45",
+				WellPosition: 1,
+				ExperimentID: experimentID,
+				TargetID:     targetID,
+				TargetName:   "COVID",
+				CT:           "45",
 			},
 		},
 		nil,
@@ -110,10 +113,11 @@ func (suite *WellHandlerTestSuite) TestUpsertWellSuccess() {
 	suite.dbMock.On("UpsertWells", mock.Anything, mock.Anything, mock.Anything).Return(
 		[]db.Well{
 			db.Well{ID: testUUID, Position: 1, SampleID: sampleID, ExperimentID: experimentID, Task: "UNKNOWN", ColorCode: "RED", Targets: []db.WellTarget{
-				{WellID: testUUID,
-					TargetID:   targetID,
-					TargetName: "COVID",
-					CT:         "45"},
+				{WellPosition: 1,
+					ExperimentID: experimentID,
+					TargetID:     targetID,
+					TargetName:   "COVID",
+					CT:           "45"},
 			}, SampleName: ""},
 		},
 		nil,
@@ -126,7 +130,7 @@ func (suite *WellHandlerTestSuite) TestUpsertWellSuccess() {
 		body,
 		upsertWellHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"},{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"}],"sample_name":""}]`, testUUID, experimentID, sampleID, testUUID, targetID, testUUID, targetID)
+	output := fmt.Sprintf(`[{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"experiment_id":"%s","well_position":1,"target_id":"%s","target_name":"COVID","ct":"45"},{"experiment_id":"%s","well_position":1,"target_id":"%s","target_name":"COVID","ct":"45"}],"sample_name":""}]`, testUUID, experimentID, sampleID, experimentID, targetID, experimentID, targetID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -156,23 +160,25 @@ func (suite *WellHandlerTestSuite) TestShowWellSuccess() {
 	sampleID := uuid.New()
 	experimentID := uuid.New()
 	targetID := uuid.New()
-	suite.dbMock.On("GetWellTarget", mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("GetWellTarget", mock.Anything, mock.Anything, mock.Anything).Return(
 		[]db.WellTarget{
 			{
-				WellID:     testUUID,
-				TargetID:   targetID,
-				TargetName: "COVID",
-				CT:         "45",
+				WellPosition: 1,
+				ExperimentID: experimentID,
+				TargetID:     targetID,
+				TargetName:   "COVID",
+				CT:           "45",
 			},
 		},
 		nil,
 	)
 	suite.dbMock.On("ShowWell", mock.Anything, mock.Anything).Return(
 		db.Well{ID: testUUID, Position: 1, SampleID: sampleID, ExperimentID: experimentID, Task: "UNKNOWN", ColorCode: "RED", Targets: []db.WellTarget{
-			{WellID: testUUID,
-				TargetID:   targetID,
-				TargetName: "COVID",
-				CT:         "45"},
+			{WellPosition: 1,
+				ExperimentID: experimentID,
+				TargetID:     targetID,
+				TargetName:   "COVID",
+				CT:           "45"},
 		}, SampleName: ""}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -181,7 +187,7 @@ func (suite *WellHandlerTestSuite) TestShowWellSuccess() {
 		"",
 		showWellHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"well_id":"%s","target_id":"%s","target_name":"COVID","ct":"45"}],"sample_name":""}`, testUUID, experimentID, sampleID, testUUID, targetID)
+	output := fmt.Sprintf(`{"id":"%s","position":1,"experiment_id":"%s","sample_id":"%s","task":"UNKNOWN","color_code":"RED","targets":[{"experiment_id":"%s","well_position":1,"target_id":"%s","target_name":"COVID","ct":"45"}],"sample_name":""}`, testUUID, experimentID, sampleID, experimentID, targetID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 

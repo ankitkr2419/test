@@ -8,11 +8,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
 )
-
-var upgrader = websocket.Upgrader{} // use default options
 
 func listExperimentHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -161,7 +158,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		plcStage = makePLCStage(ss)
+		plcStage := makePLCStage(ss)
 
 		err = deps.Plc.ConfigureRun(plcStage)
 		if err != nil {
@@ -184,98 +181,25 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		// experimentID set
-		experimentID = expID
-
-		//ExperimentRunning set true
-		ExperimentRunning = true
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(`{"msg":"experiment started"}`))
-	})
-}
-
-func monitorExperimentHandler(deps Dependencies) http.HandlerFunc {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-
-		// if origin not allowed it returns 403
-		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-
-		c, err := upgrader.Upgrade(rw, req, nil)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
-			return
-		}
-		defer c.Close()
-
 		// retruns all targets configured for experiment
-		targetDetails, err := deps.Store.ListConfTargets(req.Context(), experimentID)
+		targetDetails, err := deps.Store.ListConfTargets(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		activeWells := config.ActiveWells("activeWells")
+		setExperimentValues(config.ActiveWells("activeWells"), targetDetails, expID, plcStage)
 
-		var cycle uint16
-		var previousCycle uint16
+		//experimentRunning set true
+		experimentRunning = true
 
-		cycle = 0
+		//invoke monitor
+		go monitorExperiment(deps)
 
-		// ExperimentRunning is set when experiment started & if stopped then set to false
-		for ExperimentRunning {
-			scan, err := deps.Plc.Monitor(cycle)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error in plc monitor")
-				return
-			}
-			// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
-			if scan.CycleComplete && scan.Cycle != previousCycle {
-
-				// write to db & serve
-				// makeResult returns data in DB result format
-				result := makeResult(activeWells, scan, targetDetails, experimentID)
-
-				// insert current cycle result into Database
-				DBResult, err := deps.Store.InsertResult(req.Context(), result)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error inserting result data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-
-				// analyseResult returns data required for ploting graph
-				Finalresult := analyseResult(activeWells, targetDetails, DBResult, plcStage.CycleCount)
-
-				var Result db.FinalResult
-				Result.MaxThreshold = maxThreshold
-				Result.Data = append(Result.Data, Finalresult...)
-
-				respBytes, err := json.Marshal(Result)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Error marshaling experiment data")
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				err = c.WriteMessage(1, respBytes)
-				if err != nil {
-					logger.WithField("err", err.Error()).Error("Websocket failed to write")
-					break
-				}
-
-				if scan.Cycle == plcStage.CycleCount {
-					// last cycle socket closed
-					ExperimentRunning = false
-					break
-				}
-
-				cycle++
-				previousCycle++
-			}
-		}
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"msg":"experiment started"}`))
 	})
 }
 

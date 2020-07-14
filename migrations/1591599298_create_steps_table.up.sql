@@ -8,5 +8,7 @@ CREATE TABLE steps
     target_temp float,
     hold_time integer,
     data_capture boolean,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (stage_id) REFERENCES stages(id) ON DELETE CASCADE
 );

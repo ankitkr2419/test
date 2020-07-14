@@ -49,6 +49,11 @@ func ActiveWells(key string) (activeWells []int32) {
 	return
 }
 
+func GetColorLimits(key string) uint16 {
+	checkIfSet(key)
+	return uint16(viper.GetInt(key))
+}
+
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))

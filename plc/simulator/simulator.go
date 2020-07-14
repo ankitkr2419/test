@@ -21,8 +21,8 @@ type Simulator struct {
 	plcIO     plcRegistors
 	config    plc.Stage
 	emissions []plc.Emissions
-	exitCh    chan string
-	errCh     chan error
+	ExitCh    chan string
+	ErrCh     chan error
 	wells     []Well
 }
 
@@ -30,8 +30,8 @@ func NewSimulator(exit chan error) plc.Driver {
 	ex := make(chan string)
 
 	s := Simulator{}
-	s.exitCh = ex
-	s.errCh = exit
+	s.ExitCh = ex
+	s.ErrCh = exit
 	s.pcrHeartBeat()
 	return &s
 }
@@ -44,7 +44,7 @@ func (d *Simulator) HeartBeat() {
 
 	LOOP:
 		for {
-			time.Sleep(5000 * time.Millisecond) // sleep it off for a bit
+			time.Sleep(2000 * time.Millisecond) // sleep it off for a bit
 
 			// 3 attempts to check for heartbeat of PLC and write ours!
 			for i := 0; i < 3; i++ {
@@ -68,16 +68,16 @@ func (d *Simulator) HeartBeat() {
 
 		// something went wrong. Signal parent process
 		logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-		d.errCh <- err
+		d.ErrCh <- err
 		return
 	}()
 }
 
 func (d *Simulator) ConfigureRun(s plc.Stage) error {
 	// NOTE: commented to run new exp when stop
-	// if d.config.CycleCount != 0 {
-	// 	return errors.New("PLC is already configured")
-	// }
+	if d.config.CycleCount != 0 {
+		return errors.New("PLC is already configured")
+	}
 
 	// setting config with stage data
 	d.config = s
@@ -102,15 +102,16 @@ func (d *Simulator) Start() (err error) {
 }
 
 func (d *Simulator) Stop() (err error) {
-	go func() {
-		if d.plcIO.m.startStopCycle == 0 {
-			err = errors.New("Cannot stop, not yet started")
-			return
-		}
+	// Abort running process
 
-		d.plcIO.m.startStopCycle = 0
-		d.exitCh <- "stop"
-	}()
+	if d.plcIO.m.startStopCycle == 0 {
+		err = errors.New("Cannot stop, not yet started")
+		return
+	}
+
+	d.plcIO.m.startStopCycle = 0
+
+	d.ExitCh <- "abort"
 
 	return
 }
@@ -128,22 +129,36 @@ func (d *Simulator) simulate() {
 	for {
 		// Intentionally don't have a default, so that it blocks on either one of the channels.
 		select {
-		case msg := <-d.exitCh:
+		case msg := <-d.ExitCh:
 			logger.WithField("msg", msg).Info("simulate: ExitCh received data")
 			if msg == "stop" {
-				d.errCh <- errors.New("PCR Stopped")
-				return
+				d.ErrCh <- errors.New("PCR Stopped")
+
+				// reset to start new experiment
+				d.config = plc.Stage{}
+				d.plcIO = plcRegistors{}
+				d.wells = []Well{}
+
 			}
 			if msg == "abort" {
-				//TBD
+
+				d.ErrCh <- errors.New("PCR Aborted")
+
+				// reset to start new experiment
+				d.config = plc.Stage{}
+				d.plcIO = plcRegistors{}
+				d.wells = []Well{}
+
 			}
 			if msg == "pause" {
 				//TBD
 			}
-		case err := <-d.errCh:
-			// Some error flagged
-			logger.WithField("err", err.Error()).Error("simulate: errCh recevied data")
-			return
+			/* This ErrCh will never be used between simulator and PCR
+			case err := <-d.ErrCh:
+				// Some error flagged
+				logger.WithField("err", err.Error()).Error("simulate: errCh recevied data")
+				return
+			*/
 		}
 	}
 }
