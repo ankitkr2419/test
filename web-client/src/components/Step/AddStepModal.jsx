@@ -6,6 +6,7 @@ import {
 	Row,
 	Col,
 	Input,
+	InputGroupWithAddonText,
 	Label,
 	Modal,
 	ModalBody,
@@ -13,7 +14,11 @@ import {
 	FormError,
 } from 'core-components';
 import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
-import { validateHoldTime, validateRampRate, validateTargetTemperature } from './stepHelper';
+import {
+	validateHoldTime,
+	validateRampRate,
+	validateTargetTemperature,
+} from './stepHelper';
 
 const AddStepModal = (props) => {
 	const {
@@ -115,19 +120,30 @@ const AddStepModal = (props) => {
 								<Label for='ramp_rate' className='font-weight-bold'>
 									Ramp Rate
 								</Label>
-								<Input
-									type='number'
-									name='rampRate'
-									id='ramp_rate'
-									placeholder='0.5 - 6'
-									value={rampRate}
-									onChange={onChangeHandler}
-									onBlur={onRampRateBlurHandler}
-									onFocus={onRampRateFocusHandler}
-									invalid={rampRateError}
-								/>
-								<Label>unit °C</Label>
-								<FormError>Invalid ramp rate</FormError>
+								<InputGroupWithAddonText
+									addonText='unit °C'
+									paddingRight={54}
+									addonSize={12}
+								>
+									<Input
+										type='number'
+										name='rampRate'
+										id='ramp_rate'
+										placeholder='0.5 - 6'
+										value={rampRate}
+										onChange={onChangeHandler}
+										onBlur={onRampRateBlurHandler}
+										onFocus={onRampRateFocusHandler}
+										invalid={rampRateError}
+									/>
+								</InputGroupWithAddonText>
+								<Text
+									Tag='p'
+									size={12}
+									className={`${rampRateError && 'text-danger'} px-2 mb-0`}
+								>
+									Enter value between 0.5 to 6
+								</Text>
 							</FormGroup>
 						</Col>
 						<Col sm={colSize}>
@@ -135,19 +151,32 @@ const AddStepModal = (props) => {
 								<Label for='target_temperature' className='font-weight-bold'>
 									Target Temperature
 								</Label>
-								<Input
-									type='number'
-									name='targetTemperature'
-									id='target_temperature'
-									placeholder='22 - 120'
-									value={targetTemperature}
-									onChange={onChangeHandler}
-									onBlur={onTargetTemperatureBlurHandler}
-									onFocus={onTargetTemperatureFocusHandler}
-									invalid={targetTemperatureError}
-								/>
-								<Label>unit °C</Label>
-								<FormError>Invalid target temperature</FormError>
+								<InputGroupWithAddonText
+									addonText='unit °C'
+									paddingRight={54}
+									addonSize={12}
+								>
+									<Input
+										type='number'
+										name='targetTemperature'
+										id='target_temperature'
+										placeholder='22 - 120'
+										value={targetTemperature}
+										onChange={onChangeHandler}
+										onBlur={onTargetTemperatureBlurHandler}
+										onFocus={onTargetTemperatureFocusHandler}
+										invalid={targetTemperatureError}
+									/>
+								</InputGroupWithAddonText>
+								<Text
+									Tag='p'
+									size={12}
+									className={`${
+										targetTemperatureError && 'text-danger'
+									} px-2 mb-0`}
+								>
+									Enter value between 22 to 120
+								</Text>
 							</FormGroup>
 						</Col>
 						<Col sm={colSize}>
@@ -166,7 +195,7 @@ const AddStepModal = (props) => {
 									onChange={onChangeHandler}
 									invalid={holdTimeError}
 								/>
-								<FormError>Invalid hold time</FormError>
+								<FormError className='text-left'>Invalid hold time</FormError>
 							</FormGroup>
 						</Col>
 						{/* If the stage type is hold don't show datacapture checkbox */}
@@ -182,7 +211,7 @@ const AddStepModal = (props) => {
 									onChange={(event) => {
 										updateStepFormStateWrapper(
 											event.target.name,
-											event.target.checked,
+											event.target.checked
 										);
 									}}
 									className='mr-2 ml-3 py-2'
