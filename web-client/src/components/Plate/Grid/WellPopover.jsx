@@ -15,6 +15,10 @@ const StyledPopover = styled(Popover)`
 	}
 `;
 
+const StyledText = styled(Text)`
+	color: ${props => (props.positive ? '#3FC13A' : '#F06666') || '#707070'} !important;
+`;
+
 const WellPopover = (props) => {
 	const {
 		status,
@@ -66,10 +70,11 @@ const WellPopover = (props) => {
 							)}
 							{targets !== null
                 && targets.map(ele => (
-                	<Text key={ele.target_id} className={`mb-1 ${status}`}>
-                		{ele.target_name || 'target_name'}
-                	</Text>
-                ))}
+                		<StyledText key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
+                		{ele.target_name || 'target_name'}{ele.ct === '' ? '' : `, CT ${ele.ct}`}
+                		</StyledText>
+                	))
+							}
 						</div>
 					</li>
 					<li className="d-flex py-1">
