@@ -25,13 +25,14 @@ const StepComponent = (props) => {
 		selectedStepId,
 		saveStep, // update api call
 		isStepsLoading,
-		goToStageWizard
+		goToStageWizard,
+		stageType,
 	} = props;
 
 	// local state to save form data and modal state flag
 	const [stepFormState, updateStepFormState] = useReducer(
 		stepStateReducer,
-		stepStateInitialState
+		stepStateInitialState,
 	);
 
 	// immutable => js
@@ -58,7 +59,7 @@ const StepComponent = (props) => {
 	const toggleCreateStepModal = () => {
 		updateStepFormStateWrapper(
 			'isCreateStepModalVisible',
-			!isCreateStepModalVisible
+			!isCreateStepModalVisible,
 		);
 	};
 
@@ -188,7 +189,9 @@ const StepComponent = (props) => {
 										<td>{step.get('ramp_rate')}</td>
 										<td>{step.get('target_temp')}</td>
 										<td>{(step.get('hold_time'))}</td>
-										<td>{step.get('data_capture') ? 'Yes' : 'No'}</td>
+										{/* If the stage type is Hold show N/A for data capture property */}
+										{stageType !== 'hold' ?
+											<td>{step.get('data_capture') ? 'Yes' : 'No'}</td> : <td>N/A</td>}
 										<td className='td-actions'>
 											<ButtonIcon
 												onClick={() => {
@@ -231,6 +234,7 @@ const StepComponent = (props) => {
 							addClickHandler={addClickHandler}
 							saveClickHandler={saveClickHandler}
 							resetFormValues={resetFormValues}
+							stageType={stageType}
 						/>
 					)}
 				</TableWrapperFooter>
@@ -248,6 +252,7 @@ StepComponent.propTypes = {
 	selectedStepId: PropTypes.string,
 	saveStep: PropTypes.func.isRequired,
 	isStepsLoading: PropTypes.bool.isRequired,
+	stageType: PropTypes.string.isRequired,
 };
 
 export default React.memo(StepComponent);
