@@ -3,6 +3,7 @@ package service
 import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -53,4 +54,16 @@ type resultOnSuccess struct {
 type resultOnFail struct {
 	Type string `json:"type"`
 	Data string `json:"data"`
+}
+
+type resultTemperature struct {
+	Type string      `json:"type"`
+	Data temperature `json:"data"`
+}
+
+type temperature struct {
+	Temp    []float32   `json:"temp"`
+	LidTemp []float32   `json:"lidTemp"`
+	Time    []time.Time `json:"time"`
+	Cycle   []uint16    `json:"cycle"`
 }

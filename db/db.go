@@ -50,4 +50,6 @@ type Storer interface {
 	UpdateStopTimeExperiments(context.Context, time.Time, uuid.UUID) error
 	GetResult(context.Context, uuid.UUID) ([]Result, error)
 	UpdateColorWell(context.Context, string, uuid.UUID) error
+	ListResultTemperature(context.Context, uuid.UUID) ([]ResultTemperature, error)
+	InsertResultTemperature(context.Context, ResultTemperature) error
 }
