@@ -25,6 +25,7 @@ const AddStepModal = (props) => {
 		addClickHandler,
 		resetFormValues,
 		saveClickHandler,
+		stageType,
 	} = props;
 
 	const {
@@ -38,7 +39,8 @@ const AddStepModal = (props) => {
 
 	// stageId will be present when we are updating stage
 	const isUpdateForm = stepId !== null;
-
+	// If stageType is hold column size will be 4 or else will be 3
+	const colSize = stageType === 'hold' ? 4 : 3;
 	// eslint-disable-next-line arrow-body-style
 	useEffect(() => {
 		return () => {
@@ -86,7 +88,7 @@ const AddStepModal = (props) => {
 						onClick={toggleCreateStepModal}
 					/>
 					<Row form className='mb-5 pb-5'>
-						<Col sm={3}>
+						<Col sm={colSize}>
 							<FormGroup>
 								<Label for='ramp_rate' className='font-weight-bold'>
 									Ramp Rate
@@ -104,7 +106,7 @@ const AddStepModal = (props) => {
 								<Label>unit °C</Label>
 							</FormGroup>
 						</Col>
-						<Col sm={3}>
+						<Col sm={colSize}>
 							<FormGroup>
 								<Label for='target_temperature' className='font-weight-bold'>
 									Target Temperature
@@ -122,7 +124,7 @@ const AddStepModal = (props) => {
 								<Label>unit °C</Label>
 							</FormGroup>
 						</Col>
-						<Col sm={3}>
+						<Col sm={colSize}>
 							<FormGroup>
 								<Label for='hold_time' className='font-weight-bold'>
 									Hold Time
@@ -141,7 +143,8 @@ const AddStepModal = (props) => {
 								<FormError>Invalid hold time</FormError>
 							</FormGroup>
 						</Col>
-						<Col sm={3}>
+						{stageType !== 'hold' &&
+						(<Col sm={colSize}>
 							<FormGroup>
 								<Label for='data_capture' className='font-weight-bold'>
 									Data Capture
@@ -152,14 +155,14 @@ const AddStepModal = (props) => {
 									onChange={(event) => {
 										updateStepFormStateWrapper(
 											event.target.name,
-											event.target.checked
+											event.target.checked,
 										);
 									}}
 									className='mr-2 ml-3 py-2'
 									checked={dataCapture}
 								/>
 							</FormGroup>
-						</Col>
+						</Col>)}
 					</Row>
 					<ButtonGroup className='text-center p-0 m-0 pt-5'>
 						{isUpdateForm === false && (
@@ -196,6 +199,7 @@ AddStepModal.propTypes = {
 	addClickHandler: PropTypes.func.isRequired,
 	resetFormValues: PropTypes.func.isRequired,
 	saveClickHandler: PropTypes.func.isRequired,
+	stageType: PropTypes.string.isRequired,
 };
 
 export default AddStepModal;
