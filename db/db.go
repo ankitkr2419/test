@@ -50,4 +50,6 @@ type Storer interface {
 	UpdateStopTimeExperiments(context.Context, time.Time, uuid.UUID) error
 	GetResult(context.Context, uuid.UUID) ([]Result, error)
 	UpdateColorWell(context.Context, string, uuid.UUID) error
+	PublishTemplate(context.Context, uuid.UUID) error
+	ListPublishedTemplates(context.Context) ([]Template, error)
 }

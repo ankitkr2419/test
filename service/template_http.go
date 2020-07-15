@@ -177,14 +177,36 @@ func publishTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		t, err := deps.Store.ListTemplateTargets(req.Context(), tempID)
+		t, err := deps.Store.ListTemplateTargets(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		ss, err := deps.Store.ListStageSteps(req.Context(), e.TemplateID)
+		ss, err := deps.Store.ListStageSteps(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// validate template
+		errorResp, valid := db.ValidateTemplate(t, ss)
+
+		if !valid {
+			respBytes, err := json.Marshal(errorResp)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error marshaling template data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write(respBytes)
+			rw.Header().Add("Content-Type", "application/json")
+		}
+
+		err = deps.Store.PublishTemplate(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -192,7 +214,30 @@ func publishTemplateHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		rw.Write([]byte(`{"msg":"template published successfully"}`))
+
 		rw.Header().Add("Content-Type", "application/json")
+	})
+}
+
+func listPublishedTemplateHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		t, err := deps.Store.ListPublishedTemplates(req.Context())
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		respBytes, err := json.Marshal(t)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling templates data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(respBytes)
 	})
 }

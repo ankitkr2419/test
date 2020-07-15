@@ -21,17 +21,19 @@ const (
 		description)
 		VALUES ($1, $2) RETURNING id`
 
-	getTemplateQuery = `SELECT id,
-		name,
-		description
+	getTemplateQuery = `SELECT *
 		FROM templates WHERE id = $1`
 
 	updateTemplateQuery = `UPDATE templates SET
 		name = $1,
 		description = $2
-		where id = $3`
+		where id = $3 AND publish = false`
 
 	deleteTemplateQuery = `DELETE FROM templates WHERE id = $1`
+
+	publishTempQuery = `UPDATE templates SET
+	publish = true
+	where id = $1`
 )
 
 type Template struct {
@@ -66,22 +68,26 @@ func ValidateTemplate(targets []TemplateTarget, steps []StageStep) (errorRespons
 				holdsteps = append(holdsteps, s)
 			case "cycle":
 				cyclesteps = append(cyclesteps, s)
+				// TBD: validation to be added on repeat count
 				cycles += s.RepeatCount
 			}
 		}
 		if len(holdsteps) == 0 {
-			validationErrors["steps"] = "No steps added"
+			validationErrors["holdstep"] = "No holdstep added"
+		}
+		if len(cyclesteps) == 0 {
+			validationErrors["cyclestep"] = "No cyclestep added"
 		}
 	}
-	if len(fieldErrors) == 0 {
+	if len(validationErrors) == 0 {
 		valid = true
 		return
 	}
 
 	errorResponse = map[string]ErrorResponse{"error": ErrorResponse{
 		Code:    "invalid_data",
-		Message: "Please provide valid badge data",
-		Fields:  fieldErrors,
+		Message: "Please provide valid template data",
+		Fields:  validationErrors,
 	},
 	}
 
@@ -174,6 +180,21 @@ func (s *pgStore) DeleteTemplate(ctx context.Context, id uuid.UUID) (err error) 
 	if c == 0 {
 		err = errors.New("Record Not Found")
 		logger.WithField("err", err.Error()).Error("Error Template not found")
+	}
+
+	return
+}
+
+func (s *pgStore) PublishTemplate(ctx context.Context, id uuid.UUID) (err error) {
+
+	_, err = s.db.Exec(
+		publishTempQuery,
+		id,
+	)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error publishing Template")
+		return
 	}
 
 	return
