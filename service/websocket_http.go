@@ -296,7 +296,6 @@ func monitorExperiment(deps Dependencies) {
 
 	var cycle uint16
 	var previousCycle uint16
-	var previousTemp float32
 
 	cycle = 0
 
@@ -342,15 +341,15 @@ func monitorExperiment(deps Dependencies) {
 		}
 
 		// writes temp on every step against time in DB
-		if scan.Temp != previousTemp {
-			err = WriteResultTemperature(deps, scan)
-			if err != nil {
-				return
-			} else {
-				previousTemp = scan.Temp
-				deps.WsMsgCh <- "read_temp"
-			}
+		err = WriteResultTemperature(deps, scan)
+		if err != nil {
+			return
+		} else {
+			deps.WsMsgCh <- "read_temp"
 		}
+
+		// adding delay of 0.5s to reduce the cpu usage
+		time.Sleep(500 * time.Millisecond)
 
 	}
 	logger.Info("Stop monitoring experiment")
@@ -430,7 +429,6 @@ func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) 
 func WriteResultTemperature(deps Dependencies, scan plc.Scan) (err error) {
 
 	// makeResultTemp returns data in DB resultTemp format
-
 	resultTemp := db.ResultTemperature{
 		ExperimentID: experimentValues.experimentID,
 		Temp:         scan.Temp,
