@@ -112,3 +112,18 @@ export const isNoTargetSelected = createSelector(
 		return selectedTargetList.length === 0;
 	},
 );
+// validate the threshold value
+export const validateThreshold = (threshold) => {
+	if (threshold <= 10 && threshold >= 0.5) {
+		return true;
+	}
+	return false;
+};
+
+// If any threshold value is selected target list is invalid return false
+export const validateForm = (selectedTargets) => {
+	const list = selectedTargets.toJS().filter(
+		ele => ele.thresholdError && ele.thresholdError === true,
+	);
+	return list.length === 0;
+};

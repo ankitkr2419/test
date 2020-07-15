@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import {
@@ -13,7 +13,7 @@ import {
 
 import { covertToSelectOption } from 'utils/helpers';
 import TargetHeader from './TargetHeader';
-import { checkIfIdPresentInList } from './targetHelper';
+import { checkIfIdPresentInList, validateThreshold } from './targetHelper';
 
 const TargetActions = styled.div`
   justify-content: space-between;
@@ -39,6 +39,8 @@ const TargetComponent = (props) => {
 		navigateToStageWizard,
 		editTemplate,
 		isNoTargetSelected,
+		setThresholdError,
+		isFormValid,
 	} = props;
 
 	const isTargetDisabled = (ele) => {
@@ -47,6 +49,18 @@ const TargetComponent = (props) => {
 		}
 		return false;
 	};
+
+	// set threshold error flag true if threshold is invalid
+	const onThresholdBlurHandler = useCallback((threshold, index) => {
+		if (validateThreshold(threshold) === false) {
+			setThresholdError(true, index);
+		}
+	}, [setThresholdError]);
+
+	// set threshold error flag false on focus on input field
+	const onThresholdFocusHandler = useCallback((index) => {
+		setThresholdError(false, index);
+	}, [setThresholdError]);
 
 	const getFilteredOptionsList = useMemo(
 		() => {
@@ -99,12 +113,14 @@ const TargetComponent = (props) => {
 					type="number"
 					name={`threshold${index}`}
 					index={`threshold${index}`}
-					placeholder="Type here..."
+					placeholder="0.5 - 10"
 					value={ele.threshold === undefined ? '' : ele.threshold}
-					min="0"
 					onChange={(event) => {
 						onThresholdChange(event.target.value, index);
 					}}
+					onBlur={() => onThresholdBlurHandler(ele.threshold, index)}
+					onFocus={() => onThresholdFocusHandler(index)}
+					invalid={ele.thresholdError}
 				/>
 			</TargetListItem>
 		)),
@@ -116,6 +132,8 @@ const TargetComponent = (props) => {
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
 			getFilteredOptionsList,
+			onThresholdBlurHandler,
+			onThresholdFocusHandler,
 		],
 	);
 	return (
@@ -162,7 +180,7 @@ const TargetComponent = (props) => {
 						color="primary"
 						onClick={onSaveClick}
 						className="mx-auto"
-						disabled={isTargetListUpdated === false || isNoTargetSelected}
+						disabled={isTargetListUpdated === false || isNoTargetSelected || !isFormValid}
 					>
             Save
 					</Button>
