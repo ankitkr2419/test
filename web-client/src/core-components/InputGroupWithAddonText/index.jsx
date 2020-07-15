@@ -45,7 +45,8 @@ InputGroupWithAddonText.propTypes = {
 };
 
 InputGroupWithAddonText.defaultProps = {
-	paddingRight: 24,
+	paddingRight: 54,
+	addonSize: 12,
 };
 
 export default InputGroupWithAddonText;

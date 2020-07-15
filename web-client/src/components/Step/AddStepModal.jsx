@@ -11,7 +11,6 @@ import {
 	Modal,
 	ModalBody,
 	CheckBox,
-	FormError,
 } from 'core-components';
 import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
 import {
@@ -122,8 +121,6 @@ const AddStepModal = (props) => {
 								</Label>
 								<InputGroupWithAddonText
 									addonText='unit °C'
-									paddingRight={54}
-									addonSize={12}
 								>
 									<Input
 										type='number'
@@ -153,8 +150,6 @@ const AddStepModal = (props) => {
 								</Label>
 								<InputGroupWithAddonText
 									addonText='unit °C'
-									paddingRight={54}
-									addonSize={12}
 								>
 									<Input
 										type='number'
@@ -184,18 +179,30 @@ const AddStepModal = (props) => {
 								<Label for='hold_time' className='font-weight-bold'>
 									Hold Time
 								</Label>
-								<Input
-									type='text'
-									name='holdTime'
-									id='hold_time'
-									placeholder='seconds'
-									value={holdTime}
-									onBlur={onHoldTimeBlurHandler}
-									onFocus={onHoldTimeFocusHandler}
-									onChange={onChangeHandler}
-									invalid={holdTimeError}
-								/>
-								<FormError className='text-left'>Invalid hold time</FormError>
+								<InputGroupWithAddonText
+									addonText='unit sec'
+								>
+									<Input
+										type='number'
+										name='holdTime'
+										id='hold_time'
+										placeholder='seconds'
+										value={holdTime}
+										onBlur={onHoldTimeBlurHandler}
+										onFocus={onHoldTimeFocusHandler}
+										onChange={onChangeHandler}
+										invalid={holdTimeError}
+									/>
+								</InputGroupWithAddonText>
+								{ holdTimeError &&
+									<Text
+										Tag='p'
+										size={12}
+										className='text-danger px-2 mb-0'
+									>
+									Invalid Hold time
+									</Text>
+								}
 							</FormGroup>
 						</Col>
 						{/* If the stage type is hold don't show datacapture checkbox */}
@@ -211,7 +218,7 @@ const AddStepModal = (props) => {
 									onChange={(event) => {
 										updateStepFormStateWrapper(
 											event.target.name,
-											event.target.checked
+											event.target.checked,
 										);
 									}}
 									className='mr-2 ml-3 py-2'
