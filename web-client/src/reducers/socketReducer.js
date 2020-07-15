@@ -12,9 +12,15 @@ export const socketReducer = (state = socketInitialState, action) => {
 	case webSocketActions.onOpen:
 		return state.setIn(['isOpened'], true);
 	case webSocketActions.onClose:
-		return state.setIn(['isClosed'], true);
+		return state.merge({
+			isClosed: true,
+			isOpened: false,
+		});
 	case webSocketActions.onError:
-		return state.setIn(['isError'], true);
+		return state.merge({
+			isError: true,
+			isOpened: false,
+		});
 	default:
 		return state;
 	}

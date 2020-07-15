@@ -73,21 +73,6 @@ type TargetDetails struct {
 	DyePosition  int32     `db:"dye_position" json:"dye_position"`
 }
 
-type FinalResult struct {
-	MaxThreshold float32    `json:"max_threshold"`
-	Data         []WellData `json:"data"`
-}
-
-type WellData struct {
-	WellPosition int32     `db:"well_position" json:"well_position"`
-	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
-	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id"`
-	TotalCycles  uint16    `db:"total_cycles" json:"total_cycles"`
-	Cycle        []uint16  `db:"cycle" json:"cycle"`
-	FValue       []uint16  `db:"f_value" json:"f_value"`
-	Threshold    float32   `db:"threshold" json:"threshold"`
-}
-
 type WellTargetResults struct {
 	WellTarget
 	Cycle     uint16  `db:"cycle" json:"cycle"`
@@ -119,6 +104,16 @@ func (s *pgStore) ListWellTargetsResult(ctx context.Context, r Result) (w []Well
 	return
 }
 
+func (s *pgStore) GetResult(ctx context.Context, ExperimentID uuid.UUID) (rDB []Result, err error) {
+	err = s.db.Select(&rDB, getAllCyclesResultQuery, ExperimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing well details")
+		return
+	}
+
+	return
+}
+
 func (s *pgStore) InsertResult(ctx context.Context, r []Result) (rDB []Result, err error) {
 	stmt := makeResultQuery(r)
 
@@ -144,7 +139,7 @@ func makeResultQuery(results []Result) string {
 	values := make([]string, 0, len(results))
 
 	for _, r := range results {
-		
+
 		values = append(values, fmt.Sprintf("('%v', '%v', %v,%v,%v)", r.ExperimentID, r.TargetID, r.WellPosition, r.Cycle, r.FValue))
 	}
 

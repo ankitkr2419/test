@@ -192,13 +192,13 @@ func (m *DBMockStore) UpdateStepCount(ctx context.Context) (err error) {
 	return args.Error(1)
 }
 
-func (m *DBMockStore) GetWellTarget(ctx context.Context, wellID uuid.UUID) (w []WellTarget, err error) {
-	args := m.Called(ctx, wellID)
+func (m *DBMockStore) GetWellTarget(ctx context.Context, i int32, wellID uuid.UUID) (w []WellTarget, err error) {
+	args := m.Called(ctx, i, wellID)
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 
-func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget) (wt []WellTarget, err error) {
-	args := m.Called(ctx, w)
+func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget, id uuid.UUID) (wt []WellTarget, err error) {
+	args := m.Called(ctx, w, id)
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 func (m *DBMockStore) ListStageSteps(ctx context.Context, id uuid.UUID) (s []StageStep, err error) {
@@ -219,12 +219,21 @@ func (m *DBMockStore) InsertResult(ctx context.Context, r []Result) (dbR []Resul
 	return args.Get(0).([]Result), args.Error(1)
 }
 
-func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID []uuid.UUID) (w []WellTarget, err error) {
+func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (w []WellTarget, err error) {
 	args := m.Called(ctx, wellID)
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 
 func (m *DBMockStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID) (err error) {
 	args := m.Called(ctx, t, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) GetResult(ctx context.Context, id uuid.UUID) (result []Result, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]Result), args.Error(1)
+}
+func (m *DBMockStore) UpdateColorWell(ctx context.Context, s string, id uuid.UUID) (err error) {
+	args := m.Called(ctx, s, id)
 	return args.Error(1)
 }

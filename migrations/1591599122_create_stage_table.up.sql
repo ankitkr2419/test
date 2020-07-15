@@ -7,5 +7,7 @@ CREATE TABLE stages
     repeat_count integer,
     template_id uuid,
     step_count integer  NOT NULL,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
 );
