@@ -245,5 +245,5 @@ func (m *DBMockStore) ListResultTemperature(ctx context.Context, id uuid.UUID) (
 
 func (m *DBMockStore) InsertResultTemperature(ctx context.Context, r ResultTemperature) (err error) {
 	args := m.Called(ctx, r)
-	return args.Error(0)
+	return args.Error(1)
 }
