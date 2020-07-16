@@ -7,14 +7,9 @@ import {
 import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from 'appConstants';
 import { updateWellThroughSocket } from 'action-creators/wellActionCreators';
 import { wellGraphSucceeded } from 'action-creators/wellGraphActionCreators';
-<<<<<<< HEAD
 import { experimentedCompleted, experimentedFailed } from 'action-creators/runExperimentActionCreators';
 import { showErrorModal } from 'action-creators/modalActionCreators';
-=======
-import { experimentedCompleted } from 'action-creators/runExperimentActionCreators';
 import { temperatureDataSucceeded } from 'action-creators/temperatureGraphActionCreators';
-import { tempData } from 'utils/temperatureData';
->>>>>>> Actions, Action creators and reducer added for temperature graph
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {

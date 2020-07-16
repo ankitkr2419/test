@@ -65,11 +65,8 @@ const rootReducer = combineReducers({
 	activeWellReducer,
 	wellGraphReducer,
 	socketReducer,
-<<<<<<< HEAD
 	modalReducer,
-=======
 	temperatureGraphReducer,
->>>>>>> Actions, Action creators and reducer added for temperature graph
 });
 
 export default rootReducer;
