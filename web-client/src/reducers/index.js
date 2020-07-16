@@ -35,6 +35,7 @@ import { activeWellReducer } from 'reducers/actionWellReducer';
 import { wellGraphReducer } from 'reducers/wellGraphReducer';
 import { socketReducer } from 'reducers/socketReducer';
 import { modalReducer } from 'reducers/modalReducer';
+import { temperatureGraphReducer } from 'reducers/temperatureGraphReducer';
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -64,7 +65,11 @@ const rootReducer = combineReducers({
 	activeWellReducer,
 	wellGraphReducer,
 	socketReducer,
+<<<<<<< HEAD
 	modalReducer,
+=======
+	temperatureGraphReducer,
+>>>>>>> Actions, Action creators and reducer added for temperature graph
 });
 
 export default rootReducer;
