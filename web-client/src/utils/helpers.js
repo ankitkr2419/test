@@ -31,7 +31,6 @@ export const convertSecondsToString = (seconds) => {
 	return `${min}:${sec}`;
 };
 
-// TODO convert to selector
 export const formatDate = createSelector(
 	inputDate => inputDate,
 	(inputDate) => {

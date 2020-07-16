@@ -7,7 +7,8 @@ import {
 import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from 'appConstants';
 import { updateWellThroughSocket } from 'action-creators/wellActionCreators';
 import { wellGraphSucceeded } from 'action-creators/wellGraphActionCreators';
-import { experimentedCompleted } from 'action-creators/runExperimentActionCreators';
+import { experimentedCompleted, experimentedFailed } from 'action-creators/runExperimentActionCreators';
+import { showErrorModal } from 'action-creators/modalActionCreators';
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
@@ -26,8 +27,18 @@ export const connectSocket = (dispatch) => {
 			case SOCKET_MESSAGE_TYPE.wellsData:
 				dispatch(updateWellThroughSocket(data));
 				break;
-			case SOCKET_MESSAGE_TYPE.OnSuccess:
+			case SOCKET_MESSAGE_TYPE.success:
 				dispatch(experimentedCompleted(data));
+				break;
+			case SOCKET_MESSAGE_TYPE.failure:
+				dispatch(experimentedFailed(data));
+				break;
+			// TODO after discussion with shailesh
+			// case SOCKET_MESSAGE_TYPE.ErrorPCRAborted:
+			// case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
+			case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
+			case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
+				dispatch(showErrorModal(data));
 				break;
 			default:
 				break;

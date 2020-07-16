@@ -32,7 +32,7 @@ export const getXAxis = createSelector(
 	count => count,
 	(count) => {
 		const arr = [];
-		for (let x = 1; x <= count; x += 1) {
+		for (let x = 0; x < count; x += 1) {
 			arr.push(x);
 		}
 		return arr;
