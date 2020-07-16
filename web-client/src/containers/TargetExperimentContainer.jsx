@@ -17,7 +17,7 @@ import {
 	createExperimentTargetReset,
 } from 'action-creators/experimentTargetActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
-import { getSelectedTargetExperiment } from 'components/Target/targetHelper';
+import { getSelectedTargetExperiment, isNoTargetSelected } from 'components/Target/targetHelper';
 import { Redirect } from 'react-router';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { setIsPlateRoute } from 'action-creators/loginActionCreators';
@@ -131,6 +131,7 @@ const TargetExperimentContainer = (props) => {
 			isLoginTypeAdmin={isLoginTypeAdmin}
 			isLoginTypeOperator={isLoginTypeOperator}
 			isTargetListUpdated={isTargetListUpdated(selectedTargetState)}
+			isNoTargetSelected={isNoTargetSelected(selectedTargetState.get('targetList'))}
 		/>
 	);
 };
