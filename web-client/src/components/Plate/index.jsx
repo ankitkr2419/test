@@ -52,7 +52,6 @@ const Plate = (props) => {
 		}
 
 		/**
-		 * TODO CHANGE IT for non filled wells also
 		 * if multi-select checkbox is checked, will allow to select filled wells
 		 */
 		if (isMultiSelectionOptionOn === true) {

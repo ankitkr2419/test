@@ -15,7 +15,7 @@ export const runExperimentFailed = errorResponse => ({
 	},
 });
 
-
+// abort experiment, Will call stop api call
 export const stopExperiment = experimentId => ({
 	type: stopExperimentActions.stopExperiment,
 	payload: {
@@ -31,8 +31,17 @@ export const stopExperimentFailed = errorResponse => ({
 	},
 });
 
+// web socket received message => experiment completed
 export const experimentedCompleted = data => ({
 	type: experimentCompleteActions.success,
+	payload: {
+		data,
+	},
+});
+
+// web socket received message => experiment failed
+export const experimentedFailed = data => ({
+	type: experimentCompleteActions.failed,
 	payload: {
 		data,
 	},
