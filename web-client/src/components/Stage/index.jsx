@@ -168,8 +168,12 @@ const StageComponent = (props) => {
 								>
 									<td>{i + 1}</td>
 									<td>{stage.get('type')}</td>
-									<td>{stage.get('repeat_count')}</td>
-									<td>{stage.get('step_count') || '-'}</td>
+									<td>
+										{stage.get('type') === 'hold' ?
+											'N/A' :
+											stage.get('repeat_count')}
+									</td>
+									<td>{stage.get('step_count') || '0'}</td>
 									<td className='td-actions'>
 										<ButtonIcon
 											onClick={() => {

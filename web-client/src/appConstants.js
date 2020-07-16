@@ -25,12 +25,20 @@ export const TARGET_LINE_COLORS = [
 export const SOCKET_MESSAGE_TYPE = {
 	wellsData : 'Wells',
 	graphData: 'Graph',
-	OnSuccess: 'Success',
+	success: 'Success',
+	failure: 'Fail',
+	ErrorPCRAborted: 'ErrorPCRAborted',
+	ErrorPCRStopped: 'ErrorPCRStopped',
+	ErrorPCRMonitor: 'ErrorPCRMonitor',
+	ErrorPCRDead: 'ErrorPCRDead',
 };
 
 export const EXPERIMENT_STATUS = {
 	running: 'running',
 	runFailed: 'run-failed',
 	stopped: 'stopped',
+
+	// socket
 	success: 'success',
+	failed: 'failed',
 };
