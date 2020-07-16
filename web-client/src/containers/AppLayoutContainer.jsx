@@ -7,6 +7,7 @@ import AppHeader from 'components/AppHeader';
 import '../assets/scss/default.scss';
 import { fetchActiveWells } from 'action-creators/activeWellActionCreators';
 import { getActiveLoadedWellFlag } from 'selectors/activeWellSelector';
+import ModalContainer from './ModalContainer';
 /**
  * AppLayoutContainer Will contain routes(content), headers, sub-headers, notification etc.
  * @param {*} props
@@ -33,6 +34,8 @@ const AppLayoutContainer = (props) => {
 				isLoginTypeAdmin={loginReducer.get('isLoginTypeAdmin')}
 				isLoginTypeOperator={loginReducer.get('isLoginTypeOperator')}
 			/>
+			{/* Modal container will helps in displaying error/info/warning through modal */}
+			<ModalContainer />
 			<section className="ml-content">
 				<Switch>
 					<Redirect exact from="/" to="/login" />

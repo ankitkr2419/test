@@ -6,6 +6,7 @@ import {
 } from 'actions/runExperimentActions';
 import loginActions from 'actions/loginActions';
 import { EXPERIMENT_STATUS } from 'appConstants';
+import { getTimeNow } from 'selectors/runExperimentSelector';
 
 const runInitialState = fromJS({
 	isLoading: false,
@@ -16,19 +17,11 @@ const runInitialState = fromJS({
    * e.g completion time, no of wells etc
    */
 	data: {},
+	/**
+   * experiment failed details
+   */
+	failedData: null,
 });
-
-const getTimeNow = () => {
-	const date = new Date();
-	let hours = date.getHours();
-	let minutes = date.getMinutes();
-	const ampm = hours >= 12 ? 'pm' : 'am';
-	hours %= 12;
-	hours = hours || 12; // the hour '0' should be '12'
-	minutes = minutes < 10 ? `0${minutes}` : minutes;
-	const strTime = `${hours}:${minutes} ${ampm}`;
-	return strTime;
-};
 
 export const runExperimentReducer = (state = runInitialState, action) => {
 	switch (action.type) {
@@ -47,7 +40,7 @@ export const runExperimentReducer = (state = runInitialState, action) => {
 			experimentStartedTime: getTimeNow(),
 		});
 
-		// experiment completed
+	// experiment completed
 	case experimentCompleteActions.success:
 		return state.merge({
 			experimentStatus:
@@ -57,7 +50,17 @@ export const runExperimentReducer = (state = runInitialState, action) => {
 			data: fromJS(action.payload.data),
 		});
 
-		// stop experiment actions
+		// experiment failed
+	case experimentCompleteActions.failed:
+		return state.merge({
+			experimentStatus:
+					state.get('experimentStatus') === EXPERIMENT_STATUS.running
+						? EXPERIMENT_STATUS.failed
+						: null,
+			failedData: fromJS(action.payload.data),
+		});
+
+	// stop experiment actions (abort)
 	case stopExperimentActions.stopExperiment:
 		return state;
 	case stopExperimentActions.successAction:

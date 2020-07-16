@@ -11,6 +11,9 @@ export const stopExperimentActions = {
 	failureAction: 'STOP_EXPERIMENT_FAILURE',
 };
 
+// web socket actions for experiment
 export const experimentCompleteActions = {
 	success: 'EXPERIMENT_COMPLETED',
+	failed: 'EXPERIMENT_FAILED',
+	error: 'EXPERIMENT_ERROR',
 };

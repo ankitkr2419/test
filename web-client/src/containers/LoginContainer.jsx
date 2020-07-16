@@ -20,7 +20,7 @@ const LoginContainer = () => {
 	const dispatch = useDispatch();
 
 	const loginAsOperator = () => {
-		// TODO check if connection is already opened
+		// if connection is already opened
 		if (isOpened === false) {
 			connectSocket(dispatch);
 		}
