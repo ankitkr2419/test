@@ -19,6 +19,7 @@ const SidebarGraph = (props) => {
 		isExperimentSucceeded,
 		setThresholdError,
 		resetThresholdError,
+		isThresholdInvalid,
 	} = props;
 
 	let noOfCycles = 0;
@@ -59,6 +60,15 @@ const SidebarGraph = (props) => {
 				<Text size={14} className='text-default mb-0'>
 					Note: Click on the threshold number to change it.
 				</Text>
+				{isThresholdInvalid &&
+					<Text
+						Tag='p'
+						size={15}
+						className='text-danger px-2 mb-0'
+					>
+					Threshold value should be between 0.5 - 10
+					</Text>
+				}
 			</Sidebar>
 		);
 	}

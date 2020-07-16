@@ -7,6 +7,7 @@ import { getExperimentGraphTargets } from 'selectors/experimentTargetSelector';
 import { updateExperimentTargetFilters } from 'action-creators/experimentTargetActionCreators';
 import { EXPERIMENT_STATUS } from 'appConstants';
 import { parseFloatWrapper } from 'utils/helpers';
+import { isAnyThresholdInvalid } from 'components/Target/targetHelper';
 
 const ExperimentGraphContainer = ({ experimentStatus }) => {
 	const dispatch = useDispatch();
@@ -56,6 +57,7 @@ const ExperimentGraphContainer = ({ experimentStatus }) => {
 			toggleGraphFilterActive={toggleGraphFilterActive}
 			setThresholdError={setThresholdError}
 			resetThresholdError={resetThresholdError}
+			isThresholdInvalid={isAnyThresholdInvalid(experimentGraphTargetsList)}
 		/>
 	);
 };

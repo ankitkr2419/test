@@ -20,7 +20,7 @@ import { getTemplateById } from 'reducers/templateReducer';
 import {
 	getSelectedTargetsToLocal,
 	isTargetAlreadySelected,
-	validateForm,
+	isAnyThresholdInvalid,
 } from 'components/Target/targetHelper';
 
 const TargetContainer = (props) => {
@@ -204,7 +204,7 @@ const TargetContainer = (props) => {
 			navigateToStageWizard={navigateToStageWizard}
 			editTemplate={editTemplate}
 			setThresholdError={setThresholdError}
-			isFormValid={validateForm(selectedTargetState.get('targetList'))}
+			isThresholdInvalid={isAnyThresholdInvalid(selectedTargetState.get('targetList'))}
 		/>
 	);
 };

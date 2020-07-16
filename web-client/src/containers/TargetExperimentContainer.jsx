@@ -17,11 +17,7 @@ import {
 	createExperimentTargetReset,
 } from 'action-creators/experimentTargetActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
-<<<<<<< HEAD
-import { getSelectedTargetExperiment, isNoTargetSelected } from 'components/Target/targetHelper';
-=======
-import { getSelectedTargetExperiment, validateForm } from 'components/Target/targetHelper';
->>>>>>> Validations added for threshold field in Target wizard
+import { getSelectedTargetExperiment, isAnyThresholdInvalid, isNoTargetSelected } from 'components/Target/targetHelper';
 import { Redirect } from 'react-router';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { setIsPlateRoute } from 'action-creators/loginActionCreators';
@@ -149,7 +145,7 @@ const TargetExperimentContainer = (props) => {
 			isTargetListUpdated={isTargetListUpdated(selectedTargetState)}
 			isNoTargetSelected={isNoTargetSelected(selectedTargetState.get('targetList'))}
 			setThresholdError={setThresholdError}
-			isFormValid={validateForm(selectedTargetState.get('targetList'))}
+			isThresholdInvalid={isAnyThresholdInvalid(selectedTargetState.get('targetList'))}
 		/>
 	);
 };

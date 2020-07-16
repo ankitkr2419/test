@@ -120,10 +120,10 @@ export const validateThreshold = (threshold) => {
 	return false;
 };
 
-// If any threshold value is selected target list is invalid return false
-export const validateForm = (selectedTargets) => {
+// If any threshold value in selected target list is invalid return true
+export const isAnyThresholdInvalid = (selectedTargets) => {
 	const list = selectedTargets.toJS().filter(
 		ele => ele.thresholdError && ele.thresholdError === true,
 	);
-	return list.length === 0;
+	return list.length !== 0;
 };

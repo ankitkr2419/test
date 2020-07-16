@@ -40,7 +40,7 @@ const TargetComponent = (props) => {
 		editTemplate,
 		isNoTargetSelected,
 		setThresholdError,
-		isFormValid,
+		isThresholdInvalid,
 	} = props;
 
 	const isTargetDisabled = (ele) => {
@@ -180,12 +180,21 @@ const TargetComponent = (props) => {
 						color="primary"
 						onClick={onSaveClick}
 						className="mx-auto"
-						disabled={isTargetListUpdated === false || isNoTargetSelected || !isFormValid}
+						disabled={isTargetListUpdated === false || isNoTargetSelected || isThresholdInvalid}
 					>
             Save
 					</Button>
 				</TargetActions>
 			</div>
+			{isThresholdInvalid
+				&& <Text
+					Tag='p'
+					size={15}
+					className='text-danger px-2 mb-0'
+				>
+					Threshold value should be between 0.5 - 10
+				</Text>
+			}
 		</div>
 	);
 };
