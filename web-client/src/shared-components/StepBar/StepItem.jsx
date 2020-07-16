@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { NavItem } from "reactstrap";
-import PropTypes from "prop-types";
-import bgStep from "../../assets/images/steps.svg";
+import styled from 'styled-components';
+import { NavItem } from 'reactstrap';
+import PropTypes from 'prop-types';
+import bgStep from '../../assets/images/steps.svg';
 
 export const StepItem = styled(NavItem)`
   width: 185px;
@@ -12,9 +12,16 @@ export const StepItem = styled(NavItem)`
   margin: 0;
   padding: 0 23px;
   text-align: center;
-  opacity: ${(props) =>
-    props.disabled ? "0.40" : "" || props.visited ? "0.80" : ""};
-  pointer-events: ${(props) => (props.disabled ? "none" : "")};
+  opacity: ${(props) => {
+		if (props.disabled) {
+			return '0.40';
+		}
+		if (props.visited) {
+			return '0.80';
+		}
+		return '';
+	}};
+  pointer-events: ${(props) => (props.disabled ? 'none' : '')};
 
   + .nav-item {
     margin: 0 0 0 -16px;
@@ -24,11 +31,10 @@ export const StepItem = styled(NavItem)`
 StepItem.passProps = false;
 
 StepItem.propTypes = {
-  disabled: PropTypes.bool,
-  visited: PropTypes.bool,
+	disabled: PropTypes.bool,
+	visited: PropTypes.bool,
 };
 
 StepItem.defaultProps = {
-  disabled: false,
-  visited: false,
+	disabled: false,
 };
