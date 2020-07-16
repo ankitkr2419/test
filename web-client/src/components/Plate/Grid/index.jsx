@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { YCoordinates, XCoordinates} from 'components/Plate/plateConstant';
+import { YCoordinates, XCoordinates } from 'components/Plate/plateConstant';
 import Coordinate from './Coordinate';
 import CoordinateItem from './CoordinateItem';
 import WellGrid from './WellGrid';
@@ -12,6 +12,7 @@ const GridComponent = ({
 	onWellClickHandler,
 	onWellUpdateClickHandler,
 	isGroupSelectionOn,
+	showGraphOfWell,
 }) => (
 	<div className="d-flex flex-column flex-100">
 		<Coordinate direction="horizontal">
@@ -65,6 +66,7 @@ const GridComponent = ({
 									onEditClickHandler={(event) => {
 										onWellUpdateClickHandler(well, index, event);
 									}}
+									showGraphOfWell={showGraphOfWell}
 								/>
 							)}
 						</React.Fragment>
