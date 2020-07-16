@@ -47,7 +47,6 @@ const WellPopover = (props) => {
 
 	return (
 		<Popover
-			// isOpen={isPopoverOpen}
 			trigger="legacy"
 			target={`PopoverWell${index}`}
 			hideArrow

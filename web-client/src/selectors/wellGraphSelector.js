@@ -70,7 +70,6 @@ export const getLineChartData = createSelector(
 	(wellGraphReducer, experimentTargets, wells) => {
 		// graphTargets contains updated graph target values(Filters)
 		const graphTargets = experimentTargets.get('graphTargets');
-		// const isMultiSelectionOptionOn = wells.get('isMultiSelectionOptionOn');
 		const selectedPositions = getWellsPosition(wells);
 		let wellGraphData = wellGraphReducer.get('chartData');
 		// Should apply filter if we have positions selected from viewing graph
