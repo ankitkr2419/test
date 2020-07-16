@@ -17,6 +17,8 @@ const SidebarGraph = (props) => {
 		toggleGraphFilterActive,
 		experimentGraphTargetsList,
 		isExperimentSucceeded,
+		setThresholdError,
+		resetThresholdError,
 	} = props;
 
 	let noOfCycles = 0;
@@ -29,6 +31,7 @@ const SidebarGraph = (props) => {
 		labels: getXAxis(noOfCycles),
 		datasets: lineChartData.toJS(),
 	};
+
 
 	if (isExperimentRunning === true || isExperimentSucceeded === true) {
 		return (
@@ -50,6 +53,8 @@ const SidebarGraph = (props) => {
 					targets={experimentGraphTargetsList}
 					onThresholdChangeHandler={onThresholdChangeHandler}
 					toggleGraphFilterActive={toggleGraphFilterActive}
+					setThresholdError={setThresholdError}
+					resetThresholdError={resetThresholdError}
 				/>
 				<Text size={14} className='text-default mb-0'>
 					Note: Click on the threshold number to change it.

@@ -6,6 +6,7 @@ import { getLineChartData } from 'selectors/wellGraphSelector';
 import { getExperimentGraphTargets } from 'selectors/experimentTargetSelector';
 import { updateExperimentTargetFilters } from 'action-creators/experimentTargetActionCreators';
 import { EXPERIMENT_STATUS } from 'appConstants';
+import { parseFloatWrapper } from 'utils/helpers';
 
 const ExperimentGraphContainer = ({ experimentStatus }) => {
 	const dispatch = useDispatch();
@@ -26,11 +27,21 @@ const ExperimentGraphContainer = ({ experimentStatus }) => {
 	};
 
 	const onThresholdChangeHandler = (threshold, index) => {
-		dispatch(updateExperimentTargetFilters(index, 'threshold', parseFloat(threshold)));
+		dispatch(updateExperimentTargetFilters(index, 'threshold', parseFloatWrapper(threshold)));
 	};
 
 	const toggleGraphFilterActive = (index, isActive) => {
 		dispatch(updateExperimentTargetFilters(index, 'isActive', !isActive));
+	};
+
+	// set threshold error true
+	const setThresholdError = (index) => {
+		dispatch(updateExperimentTargetFilters(index, 'thresholdError', true));
+	};
+
+	// reset threshold error to false
+	const resetThresholdError = (index) => {
+		dispatch(updateExperimentTargetFilters(index, 'thresholdError', false));
 	};
 
 	return (
@@ -43,6 +54,8 @@ const ExperimentGraphContainer = ({ experimentStatus }) => {
 			toggleSideBar={toggleSideBar}
 			onThresholdChangeHandler={onThresholdChangeHandler}
 			toggleGraphFilterActive={toggleGraphFilterActive}
+			setThresholdError={setThresholdError}
+			resetThresholdError={resetThresholdError}
 		/>
 	);
 };
