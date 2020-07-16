@@ -56,10 +56,6 @@ const Plate = (props) => {
 			setSelectedWell(index, !isSelected);
 		}
 
-		if (isMultiSelectionOptionOn === false && isWellFilled === true) {
-			resetSelectedWells();
-		}
-
 		/**
 		 * if multi-select checkbox is checked, will allow to select filled wells
 		 */
@@ -113,6 +109,8 @@ const Plate = (props) => {
 				experimentStatus={experimentStatus}
 				isSidebarOpen={isSidebarOpen}
 				setIsSidebarOpen={setIsSidebarOpen}
+				resetSelectedWells={resetSelectedWells}
+				isMultiSelectionOptionOn={isMultiSelectionOptionOn}
 			/>
 		</div>
 	);

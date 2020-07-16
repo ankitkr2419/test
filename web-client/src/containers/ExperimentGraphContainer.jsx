@@ -10,7 +10,13 @@ import { parseFloatWrapper } from 'utils/helpers';
 import { isAnyThresholdInvalid } from 'components/Target/targetHelper';
 
 const ExperimentGraphContainer = (props) => {
-	const { setIsSidebarOpen, isSidebarOpen, experimentStatus } = props;
+	const {
+		setIsSidebarOpen,
+		isSidebarOpen,
+		experimentStatus,
+		isMultiSelectionOptionOn,
+		resetSelectedWells,
+	} = props;
 	const dispatch = useDispatch();
 	// get targets from experiment target reducer(graph : target filters)
 	const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
@@ -22,6 +28,10 @@ const ExperimentGraphContainer = (props) => {
 	const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
 
 	const toggleSideBar = () => {
+		// reset the selected wells while closing the sidebar
+		if (isSidebarOpen && isMultiSelectionOptionOn === false) {
+			resetSelectedWells();
+		}
 		setIsSidebarOpen(toggleStateValue => !toggleStateValue);
 	};
 
