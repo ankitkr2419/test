@@ -68,8 +68,7 @@ func ValidateTemplate(targets []TemplateTarget, steps []StageStep) (errorRespons
 				holdsteps = append(holdsteps, s)
 			case "cycle":
 				cyclesteps = append(cyclesteps, s)
-				// TBD: validation to be added on repeat count
-				cycles += s.RepeatCount
+				cycles = s.RepeatCount
 			}
 		}
 		if len(holdsteps) == 0 {
@@ -78,6 +77,10 @@ func ValidateTemplate(targets []TemplateTarget, steps []StageStep) (errorRespons
 		if len(cyclesteps) == 0 {
 			validationErrors["cyclestep"] = "No cyclestep added"
 		}
+		if cycles < 5 && cycles > 100 {
+			validationErrors["repeatCount"] = "Invalid reapeat_count in cycle stage"
+		}
+
 	}
 	if len(validationErrors) == 0 {
 		valid = true
