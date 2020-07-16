@@ -52,23 +52,30 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				}
 
 			case err = <-deps.ExitCh:
-
+				var errortype string
 				if err.Error() == "PCR Aborted" {
 
 					// on pre-emptive stop
 					experimentRunning = false
+					errortype = "ErrorPCRAborted"
 
+				} else if err.Error() == "PCR Stopped" {
+					errortype = "ErrorPCRStopped"
+
+				} else if err.Error() == "PCR Dead" {
+					errortype = "ErrorPCRDead"
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 
-				sendOnFail(err.Error(), rw, c)
+				sendOnFail(err.Error(), errortype, rw, c)
 
 			case err = <-deps.WsErrCh:
 
 				logger.WithField("err", err.Error()).Error("Monitor has requested exit")
+				var errortype = "ErrorPCRMonitor"
 
-				sendOnFail(err.Error(), rw, c)
+				sendOnFail(err.Error(), errortype, rw, c)
 
 			}
 
@@ -136,10 +143,10 @@ func sendOnSuccess(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn)
 
 }
 
-func sendOnFail(msg string, rw http.ResponseWriter, c *websocket.Conn) {
+func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn) {
 
 	r := resultOnFail{
-		Type: "Fail",
+		Type: errortype,
 		Data: msg,
 	}
 
