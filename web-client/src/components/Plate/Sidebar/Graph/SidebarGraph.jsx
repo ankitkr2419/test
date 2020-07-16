@@ -33,19 +33,18 @@ const SidebarGraph = (props) => {
 		datasets: lineChartData.toJS(),
 	};
 
-
 	if (isExperimentRunning === true || isExperimentSucceeded === true) {
 		return (
 			<Sidebar
 				isOpen={isSidebarOpen}
 				toggleSideBar={toggleSideBar}
-				className='graph'
-				bodyClassName='py-4'
-				handleIcon='graph'
+				className="graph"
+				bodyClassName="py-4"
+				handleIcon="graph"
 				handleIconSize={56}
 			>
-				<Text size={20} className='text-default mb-4'>
-					Amplification plot
+				<Text size={20} className="text-default mb-4">
+          Amplification plot
 				</Text>
 				<GraphCard>
 					<LineChart data={data} />
@@ -57,18 +56,14 @@ const SidebarGraph = (props) => {
 					setThresholdError={setThresholdError}
 					resetThresholdError={resetThresholdError}
 				/>
-				<Text size={14} className='text-default mb-0'>
-					Note: Click on the threshold number to change it.
-				</Text>
-				{isThresholdInvalid &&
-					<Text
-						Tag='p'
-						size={15}
-						className='text-danger px-2 mb-0'
-					>
-					Threshold value should be between 0.5 - 10
+				{isThresholdInvalid && (
+					<Text Tag="p" size={14} className="text-danger px-2 mb-1">
+            Threshold value should be between 0.5 - 10
 					</Text>
-				}
+				)}
+				<Text size={14} className="text-default mb-0">
+          Note: Click on the threshold number to change it.
+				</Text>
 			</Sidebar>
 		);
 	}
@@ -76,12 +71,12 @@ const SidebarGraph = (props) => {
 };
 
 const GraphCard = styled.div`
-	width: 830px;
-	height: 344px;
-	background: #ffffff 0% 0% no-repeat padding-box;
-	border: 1px solid #707070;
-	padding: 8px;
-	margin: 0 0 32px 0;
+  width: 830px;
+  height: 344px;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  border: 1px solid #707070;
+  padding: 8px;
+  margin: 0 0 32px 0;
 `;
 
 SidebarGraph.propTypes = {
