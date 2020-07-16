@@ -156,7 +156,14 @@ func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.DeleteTemplate(req.Context(), id)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while deleting template")
+			if err.Error() == "Violates foreign key constraint" {
+				// cannot delete template as it is used in experiments
+				rw.WriteHeader(http.StatusForbidden)
+				rw.Header().Add("Content-Type", "application/json")
+				rw.Write([]byte(`{"msg":"template cannot be deleted"}`))
+				return
+
+			}
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
