@@ -179,7 +179,8 @@ func found(key uint16, search []uint16) (found bool) {
 	return
 }
 
-func makeResultTemp(DBTemp []db.ResultTemperature) (Data temperature) {
+// formating data to plot easy graph
+func makeExperimentTemp(DBTemp []db.ExperimentTemperature) (Data temperature) {
 	for _, t := range DBTemp {
 		Data.Temp = append(Data.Temp, t.Temp)
 		Data.LidTemp = append(Data.LidTemp, t.LidTemp)

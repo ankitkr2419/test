@@ -270,15 +270,15 @@ func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
 }
 
 func getTemperatureDetails(deps Dependencies) (respBytes []byte, err error) {
-	Temp, err := deps.Store.ListResultTemperature(context.Background(), experimentValues.experimentID)
+	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentValues.experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error get experiment")
 		return
 	}
 
-	data := makeResultTemp(Temp)
+	data := makeExperimentTemp(Temp)
 
-	result := resultTemperature{
+	result := experimentTemperature{
 		Type: "Temperature",
 		Data: data,
 	}
@@ -341,7 +341,7 @@ func monitorExperiment(deps Dependencies) {
 		}
 
 		// writes temp on every step against time in DB
-		err = WriteResultTemperature(deps, scan)
+		err = WriteExperimentTemperature(deps, scan)
 		if err != nil {
 			return
 		} else {
@@ -426,10 +426,10 @@ func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) 
 	return
 }
 
-func WriteResultTemperature(deps Dependencies, scan plc.Scan) (err error) {
+func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 
-	// makeResultTemp returns data in DB resultTemp format
-	resultTemp := db.ResultTemperature{
+	// makeexpTemp returns data in DB expTemp format
+	expTemp := db.ExperimentTemperature{
 		ExperimentID: experimentValues.experimentID,
 		Temp:         scan.Temp,
 		LidTemp:      scan.LidTemp,
@@ -437,9 +437,9 @@ func WriteResultTemperature(deps Dependencies, scan plc.Scan) (err error) {
 	}
 
 	// insert every cycle  result temp into Database
-	err = deps.Store.InsertResultTemperature(context.Background(), resultTemp)
+	err = deps.Store.InsertExperimentTemperature(context.Background(), expTemp)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error inserting resultTemp data")
+		logger.WithField("err", err.Error()).Error("Error inserting experiment_Temperatures data")
 		// send error
 		deps.WsErrCh <- err
 		return

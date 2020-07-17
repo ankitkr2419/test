@@ -168,7 +168,7 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything).Return(
 		nil, nil)
 
-	suite.dbMock.On("InsertResultTemperature", mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("InsertExperimentTemperature", mock.Anything, mock.Anything).Return(
 		nil, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
