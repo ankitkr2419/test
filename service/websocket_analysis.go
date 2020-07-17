@@ -178,14 +178,3 @@ func found(key uint16, search []uint16) (found bool) {
 	}
 	return
 }
-
-// formating data to plot easy graph
-func makeExperimentTemp(DBTemp []db.ExperimentTemperature) (Data temperature) {
-	for _, t := range DBTemp {
-		Data.Temp = append(Data.Temp, t.Temp)
-		Data.LidTemp = append(Data.LidTemp, t.LidTemp)
-		Data.Cycle = append(Data.Cycle, t.Cycle)
-		Data.Time = append(Data.Time, t.CreatedAt)
-	}
-	return
-}

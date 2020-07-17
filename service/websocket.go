@@ -57,8 +57,8 @@ type resultOnFail struct {
 }
 
 type experimentTemperature struct {
-	Type string      `json:"type"`
-	Data temperature `json:"data"`
+	Type string                     `json:"type"`
+	Data []db.ExperimentTemperature `json:"data"`
 }
 
 type temperature struct {

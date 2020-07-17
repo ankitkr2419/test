@@ -276,11 +276,9 @@ func getTemperatureDetails(deps Dependencies) (respBytes []byte, err error) {
 		return
 	}
 
-	data := makeExperimentTemp(Temp)
-
 	result := experimentTemperature{
 		Type: "Temperature",
-		Data: data,
+		Data: Temp,
 	}
 
 	respBytes, err = json.Marshal(result)
