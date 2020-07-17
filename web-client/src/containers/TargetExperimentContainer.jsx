@@ -15,6 +15,7 @@ import {
 	fetchExperimentTargets,
 	createExperimentTarget,
 	createExperimentTargetReset,
+	resetExperimentTargets,
 } from 'action-creators/experimentTargetActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { getSelectedTargetExperiment, isAnyThresholdInvalid, isNoTargetSelected } from 'components/Target/targetHelper';
@@ -47,6 +48,11 @@ const TargetExperimentContainer = (props) => {
 		fromJS({ targetList: [], originalTargetList: [] }),
 	);
 	const [isRedirectToPlate, setRedirectToPlate] = useState(false);
+
+	// reset experiment targets reducer on unmount
+	useEffect(() => () => {
+		dispatch(resetExperimentTargets());
+	}, [dispatch]);
 
 	useEffect(() => {
 		// fetching list of experiment targets
