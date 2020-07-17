@@ -11,7 +11,7 @@ const StyledInput = styled(Input)`
 const selectText = (event) => event.target.select();
 
 const CustomInput = (props) => (
-	<StyledInput {...props} onFocus={selectText}>
+	<StyledInput {...props} onClick={selectText}>
 		{props.children}
 	</StyledInput>);
 

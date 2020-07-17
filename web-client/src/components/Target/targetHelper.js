@@ -1,5 +1,6 @@
 import { TARGET_CAPACITY } from 'appConstants';
 import { createSelector } from 'reselect';
+import { MAX_THRESHOLD, MIN_THRESHOLD } from './targetConstants';
 
 export const getTargetOption = () => {
 	const arr = [];
@@ -114,7 +115,7 @@ export const isNoTargetSelected = createSelector(
 );
 // validate the threshold value
 export const validateThreshold = (threshold) => {
-	if (threshold <= 10 && threshold >= 0.5) {
+	if (threshold <= MAX_THRESHOLD && threshold >= MIN_THRESHOLD) {
 		return true;
 	}
 	return false;
