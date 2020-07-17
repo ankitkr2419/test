@@ -306,7 +306,6 @@ func monitorExperiment(deps Dependencies) {
 			deps.WsErrCh <- err
 			return
 		}
-		// fmt.Printf("scan: %+v\n", scan)
 
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
 		if scan.CycleComplete && scan.Cycle != previousCycle {
