@@ -166,7 +166,7 @@ func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Con
 
 }
 
-func sendOnFail(msg string, rw http.ResponseWriter, c *websocket.Conn) {
+func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn) {
 
 	r := resultOnFail{
 		Type: errortype,
