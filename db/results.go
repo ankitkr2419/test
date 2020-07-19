@@ -80,12 +80,6 @@ type WellTargetResults struct {
 	Threshold float32 `db:"threshold" json:"threshold"`
 }
 
-type WellResults struct {
-	Well
-	Cycle  uint16 `db:"cycle" json:"cycle"`
-	FValue uint16 `db:"f_value" json:"f_value"`
-}
-
 func (s *pgStore) ListConfTargets(ctx context.Context, experimentID uuid.UUID) (w []TargetDetails, err error) {
 	err = s.db.Select(&w, getwellsConfigured, experimentID)
 	if err != nil {

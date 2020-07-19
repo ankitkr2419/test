@@ -22,8 +22,11 @@ import (
 type ExperimentHandlerTestSuite struct {
 	suite.Suite
 
-	dbMock *db.DBMockStore
-	plc    plc.Driver
+	dbMock  *db.DBMockStore
+	plc     plc.Driver
+	ExitCh  <-chan error
+	WsErrCh chan error
+	WsMsgCh chan string
 }
 
 func (suite *ExperimentHandlerTestSuite) SetupTest() {
@@ -135,6 +138,8 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()
 	exit := make(chan error)
+	websocketMsg := make(chan string)
+	websocketErr := make(chan error)
 
 	config.Load("simulator_test")
 
@@ -158,18 +163,21 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 		ss1, ss2,
 	}, nil)
 
-	suite.dbMock.On("ListConfTargets", mock.Anything, mock.Anything).Return([]db.TargetDetails{
-		//ss1, ss2,
-	}, nil)
+	suite.dbMock.On("ListConfTargets", mock.Anything, mock.Anything).Return([]db.TargetDetails{}, nil)
+
 	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything).Return(
 		nil, nil)
+
+	suite.dbMock.On("InsertExperimentTemperature", mock.Anything, mock.Anything).Return(
+		nil, nil)
+
 	recorder := makeHTTPCall(http.MethodGet,
 		"/experiments/{experiment_id}/run",
 		"/experiments/"+testUUID.String()+"/run",
 		"",
-		runExperimentHandler(Dependencies{Store: suite.dbMock, Plc: simulator.NewSimulator(exit)}),
+		runExperimentHandler(Dependencies{Store: suite.dbMock, Plc: simulator.NewSimulator(exit), ExitCh: exit, WsErrCh: websocketErr, WsMsgCh: websocketMsg}),
 	)
-
+	<-websocketMsg // read from chn to avoid block
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), `{"msg":"experiment started"}`, recorder.Body.String())
 

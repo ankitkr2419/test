@@ -237,3 +237,13 @@ func (m *DBMockStore) UpdateColorWell(ctx context.Context, s string, id uuid.UUI
 	args := m.Called(ctx, s, id)
 	return args.Error(1)
 }
+
+func (m *DBMockStore) ListExperimentTemperature(ctx context.Context, id uuid.UUID) (result []ExperimentTemperature, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]ExperimentTemperature), args.Error(1)
+}
+
+func (m *DBMockStore) InsertExperimentTemperature(ctx context.Context, r ExperimentTemperature) (err error) {
+	args := m.Called(ctx, r)
+	return args.Error(1)
+}
