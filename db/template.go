@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -105,6 +106,12 @@ func (s *pgStore) DeleteTemplate(ctx context.Context, id uuid.UUID) (err error) 
 	)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error deleting Template")
+
+		if strings.Contains(err.Error(), "violates foreign key constraint") {
+			err = errors.New("Violates foreign key constraint")
+			return
+		}
+
 		return
 	}
 
