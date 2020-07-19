@@ -97,6 +97,7 @@ const AppHeader = (props) => {
 		setExitModalVisibility(false);
 		if (isConfirmed) {
 			if (isExperimentRunning === true) {
+				// user aborted experiment
 				dispatch(stopExperiment(experimentId));
 			} else {
 				dispatch(loginReset());

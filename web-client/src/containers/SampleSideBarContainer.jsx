@@ -90,7 +90,6 @@ const SampleSideBarContainer = (props) => {
 						label: sample_name,
 						value: sample_id,
 					},
-					// TODO REMOVE ONCE WE GET TARGETS
 					targets: experimentTargetsList,
 					task:{
 						label: task,

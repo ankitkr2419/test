@@ -1,6 +1,6 @@
 import ButtonGroup from './ButtonGroup';
 import ButtonIcon from './ButtonIcon';
-import Center from "./Center";
+import Center from './Center';
 import Icon from './Icon';
 import Link from './Link';
 import Logo from './Logo';
@@ -13,25 +13,27 @@ import {
 	CustomButton,
 } from './ListElements';
 import Text from './Text';
+import ImageIcon from './ImageIcon';
 
 export {
 	ButtonGroup,
-  ButtonIcon,
-  Center,
-  Icon,
-  Link,
-  Logo,
-  Step, 
-  StepItem,
-  StepLink,
-  TableWrapper,
-  TableWrapperBody,
-  TableWrapperFooter,
-  TargetList, 
-  TargetListHeader, 
-  TargetListItem,
+	ButtonIcon,
+	Center,
+	Icon,
+	Link,
+	Logo,
+	Step,
+	StepItem,
+	StepLink,
+	TableWrapper,
+	TableWrapperBody,
+	TableWrapperFooter,
+	TargetList,
+	TargetListHeader,
+	TargetListItem,
 	Text,
 	StyledUl,
 	StyledLi,
 	CustomButton,
+	ImageIcon,
 };

@@ -1,4 +1,5 @@
 import { TARGET_CAPACITY } from 'appConstants';
+import { createSelector } from 'reselect';
 
 export const getTargetOption = () => {
 	const arr = [];
@@ -102,3 +103,12 @@ export const checkIfIdPresentInList = (id, selectedTargetState) => {
 		&& ele.selectedTarget.value === id);
 	return list.size !== 0;
 };
+
+// return true if no targets are selected
+export const isNoTargetSelected = createSelector(
+	targetList => targetList.toJS(),
+	(targetList) => {
+		const selectedTargetList = targetList.filter(ele => ele.isChecked);
+		return selectedTargetList.length === 0;
+	},
+);

@@ -7,6 +7,7 @@ import {
 	CustomButton,
 	Center,
 	Text,
+	ImageIcon,
 } from 'shared-components';
 import imgNoTemplate from 'assets/images/no-template-available.svg';
 
@@ -59,7 +60,7 @@ const TemplateComponent = (props) => {
 		<div className="d-flex flex-100 flex-column p-4 mt-3">
 			{templates.size === 0 && (
 				<Center className="no-template-wrap">
-					<img
+					<ImageIcon
 						src={imgNoTemplate}
 						alt="No templates available"
 						className="img-no-template"

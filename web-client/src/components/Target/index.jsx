@@ -38,6 +38,7 @@ const TargetComponent = (props) => {
 		isViewStagesEnabled,
 		navigateToStageWizard,
 		editTemplate,
+		isNoTargetSelected,
 	} = props;
 
 	const isTargetDisabled = (ele) => {
@@ -161,7 +162,7 @@ const TargetComponent = (props) => {
 						color="primary"
 						onClick={onSaveClick}
 						className="mx-auto"
-						disabled={isTargetListUpdated === false}
+						disabled={isTargetListUpdated === false || isNoTargetSelected}
 					>
             Save
 					</Button>

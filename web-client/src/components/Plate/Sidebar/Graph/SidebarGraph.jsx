@@ -24,6 +24,7 @@ const SidebarGraph = (props) => {
 	if (lineChartData.size !== 0) {
 		noOfCycles = lineChartData.first().totalCycles;
 	}
+
 	const data = {
 		labels: getXAxis(noOfCycles),
 		datasets: lineChartData.toJS(),
