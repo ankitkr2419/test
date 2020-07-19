@@ -49,6 +49,10 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 					sendOnSuccess(deps, rw, c)
 
+				} else if msg == "read_temp" {
+
+					sendTemperature(deps, rw, c)
+
 				}
 
 			case err = <-deps.ExitCh:
@@ -133,6 +137,25 @@ func sendOnSuccess(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn)
 	}
 
 	logger.WithField("data", "Success").Info("Websocket send Data")
+
+}
+
+func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
+
+	respBytes, err := getTemperatureDetails(deps)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("error in fetching data")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	err = c.WriteMessage(1, respBytes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", "Temperature").Info("Websocket send Data")
 
 }
 
@@ -246,6 +269,27 @@ func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
 	return
 }
 
+func getTemperatureDetails(deps Dependencies) (respBytes []byte, err error) {
+	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error get experiment")
+		return
+	}
+
+	result := experimentTemperature{
+		Type: "Temperature",
+		Data: Temp,
+	}
+
+	respBytes, err = json.Marshal(result)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling result temp data")
+		return
+	}
+
+	return
+}
+
 func monitorExperiment(deps Dependencies) {
 
 	var cycle uint16
@@ -292,9 +336,20 @@ func monitorExperiment(deps Dependencies) {
 			cycle++
 			previousCycle++
 		}
+
+		// writes temp on every step against time in DB
+		err = WriteExperimentTemperature(deps, scan)
+		if err != nil {
+			return
+		} else {
+			deps.WsMsgCh <- "read_temp"
+		}
+
+		// adding delay of 0.5s to reduce the cpu usage
+		time.Sleep(500 * time.Millisecond)
+
 	}
 	logger.Info("Stop monitoring experiment")
-
 }
 
 func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err error) {
@@ -362,6 +417,27 @@ func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) 
 	if err != nil {
 		// send error
 		logger.WithField("err", err.Error()).Error("Error upsert wells")
+		deps.WsErrCh <- err
+		return
+	}
+	return
+}
+
+func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
+
+	// makeexpTemp returns data in DB expTemp format
+	expTemp := db.ExperimentTemperature{
+		ExperimentID: experimentValues.experimentID,
+		Temp:         scan.Temp,
+		LidTemp:      scan.LidTemp,
+		Cycle:        scan.Cycle,
+	}
+
+	// insert every cycle  result temp into Database
+	err = deps.Store.InsertExperimentTemperature(context.Background(), expTemp)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error inserting experiment_Temperatures data")
+		// send error
 		deps.WsErrCh <- err
 		return
 	}

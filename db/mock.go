@@ -247,4 +247,13 @@ func (m *DBMockStore) PublishTemplate(ctx context.Context, id uuid.UUID) (err er
 func (m *DBMockStore) ListPublishedTemplates(ctx context.Context) (t []Template, err error) {
 	args := m.Called(ctx)
 	return args.Get(0).([]Template), args.Error(1)
+	
+func (m *DBMockStore) ListExperimentTemperature(ctx context.Context, id uuid.UUID) (result []ExperimentTemperature, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]ExperimentTemperature), args.Error(1)
+}
+
+func (m *DBMockStore) InsertExperimentTemperature(ctx context.Context, r ExperimentTemperature) (err error) {
+	args := m.Called(ctx, r)
+	return args.Error(1)
 }

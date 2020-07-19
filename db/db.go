@@ -52,4 +52,6 @@ type Storer interface {
 	UpdateColorWell(context.Context, string, uuid.UUID) error
 	PublishTemplate(context.Context, uuid.UUID) error
 	ListPublishedTemplates(context.Context) ([]Template, error)
+	ListExperimentTemperature(context.Context, uuid.UUID) ([]ExperimentTemperature, error)
+	InsertExperimentTemperature(context.Context, ExperimentTemperature) error
 }
