@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { formatTime } from 'utils/helpers';
 
 const lineConfigs = {
 	fill: false,
@@ -16,27 +15,34 @@ const lineConfigs = {
 	borderCapStyle: 'butt',
 };
 
-const getTemperatureGraphData = state => state.temperatureGraphReducer;
+const getTemperatureGraphReducer = state => state.temperatureGraphReducer;
 
-// get x-axis data, which will be array with time values in hh:mm:ss format
-const getXaxisData = createSelector(
-	temperatureGraphData => temperatureGraphData.get('time'),
-	(timeData) => {
-		const timeDataJS = timeData.toJS();
-		const xAxisData = timeDataJS.map(ele => formatTime(ele));
-		return xAxisData;
-	},
+// sort the temperature graph reducer wrt created_at property
+const getSortedTemperatureGraphReducer = createSelector(
+	getTemperatureGraphReducer,
+	temperatureGraphReducer => temperatureGraphReducer.updateIn(['temperatureData'],
+		myList => myList.sortBy(ele => ele.get('created_at'))),
 );
+
+// get starting time of temperature graph
+const getStartTime = temperatureGraphData => new Date(temperatureGraphData.first().get('created_at'));
+
+// To show the time span of experiment get the time differnce in current and start time in minutes
+const getTimeDiff = (startTime, currTime) => {
+	const hour_diff = currTime.getHours() - startTime.getHours();
+	const min_diff = currTime.getMinutes() - startTime.getMinutes();
+	const sec_diff = currTime.getSeconds() - startTime.getSeconds();
+	const time_diff = min_diff + hour_diff * 60 + sec_diff / 60;
+	return time_diff;
+};
 
 const getYaxisData = createSelector(
 	temperatureGraphData => temperatureGraphData,
-	(temperatureGraphData) => temperatureGraphData.map(ele => {
-		const start_time = new Date(temperatureGraphData.first().get('created_at'));
-		const curr_time = new Date(ele.get('created_at'));
-		let time_diff = curr_time.getMinutes() - start_time.getMinutes();
-		time_diff = time_diff >= 0 ? time_diff : time_diff + 60;
+	getStartTime,
+	(temperatureGraphData, startTime) => temperatureGraphData.map(ele => {
+		const currTime = new Date(ele.get('created_at'));
 		return {
-			x: time_diff,
+			x: getTimeDiff(startTime, currTime),
 			y: ele.get('temp'),
 		};
 	}),
@@ -44,7 +50,7 @@ const getYaxisData = createSelector(
 
 // get chart data object for plotting temperature line chart
 export const getTemperatureChartData = createSelector(
-	getTemperatureGraphData,
+	getSortedTemperatureGraphReducer,
 	(temperatureGraphReducer) => {
 		const temperatureGraphData = temperatureGraphReducer.get('temperatureData');
 		// if no data present return empty object
