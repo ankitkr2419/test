@@ -28,15 +28,10 @@ const getThresholdLineData = (value, count) => {
 	return arr;
 };
 
+// roundoff the values after decimal point to one digit ie. 1.3333 to 1.3
 export const getXAxis = createSelector(
-	count => count,
-	(count) => {
-		const arr = [];
-		for (let x = 0; x < count; x += 1) {
-			arr.push(x);
-		}
-		return arr;
-	},
+	cycles => cycles,
+	(cycles) => cycles.map(cycle => Math.floor(cycle * 10) / 10),
 );
 
 const getThresholdLine = (label, max_threshold, count, lineColor) => ({

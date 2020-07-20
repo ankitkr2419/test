@@ -30,7 +30,7 @@ const SidebarGraph = (props) => {
 	}
 
 	const data = {
-		labels: cyclesArray,
+		labels: getXAxis(cyclesArray),
 		datasets: lineChartData.toJS(),
 	};
 
