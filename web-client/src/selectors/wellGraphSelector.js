@@ -106,6 +106,7 @@ export const getLineChartData = createSelector(
 						borderColor, // line color
 						data: ele.get('f_value'), // line data
 						totalCycles: ele.get('total_cycles'), // cycle count to x-axis
+						cycles: ele.get('cycle'), // cycles array with intermediate steps
 					};
 				}
 				return null;
