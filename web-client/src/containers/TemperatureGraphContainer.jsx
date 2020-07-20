@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { LineChart } from 'core-components';
 import { Text } from 'shared-components';
@@ -11,10 +11,23 @@ const options = {
 	},
 	scales: {
 		xAxes: [{
+			scaleLabel: {
+				display: true,
+				labelString: 'minutes',
+			},
 			type: 'linear',
-			// ticks: {
-			// 	source: 'data',
-			// },
+			ticks: {
+				source: 'data',
+				beginAtZero: true,
+				suggestedMin: 0,
+				min: 0,
+			},
+		}],
+		yAxes: [{
+			scaleLabel: {
+				display: true,
+				labelString: 'Temperature',
+			},
 		}],
 	},
 };
@@ -22,10 +35,6 @@ const options = {
 const TemperatureGraphContainer = (props) => {
 	// Extracting temperature graph data, Which is populated from websocket
 	const temperatureChartData = useSelector(getTemperatureChartData);
-
-	useEffect(() => {
-		console.log(temperatureChartData);
-	}, [temperatureChartData]);
 	return (
 		<div>
 			<Text size={20} className='text-default mb-4'>
