@@ -56,23 +56,27 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				}
 
 			case err = <-deps.ExitCh:
-				var errortype string
+				var errortype, msg string
 				if err.Error() == "PCR Aborted" {
 
 					// on pre-emptive stop
 					experimentRunning = false
 					errortype = "ErrorPCRAborted"
+					msg = "PCR Aborted by user"
 
 				} else if err.Error() == "PCR Stopped" {
 					errortype = "ErrorPCRStopped"
+					msg = "PCR stopped experiment"
 
 				} else if err.Error() == "PCR Dead" {
 					errortype = "ErrorPCRDead"
+					msg = "PCR Dead , Heartbeat has stop"
+
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 
-				sendOnFail(err.Error(), errortype, rw, c)
+				sendOnFail(msg, errortype, rw, c)
 
 			case err = <-deps.WsErrCh:
 
