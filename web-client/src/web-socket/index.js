@@ -34,9 +34,9 @@ export const connectSocket = (dispatch) => {
 			case SOCKET_MESSAGE_TYPE.success:
 				dispatch(experimentedCompleted(data));
 				break;
-			case SOCKET_MESSAGE_TYPE.failure:
-				dispatch(experimentedFailed(data));
-				break;
+			// case SOCKET_MESSAGE_TYPE.failure:
+			// 	dispatch(experimentedFailed(data));
+			// 	break;
 			// TODO after discussion with shailesh
 			// case SOCKET_MESSAGE_TYPE.ErrorPCRAborted:
 			// case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:

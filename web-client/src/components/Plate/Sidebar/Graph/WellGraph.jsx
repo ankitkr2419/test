@@ -6,6 +6,12 @@ import PropTypes from 'prop-types';
 import { MIN_THRESHOLD, MAX_THRESHOLD } from 'components/Target/targetConstants';
 import GraphFilters from './GraphFilters';
 
+const options = {
+	legend: {
+		display: false,
+	},
+};
+
 const WellGraph = ({
 	data,
 	experimentGraphTargetsList,
@@ -20,7 +26,7 @@ const WellGraph = ({
       Amplification plot
 		</Text>
 		<GraphCard>
-			<LineChart data={data} />
+			<LineChart data={data} options={options}/>
 		</GraphCard>
 		<GraphFilters
 			targets={experimentGraphTargetsList}

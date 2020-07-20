@@ -28,6 +28,20 @@ const getXaxisData = createSelector(
 	},
 );
 
+const getYaxisData = createSelector(
+	temperatureGraphData => temperatureGraphData,
+	(temperatureGraphData) => temperatureGraphData.map(ele => {
+		const start_time = new Date(temperatureGraphData.first().get('created_at'));
+		const curr_time = new Date(ele.get('created_at'));
+		let time_diff = curr_time.getMinutes() - start_time.getMinutes();
+		time_diff = time_diff >= 0 ? time_diff : time_diff + 60;
+		return {
+			x: time_diff,
+			y: ele.get('temp'),
+		};
+	}),
+);
+
 // get chart data object for plotting temperature line chart
 export const getTemperatureChartData = createSelector(
 	getTemperatureGraphData,
@@ -39,13 +53,12 @@ export const getTemperatureChartData = createSelector(
 		}
 		const borderColor = 'rgba(148,147,147,1)'; // default line color
 		const chartData = {
-			labels: getXaxisData(temperatureGraphData),
 			datasets: [
 				{
 					...lineConfigs,
 					label: 'Temperature Plot',
 					borderColor,
-					data: temperatureGraphData.get('temp').toJS(),
+					data: getYaxisData(temperatureGraphData).toJS(),
 				},
 			],
 		};
