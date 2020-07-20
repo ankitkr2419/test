@@ -26,10 +26,11 @@ const WellPopover = (props) => {
 			target={`PopoverWell${index}`}
 			hideArrow
 			placement="top-start"
-			popperClassName={`popover-well ${status}`}
+			popperClassName='popover-well'
+			status={status}
 			{...rest}
 		>
-			<PopoverHeader>
+			<PopoverHeader status={status}>
 				<Text Tag="span">{text}</Text>
 				<ButtonIcon
 					position="absolute"
@@ -56,10 +57,11 @@ const WellPopover = (props) => {
 							)}
 							{targets !== null
                 && targets.map(ele => (
-                	<Text key={ele.target_id} className={`mb-1 ${status}`}>
-                		{ele.target_name || 'target_name'}
-                	</Text>
-                ))}
+                		<Text key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
+                		{ele.target_name || 'target_name'}{ele.ct === '' ? '' : `, CT ${ele.ct}`}
+                		</Text>
+                	))
+							}
 						</div>
 					</li>
 					<li className="d-flex py-1">
