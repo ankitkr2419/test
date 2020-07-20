@@ -19,7 +19,7 @@ const GraphFilters = ({
 		}
 	}, [setThresholdError]);
 
-	// set threshold error flag false on focus on input field
+	// reset threshold error flag to false on focus on input field
 	const onThresholdFocusHandler = useCallback((index) => {
 		resetThresholdError(index);
 	}, [resetThresholdError]);

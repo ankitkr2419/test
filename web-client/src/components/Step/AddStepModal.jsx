@@ -18,6 +18,7 @@ import {
 	validateRampRate,
 	validateTargetTemperature,
 } from './stepHelper';
+import { MIN_RAMP_RATE, MAX_RAMP_RATE, MAX_TARGET_TEMPERATURE, MIN_TARGET_TEMPERATURE } from './stepConstants';
 
 const AddStepModal = (props) => {
 	const {
@@ -56,36 +57,43 @@ const AddStepModal = (props) => {
 	}, []);
 
 	const onChangeHandler = ({ target: { name, value } }) => {
+		// set rampRate/targetTemperature/holdTime with its value in stepForm local state
 		updateStepFormStateWrapper(name, value);
 	};
 
 	const onHoldTimeBlurHandler = () => {
 		if (validateHoldTime(holdTime) === null) {
+			// set holdTimeError flag to true maintained over stepForm local state
 			updateStepFormStateWrapper('holdTimeError', true);
 		}
 	};
 
 	const onHoldTimeFocusHandler = () => {
+		// reset holdTimeError flag to false maintained over stepForm local state
 		updateStepFormStateWrapper('holdTimeError', false);
 	};
 
 	const onRampRateBlurHandler = () => {
 		if (validateRampRate(rampRate) === false) {
+			// set rampRateError flag to true maintained over stepForm local state
 			updateStepFormStateWrapper('rampRateError', true);
 		}
 	};
 
 	const onRampRateFocusHandler = () => {
+		// reset rampRateError flag to false maintained over stepForm local state
 		updateStepFormStateWrapper('rampRateError', false);
 	};
 
 	const onTargetTemperatureBlurHandler = () => {
 		if (validateTargetTemperature(targetTemperature) === false) {
+			// set targetTemperatureError flag to true maintained over stepForm local state
 			updateStepFormStateWrapper('targetTemperatureError', true);
 		}
 	};
 
 	const onTargetTemperatureFocusHandler = () => {
+		// reset targetTemperatureError flag to false maintained over stepForm local state
 		updateStepFormStateWrapper('targetTemperatureError', false);
 	};
 
@@ -126,7 +134,7 @@ const AddStepModal = (props) => {
 										type='number'
 										name='rampRate'
 										id='ramp_rate'
-										placeholder='0.5 - 6'
+										placeholder={`${MIN_RAMP_RATE} - ${MAX_RAMP_RATE}`}
 										value={rampRate}
 										onChange={onChangeHandler}
 										onBlur={onRampRateBlurHandler}
@@ -139,7 +147,7 @@ const AddStepModal = (props) => {
 									size={12}
 									className={`${rampRateError && 'text-danger'} px-2 mb-0`}
 								>
-									Enter value between 0.5 to 6
+									Enter value between {MIN_RAMP_RATE} to {MAX_RAMP_RATE}
 								</Text>
 							</FormGroup>
 						</Col>
@@ -155,7 +163,7 @@ const AddStepModal = (props) => {
 										type='number'
 										name='targetTemperature'
 										id='target_temperature'
-										placeholder='22 - 120'
+										placeholder={`${MIN_TARGET_TEMPERATURE} - ${MAX_TARGET_TEMPERATURE}`}
 										value={targetTemperature}
 										onChange={onChangeHandler}
 										onBlur={onTargetTemperatureBlurHandler}
@@ -170,7 +178,7 @@ const AddStepModal = (props) => {
 										targetTemperatureError && 'text-danger'
 									} px-2 mb-0`}
 								>
-									Enter value between 22 to 120
+									Enter value between {MIN_TARGET_TEMPERATURE} to {MAX_TARGET_TEMPERATURE}
 								</Text>
 							</FormGroup>
 						</Col>

@@ -3,8 +3,7 @@ import { MAX_RAMP_RATE, MIN_RAMP_RATE, MAX_TARGET_TEMPERATURE, MIN_TARGET_TEMPER
 
 export const validateHoldTime = holdTime => holdTime.match(/^[1-9]\d{0,4}$/);
 
-// Validate Ramp rate below Maximum and above Minimum ramp rate
-
+// Validate Ramp rate. Should be below Maximum and above Minimum ramp rate
 export const validateRampRate = createSelector(
 	rampRate => rampRate,
 	(rampRate) => {
@@ -16,7 +15,7 @@ export const validateRampRate = createSelector(
 	},
 );
 
-// Validate Target Temperature below Maximum and above Minimum Target temperature
+// Validate Target Temperature. Should be below Maximum and above Minimum Target temperature
 export const validateTargetTemperature = createSelector(
 	targetTemperature => targetTemperature,
 	(targetTemperature) => {

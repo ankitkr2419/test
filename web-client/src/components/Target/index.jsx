@@ -14,6 +14,7 @@ import {
 import { covertToSelectOption } from 'utils/helpers';
 import TargetHeader from './TargetHeader';
 import { checkIfIdPresentInList, validateThreshold } from './targetHelper';
+import { MIN_THRESHOLD, MAX_THRESHOLD } from './targetConstants';
 
 const TargetActions = styled.div`
   justify-content: space-between;
@@ -60,7 +61,7 @@ const TargetComponent = (props) => {
 		[setThresholdError],
 	);
 
-	// set threshold error flag false on focus on input field
+	// reset threshold error flag to false on focus on input field
 	const onThresholdFocusHandler = useCallback(
 		(index) => {
 			setThresholdError(false, index);
@@ -121,7 +122,7 @@ const TargetComponent = (props) => {
 					type="number"
 					name={`threshold${index}`}
 					index={`threshold${index}`}
-					placeholder="0.5 - 10"
+					placeholder={`${MIN_THRESHOLD} - ${MAX_THRESHOLD}`}
 					value={ele.threshold === undefined ? '' : ele.threshold}
 					onChange={(event) => {
 						onThresholdChange(event.target.value, index);
@@ -190,7 +191,11 @@ const TargetComponent = (props) => {
 						color="primary"
 						onClick={onSaveClick}
 						className="mx-auto"
-						disabled={!isTargetListUpdated || isNoTargetSelected || isThresholdInvalid}
+						disabled={
+							isTargetListUpdated === false ||
+							isNoTargetSelected === true ||
+							isThresholdInvalid === true
+						}
 					>
             Save
 					</Button>
@@ -204,7 +209,7 @@ const TargetComponent = (props) => {
 							size={14}
 							className="text-right text-danger px-5 mb-0"
 						>
-              Threshold value should be between 0.5 - 10
+              Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
 						</Text>
 					</div>
 				</div>

@@ -5,6 +5,7 @@ import { LineChart } from 'core-components';
 import { Text } from 'shared-components';
 import styled from 'styled-components';
 import { getXAxis } from 'selectors/wellGraphSelector';
+import { MIN_THRESHOLD, MAX_THRESHOLD } from 'components/Target/targetConstants';
 import GraphFilters from './GraphFilters';
 
 const SidebarGraph = (props) => {
@@ -58,7 +59,7 @@ const SidebarGraph = (props) => {
 				/>
 				{isThresholdInvalid && (
 					<Text Tag="p" size={14} className="text-danger px-2 mb-1">
-            Threshold value should be between 0.5 - 10
+            Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
 					</Text>
 				)}
 				<Text size={14} className="text-default mb-0">
