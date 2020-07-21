@@ -5,6 +5,16 @@ import {
 	Button, Popover, PopoverHeader, PopoverBody,
 } from 'core-components';
 import { Text, Center, ButtonIcon } from 'shared-components';
+import styled from 'styled-components';
+
+const StyledText = styled(Text)`
+	color: ${props => {
+		if (props.positive !== undefined) {
+			return props.positive ? '#3FC13A' : '#F06666';
+		}
+		return '#707070';
+	}} !important;
+`;
 
 const WellPopover = (props) => {
 	const {
@@ -15,10 +25,25 @@ const WellPopover = (props) => {
 		task,
 		targets,
 		onEditClickHandler,
+		showGraphOfWell,
 		...rest
 	} = props;
 
 	const simulateOutSideClick = () => document.body.click();
+
+	// on show graph button click handler
+	const onShowClickHandler = () => {
+		// close the popover
+		simulateOutSideClick();
+		showGraphOfWell(index);
+	};
+
+	// on edit click handler
+	const onEditClick = (event) => {
+		// close the popover
+		simulateOutSideClick();
+		onEditClickHandler(event);
+	};
 
 	return (
 		<Popover
@@ -57,9 +82,9 @@ const WellPopover = (props) => {
 							)}
 							{targets !== null
                 && targets.map(ele => (
-                		<Text key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
+                		<StyledText key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
                 		{ele.target_name || 'target_name'}{ele.ct === '' ? '' : `, CT ${ele.ct}`}
-                		</Text>
+                		</StyledText>
                 	))
 							}
 						</div>
@@ -74,8 +99,8 @@ const WellPopover = (props) => {
 					</li> */}
 				</ul>
 				<Center>
-					<Button className="mb-4">Show on Graph</Button>
-					<Button onClick={onEditClickHandler}>Edit Info</Button>
+					<Button className="mb-4" onClick={onShowClickHandler}>Show on Graph</Button>
+					<Button onClick={onEditClick}>Edit Info</Button>
 				</Center>
 			</PopoverBody>
 		</Popover>

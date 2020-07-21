@@ -70,11 +70,10 @@ export const getLineChartData = createSelector(
 	(wellGraphReducer, experimentTargets, wells) => {
 		// graphTargets contains updated graph target values(Filters)
 		const graphTargets = experimentTargets.get('graphTargets');
-		const isMultiSelectionOptionOn = wells.get('isMultiSelectionOptionOn');
 		const selectedPositions = getWellsPosition(wells);
 		let wellGraphData = wellGraphReducer.get('chartData');
 		// Should apply filter if we have positions selected from viewing graph
-		if (isMultiSelectionOptionOn === true && selectedPositions.size !== 0) {
+		if (selectedPositions.size !== 0) {
 			wellGraphData = wellGraphData.filter(ele => selectedPositions.includes(ele.get('well_position')));
 		}
 		// filtering active wells
@@ -103,7 +102,7 @@ export const getLineChartData = createSelector(
 
 					return {
 						...lineConfigs, // chart line config
-						label: `index-${index}`, // unique label per line 
+						label: `index-${index}`, // unique label per line
 						borderColor, // line color
 						data: ele.get('f_value'), // line data
 						totalCycles: ele.get('total_cycles'), // cycle count to x-axis

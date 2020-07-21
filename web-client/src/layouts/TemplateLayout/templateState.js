@@ -6,6 +6,7 @@ export const templateLayoutActions = {
 	SET_ACTIVE_WIDGET: 'SET_ACTIVE_WIDGET',
 	SET_TEMPLATE_ID: 'SET_TEMPLATE_ID',
 	SET_STAGE_ID: 'SET_STAGE_ID',
+	RESET_WIZARD_LIST: 'RESET_WIZARD_LIST',
 };
 
 // Initial state wrap with fromJS for immutability
@@ -45,6 +46,8 @@ const templateLayoutReducer = (state, action) => {
 	switch (action.type) {
 	case templateLayoutActions.SET_ACTIVE_WIDGET:
 		return getUpdatedList(state, action.value);
+	case templateLayoutActions.RESET_WIZARD_LIST:
+		return state.set('wizardList', fromJS(wizardList));
 	case templateLayoutActions.SET_TEMPLATE_ID:
 		return state.setIn(['templateID'], action.value);
 	case templateLayoutActions.SET_STAGE_ID:
