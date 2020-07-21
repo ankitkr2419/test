@@ -1,6 +1,5 @@
 import React, {
-	useCallback, useReducer,
-} from 'react';
+	useCallback, useReducer } from 'react';
 import { CardBody, Card } from 'core-components';
 import Wizard from 'shared-components/Wizard';
 import TemplateContainer from 'containers/TemplateContainer';
@@ -71,6 +70,10 @@ const TemplateLayout = (props) => {
 		templateLayoutDispatch({
 			type: templateLayoutActions.SET_TEMPLATE_ID,
 			value: selectedTemplateID,
+		});
+		// reset wizard list to disable already enabled wizard stages
+		templateLayoutDispatch({
+			type: templateLayoutActions.RESET_WIZARD_LIST,
 		});
 	}, []);
 

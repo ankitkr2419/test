@@ -48,7 +48,7 @@ export const createExperimentReducer = (
 	case createExperimentActions.successAction:
 		return state.merge({ isExperimentSaved: true, isLoading: false, ...action.payload.response });
 	case createExperimentActions.failureAction:
-		return state.merge({ isExperimentSaved: true, isLoading: true, isError: true });
+		return state.merge({ isExperimentSaved: true, isLoading: false, isError: true, id:null });
 	case createExperimentActions.createExperimentReset:
 		return state.setIn(['isExperimentSaved'], false);
 	case loginActions.loginReset:

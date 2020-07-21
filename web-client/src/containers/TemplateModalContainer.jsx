@@ -13,8 +13,12 @@ import { templateModalActions } from 'components/TemplateModal/templateModalStat
 const TemplateModalContainer = (props) => {
 	// constants
 	const {
-		templateModalState, templateModalDispatch, templateID, toggleTemplateModal,
+		templateModalState,
+		templateModalDispatch,
+		templateID,
+		toggleTemplateModal,
 	} = props;
+
 	const {
 		templateDescription,
 		templateName,
