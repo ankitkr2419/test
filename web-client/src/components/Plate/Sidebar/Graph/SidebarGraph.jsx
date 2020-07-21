@@ -23,14 +23,14 @@ const SidebarGraph = (props) => {
 		isThresholdInvalid,
 	} = props;
 
-	let noOfCycles = 0;
+	let cyclesArray = [];
 	// below case can happen if user selects all filter we might get empty chart data
 	if (lineChartData.size !== 0) {
-		noOfCycles = lineChartData.first().totalCycles;
+		cyclesArray = lineChartData.first().cycles.toJS();
 	}
 
 	const data = {
-		labels: getXAxis(noOfCycles),
+		labels: getXAxis(cyclesArray),
 		datasets: lineChartData.toJS(),
 	};
 
