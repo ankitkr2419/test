@@ -31,6 +31,7 @@ export const SOCKET_MESSAGE_TYPE = {
 	ErrorPCRStopped: 'ErrorPCRStopped',
 	ErrorPCRMonitor: 'ErrorPCRMonitor',
 	ErrorPCRDead: 'ErrorPCRDead',
+	temperatureData: 'Temperature',
 };
 
 export const EXPERIMENT_STATUS = {

@@ -7,8 +7,9 @@ import {
 import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from 'appConstants';
 import { updateWellThroughSocket } from 'action-creators/wellActionCreators';
 import { wellGraphSucceeded } from 'action-creators/wellGraphActionCreators';
-import { experimentedCompleted, experimentedFailed } from 'action-creators/runExperimentActionCreators';
+import { experimentedCompleted } from 'action-creators/runExperimentActionCreators';
 import { showErrorModal } from 'action-creators/modalActionCreators';
+import { temperatureDataSucceeded } from 'action-creators/temperatureGraphActionCreators';
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
@@ -27,12 +28,15 @@ export const connectSocket = (dispatch) => {
 			case SOCKET_MESSAGE_TYPE.wellsData:
 				dispatch(updateWellThroughSocket(data));
 				break;
+			case SOCKET_MESSAGE_TYPE.temperatureData:
+				dispatch(temperatureDataSucceeded(data));
+				break;
 			case SOCKET_MESSAGE_TYPE.success:
 				dispatch(experimentedCompleted(data));
 				break;
-			case SOCKET_MESSAGE_TYPE.failure:
-				dispatch(experimentedFailed(data));
-				break;
+			// case SOCKET_MESSAGE_TYPE.failure:
+			// 	dispatch(experimentedFailed(data));
+			// 	break;
 			// TODO after discussion with shailesh
 			// case SOCKET_MESSAGE_TYPE.ErrorPCRAborted:
 			// case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
