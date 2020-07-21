@@ -25,10 +25,25 @@ const WellPopover = (props) => {
 		task,
 		targets,
 		onEditClickHandler,
+		showGraphOfWell,
 		...rest
 	} = props;
 
 	const simulateOutSideClick = () => document.body.click();
+
+	// on show graph button click handler
+	const onShowClickHandler = () => {
+		// close the popover
+		simulateOutSideClick();
+		showGraphOfWell(index);
+	};
+
+	// on edit click handler
+	const onEditClick = (event) => {
+		// close the popover
+		simulateOutSideClick();
+		onEditClickHandler(event);
+	};
 
 	return (
 		<Popover
@@ -84,8 +99,8 @@ const WellPopover = (props) => {
 					</li> */}
 				</ul>
 				<Center>
-					<Button className="mb-4">Show on Graph</Button>
-					<Button onClick={onEditClickHandler}>Edit Info</Button>
+					<Button className="mb-4" onClick={onShowClickHandler}>Show on Graph</Button>
+					<Button onClick={onEditClick}>Edit Info</Button>
 				</Center>
 			</PopoverBody>
 		</Popover>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import SidebarGraph from 'components/Plate/Sidebar/Graph/SidebarGraph';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,7 +9,14 @@ import { EXPERIMENT_STATUS } from 'appConstants';
 import { parseFloatWrapper } from 'utils/helpers';
 import { isAnyThresholdInvalid } from 'components/Target/targetHelper';
 
-const ExperimentGraphContainer = ({ experimentStatus }) => {
+const ExperimentGraphContainer = (props) => {
+	const {
+		setIsSidebarOpen,
+		isSidebarOpen,
+		experimentStatus,
+		isMultiSelectionOptionOn,
+		resetSelectedWells,
+	} = props;
 	const dispatch = useDispatch();
 	// get targets from experiment target reducer(graph : target filters)
 	const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
@@ -20,10 +27,11 @@ const ExperimentGraphContainer = ({ experimentStatus }) => {
 	const isExperimentRunning = experimentStatus === EXPERIMENT_STATUS.running;
 	const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
 
-	// local state to save filter graph data
-	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
 	const toggleSideBar = () => {
+		// reset the selected wells while closing the sidebar
+		if (isSidebarOpen && isMultiSelectionOptionOn === false) {
+			resetSelectedWells();
+		}
 		setIsSidebarOpen(toggleStateValue => !toggleStateValue);
 	};
 
