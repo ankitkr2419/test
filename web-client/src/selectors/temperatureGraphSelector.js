@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { getTimeDiff } from 'utils/helpers';
 
 const lineConfigs = {
 	fill: false,
@@ -26,15 +27,6 @@ const getSortedTemperatureGraphReducer = createSelector(
 
 // get starting time of temperature graph
 const getStartTime = temperatureGraphData => new Date(temperatureGraphData.first().get('created_at'));
-
-// To show the time span of experiment get the time differnce in current and start time in minutes
-const getTimeDiff = (startTime, currTime) => {
-	const hour_diff = currTime.getHours() - startTime.getHours();
-	const min_diff = currTime.getMinutes() - startTime.getMinutes();
-	const sec_diff = currTime.getSeconds() - startTime.getSeconds();
-	const time_diff = min_diff + hour_diff * 60 + sec_diff / 60;
-	return time_diff;
-};
 
 const getYaxisData = createSelector(
 	temperatureGraphData => temperatureGraphData,

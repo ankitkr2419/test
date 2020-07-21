@@ -4,15 +4,8 @@ import PropTypes from 'prop-types';
 import { getXAxis } from 'selectors/wellGraphSelector';
 import TemperatureGraphContainer from 'containers/TemperatureGraphContainer';
 import { Switch } from 'core-components';
-import styled from 'styled-components';
+import { SwitchWrapper } from 'shared-components/SwitchWrapper';
 import WellGraph from './WellGraph';
-
-const StyledSwitchWrapper = styled.header`
-	display: flex;
-	height: 40px;
-	align-items: center;
-	justify-content: flex-end;
-`;
 
 const SidebarGraph = (props) => {
 	const {
@@ -29,7 +22,7 @@ const SidebarGraph = (props) => {
 		isThresholdInvalid,
 	} = props;
 
-	// local state to toggle between welldata graph and temperature graph
+	// local state to toggle between emission graph and temperature graph
 	const [showTempGraph, setShowTempGraph] = useState(false);
 
 	let cyclesArray = [];
@@ -58,7 +51,7 @@ const SidebarGraph = (props) => {
 				handleIcon="graph"
 				handleIconSize={56}
 			>
-				<StyledSwitchWrapper>
+				<SwitchWrapper>
 					<Switch
 						id="temperature"
 						name="temperature"
@@ -66,7 +59,7 @@ const SidebarGraph = (props) => {
 						value={showTempGraph}
 						onChange={toggleTempGraphSwitch}
 					/>
-				</StyledSwitchWrapper>
+				</SwitchWrapper>
 				{/* show the well data graph if showTempGraph flag is off */}
 				{!showTempGraph
 					&& <WellGraph
