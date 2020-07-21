@@ -114,11 +114,11 @@ export const getLineChartData = createSelector(
 		}
 
 		// populating threshold line per targets
-		const { totalCycles } = chartData.first();
+		const { cycles } = chartData.first();
 		const thresholdArray = activeTargets.map(ele => getThresholdLine(
 			ele.get('target_name'),
 			ele.get('threshold'),
-			totalCycles,
+			cycles.size,
 			ele.get('lineColor'),
 		));
 		return chartData.merge(thresholdArray);
