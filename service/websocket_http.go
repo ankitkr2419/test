@@ -32,8 +32,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
-		deps.Plc.SelfTest()
-		deps.Plc.HeartBeat()
+		go deps.Plc.SelfTest()
 
 		for {
 
@@ -62,15 +61,15 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					// on pre-emptive stop
 					experimentRunning = false
 					errortype = "ErrorPCRAborted"
-					msg = "PCR Aborted by user"
+					msg = "Experiment aborted by user"
 
 				} else if err.Error() == "PCR Stopped" {
 					errortype = "ErrorPCRStopped"
-					msg = "PCR stopped experiment"
+					msg = "PCR completed experiment"
 
 				} else if err.Error() == "PCR Dead" {
 					errortype = "ErrorPCRDead"
-					msg = "PCR Dead , Heartbeat has stop"
+					msg = "Unable to connect to Hardware"
 
 				}
 

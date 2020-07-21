@@ -33,6 +33,9 @@ func NewSimulator(exit chan error) plc.Driver {
 	s.ExitCh = ex
 	s.ErrCh = exit
 	s.pcrHeartBeat()
+
+	go s.HeartBeat()
+
 	return &s
 }
 
