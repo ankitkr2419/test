@@ -66,3 +66,11 @@ export const formatTime = createSelector(
 		return `${h}:${m}:${s}`;
 	},
 );
+
+//  To avoid parseFloat returning NaN return the value as it is or else return parsed output
+export const parseFloatWrapper = (value) => {
+	if (value === undefined || value === '' || value === null) {
+		return value;
+	}
+	return parseFloat(value);
+};

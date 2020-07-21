@@ -16,12 +16,6 @@ const StyledText = ({ Tag, onClick, className, size, children }) => (
 
 const Text = styled(StyledText)`
 	font-size: ${(props) => props.size}px;
-	color: ${props => {
-		if (props.positive !== undefined) {
-			return props.positive ? '#3FC13A' : '#F06666';
-		}
-		return '#707070';
-	}} !important;
 `;
 
 Text.propTypes = {

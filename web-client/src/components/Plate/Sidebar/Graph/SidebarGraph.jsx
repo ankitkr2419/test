@@ -5,6 +5,7 @@ import { LineChart } from 'core-components';
 import { Text } from 'shared-components';
 import styled from 'styled-components';
 import { getXAxis } from 'selectors/wellGraphSelector';
+import { MIN_THRESHOLD, MAX_THRESHOLD } from 'components/Target/targetConstants';
 import GraphFilters from './GraphFilters';
 
 const SidebarGraph = (props) => {
@@ -17,6 +18,9 @@ const SidebarGraph = (props) => {
 		toggleGraphFilterActive,
 		experimentGraphTargetsList,
 		isExperimentSucceeded,
+		setThresholdError,
+		resetThresholdError,
+		isThresholdInvalid,
 	} = props;
 
 	let noOfCycles = 0;
@@ -35,13 +39,13 @@ const SidebarGraph = (props) => {
 			<Sidebar
 				isOpen={isSidebarOpen}
 				toggleSideBar={toggleSideBar}
-				className='graph'
-				bodyClassName='py-4'
-				handleIcon='graph'
+				className="graph"
+				bodyClassName="py-4"
+				handleIcon="graph"
 				handleIconSize={56}
 			>
-				<Text size={20} className='text-default mb-4'>
-					Amplification plot
+				<Text size={20} className="text-default mb-4">
+          Amplification plot
 				</Text>
 				<GraphCard>
 					<LineChart data={data} />
@@ -50,9 +54,16 @@ const SidebarGraph = (props) => {
 					targets={experimentGraphTargetsList}
 					onThresholdChangeHandler={onThresholdChangeHandler}
 					toggleGraphFilterActive={toggleGraphFilterActive}
+					setThresholdError={setThresholdError}
+					resetThresholdError={resetThresholdError}
 				/>
-				<Text size={14} className='text-default mb-0'>
-					Note: Click on the threshold number to change it.
+				{isThresholdInvalid && (
+					<Text Tag="p" size={14} className="text-danger px-2 mb-1">
+            Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
+					</Text>
+				)}
+				<Text size={14} className="text-default mb-0">
+          Note: Click on the threshold number to change it.
 				</Text>
 			</Sidebar>
 		);
@@ -61,12 +72,12 @@ const SidebarGraph = (props) => {
 };
 
 const GraphCard = styled.div`
-	width: 830px;
-	height: 344px;
-	background: #ffffff 0% 0% no-repeat padding-box;
-	border: 1px solid #707070;
-	padding: 8px;
-	margin: 0 0 32px 0;
+  width: 830px;
+  height: 344px;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  border: 1px solid #707070;
+  padding: 8px;
+  margin: 0 0 32px 0;
 `;
 
 SidebarGraph.propTypes = {

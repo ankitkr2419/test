@@ -5,6 +5,16 @@ import {
 	Button, Popover, PopoverHeader, PopoverBody,
 } from 'core-components';
 import { Text, Center, ButtonIcon } from 'shared-components';
+import styled from 'styled-components';
+
+const StyledText = styled(Text)`
+	color: ${props => {
+		if (props.positive !== undefined) {
+			return props.positive ? '#3FC13A' : '#F06666';
+		}
+		return '#707070';
+	}} !important;
+`;
 
 const WellPopover = (props) => {
 	const {
@@ -57,9 +67,9 @@ const WellPopover = (props) => {
 							)}
 							{targets !== null
                 && targets.map(ele => (
-                		<Text key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
+                		<StyledText key={ele.target_id} className={'mb-1'} positive={ele.ct === ''}>
                 		{ele.target_name || 'target_name'}{ele.ct === '' ? '' : `, CT ${ele.ct}`}
-                		</Text>
+                		</StyledText>
                 	))
 							}
 						</div>

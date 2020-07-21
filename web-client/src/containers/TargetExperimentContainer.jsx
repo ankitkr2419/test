@@ -17,7 +17,7 @@ import {
 	createExperimentTargetReset,
 } from 'action-creators/experimentTargetActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
-import { getSelectedTargetExperiment, isNoTargetSelected } from 'components/Target/targetHelper';
+import { getSelectedTargetExperiment, isAnyThresholdInvalid, isNoTargetSelected } from 'components/Target/targetHelper';
 import { Redirect } from 'react-router';
 import { getExperimentId } from 'selectors/experimentSelector';
 import { setIsPlateRoute } from 'action-creators/loginActionCreators';
@@ -102,6 +102,18 @@ const TargetExperimentContainer = (props) => {
 		});
 	}, []);
 
+	// set thresholdError value maintained in local state
+	const setThresholdError = useCallback((thresholdError, index) => {
+		updateTargetState({
+			type: targetStateActions.SET_THRESHOLD_ERROR,
+			value: {
+				thresholdError,
+				index,
+			},
+		});
+	}, []);
+
+
 	// onSaveClick Save data on server
 	const onSaveClick = useCallback(() => {
 		// get list of selected targets
@@ -132,6 +144,8 @@ const TargetExperimentContainer = (props) => {
 			isLoginTypeOperator={isLoginTypeOperator}
 			isTargetListUpdated={isTargetListUpdated(selectedTargetState)}
 			isNoTargetSelected={isNoTargetSelected(selectedTargetState.get('targetList'))}
+			setThresholdError={setThresholdError}
+			isThresholdInvalid={isAnyThresholdInvalid(selectedTargetState.get('targetList'))}
 		/>
 	);
 };
