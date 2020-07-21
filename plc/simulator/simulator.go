@@ -33,6 +33,9 @@ func NewSimulator(exit chan error) plc.Driver {
 	s.ExitCh = ex
 	s.ErrCh = exit
 	s.pcrHeartBeat()
+
+	go s.HeartBeat()
+
 	return &s
 }
 
@@ -68,7 +71,7 @@ func (d *Simulator) HeartBeat() {
 
 		// something went wrong. Signal parent process
 		logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-		d.ErrCh <- err
+		d.ExitCh <- "dead"
 		return
 	}()
 }
@@ -112,7 +115,6 @@ func (d *Simulator) Stop() (err error) {
 	d.plcIO.m.startStopCycle = 0
 
 	d.ExitCh <- "abort"
-
 	return
 }
 
@@ -152,6 +154,12 @@ func (d *Simulator) simulate() {
 			}
 			if msg == "pause" {
 				//TBD
+			}
+			if msg == "dead" {
+
+				// heart beat failes, pcr is not responding
+				d.ErrCh <- errors.New("PCR Dead")
+
 			}
 			/* This ErrCh will never be used between simulator and PCR
 			case err := <-d.ErrCh:

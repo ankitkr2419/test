@@ -32,8 +32,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
-		deps.Plc.SelfTest()
-		deps.Plc.HeartBeat()
+		go deps.Plc.SelfTest()
 
 		for {
 
@@ -56,23 +55,34 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				}
 
 			case err = <-deps.ExitCh:
-
+				var errortype, msg string
 				if err.Error() == "PCR Aborted" {
 
 					// on pre-emptive stop
 					experimentRunning = false
+					errortype = "ErrorPCRAborted"
+					msg = "Experiment aborted by user"
+
+				} else if err.Error() == "PCR Stopped" {
+					errortype = "ErrorPCRStopped"
+					msg = "PCR completed experiment"
+
+				} else if err.Error() == "PCR Dead" {
+					errortype = "ErrorPCRDead"
+					msg = "Unable to connect to Hardware"
 
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 
-				sendOnFail(err.Error(), rw, c)
+				sendOnFail(msg, errortype, rw, c)
 
 			case err = <-deps.WsErrCh:
 
 				logger.WithField("err", err.Error()).Error("Monitor has requested exit")
+				var errortype = "ErrorPCRMonitor"
 
-				sendOnFail(err.Error(), rw, c)
+				sendOnFail(err.Error(), errortype, rw, c)
 
 			}
 
@@ -159,10 +169,10 @@ func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Con
 
 }
 
-func sendOnFail(msg string, rw http.ResponseWriter, c *websocket.Conn) {
+func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn) {
 
 	r := resultOnFail{
-		Type: "Fail",
+		Type: errortype,
 		Data: msg,
 	}
 
