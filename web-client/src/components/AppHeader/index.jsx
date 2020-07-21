@@ -82,8 +82,17 @@ const AppHeader = (props) => {
 		}
 	};
 
+	const getIsNavLinkDisabled = (pathname) => {
+		if ((pathname === '/plate' && isLoginTypeAdmin === true)
+		|| (isPlateRoute === true && pathname === '/templates')
+		|| (pathname === '/plate' && isPlateRoute === false)) {
+			return true;
+		}
+		return  false;
+	};
+
 	const onNavLinkClickHandler = (event, pathname) => {
-		if (pathname === '/plate' && isLoginTypeAdmin === true) {
+		if (getIsNavLinkDisabled(pathname)) {
 			event.preventDefault();
 		}
 	};
@@ -117,10 +126,7 @@ const AppHeader = (props) => {
 									onNavLinkClickHandler(event, ele.path);
 								}}
 								to={ele.path}
-								disabled={
-									(ele.path === '/plate' && isLoginTypeAdmin === true)
-                  || (isPlateRoute === true && ele.path === '/templates')
-								}
+								disabled={getIsNavLinkDisabled(ele.path)}
 							>
 								{ele.name}
 							</NavLink>
