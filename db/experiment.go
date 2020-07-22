@@ -53,6 +53,50 @@ type Experiment struct {
 	WellCount    int       `db:"well_count" json:"well_count"`
 }
 
+type WarnResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// ValidateExperiment for correct configuration of NC,PC or NTC
+func ValidateExperiment(wells []Well) (valid bool, resp WarnResponse) {
+
+	tasksCount := map[string]int{
+		"NC":  0,
+		"PC":  0,
+		"NTC": 0,
+	}
+
+	if len(wells) == 0 {
+		resp.Code = "Warning"
+		resp.Message = "Absence of NC,PC or NTC"
+		return
+	} else {
+		for _, w := range wells {
+			switch w.Task {
+			case "NC":
+				tasksCount["NC"] = tasksCount["NC"] + 1
+
+			case "PC":
+				tasksCount["PC"] = tasksCount["PC"] + 1
+
+			case "NTC":
+				tasksCount["NTC"] = tasksCount["NTC"] + 1
+			}
+		}
+
+		for _, v := range tasksCount {
+			if v == 0 {
+				resp.Code = "Warning"
+				resp.Message = "Absence of NC,PC or NTC"
+				return
+			}
+		}
+	}
+	valid = true
+	return
+}
+
 func (s *pgStore) ListExperiments(ctx context.Context) (e []Experiment, err error) {
 	err = s.db.Select(e, getExperimentListQuery)
 	if err != nil {

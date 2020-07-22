@@ -137,6 +137,8 @@ func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()
+	sampleID := uuid.New()
+	targetID := uuid.New()
 	exit := make(chan error)
 	websocketMsg := make(chan string)
 	websocketErr := make(chan error)
@@ -144,6 +146,19 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 	config.Load("simulator_test")
 
 	config.Load("config_test")
+
+	suite.dbMock.On("ListWells", mock.Anything, mock.Anything).Return(
+		[]db.Well{
+			db.Well{ID: testUUID, Position: 1, SampleID: sampleID, ExperimentID: testUUID, Task: "UNKNOWN", ColorCode: "RED", Targets: []db.WellTarget{
+				{WellPosition: 1,
+					ExperimentID: testUUID,
+					TargetID:     targetID,
+					TargetName:   "COVID",
+					CT:           "45"},
+			}, SampleName: ""},
+		},
+		nil,
+	)
 
 	suite.dbMock.On("ShowExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
 		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
@@ -178,8 +193,8 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 		runExperimentHandler(Dependencies{Store: suite.dbMock, Plc: simulator.NewSimulator(exit), ExitCh: exit, WsErrCh: websocketErr, WsMsgCh: websocketMsg}),
 	)
 	<-websocketMsg // read from chn to avoid block
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"experiment started"}`, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusAccepted, recorder.Code)
+	assert.Equal(suite.T(), `{"code":"Warning","message":"Absence of NC,PC or NTC"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

@@ -145,6 +145,17 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		wells, err := deps.Store.ListWells(req.Context(), expID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching wells data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// validate of NC,PC or NTC set for wells
+
+		isValid, response := db.ValidateExperiment(wells)
+
 		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
@@ -197,9 +208,23 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		//invoke monitor
 		go monitorExperiment(deps)
 
+		if !isValid {
+			respBytes, err := json.Marshal(response)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error marshaling experiments data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write(respBytes)
+			return
+		}
+
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`{"msg":"experiment started"}`))
+		return
 	})
 }
 
