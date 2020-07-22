@@ -25,14 +25,14 @@ const SidebarGraph = (props) => {
 	// local state to toggle between emission graph and temperature graph
 	const [showTempGraph, setShowTempGraph] = useState(false);
 
-	let cyclesArray = [];
+	let cyclesCount = 0;
 	// below case can happen if user selects all filter we might get empty chart data
 	if (lineChartData.size !== 0) {
-		cyclesArray = lineChartData.first().cycles.toJS();
+		cyclesCount = lineChartData.first().totalCycles;
 	}
 
 	const data = {
-		labels: getXAxis(cyclesArray),
+		labels: getXAxis(cyclesCount),
 		datasets: lineChartData.toJS(),
 	};
 
