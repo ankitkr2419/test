@@ -102,6 +102,10 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 
 						// add ct
 						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
+					} else if t.CT != "" && t.CT != undetermine && r.Threshold >= scaleThreshold(float32(r.FValue)) {
+
+						// if ct value again crosses threshold then only set it as undertermine
+						DBWellTargets[i].CT = undetermine
 					}
 				}
 			}
@@ -114,7 +118,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
 
 						switch {
-						case redlowerlimit >= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
+						case redlowerlimit <= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
 							// mark red
 							DBWells[i].ColorCode = red
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
@@ -127,9 +131,9 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
 							// only update ct
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
-						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT != "":
-							// only update ct
-							DBWellTargets[j].CT = "UNDETERMINE"
+
+						case scaleThreshold(float32(r.FValue)) <= r.Threshold && t.CT != "": // only update ct
+							DBWellTargets[j].CT = undetermine // undertermine is marked when second time graph cuts threshold line
 							DBWells[i].ColorCode = red
 						}
 
