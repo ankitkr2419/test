@@ -14,6 +14,7 @@ import {
 	createExperimentReset,
 } from 'action-creators/experimentActionCreators';
 import { getIsExperimentSaved } from 'selectors/experimentSelector';
+import { setIsTemplateRoute } from 'action-creators/loginActionCreators';
 
 const TemplateContainer = (props) => {
 	const {
@@ -40,6 +41,12 @@ const TemplateContainer = (props) => {
 
 	// isTemplateDeleted = true means experiment created successfully
 	const isExperimentSaved = useSelector(getIsExperimentSaved);
+
+	// set isTemplateRoute true on mount
+	useEffect(() => {
+		// isTemplateRoute use in appHeader to manage visibility of header buttons
+		dispatch(setIsTemplateRoute(true));
+	}, [dispatch]);
 
 	useEffect(() => {
 		// Once we create template will fetch updated template list

@@ -44,6 +44,7 @@ const AppHeader = (props) => {
 		isPlateRoute,
 		isLoginTypeAdmin,
 		isLoginTypeOperator,
+		isTemplateRoute,
 	} = props;
 
 	const dispatch = useDispatch();
@@ -83,12 +84,34 @@ const AppHeader = (props) => {
 	};
 
 	const getIsNavLinkDisabled = (pathname) => {
-		if ((pathname === '/plate' && isLoginTypeAdmin === true)
-		|| (isPlateRoute === true && pathname === '/templates')
-		|| (pathname === '/plate' && isPlateRoute === false)) {
-			return true;
+		switch (pathname) {
+		/* Disable plate navlink if user logged in is admin. Admin just has access to templates
+		and activity log. Also user can't navigate to plate directly from templates route
+		without selecting a template. isTemplateRoute is true untill user selects a template */
+		case '/plate':
+			if (isLoginTypeAdmin === true || isTemplateRoute === true) {
+				return true;
+			}
+			return false;
+
+		/* Disable Templates navlink when isPlateRoute is true or
+		after experiment is started */
+		case '/templates':
+			if (isPlateRoute === true || experimentStatus !== null) {
+				return true;
+			}
+			return false;
+
+		/* Disable Activity log navlink while experiment is running */
+		case '/activity':
+			if (isExperimentRunning === true) {
+				return true;
+			}
+			return false;
+
+		default:
+			return false;
 		}
-		return  false;
 	};
 
 	const onNavLinkClickHandler = (event, pathname) => {
