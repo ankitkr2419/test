@@ -28,6 +28,8 @@ const SidebarSample = (props) => {
 	} = sampleState.toJS();
 
 	const toggleSideBar = () => {
+		// console log on sample drawer handle click
+		console.info('Sample drawer handle clicked');
 		// if user close sidebar without editing then reset local state
 		if (isSideBarOpen === true && isEdit === true) {
 			resetLocalState();
