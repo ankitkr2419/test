@@ -131,8 +131,9 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
 							// only update ct
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+							// here, we do not detemine color as cycle is 1 to lowerLimitOfRed
 
-						case scaleThreshold(float32(r.FValue)) <= r.Threshold && t.CT != "": // only update ct
+						case scaleThreshold(float32(r.FValue)) <= r.Threshold && t.CT != "":
 							DBWellTargets[j].CT = undetermine // undertermine is marked when second time graph cuts threshold line
 							DBWells[i].ColorCode = red
 						}

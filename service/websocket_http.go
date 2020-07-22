@@ -4,10 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
 	"time"
+
+	"strconv"
 
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
@@ -238,6 +241,13 @@ func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 		for i, w := range wells {
 			for _, t := range welltargets {
 				if w.Position == t.WellPosition {
+
+					// show scaled value for graph
+					if t.CT != "" && t.CT != undetermine {
+						ct, _ := strconv.ParseFloat(t.CT, 32)
+						t.CT = fmt.Sprintf("%f", scaleThreshold(float32(ct)))
+					}
+
 					wells[i].Targets = append(wells[i].Targets, t)
 				}
 			}
