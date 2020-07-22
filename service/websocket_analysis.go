@@ -24,6 +24,12 @@ func setExperimentValues(aw []int32, TargetDetails []db.TargetDetails, Experimen
 
 }
 
+// scale threshold
+func scaleThreshold(val float32) float32 {
+
+	return ((val-pcrMin)/(pcrMax-pcrMin))*(graphMax-graphMin) + graphMin
+}
+
 // makePLCStage return plc.Stage from stagesteps
 func makePLCStage(ss []db.StageStep) plc.Stage {
 	var plcStage plc.Stage
@@ -78,7 +84,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 
 			wt.ExperimentID = r.ExperimentID
 
-			if r.Threshold < float32(r.FValue) {
+			if r.Threshold < scaleThreshold(float32(r.FValue)) {
 				// add ct value
 				wt.CT = strconv.Itoa(int(r.FValue))
 			} else {
@@ -92,7 +98,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 		for _, r := range Result {
 			for i, t := range DBWellTargets {
 				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID {
-					if t.CT == "" && r.Threshold < float32(r.FValue) {
+					if t.CT == "" && r.Threshold < scaleThreshold(float32(r.FValue)) {
 
 						// add ct
 						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
@@ -108,20 +114,20 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
 
 						switch {
-						case redlowerlimit >= currentCycle && currentCycle < redupperlimit && float32(r.FValue) > r.Threshold && t.CT == "":
+						case redlowerlimit >= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
 							// mark red
 							DBWells[i].ColorCode = red
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case orangelowerlimit <= currentCycle && float32(r.FValue) > r.Threshold && t.CT == "":
+						case orangelowerlimit <= currentCycle && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
 							// mark orange
 							DBWells[i].ColorCode = orange
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case float32(r.FValue) > r.Threshold && t.CT == "":
+						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
 							// only update ct
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
-						case float32(r.FValue) > r.Threshold && t.CT != "":
+						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT != "":
 							// only update ct
 							DBWellTargets[j].CT = "UNDETERMINE"
 							DBWells[i].ColorCode = red
@@ -154,7 +160,7 @@ func analyseResult(result []db.Result) (finalResult []graph) {
 					// if cycle found do not add again!
 					if !found(r.Cycle, wellResult.Cycle) {
 						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
-						wellResult.FValue = append(wellResult.FValue, r.FValue)
+						wellResult.FValue = append(wellResult.FValue, scaleThreshold(float32(r.FValue)))
 					}
 
 				}
@@ -162,7 +168,7 @@ func analyseResult(result []db.Result) (finalResult []graph) {
 			}
 			finalResult = append(finalResult, wellResult)
 			wellResult.Cycle = []uint16{}
-			wellResult.FValue = []uint16{}
+			wellResult.FValue = []float32{}
 		}
 
 	}
