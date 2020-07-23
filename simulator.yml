@@ -1,10 +1,10 @@
 environment: normal  # normal | error
 
 controls:
-  positive: 5
-  negative: 5
-  internal: 5
-  no_template: 5
+  positive: 1        # position of well to be set positive control
+  negative: 2        # position of well to be set negative control
+  internal: 3        # position of well to be set internal control
+  no_template: 4     # position of well to be set no template
 
 wells:
-  count: 56
+  count: 96           # total no of well count range in between 1-96, note that controls position should not exceed well_count

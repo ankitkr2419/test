@@ -65,7 +65,7 @@ func makeResult(scan plc.Scan) (result []db.Result) {
 		for _, t := range experimentValues.targets {
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
-			r.FValue = scan.Wells[w][t.DyePosition] // for 5th well & target 2 = scanWells[5][1]
+			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
 
 			result = append(result, r)
 		}
@@ -84,7 +84,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 
 			wt.ExperimentID = r.ExperimentID
 
-			if r.Threshold < scaleThreshold(float32(r.FValue)) {
+			if r.Threshold <= scaleThreshold(float32(r.FValue)) {
 				// add ct value
 				wt.CT = strconv.Itoa(int(r.FValue))
 			} else {
@@ -98,10 +98,14 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 		for _, r := range Result {
 			for i, t := range DBWellTargets {
 				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID {
-					if t.CT == "" && r.Threshold < scaleThreshold(float32(r.FValue)) {
+					if t.CT == "" && r.Threshold <= scaleThreshold(float32(r.FValue)) {
 
 						// add ct
 						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
+					} else if t.CT != "" && t.CT != undetermine && r.Threshold >= scaleThreshold(float32(r.FValue)) {
+
+						// if ct value again crosses threshold then only set it as undertermine
+						DBWellTargets[i].CT = undetermine
 					}
 				}
 			}
@@ -114,22 +118,23 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
 
 						switch {
-						case redlowerlimit >= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
+						case redlowerlimit <= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
 							// mark red
 							DBWells[i].ColorCode = red
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case orangelowerlimit <= currentCycle && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
+						case orangelowerlimit <= currentCycle && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
 							// mark orange
 							DBWells[i].ColorCode = orange
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
+						case scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
 							// only update ct
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
-						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT != "":
-							// only update ct
-							DBWellTargets[j].CT = "UNDETERMINE"
+							// here, we do not detemine color as cycle is 1 to lowerLimitOfRed
+
+						case scaleThreshold(float32(r.FValue)) <= r.Threshold && t.CT != "":
+							DBWellTargets[j].CT = undetermine // undertermine is marked when second time graph cuts threshold line
 							DBWells[i].ColorCode = red
 						}
 

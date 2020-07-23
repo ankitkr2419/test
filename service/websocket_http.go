@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"time"
 
+	"strconv"
+
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
 )
@@ -244,6 +246,13 @@ func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 		for i, w := range wells {
 			for _, t := range welltargets {
 				if w.Position == t.WellPosition {
+
+					// show scaled value for graph
+					if t.CT != "" && t.CT != undetermine {
+						ct, _ := strconv.ParseFloat(t.CT, 32)
+						t.CT = fmt.Sprintf("%f", scaleThreshold(float32(ct)))
+					}
+
 					wells[i].Targets = append(wells[i].Targets, t)
 				}
 			}
@@ -373,6 +382,11 @@ func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err er
 	// makeResult returns data in DB result format
 	result := makeResult(scan)
 
+	// for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
+	if scan.Cycle == 1 {
+		addResultForZerothCycle(deps, result)
+	}
+
 	// insert current cycle result into Database
 	DBResult, err = deps.Store.InsertResult(context.Background(), result)
 	if err != nil {
@@ -382,6 +396,35 @@ func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err er
 		return
 	}
 	return
+}
+
+//addResultForZerothCycle for graph
+func addResultForZerothCycle(deps Dependencies, result []db.Result) {
+
+	// set default value [0,0]
+	var zerothResult []db.Result
+	for _, v := range result {
+		var r db.Result
+
+		// copy all fields
+		r = v
+
+		// set cycle & FValue to [0,0]
+		r.Cycle = 0
+		r.FValue = 0
+
+		zerothResult = append(zerothResult, r)
+
+	}
+
+	// insert current cycle result into Database
+	_, err := deps.Store.InsertResult(context.Background(), zerothResult)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error inserting result data")
+		// send error
+		deps.WsErrCh <- err
+		return
+	}
 }
 
 func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) (err error) {

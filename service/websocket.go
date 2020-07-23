@@ -20,6 +20,7 @@ var (
 	pcrMax            float32 = 32000
 	graphMin          float32 = 0 // scale for graph
 	graphMax          float32 = 10
+	undetermine               = "UNDETERMINE"
 )
 
 type experimentResultValues struct {
