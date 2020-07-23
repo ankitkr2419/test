@@ -22,10 +22,13 @@ const TemplateContainer = (props) => {
 		updateSelectedWizard,
 		updateTemplateID,
 		toggleTemplateModal,
+		isCreateTemplateModalVisible,
 	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
+
+	const isTemplatesLoading = templates.get('isLoading');
 	// isTemplateCreated = true means template created successfully
 	const { isTemplateCreated, response  } = useSelector(
 		state => state.createTemplateReducer,
@@ -97,6 +100,8 @@ const TemplateContainer = (props) => {
 			isLoginTypeOperator={isLoginTypeOperator}
 			createExperiment={createExperiment}
 			toggleTemplateModal={toggleTemplateModal}
+			isTemplatesLoading={isTemplatesLoading}
+			isCreateTemplateModalVisible={isCreateTemplateModalVisible}
 		/>
 	);
 };
