@@ -17,7 +17,7 @@ export function* fetchSamples(actions) {
 		yield call(callApi, {
 			payload: {
 				body: null,
-				reqPath: `samples/${searchText}`,
+				reqPath: `samples/?text=${searchText}`,
 				successAction,
 				failureAction,
 			},
