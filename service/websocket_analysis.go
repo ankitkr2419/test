@@ -84,7 +84,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 
 			wt.ExperimentID = r.ExperimentID
 
-			if r.Threshold < scaleThreshold(float32(r.FValue)) {
+			if r.Threshold <= scaleThreshold(float32(r.FValue)) {
 				// add ct value
 				wt.CT = strconv.Itoa(int(r.FValue))
 			} else {
@@ -98,7 +98,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 		for _, r := range Result {
 			for i, t := range DBWellTargets {
 				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID {
-					if t.CT == "" && r.Threshold < scaleThreshold(float32(r.FValue)) {
+					if t.CT == "" && r.Threshold <= scaleThreshold(float32(r.FValue)) {
 
 						// add ct
 						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
@@ -118,17 +118,17 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
 
 						switch {
-						case redlowerlimit <= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
+						case redlowerlimit <= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
 							// mark red
 							DBWells[i].ColorCode = red
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case orangelowerlimit <= currentCycle && scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
+						case orangelowerlimit <= currentCycle && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
 							// mark orange
 							DBWells[i].ColorCode = orange
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case scaleThreshold(float32(r.FValue)) > r.Threshold && t.CT == "":
+						case scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
 							// only update ct
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 							// here, we do not detemine color as cycle is 1 to lowerLimitOfRed

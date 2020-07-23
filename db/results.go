@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -51,7 +52,8 @@ const (
  		r.experiment_id,t.template_id,r.target_id,t.threshold,r.cycle,r.f_value,r.well_position
 		FROM results as r , experiment_template_targets as t
 		WHERE r.experiment_id = t.experiment_id AND r.target_id = t.target_id
-		AND r.experiment_id = $1`
+		AND r.experiment_id = $1
+		ORDER BY created_at ASC`
 )
 
 type Result struct {
@@ -75,9 +77,11 @@ type TargetDetails struct {
 
 type WellTargetResults struct {
 	WellTarget
-	Cycle     uint16  `db:"cycle" json:"cycle"`
-	FValue    uint16  `db:"f_value" json:"f_value"`
-	Threshold float32 `db:"threshold" json:"threshold"`
+	Cycle     uint16    `db:"cycle" json:"cycle"`
+	FValue    uint16    `db:"f_value" json:"f_value"`
+	Threshold float32   `db:"threshold" json:"threshold"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) ListConfTargets(ctx context.Context, experimentID uuid.UUID) (w []TargetDetails, err error) {
