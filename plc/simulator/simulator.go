@@ -194,24 +194,23 @@ func (d *Simulator) setWells() {
 			for i := 0; i < 6; i++ {
 				well.goals[i] = "high"
 			}
-			wc++ // incrementing well count as it is control well
+
 		} else if i == nc {
 			well.control = "negative"
 			for i := 0; i < 6; i++ {
 				well.goals[i] = ""
 			}
-			wc++
+
 		} else if i == ic {
 			well.control = "internal"
 			well.goals = [6]string{"", "", "", "", "", "high"} //TODO: discuss
 
-			wc++
 		} else if i == ntc {
 			well.control = "no_template"
 			for i := 0; i < 6; i++ {
 				well.goals[i] = "0"
 			}
-			wc++
+
 		} else {
 			well.control = "" // patient sample
 
