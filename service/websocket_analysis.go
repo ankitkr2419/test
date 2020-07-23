@@ -65,7 +65,7 @@ func makeResult(scan plc.Scan) (result []db.Result) {
 		for _, t := range experimentValues.targets {
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
-			r.FValue = scan.Wells[w][t.DyePosition] // for 5th well & target 2 = scanWells[5][1]
+			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
 
 			result = append(result, r)
 		}
