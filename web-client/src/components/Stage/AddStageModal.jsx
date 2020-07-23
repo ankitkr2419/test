@@ -11,9 +11,11 @@ import {
 	Modal,
 	ModalBody,
 	Select,
+	FormError,
 } from 'core-components';
 import { Center, ButtonIcon, Text } from 'shared-components';
-import { stageTypeOptions } from './stageConstants';
+import { stageTypeOptions, MAX_REPEAT_COUNT, MIN_REPEAT_COUNT } from './stageConstants';
+import { validateRepeatCount } from './stageHelper';
 
 const AddStageModal = (props) => {
 	const {
@@ -27,7 +29,7 @@ const AddStageModal = (props) => {
 		updateStageFormStateWrapper,
 	} = props;
 
-	const { stageId, stageType, stageRepeatCount } = stageFormStateJS;
+	const { stageId, stageType, stageRepeatCount, repeatCountError } = stageFormStateJS;
 
 	const isRepeatCountDisabled = stageType && stageType.value === 'hold';
 
@@ -47,6 +49,18 @@ const AddStageModal = (props) => {
 		updateStageFormStateWrapper(name, value);
 	};
 
+	// reset repeatCountError to false stored in stageForm local state
+	const onRepeatCountFocusHandler = () => {
+		updateStageFormStateWrapper('repeatCountError', false);
+	};
+
+	// set repeatCountError true stored in stageForm local state
+	const onRepeatCountBlurHandler = () => {
+		if (validateRepeatCount(stageRepeatCount) === false) {
+			updateStageFormStateWrapper('repeatCountError', true);
+		}
+	};
+
 	const stageTypeChangeHandler = (selectedStageType) => {
 		// repeat count is applicable for stage type cycle,
 		// So resetting repeat count in case of stage type hold
@@ -55,6 +69,8 @@ const AddStageModal = (props) => {
 				'stageRepeatCount',
 				'',
 			);
+			// reset repeatCountError to false
+			updateStageFormStateWrapper('repeatCountError', false);
 		}
 		updateStageFormStateWrapper(
 			'stageType',
@@ -113,8 +129,12 @@ const AddStageModal = (props) => {
 										placeholder='Type here'
 										value={stageRepeatCount}
 										onChange={onChangeHandler}
+										onFocus={onRepeatCountFocusHandler}
+										onBlur={onRepeatCountBlurHandler}
 										disabled={isRepeatCountDisabled}
+										invalid={repeatCountError}
 									/>
+									<FormError>Enter value between {MIN_REPEAT_COUNT} - {MAX_REPEAT_COUNT} </FormError>
 								</FormGroup>
 							</Col>
 						</Row>
