@@ -245,7 +245,8 @@ func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 					// show scaled value for graph
 					if t.CT != "" && t.CT != undetermine {
 						ct, _ := strconv.ParseFloat(t.CT, 32)
-						t.CT = fmt.Sprintf("%f", scaleThreshold(float32(ct)))
+						// %.1f takes decimal value upto 1
+						t.CT = fmt.Sprintf("%.1f", scaleThreshold(float32(ct)))
 					}
 
 					wells[i].Targets = append(wells[i].Targets, t)
