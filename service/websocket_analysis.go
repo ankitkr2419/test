@@ -124,7 +124,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 							DBWellTargets[j].CT = undetermine // undertermine is marked when second time graph cuts threshold line
 							DBWells[i].ColorCode = red
 
-						case t.CT != "" && t.CT != undetermine && DBWells[i].ColorCode == green: //if earlier CT value is updated when well was not configured then change only color of the well
+						case t.CT != "" && DBWells[i].ColorCode == green: //if earlier CT value is updated when well was not configured then change only color of the well
 							DBWells[i].ColorCode = red
 
 						}
