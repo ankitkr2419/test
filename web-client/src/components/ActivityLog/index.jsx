@@ -19,7 +19,7 @@ const ActivityComponent = (props) => {
 						<col />
 						<col width='12%' />
 						<col width='10.5%' />
-						<col width='9.5%' />
+						<col width='10.5%' />
 						<col width='8%' />
 						<col width='8%' />
 						<col width='12%' />

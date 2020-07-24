@@ -443,6 +443,61 @@ button:focus {
 			}
 		}
 	}
+
+	&.table-sm {
+		th,
+		td {
+			&:first-child {
+				padding-left: rem(32px);
+			}
+		}
+
+		thead th {
+			font-size: rem(12px);
+			line-height: rem(16px);
+			padding: rem(16px 12px);
+		}
+
+		tbody td {
+			font-size: rem(14px);
+			line-height: rem(18px);
+			padding: rem(6px 12px);
+
+			&.td-actions {
+				button {
+					+ button {
+						margin-left: rem(16px);
+					}
+				}
+			}
+		}
+	}
+
+	&.table-steps {
+		thead {
+			tr {
+				box-shadow: rem(0 4px 16px) #00000029;
+			}
+
+			th {
+				background-color: $white;
+			}
+		}
+
+		&.-hold {
+			height: rem(218px);
+			margin: rem(0 0 8px);
+		}
+
+		&.-cycle {
+			height: rem(290px);
+		}
+
+		th.th-counter {
+			font-size: rem(12px);
+			line-height: rem(16px);
+		}
+	}
 }
 
 // Table Striped
