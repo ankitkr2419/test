@@ -467,7 +467,7 @@ func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) 
 	}
 
 	// update ct value in DB
-	_, err = deps.Store.UpsertWellTargets(context.Background(), targets, experimentValues.experimentID)
+	_, err = deps.Store.UpsertWellTargets(context.Background(), targets, experimentValues.experimentID, false)
 	if err != nil {
 		// send error
 		logger.WithField("err", err.Error()).Error("Error upsert wells")

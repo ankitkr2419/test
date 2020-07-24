@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
@@ -202,6 +203,15 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		setExperimentValues(config.ActiveWells("activeWells"), targetDetails, expID, plcStage)
 
+		WellTargets := initializeWellTargets()
+
+		// update well targets value in DB
+		_, err = deps.Store.UpsertWellTargets(context.Background(), WellTargets, experimentValues.experimentID, false)
+		if err != nil {
+			// send error
+			logger.WithField("err", err.Error()).Error("Error upsert wells")
+			return
+		}
 		//experimentRunning set true
 		experimentRunning = true
 
