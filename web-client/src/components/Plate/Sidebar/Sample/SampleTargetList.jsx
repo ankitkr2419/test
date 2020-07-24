@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import SampleTarget from './SampleTarget';
 
 const StyledSampleTargetList = styled.div`
-  padding: 24px 0;
-  margin: 0 0 8px;
+	padding: 24px 0;
+	margin: 0 0 8px;
 `;
 
 const SampleTargetList = ({ list, onCrossClickHandler }) => (
@@ -15,6 +15,7 @@ const SampleTargetList = ({ list, onCrossClickHandler }) => (
 				key={ele.get('target_id')}
 				onClickHandler={() => onCrossClickHandler(ele.get('target_id'))}
 				label={ele.get('target_name')}
+				isSelected={true}
 			/>
 		))}
 	</StyledSampleTargetList>
