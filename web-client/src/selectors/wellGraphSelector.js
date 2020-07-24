@@ -22,16 +22,22 @@ const getWellGraphData = state => state.wellGraphReducer;
 const nullableCheck = arr => arr.every(item => item === 0);
 const getThresholdLineData = (value, count) => {
 	const arr = [];
-	for (let x = 1; x <= count; x += 1) {
+	for (let x = 0; x <= count; x += 1) {
 		arr.push(value);
 	}
 	return arr;
 };
 
-// roundoff the values after decimal point to one digit ie. 1.3333 to 1.3
+// get xaxis labels
 export const getXAxis = createSelector(
-	cycles => cycles,
-	(cycles) => cycles.map(cycle => Math.floor(cycle * 10) / 10),
+	count => count,
+	(count) => {
+		const arr = [];
+		for (let x = 0; x <= count; x += 1) {
+			arr.push(x);
+		}
+		return arr;
+	},
 );
 
 const getThresholdLine = (label, max_threshold, count, lineColor) => ({
@@ -94,7 +100,6 @@ export const getLineChartData = createSelector(
 						// if line color is present assign it
 						borderColor = lineColorFiltered.first().get('lineColor');
 					}
-
 					return {
 						...lineConfigs, // chart line config
 						label: `index-${index}`, // unique label per line
@@ -114,11 +119,11 @@ export const getLineChartData = createSelector(
 		}
 
 		// populating threshold line per targets
-		const { cycles } = chartData.first();
+		const { totalCycles } = chartData.first();
 		const thresholdArray = activeTargets.map(ele => getThresholdLine(
 			ele.get('target_name'),
 			ele.get('threshold'),
-			cycles.size,
+			totalCycles,
 			ele.get('lineColor'),
 		));
 		return chartData.merge(thresholdArray);

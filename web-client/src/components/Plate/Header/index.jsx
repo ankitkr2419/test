@@ -23,15 +23,16 @@ const SubHeader = (props) => {
 		experimentTemplate,
 		isExperimentSucceeded,
 		experimentDetails,
+		experimentId,
 	} = props;
 
-	const { templateId, templateName } = experimentTemplate;
+	const { templateName } = experimentTemplate;
 	const { start_time, end_time, well_count } = experimentDetails.toJS();
 
 	return (
 		<StyledSubHeader className="plate-subheader">
 			<Text Tag="h6" className="mb-0">
-				{templateId}
+				{experimentId}
 			</Text>
 			<Text Tag="h6" className="mb-0 mx-5">
 				{templateName}
