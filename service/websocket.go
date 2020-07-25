@@ -8,6 +8,7 @@ import (
 )
 
 var (
+	ic                int         //internal control
 	green             = "#3FC13A" // All CT values for the well are below threshold,
 	red               = "#F06666" //Even a single value crosses threshold for target
 	orange            = "#F3811F" // If the CT values are close to threshold (delta)
@@ -32,10 +33,8 @@ type experimentResultValues struct {
 type resultGraph struct {
 	Type string  `json:"type"`
 	Data []graph `json:"data"`
-	// LidTemperature float32 `json:"lid_temp"`
-	// Temperature float32 `json:"temperature"`
-	// CurrentCycle uint16    `json:"current_cycle"`
 }
+
 type graph struct {
 	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
