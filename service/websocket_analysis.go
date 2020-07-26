@@ -10,12 +10,13 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func setExperimentValues(aw []int32, TargetDetails []db.TargetDetails, ExperimentID uuid.UUID, stage plc.Stage) {
+func setExperimentValues(aw []int32, t uuid.UUID, TargetDetails []db.TargetDetails, ExperimentID uuid.UUID, stage plc.Stage) {
 	experimentValues = experimentResultValues{
 		experimentID: ExperimentID,
 		activeWells:  aw,
 		targets:      TargetDetails,
 		plcStage:     stage,
+		icTargetID:   t,
 	}
 
 	redlowerlimit = config.GetColorLimits("redlowerlimit")

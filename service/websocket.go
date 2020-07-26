@@ -29,7 +29,9 @@ type experimentResultValues struct {
 	experimentID uuid.UUID
 	activeWells  []int32
 	targets      []db.TargetDetails
+	icTargetID   uuid.UUID
 }
+
 type resultGraph struct {
 	Type string  `json:"type"`
 	Data []graph `json:"data"`
