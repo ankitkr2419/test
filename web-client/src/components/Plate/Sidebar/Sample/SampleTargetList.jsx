@@ -8,14 +8,14 @@ const StyledSampleTargetList = styled.div`
 	margin: 0 0 8px;
 `;
 
-const SampleTargetList = ({ list, onCrossClickHandler }) => (
+const SampleTargetList = ({ list, onTargetClickHandler }) => (
 	<StyledSampleTargetList>
 		{list.map((ele, index) => (
 			<SampleTarget
 				key={ele.get('target_id')}
-				onClickHandler={() => onCrossClickHandler(ele.get('target_id'))}
+				onClickHandler={() => onTargetClickHandler(index)}
 				label={ele.get('target_name')}
-				isSelected={true}
+				isSelected={ele.get('isSelected')}
 			/>
 		))}
 	</StyledSampleTargetList>
@@ -23,7 +23,7 @@ const SampleTargetList = ({ list, onCrossClickHandler }) => (
 
 SampleTargetList.propTypes = {
 	list: PropTypes.object.isRequired,
-	onCrossClickHandler: PropTypes.func.isRequired,
+	onTargetClickHandler: PropTypes.func.isRequired,
 };
 
 export default SampleTargetList;

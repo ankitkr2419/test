@@ -16,6 +16,7 @@ import createSampleStateReducer, {
 } from 'components/Plate/Sidebar/Sample/createSampleState';
 import { addWell, addWellReset } from 'action-creators/wellActionCreators';
 import { taskOptions } from 'components/Plate/plateConstant';
+import { getSampleTargetList, getInitSampleTargetList } from 'components/Plate/Sidebar/Sample/sampleHelper';
 
 const SampleSideBarContainer = (props) => {
 	// constant
@@ -59,7 +60,7 @@ const SampleSideBarContainer = (props) => {
 	// update targets to local state, so every time list will contain original target list
 	const addTargetsToLocalState = useCallback(() => {
 		if (experimentTargetsList !== null && experimentTargetsList.size !== 0) {
-			updateCreateSampleWrapper('targets', experimentTargetsList);
+			updateCreateSampleWrapper('targets', getInitSampleTargetList(experimentTargetsList));
 		}
 	}, [experimentTargetsList]);
 
@@ -81,7 +82,7 @@ const SampleSideBarContainer = (props) => {
 		// this effect will run when operator is trying to update well data
 		if (updateWell !== null) {
 			const {
-				sample_name, sample_id, task, position,
+				sample_name, sample_id, task, position, targets,
 			} = updateWell;
 			// set data to local state for update
 			sampleStateDispatch({
@@ -94,7 +95,7 @@ const SampleSideBarContainer = (props) => {
 						label: sample_name,
 						value: sample_id,
 					},
-					targets: experimentTargetsList,
+					targets: getSampleTargetList(targets, experimentTargetsList),
 					task:{
 						label: task,
 						value: task,
@@ -111,11 +112,11 @@ const SampleSideBarContainer = (props) => {
 	const addNewLocalSample = (sample) => {
 		dispatch(addSampleLocallyCreated(sample));
 	};
-
-	const onCrossClickHandler = (id) => {
+	// helper function to select or unselect a target stored in targets list in local state
+	const onTargetClickHandler = (index) => {
 		sampleStateDispatch({
-			type: createSampleActions.deleteTarget,
-			value: id,
+			type: createSampleActions.TOGGLE_TARGET,
+			value: index,
 		});
 	};
 
@@ -134,7 +135,7 @@ const SampleSideBarContainer = (props) => {
 			sampleOptions={sampleList}
 			isSampleListLoading={isSampleListLoading}
 			taskOptions={taskOptions}
-			onCrossClickHandler={onCrossClickHandler}
+			onTargetClickHandler={onTargetClickHandler}
 			addButtonClickHandler={addButtonClickHandler}
 			isSampleStateValid={isSampleStateValid}
 			resetLocalState={resetLocalState}
