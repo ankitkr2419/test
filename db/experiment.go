@@ -51,6 +51,7 @@ type Experiment struct {
 	StartTime    time.Time `db:"start_time" json:"start_time"`
 	EndTime      time.Time `db:"end_time" json:"end_time"`
 	WellCount    int       `db:"well_count" json:"well_count"`
+	Result       string    `db:"result" json:"result"`
 }
 
 type WarnResponse struct {
