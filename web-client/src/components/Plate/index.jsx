@@ -84,6 +84,7 @@ const Plate = (props) => {
 				experimentTemplate={experimentTemplate}
 				isExperimentSucceeded={experimentStatus === EXPERIMENT_STATUS.success}
 				experimentDetails={experimentDetails}
+				experimentId={experimentId}
 			/>
 			<GridWrapper className="plate-body flex-100">
 				<WellGridHeader

@@ -28,10 +28,14 @@ const ExperimentGraphContainer = (props) => {
 	const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
 
 	const toggleSideBar = () => {
+		// console log on graph drawer handle click
+		console.info('Graph Drawer Handle Clicked');
 		// reset the selected wells while closing the sidebar
 		if (isSidebarOpen && isMultiSelectionOptionOn === false) {
 			resetSelectedWells();
 		}
+		// console log on graph drawer opened or close
+		console.info(`Graph Drawer ${isSidebarOpen === true ? 'Closed' : 'Opened'}`);
 		setIsSidebarOpen(toggleStateValue => !toggleStateValue);
 	};
 
