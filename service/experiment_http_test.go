@@ -183,6 +183,19 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything).Return(
 		nil, nil)
 
+	suite.dbMock.On("UpsertWellTargets", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
+		[]db.WellTarget{
+			{
+				WellPosition: 1,
+				ExperimentID: testUUID,
+				TargetID:     targetID,
+				TargetName:   "COVID",
+				CT:           "45",
+			},
+		},
+		nil,
+	)
+
 	suite.dbMock.On("InsertExperimentTemperature", mock.Anything, mock.Anything).Return(
 		nil, nil)
 

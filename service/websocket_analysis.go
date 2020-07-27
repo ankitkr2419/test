@@ -76,25 +76,7 @@ func makeResult(scan plc.Scan) (result []db.Result) {
 
 func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWells []db.Well, currentCycle uint16) ([]db.WellTarget, []db.Well) {
 	//if no well configured
-	if len(DBWells) == 0 && len(DBWellTargets) == 0 {
-		for _, r := range Result {
-			var wt db.WellTarget
-			wt.WellPosition = r.WellPosition
-			wt.TargetID = r.TargetID
-
-			wt.ExperimentID = r.ExperimentID
-
-			if r.Threshold <= scaleThreshold(float32(r.FValue)) {
-				// add ct value
-				wt.CT = strconv.Itoa(int(r.FValue))
-			} else {
-				wt.CT = ""
-			}
-
-			DBWellTargets = append(DBWellTargets, wt)
-		}
-		return DBWellTargets, DBWells
-	} else if len(DBWellTargets) > 0 && len(DBWells) == 0 { //when only targets added in prev cycle
+	if len(DBWellTargets) > 0 && len(DBWells) == 0 { //when only targets added in prev cycle
 		for _, r := range Result {
 			for i, t := range DBWellTargets {
 				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID {
@@ -111,10 +93,15 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			}
 		}
 		return DBWellTargets, DBWells
-	} else { // determine color
+	} else {
+		wellsConfigured := make([]uint16, len(DBWells))
+		for _, w := range DBWells {
+			wellsConfigured = append(wellsConfigured, uint16(w.Position))
+		}
 		for _, r := range Result {
-			for i, w := range DBWells {
-				for j, t := range DBWellTargets {
+			for j, t := range DBWellTargets {
+				for i, w := range DBWells {
+					// determine color
 					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
 
 						switch {
@@ -128,16 +115,33 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 							DBWells[i].ColorCode = orange
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
-							// only update ct
+						case redlowerlimit > currentCycle && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
+
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
-							// here, we do not detemine color as cycle is 1 to lowerLimitOfRed
+							DBWells[i].ColorCode = red // here, we do detemine color as cycle is 1 to lowerLimitOfRed also crosses threshold
 
 						case scaleThreshold(float32(r.FValue)) <= r.Threshold && t.CT != "":
 							DBWellTargets[j].CT = undetermine // undertermine is marked when second time graph cuts threshold line
 							DBWells[i].ColorCode = red
+
+						case t.CT != "" && DBWells[i].ColorCode == green: //if earlier CT value is updated when well was not configured then change only color of the well
+							DBWells[i].ColorCode = red
+
 						}
 
+					}
+				}
+				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID && !found(uint16(t.WellPosition), wellsConfigured) {
+
+					// if well is not configured for any target we should not miss the CT update
+					if t.CT == "" && r.Threshold <= scaleThreshold(float32(r.FValue)) {
+
+						// add ct
+						DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+					} else if t.CT != "" && t.CT != undetermine && r.Threshold >= scaleThreshold(float32(r.FValue)) {
+
+						// if ct value again crosses threshold then only set it as undertermine
+						DBWellTargets[j].CT = undetermine
 					}
 				}
 			}
@@ -185,6 +189,26 @@ func found(key uint16, search []uint16) (found bool) {
 		if v == key {
 			found = true
 			return
+		}
+	}
+	return
+}
+
+// initializeWellTargets adds all well targets at start of experiment
+func initializeWellTargets() (WTs []db.WellTarget) {
+	for _, w := range experimentValues.activeWells {
+
+		for _, t := range experimentValues.targets {
+
+			var wt db.WellTarget
+
+			wt.ExperimentID = experimentValues.experimentID
+			wt.TargetID = t.TargetID
+			wt.WellPosition = w
+			wt.CT = ""
+
+			WTs = append(WTs, wt)
+
 		}
 	}
 	return
