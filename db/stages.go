@@ -16,7 +16,7 @@ const (
 		repeat_count,
 		template_id,
 		step_count)
-		VALUES ($1, $2, $3, $4) RETURNING id`
+		VALUES %s`
 
 	getStageListQuery = `SELECT * FROM stages
 		where template_id = $1
@@ -87,7 +87,7 @@ func (s *pgStore) ListStages(ctx context.Context, template_id uuid.UUID) (stgs [
 func (s *pgStore) CreateStages(ctx context.Context, stg []Stage) (createdStage []Stage, err error) {
 
 	stmt := makeInsertStagesQuery(stg)
-
+	fmt.Println(stmt)
 	_, err = s.db.Exec(stmt)
 
 	if err != nil {
@@ -164,7 +164,7 @@ func makeInsertStagesQuery(stages []Stage) string {
 	values := make([]string, 0, len(stages))
 
 	for _, s := range stages {
-		values = append(values, fmt.Sprintf("%v,%v,'%v',%v", s.Type, s.RepeatCount, s.TemplateID, s.StepCount))
+		values = append(values, fmt.Sprintf("('%v',%v,'%v',%v)", s.Type, s.RepeatCount, s.TemplateID, s.StepCount))
 	}
 
 	stmt := fmt.Sprintf(createStageQuery,
