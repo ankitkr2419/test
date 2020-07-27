@@ -3,6 +3,8 @@ import {
 	listStepActions,
 	updateStepActions,
 	deleteStepActions,
+	listHoldStepActions,
+	listCycleStepActions,
 } from 'actions/stepActions';
 
 export const addStep = body => ({
@@ -24,15 +26,30 @@ export const addStepReset = () => ({
 	type: addStepActions.addStepReset,
 });
 
-export const fetchSteps = stageId => ({
-	type: listStepActions.listAction,
+export const fetchHoldSteps = stageId => ({
+	type: listHoldStepActions.listAction,
 	payload: {
 		stageId,
 	},
 });
 
-export const fetchStepsFailed = errorResponse => ({
-	type: listStepActions.failureAction,
+export const fetchHoldStepsFailed = errorResponse => ({
+	type: listHoldStepActions.failureAction,
+	payload: {
+		...errorResponse,
+		error: true,
+	},
+});
+
+export const fetchCycleSteps = stageId => ({
+	type: listCycleStepActions.listAction,
+	payload: {
+		stageId,
+	},
+});
+
+export const fetchCycleStepsFailed = errorResponse => ({
+	type: listCycleStepActions.failureAction,
 	payload: {
 		...errorResponse,
 		error: true,
