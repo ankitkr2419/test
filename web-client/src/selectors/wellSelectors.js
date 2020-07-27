@@ -19,8 +19,9 @@ export const getWellsPosition = createSelector(
 		.get('defaultList')
 		.map((ele, index) => {
 			if (
-				ele.get('isSelected') === true
-          || ele.get('isMultiSelected') === true
+				ele !== null &&
+				(ele.get('isSelected') === true
+          || ele.get('isMultiSelected') === true)
 			) {
 				return index;
 			}
@@ -34,15 +35,19 @@ export const setSelectedToList = (state, { isSelected, index }) => state.setIn([
 // set isMultiSelected flag to true for given index
 export const setMultiSelectedToList = (state, { isMultiSelected, index }) => state.setIn(['defaultList', index, 'isMultiSelected'], isMultiSelected);
 // makes all wells isSelected flag to  false
-export const resetWellDefaultList = state => state.updateIn(['defaultList'], myDefaultList => myDefaultList.map(ele => ele.setIn(['isSelected'], false)));
+export const resetWellDefaultList = state => state.updateIn(['defaultList'], myDefaultList => myDefaultList.map(ele => ele && ele.setIn(['isSelected'], false)));
 // makes all wells isMultiSelected flag to  false
-export const resetMultiWellDefaultList = state => state.updateIn(['defaultList'], myDefaultList => myDefaultList.map(ele => ele.setIn(['isMultiSelected'], false)));
+export const resetMultiWellDefaultList = state => state.updateIn(['defaultList'], myDefaultList => myDefaultList.map(ele => ele && ele.setIn(['isMultiSelected'], false)));
 
 /**
  * getDefaultPlatesList return wells default data w.r.t PLATE_CAPACITY.
  */
 export const getDefaultWellsList = createSelector(() => {
 	const arr = [];
+	// insert a null value at beginning of list so that wells data will start from index 1
+	// we have the wells numbered from from 1 and we use the index of each element in array
+	// as it's well number so to maintain the number ordering we have added a null at start
+	arr.push(null);
 	const initialPlateState = {
 		isSelected: false,
 		isWellFilled: false,
@@ -53,7 +58,7 @@ export const getDefaultWellsList = createSelector(() => {
 		id: null,
 		isWellActive: false,
 	};
-
+	// Initial plate state added for wells in array from index 1
 	for (let i = 0; i !== PLATE_CAPACITY; i += 1) {
 		arr.push(initialPlateState);
 	}
@@ -122,7 +127,7 @@ export const setActiveWells = createSelector(
 			const activeWellsPositions = action.payload.response;
 			const tempState = state.updateIn(['defaultList'], myDefaultList => myDefaultList.map((ele, index) => {
 				// find the index present in response data
-				if (activeWellsPositions.includes(index)) {
+				if (activeWellsPositions.includes(index) && ele !== null) {
 					return ele.merge({
 						isWellActive: true,
 					});
