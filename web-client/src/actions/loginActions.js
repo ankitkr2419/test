@@ -5,4 +5,5 @@ export default {
 	loginReset: 'LOGIN_RESET',
 	setLoginTypeAsOperator: 'SET_LOGIN_TYPE_AS_OPERATOR',
 	setIsPlateRoute: 'SET_IS_PLATE_ROUTE',
+	setIsTemplateRoute: 'SET_IS_TEMPLATE_ROUTE',
 };

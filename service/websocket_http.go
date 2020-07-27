@@ -78,12 +78,17 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 
+				//log in Db notifications
+				go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, msg))
+
 				sendOnFail(msg, errortype, rw, c)
 
 			case err = <-deps.WsErrCh:
 
 				logger.WithField("err", err.Error()).Error("Monitor has requested exit")
 				var errortype = "ErrorPCRMonitor"
+
+				go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, err.Error()))
 
 				sendOnFail(err.Error(), errortype, rw, c)
 
@@ -245,7 +250,8 @@ func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 					// show scaled value for graph
 					if t.CT != "" && t.CT != undetermine {
 						ct, _ := strconv.ParseFloat(t.CT, 32)
-						t.CT = fmt.Sprintf("%f", scaleThreshold(float32(ct)))
+						// %.1f takes decimal value upto 1
+						t.CT = fmt.Sprintf("%.1f", scaleThreshold(float32(ct)))
 					}
 
 					wells[i].Targets = append(wells[i].Targets, t)

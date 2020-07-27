@@ -52,4 +52,7 @@ type Storer interface {
 	UpdateColorWell(context.Context, string, uuid.UUID) error
 	ListExperimentTemperature(context.Context, uuid.UUID) ([]ExperimentTemperature, error)
 	InsertExperimentTemperature(context.Context, ExperimentTemperature) error
+	ListNotification(context.Context, uuid.UUID) ([]Notification, error)
+	InsertNotification(context.Context, Notification) error
+	MarkNotificationasRead(context.Context, uuid.UUID) error
 }

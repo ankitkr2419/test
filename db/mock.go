@@ -247,3 +247,18 @@ func (m *DBMockStore) InsertExperimentTemperature(ctx context.Context, r Experim
 	args := m.Called(ctx, r)
 	return args.Error(1)
 }
+
+func (m *DBMockStore) ListNotification(ctx context.Context, id uuid.UUID) (result []Notification, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]Notification), args.Error(1)
+}
+
+func (m *DBMockStore) InsertNotification(ctx context.Context, r Notification) (err error) {
+	args := m.Called(ctx, r)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) MarkNotificationasRead(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
