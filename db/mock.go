@@ -197,8 +197,8 @@ func (m *DBMockStore) GetWellTarget(ctx context.Context, i int32, wellID uuid.UU
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 
-func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget, id uuid.UUID) (wt []WellTarget, err error) {
-	args := m.Called(ctx, w, id)
+func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget, id uuid.UUID, s bool) (wt []WellTarget, err error) {
+	args := m.Called(ctx, w, id, s)
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 func (m *DBMockStore) ListStageSteps(ctx context.Context, id uuid.UUID) (s []StageStep, err error) {

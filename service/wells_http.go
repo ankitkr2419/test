@@ -116,7 +116,7 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 			}
 		}
 
-		createdTargets, err := deps.Store.UpsertWellTargets(req.Context(), targets, expID)
+		createdTargets, err := deps.Store.UpsertWellTargets(req.Context(), targets, expID, true)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
