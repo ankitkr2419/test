@@ -7,7 +7,5 @@ CREATE TABLE experiments (
   operator_name varchar(50),
   start_time timestamp,
   end_time timestamp,
-  result status,
-  repeat_cycles integer,
   FOREIGN KEY (template_id) REFERENCES templates(id)
 );
