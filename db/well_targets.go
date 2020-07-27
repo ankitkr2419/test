@@ -142,7 +142,7 @@ func (s *pgStore) UpsertWellTargets(ctx context.Context, WellTargets []WellTarge
 
 	for rows.Next() {
 		var r WellTarget
-		if err := rows.Scan(&r.ExperimentID, &r.WellPosition, &r.TargetID, &r.CT, &r.TargetName); err != nil {
+		if err := rows.Scan(&r.ExperimentID, &r.WellPosition, &r.TargetID, &r.CT, &r.Selected, &r.TargetName); err != nil {
 			logger.WithField("err", err.Error()).Error("Error getting new well targets")
 		}
 		targets = append(targets, r)
