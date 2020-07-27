@@ -11,6 +11,7 @@ export const stageStateInitialState = fromJS({
 	stageType: '',
 	stageRepeatCount: '',
 	stageId: null,
+	repeatCountError: false,
 	isCreateStageModalVisible: false,
 });
 

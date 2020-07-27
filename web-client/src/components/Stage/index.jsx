@@ -13,6 +13,7 @@ import stageStateReducer, {
 	stageStateActions,
 } from './stageState';
 import { stageTableHeader } from './stageConstants';
+import { validateStageForm } from './stageHelper';
 
 const StageComponent = (props) => {
 	const {
@@ -52,17 +53,6 @@ const StageComponent = (props) => {
 			'isCreateStageModalVisible',
 			!isCreateStageModalVisible,
 		);
-	};
-
-	// Validate create stage form
-	const validateStageForm = ({ stageType, stageRepeatCount }) => {
-		if (stageType.value === 'cycle' && stageRepeatCount !== '' && parseInt(stageRepeatCount, 10) > 0) {
-			return true;
-		}
-		if (stageType !== '' && stageType.value === 'hold') {
-			return true;
-		}
-		return false;
 	};
 
 	// create stage handler
