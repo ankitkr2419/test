@@ -49,7 +49,8 @@ const SidebarSample = (props) => {
 	};
 
 	const handleSampleInputChange = (text) => {
-		if (text.length >= 3) {
+		// fetch samples if text length is greater than zero ie.text is not empty
+		if (text.length > 0) {
 			fetchSamples(text);
 		}
 	};
