@@ -78,12 +78,17 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 
+				//log in Db notifications
+				go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, msg))
+
 				sendOnFail(msg, errortype, rw, c)
 
 			case err = <-deps.WsErrCh:
 
 				logger.WithField("err", err.Error()).Error("Monitor has requested exit")
 				var errortype = "ErrorPCRMonitor"
+
+				go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, err.Error()))
 
 				sendOnFail(err.Error(), errortype, rw, c)
 

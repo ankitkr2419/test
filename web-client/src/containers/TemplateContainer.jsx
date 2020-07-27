@@ -14,6 +14,7 @@ import {
 	createExperimentReset,
 } from 'action-creators/experimentActionCreators';
 import { getIsExperimentSaved } from 'selectors/experimentSelector';
+import { setIsTemplateRoute } from 'action-creators/loginActionCreators';
 
 const TemplateContainer = (props) => {
 	const {
@@ -22,10 +23,13 @@ const TemplateContainer = (props) => {
 		updateSelectedWizard,
 		updateTemplateID,
 		toggleTemplateModal,
+		isCreateTemplateModalVisible,
 	} = props;
 	const dispatch = useDispatch();
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
+
+	const isTemplatesLoading = templates.get('isLoading');
 	// isTemplateCreated = true means template created successfully
 	const { isTemplateCreated, response  } = useSelector(
 		state => state.createTemplateReducer,
@@ -37,6 +41,12 @@ const TemplateContainer = (props) => {
 
 	// isTemplateDeleted = true means experiment created successfully
 	const isExperimentSaved = useSelector(getIsExperimentSaved);
+
+	// set isTemplateRoute true on mount
+	useEffect(() => {
+		// isTemplateRoute use in appHeader to manage visibility of header buttons
+		dispatch(setIsTemplateRoute(true));
+	}, [dispatch]);
 
 	useEffect(() => {
 		// Once we create template will fetch updated template list
@@ -97,6 +107,8 @@ const TemplateContainer = (props) => {
 			isLoginTypeOperator={isLoginTypeOperator}
 			createExperiment={createExperiment}
 			toggleTemplateModal={toggleTemplateModal}
+			isTemplatesLoading={isTemplatesLoading}
+			isCreateTemplateModalVisible={isCreateTemplateModalVisible}
 		/>
 	);
 };
