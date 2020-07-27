@@ -29,7 +29,28 @@ export const getWellsPosition = createSelector(
 		})
 		.filter(ele => ele !== null),
 );
-
+//  returns array of indexes of filled wells
+export const getFilledWellsPosition = createSelector(
+	wellListReducer => wellListReducer,
+	wellListReducer => wellListReducer
+		.get('defaultList')
+		.map((ele, index) => {
+			if (ele !== null && ele.get('isWellFilled') === true) {
+				return index;
+			}
+			return null;
+		})
+		.filter(ele => ele !== null),
+);
+// returns array of targets_ids configured for a filled well
+export const getFilledWellTargets = createSelector(
+	wellListReducer => wellListReducer,
+	(_, wellPosition) => wellPosition,
+	(wellListReducer, wellPosition) => {
+		const temp = wellListReducer.getIn(['defaultList', wellPosition, 'targets']).map(ele => ele.target_id);
+		return temp;
+	},
+);
 // set isSelected flag to true for given index
 export const setSelectedToList = (state, { isSelected, index }) => state.setIn(['defaultList', index, 'isSelected'], isSelected);
 // set isMultiSelected flag to true for given index
