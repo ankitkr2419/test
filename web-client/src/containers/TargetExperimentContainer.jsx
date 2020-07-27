@@ -21,7 +21,7 @@ import { getExperimentTargets } from 'selectors/experimentTargetSelector';
 import { getSelectedTargetExperiment, isAnyThresholdInvalid, isNoTargetSelected } from 'components/Target/targetHelper';
 import { Redirect } from 'react-router';
 import { getExperimentId } from 'selectors/experimentSelector';
-import { setIsPlateRoute } from 'action-creators/loginActionCreators';
+import { setIsTemplateRoute } from 'action-creators/loginActionCreators';
 
 const TargetExperimentContainer = (props) => {
 	// constants
@@ -130,7 +130,9 @@ const TargetExperimentContainer = (props) => {
 	}, [selectedTargetState, experimentId, dispatch]);
 
 	const onNextClick = () => {
-		dispatch(setIsPlateRoute(true));
+		// set isTempalteRoute false.
+		// isTemplateRoute use in appHeader to manage visibility of header buttons
+		dispatch(setIsTemplateRoute(false));
 		setRedirectToPlate(true);
 	};
 

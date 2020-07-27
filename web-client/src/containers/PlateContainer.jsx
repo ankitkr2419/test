@@ -31,6 +31,15 @@ const PlateContainer = () => {
 	// activeWells means the well which are allowed to configure
 	const activeWells = useSelector(getActiveLoadedWells);
 
+	// set isPlateRoute true on mount and false on unmount
+	useEffect(() => {
+		// isPlateRoute use in appHeader to manage visibility of header buttons
+		dispatch(setIsPlateRoute(true));
+		return () => {
+			dispatch(setIsPlateRoute(false));
+		};
+	}, [dispatch]);
+
 	useEffect(() => {
 		if (experimentId !== null) {
 			// fetching configured wells data

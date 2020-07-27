@@ -54,4 +54,7 @@ type Storer interface {
 	InsertExperimentTemperature(context.Context, ExperimentTemperature) error
 	GetICTarget(context.Context, int) (Target, error)
 	AddExpTemplateTarget(context.Context, []ExpTemplateTarget, uuid.UUID) error
+	ListNotification(context.Context, uuid.UUID) ([]Notification, error)
+	InsertNotification(context.Context, Notification) error
+	MarkNotificationasRead(context.Context, uuid.UUID) error
 }
