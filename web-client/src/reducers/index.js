@@ -19,7 +19,8 @@ import {
 } from 'reducers/stageReducer';
 
 import {
-	listStepsReducer,
+	listHoldStepsReducer,
+	listCycleStepsReducer,
 	createStepReducer,
 	deleteStepReducer,
 	updateStepReducer,
@@ -49,7 +50,8 @@ const rootReducer = combineReducers({
 	createStageReducer,
 	deleteStageReducer,
 	updateStageReducer,
-	listStepsReducer,
+	listHoldStepsReducer,
+	listCycleStepsReducer,
 	createStepReducer,
 	deleteStepReducer,
 	updateStepReducer,
