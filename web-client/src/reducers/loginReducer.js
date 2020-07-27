@@ -17,6 +17,7 @@ const loginInitialState = fromJS({
 	isLoginTypeOperator: false,
 	isError: false,
 	isPlateRoute: false,
+	isTemplateRoute: false,
 });
 
 export const loginReducer = (state = loginInitialState, action) => {
@@ -50,6 +51,8 @@ export const loginReducer = (state = loginInitialState, action) => {
 		});
 	case loginActions.setIsPlateRoute:
 		return state.setIn(['isPlateRoute'], action.payload.isPlateRoute);
+	case loginActions.setIsTemplateRoute:
+		return state.setIn(['isTemplateRoute'], action.payload.isTemplateRoute);
 	case loginActions.loginReset:
 		return loginInitialState;
 	default:
