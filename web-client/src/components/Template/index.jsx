@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'core-components';
 import PropTypes from 'prop-types';
 import {
@@ -21,6 +21,8 @@ const TemplateComponent = (props) => {
 		isLoginTypeAdmin,
 		createExperiment,
 		toggleTemplateModal,
+		isTemplatesLoading,
+		isCreateTemplateModalVisible,
 	} = props;
 
 	// Local state to store template name
@@ -55,6 +57,20 @@ const TemplateComponent = (props) => {
 			// updateSelectedWizard('target');
 		}
 	};
+
+	useEffect(() => {
+		// make creat modal open if no data is available
+		// isTemplatesLoading will tell us weather api calling is finish or not
+		// templates.size = 0  will tell us there is no records present
+		// isCreateTemplateModalVisible is check as we have to make modal visible only once
+		if (isTemplatesLoading === false
+			&& templates.size === 0
+			&& isCreateTemplateModalVisible === false) {
+			toggleTemplateModal();
+		}
+		// isCreateStageModalVisible skipped in dependency because its causing issue with modal state
+		// eslint-disable-next-line
+	}, [isTemplatesLoading, templates]);
 
 	return (
 		<div className="d-flex flex-100 flex-column p-4 mt-3">
