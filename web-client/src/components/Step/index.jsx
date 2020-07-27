@@ -1,32 +1,27 @@
 import React, { useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button } from 'core-components';
-import {
-	ButtonIcon,
-	TableWrapper,
-	TableWrapperBody,
-	TableWrapperFooter,
-	Icon,
-} from 'shared-components';
 import stepStateReducer, {
 	stepStateInitialState,
 } from 'components/Step/stepState';
 import AddStepModal from './AddStepModal';
 import { stepStateActions } from './stepState';
 import { validateStepForm } from './stepHelper';
+import HoldSteps from './HoldSteps';
+import CycleSteps from './CycleSteps';
 
 const StepComponent = (props) => {
 	const {
-		stageId,
-		steps, // list of steps
+		currentStageId,
+		setCurrentStageId,
+		holdStageId,
+		cycleStageId,
+		holdSteps,	// list of hold steps
+		cycleSteps, // list of cycle steps
 		addStep, // create api cal
 		deleteStep,
 		onStepRowClicked,
 		selectedStepId,
 		saveStep, // update api call
-		isStepsLoading,
-		goToStageWizard,
-		stageType,
 	} = props;
 
 	// local state to save form data and modal state flag
@@ -72,7 +67,7 @@ const StepComponent = (props) => {
 			dataCapture,
 		} = stepFormStateJS;
 		addStep({
-			stage_id: stageId,
+			stage_id: currentStageId,
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
 			hold_time: parseInt(holdTime, 10),
@@ -91,7 +86,7 @@ const StepComponent = (props) => {
 			dataCapture,
 		} = stepFormStateJS;
 		saveStep(stepId, {
-			stage_id: stageId,
+			stage_id: currentStageId,
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
 			hold_time: parseInt(holdTime, 10),
@@ -122,123 +117,63 @@ const StepComponent = (props) => {
 		toggleCreateStepModal();
 	};
 
-	useEffect(() => {
-		// make creat modal open if no data is available
-		// isStagesLoading will tell us weather api calling is finish or not
-		// stages.size = 0  will tell us there is no records present
-		// isCreateStageModalVisible is check as we have to make modal visible only once
-		if (
-			isStepsLoading === false
-			&& steps.size === 0
-			&& isCreateStepModalVisible === false
-		) {
-			toggleCreateStepModal();
-		}
-		// isCreateStepModalVisible skipped in dependency because its causing issue with modal state
-		// eslint-disable-next-line
-	}, [isStepsLoading, steps]);
+	const addHoldStep = () => {
+		setCurrentStageId(holdStageId);
+		toggleCreateStepModal();
+	};
+
+	const addCycleStep = () => {
+		setCurrentStageId(cycleStageId);
+		toggleCreateStepModal();
+	};
+
+	// useEffect(() => {
+	// 	// make creat modal open if no data is available
+	// 	// isStagesLoading will tell us weather api calling is finish or not
+	// 	// stages.size = 0  will tell us there is no records present
+	// 	// isCreateStageModalVisible is check as we have to make modal visible only once
+	// 	if (
+	// 		isStepsLoading === false
+	// 		&& steps.size === 0
+	// 		&& isCreateStepModalVisible === false
+	// 	) {
+	// 		toggleCreateStepModal();
+	// 	}
+	// 	// isCreateStepModalVisible skipped in dependency because its causing issue with modal state
+	// 	// eslint-disable-next-line
+	// }, [isStepsLoading, steps]);
 
 	return (
 		<div className='d-flex flex-column flex-100'>
-			<TableWrapper>
-				<TableWrapperBody>
-					<Table striped>
-						<colgroup>
-							<col width='16%' />
-							<col width='12%' />
-							<col />
-							<col width='16%' />
-							<col width='16%' />
-							<col width='156px' />
-						</colgroup>
-						<thead>
-							<tr>
-								<th>
-									Steps <br />
-									(Count/Name)
-								</th>
-								<th>
-									Ramp rate <br />
-									(unit °C)
-								</th>
-								<th>
-									Target Temperature <br />
-									(unit °C)
-								</th>
-								<th>
-									Hold Time <br />
-									(unit seconds)
-								</th>
-								<th>Data Capture</th>
-								<th />
-							</tr>
-						</thead>
-						<tbody>
-							{steps.map((step, index) => {
-								const stepId = step.get('id');
-								const classes = selectedStepId === stepId ? 'active' : '';
-								return (
-									<tr
-										className={classes}
-										key={stepId}
-										onClick={() => {
-											onStepRowClicked(stepId);
-										}}
-									>
-										<td>{index + 1}</td>
-										<td>{step.get('ramp_rate')}</td>
-										<td>{step.get('target_temp')}</td>
-										<td>{(step.get('hold_time'))}</td>
-										{/* If the stage type is Hold show N/A for data capture property */}
-										{stageType !== 'hold'
-											? <td>{step.get('data_capture') ? 'Yes' : 'No'}</td> : <td>N/A</td>}
-										<td className='td-actions'>
-											<ButtonIcon
-												onClick={() => {
-													editStep(step.toJS());
-												}}
-												size={28}
-												name='pencil'
-											/>
-											<ButtonIcon
-												onClick={() => {
-													deleteStep(stepId);
-												}}
-												size={28}
-												name='trash'
-											/>
-										</td>
-									</tr>
-								);
-							})}
-						</tbody>
-					</Table>
-				</TableWrapperBody>
-				<TableWrapperFooter>
-					<ButtonIcon
-						name='angle-left'
-						size={32}
-						className='mr-auto border-0'
-						onClick={goToStageWizard}
-					/>
-					<Button color='primary' icon onClick={toggleCreateStepModal}>
-						<Icon size={40} name='plus-2' />
-					</Button>
-					{isCreateStepModalVisible && (
-						<AddStepModal
-							isCreateStepModalVisible={isCreateStepModalVisible}
-							toggleCreateStepModal={toggleCreateStepModal}
-							stepFormState={stepFormStateJS}
-							updateStepFormStateWrapper={updateStepFormStateWrapper}
-							isFormValid={validateStepForm(stepFormStateJS)}
-							addClickHandler={addClickHandler}
-							saveClickHandler={saveClickHandler}
-							resetFormValues={resetFormValues}
-							stageType={stageType}
-						/>
-					)}
-				</TableWrapperFooter>
-			</TableWrapper>
+			<HoldSteps
+				editStep={editStep}
+				holdSteps={holdSteps}
+				deleteStep={deleteStep}
+				onStepRowClicked={onStepRowClicked}
+				selectedStepId={selectedStepId}
+				addHoldStep={addHoldStep}
+			/>
+			<CycleSteps
+				editStep={editStep}
+				cycleSteps={cycleSteps}
+				deleteStep={deleteStep}
+				onStepRowClicked={onStepRowClicked}
+				selectedStepId={selectedStepId}
+				addCycleStep={addCycleStep}
+			/>
+			{isCreateStepModalVisible && (
+				<AddStepModal
+					isCreateStepModalVisible={isCreateStepModalVisible}
+					toggleCreateStepModal={toggleCreateStepModal}
+					updateStepFormStateWrapper={updateStepFormStateWrapper}
+					isFormValid={validateStepForm(stepFormStateJS)}
+					stepFormState={stepFormStateJS}
+					addClickHandler={addClickHandler}
+					saveClickHandler={saveClickHandler}
+					resetFormValues={resetFormValues}
+					stageType={'cycle'}
+				/>
+			)}
 		</div>
 	);
 };

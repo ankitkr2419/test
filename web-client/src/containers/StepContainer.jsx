@@ -10,26 +10,32 @@ import {
 	addStepReset,
 	deleteStepReset,
 	updateStepReset,
+	fetchHoldSteps,
+	fetchCycleSteps,
 } from 'action-creators/stepActionCreators';
-import { getStepList, getStageType } from 'selectors/stepSelector';
+import { getHoldStepList, getCycleStepList } from 'selectors/stepSelector';
 
 const StepContainer = (props) => {
-	const { stageId, updateSelectedWizard } = props;
+	const { holdStageId, cycleStageId  } = props;
 	const dispatch = useDispatch();
 	// local state for storing step id for row selection
 	const [selectedStepId, setSelectedStepId] = useState(null);
+	// local state for storing stage id for creating steps in respective stages
+	const [currentStageId, setCurrentStageId] = useState(null);
 
-	// reading steps from redux
-	const steps = useSelector(getStepList);
+	// reading hold steps from redux
+	const holdSteps = useSelector(getHoldStepList);
+	// reading cycle steps from redux
+	const cycleSteps = useSelector(getCycleStepList);
+
 	// stageType = hold or cycle stage
-	const stageType = useSelector(state => getStageType(state, stageId));
+	// const stageType = useSelector(state => getStageType(state, stageId));
 	// isStepSaved = true means step created successfully
 	const { isStepSaved, response } = useSelector(state => state.createStepReducer);
 	// isStepDeleted = true means step deleted successfully
 	const { isStepDeleted } = useSelector(state => state.deleteStepReducer);
 	// isStepUpdated = true means step updated successfully
 	const { isStepUpdated } = useSelector(state => state.updateStepReducer);
-
 
 	useEffect(() => {
 		// Once we create step will fetch updated step list
@@ -39,28 +45,45 @@ const StepContainer = (props) => {
 			dispatch(addStepReset());
 			// No need to fetch again as we have already added the created step to stepslist in reducer
 		}
-	}, [isStepSaved, stageId, dispatch, response]);
+	}, [isStepSaved, dispatch, response]);
 
 	useEffect(() => {
-		// Once we delete step will fetch updated step list
+		// Once we delete hold step will fetch updated hold step list
 		if (isStepDeleted === true) {
 			dispatch(deleteStepReset());
-			dispatch(fetchSteps(stageId));
+			dispatch(fetchHoldSteps(holdStageId));
 		}
-	}, [isStepDeleted, stageId, dispatch]);
+	}, [isStepDeleted, holdStageId, dispatch]);
 
 	useEffect(() => {
-		// Once we update step will fetch updated step list
+		// Once we delete cycle step will fetch updated cycle step list
+		if (isStepDeleted === true) {
+			dispatch(deleteStepReset());
+			dispatch(fetchCycleSteps(cycleStageId));
+		}
+	}, [isStepDeleted, cycleStageId, dispatch]);
+
+	useEffect(() => {
+		// Once we update hold step will fetch updated hold step list
 		if (isStepUpdated === true) {
 			dispatch(updateStepReset());
-			dispatch(fetchSteps(stageId));
+			dispatch(fetchHoldSteps(holdStageId));
 		}
-	}, [isStepUpdated, stageId, dispatch]);
+	}, [isStepUpdated, holdStageId, dispatch]);
 
 	useEffect(() => {
-		// fetch updated step list from server
-		dispatch(fetchSteps(stageId));
-	}, [stageId, dispatch]);
+		// Once we update cycle step will fetch updated cycle step list
+		if (isStepUpdated === true) {
+			dispatch(updateStepReset());
+			dispatch(fetchCycleSteps(cycleStageId));
+		}
+	}, [isStepUpdated, cycleStageId, dispatch]);
+
+	useEffect(() => {
+		// fetch updated hold and cycle step list from server
+		dispatch(fetchHoldSteps(holdStageId));
+		dispatch(fetchCycleSteps(cycleStageId));
+	}, [holdStageId, cycleStageId, dispatch]);
 
 	const addStep = (step) => {
 		// creating step though api
@@ -86,28 +109,26 @@ const StepContainer = (props) => {
 		}
 	};
 
-	const goToStageWizard = () => {
-		updateSelectedWizard('stage');
-	};
-
 	return (
 		<StepComponent
-			stageId={stageId}
-			steps={steps.get('list')}
-			isStepsLoading={steps.get('isLoading')}
+			holdSteps={holdSteps.get('list')}
+			cycleSteps={cycleSteps.get('list')}
 			addStep={addStep}
 			deleteStep={deleteStep}
 			onStepRowClicked={onStepRowClicked}
 			selectedStepId={selectedStepId}
 			saveStep={saveStep}
-			goToStageWizard={goToStageWizard}
-			stageType={stageType}
+			holdStageId={holdStageId}
+			cycleStageId={cycleStageId}
+			currentStageId={currentStageId}
+			setCurrentStageId={setCurrentStageId}
 		/>
 	);
 };
 
 StepContainer.propTypes = {
-	stageId: PropTypes.string.isRequired,
+	holdStageId: PropTypes.string.isRequired,
+	cycleStageId: PropTypes.string.isRequired,
 };
 
 export default StepContainer;
