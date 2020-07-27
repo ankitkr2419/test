@@ -262,3 +262,13 @@ func (m *DBMockStore) MarkNotificationasRead(ctx context.Context, id uuid.UUID) 
 	args := m.Called(ctx, id)
 	return args.Error(1)
 }
+
+func (m *DBMockStore) AddExpTemplateTarget(ctx context.Context, tt []ExpTemplateTarget, id uuid.UUID) (err error) {
+	args := m.Called(ctx, tt, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) GetICTarget(ctx context.Context, i int) (t Target, err error) {
+	args := m.Called(ctx, i)
+	return args.Get(0).(Target), args.Error(1)
+}
