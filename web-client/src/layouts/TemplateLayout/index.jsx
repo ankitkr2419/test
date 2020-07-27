@@ -4,7 +4,6 @@ import { CardBody, Card } from 'core-components';
 import Wizard from 'shared-components/Wizard';
 import TemplateContainer from 'containers/TemplateContainer';
 import TargetContainer from 'containers/TargetContainer';
-import StageContainer from 'containers/StageContainer';
 import StepContainer from 'containers/StepContainer';
 import TargetExperimentContainer from 'containers/TargetExperimentContainer';
 import TemplateModalContainer from 'containers/TemplateModalContainer';
@@ -36,7 +35,6 @@ const TemplateLayout = (props) => {
 	// Here we have stored id for active widget
 	const activeWidgetID = templateLayoutState.get('activeWidgetID');
 	const templateID = templateLayoutState.get('templateID');
-	const stageId = templateLayoutState.get('stageId');
 
 	const wizardList = getWizardListByLoginType(
 		templateLayoutState.get('wizardList'),
@@ -74,13 +72,6 @@ const TemplateLayout = (props) => {
 		// reset wizard list to disable already enabled wizard stages
 		templateLayoutDispatch({
 			type: templateLayoutActions.RESET_WIZARD_LIST,
-		});
-	}, []);
-
-	const updateStageID = useCallback((selectedStageId) => {
-		templateLayoutDispatch({
-			type: templateLayoutActions.SET_STAGE_ID,
-			value: selectedStageId,
 		});
 	}, []);
 
@@ -128,19 +119,8 @@ const TemplateLayout = (props) => {
 							templateID={templateID}
 						/>
 					)}
-
-					{activeWidgetID === 'stage' && (
-						<StageContainer
-							updateSelectedWizard={updateSelectedWizard}
-							updateStageID={updateStageID}
-							templateID={templateID}
-						/>
-					)}
 					{activeWidgetID === 'step' && (
-						<StepContainer
-							updateSelectedWizard={updateSelectedWizard}
-							stageId={stageId}
-						/>
+						<StepContainer />
 					)}
 				</CardBody>
 			</Card>

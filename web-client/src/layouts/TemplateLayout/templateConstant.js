@@ -20,13 +20,6 @@ export const wizardList = [
 		isAdmin: true,
 	},
 	{
-		id: 'stage',
-		name: 'Add Stage',
-		isDisable: true,
-		isOperatorVisible: false,
-		isAdmin: true,
-	},
-	{
 		id: 'step',
 		name: 'Add Step',
 		isDisable: true,
