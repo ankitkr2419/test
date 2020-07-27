@@ -45,6 +45,7 @@ const AppLayoutContainer = (props) => {
 				isUserLoggedIn={loginReducer.get('isUserLoggedIn')}
 				isLoginTypeAdmin={loginReducer.get('isLoginTypeAdmin')}
 				isLoginTypeOperator={loginReducer.get('isLoginTypeOperator')}
+				isTemplateRoute={loginReducer.get('isTemplateRoute')}
 			/>
 			{/* Modal container will helps in displaying error/info/warning through modal */}
 			<ModalContainer />
