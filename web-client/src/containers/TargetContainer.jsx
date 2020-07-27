@@ -163,8 +163,8 @@ const TargetContainer = (props) => {
 		dispatch,
 	]);
 
-	const navigateToStageWizard = useCallback(() => {
-		return updateSelectedWizard('stage');
+	const navigateToStepWizard = useCallback(() => {
+		return updateSelectedWizard('step');
 	}, [updateSelectedWizard]);
 
 	// onEditing a template
@@ -201,7 +201,7 @@ const TargetContainer = (props) => {
 			isLoginTypeOperator={isLoginTypeOperator}
 			isTargetListUpdated={getIsTargetListUpdatedAdmin()}
 			isViewStagesEnabled={getIsViewStagesEnabled()}
-			navigateToStageWizard={navigateToStageWizard}
+			navigateToStepWizard={navigateToStepWizard}
 			editTemplate={editTemplate}
 			setThresholdError={setThresholdError}
 			isThresholdInvalid={isAnyThresholdInvalid(selectedTargetState.get('targetList'))}
