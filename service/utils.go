@@ -1,7 +1,9 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
+	"mylab/cpagent/db"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -67,5 +69,21 @@ func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusBadRequest)
 	rw.Write(respBytes)
+	return
+}
+
+// LogNotification add log for notification
+
+func LogNotification(deps Dependencies, msg string) {
+
+	n := db.Notification{
+		Message: msg,
+	}
+
+	err := deps.Store.InsertNotification(context.Background(), n)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in Log Notification")
+		return
+	}
 	return
 }

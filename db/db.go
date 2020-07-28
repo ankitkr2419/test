@@ -41,7 +41,7 @@ type Storer interface {
 	ShowWell(context.Context, uuid.UUID) (Well, error)
 	DeleteWell(context.Context, uuid.UUID) error
 	GetWellTarget(context.Context, int32, uuid.UUID) ([]WellTarget, error)
-	UpsertWellTargets(context.Context, []WellTarget, uuid.UUID) ([]WellTarget, error)
+	UpsertWellTargets(context.Context, []WellTarget, uuid.UUID, bool) ([]WellTarget, error)
 	ListStageSteps(context.Context, uuid.UUID) ([]StageStep, error)
 	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID) error
 	ListConfTargets(context.Context, uuid.UUID) ([]TargetDetails, error)
@@ -52,4 +52,7 @@ type Storer interface {
 	UpdateColorWell(context.Context, string, uuid.UUID) error
 	ListExperimentTemperature(context.Context, uuid.UUID) ([]ExperimentTemperature, error)
 	InsertExperimentTemperature(context.Context, ExperimentTemperature) error
+	ListNotification(context.Context, uuid.UUID) ([]Notification, error)
+	InsertNotification(context.Context, Notification) error
+	MarkNotificationasRead(context.Context, uuid.UUID) error
 }

@@ -108,6 +108,7 @@ const TemplateLayout = (props) => {
 							updateSelectedWizard={updateSelectedWizard}
 							updateTemplateID={updateTemplateID}
 							toggleTemplateModal={toggleTemplateModal}
+							isCreateTemplateModalVisible={templateModalState.get('isCreateTemplateModalVisible')}
 						/>
 					)}
 					{activeWidgetID === 'target' && (

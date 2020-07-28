@@ -29,3 +29,10 @@ export const setIsPlateRoute = isPlateRoute => ({
 		isPlateRoute,
 	},
 });
+
+export const setIsTemplateRoute = isTemplateRoute => ({
+	type: loginActions.setIsTemplateRoute,
+	payload: {
+		isTemplateRoute,
+	},
+});
