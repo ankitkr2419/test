@@ -348,7 +348,7 @@ func monitorExperiment(deps Dependencies) {
 			}
 			deps.WsMsgCh <- "read"
 			if scan.Cycle == experimentValues.plcStage.CycleCount {
-				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID)
+				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID, "successful")
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error updating stop time")
 					deps.WsErrCh <- err

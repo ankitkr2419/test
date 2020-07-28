@@ -16,15 +16,13 @@ const (
 		template_id,
 		operator_name,
  		start_time,
- 		end_time)
-		VALUES ($1, $2,$3, $4,$5) RETURNING id`
+		end_time,
+		repeat_cycle,
+		result)
+		VALUES ($1, $2,$3, $4,$5,$6,$7) RETURNING id`
 
-	getExperimentQuery = `SELECT 	e.id,
-		e.description,
-		e.template_id,
-		e.operator_name,
-		e.start_time,
-		e.end_time,
+	getExperimentQuery = `SELECT
+		e.*,
         t.name as template_name,
 		 (
             SELECT COUNT(*)
@@ -35,11 +33,13 @@ const (
 		WHERE t.id = e.template_id AND e.id = $1`
 
 	updateStartTimeQuery = `UPDATE experiments
-		SET start_time = $1
-		WHERE id = $2`
+		SET start_time = $1,
+		repeat_cycle = $2
+		WHERE id = $3`
 	updateStopTimeQuery = `UPDATE experiments
-		SET end_time = $1
-		WHERE id = $2`
+		SET end_time = $1,
+		result = $2
+		WHERE id = $3`
 )
 
 type Experiment struct {
@@ -51,6 +51,10 @@ type Experiment struct {
 	StartTime    time.Time `db:"start_time" json:"start_time"`
 	EndTime      time.Time `db:"end_time" json:"end_time"`
 	WellCount    int       `db:"well_count" json:"well_count"`
+	Result       string    `db:"result" json:"result"`
+	RepeatCycle  uint16    `db:"repeat_cycle" json:"repeat_cycle"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type WarnResponse struct {
@@ -116,7 +120,9 @@ func (s *pgStore) CreateExperiment(ctx context.Context, e Experiment) (createdTe
 		e.TemplateID,
 		e.OperatorName,
 		e.StartTime,
-		e.EndTime).Scan(&id)
+		e.EndTime,
+		0,            // repeat_cycle = 0
+		"").Scan(&id) // result set to blank
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error creating Experiment")
 		return
@@ -140,10 +146,11 @@ func (s *pgStore) ShowExperiment(ctx context.Context, id uuid.UUID) (e Experimen
 	return
 }
 
-func (s *pgStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID) (err error) {
+func (s *pgStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID, repeatCycle uint16) (err error) {
 	_, err = s.db.Exec(
 		updateStartTimeQuery,
 		t,
+		repeatCycle,
 		experimentID,
 	)
 	if err != nil {
@@ -153,10 +160,11 @@ func (s *pgStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, e
 	return
 }
 
-func (s *pgStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID) (err error) {
+func (s *pgStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID, result string) (err error) {
 	_, err = s.db.Exec(
 		updateStopTimeQuery,
 		t,
+		result,
 		experimentID,
 	)
 	if err != nil {

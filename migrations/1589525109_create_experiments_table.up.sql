@@ -7,5 +7,9 @@ CREATE TABLE experiments (
   operator_name varchar(50),
   start_time timestamp,
   end_time timestamp,
+  result varchar(50),
+  repeat_cycle integer,
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (template_id) REFERENCES templates(id)
 );
