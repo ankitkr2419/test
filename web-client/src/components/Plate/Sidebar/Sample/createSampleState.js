@@ -56,9 +56,6 @@ const createSampleStateReducer = (state, action) => {
 	case createSampleActions.TOGGLE_TARGET:
 		return state.updateIn(['targets', action.value, 'isSelected'], value => !value);
 	case createSampleActions.RESET_VALUES:
-		if (state.get('isEdit') === true) {
-			return createSampleInitialState.updateIn(['targets'], () => state.get('targets'));
-		}
 		return createSampleInitialState;
 	default:
 		throw new Error('Invalid action type');

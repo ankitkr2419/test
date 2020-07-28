@@ -52,17 +52,20 @@ const SampleSideBarContainer = (props) => {
 		}
 	};
 
-	// reset local state
-	const resetLocalState = () => {
-		sampleStateDispatch({ type: createSampleActions.RESET_VALUES });
-	};
-
 	// update targets to local state, so every time list will contain original target list
 	const addTargetsToLocalState = useCallback(() => {
 		if (experimentTargetsList !== null && experimentTargetsList.size !== 0) {
 			updateCreateSampleWrapper('targets', getInitSampleTargetList(experimentTargetsList));
 		}
 	}, [experimentTargetsList]);
+
+	// reset local state
+	const resetLocalState = useCallback(() => {
+		sampleStateDispatch({ type: createSampleActions.RESET_VALUES });
+		// after local state reset update targets to local state, so each new well will contain
+		// initially original target list
+		addTargetsToLocalState();
+	}, [addTargetsToLocalState]);
 
 	useEffect(() => {
 		// on page laod, Load target list to local
@@ -76,7 +79,7 @@ const SampleSideBarContainer = (props) => {
 			dispatch(addWellReset());
 			addTargetsToLocalState();
 		}
-	}, [areWellsCreated, addTargetsToLocalState, dispatch]);
+	}, [areWellsCreated, addTargetsToLocalState, dispatch, resetLocalState]);
 
 	useEffect(() => {
 		// this effect will run when operator is trying to update well data
