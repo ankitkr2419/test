@@ -52,7 +52,8 @@ const SampleSideBarContainer = (props) => {
 		}
 	};
 
-	// update targets to local state, so every time list will contain original target list
+	// update targets to local state, so every time list will contain
+	// original target list with each target selected
 	const addTargetsToLocalState = useCallback(() => {
 		if (experimentTargetsList !== null && experimentTargetsList.size !== 0) {
 			updateCreateSampleWrapper('targets', getInitSampleTargetList(experimentTargetsList));
@@ -62,13 +63,13 @@ const SampleSideBarContainer = (props) => {
 	// reset local state
 	const resetLocalState = useCallback(() => {
 		sampleStateDispatch({ type: createSampleActions.RESET_VALUES });
-		// after local state reset update targets to local state, so each new well will contain
-		// initially original target list
+		// after local state reset update targets to local state so that for a newly selected well
+		// original target list is shown
 		addTargetsToLocalState();
 	}, [addTargetsToLocalState]);
 
 	useEffect(() => {
-		// on page laod, Load target list to local
+		// on page load, Load target list to local
 		addTargetsToLocalState();
 	}, [addTargetsToLocalState]);
 

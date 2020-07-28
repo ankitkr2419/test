@@ -1,4 +1,5 @@
 import { fromJS, List } from 'immutable';
+import { getSelectedTargetIds } from './sampleHelper';
 
 // const action types
 export const createSampleActions = {
@@ -40,8 +41,8 @@ export const getSampleRequestData = (state, positions) => {
 			name: sample.label,
 		};
 	}
-	// filter the targets list to get the selected targets
-	requestObject.targets = targets.filter(ele => ele.isSelected).map(ele => ele.target_id);
+	// get Target Ids of selected targets
+	requestObject.targets = getSelectedTargetIds(targets);
 	requestObject.task = task.value;
 	requestObject.position = isEdit === true ? [position] : positions;
 	return requestObject;

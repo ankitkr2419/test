@@ -22,7 +22,14 @@ export const getSampleTargetList = createSelector(
 	},
 );
 
+// Get the initial sample target list with each target having property selected as true
 export const getInitSampleTargetList = createSelector(
 	experimentTargetsList => experimentTargetsList,
 	experimentTargetsList => experimentTargetsList.map(ele => ele.merge({ isSelected: true })),
+);
+
+// returns array of selected target ID's
+export const getSelectedTargetIds = createSelector(
+	targetList => targetList,
+	targetList => targetList.filter(ele => ele.isSelected).map(ele => ele.target_id),
 );
