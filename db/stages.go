@@ -33,11 +33,9 @@ const (
 		WHERE id = $1`
 
 	updateStageQuery = `UPDATE stages SET (
-		type,
 		repeat_count,
-		template_id,
 		updated_at) =
-		($1, $2, $3,$4) where id = $5`
+		($1, $2) where id = $3`
 
 	deleteStageQuery = `DELETE FROM stages WHERE id = $1`
 
@@ -87,7 +85,7 @@ func (s *pgStore) ListStages(ctx context.Context, template_id uuid.UUID) (stgs [
 func (s *pgStore) CreateStages(ctx context.Context, stg []Stage) (createdStage []Stage, err error) {
 
 	stmt := makeInsertStagesQuery(stg)
-	fmt.Println(stmt)
+
 	_, err = s.db.Exec(stmt)
 
 	if err != nil {
@@ -100,10 +98,8 @@ func (s *pgStore) CreateStages(ctx context.Context, stg []Stage) (createdStage [
 
 func (s *pgStore) UpdateStage(ctx context.Context, stg Stage) (err error) {
 	_, err = s.db.Exec(
-		updateStageQuery,
-		stg.Type,
+		updateStageQuery, //only update repeat count
 		stg.RepeatCount,
-		stg.TemplateID,
 		time.Now(),
 		stg.ID,
 	)
