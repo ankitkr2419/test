@@ -1,6 +1,7 @@
 import React from 'react';
 import { ButtonIcon, Icon } from 'shared-components';
 import { Table, Button, CheckBox } from 'core-components';
+import CounterPopover from './CounterPopover';
 
 const CycleSteps = ({
 	addCycleStep,
@@ -24,24 +25,32 @@ const CycleSteps = ({
 			<tr>
 				<th>Cycle Steps</th>
 				<th>
-						Ramp rate <br />
-						(unit °C)
+					Ramp rate <br />
+					(unit °C)
 				</th>
 				<th>
-						Target Temperature <br />
-						(unit °C)
+					Target Temperature <br />
+					(unit °C)
 				</th>
 				<th>
-						Hold Time <br />
-						(unit seconds)
+					Hold Time <br />
+					(unit seconds)
 				</th>
 				<th>
-						Data Capture <br />
-						(boolean flag)
+					Data Capture <br />
+					(boolean flag)
 				</th>
-				<th className='th-counter'>Repeat counter</th>
+				<th className='th-counter'>
+					Repeat counter <br />
+					<CounterPopover />
+				</th>
 				<th>
-					<Button color='primary' icon className='ml-auto' onClick={addCycleStep}>
+					<Button
+						color='primary'
+						icon
+						className='ml-auto'
+						onClick={addCycleStep}
+					>
 						<Icon size={40} name='plus-2' />
 					</Button>
 				</th>

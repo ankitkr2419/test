@@ -496,6 +496,7 @@ button:focus {
 		th.th-counter {
 			font-size: rem(12px);
 			line-height: rem(16px);
+			padding: 12px;
 		}
 	}
 }
@@ -552,4 +553,17 @@ button:focus {
 .bs-popover-left,
 .bs-popover-auto[x-placement^='left'] {
 	margin-right: rem(4px);
+}
+
+// Popover Counter
+.popover-counter {
+	border: 1px solid $gray-80;
+	.btn {
+		width: rem(40px);
+	}
+
+	&.bs-popover-top > .arrow::before,
+	&.bs-popover-auto[x-placement^='top'] > .arrow::before {
+		border-top-color: $gray-80;
+	}
 }
