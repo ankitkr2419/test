@@ -5,6 +5,7 @@ import {
 	updateStageActions,
 	deleteStageActions,
 } from 'actions/stageActions';
+import { createTemplateActions } from 'actions/templateActions';
 
 const listStageInitialState = fromJS({
 	isLoading: true,
@@ -41,6 +42,9 @@ export const listStagesReducer = (
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
+	// Add the stages on create template
+	case createTemplateActions.successAction:
+		return state.merge({ list : fromJS(action.payload.response.stages || []), isLoading: false });
 	// Add the created stage to list to avoid an extra get api call
 	case addStageActions.successAction:
 		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response || {})));

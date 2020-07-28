@@ -55,7 +55,7 @@ export const listTemplatesReducer = (
 		});
 		// appending the template list with created template
 	case createTemplateActions.successAction:
-		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response)));
+		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response.template)));
 	default:
 		return state;
 	}
