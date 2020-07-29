@@ -2,7 +2,6 @@ import { takeEvery, put, call } from 'redux-saga/effects';
 import { callApi } from 'apis/apiHelper';
 import {
 	addStepActions,
-	listStepActions,
 	updateStepActions,
 	deleteStepActions,
 	listHoldStepActions,

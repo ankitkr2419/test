@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import stepStateReducer, {
 	stepStateInitialState,
@@ -8,13 +8,10 @@ import { stepStateActions } from './stepState';
 import { validateStepForm } from './stepHelper';
 import HoldSteps from './HoldSteps';
 import CycleSteps from './CycleSteps';
+import { HOLD_STAGE, CYCLE_STAGE } from './stepConstants';
 
 const StepComponent = (props) => {
 	const {
-		currentStageId,
-		setCurrentStageId,
-		holdStageId,
-		cycleStageId,
 		holdSteps,	// list of hold steps
 		cycleSteps, // list of cycle steps
 		addStep, // create api cal
@@ -22,6 +19,12 @@ const StepComponent = (props) => {
 		onStepRowClicked,
 		selectedStepId,
 		saveStep, // update api call
+		holdStageId,
+		cycleStageId,
+		stageType,
+		setStageType,
+		saveRepeatCount, // update repeat count api call
+		cycleRepeatCount, // cycle repeat count stored over server
 	} = props;
 
 	// local state to save form data and modal state flag
@@ -30,9 +33,18 @@ const StepComponent = (props) => {
 		stepStateInitialState,
 	);
 
+	// local state to store repeat count
+	const [repeatCount, setRepeatCount] = useState('');
+
+	// local state to show cycle step form conditionally
+	const [showCycleStepForm, setShowCycleStepForm] = useState(false);
+
 	// immutable => js
 	const stepFormStateJS = stepFormState.toJS();
 	const { isCreateStepModalVisible } = stepFormStateJS;
+
+	// get stage Id for currently opened create step modal
+	const getStageId = () => (stageType === HOLD_STAGE ? holdStageId : cycleStageId);
 
 	// helper function to update local state
 	const updateStepFormStateWrapper = (key, value) => {
@@ -48,6 +60,13 @@ const StepComponent = (props) => {
 		updateStepFormState({
 			type: stepStateActions.RESET_VALUES,
 		});
+		// reset the repeat count stored in local state
+		setRepeatCount('');
+		// if user closes the modal without saving the repeat count in first use case scenario
+		// reset the showCycleStepForm to false
+		if (cycleRepeatCount === 0 && showCycleStepForm === true) {
+			setShowCycleStepForm(false);
+		}
 	};
 
 	// helper method to toggle create template modal
@@ -67,12 +86,17 @@ const StepComponent = (props) => {
 			dataCapture,
 		} = stepFormStateJS;
 		addStep({
-			stage_id: currentStageId,
+			stage_id: getStageId(),
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
 			hold_time: parseInt(holdTime, 10),
 			data_capture: dataCapture,
 		});
+		// if its cycle stage and repeat count is initial zero then
+		// its the first use scenario and we need to save repeat count
+		if (stageType === CYCLE_STAGE && cycleRepeatCount === 0) {
+			saveRepeatCount(repeatCount);
+		}
 		toggleCreateStepModal();
 	};
 
@@ -86,7 +110,7 @@ const StepComponent = (props) => {
 			dataCapture,
 		} = stepFormStateJS;
 		saveStep(stepId, {
-			stage_id: currentStageId,
+			stage_id: getStageId(),
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
 			hold_time: parseInt(holdTime, 10),
@@ -118,30 +142,24 @@ const StepComponent = (props) => {
 	};
 
 	const addHoldStep = () => {
-		setCurrentStageId(holdStageId);
+		// set stage type as hold
+		setStageType(HOLD_STAGE);
 		toggleCreateStepModal();
 	};
 
 	const addCycleStep = () => {
-		setCurrentStageId(cycleStageId);
+		// set stage type as cycle
+		setStageType(CYCLE_STAGE);
 		toggleCreateStepModal();
 	};
 
-	// useEffect(() => {
-	// 	// make creat modal open if no data is available
-	// 	// isStagesLoading will tell us weather api calling is finish or not
-	// 	// stages.size = 0  will tell us there is no records present
-	// 	// isCreateStageModalVisible is check as we have to make modal visible only once
-	// 	if (
-	// 		isStepsLoading === false
-	// 		&& steps.size === 0
-	// 		&& isCreateStepModalVisible === false
-	// 	) {
-	// 		toggleCreateStepModal();
-	// 	}
-	// 	// isCreateStepModalVisible skipped in dependency because its causing issue with modal state
-	// 	// eslint-disable-next-line
-	// }, [isStepsLoading, steps]);
+	useEffect(() => {
+		// set the showCycleStepForm true if repeat count is not the initial zero
+		if (cycleRepeatCount !== 0) {
+			// show cycle step form
+			setShowCycleStepForm(true);
+		}
+	}, [cycleRepeatCount, setShowCycleStepForm]);
 
 	return (
 		<div className='d-flex flex-column flex-100'>
@@ -160,6 +178,7 @@ const StepComponent = (props) => {
 				onStepRowClicked={onStepRowClicked}
 				selectedStepId={selectedStepId}
 				addCycleStep={addCycleStep}
+				cycleRepeatCount={cycleRepeatCount}
 			/>
 			{isCreateStepModalVisible && (
 				<AddStepModal
@@ -171,7 +190,13 @@ const StepComponent = (props) => {
 					addClickHandler={addClickHandler}
 					saveClickHandler={saveClickHandler}
 					resetFormValues={resetFormValues}
-					stageType={'cycle'}
+					stageType={stageType}
+					saveRepeatCount={saveRepeatCount}
+					repeatCount={repeatCount}
+					setRepeatCount={setRepeatCount}
+					showCycleStepForm={showCycleStepForm}
+					setShowCycleStepForm={setShowCycleStepForm}
+					cycleRepeatCount={cycleRepeatCount}
 				/>
 			)}
 		</div>
@@ -179,15 +204,19 @@ const StepComponent = (props) => {
 };
 
 StepComponent.propTypes = {
-	stageId: PropTypes.string.isRequired,
-	steps: PropTypes.object.isRequired,
+	holdStageId: PropTypes.string.isRequired,
+	cycleStageId: PropTypes.string.isRequired,
+	stageType: PropTypes.string.isRequired,
+	holdSteps: PropTypes.object.isRequired,
+	cycleSteps: PropTypes.object.isRequired,
 	addStep: PropTypes.func.isRequired,
 	deleteStep: PropTypes.func.isRequired,
 	onStepRowClicked: PropTypes.func.isRequired,
+	setStageType: PropTypes.func.isRequired,
 	selectedStepId: PropTypes.string,
 	saveStep: PropTypes.func.isRequired,
-	isStepsLoading: PropTypes.bool.isRequired,
-	stageType: PropTypes.string.isRequired,
+	saveRepeatCount: PropTypes.func.isRequired,
+	cycleRepeatCount: PropTypes.number.isRequired,
 };
 
 export default React.memo(StepComponent);

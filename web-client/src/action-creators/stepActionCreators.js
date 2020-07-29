@@ -1,6 +1,5 @@
 import {
 	addStepActions,
-	listStepActions,
 	updateStepActions,
 	deleteStepActions,
 	listHoldStepActions,

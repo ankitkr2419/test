@@ -1,7 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ButtonIcon, Icon } from 'shared-components';
 import { Table, Button, CheckBox } from 'core-components';
 import CounterPopover from './CounterPopover';
+import { CYCLE_STAGE } from './stepConstants';
 
 const CycleSteps = ({
 	addCycleStep,
@@ -10,6 +12,7 @@ const CycleSteps = ({
 	deleteStep,
 	onStepRowClicked,
 	selectedStepId,
+	cycleRepeatCount,
 }) => (
 	<div className='table-steps-wrapper -cycle'>
 		<Table className='table-steps' size='sm' striped>
@@ -41,112 +44,69 @@ const CycleSteps = ({
 						Data Capture <br />
 						(boolean flag)
 					</th>
-					<th className='th-counter'>
-						Repeat counter <br />
-						<CounterPopover />
-					</th>
+					<th className='th-counter'>Repeat counter <br /> <CounterPopover /></th>
 					<th>
-						<Button
-							color='primary'
-							icon
-							className='ml-auto'
-							onClick={addCycleStep}
-						>
+						<Button color='primary' icon className='ml-auto' onClick={addCycleStep}>
 							<Icon size={40} name='plus-2' />
 						</Button>
 					</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td>1</td>
-					<td>2</td>
-					<td>40</td>
-					<td>30</td>
-					<td>
-						<CheckBox id='checkbox1' />
-					</td>
-					<td />
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>2</td>
-					<td>2</td>
-					<td>40</td>
-					<td>30</td>
-					<td>
-						<CheckBox id='checkbox2' />
-					</td>
-					<td />
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>3</td>
-					<td>2</td>
-					<td>40</td>
-					<td>30</td>
-					<td>
-						<CheckBox id='checkbox3' />
-					</td>
-					<td />
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>4</td>
-					<td>2</td>
-					<td>40</td>
-					<td>30</td>
-					<td>
-						<CheckBox id='checkbox4' />
-					</td>
-					<td />
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>5</td>
-					<td>2</td>
-					<td>40</td>
-					<td>30</td>
-					<td>
-						<CheckBox id='checkbox5' />
-					</td>
-					<td />
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>6</td>
-					<td>2</td>
-					<td>40</td>
-					<td>30</td>
-					<td>
-						<CheckBox id='checkbox6' />
-					</td>
-					<td />
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
+				{cycleSteps.map((step, index) => {
+					const stepId = step.get('id');
+					const classes = selectedStepId === stepId ? 'active' : '';
+					return (
+						<tr
+							className={classes}
+							key={stepId}
+							onClick={() => {
+								onStepRowClicked(stepId, CYCLE_STAGE);
+							}}
+						>
+							<td>{index + 1}</td>
+							<td>{step.get('ramp_rate')}</td>
+							<td>{step.get('target_temp')}</td>
+							<td>{(step.get('hold_time'))}</td>
+							<td>
+								<CheckBox
+									id={`checkbox${index}`}
+									checked={step.get('data_capture')}
+									disabled={true}
+								/>
+							</td>
+							<td className='td-actions'>
+								<ButtonIcon
+									size={16}
+									name='pencil'
+									onClick={() => {
+										editStep(step.toJS());
+									}}
+								/>
+								<ButtonIcon
+									size={16}
+									name='trash'
+									onClick={() => {
+										deleteStep(stepId);
+									}}
+								/>
+							</td>
+						</tr>
+					);
+				})}
 			</tbody>
 		</Table>
 	</div>
 );
 
-CycleSteps.propTypes = {};
+CycleSteps.propTypes = {
+	addCycleStep: PropTypes.func.isRequired,
+	editStep: PropTypes.func.isRequired,
+	cycleSteps: PropTypes.object.isRequired,
+	deleteStep: PropTypes.func.isRequired,
+	onStepRowClicked: PropTypes.func.isRequired,
+	selectedStepId: PropTypes.string,
+	cycleRepeatCount: PropTypes.number.isRequired,
+};
 
 export default CycleSteps;

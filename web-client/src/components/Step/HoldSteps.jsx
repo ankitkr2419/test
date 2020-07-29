@@ -1,6 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ButtonIcon, Icon } from 'shared-components';
 import { Table, Button } from 'core-components';
+import { HOLD_STAGE } from './stepConstants';
 
 const HoldSteps = ({
 	addHoldStep,
@@ -35,63 +37,59 @@ const HoldSteps = ({
 						(unit seconds)
 					</th>
 					<th>
-						<Button
-							color='primary'
-							icon
-							className='ml-auto'
-							onClick={addHoldStep}
-						>
+						<Button color='primary' icon className='ml-auto' onClick={addHoldStep}>
 							<Icon size={40} name='plus-2' />
 						</Button>
 					</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td>1</td>
-					<td>2</td>
-					<td>50</td>
-					<td>30</td>
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>2</td>
-					<td>2</td>
-					<td>50</td>
-					<td>30</td>
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>3</td>
-					<td>2</td>
-					<td>50</td>
-					<td>30</td>
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
-				<tr>
-					<td>4</td>
-					<td>2</td>
-					<td>50</td>
-					<td>30</td>
-					<td className='td-actions'>
-						<ButtonIcon size={16} name='pencil' />
-						<ButtonIcon size={16} name='trash' />
-					</td>
-				</tr>
+				{holdSteps.map((step, index) => {
+					const stepId = step.get('id');
+					const classes = selectedStepId === stepId ? 'active' : '';
+					return (
+						<tr
+							className={classes}
+							key={stepId}
+							onClick={() => {
+								onStepRowClicked(stepId, HOLD_STAGE);
+							}}
+						>
+							<td>{index + 1}</td>
+							<td>{step.get('ramp_rate')}</td>
+							<td>{step.get('target_temp')}</td>
+							<td>{(step.get('hold_time'))}</td>
+							<td className='td-actions'>
+								<ButtonIcon
+									size={16}
+									name='pencil'
+									onClick={() => {
+										editStep(step.toJS());
+									}}
+								/>
+								<ButtonIcon
+									size={16}
+									name='trash'
+									onClick={() => {
+										deleteStep(stepId);
+									}}
+								/>
+							</td>
+						</tr>
+					);
+				})}
 			</tbody>
 		</Table>
 	</div>
 );
 
-HoldSteps.propTypes = {};
+HoldSteps.propTypes = {
+	addHoldStep: PropTypes.func.isRequired,
+	editStep: PropTypes.func.isRequired,
+	holdSteps: PropTypes.object.isRequired,
+	deleteStep: PropTypes.func.isRequired,
+	onStepRowClicked: PropTypes.func.isRequired,
+	selectedStepId: PropTypes.string,
+};
 
 export default HoldSteps;
