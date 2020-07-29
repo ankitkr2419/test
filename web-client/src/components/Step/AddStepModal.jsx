@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
 	Button,
@@ -23,6 +23,8 @@ import {
 	MAX_RAMP_RATE,
 	MAX_TARGET_TEMPERATURE,
 	MIN_TARGET_TEMPERATURE,
+	CYCLE_STAGE,
+	HOLD_STAGE,
 } from './stepConstants';
 
 const AddStepModal = (props) => {
@@ -36,6 +38,11 @@ const AddStepModal = (props) => {
 		resetFormValues,
 		saveClickHandler,
 		stageType,
+		setShowCycleStepForm,
+		showCycleStepForm,
+		setRepeatCount,
+		repeatCount,
+		cycleRepeatCount,
 	} = props;
 
 	const {
@@ -52,14 +59,7 @@ const AddStepModal = (props) => {
 	// stageId will be present when we are updating stage
 	const isUpdateForm = stepId !== null;
 	// If stageType is hold column size will be 4 or else will be 3
-	const colSize = stageType === 'hold' ? 4 : 3;
-	// eslint-disable-next-line arrow-body-style
-	useEffect(() => {
-		return () => {
-			resetFormValues();
-		};
-		// eslint-disable-next-line
-	}, []);
+	const colSize = stageType === HOLD_STAGE ? 4 : 3;
 
 	const onChangeHandler = ({ target: { name, value } }) => {
 		// set rampRate/targetTemperature/holdTime with its value in stepForm local state
@@ -102,11 +102,16 @@ const AddStepModal = (props) => {
 		updateStepFormStateWrapper('targetTemperatureError', false);
 	};
 
+	// repeat count change handler
+	const onRepeatCountChange = (event) => {
+		setRepeatCount(event.target.value);
+	};
 	return (
 		<>
 			<Modal
 				isOpen={isCreateStepModalVisible}
 				toggle={toggleCreateStepModal}
+				onExit={resetFormValues}
 				centered
 				size='lg'
 			>
@@ -117,7 +122,8 @@ const AddStepModal = (props) => {
 						className='modal-title text-center text-truncate text-capitalize font-weight-bold'
 					>
 						Add Step - {stageType}{' '}
-						{stageType === 'cycle' ? `(Repeat count - ${50})` : ''}
+						{/* If its cycle stage then show repeat count in header */}
+						{stageType === CYCLE_STAGE ? `(Repeat count - ${cycleRepeatCount})` : ''}
 					</Text>
 					<ButtonIcon
 						position='absolute'
@@ -128,14 +134,16 @@ const AddStepModal = (props) => {
 						name='cross'
 						onClick={toggleCreateStepModal}
 					/>
-					{stageType === 'cycle' ? (
+					{/* Show the repeat count form only if the stage type is cycle and repeat count value
+					is initial zero. This case will only be true when the first cycle step is created */}
+					{stageType === CYCLE_STAGE && cycleRepeatCount === 0 ? (
 						<Row className='mb-3 pb-3'>
 							<Col sm={3}>
 								<FormGroup>
 									<Label for='stage_type' className='font-weight-bold'>
 										Stage Type
 									</Label>
-									<Input plaintext value='Cycle' className='text-default' />
+									<Input plaintext defaultValue='Cycle' className='text-default' disabled={true}/>
 								</FormGroup>
 							</Col>
 							<Col sm={3}>
@@ -148,11 +156,17 @@ const AddStepModal = (props) => {
 										name='repeatCount'
 										id='repeat_count'
 										placeholder='Enter Count'
+										value={repeatCount}
+										onChange={onRepeatCountChange}
 									/>
 								</FormGroup>
 							</Col>
 							<Col sm={6} className='text-right'>
-								<Button color='primary' className='mt-4'>
+								<Button color='primary'
+									className='mt-4'
+									onClick={() => setShowCycleStepForm(true)}
+									disabled={showCycleStepForm}
+								>
 									Next
 								</Button>
 							</Col>
@@ -160,112 +174,116 @@ const AddStepModal = (props) => {
 					) : (
 						''
 					)}
-					<Row form className='mb-3 pb-3'>
-						<Col sm={colSize}>
-							<FormGroup>
-								<Label for='ramp_rate' className='font-weight-bold'>
-									Ramp Rate
-								</Label>
-								<InputGroupWithAddonText addonText='unit °C'>
-									<Input
-										type='number'
-										name='rampRate'
-										id='ramp_rate'
-										placeholder={`${MIN_RAMP_RATE} - ${MAX_RAMP_RATE}`}
-										value={rampRate}
-										onChange={onChangeHandler}
-										onBlur={onRampRateBlurHandler}
-										onFocus={onRampRateFocusHandler}
-										invalid={rampRateError}
-									/>
-								</InputGroupWithAddonText>
-								<Text
-									Tag='p'
-									size={12}
-									className={`${rampRateError && 'text-danger'} px-2 mb-0`}
-								>
-									Enter value between {MIN_RAMP_RATE} to {MAX_RAMP_RATE}
-								</Text>
-							</FormGroup>
-						</Col>
-						<Col sm={colSize}>
-							<FormGroup>
-								<Label for='target_temperature' className='font-weight-bold'>
-									Target Temperature
-								</Label>
-								<InputGroupWithAddonText addonText='unit °C'>
-									<Input
-										type='number'
-										name='targetTemperature'
-										id='target_temperature'
-										placeholder={`${MIN_TARGET_TEMPERATURE} - ${MAX_TARGET_TEMPERATURE}`}
-										value={targetTemperature}
-										onChange={onChangeHandler}
-										onBlur={onTargetTemperatureBlurHandler}
-										onFocus={onTargetTemperatureFocusHandler}
-										invalid={targetTemperatureError}
-									/>
-								</InputGroupWithAddonText>
-								<Text
-									Tag='p'
-									size={12}
-									className={`${
-										targetTemperatureError && 'text-danger'
-									} px-2 mb-0`}
-								>
-									Enter value between {MIN_TARGET_TEMPERATURE} to{' '}
-									{MAX_TARGET_TEMPERATURE}
-								</Text>
-							</FormGroup>
-						</Col>
-						<Col sm={colSize}>
-							<FormGroup>
-								<Label for='hold_time' className='font-weight-bold'>
-									Hold Time
-								</Label>
-								<InputGroupWithAddonText addonText='unit sec'>
-									<Input
-										type='number'
-										name='holdTime'
-										id='hold_time'
-										placeholder='seconds'
-										value={holdTime}
-										onBlur={onHoldTimeBlurHandler}
-										onFocus={onHoldTimeFocusHandler}
-										onChange={onChangeHandler}
-										invalid={holdTimeError}
-									/>
-								</InputGroupWithAddonText>
-								{holdTimeError && (
-									<Text Tag='p' size={12} className='text-danger px-2 mb-0'>
-										Invalid Hold time
-									</Text>
-								)}
-							</FormGroup>
-						</Col>
-						{/* If the stage type is hold don't show datacapture checkbox */}
-						{stageType !== 'hold' && (
+					{/* If its cycle stage show the cycle step form only when showCycleStepform is true.
+					It will be true only when a valid repeat count is accepted from user  */}
+					{stageType === HOLD_STAGE || showCycleStepForm === true ? (
+						<Row form className='mb-3 pb-3'>
 							<Col sm={colSize}>
 								<FormGroup>
-									<Label for='data_capture' className='font-weight-bold'>
-										Data Capture
+									<Label for='ramp_rate' className='font-weight-bold'>
+									Ramp Rate
 									</Label>
-									<CheckBox
-										name='dataCapture'
-										id='dataCapture'
-										onChange={(event) => {
-											updateStepFormStateWrapper(
-												event.target.name,
-												event.target.checked
-											);
-										}}
-										className='mr-2 ml-3 py-2'
-										checked={dataCapture}
-									/>
+									<InputGroupWithAddonText addonText='unit °C'>
+										<Input
+											type='number'
+											name='rampRate'
+											id='ramp_rate'
+											placeholder={`${MIN_RAMP_RATE} - ${MAX_RAMP_RATE}`}
+											value={rampRate}
+											onChange={onChangeHandler}
+											onBlur={onRampRateBlurHandler}
+											onFocus={onRampRateFocusHandler}
+											invalid={rampRateError}
+										/>
+									</InputGroupWithAddonText>
+									<Text
+										Tag='p'
+										size={12}
+										className={`${rampRateError && 'text-danger'} px-2 mb-0`}
+									>
+									Enter value between {MIN_RAMP_RATE} to {MAX_RAMP_RATE}
+									</Text>
 								</FormGroup>
 							</Col>
-						)}
-					</Row>
+							<Col sm={colSize}>
+								<FormGroup>
+									<Label for='target_temperature' className='font-weight-bold'>
+									Target Temperature
+									</Label>
+									<InputGroupWithAddonText addonText='unit °C'>
+										<Input
+											type='number'
+											name='targetTemperature'
+											id='target_temperature'
+											placeholder={`${MIN_TARGET_TEMPERATURE} - ${MAX_TARGET_TEMPERATURE}`}
+											value={targetTemperature}
+											onChange={onChangeHandler}
+											onBlur={onTargetTemperatureBlurHandler}
+											onFocus={onTargetTemperatureFocusHandler}
+											invalid={targetTemperatureError}
+										/>
+									</InputGroupWithAddonText>
+									<Text
+										Tag='p'
+										size={12}
+										className={`${
+											targetTemperatureError && 'text-danger'
+										} px-2 mb-0`}
+									>
+									Enter value between {MIN_TARGET_TEMPERATURE} to{' '}
+										{MAX_TARGET_TEMPERATURE}
+									</Text>
+								</FormGroup>
+							</Col>
+							<Col sm={colSize}>
+								<FormGroup>
+									<Label for='hold_time' className='font-weight-bold'>
+									Hold Time
+									</Label>
+									<InputGroupWithAddonText addonText='unit sec'>
+										<Input
+											type='number'
+											name='holdTime'
+											id='hold_time'
+											placeholder='seconds'
+											value={holdTime}
+											onBlur={onHoldTimeBlurHandler}
+											onFocus={onHoldTimeFocusHandler}
+											onChange={onChangeHandler}
+											invalid={holdTimeError}
+										/>
+									</InputGroupWithAddonText>
+									{holdTimeError && (
+										<Text Tag='p' size={12} className='text-danger px-2 mb-0'>
+										Invalid Hold time
+										</Text>
+									)}
+								</FormGroup>
+							</Col>
+							{/* If the stage type is hold don't show datacapture checkbox */}
+							{stageType !== HOLD_STAGE && (
+								<Col sm={colSize}>
+									<FormGroup>
+										<Label for='data_capture' className='font-weight-bold'>
+										Data Capture
+										</Label>
+										<CheckBox
+											name='dataCapture'
+											id='dataCapture'
+											onChange={(event) => {
+												updateStepFormStateWrapper(
+													event.target.name,
+													event.target.checked,
+												);
+											}}
+											className='mr-2 ml-3 py-2'
+											checked={dataCapture}
+										/>
+									</FormGroup>
+								</Col>
+							)}
+						</Row>) : null
+					}
 					<ButtonGroup className='text-center p-0 m-0 pt-5'>
 						{isUpdateForm === false && (
 							<Button
@@ -302,6 +320,11 @@ AddStepModal.propTypes = {
 	resetFormValues: PropTypes.func.isRequired,
 	saveClickHandler: PropTypes.func.isRequired,
 	stageType: PropTypes.string.isRequired,
+	setShowCycleStepForm: PropTypes.func.isRequired,
+	showCycleStepForm: PropTypes.bool.isRequired,
+	setRepeatCount: PropTypes.func.isRequired,
+	repeatCount: PropTypes.string.isRequired,
+	cycleRepeatCount: PropTypes.number.isRequired,
 };
 
 export default AddStepModal;
