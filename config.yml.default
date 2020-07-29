@@ -19,7 +19,6 @@ dyes:
     targets: ["TB"]
 
 ic_position: 6         # IC: internal Control Position
-ic_threshold: 3.5       # IC: internal Control Threshold  
 
 activeWells: [7,1,5,32,51,87]
 

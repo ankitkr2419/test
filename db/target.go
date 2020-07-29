@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"mylab/cpagent/config"
 	"strings"
 
 	"github.com/google/uuid"
@@ -11,18 +10,14 @@ import (
 )
 
 const (
-	getTargetListQuery = `SELECT targets.* FROM targets,dyes
-		WHERE dyes.position != $1 AND dyes.id = targets.dye_id
-		ORDER BY name ASC`
+	getTargetListQuery = `SELECT targets.* FROM targets
+			ORDER BY name ASC`
 
 	insertTargetsQuery1 = `INSERT INTO targets(
 				name,
 				dye_id)
 				VALUES %s `
 	insertTargetsQuery2 = `ON CONFLICT DO NOTHING;`
-
-	getICTargetQuery = `SELECT targets.* FROM targets,dyes
-		WHERE dyes.position = $1 AND dyes.id = targets.dye_id`
 )
 
 type Target struct {
@@ -32,7 +27,7 @@ type Target struct {
 }
 
 func (s *pgStore) ListTargets(ctx context.Context) (t []Target, err error) {
-	err = s.db.Select(&t, getTargetListQuery, config.GetICPosition())
+	err = s.db.Select(&t, getTargetListQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing targets")
 		return
@@ -71,16 +66,4 @@ func makeTargetQuery(Targets []Target) string {
 	stmt += insertTargetsQuery2
 
 	return stmt
-}
-
-// It gets Internal Control Target
-func (s *pgStore) GetICTarget(ctx context.Context, dyeposition int) (t Target, err error) {
-
-	err = s.db.Get(&t, getICTargetQuery, dyeposition)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing IC target")
-		return
-	}
-
-	return
 }

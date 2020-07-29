@@ -178,13 +178,6 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 		ss1, ss2,
 	}, nil)
 
-	suite.dbMock.On("GetICTarget", mock.Anything, mock.Anything).Return(db.Target{}, nil)
-
-	suite.dbMock.On("AddExpTemplateTarget", mock.Anything, mock.Anything, mock.Anything).Return(
-		db.ExpTemplateTarget{},
-		nil,
-	)
-
 	suite.dbMock.On("ListConfTargets", mock.Anything, mock.Anything).Return([]db.TargetDetails{}, nil)
 
 	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything).Return(

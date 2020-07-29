@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	ic                int         //internal control
 	green             = "#3FC13A" // All CT values for the well are below threshold,
 	red               = "#F06666" //Even a single value crosses threshold for target
 	orange            = "#F3811F" // If the CT values are close to threshold (delta)

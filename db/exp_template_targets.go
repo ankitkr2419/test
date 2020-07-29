@@ -26,8 +26,6 @@ const (
 		threshold)
 		VALUES `
 
-	upsertExpTempTargetQuery2 = `ON CONFLICT DO NOTHING;`
-
 	deleteExpTempTargetsQuery = `DELETE FROM experiment_template_targets
 		WHERE
 		experiment_template_targets.experiment_id = $1
@@ -105,18 +103,4 @@ func makeInsertQuery(tt []ExpTemplateTarget) string {
 		strings.Join(values, ","))
 
 	return stmt
-}
-
-func (s *pgStore) AddExpTemplateTarget(ctx context.Context, t []ExpTemplateTarget, ExperimentID uuid.UUID) (err error) {
-	stmt := makeInsertQuery(t)
-	stmt += upsertExpTempTargetQuery2
-
-	_, err = s.db.Exec(
-		stmt,
-	)
-	if err != nil {
-		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
-		return
-	}
-	return
 }

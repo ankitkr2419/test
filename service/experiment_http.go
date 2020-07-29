@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -193,38 +194,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		//get templateID
-		latestE, err := deps.Store.ShowExperiment(req.Context(), expID)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error show experiment")
-			return
-		}
-
-		// add Internal Control Target
-		target, err := deps.Store.GetICTarget(req.Context(), config.GetICPosition())
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching target data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		expTarget := []db.ExpTemplateTarget{
-			{
-				ExperimentID: expID,
-				TargetID:     target.ID,
-				TemplateID:   latestE.TemplateID,
-				TargetName:   target.Name,
-				Threshold:    config.GetICThreshold(),
-			},
-		}
-
-		err = deps.Store.AddExpTemplateTarget(req.Context(), expTarget, expID)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create target")
-			return
-		}
-
 		// retruns all targets configured for experiment
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), expID)
 		if err != nil {
@@ -233,7 +202,16 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		setExperimentValues(config.ActiveWells("activeWells"), target.ID, targetDetails, expID, plcStage)
+		var ICTargetID uuid.UUID
+
+		for _, t := range targetDetails {
+			if t.DyePosition == int32(config.GetICPosition()) {
+				ICTargetID = t.TargetID
+			}
+
+		}
+
+		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
 		WellTargets := initializeWellTargets()
 

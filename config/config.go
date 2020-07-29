@@ -58,10 +58,6 @@ func GetICPosition() int {
 	return ReadEnvInt("ic_position")
 }
 
-func GetICThreshold() float64 {
-	return ReadEnvFloat("ic_threshold")
-}
-
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))
