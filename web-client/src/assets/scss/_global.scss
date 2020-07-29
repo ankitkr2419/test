@@ -140,15 +140,6 @@ button:focus {
 	color: $white;
 }
 
-.btn-outline-primary:not(:disabled):not(.disabled):active,
-.btn-outline-primary:not(:disabled):not(.disabled).active,
-.show > .btn-outline-primary.dropdown-toggle,
-.btn-outline-primary:hover,
-.btn-outline-primary.disabled,
-.btn-outline-primary:disabled {
-	color: $white;
-}
-
 .btn-secondary,
 .btn-secondary.disabled,
 .btn-secondary:disabled {
@@ -484,15 +475,6 @@ button:focus {
 			}
 		}
 
-		&.-hold {
-			height: rem(218px);
-			margin: rem(0 0 8px);
-		}
-
-		&.-cycle {
-			height: rem(290px);
-		}
-
 		th.th-counter {
 			font-size: rem(12px);
 			line-height: rem(16px);
@@ -516,6 +498,17 @@ button:focus {
 	> p {
 		color: $gray-40;
 		margin: rem(-64px 0 0 -40px);
+	}
+}
+
+.table-steps-wrapper {
+	&.-hold {
+		height: rem(218px);
+		margin: rem(0 0 8px);
+	}
+
+	&.-cycle {
+		height: rem(290px);
 	}
 }
 

@@ -1,5 +1,11 @@
 import React from 'react';
-import { Popover, PopoverBody, Input, Button } from 'core-components';
+import {
+	Popover,
+	PopoverBody,
+	Input,
+	Button,
+	FormGroup,
+} from 'core-components';
 import { ButtonIcon, Text, Icon } from 'shared-components';
 import styled from 'styled-components';
 
@@ -21,16 +27,28 @@ const CounterPopover = ({ className, ...rest }) => {
 				popperClassName='popover-counter'
 			>
 				<PopoverBody className='d-flex'>
-					<Input
-						type='number'
-						id='counter'
-						name='counter'
-						className='flex-100'
-					/>
-					<Button icon color='primary' className='rounded-circle ml-3'>
+					<FormGroup className='mb-0'>
+						<Input
+							type='number'
+							id='counter'
+							name='counter'
+							placeholder='Enetr Count'
+							className='flex-100'
+						/>
+						<Text Tag='p' size={11} className={`px-2 mb-0`}>
+							Enter count between 5 to 100
+						</Text>
+					</FormGroup>
+					{/* TODO: Change color prop value to 'secondary' when button is disabled */}
+					<Button icon outline color='primary' className='rounded-circle ml-3'>
 						<Icon size={32} name='check' />
 					</Button>
-					<Button icon color='secondary' className='rounded-circle ml-3'>
+					<Button
+						icon
+						outline
+						color='secondary'
+						className='rounded-circle ml-3'
+					>
 						<Icon size={32} name='cross' />
 					</Button>
 				</PopoverBody>
