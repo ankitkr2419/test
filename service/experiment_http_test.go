@@ -54,7 +54,7 @@ func (suite *ExperimentHandlerTestSuite) TestListExperimentsSuccess() {
 		"",
 		listExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0}]`, testUUID, tempUUID)
+	output := fmt.Sprintf(`[{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -108,7 +108,7 @@ func (suite *ExperimentHandlerTestSuite) TestCreateExperimentSuccess() {
 		createExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -127,7 +127,7 @@ func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 		"",
 		showExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -180,7 +180,7 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 
 	suite.dbMock.On("ListConfTargets", mock.Anything, mock.Anything).Return([]db.TargetDetails{}, nil)
 
-	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
 		nil, nil)
 
 	suite.dbMock.On("UpsertWellTargets", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(

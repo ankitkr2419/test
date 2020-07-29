@@ -7,7 +7,7 @@ CREATE TABLE experiments (
   operator_name varchar(50),
   start_time timestamp,
   end_time timestamp,
-  result varchar(50),
+  result varchar(50) DEFAULT '' NOT NULL,
   repeat_cycle integer,
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

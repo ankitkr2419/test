@@ -12,6 +12,7 @@ import (
 
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
 )
@@ -101,7 +102,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 func sendGraph(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	graphResult, err := getGraph(deps)
+	graphResult, err := getGraph(deps, experimentValues.experimentID, experimentValues.activeWells, experimentValues.targets)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("error in fetching data")
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -160,7 +161,7 @@ func sendOnSuccess(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn)
 
 func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	respBytes, err := getTemperatureDetails(deps)
+	respBytes, err := getTemperatureDetails(deps, experimentValues.experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("error in fetching data")
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -200,16 +201,16 @@ func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn
 
 }
 
-func getGraph(deps Dependencies) (respBytes []byte, err error) {
+func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails) (respBytes []byte, err error) {
 
-	DBResult, err := deps.Store.GetResult(context.Background(), experimentValues.experimentID)
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching result data")
 		return
 	}
 
 	// analyseResult returns data required for ploting graph
-	Finalresult := analyseResult(DBResult)
+	Finalresult := analyseResult(DBResult, wells, targets)
 
 	Result := resultGraph{
 		Type: "Graph",
@@ -295,8 +296,8 @@ func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
 	return
 }
 
-func getTemperatureDetails(deps Dependencies) (respBytes []byte, err error) {
-	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentValues.experimentID)
+func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes []byte, err error) {
+	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error get experiment")
 		return

@@ -9,7 +9,16 @@ import (
 )
 
 const (
-	getExperimentListQuery = `SELECT * FROM experiments`
+	getExperimentListQuery = `SELECT
+	e.*,
+	t.name as template_name,
+	 (
+		SELECT COUNT(*)
+		FROM wells
+		WHERE wells.experiment_id=e.id
+   ) AS well_count
+	FROM experiments as e,templates as t
+	WHERE t.id = e.template_id`
 
 	createExperimentQuery = `INSERT INTO experiments (
 		description,
@@ -34,12 +43,14 @@ const (
 
 	updateStartTimeQuery = `UPDATE experiments
 		SET start_time = $1,
-		repeat_cycle = $2
-		WHERE id = $3`
+		repeat_cycle = $2,
+		updated_at = $3
+		WHERE id = $4`
 	updateStopTimeQuery = `UPDATE experiments
 		SET end_time = $1,
-		result = $2
-		WHERE id = $3`
+		result = $2,
+		updated_at = $3
+		WHERE id = $4`
 )
 
 type Experiment struct {
@@ -102,7 +113,7 @@ func ValidateExperiment(wells []Well) (valid bool, resp WarnResponse) {
 }
 
 func (s *pgStore) ListExperiments(ctx context.Context) (e []Experiment, err error) {
-	err = s.db.Select(e, getExperimentListQuery)
+	err = s.db.Select(&e, getExperimentListQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing experiments")
 		return
@@ -151,6 +162,7 @@ func (s *pgStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, e
 		updateStartTimeQuery,
 		t,
 		repeatCycle,
+		time.Now(),
 		experimentID,
 	)
 	if err != nil {
@@ -165,6 +177,7 @@ func (s *pgStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, ex
 		updateStopTimeQuery,
 		t,
 		result,
+		time.Now(),
 		experimentID,
 	)
 	if err != nil {
