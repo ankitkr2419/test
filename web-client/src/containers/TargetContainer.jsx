@@ -22,6 +22,7 @@ import {
 	isTargetAlreadySelected,
 	isAnyThresholdInvalid,
 } from 'components/Target/targetHelper';
+import { fetchStages } from 'action-creators/stageActionCreators';
 
 const TargetContainer = (props) => {
 	// constants
@@ -55,6 +56,11 @@ const TargetContainer = (props) => {
 	);
 
 	// useEffect section
+	useEffect(() => {
+		// fetch updated stage list from server. required for next steps wizard
+		dispatch(fetchStages(templateID));
+	}, [templateID, dispatch]);
+
 	// below useEffect is use to navigate to next wizard when user will save targets
 	useEffect(() => {
 		if (isTargetSaved === true) {
