@@ -13,6 +13,9 @@ const CycleSteps = ({
 	onStepRowClicked,
 	selectedStepId,
 	cycleRepeatCount,
+	repeatCounterState,
+	updateRepeatCounterStateWrapper,
+	saveRepeatCount,
 }) => (
 	<div className='table-steps-wrapper -cycle'>
 		<Table className='table-steps' size='sm' striped>
@@ -44,7 +47,16 @@ const CycleSteps = ({
 						Data Capture <br />
 						(boolean flag)
 					</th>
-					<th className='th-counter'>Repeat counter <br /> <CounterPopover /></th>
+					<th className='th-counter'>Repeat counter <br />
+						{cycleRepeatCount !== 0 && (
+							<CounterPopover
+								cycleRepeatCount={cycleRepeatCount}
+								repeatCounterState={repeatCounterState}
+								updateRepeatCounterStateWrapper={updateRepeatCounterStateWrapper}
+								saveRepeatCount={saveRepeatCount}
+							/>
+						)}
+					</th>
 					<th>
 						<Button color='primary' icon className='ml-auto' onClick={addCycleStep}>
 							<Icon size={40} name='plus-2' />

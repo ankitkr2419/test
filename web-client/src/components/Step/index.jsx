@@ -1,7 +1,11 @@
 import React, { useReducer, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import stepStateReducer, {
+import {
 	stepStateInitialState,
+	repeatCounterInitialState,
+	repeatCounterStateReducer,
+	stepStateReducer,
+	repeatCounterStateActions,
 } from 'components/Step/stepState';
 import AddStepModal from './AddStepModal';
 import { stepStateActions } from './stepState';
@@ -33,8 +37,11 @@ const StepComponent = (props) => {
 		stepStateInitialState,
 	);
 
-	// local state to store repeat count
-	const [repeatCount, setRepeatCount] = useState('');
+	// local state to save repeat count and repeatCountError flag
+	const [repeatCounterState, updateRepeatCounterState] = useReducer(
+		repeatCounterStateReducer,
+		repeatCounterInitialState,
+	);
 
 	// local state to show cycle step form conditionally
 	const [showCycleStepForm, setShowCycleStepForm] = useState(false);
@@ -46,10 +53,19 @@ const StepComponent = (props) => {
 	// get stage Id for currently opened create step modal
 	const getStageId = () => (stageType === HOLD_STAGE ? holdStageId : cycleStageId);
 
-	// helper function to update local state
+	// helper function to update step form local state
 	const updateStepFormStateWrapper = (key, value) => {
 		updateStepFormState({
 			type: stepStateActions.SET_VALUES,
+			key,
+			value,
+		});
+	};
+
+	// helper function to update repeat counter local state
+	const updateRepeatCounterStateWrapper = (key, value) => {
+		updateRepeatCounterState({
+			type: repeatCounterStateActions.SET_VALUES,
 			key,
 			value,
 		});
@@ -61,7 +77,7 @@ const StepComponent = (props) => {
 			type: stepStateActions.RESET_VALUES,
 		});
 		// reset the repeat count stored in local state
-		setRepeatCount('');
+		updateRepeatCounterStateWrapper('repeatCount', '');
 		// if user closes the modal without saving the repeat count in first use case scenario
 		// reset the showCycleStepForm to false
 		if (cycleRepeatCount === 0 && showCycleStepForm === true) {
@@ -95,7 +111,7 @@ const StepComponent = (props) => {
 		// if its cycle stage and repeat count is initial zero then
 		// its the first use scenario and we need to save repeat count
 		if (stageType === CYCLE_STAGE && cycleRepeatCount === 0) {
-			saveRepeatCount(repeatCount);
+			saveRepeatCount(repeatCounterState.get('repeatCount'));
 		}
 		toggleCreateStepModal();
 	};
@@ -158,6 +174,8 @@ const StepComponent = (props) => {
 		if (cycleRepeatCount !== 0) {
 			// show cycle step form
 			setShowCycleStepForm(true);
+			// store the cycle repeat count from server in local state
+			updateRepeatCounterStateWrapper('repeatCount', cycleRepeatCount);
 		}
 	}, [cycleRepeatCount, setShowCycleStepForm]);
 
@@ -179,6 +197,9 @@ const StepComponent = (props) => {
 				selectedStepId={selectedStepId}
 				addCycleStep={addCycleStep}
 				cycleRepeatCount={cycleRepeatCount}
+				repeatCounterState={repeatCounterState.toJS()}
+				updateRepeatCounterStateWrapper={updateRepeatCounterStateWrapper}
+				saveRepeatCount={saveRepeatCount}
 			/>
 			{isCreateStepModalVisible && (
 				<AddStepModal
@@ -192,8 +213,8 @@ const StepComponent = (props) => {
 					resetFormValues={resetFormValues}
 					stageType={stageType}
 					saveRepeatCount={saveRepeatCount}
-					repeatCount={repeatCount}
-					setRepeatCount={setRepeatCount}
+					repeatCounterState={repeatCounterState.toJS()}
+					updateRepeatCounterStateWrapper={updateRepeatCounterStateWrapper}
 					showCycleStepForm={showCycleStepForm}
 					setShowCycleStepForm={setShowCycleStepForm}
 					cycleRepeatCount={cycleRepeatCount}

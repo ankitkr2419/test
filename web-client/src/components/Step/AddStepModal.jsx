@@ -13,6 +13,8 @@ import {
 	CheckBox,
 } from 'core-components';
 import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
+import { validateRepeatCount } from 'components/Stage/stageHelper';
+import { MIN_REPEAT_COUNT, MAX_REPEAT_COUNT } from 'components/Stage/stageConstants';
 import {
 	validateHoldTime,
 	validateRampRate,
@@ -40,9 +42,9 @@ const AddStepModal = (props) => {
 		stageType,
 		setShowCycleStepForm,
 		showCycleStepForm,
-		setRepeatCount,
-		repeatCount,
+		updateRepeatCounterStateWrapper,
 		cycleRepeatCount,
+		repeatCounterState,
 	} = props;
 
 	const {
@@ -55,6 +57,11 @@ const AddStepModal = (props) => {
 		rampRateError,
 		targetTemperatureError,
 	} = stepFormState;
+
+	const {
+		repeatCount,
+		repeatCountError,
+	} = repeatCounterState;
 
 	// stageId will be present when we are updating stage
 	const isUpdateForm = stepId !== null;
@@ -103,8 +110,20 @@ const AddStepModal = (props) => {
 	};
 
 	// repeat count change handler
-	const onRepeatCountChange = (event) => {
-		setRepeatCount(event.target.value);
+	const onRepeatCountChangeHandler = ({ target: { name, value } }) => {
+		updateRepeatCounterStateWrapper(name, value);
+	};
+
+	// reset repeatCountError to false stored in stageForm local state
+	const onRepeatCountFocusHandler = () => {
+		updateRepeatCounterStateWrapper('repeatCountError', false);
+	};
+
+	// set repeatCountError true stored in stageForm local state
+	const onRepeatCountBlurHandler = () => {
+		if (validateRepeatCount(repeatCount) === false) {
+			updateRepeatCounterStateWrapper('repeatCountError', true);
+		}
 	};
 	return (
 		<>
@@ -157,15 +176,27 @@ const AddStepModal = (props) => {
 										id='repeat_count'
 										placeholder='Enter Count'
 										value={repeatCount}
-										onChange={onRepeatCountChange}
+										onChange={onRepeatCountChangeHandler}
+										onFocus={onRepeatCountFocusHandler}
+										onBlur={onRepeatCountBlurHandler}
+										invalid={repeatCountError}
 									/>
+									<Text
+										Tag='p'
+										size={12}
+										className={`${
+											repeatCountError && 'text-danger'
+										} px-2 mb-0`}
+									>
+									Enter value between {MIN_REPEAT_COUNT} to {MAX_REPEAT_COUNT}
+									</Text>
 								</FormGroup>
 							</Col>
 							<Col sm={6} className='text-right'>
 								<Button color='primary'
 									className='mt-4'
 									onClick={() => setShowCycleStepForm(true)}
-									disabled={showCycleStepForm}
+									disabled={repeatCountError === true  || showCycleStepForm === true}
 								>
 									Next
 								</Button>
@@ -322,8 +353,8 @@ AddStepModal.propTypes = {
 	stageType: PropTypes.string.isRequired,
 	setShowCycleStepForm: PropTypes.func.isRequired,
 	showCycleStepForm: PropTypes.bool.isRequired,
-	setRepeatCount: PropTypes.func.isRequired,
-	repeatCount: PropTypes.string.isRequired,
+	updateRepeatCounterStateWrapper: PropTypes.func.isRequired,
+	repeatCounterState: PropTypes.object.isRequired,
 	cycleRepeatCount: PropTypes.number.isRequired,
 };
 
