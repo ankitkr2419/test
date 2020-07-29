@@ -35,12 +35,7 @@ type Template struct {
 	ID          uuid.UUID `db:"id" json:"id"`
 	Name        string    `db:"name" json:"name" validate:"required"`
 	Description string    `db:"description" json:"description" validate:"required"`
-}
-
-// TemplateStgs is used to return createtemplate json
-type TemplateStgs struct {
-	Template Template `json:"template"`
-	Stages   []Stage  `json:"stages"`
+	Stages      []Stage   `json:"stages,omitempty"`
 }
 
 func (s *pgStore) ListTemplates(ctx context.Context) (t []Template, err error) {

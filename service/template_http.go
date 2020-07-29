@@ -76,19 +76,14 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 			},
 		}
 
-		createdStgs, err := deps.Store.CreateStages(req.Context(), stgs)
+		createdTemp.Stages, err = deps.Store.CreateStages(req.Context(), stgs)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error create target")
 			return
 		}
 
-		templateStgs := db.TemplateStgs{
-			Template: createdTemp,
-			Stages:   createdStgs,
-		}
-
-		respBytes, err = json.Marshal(templateStgs)
+		respBytes, err = json.Marshal(createdTemp)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling targets data")
 			rw.WriteHeader(http.StatusInternalServerError)
