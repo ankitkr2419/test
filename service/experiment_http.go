@@ -186,7 +186,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID)
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -255,7 +255,7 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID)
+		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)

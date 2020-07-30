@@ -34,8 +34,8 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 				return
 			}
 
-			for i, w := range wells {
-				for _, t := range welltargets {
+			for _, t := range welltargets {
+				for i, w := range wells {
 					if w.Position == t.WellPosition {
 						wells[i].Targets = append(w.Targets, t)
 					}

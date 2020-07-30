@@ -205,8 +205,8 @@ func (m *DBMockStore) ListStageSteps(ctx context.Context, id uuid.UUID) (s []Sta
 	args := m.Called(ctx, id)
 	return args.Get(0).([]StageStep), args.Error(1)
 }
-func (m *DBMockStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID) (err error) {
-	args := m.Called(ctx, t, id)
+func (m *DBMockStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID, i uint16) (err error) {
+	args := m.Called(ctx, t, id, i)
 	return args.Error(1)
 }
 
@@ -224,8 +224,8 @@ func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (w 
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 
-func (m *DBMockStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID) (err error) {
-	args := m.Called(ctx, t, id)
+func (m *DBMockStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID, s string) (err error) {
+	args := m.Called(ctx, t, id, s)
 	return args.Error(1)
 }
 
