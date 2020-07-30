@@ -1,10 +1,12 @@
 import { fromJS, List } from 'immutable';
+import { getSelectedTargetIds } from './sampleHelper';
 
 // const action types
 export const createSampleActions = {
 	UPDATE_STATE: 'UPDATE_SAMPLE_STATE',
 	SET_VALUES: 'UPDATE_SAMPLE_VALUES',
 	RESET_VALUES: 'RESET_SAMPLE_VALUES',
+	TOGGLE_TARGET: 'TOGGLE_TARGET',
 };
 
 export const createSampleInitialState = fromJS({
@@ -39,12 +41,10 @@ export const getSampleRequestData = (state, positions) => {
 			name: sample.label,
 		};
 	}
-
-	requestObject.targets = targets.map(ele => ele.target_id);
+	// get Target Ids of selected targets
+	requestObject.targets = getSelectedTargetIds(targets);
 	requestObject.task = task.value;
 	requestObject.position = isEdit === true ? [position] : positions;
-
-
 	return requestObject;
 };
 
@@ -54,12 +54,9 @@ const createSampleStateReducer = (state, action) => {
 		return state.setIn([action.key], action.value);
 	case createSampleActions.UPDATE_STATE:
 		return state.merge(action.value);
-	case createSampleActions.deleteTarget:
-		return state.updateIn(['targets'], targetList => targetList.filter(ele => ele.get('target_id') !== action.value));
+	case createSampleActions.TOGGLE_TARGET:
+		return state.updateIn(['targets', action.value, 'isSelected'], value => !value);
 	case createSampleActions.RESET_VALUES:
-		if (state.get('isEdit') === true) {
-			return createSampleInitialState.updateIn(['targets'], () => state.get('targets'));
-		}
 		return createSampleInitialState;
 	default:
 		throw new Error('Invalid action type');
