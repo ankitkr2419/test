@@ -52,7 +52,7 @@ const TemplateContainer = (props) => {
 		// Once we create template will fetch updated template list
 		if (isTemplateCreated === true) {
 			// update the templateId in templateState maintained in templateLayout with created Id
-			updateTemplateID(response.template.id);
+			updateTemplateID(response.id);
 			// navigate to next wizard
 			updateSelectedWizard('target');
 			dispatch(addTemplateReset());
