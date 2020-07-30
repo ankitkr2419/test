@@ -35,6 +35,7 @@ type Template struct {
 	ID          uuid.UUID `db:"id" json:"id"`
 	Name        string    `db:"name" json:"name" validate:"required"`
 	Description string    `db:"description" json:"description" validate:"required"`
+	Stages      []Stage   `json:"stages,omitempty"`
 }
 
 func (s *pgStore) ListTemplates(ctx context.Context) (t []Template, err error) {

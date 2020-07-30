@@ -17,7 +17,7 @@ type Storer interface {
 	ShowTemplate(context.Context, uuid.UUID) (Template, error)
 	DeleteTemplate(context.Context, uuid.UUID) error
 	ListStages(context.Context, uuid.UUID) ([]Stage, error)
-	CreateStage(context.Context, Stage) (Stage, error)
+	CreateStages(context.Context, []Stage) ([]Stage, error)
 	UpdateStage(context.Context, Stage) error
 	ShowStage(context.Context, uuid.UUID) (Stage, error)
 	DeleteStage(context.Context, uuid.UUID) error
@@ -43,11 +43,11 @@ type Storer interface {
 	GetWellTarget(context.Context, int32, uuid.UUID) ([]WellTarget, error)
 	UpsertWellTargets(context.Context, []WellTarget, uuid.UUID, bool) ([]WellTarget, error)
 	ListStageSteps(context.Context, uuid.UUID) ([]StageStep, error)
-	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID) error
+	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID, uint16) error
 	ListConfTargets(context.Context, uuid.UUID) ([]TargetDetails, error)
 	InsertResult(context.Context, []Result) ([]Result, error)
 	ListWellTargets(context.Context, uuid.UUID) ([]WellTarget, error)
-	UpdateStopTimeExperiments(context.Context, time.Time, uuid.UUID) error
+	UpdateStopTimeExperiments(context.Context, time.Time, uuid.UUID, string) error
 	GetResult(context.Context, uuid.UUID) ([]Result, error)
 	UpdateColorWell(context.Context, string, uuid.UUID) error
 	ListExperimentTemperature(context.Context, uuid.UUID) ([]ExperimentTemperature, error)

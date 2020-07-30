@@ -166,14 +166,14 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 	}
 }
 
-func analyseResult(result []db.Result) (finalResult []graph) {
+func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails) (finalResult []graph) {
 
 	// ex: for 8 active wells * 6 targets * no of cycle
-	for _, aw := range experimentValues.activeWells {
+	for _, aw := range wells {
 		var wellResult graph
 		wellResult.WellPosition = aw
 
-		for _, t := range experimentValues.targets {
+		for _, t := range targets {
 			wellResult.TargetID = t.TargetID
 			for _, r := range result {
 				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {

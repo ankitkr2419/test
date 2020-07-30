@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,7 +16,7 @@ const (
 		repeat_count,
 		template_id,
 		step_count)
-		VALUES ($1, $2, $3, $4) RETURNING id`
+		VALUES %s`
 
 	getStageListQuery = `SELECT * FROM stages
 		where template_id = $1
@@ -31,11 +33,9 @@ const (
 		WHERE id = $1`
 
 	updateStageQuery = `UPDATE stages SET (
-		type,
 		repeat_count,
-		template_id,
 		updated_at) =
-		($1, $2, $3,$4) where id = $5`
+		($1, $2) where id = $3`
 
 	deleteStageQuery = `DELETE FROM stages WHERE id = $1`
 
@@ -82,35 +82,24 @@ func (s *pgStore) ListStages(ctx context.Context, template_id uuid.UUID) (stgs [
 	return
 }
 
-func (s *pgStore) CreateStage(ctx context.Context, stg Stage) (createdStage Stage, err error) {
-	var lastInsertId uuid.UUID
-	err = s.db.QueryRow(
-		createStageQuery,
-		stg.Type,
-		stg.RepeatCount,
-		stg.TemplateID,
-		0, //initial step count = 0
-	).Scan(&lastInsertId)
+func (s *pgStore) CreateStages(ctx context.Context, stg []Stage) (createdStage []Stage, err error) {
+
+	stmt := makeInsertStagesQuery(stg)
+
+	_, err = s.db.Exec(stmt)
 
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error creating Stage")
 		return
 	}
 
-	err = s.db.Get(&createdStage, getStageQuery, lastInsertId)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting Stage")
-		return
-	}
-	return
+	return s.ListStages(ctx, stg[0].TemplateID)
 }
 
 func (s *pgStore) UpdateStage(ctx context.Context, stg Stage) (err error) {
 	_, err = s.db.Exec(
-		updateStageQuery,
-		stg.Type,
+		updateStageQuery, //only update repeat count
 		stg.RepeatCount,
-		stg.TemplateID,
 		time.Now(),
 		stg.ID,
 	)
@@ -165,4 +154,18 @@ func (s *pgStore) ListStageSteps(ctx context.Context, templateID uuid.UUID) (ss 
 	}
 
 	return
+}
+
+func makeInsertStagesQuery(stages []Stage) string {
+	values := make([]string, 0, len(stages))
+
+	for _, s := range stages {
+		values = append(values, fmt.Sprintf("('%v',%v,'%v',%v)", s.Type, s.RepeatCount, s.TemplateID, s.StepCount))
+	}
+
+	stmt := fmt.Sprintf(createStageQuery,
+		strings.Join(values, ","))
+
+	return stmt
+
 }
