@@ -181,7 +181,7 @@ func (d *Simulator) setWells() {
 	// controls
 	pc := config.ReadEnvInt("controls.positive")
 	nc := config.ReadEnvInt("controls.negative")
-	ic := config.ReadEnvInt("controls.internal")
+	ic := config.GetICPosition() - 1 // ic to be added in all the wells //-1 as positions start from 1
 	ntc := config.ReadEnvInt("controls.no_template")
 
 	/* TBD, the logic needs to be optimised, too many conditions,
@@ -215,13 +215,17 @@ func (d *Simulator) setWells() {
 			well.control = "" // patient sample
 
 			for i := 0; i < 6; i++ {
-				switch goal := jitter(0, 1, 4); goal { // randomization of goals
-				case 1:
-					well.goals[i] = "" // negative
-				case 2:
-					well.goals[i] = "high"
-				case 3:
-					well.goals[i] = "low"
+				if i != ic { // for all targets accept ic assign random goals
+					switch goal := jitter(0, 1, 4); goal { // randomization of goals
+					case 1:
+						well.goals[i] = "" // negative
+					case 2:
+						well.goals[i] = "high"
+					case 3:
+						well.goals[i] = "low"
+					}
+				} else {
+					well.goals[i] = "high" //	set internal control "high"
 				}
 			}
 		}

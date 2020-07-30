@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -201,7 +202,16 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		setExperimentValues(config.ActiveWells("activeWells"), targetDetails, expID, plcStage)
+		var ICTargetID uuid.UUID
+
+		for _, t := range targetDetails {
+			if t.DyePosition == int32(config.GetICPosition()) {
+				ICTargetID = t.TargetID
+			}
+
+		}
+
+		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
 		WellTargets := initializeWellTargets()
 

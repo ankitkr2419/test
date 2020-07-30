@@ -10,12 +10,13 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func setExperimentValues(aw []int32, TargetDetails []db.TargetDetails, ExperimentID uuid.UUID, stage plc.Stage) {
+func setExperimentValues(aw []int32, t uuid.UUID, TargetDetails []db.TargetDetails, ExperimentID uuid.UUID, stage plc.Stage) {
 	experimentValues = experimentResultValues{
 		experimentID: ExperimentID,
 		activeWells:  aw,
 		targets:      TargetDetails,
 		plcStage:     stage,
+		icTargetID:   t,
 	}
 
 	redlowerlimit = config.GetColorLimits("redlowerlimit")
@@ -102,20 +103,20 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 			for j, t := range DBWellTargets {
 				for i, w := range DBWells {
 					// determine color
-					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position {
+					if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position && r.TargetID != experimentValues.icTargetID {
 
 						switch {
-						case redlowerlimit <= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
+						case redlowerlimit <= currentCycle && currentCycle < redupperlimit && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "" && DBWells[i].ColorCode == green:
 							// mark red
 							DBWells[i].ColorCode = red
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case orangelowerlimit <= currentCycle && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
+						case orangelowerlimit <= currentCycle && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "" && DBWells[i].ColorCode == green:
 							// mark orange
 							DBWells[i].ColorCode = orange
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 
-						case redlowerlimit > currentCycle && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "":
+						case redlowerlimit > currentCycle && scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "" && DBWells[i].ColorCode == green:
 
 							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
 							DBWells[i].ColorCode = red // here, we do detemine color as cycle is 1 to lowerLimitOfRed also crosses threshold
@@ -127,8 +128,23 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 						case t.CT != "" && DBWells[i].ColorCode == green: //if earlier CT value is updated when well was not configured then change only color of the well
 							DBWells[i].ColorCode = red
 
+						case scaleThreshold(float32(r.FValue)) >= r.Threshold && t.CT == "" && DBWells[i].ColorCode != green: //when color is already marked we have only update CT Value
+							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+
 						}
 
+					} else if r.WellPosition == w.Position && r.TargetID == t.TargetID && t.WellPosition == w.Position && r.TargetID == experimentValues.icTargetID {
+						// for IC: internal control target only update CT Values, do not update color
+						// if well is not configured for any target we should not miss the CT update
+						if t.CT == "" && r.Threshold <= scaleThreshold(float32(r.FValue)) {
+
+							// add ct
+							DBWellTargets[j].CT = strconv.Itoa(int(r.FValue))
+						} else if t.CT != "" && t.CT != undetermine && r.Threshold >= scaleThreshold(float32(r.FValue)) {
+
+							// if ct value again crosses threshold then only set it as undertermine
+							DBWellTargets[j].CT = undetermine
+						}
 					}
 				}
 				if r.WellPosition == t.WellPosition && r.TargetID == t.TargetID && !found(uint16(t.WellPosition), wellsConfigured) {

@@ -28,14 +28,14 @@ type experimentResultValues struct {
 	experimentID uuid.UUID
 	activeWells  []int32
 	targets      []db.TargetDetails
+	icTargetID   uuid.UUID
 }
+
 type resultGraph struct {
 	Type string  `json:"type"`
 	Data []graph `json:"data"`
-	// LidTemperature float32 `json:"lid_temp"`
-	// Temperature float32 `json:"temperature"`
-	// CurrentCycle uint16    `json:"current_cycle"`
 }
+
 type graph struct {
 	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
