@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ButtonIcon, Icon } from 'shared-components';
-import { Table, Button, CheckBox } from 'core-components';
-import CounterPopover from './CounterPopover';
+import { Table, Button } from 'core-components';
 import { CYCLE_STAGE } from './stepConstants';
+import CounterPopover from './CounterPopover';
 
 const CycleSteps = ({
 	addCycleStep,
@@ -48,14 +48,12 @@ const CycleSteps = ({
 						(boolean flag)
 					</th>
 					<th className='th-counter'>Repeat counter <br />
-						{cycleRepeatCount !== 0 && (
-							<CounterPopover
-								cycleRepeatCount={cycleRepeatCount}
-								repeatCounterState={repeatCounterState}
-								updateRepeatCounterStateWrapper={updateRepeatCounterStateWrapper}
-								saveRepeatCount={saveRepeatCount}
-							/>
-						)}
+						<CounterPopover
+							cycleRepeatCount={cycleRepeatCount}
+							repeatCounterState={repeatCounterState}
+							updateRepeatCounterStateWrapper={updateRepeatCounterStateWrapper}
+							saveRepeatCount={saveRepeatCount}
+						/>
 					</th>
 					<th>
 						<Button color='primary' icon className='ml-auto' onClick={addCycleStep}>
@@ -80,13 +78,8 @@ const CycleSteps = ({
 							<td>{step.get('ramp_rate')}</td>
 							<td>{step.get('target_temp')}</td>
 							<td>{(step.get('hold_time'))}</td>
-							<td>
-								<CheckBox
-									id={`checkbox${index}`}
-									checked={step.get('data_capture')}
-									disabled={true}
-								/>
-							</td>
+							<td>{step.get('data_capture') === true ? 'Yes' : 'No'}</td>
+							<td />
 							<td className='td-actions'>
 								<ButtonIcon
 									size={16}

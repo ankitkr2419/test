@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useState } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
 	stepStateInitialState,
@@ -43,9 +43,6 @@ const StepComponent = (props) => {
 		repeatCounterInitialState,
 	);
 
-	// local state to show cycle step form conditionally
-	const [showCycleStepForm, setShowCycleStepForm] = useState(false);
-
 	// immutable => js
 	const stepFormStateJS = stepFormState.toJS();
 	const { isCreateStepModalVisible } = stepFormStateJS;
@@ -76,13 +73,6 @@ const StepComponent = (props) => {
 		updateStepFormState({
 			type: stepStateActions.RESET_VALUES,
 		});
-		// reset the repeat count stored in local state
-		updateRepeatCounterStateWrapper('repeatCount', '');
-		// if user closes the modal without saving the repeat count in first use case scenario
-		// reset the showCycleStepForm to false
-		if (cycleRepeatCount === 0 && showCycleStepForm === true) {
-			setShowCycleStepForm(false);
-		}
 	};
 
 	// helper method to toggle create template modal
@@ -108,11 +98,6 @@ const StepComponent = (props) => {
 			hold_time: parseInt(holdTime, 10),
 			data_capture: dataCapture,
 		});
-		// if its cycle stage and repeat count is initial zero then
-		// its the first use scenario and we need to save repeat count
-		if (stageType === CYCLE_STAGE && cycleRepeatCount === 0) {
-			saveRepeatCount(repeatCounterState.get('repeatCount'));
-		}
 		toggleCreateStepModal();
 	};
 
@@ -170,14 +155,9 @@ const StepComponent = (props) => {
 	};
 
 	useEffect(() => {
-		// set the showCycleStepForm true if repeat count is not the initial zero
-		if (cycleRepeatCount !== 0) {
-			// show cycle step form
-			setShowCycleStepForm(true);
-			// store the cycle repeat count from server in local state
-			updateRepeatCounterStateWrapper('repeatCount', cycleRepeatCount);
-		}
-	}, [cycleRepeatCount, setShowCycleStepForm]);
+		// store the cycle repeat count from server in local state
+		updateRepeatCounterStateWrapper('repeatCount', cycleRepeatCount);
+	}, [cycleRepeatCount]);
 
 	return (
 		<div className='d-flex flex-column flex-100'>
@@ -212,11 +192,6 @@ const StepComponent = (props) => {
 					saveClickHandler={saveClickHandler}
 					resetFormValues={resetFormValues}
 					stageType={stageType}
-					saveRepeatCount={saveRepeatCount}
-					repeatCounterState={repeatCounterState.toJS()}
-					updateRepeatCounterStateWrapper={updateRepeatCounterStateWrapper}
-					showCycleStepForm={showCycleStepForm}
-					setShowCycleStepForm={setShowCycleStepForm}
 					cycleRepeatCount={cycleRepeatCount}
 				/>
 			)}
