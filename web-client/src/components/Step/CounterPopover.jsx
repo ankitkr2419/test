@@ -45,8 +45,10 @@ const CounterPopover = (props) => {
 	};
 
 	const onSaveClickHandler = () => {
-		// save the repeat count
-		saveRepeatCount(repeatCount);
+		// call save the repeat count helper function only if there is a change
+		if (parseInt(repeatCount, 10) !== cycleRepeatCount) {
+			saveRepeatCount(repeatCount);
+		}
 		// close the popover
 		simulateOutSideClick();
 	};
