@@ -119,6 +119,9 @@ CycleSteps.propTypes = {
 	onStepRowClicked: PropTypes.func.isRequired,
 	selectedStepId: PropTypes.string,
 	cycleRepeatCount: PropTypes.number.isRequired,
+	repeatCounterState: PropTypes.object.isRequired,
+	updateRepeatCounterStateWrapper: PropTypes.func.isRequired,
+	saveRepeatCount: PropTypes.func.isRequired,
 };
 
 export default CycleSteps;

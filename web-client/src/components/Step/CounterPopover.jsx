@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
 	Popover,
 	PopoverBody,
@@ -122,6 +123,12 @@ const CounterPopover = (props) => {
 		</StyledCounterPopover>
 	);
 };
-CounterPopover.propTypes = {};
+
+CounterPopover.propTypes = {
+	cycleRepeatCount: PropTypes.number.isRequired,
+	repeatCounterState: PropTypes.object.isRequired,
+	updateRepeatCounterStateWrapper: PropTypes.func.isRequired,
+	saveRepeatCount: PropTypes.func.isRequired,
+};
 
 export default CounterPopover;
