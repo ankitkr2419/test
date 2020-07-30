@@ -55,4 +55,6 @@ type Storer interface {
 	ListNotification(context.Context, uuid.UUID) ([]Notification, error)
 	InsertNotification(context.Context, Notification) error
 	MarkNotificationasRead(context.Context, uuid.UUID) error
+	InsertUser(context.Context, User) error
+	ValidateUser(context.Context, User) error
 }
