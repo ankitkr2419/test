@@ -100,6 +100,7 @@ export const getWellsSavedStatus = createSelector(
  */
 const getSelectedWell = (wells, position) => wells.filter(ele => ele.position === position)[0];
 
+const getSelectedTargets = (selectedWell) => selectedWell.targets.filter(ele => ele.selected);
 /**
  * updateWellListSelector accepts current state and action
  * It will update default list with updated action response
@@ -122,6 +123,8 @@ export const updateWellListSelector = createSelector(
 				if (positions.includes(index)) {
 					// get selected well data by index
 					const selectedWell = getSelectedWell(response, index);
+					// filter the targets to get only the selected targets with selected property true
+					selectedWell.targets = getSelectedTargets(selectedWell);
 					// merge selected well data and modify local fields.
 					return ele.merge({
 						isWellFilled: true,

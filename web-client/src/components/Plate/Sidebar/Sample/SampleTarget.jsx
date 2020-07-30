@@ -17,22 +17,30 @@ const StyledSampleTarget = styled.div`
 	box-shadow: 0 3px 6px #0000000b;
 	margin: 0 auto 8px;
 	padding: 1px;
+	opacity: ${(props) => (props.isSelected ? '1' : '0.5')};
 
 	button {
 		color: #999999;
 	}
 `;
 
-const SampleTarget = ({ label, onClickHandler }) => (
-	<StyledSampleTarget>
-		<Text className="m-0 px-3">{label}</Text>
-		<ButtonIcon onClick={onClickHandler} name="cross" size={28} className="ml-auto" />
+const SampleTarget = ({ label, isSelected, onClickHandler }) => (
+	<StyledSampleTarget onClick={onClickHandler} isSelected={isSelected}>
+		<Text className='m-0 px-3'>{label}</Text>
+		{isSelected ? (
+			<ButtonIcon name='cross' size={28} className='ml-auto' />
+		) : null}
 	</StyledSampleTarget>
 );
 
 SampleTarget.propTypes = {
 	label: PropTypes.string.isRequired,
 	onClickHandler: PropTypes.func.isRequired,
+	isSelected: PropTypes.bool,
+};
+
+SampleTarget.defaultProps = {
+	isSelected: false,
 };
 
 export default SampleTarget;

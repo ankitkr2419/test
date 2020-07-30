@@ -13,7 +13,7 @@ const SidebarSample = (props) => {
 		addNewLocalSample,
 		isSampleListLoading,
 		taskOptions,
-		onCrossClickHandler,
+		onTargetClickHandler,
 		addButtonClickHandler,
 		isSampleStateValid, // form state valid
 		isDisabled,
@@ -87,7 +87,7 @@ const SidebarSample = (props) => {
 			/>
 			<SampleTargetList
 				list={sampleState.get('targets')}
-				onCrossClickHandler={onCrossClickHandler}
+				onTargetClickHandler={onTargetClickHandler}
 			/>
 			<Select
 				placeholder="Select Task"
@@ -110,7 +110,7 @@ SidebarSample.propTypes = {
 	addNewLocalSample: PropTypes.func.isRequired,
 	isSampleListLoading: PropTypes.bool.isRequired,
 	taskOptions: PropTypes.array.isRequired,
-	onCrossClickHandler: PropTypes.func.isRequired,
+	onTargetClickHandler: PropTypes.func.isRequired,
 	addButtonClickHandler: PropTypes.func.isRequired,
 	isSampleStateValid: PropTypes.bool.isRequired,
 	isDisabled: PropTypes.bool.isRequired,
