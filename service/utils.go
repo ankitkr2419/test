@@ -11,6 +11,11 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+const (
+	hold  = "hold"
+	cycle = "cycle"
+)
+
 func validate(i interface{}) (valid bool, respBytes []byte) {
 
 	fieldErrors := make(map[string]string)

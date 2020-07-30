@@ -47,9 +47,9 @@ func (m *DBMockStore) ListStages(ctx context.Context, t uuid.UUID) (s []Stage, e
 	return args.Get(0).([]Stage), args.Error(1)
 }
 
-func (m *DBMockStore) CreateStage(ctx context.Context, stg Stage) (s Stage, err error) {
+func (m *DBMockStore) CreateStages(ctx context.Context, stg []Stage) (s []Stage, err error) {
 	args := m.Called(ctx, stg)
-	return args.Get(0).(Stage), args.Error(1)
+	return args.Get(0).([]Stage), args.Error(1)
 }
 
 func (m *DBMockStore) UpdateStage(ctx context.Context, s Stage) (err error) {

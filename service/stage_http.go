@@ -37,49 +37,6 @@ func listStagesHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-// @Title createStageHandler
-// @Description Create createStageHandler
-// @Router /stage [post]
-// @Accept  json
-// @Success 200 {object}
-// @Failure 400 {object}
-func createStageHandler(deps Dependencies) http.HandlerFunc {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var t db.Stage
-		err := json.NewDecoder(req.Body).Decode(&t)
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding stage data")
-			return
-		}
-
-		valid, respBytes := validate(t)
-		if !valid {
-			responseBadRequest(rw, respBytes)
-			return
-		}
-
-		var createdTemp db.Stage
-		createdTemp, err = deps.Store.CreateStage(req.Context(), t)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create target")
-			return
-		}
-
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling targets data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
-		rw.Header().Add("Content-Type", "application/json")
-	})
-}
-
 func updateStageHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)

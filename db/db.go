@@ -17,7 +17,7 @@ type Storer interface {
 	ShowTemplate(context.Context, uuid.UUID) (Template, error)
 	DeleteTemplate(context.Context, uuid.UUID) error
 	ListStages(context.Context, uuid.UUID) ([]Stage, error)
-	CreateStage(context.Context, Stage) (Stage, error)
+	CreateStages(context.Context, []Stage) ([]Stage, error)
 	UpdateStage(context.Context, Stage) error
 	ShowStage(context.Context, uuid.UUID) (Stage, error)
 	DeleteStage(context.Context, uuid.UUID) error

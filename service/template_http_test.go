@@ -78,6 +78,11 @@ func (suite *TemplateHandlerTestSuite) TestCreateTemplateSuccess() {
 		Description: "blah blah",
 	}, nil)
 
+	stageUUID := uuid.New()
+	suite.dbMock.On("CreateStages", mock.Anything, mock.Anything).Return([]db.Stage{
+		{ID: stageUUID, Type: "Repeat", RepeatCount: 3, TemplateID: testUUID, StepCount: 0},
+	}, nil)
+
 	body := `{"name":"test template","description":"blah blah"}`
 
 	recorder := makeHTTPCall(http.MethodPost,
@@ -86,7 +91,7 @@ func (suite *TemplateHandlerTestSuite) TestCreateTemplateSuccess() {
 		body,
 		createTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"test template","description":"blah blah"}`, testUUID)
+	output := fmt.Sprintf(`{"template":{"id":"%s","name":"test template","description":"blah blah"},"stages":[{"id":"%s","type":"Repeat","repeat_count":3,"template_id":"%s","step_count":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]}`, testUUID, stageUUID, testUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
