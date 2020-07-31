@@ -32,13 +32,14 @@ func (suite *UserHandlerTestSuite) TestValidateUsersSuccess() {
 
 	username := "test"
 	password := "test"
+	role := "admin"
 
 	suite.dbMock.On("ValidateUser", mock.Anything, mock.Anything).Return(
 		nil,
 		nil,
 	)
 
-	body := fmt.Sprintf(`{"username": "%s","password":"%s"}`, username, password)
+	body := fmt.Sprintf(`{"username": "%s","password":"%s","role":"%s"}`, username, password, role)
 
 	recorder := makeHTTPCall(
 		http.MethodPost,
@@ -57,13 +58,14 @@ func (suite *UserHandlerTestSuite) TestValidateUsersFail() {
 
 	username := "test"
 	password := "test"
+	role := "admin"
 
 	suite.dbMock.On("ValidateUser", mock.Anything, mock.Anything).Return(
 		nil,
 		errors.New("Record Not Found"),
 	)
 
-	body := fmt.Sprintf(`{"username": "%s","password":"%s"}`, username, password)
+	body := fmt.Sprintf(`{"username": "%s","password":"%s","role":"%s"}`, username, password, role)
 
 	recorder := makeHTTPCall(
 		http.MethodPost,
