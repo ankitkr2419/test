@@ -209,8 +209,12 @@ func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets 
 		return
 	}
 
-	// analyseResult returns data required for ploting graph
-	Finalresult := analyseResult(DBResult, wells, targets, t_cycles)
+	Finalresult := make([]graph, 0)
+
+	if len(DBResult) > 0 {
+		// analyseResult returns data required for ploting graph
+		Finalresult = analyseResult(DBResult, wells, targets, t_cycles)
+	}
 
 	Result := resultGraph{
 		Type: "Graph",
