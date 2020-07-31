@@ -14,8 +14,6 @@ import {
 
 import {
 	fetchStagesSaga,
-	addStageSaga,
-	deleteStageSaga,
 	updateStageSaga,
 } from 'sagas/stageSaga';
 
@@ -55,8 +53,6 @@ const allSagas = [
 	deleteTemplateSaga(),
 	updateTemplateSaga(),
 	fetchStagesSaga(),
-	addStageSaga(),
-	deleteStageSaga(),
 	updateStageSaga(),
 	fetchHoldStepsSaga(),
 	fetchCycleStepsSaga(),

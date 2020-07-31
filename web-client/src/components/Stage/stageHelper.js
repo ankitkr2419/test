@@ -10,24 +10,3 @@ export const validateRepeatCount = createSelector(
 		return false;
 	},
 );
-
-// Validate create stage form
-export const validateStageForm = createSelector(
-	stageFormStateJS => stageFormStateJS,
-	({ stageType, stageRepeatCount, repeatCountError }) => {
-		// if stage type is cycle check if repeatCountError is false for valid stage form
-		if (
-			stageType.value === 'cycle'
-			&& stageRepeatCount !== ''
-			&& repeatCountError === false
-		) {
-			return true;
-		}
-		// Repeat count is not applicable for hold stage so we don't validate
-		// repeat count for hold stage
-		if (stageType !== '' && stageType.value === 'hold') {
-			return true;
-		}
-		return false;
-	},
-);

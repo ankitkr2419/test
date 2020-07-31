@@ -13,8 +13,6 @@ import {
 
 import {
 	listStagesReducer,
-	createStageReducer,
-	deleteStageReducer,
 	updateStageReducer,
 } from 'reducers/stageReducer';
 
@@ -47,8 +45,6 @@ const rootReducer = combineReducers({
 	listTargetByTemplateIDReducer,
 	saveTargetReducer,
 	listStagesReducer,
-	createStageReducer,
-	deleteStageReducer,
 	updateStageReducer,
 	listHoldStepsReducer,
 	listCycleStepsReducer,
