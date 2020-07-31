@@ -5,6 +5,7 @@ import {
 	updateTemplateActions,
 	deleteTemplateActions,
 } from 'actions/templateActions';
+import { getTemplateDetails } from 'components/Template/templateHelper';
 
 const listTemplateInitialState = fromJS({
 	isLoading: true,
@@ -53,9 +54,12 @@ export const listTemplatesReducer = (
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
-		// appending the template list with created template
+	// appending the template list with created template
+	// getTemplateDetails function is used for storing only the template details in template reducer.
+	// stages data is filtered out
 	case createTemplateActions.successAction:
-		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response)));
+		return state.updateIn(['list'],
+			list => list.push(getTemplateDetails(action.payload.response)));
 	default:
 		return state;
 	}

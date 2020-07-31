@@ -22,6 +22,7 @@ import {
 	isTargetAlreadySelected,
 	isAnyThresholdInvalid,
 } from 'components/Target/targetHelper';
+import { fetchStages } from 'action-creators/stageActionCreators';
 
 const TargetContainer = (props) => {
 	// constants
@@ -55,6 +56,11 @@ const TargetContainer = (props) => {
 	);
 
 	// useEffect section
+	useEffect(() => {
+		// fetch updated stage list from server. required for next steps wizard
+		dispatch(fetchStages(templateID));
+	}, [templateID, dispatch]);
+
 	// below useEffect is use to navigate to next wizard when user will save targets
 	useEffect(() => {
 		if (isTargetSaved === true) {
@@ -163,8 +169,8 @@ const TargetContainer = (props) => {
 		dispatch,
 	]);
 
-	const navigateToStageWizard = useCallback(() => {
-		return updateSelectedWizard('stage');
+	const navigateToStepWizard = useCallback(() => {
+		return updateSelectedWizard('step');
 	}, [updateSelectedWizard]);
 
 	// onEditing a template
@@ -201,7 +207,7 @@ const TargetContainer = (props) => {
 			isLoginTypeOperator={isLoginTypeOperator}
 			isTargetListUpdated={getIsTargetListUpdatedAdmin()}
 			isViewStagesEnabled={getIsViewStagesEnabled()}
-			navigateToStageWizard={navigateToStageWizard}
+			navigateToStepWizard={navigateToStepWizard}
 			editTemplate={editTemplate}
 			setThresholdError={setThresholdError}
 			isThresholdInvalid={isAnyThresholdInvalid(selectedTargetState.get('targetList'))}

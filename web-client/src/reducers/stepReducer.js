@@ -1,7 +1,8 @@
 import { fromJS } from 'immutable';
 import {
 	addStepActions,
-	listStepActions,
+	listHoldStepActions,
+	listCycleStepActions,
 	updateStepActions,
 	deleteStepActions,
 } from 'actions/stepActions';
@@ -26,23 +27,45 @@ const deleteStepInitialState = {
 	isStepDeleted: false,
 };
 
-export const listStepsReducer = (
+export const listHoldStepsReducer = (
 	state = listStepInitialState,
 	action,
 ) => {
 	switch (action.type) {
-	case listStepActions.listAction:
+	case listHoldStepActions.listAction:
 		return state.setIn(['isLoading'], true);
-	case listStepActions.successAction:
+	case listHoldStepActions.successAction:
 		return state.merge({ list: fromJS(action.payload.response || []), isLoading: false });
-	case listStepActions.failureAction:
+	case listHoldStepActions.failureAction:
 		return state.merge({
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
 	// Add the created step to list to avoid an extra get api call
-	case addStepActions.successAction:
-		return state.updateIn(['list'], list => list.push(fromJS(action.payload.response || {})));
+	// case addStepActions.successAction:
+	// 	return state.updateIn(['list'], list => list.push(fromJS(action.payload.response || {})));
+	default:
+		return state;
+	}
+};
+
+export const listCycleStepsReducer = (
+	state = listStepInitialState,
+	action,
+) => {
+	switch (action.type) {
+	case listCycleStepActions.listAction:
+		return state.setIn(['isLoading'], true);
+	case listCycleStepActions.successAction:
+		return state.merge({ list: fromJS(action.payload.response || []), isLoading: false });
+	case listCycleStepActions.failureAction:
+		return state.merge({
+			error: fromJS(action.payload.error),
+			isLoading: false,
+		});
+	// Add the created step to list to avoid an extra get api call
+	// case addStepActions.successAction:
+	// 	return state.updateIn(['list'], list => list.push(fromJS(action.payload.response || {})));
 	default:
 		return state;
 	}
