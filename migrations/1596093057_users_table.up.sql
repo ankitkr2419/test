@@ -5,5 +5,6 @@ CREATE TABLE users
     password varchar(250),
     role varchar(250),
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unquser UNIQUE (username, role)
 );
