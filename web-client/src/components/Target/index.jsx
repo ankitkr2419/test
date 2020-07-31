@@ -37,7 +37,7 @@ const TargetComponent = (props) => {
 		isTargetListUpdated,
 		selectedTemplateDetails,
 		isViewStagesEnabled,
-		navigateToStageWizard,
+		navigateToStepWizard,
 		editTemplate,
 		isNoTargetSelected,
 		setThresholdError,
@@ -168,13 +168,13 @@ const TargetComponent = (props) => {
 					{isLoginTypeAdmin === true && (
 						<Button
 							color="primary"
-							onClick={navigateToStageWizard}
+							onClick={navigateToStepWizard}
 							className="mx-auto mb-3"
 							disabled={
 								isTargetListUpdated === true || isViewStagesEnabled === false
 							}
 						>
-              View Stages
+              View Steps
 						</Button>
 					)}
 					{isLoginTypeOperator === true && (

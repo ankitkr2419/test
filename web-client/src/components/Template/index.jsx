@@ -59,11 +59,13 @@ const TemplateComponent = (props) => {
 	};
 
 	useEffect(() => {
-		// make creat modal open if no data is available
+		// If admin login make creat modal open if no data is available
 		// isTemplatesLoading will tell us weather api calling is finish or not
 		// templates.size = 0  will tell us there is no records present
 		// isCreateTemplateModalVisible is check as we have to make modal visible only once
-		if (isTemplatesLoading === false
+		if (
+			isLoginTypeAdmin === true
+			&& isTemplatesLoading === false
 			&& templates.size === 0
 			&& isCreateTemplateModalVisible === false) {
 			toggleTemplateModal();

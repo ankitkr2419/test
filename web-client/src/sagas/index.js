@@ -14,13 +14,12 @@ import {
 
 import {
 	fetchStagesSaga,
-	addStageSaga,
-	deleteStageSaga,
 	updateStageSaga,
 } from 'sagas/stageSaga';
 
 import {
-	fetchStepsSaga,
+	fetchHoldStepsSaga,
+	fetchCycleStepsSaga,
 	addStepSaga,
 	deleteStepSaga,
 	updateStepSaga,
@@ -54,10 +53,9 @@ const allSagas = [
 	deleteTemplateSaga(),
 	updateTemplateSaga(),
 	fetchStagesSaga(),
-	addStageSaga(),
-	deleteStageSaga(),
 	updateStageSaga(),
-	fetchStepsSaga(),
+	fetchHoldStepsSaga(),
+	fetchCycleStepsSaga(),
 	addStepSaga(),
 	deleteStepSaga(),
 	updateStepSaga(),
