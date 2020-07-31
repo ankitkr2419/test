@@ -25,6 +25,8 @@ import {
 	MIN_TARGET_TEMPERATURE,
 	CYCLE_STAGE,
 	HOLD_STAGE,
+	COL_SIZE_HOLD_STAGE,
+	COL_SIZE_CYCLE_STAGE,
 } from './stepConstants';
 
 const AddStepModal = (props) => {
@@ -54,8 +56,8 @@ const AddStepModal = (props) => {
 
 	// stageId will be present when we are updating stage
 	const isUpdateForm = stepId !== null;
-	// If stageType is hold column size will be 4 or else will be 3
-	const colSize = stageType === HOLD_STAGE ? 4 : 3;
+	// set column size according to stage type
+	const colSize = stageType === HOLD_STAGE ? COL_SIZE_HOLD_STAGE : COL_SIZE_CYCLE_STAGE;
 
 	const onChangeHandler = ({ target: { name, value } }) => {
 		// set rampRate/targetTemperature/holdTime with its value in stepForm local state
@@ -113,9 +115,9 @@ const AddStepModal = (props) => {
 						size={24}
 						className='modal-title text-center text-truncate text-capitalize font-weight-bold'
 					>
-						Add Step - {stageType}{' '}
+						Add Step - {stageType}
 						{/* If its cycle stage then show repeat count in header */}
-						{stageType === CYCLE_STAGE ? `(Repeat count - ${cycleRepeatCount})` : ''}
+						{stageType === CYCLE_STAGE && ` (Repeat count - ${cycleRepeatCount})`}
 					</Text>
 					<ButtonIcon
 						position='absolute'

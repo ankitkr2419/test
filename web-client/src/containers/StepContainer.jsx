@@ -12,8 +12,17 @@ import {
 	fetchCycleSteps,
 } from 'action-creators/stepActionCreators';
 import { getHoldStepList, getCycleStepList } from 'selectors/stepSelector';
-import { getHoldStageId, getCycleStageId, getCycleRepeatCount, getCycleStage } from 'selectors/stageSelector';
-import { updateStage as updateStageAction, fetchStages, updateStageReset } from 'action-creators/stageActionCreators';
+import {
+	getHoldStageId,
+	getCycleStageId,
+	getCycleRepeatCount,
+	getCycleStage,
+} from 'selectors/stageSelector';
+import {
+	updateStage as updateStageAction,
+	fetchStages,
+	updateStageReset,
+} from 'action-creators/stageActionCreators';
 import { HOLD_STAGE, CYCLE_STAGE } from 'components/Step/stepConstants';
 
 

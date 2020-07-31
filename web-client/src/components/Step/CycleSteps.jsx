@@ -44,8 +44,7 @@ const CycleSteps = ({
 						(unit seconds)
 					</th>
 					<th>
-						Data Capture <br />
-						(boolean flag)
+						Data Capture
 					</th>
 					<th className='th-counter'>Repeat counter <br />
 						<CounterPopover

@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
-
+// Added the above line to avoid the document undefine error
+//  in simulateOutSideClick function
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -12,6 +13,7 @@ import {
 import { ButtonIcon, Text, Icon } from 'shared-components';
 import styled from 'styled-components';
 import { validateRepeatCount } from 'components/Stage/stageHelper';
+import { MIN_REPEAT_COUNT, MAX_REPEAT_COUNT } from 'components/Stage/stageConstants';
 
 const StyledCounterPopover = styled.div`
 	display: flex;
@@ -97,10 +99,9 @@ const CounterPopover = (props) => {
 							onBlur={onRepeatCountBlurHandler}
 						/>
 						<Text Tag='p' size={11} className={`${repeatCountError && 'text-danger'} px-2 mb-0`}>
-								Enter count between 5 to 100
+								Enter count between {MIN_REPEAT_COUNT} to {MAX_REPEAT_COUNT}
 						</Text>
 					</FormGroup>
-					{/* TODO: Change color prop value to 'secondary' when button is disabled */}
 					<Button
 						icon
 						outline
