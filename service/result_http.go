@@ -37,7 +37,14 @@ func getResultHandler(deps Dependencies) http.HandlerFunc {
 				return
 			}
 
-			respBytes, err := getGraph(deps, experimentID, wellPositions, targets)
+			e, err := deps.Store.ShowExperiment(req.Context(), experimentID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			respBytes, err := getGraph(deps, experimentID, wellPositions, targets, e.RepeatCycle)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error marshaling Result data")
 				rw.WriteHeader(http.StatusInternalServerError)
