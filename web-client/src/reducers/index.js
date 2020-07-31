@@ -13,13 +13,12 @@ import {
 
 import {
 	listStagesReducer,
-	createStageReducer,
-	deleteStageReducer,
 	updateStageReducer,
 } from 'reducers/stageReducer';
 
 import {
-	listStepsReducer,
+	listHoldStepsReducer,
+	listCycleStepsReducer,
 	createStepReducer,
 	deleteStepReducer,
 	updateStepReducer,
@@ -46,10 +45,9 @@ const rootReducer = combineReducers({
 	listTargetByTemplateIDReducer,
 	saveTargetReducer,
 	listStagesReducer,
-	createStageReducer,
-	deleteStageReducer,
 	updateStageReducer,
-	listStepsReducer,
+	listHoldStepsReducer,
+	listCycleStepsReducer,
 	createStepReducer,
 	deleteStepReducer,
 	updateStepReducer,

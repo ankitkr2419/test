@@ -1,18 +1,16 @@
 import { createSelector } from 'reselect';
 
-const getListStepsReducer = state => state.listStepsReducer;
-const getListStagesReducer = state => state.listStagesReducer;
+const getHoldListStepsReducer = state => state.listHoldStepsReducer;
+const getCycleListStepsReducer = state => state.listCycleStepsReducer;
 
-export const getStepList = createSelector(
-	getListStepsReducer,
-	listStepReducer => listStepReducer.updateIn(['list'], myList => myList.sortBy(ele => ele.get('created_at'))),
+// const getListStagesReducer = state => state.listStagesReducer;
+
+export const getHoldStepList = createSelector(
+	getHoldListStepsReducer,
+	listHoldStepReducer => listHoldStepReducer.updateIn(['list'], myList => myList.sortBy(ele => ele.get('created_at'))),
 );
 
-export const getStageType = createSelector(
-	getListStagesReducer,
-	(_, stageId) => stageId,
-	(listStagesReducer, stageId) => {
-		const stage = listStagesReducer.get('list').find(ele => ele.get('id') === stageId).toJS();
-		return stage.type;
-	},
+export const getCycleStepList = createSelector(
+	getCycleListStepsReducer,
+	listCycleStepReducer => listCycleStepReducer.updateIn(['list'], myList => myList.sortBy(ele => ele.get('created_at'))),
 );
