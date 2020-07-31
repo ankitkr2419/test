@@ -2,13 +2,15 @@ import { takeEvery, put, call } from 'redux-saga/effects';
 import { callApi } from 'apis/apiHelper';
 import {
 	addStepActions,
-	listStepActions,
 	updateStepActions,
 	deleteStepActions,
+	listHoldStepActions,
+	listCycleStepActions,
 } from 'actions/stepActions';
 import {
 	addStepFailed,
-	fetchStepsFailed,
+	fetchHoldStepsFailed,
+	fetchCycleStepsFailed,
 	updateStepFailed,
 	deleteStepFailed,
 } from 'action-creators/stepActionCreators';
@@ -37,11 +39,11 @@ export function* addStep(actions) {
 	}
 }
 
-export function* fetchSteps(actions) {
+export function* fetchHoldSteps(actions) {
 	const {
 		payload: { stageId },
 	} = actions;
-	const { successAction, failureAction } = listStepActions;
+	const { successAction, failureAction } = listHoldStepActions;
 	try {
 		yield call(callApi, {
 			payload: {
@@ -53,7 +55,27 @@ export function* fetchSteps(actions) {
 		});
 	} catch (error) {
 		console.error('error in fetch steps ', error);
-		yield put(fetchStepsFailed(error));
+		yield put(fetchHoldStepsFailed(error));
+	}
+}
+
+export function* fetchCycleSteps(actions) {
+	const {
+		payload: { stageId },
+	} = actions;
+	const { successAction, failureAction } = listCycleStepActions;
+	try {
+		yield call(callApi, {
+			payload: {
+				body: null,
+				reqPath: `stages/${stageId}/steps`,
+				successAction,
+				failureAction,
+			},
+		});
+	} catch (error) {
+		console.error('error in fetch steps ', error);
+		yield put(fetchCycleStepsFailed(error));
 	}
 }
 
@@ -106,8 +128,12 @@ export function* addStepSaga() {
 	yield takeEvery(addStepActions.addAction, addStep);
 }
 
-export function* fetchStepsSaga() {
-	yield takeEvery(listStepActions.listAction, fetchSteps);
+export function* fetchHoldStepsSaga() {
+	yield takeEvery(listHoldStepActions.listAction, fetchHoldSteps);
+}
+
+export function* fetchCycleStepsSaga() {
+	yield takeEvery(listCycleStepActions.listAction, fetchCycleSteps);
 }
 
 export function* updateStepSaga() {

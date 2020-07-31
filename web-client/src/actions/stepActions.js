@@ -5,11 +5,18 @@ export const addStepActions = {
 	addStepReset: 'ADD_STEP_RESET',
 };
 
-export const listStepActions = {
-	listAction: 'FETCH_STEPS_INITIATED',
-	successAction: 'FETCH_STEPS_SUCCEEDED',
-	failureAction: 'FETCH_STEPS_FAILURE',
+export const listHoldStepActions = {
+	listAction: 'FETCH_HOLD_STEPS_INITIATED',
+	successAction: 'FETCH_HOLD_STEPS_SUCCEEDED',
+	failureAction: 'FETCH_HOLD_STEPS_FAILURE',
 };
+
+export const listCycleStepActions = {
+	listAction: 'FETCH_CYCLE_STEPS_INITIATED',
+	successAction: 'FETCH_CYCLE_STEPS_SUCCEEDED',
+	failureAction: 'FETCH_CYCLE_STEPS_FAILURE',
+};
+
 
 export const updateStepActions = {
 	updateAction: 'UPDATE_STEP_INITIATED',

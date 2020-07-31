@@ -1,32 +1,34 @@
 import React, { useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button } from 'core-components';
 import {
-	ButtonIcon,
-	TableWrapper,
-	TableWrapperBody,
-	TableWrapperFooter,
-	Icon,
-} from 'shared-components';
-import stepStateReducer, {
 	stepStateInitialState,
+	repeatCounterInitialState,
+	repeatCounterStateReducer,
+	stepStateReducer,
+	repeatCounterStateActions,
 } from 'components/Step/stepState';
 import AddStepModal from './AddStepModal';
 import { stepStateActions } from './stepState';
 import { validateStepForm } from './stepHelper';
+import HoldSteps from './HoldSteps';
+import CycleSteps from './CycleSteps';
+import { HOLD_STAGE, CYCLE_STAGE } from './stepConstants';
 
 const StepComponent = (props) => {
 	const {
-		stageId,
-		steps, // list of steps
+		holdSteps,	// list of hold steps
+		cycleSteps, // list of cycle steps
 		addStep, // create api cal
 		deleteStep,
 		onStepRowClicked,
 		selectedStepId,
 		saveStep, // update api call
-		isStepsLoading,
-		goToStageWizard,
+		holdStageId,
+		cycleStageId,
 		stageType,
+		setStageType,
+		saveRepeatCount, // update repeat count api call
+		cycleRepeatCount, // cycle repeat count stored over server
 	} = props;
 
 	// local state to save form data and modal state flag
@@ -35,14 +37,32 @@ const StepComponent = (props) => {
 		stepStateInitialState,
 	);
 
+	// local state to save repeat count and repeatCountError flag
+	const [repeatCounterState, updateRepeatCounterState] = useReducer(
+		repeatCounterStateReducer,
+		repeatCounterInitialState,
+	);
+
 	// immutable => js
 	const stepFormStateJS = stepFormState.toJS();
 	const { isCreateStepModalVisible } = stepFormStateJS;
 
-	// helper function to update local state
+	// get stage Id for currently opened create step modal
+	const getStageId = () => (stageType === HOLD_STAGE ? holdStageId : cycleStageId);
+
+	// helper function to update step form local state
 	const updateStepFormStateWrapper = (key, value) => {
 		updateStepFormState({
 			type: stepStateActions.SET_VALUES,
+			key,
+			value,
+		});
+	};
+
+	// helper function to update repeat counter local state
+	const updateRepeatCounterStateWrapper = (key, value) => {
+		updateRepeatCounterState({
+			type: repeatCounterStateActions.SET_VALUES,
 			key,
 			value,
 		});
@@ -72,7 +92,7 @@ const StepComponent = (props) => {
 			dataCapture,
 		} = stepFormStateJS;
 		addStep({
-			stage_id: stageId,
+			stage_id: getStageId(),
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
 			hold_time: parseInt(holdTime, 10),
@@ -91,7 +111,7 @@ const StepComponent = (props) => {
 			dataCapture,
 		} = stepFormStateJS;
 		saveStep(stepId, {
-			stage_id: stageId,
+			stage_id: getStageId(),
 			ramp_rate: parseFloat(rampRate),
 			target_temp: parseFloat(targetTemperature),
 			hold_time: parseInt(holdTime, 10),
@@ -122,137 +142,77 @@ const StepComponent = (props) => {
 		toggleCreateStepModal();
 	};
 
+	const addHoldStep = () => {
+		// set stage type as hold
+		setStageType(HOLD_STAGE);
+		toggleCreateStepModal();
+	};
+
+	const addCycleStep = () => {
+		// set stage type as cycle
+		setStageType(CYCLE_STAGE);
+		toggleCreateStepModal();
+	};
+
 	useEffect(() => {
-		// make creat modal open if no data is available
-		// isStagesLoading will tell us weather api calling is finish or not
-		// stages.size = 0  will tell us there is no records present
-		// isCreateStageModalVisible is check as we have to make modal visible only once
-		if (
-			isStepsLoading === false
-			&& steps.size === 0
-			&& isCreateStepModalVisible === false
-		) {
-			toggleCreateStepModal();
-		}
-		// isCreateStepModalVisible skipped in dependency because its causing issue with modal state
-		// eslint-disable-next-line
-	}, [isStepsLoading, steps]);
+		// store the cycle repeat count from server in local state
+		updateRepeatCounterStateWrapper('repeatCount', cycleRepeatCount);
+	}, [cycleRepeatCount]);
 
 	return (
 		<div className='d-flex flex-column flex-100'>
-			<TableWrapper>
-				<TableWrapperBody>
-					<Table striped>
-						<colgroup>
-							<col width='16%' />
-							<col width='12%' />
-							<col />
-							<col width='16%' />
-							<col width='16%' />
-							<col width='156px' />
-						</colgroup>
-						<thead>
-							<tr>
-								<th>
-									Steps <br />
-									(Count/Name)
-								</th>
-								<th>
-									Ramp rate <br />
-									(unit °C)
-								</th>
-								<th>
-									Target Temperature <br />
-									(unit °C)
-								</th>
-								<th>
-									Hold Time <br />
-									(unit seconds)
-								</th>
-								<th>Data Capture</th>
-								<th />
-							</tr>
-						</thead>
-						<tbody>
-							{steps.map((step, index) => {
-								const stepId = step.get('id');
-								const classes = selectedStepId === stepId ? 'active' : '';
-								return (
-									<tr
-										className={classes}
-										key={stepId}
-										onClick={() => {
-											onStepRowClicked(stepId);
-										}}
-									>
-										<td>{index + 1}</td>
-										<td>{step.get('ramp_rate')}</td>
-										<td>{step.get('target_temp')}</td>
-										<td>{(step.get('hold_time'))}</td>
-										{/* If the stage type is Hold show N/A for data capture property */}
-										{stageType !== 'hold'
-											? <td>{step.get('data_capture') ? 'Yes' : 'No'}</td> : <td>N/A</td>}
-										<td className='td-actions'>
-											<ButtonIcon
-												onClick={() => {
-													editStep(step.toJS());
-												}}
-												size={28}
-												name='pencil'
-											/>
-											<ButtonIcon
-												onClick={() => {
-													deleteStep(stepId);
-												}}
-												size={28}
-												name='trash'
-											/>
-										</td>
-									</tr>
-								);
-							})}
-						</tbody>
-					</Table>
-				</TableWrapperBody>
-				<TableWrapperFooter>
-					<ButtonIcon
-						name='angle-left'
-						size={32}
-						className='mr-auto border-0'
-						onClick={goToStageWizard}
-					/>
-					<Button color='primary' icon onClick={toggleCreateStepModal}>
-						<Icon size={40} name='plus-2' />
-					</Button>
-					{isCreateStepModalVisible && (
-						<AddStepModal
-							isCreateStepModalVisible={isCreateStepModalVisible}
-							toggleCreateStepModal={toggleCreateStepModal}
-							stepFormState={stepFormStateJS}
-							updateStepFormStateWrapper={updateStepFormStateWrapper}
-							isFormValid={validateStepForm(stepFormStateJS)}
-							addClickHandler={addClickHandler}
-							saveClickHandler={saveClickHandler}
-							resetFormValues={resetFormValues}
-							stageType={stageType}
-						/>
-					)}
-				</TableWrapperFooter>
-			</TableWrapper>
+			<HoldSteps
+				editStep={editStep}
+				holdSteps={holdSteps}
+				deleteStep={deleteStep}
+				onStepRowClicked={onStepRowClicked}
+				selectedStepId={selectedStepId}
+				addHoldStep={addHoldStep}
+			/>
+			<CycleSteps
+				editStep={editStep}
+				cycleSteps={cycleSteps}
+				deleteStep={deleteStep}
+				onStepRowClicked={onStepRowClicked}
+				selectedStepId={selectedStepId}
+				addCycleStep={addCycleStep}
+				cycleRepeatCount={cycleRepeatCount}
+				repeatCounterState={repeatCounterState.toJS()}
+				updateRepeatCounterStateWrapper={updateRepeatCounterStateWrapper}
+				saveRepeatCount={saveRepeatCount}
+			/>
+			{isCreateStepModalVisible && (
+				<AddStepModal
+					isCreateStepModalVisible={isCreateStepModalVisible}
+					toggleCreateStepModal={toggleCreateStepModal}
+					updateStepFormStateWrapper={updateStepFormStateWrapper}
+					isFormValid={validateStepForm(stepFormStateJS)}
+					stepFormState={stepFormStateJS}
+					addClickHandler={addClickHandler}
+					saveClickHandler={saveClickHandler}
+					resetFormValues={resetFormValues}
+					stageType={stageType}
+					cycleRepeatCount={cycleRepeatCount}
+				/>
+			)}
 		</div>
 	);
 };
 
 StepComponent.propTypes = {
-	stageId: PropTypes.string.isRequired,
-	steps: PropTypes.object.isRequired,
+	holdStageId: PropTypes.string.isRequired,
+	cycleStageId: PropTypes.string.isRequired,
+	stageType: PropTypes.string.isRequired,
+	holdSteps: PropTypes.object.isRequired,
+	cycleSteps: PropTypes.object.isRequired,
 	addStep: PropTypes.func.isRequired,
 	deleteStep: PropTypes.func.isRequired,
 	onStepRowClicked: PropTypes.func.isRequired,
+	setStageType: PropTypes.func.isRequired,
 	selectedStepId: PropTypes.string,
 	saveStep: PropTypes.func.isRequired,
-	isStepsLoading: PropTypes.bool.isRequired,
-	stageType: PropTypes.string.isRequired,
+	saveRepeatCount: PropTypes.func.isRequired,
+	cycleRepeatCount: PropTypes.number.isRequired,
 };
 
 export default React.memo(StepComponent);

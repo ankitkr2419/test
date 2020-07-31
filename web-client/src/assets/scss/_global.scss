@@ -140,15 +140,6 @@ button:focus {
 	color: $white;
 }
 
-.btn-outline-primary:not(:disabled):not(.disabled):active,
-.btn-outline-primary:not(:disabled):not(.disabled).active,
-.show > .btn-outline-primary.dropdown-toggle,
-.btn-outline-primary:hover,
-.btn-outline-primary.disabled,
-.btn-outline-primary:disabled {
-	color: $white;
-}
-
 .btn-secondary,
 .btn-secondary.disabled,
 .btn-secondary:disabled {
@@ -443,6 +434,53 @@ button:focus {
 			}
 		}
 	}
+
+	&.table-sm {
+		th,
+		td {
+			&:first-child {
+				padding-left: rem(32px);
+			}
+		}
+
+		thead th {
+			font-size: rem(12px);
+			line-height: rem(16px);
+			padding: rem(16px 12px);
+		}
+
+		tbody td {
+			font-size: rem(14px);
+			line-height: rem(18px);
+			padding: rem(6px 12px);
+
+			&.td-actions {
+				button {
+					+ button {
+						margin-left: rem(16px);
+					}
+				}
+			}
+		}
+	}
+
+	&.table-steps {
+		thead {
+			tr {
+				box-shadow: rem(0 4px 16px) #00000029;
+			}
+
+			th {
+				background-color: $white;
+			}
+		}
+
+		th.th-counter {
+			font-size: rem(12px);
+			line-height: rem(16px);
+			padding: 12px;
+		}
+	}
 }
 
 // Table Striped
@@ -460,6 +498,17 @@ button:focus {
 	> p {
 		color: $gray-40;
 		margin: rem(-64px 0 0 -40px);
+	}
+}
+
+.table-steps-wrapper {
+	&.-hold {
+		height: rem(218px);
+		margin: rem(0 0 8px);
+	}
+
+	&.-cycle {
+		height: rem(290px);
 	}
 }
 
@@ -497,4 +546,17 @@ button:focus {
 .bs-popover-left,
 .bs-popover-auto[x-placement^='left'] {
 	margin-right: rem(4px);
+}
+
+// Popover Counter
+.popover-counter {
+	border: 1px solid $gray-80;
+	.btn {
+		width: rem(40px);
+	}
+
+	&.bs-popover-top > .arrow::before,
+	&.bs-popover-auto[x-placement^='top'] > .arrow::before {
+		border-top-color: $gray-80;
+	}
 }

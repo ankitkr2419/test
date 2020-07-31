@@ -14,12 +14,13 @@ export const stepStateInitialState = fromJS({
 	holdTime: '',
 	holdTimeError: false,
 	rampRateError: false,
+	repeatCountError: false,
 	targetTemperatureError: false,
 	dataCapture: false,
 	isCreateStepModalVisible: false,
 });
 
-const stepStateReducer = (state, action) => {
+export const stepStateReducer = (state, action) => {
 	switch (action.type) {
 	case stepStateActions.SET_VALUES:
 		return state.setIn([action.key], action.value);
@@ -32,4 +33,23 @@ const stepStateReducer = (state, action) => {
 	}
 };
 
-export default stepStateReducer;
+export const repeatCounterStateActions = {
+	SET_VALUES: 'SET_VALUES',
+	RESET_VALUES: 'RESET_VALUES',
+};
+
+export const repeatCounterInitialState = fromJS({
+	repeatCount: '',
+	repeatCountError: false,
+});
+
+export const repeatCounterStateReducer = (state, action) => {
+	switch (action.type) {
+	case repeatCounterStateActions.SET_VALUES:
+		return state.setIn([action.key], action.value);
+	case repeatCounterStateActions.RESET_VALUES:
+		return repeatCounterInitialState;
+	default:
+		throw new Error('Invalid action type');
+	}
+};
