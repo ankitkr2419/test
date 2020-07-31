@@ -233,6 +233,7 @@ func publishTemplateHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			rw.Write(respBytes)
 			rw.Header().Add("Content-Type", "application/json")
+			return
 		}
 
 		err = deps.Store.PublishTemplate(req.Context(), id)
@@ -242,10 +243,30 @@ func publishTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		resp, err := deps.Store.CheckIfICTargetAdded(req.Context(), id)
+		if err != nil {
+			if err.Error() == "Record Not Found" {
+				// no Internal control added
+				respBytes, err := json.Marshal(resp)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error marshaling template data")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				rw.Header().Add("Content-Type", "application/json")
+				rw.WriteHeader(http.StatusAccepted)
+				rw.Write(respBytes)
+				return
+			}
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`{"msg":"template published successfully"}`))
 
 		rw.Header().Add("Content-Type", "application/json")
+		return
 	})
 }
 

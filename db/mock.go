@@ -273,3 +273,8 @@ func (m *DBMockStore) MarkNotificationasRead(ctx context.Context, id uuid.UUID) 
 	args := m.Called(ctx, id)
 	return args.Error(1)
 }
+
+func (m *DBMockStore) CheckIfICTargetAdded(ctx context.Context, id uuid.UUID) (WarnResponse, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(WarnResponse), args.Error(1)
+}

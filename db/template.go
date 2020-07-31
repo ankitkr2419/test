@@ -19,7 +19,7 @@ const (
 
 	createTemplateQuery = `INSERT INTO templates (
 		name,
-		description)
+		description,)
 		VALUES ($1, $2) RETURNING id`
 
 	getTemplateQuery = `SELECT *
@@ -41,7 +41,8 @@ type Template struct {
 	ID          uuid.UUID `db:"id" json:"id"`
 	Name        string    `db:"name" json:"name" validate:"required"`
 	Description string    `db:"description" json:"description" validate:"required"`
-	Publish     bool      `db:"publish json:"publish"`
+	Publish     bool      `db:"publish" json:"publish"`
+	Stages      []Stage   `json:"stages,omitempty"`
 }
 type ErrorResponse struct {
 	Code    string            `json:"code"`
@@ -78,11 +79,12 @@ func ValidateTemplate(targets []TemplateTarget, steps []StageStep) (errorRespons
 		if len(cyclesteps) == 0 {
 			validationErrors["cyclestep"] = "No cyclestep added"
 		}
-		if cycles < 5 && cycles > 100 {
-			validationErrors["repeatCount"] = "Invalid reapeat_count in cycle stage"
+		if cycles < 5 || cycles > 100 {
+			validationErrors["repeatCount"] = "Invalid repeat_count in cycle stage"
 		}
 
 	}
+
 	if len(validationErrors) == 0 {
 		valid = true
 		return
@@ -96,7 +98,6 @@ func ValidateTemplate(targets []TemplateTarget, steps []StageStep) (errorRespons
 	}
 
 	return
-	Stages      []Stage   `json:"stages,omitempty"`
 }
 
 func (s *pgStore) ListTemplates(ctx context.Context) (t []Template, err error) {
@@ -191,6 +192,7 @@ func (s *pgStore) DeleteTemplate(ctx context.Context, id uuid.UUID) (err error) 
 	if c == 0 {
 		err = errors.New("Record Not Found")
 		logger.WithField("err", err.Error()).Error("Error Template not found")
+		return
 	}
 
 	return

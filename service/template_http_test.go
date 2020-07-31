@@ -45,7 +45,7 @@ func (suite *TemplateHandlerTestSuite) TestListTemplatesSuccess() {
 		"",
 		listTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","name":"test-template","description":"blah blah","Publish":false}]`, testUUID)
+	output := fmt.Sprintf(`[{"id":"%s","name":"test-template","description":"blah blah","publish":false}]`, testUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -81,7 +81,7 @@ func (suite *TemplateHandlerTestSuite) TestCreateTemplateSuccess() {
 
 	stageUUID := uuid.New()
 	suite.dbMock.On("CreateStages", mock.Anything, mock.Anything).Return([]db.Stage{
-		{ID: stageUUID, Type: "Repeat", RepeatCount: 3, TemplateID: testUUID, StepCount: 0},
+		{ID: stageUUID, Type: "cycle", RepeatCount: 3, TemplateID: testUUID, StepCount: 0},
 	}, nil)
 
 	body := `{"name":"test template","description":"blah blah"}`
@@ -92,7 +92,7 @@ func (suite *TemplateHandlerTestSuite) TestCreateTemplateSuccess() {
 		body,
 		createTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"template":{"id":"%s","name":"test template","description":"blah blah"},"stages":[{"id":"%s","type":"Repeat","repeat_count":3,"template_id":"%s","step_count":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]}`, testUUID, stageUUID, testUUID)
+	output := fmt.Sprintf(`{"id":"%s","name":"test template","description":"blah blah","publish":false,"stages":[{"id":"%s","type":"cycle","repeat_count":3,"template_id":"%s","step_count":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]}`, testUUID, stageUUID, testUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -154,7 +154,7 @@ func (suite *TemplateHandlerTestSuite) TestShowTemplateSuccess() {
 		"",
 		showTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"test template","description":"blah blah","Publish":false}`, testUUID)
+	output := fmt.Sprintf(`{"id":"%s","name":"test template","description":"blah blah","publish":false}`, testUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -162,6 +162,93 @@ func (suite *TemplateHandlerTestSuite) TestShowTemplateSuccess() {
 }
 
 func (suite *TemplateHandlerTestSuite) TestPublishTemplateSuccess() {
+	testUUID := uuid.New()
+	targetUUID := uuid.New()
+	tempUUID := uuid.New()
+	suite.dbMock.On("ListTemplateTargets", mock.Anything, mock.Anything).Return(
+		[]db.TemplateTarget{
+			db.TemplateTarget{TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
+		},
+		nil,
+	)
+
+	stage1 := db.Stage{ID: testUUID, Type: "cycle", RepeatCount: 5, TemplateID: tempUUID, StepCount: 0}
+	stage2 := db.Stage{ID: testUUID, Type: "hold", RepeatCount: 0, TemplateID: tempUUID, StepCount: 0}
+
+	step := db.Step{TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true, StageID: testUUID}
+	ss1 := db.StageStep{
+		stage1, step,
+	}
+	ss2 := db.StageStep{
+		stage2, step,
+	}
+	suite.dbMock.On("ListStageSteps", mock.Anything, mock.Anything).Return([]db.StageStep{
+		ss1, ss2,
+	}, nil)
+
+	suite.dbMock.On("PublishTemplate", mock.Anything, mock.Anything).Return(
+		nil,
+		nil)
+
+	suite.dbMock.On("CheckIfICTargetAdded", mock.Anything, mock.Anything).Return(
+		db.WarnResponse{},
+		nil)
+
+	recorder := makeHTTPCall(http.MethodPut,
+		"/templates/{id}/publish",
+		"/templates/"+tempUUID.String()+"/publish",
+		"",
+		publishTemplateHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), `{"msg":"template published successfully"}`, recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TemplateHandlerTestSuite) TestListPublishedTemplatesSuccess() {
+	testUUID := uuid.New()
+	suite.dbMock.On("ListPublishedTemplates", mock.Anything).Return(
+		[]db.Template{
+			db.Template{Name: "test-template", ID: testUUID, Description: "blah blah", Publish: true},
+		},
+		nil,
+	)
+
+	recorder := makeHTTPCall(
+		http.MethodGet,
+		"/templates/publish",
+		"/templates/publish",
+		"",
+		listPublishedTemplateHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := fmt.Sprintf(`[{"id":"%s","name":"test-template","description":"blah blah","publish":true}]`, testUUID)
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TemplateHandlerTestSuite) TestListPublishedTemplatesFail() {
+	suite.dbMock.On("ListPublishedTemplates", mock.Anything).Return(
+		[]db.Template{},
+		errors.New("error fetching templates"),
+	)
+
+	recorder := makeHTTPCall(
+		http.MethodGet,
+		"/templates/publish",
+		"/templates/publish",
+		"",
+		listPublishedTemplateHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), "", recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TemplateHandlerTestSuite) TestPublishTemplateFail() {
 	testUUID := uuid.New()
 	targetUUID := uuid.New()
 	tempUUID := uuid.New()
@@ -186,62 +273,15 @@ func (suite *TemplateHandlerTestSuite) TestPublishTemplateSuccess() {
 		ss1, ss2,
 	}, nil)
 
-	suite.dbMock.On("PublishTemplate", mock.Anything, mock.Anything).Return(
-		nil,
-		nil)
-
-	body := ``
-
 	recorder := makeHTTPCall(http.MethodPut,
 		"/templates/{id}/publish",
 		"/templates/"+tempUUID.String()+"/publish",
-		body,
+		"",
 		publishTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"template published successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), `{"error":{"code":"invalid_data","message":"Please provide valid template data","fields":{"repeatCount":"Invalid repeat_count in cycle stage"}}}`, recorder.Body.String())
 
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *TemplateHandlerTestSuite) TestListPublishedTemplatesSuccess() {
-	testUUID := uuid.New()
-	suite.dbMock.On("ListPublishedTemplates", mock.Anything).Return(
-		[]db.Template{
-			db.Template{Name: "test-template", ID: testUUID, Description: "blah blah", Publish: false},
-		},
-		nil,
-	)
-
-	recorder := makeHTTPCall(
-		http.MethodGet,
-		"/templates/publish",
-		"/templates/publish",
-		"",
-		listPublishedTemplateHandler(Dependencies{Store: suite.dbMock}),
-	)
-	output := fmt.Sprintf(`[{"id":"%s","name":"test-template","description":"blah blah","Publish":false}]`, testUUID)
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *TemplateHandlerTestSuite) TestListPublishedTemplatesFail() {
-	suite.dbMock.On("ListPublishedTemplates", mock.Anything).Return(
-		[]db.Template{},
-		errors.New("error fetching templates"),
-	)
-
-	recorder := makeHTTPCall(
-		http.MethodGet,
-		"/templates/publish",
-		"/templates/publish",
-		"",
-		listPublishedTemplateHandler(Dependencies{Store: suite.dbMock}),
-	)
-
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }

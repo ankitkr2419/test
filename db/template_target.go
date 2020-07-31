@@ -2,7 +2,9 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"mylab/cpagent/config"
 	"strings"
 
 	"github.com/google/uuid"
@@ -21,6 +23,13 @@ const (
 
 	deleteTempTargetsQuery = `DELETE FROM template_targets
 		where template_id = $1`
+
+	selectICTarget = `SELECT tt.*,d.position 
+		FROM template_targets as tt,
+		targets as t ,
+		dyes as d 
+		WHERE tt.target_id = t.id AND t.dye_id = d.id AND 
+		tt.template_id = $1 AND d.position = $2`
 )
 
 //TemplateTarget is used to store target mapped to template
@@ -91,4 +100,29 @@ func makeQuery(tt []TemplateTarget) string {
 		strings.Join(values, ","))
 
 	return stmt
+}
+
+func (s *pgStore) CheckIfICTargetAdded(ctx context.Context, temp_id uuid.UUID) (resp WarnResponse, err error) {
+	result, err := s.db.Exec(
+		selectICTarget,
+		temp_id,
+		config.GetICPosition(),
+	)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error getting IC target")
+		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		resp.Code = "Warning"
+		resp.Message = "Absence of Internal Control"
+		err = errors.New("Record Not Found")
+		logger.WithField("err", err.Error()).Error("Error IC target not found")
+		return
+	}
+
+	return
 }
