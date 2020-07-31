@@ -14,8 +14,8 @@ const (
 		ORDER BY name ASC`
 
 	getPublishedTemplateListQuery = `SELECT * FROM templates
-		ORDER BY name ASC
-		WHERE publish = true`
+		WHERE publish = true
+		ORDER BY name ASC`
 
 	createTemplateQuery = `INSERT INTO templates (
 		name,
@@ -110,7 +110,7 @@ func (s *pgStore) ListTemplates(ctx context.Context) (t []Template, err error) {
 }
 
 func (s *pgStore) ListPublishedTemplates(ctx context.Context) (t []Template, err error) {
-	err = s.db.Select(&t, getTemplateListQuery)
+	err = s.db.Select(&t, getPublishedTemplateListQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing templates")
 		return
