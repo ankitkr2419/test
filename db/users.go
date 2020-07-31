@@ -11,11 +11,12 @@ import (
 
 const (
 	validateUserQuery = `SELECT * FROM users as u
-	        WHERE u.username = $1 AND u.password = $2`
+	        WHERE u.username = $1 AND u.password = $2 AND u.role = $3`
 
 	insertUsersQuery1 = `INSERT INTO users (
 				username,
-				password)
+				password,
+			    role)
 				VALUES  `
 	insertUsersQuery2 = ` ON CONFLICT DO NOTHING;`
 )
@@ -23,6 +24,7 @@ const (
 type User struct {
 	Username  string    `db:"username" json:"username" validate:"required"`
 	Password  string    `db:"password" json:"password" validate:"required"`
+	Role      string    `db:"role" json:"role" validate:"required"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -33,6 +35,7 @@ func (s *pgStore) ValidateUser(ctx context.Context, u User) (err error) {
 		validateUserQuery,
 		u.Username,
 		u.Password,
+		u.Role,
 	)
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
@@ -52,7 +55,7 @@ func (s *pgStore) ValidateUser(ctx context.Context, u User) (err error) {
 
 func (s *pgStore) InsertUser(ctx context.Context, u User) (err error) {
 
-	values := fmt.Sprintf("('%v','%v')", u.Username, u.Password)
+	values := fmt.Sprintf("('%v','%v','%v')", u.Username, u.Password, u.Role)
 
 	stmt := fmt.Sprintf(insertUsersQuery1 + values + insertUsersQuery2)
 

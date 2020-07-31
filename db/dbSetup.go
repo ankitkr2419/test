@@ -85,6 +85,7 @@ func addDefaultUser(s Storer) {
 	u := User{
 		Username: "admin",
 		Password: "admin",
+		Role:     "administrator",
 	}
 
 	err := s.InsertUser(context.Background(), u)
