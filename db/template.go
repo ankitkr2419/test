@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -19,7 +20,7 @@ const (
 
 	createTemplateQuery = `INSERT INTO templates (
 		name,
-		description,)
+		description)
 		VALUES ($1, $2) RETURNING id`
 
 	getTemplateQuery = `SELECT *
@@ -27,13 +28,15 @@ const (
 
 	updateTemplateQuery = `UPDATE templates SET
 		name = $1,
-		description = $2
-		where id = $3 AND publish = false`
+		description = $2,
+		updated_at = $3
+		where id = $4S AND publish = false`
 
 	deleteTemplateQuery = `DELETE FROM templates WHERE id = $1`
 
 	publishTempQuery = `UPDATE templates SET
-	publish = true
+	publish = true,
+	updated_at = $2
 	where id = $1`
 )
 
@@ -43,6 +46,8 @@ type Template struct {
 	Description string    `db:"description" json:"description" validate:"required"`
 	Publish     bool      `db:"publish" json:"publish"`
 	Stages      []Stage   `json:"stages,omitempty"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
 type ErrorResponse struct {
 	Code    string            `json:"code"`
@@ -141,6 +146,7 @@ func (s *pgStore) UpdateTemplate(ctx context.Context, t Template) (err error) {
 		updateTemplateQuery,
 		t.Name,
 		t.Description,
+		time.Now(),
 		t.ID,
 	)
 
@@ -203,6 +209,7 @@ func (s *pgStore) PublishTemplate(ctx context.Context, id uuid.UUID) (err error)
 	_, err = s.db.Exec(
 		publishTempQuery,
 		id,
+		time.Now(),
 	)
 
 	if err != nil {
