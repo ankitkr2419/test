@@ -25,6 +25,9 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		//hash password to validate
+		u.Password = MD5Hash(u.Password)
+
 		err = deps.Store.ValidateUser(req.Context(), u)
 		if err != nil {
 			if err.Error() == "Record Not Found" {

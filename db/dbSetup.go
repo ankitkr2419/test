@@ -47,8 +47,6 @@ func Setup(s Storer) (err error) {
 
 	logger.Info("Targets Added in Database")
 
-	addDefaultUser(s)
-
 	return
 }
 
@@ -78,21 +76,16 @@ func makeDyeList(configDyes Config) (Dyes []Dye) {
 	return
 }
 
-// addDefaultUser to DB
+// AddDefaultUser to DB
 
-func addDefaultUser(s Storer) {
-
-	u := User{
-		Username: "admin",
-		Password: "admin",
-		Role:     "administrator",
-	}
+func AddDefaultUser(s Storer, u User) error {
 
 	err := s.InsertUser(context.Background(), u)
 	if err != nil {
-		return
+		return err
 	}
 
 	logger.Info("Default user added")
+	return nil
 
 }
