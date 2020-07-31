@@ -6,14 +6,19 @@ import {
 	Row,
 	Col,
 	Input,
+	InputGroupWithAddonText,
 	Label,
 	Modal,
 	ModalBody,
 	CheckBox,
-	FormError,
 } from 'core-components';
 import { ButtonGroup, ButtonIcon, Text } from 'shared-components';
-import { validateHoldTime } from './stepHelper';
+import {
+	validateHoldTime,
+	validateRampRate,
+	validateTargetTemperature,
+} from './stepHelper';
+import { MIN_RAMP_RATE, MAX_RAMP_RATE, MAX_TARGET_TEMPERATURE, MIN_TARGET_TEMPERATURE } from './stepConstants';
 
 const AddStepModal = (props) => {
 	const {
@@ -35,6 +40,8 @@ const AddStepModal = (props) => {
 		holdTime,
 		dataCapture,
 		holdTimeError,
+		rampRateError,
+		targetTemperatureError,
 	} = stepFormState;
 
 	// stageId will be present when we are updating stage
@@ -50,17 +57,44 @@ const AddStepModal = (props) => {
 	}, []);
 
 	const onChangeHandler = ({ target: { name, value } }) => {
+		// set rampRate/targetTemperature/holdTime with its value in stepForm local state
 		updateStepFormStateWrapper(name, value);
 	};
 
 	const onHoldTimeBlurHandler = () => {
 		if (validateHoldTime(holdTime) === null) {
+			// set holdTimeError flag to true maintained over stepForm local state
 			updateStepFormStateWrapper('holdTimeError', true);
 		}
 	};
 
 	const onHoldTimeFocusHandler = () => {
+		// reset holdTimeError flag to false maintained over stepForm local state
 		updateStepFormStateWrapper('holdTimeError', false);
+	};
+
+	const onRampRateBlurHandler = () => {
+		if (validateRampRate(rampRate) === false) {
+			// set rampRateError flag to true maintained over stepForm local state
+			updateStepFormStateWrapper('rampRateError', true);
+		}
+	};
+
+	const onRampRateFocusHandler = () => {
+		// reset rampRateError flag to false maintained over stepForm local state
+		updateStepFormStateWrapper('rampRateError', false);
+	};
+
+	const onTargetTemperatureBlurHandler = () => {
+		if (validateTargetTemperature(targetTemperature) === false) {
+			// set targetTemperatureError flag to true maintained over stepForm local state
+			updateStepFormStateWrapper('targetTemperatureError', true);
+		}
+	};
+
+	const onTargetTemperatureFocusHandler = () => {
+		// reset targetTemperatureError flag to false maintained over stepForm local state
+		updateStepFormStateWrapper('targetTemperatureError', false);
 	};
 
 	return (
@@ -93,17 +127,28 @@ const AddStepModal = (props) => {
 								<Label for='ramp_rate' className='font-weight-bold'>
 									Ramp Rate
 								</Label>
-								<Input
-									type='number'
-									min='-273.15'
-									max='1000'
-									name='rampRate'
-									id='ramp_rate'
-									placeholder='Type here'
-									value={rampRate}
-									onChange={onChangeHandler}
-								/>
-								<Label>unit °C</Label>
+								<InputGroupWithAddonText
+									addonText='unit °C'
+								>
+									<Input
+										type='number'
+										name='rampRate'
+										id='ramp_rate'
+										placeholder={`${MIN_RAMP_RATE} - ${MAX_RAMP_RATE}`}
+										value={rampRate}
+										onChange={onChangeHandler}
+										onBlur={onRampRateBlurHandler}
+										onFocus={onRampRateFocusHandler}
+										invalid={rampRateError}
+									/>
+								</InputGroupWithAddonText>
+								<Text
+									Tag='p'
+									size={12}
+									className={`${rampRateError && 'text-danger'} px-2 mb-0`}
+								>
+									Enter value between {MIN_RAMP_RATE} to {MAX_RAMP_RATE}
+								</Text>
 							</FormGroup>
 						</Col>
 						<Col sm={colSize}>
@@ -111,17 +156,30 @@ const AddStepModal = (props) => {
 								<Label for='target_temperature' className='font-weight-bold'>
 									Target Temperature
 								</Label>
-								<Input
-									type='number'
-									min='-273.15'
-									max='1000'
-									name='targetTemperature'
-									id='target_temperature'
-									placeholder='Type here'
-									value={targetTemperature}
-									onChange={onChangeHandler}
-								/>
-								<Label>unit °C</Label>
+								<InputGroupWithAddonText
+									addonText='unit °C'
+								>
+									<Input
+										type='number'
+										name='targetTemperature'
+										id='target_temperature'
+										placeholder={`${MIN_TARGET_TEMPERATURE} - ${MAX_TARGET_TEMPERATURE}`}
+										value={targetTemperature}
+										onChange={onChangeHandler}
+										onBlur={onTargetTemperatureBlurHandler}
+										onFocus={onTargetTemperatureFocusHandler}
+										invalid={targetTemperatureError}
+									/>
+								</InputGroupWithAddonText>
+								<Text
+									Tag='p'
+									size={12}
+									className={`${
+										targetTemperatureError && 'text-danger'
+									} px-2 mb-0`}
+								>
+									Enter value between {MIN_TARGET_TEMPERATURE} to {MAX_TARGET_TEMPERATURE}
+								</Text>
 							</FormGroup>
 						</Col>
 						<Col sm={colSize}>
@@ -129,18 +187,30 @@ const AddStepModal = (props) => {
 								<Label for='hold_time' className='font-weight-bold'>
 									Hold Time
 								</Label>
-								<Input
-									type='text'
-									name='holdTime'
-									id='hold_time'
-									placeholder='seconds'
-									value={holdTime}
-									onBlur={onHoldTimeBlurHandler}
-									onFocus={onHoldTimeFocusHandler}
-									onChange={onChangeHandler}
-									invalid={holdTimeError}
-								/>
-								<FormError>Invalid hold time</FormError>
+								<InputGroupWithAddonText
+									addonText='unit sec'
+								>
+									<Input
+										type='number'
+										name='holdTime'
+										id='hold_time'
+										placeholder='seconds'
+										value={holdTime}
+										onBlur={onHoldTimeBlurHandler}
+										onFocus={onHoldTimeFocusHandler}
+										onChange={onChangeHandler}
+										invalid={holdTimeError}
+									/>
+								</InputGroupWithAddonText>
+								{ holdTimeError &&
+									<Text
+										Tag='p'
+										size={12}
+										className='text-danger px-2 mb-0'
+									>
+									Invalid Hold time
+									</Text>
+								}
 							</FormGroup>
 						</Col>
 						{/* If the stage type is hold don't show datacapture checkbox */}

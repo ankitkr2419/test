@@ -13,7 +13,7 @@ const SidebarSample = (props) => {
 		addNewLocalSample,
 		isSampleListLoading,
 		taskOptions,
-		onCrossClickHandler,
+		onTargetClickHandler,
 		addButtonClickHandler,
 		isSampleStateValid, // form state valid
 		isDisabled,
@@ -28,6 +28,8 @@ const SidebarSample = (props) => {
 	} = sampleState.toJS();
 
 	const toggleSideBar = () => {
+		// console log on sample drawer handle click
+		console.info('Sample drawer handle clicked');
 		// if user close sidebar without editing then reset local state
 		if (isSideBarOpen === true && isEdit === true) {
 			resetLocalState();
@@ -47,7 +49,8 @@ const SidebarSample = (props) => {
 	};
 
 	const handleSampleInputChange = (text) => {
-		if (text.length >= 3) {
+		// fetch samples if text length is greater than zero ie.text is not empty
+		if (text.length > 0) {
 			fetchSamples(text);
 		}
 	};
@@ -84,7 +87,7 @@ const SidebarSample = (props) => {
 			/>
 			<SampleTargetList
 				list={sampleState.get('targets')}
-				onCrossClickHandler={onCrossClickHandler}
+				onTargetClickHandler={onTargetClickHandler}
 			/>
 			<Select
 				placeholder="Select Task"
@@ -107,7 +110,7 @@ SidebarSample.propTypes = {
 	addNewLocalSample: PropTypes.func.isRequired,
 	isSampleListLoading: PropTypes.bool.isRequired,
 	taskOptions: PropTypes.array.isRequired,
-	onCrossClickHandler: PropTypes.func.isRequired,
+	onTargetClickHandler: PropTypes.func.isRequired,
 	addButtonClickHandler: PropTypes.func.isRequired,
 	isSampleStateValid: PropTypes.bool.isRequired,
 	isDisabled: PropTypes.bool.isRequired,

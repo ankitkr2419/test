@@ -96,6 +96,7 @@ func ValidateTemplate(targets []TemplateTarget, steps []StageStep) (errorRespons
 	}
 
 	return
+	Stages      []Stage   `json:"stages,omitempty"`
 }
 
 func (s *pgStore) ListTemplates(ctx context.Context) (t []Template, err error) {

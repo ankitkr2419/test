@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from 'components/Sidebar';
 import PropTypes from 'prop-types';
-import { LineChart } from 'core-components';
-import { Text } from 'shared-components';
-import styled from 'styled-components';
 import { getXAxis } from 'selectors/wellGraphSelector';
-import GraphFilters from './GraphFilters';
+import TemperatureGraphContainer from 'containers/TemperatureGraphContainer';
+import { Switch } from 'core-components';
+import { SwitchWrapper } from 'shared-components/SwitchWrapper';
+import WellGraph from './WellGraph';
 
 const SidebarGraph = (props) => {
 	const {
@@ -17,17 +17,28 @@ const SidebarGraph = (props) => {
 		toggleGraphFilterActive,
 		experimentGraphTargetsList,
 		isExperimentSucceeded,
+		setThresholdError,
+		resetThresholdError,
+		isThresholdInvalid,
 	} = props;
 
-	let noOfCycles = 0;
+	// local state to toggle between emission graph and temperature graph
+	const [showTempGraph, setShowTempGraph] = useState(false);
+
+	let cyclesCount = 0;
 	// below case can happen if user selects all filter we might get empty chart data
 	if (lineChartData.size !== 0) {
-		noOfCycles = lineChartData.first().totalCycles;
+		cyclesCount = lineChartData.first().totalCycles;
 	}
 
 	const data = {
-		labels: getXAxis(noOfCycles),
+		labels: getXAxis(cyclesCount),
 		datasets: lineChartData.toJS(),
+	};
+
+	// helper function to toggle the graphs
+	const toggleTempGraphSwitch = () => {
+		setShowTempGraph(value => !value);
 	};
 
 	if (isExperimentRunning === true || isExperimentSucceeded === true) {
@@ -35,39 +46,41 @@ const SidebarGraph = (props) => {
 			<Sidebar
 				isOpen={isSidebarOpen}
 				toggleSideBar={toggleSideBar}
-				className='graph'
-				bodyClassName='py-4'
-				handleIcon='graph'
+				className="graph"
+				bodyClassName="py-4"
+				handleIcon="graph"
 				handleIconSize={56}
 			>
-				<Text size={20} className='text-default mb-4'>
-					Amplification plot
-				</Text>
-				<GraphCard>
-					<LineChart data={data} />
-				</GraphCard>
-				<GraphFilters
-					targets={experimentGraphTargetsList}
-					onThresholdChangeHandler={onThresholdChangeHandler}
-					toggleGraphFilterActive={toggleGraphFilterActive}
-				/>
-				<Text size={14} className='text-default mb-0'>
-					Note: Click on the threshold number to change it.
-				</Text>
+				<SwitchWrapper>
+					<Switch
+						id="temperature"
+						name="temperature"
+						label="Show temperature graph"
+						value={showTempGraph}
+						onChange={toggleTempGraphSwitch}
+					/>
+				</SwitchWrapper>
+				{/* show the well data graph if showTempGraph flag is off */}
+				{!showTempGraph
+					&& <WellGraph
+						data={data}
+						experimentGraphTargetsList={experimentGraphTargetsList}
+						onThresholdChangeHandler={onThresholdChangeHandler}
+						toggleGraphFilterActive={toggleGraphFilterActive}
+						setThresholdError={setThresholdError}
+						resetThresholdError={resetThresholdError}
+						isThresholdInvalid={isThresholdInvalid}
+					/>
+				}
+				{/* show temperature graph if showTempGraph flag is on */}
+				{showTempGraph
+					&& <TemperatureGraphContainer />
+				}
 			</Sidebar>
 		);
 	}
 	return null;
 };
-
-const GraphCard = styled.div`
-	width: 830px;
-	height: 344px;
-	background: #ffffff 0% 0% no-repeat padding-box;
-	border: 1px solid #707070;
-	padding: 8px;
-	margin: 0 0 32px 0;
-`;
 
 SidebarGraph.propTypes = {
 	isExperimentRunning: PropTypes.bool.isRequired,

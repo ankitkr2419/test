@@ -54,7 +54,7 @@ func (suite *ExperimentHandlerTestSuite) TestListExperimentsSuccess() {
 		"",
 		listExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0}]`, testUUID, tempUUID)
+	output := fmt.Sprintf(`[{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -108,7 +108,7 @@ func (suite *ExperimentHandlerTestSuite) TestCreateExperimentSuccess() {
 		createExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -127,7 +127,7 @@ func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 		"",
 		showExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0}`, testUUID, tempUUID)
+	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -137,6 +137,8 @@ func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 	testUUID := uuid.New()
 	tempUUID := uuid.New()
+	sampleID := uuid.New()
+	targetID := uuid.New()
 	exit := make(chan error)
 	websocketMsg := make(chan string)
 	websocketErr := make(chan error)
@@ -144,6 +146,19 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 	config.Load("simulator_test")
 
 	config.Load("config_test")
+
+	suite.dbMock.On("ListWells", mock.Anything, mock.Anything).Return(
+		[]db.Well{
+			db.Well{ID: testUUID, Position: 1, SampleID: sampleID, ExperimentID: testUUID, Task: "UNKNOWN", ColorCode: "RED", Targets: []db.WellTarget{
+				{WellPosition: 1,
+					ExperimentID: testUUID,
+					TargetID:     targetID,
+					TargetName:   "COVID",
+					CT:           "45"},
+			}, SampleName: ""},
+		},
+		nil,
+	)
 
 	suite.dbMock.On("ShowExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
 		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
@@ -165,8 +180,21 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 
 	suite.dbMock.On("ListConfTargets", mock.Anything, mock.Anything).Return([]db.TargetDetails{}, nil)
 
-	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
 		nil, nil)
+
+	suite.dbMock.On("UpsertWellTargets", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
+		[]db.WellTarget{
+			{
+				WellPosition: 1,
+				ExperimentID: testUUID,
+				TargetID:     targetID,
+				TargetName:   "COVID",
+				CT:           "45",
+			},
+		},
+		nil,
+	)
 
 	suite.dbMock.On("InsertExperimentTemperature", mock.Anything, mock.Anything).Return(
 		nil, nil)
@@ -178,8 +206,8 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 		runExperimentHandler(Dependencies{Store: suite.dbMock, Plc: simulator.NewSimulator(exit), ExitCh: exit, WsErrCh: websocketErr, WsMsgCh: websocketMsg}),
 	)
 	<-websocketMsg // read from chn to avoid block
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"experiment started"}`, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusAccepted, recorder.Code)
+	assert.Equal(suite.T(), `{"code":"Warning","message":"Absence of NC,PC or NTC"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

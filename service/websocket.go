@@ -16,6 +16,11 @@ var (
 	redlowerlimit     uint16
 	redupperlimit     uint16
 	orangelowerlimit  uint16
+	pcrMin            float32 = 0 //actual scale of emission values
+	pcrMax            float32 = 32000
+	graphMin          float32 = 0 // scale for graph
+	graphMax          float32 = 10
+	undetermine               = "UNDETERMINE"
 )
 
 type experimentResultValues struct {
@@ -23,21 +28,21 @@ type experimentResultValues struct {
 	experimentID uuid.UUID
 	activeWells  []int32
 	targets      []db.TargetDetails
+	icTargetID   uuid.UUID
 }
+
 type resultGraph struct {
 	Type string  `json:"type"`
 	Data []graph `json:"data"`
-	// LidTemperature float32 `json:"lid_temp"`
-	// Temperature float32 `json:"temperature"`
-	// CurrentCycle uint16    `json:"current_cycle"`
 }
+
 type graph struct {
 	WellPosition int32     `db:"well_position" json:"well_position"`
 	TargetID     uuid.UUID `db:"target_id" json:"target_id"`
 	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id"`
 	TotalCycles  uint16    `db:"total_cycles" json:"total_cycles"`
 	Cycle        []uint16  `db:"cycle" json:"cycle"`
-	FValue       []uint16  `db:"f_value" json:"f_value"`
+	FValue       []float32 `db:"f_value" json:"f_value"`
 	Threshold    float32   `db:"threshold" json:"threshold"`
 }
 type resultWells struct {

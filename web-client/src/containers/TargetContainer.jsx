@@ -20,6 +20,7 @@ import { getTemplateById } from 'reducers/templateReducer';
 import {
 	getSelectedTargetsToLocal,
 	isTargetAlreadySelected,
+	isAnyThresholdInvalid,
 } from 'components/Target/targetHelper';
 
 const TargetContainer = (props) => {
@@ -137,6 +138,17 @@ const TargetContainer = (props) => {
 		});
 	}, []);
 
+	// set thresholdError value maintained in local state
+	const setThresholdError = useCallback((thresholdError, index) => {
+		updateTargetState({
+			type: targetStateActions.SET_THRESHOLD_ERROR,
+			value: {
+				thresholdError,
+				index,
+			},
+		});
+	}, []);
+
 	// onSaveClick Save data on server
 	const onSaveClick = useCallback(() => {
 		// get list of selected targets
@@ -191,6 +203,8 @@ const TargetContainer = (props) => {
 			isViewStagesEnabled={getIsViewStagesEnabled()}
 			navigateToStageWizard={navigateToStageWizard}
 			editTemplate={editTemplate}
+			setThresholdError={setThresholdError}
+			isThresholdInvalid={isAnyThresholdInvalid(selectedTargetState.get('targetList'))}
 		/>
 	);
 };

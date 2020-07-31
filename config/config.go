@@ -54,6 +54,10 @@ func GetColorLimits(key string) uint16 {
 	return uint16(viper.GetInt(key))
 }
 
+func GetICPosition() int {
+	return ReadEnvInt("ic_position")
+}
+
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))
@@ -71,6 +75,11 @@ func ReadEnvString(key string) string {
 func ReadEnvBool(key string) bool {
 	checkIfSet(key)
 	return viper.GetBool(key)
+}
+
+func ReadEnvFloat(key string) float64 {
+	checkIfSet(key)
+	return viper.GetFloat64(key)
 }
 
 func checkIfSet(key string) {

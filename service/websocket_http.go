@@ -4,11 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
 	"time"
 
+	"strconv"
+
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
 )
@@ -32,8 +36,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
-		deps.Plc.SelfTest()
-		deps.Plc.HeartBeat()
+		go deps.Plc.SelfTest()
 
 		for {
 
@@ -56,23 +59,39 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				}
 
 			case err = <-deps.ExitCh:
-
+				var errortype, msg string
 				if err.Error() == "PCR Aborted" {
 
 					// on pre-emptive stop
 					experimentRunning = false
+					errortype = "ErrorPCRAborted"
+					msg = "Experiment aborted by user"
+
+				} else if err.Error() == "PCR Stopped" {
+					errortype = "ErrorPCRStopped"
+					msg = "PCR completed experiment"
+
+				} else if err.Error() == "PCR Dead" {
+					errortype = "ErrorPCRDead"
+					msg = "Unable to connect to Hardware"
 
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
 
-				sendOnFail(err.Error(), rw, c)
+				//log in Db notifications
+				go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, msg))
+
+				sendOnFail(msg, errortype, rw, c)
 
 			case err = <-deps.WsErrCh:
 
 				logger.WithField("err", err.Error()).Error("Monitor has requested exit")
+				var errortype = "ErrorPCRMonitor"
 
-				sendOnFail(err.Error(), rw, c)
+				go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, err.Error()))
+
+				sendOnFail(err.Error(), errortype, rw, c)
 
 			}
 
@@ -83,7 +102,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 func sendGraph(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	graphResult, err := getGraph(deps)
+	graphResult, err := getGraph(deps, experimentValues.experimentID, experimentValues.activeWells, experimentValues.targets)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("error in fetching data")
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -142,7 +161,7 @@ func sendOnSuccess(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn)
 
 func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	respBytes, err := getTemperatureDetails(deps)
+	respBytes, err := getTemperatureDetails(deps, experimentValues.experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("error in fetching data")
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -159,10 +178,10 @@ func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Con
 
 }
 
-func sendOnFail(msg string, rw http.ResponseWriter, c *websocket.Conn) {
+func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn) {
 
 	r := resultOnFail{
-		Type: "Fail",
+		Type: errortype,
 		Data: msg,
 	}
 
@@ -182,16 +201,16 @@ func sendOnFail(msg string, rw http.ResponseWriter, c *websocket.Conn) {
 
 }
 
-func getGraph(deps Dependencies) (respBytes []byte, err error) {
+func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails) (respBytes []byte, err error) {
 
-	DBResult, err := deps.Store.GetResult(context.Background(), experimentValues.experimentID)
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching result data")
 		return
 	}
 
 	// analyseResult returns data required for ploting graph
-	Finalresult := analyseResult(DBResult)
+	Finalresult := analyseResult(DBResult, wells, targets)
 
 	Result := resultGraph{
 		Type: "Graph",
@@ -228,6 +247,14 @@ func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 		for i, w := range wells {
 			for _, t := range welltargets {
 				if w.Position == t.WellPosition {
+
+					// show scaled value for graph
+					if t.CT != "" && t.CT != undetermine {
+						ct, _ := strconv.ParseFloat(t.CT, 32)
+						// %.1f takes decimal value upto 1
+						t.CT = fmt.Sprintf("%.1f", scaleThreshold(float32(ct)))
+					}
+
 					wells[i].Targets = append(wells[i].Targets, t)
 				}
 			}
@@ -269,8 +296,8 @@ func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
 	return
 }
 
-func getTemperatureDetails(deps Dependencies) (respBytes []byte, err error) {
-	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentValues.experimentID)
+func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes []byte, err error) {
+	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error get experiment")
 		return
@@ -322,7 +349,7 @@ func monitorExperiment(deps Dependencies) {
 			}
 			deps.WsMsgCh <- "read"
 			if scan.Cycle == experimentValues.plcStage.CycleCount {
-				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID)
+				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID, "successful")
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error updating stop time")
 					deps.WsErrCh <- err
@@ -357,6 +384,11 @@ func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err er
 	// makeResult returns data in DB result format
 	result := makeResult(scan)
 
+	// for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
+	if scan.Cycle == 1 {
+		addResultForZerothCycle(deps, result)
+	}
+
 	// insert current cycle result into Database
 	DBResult, err = deps.Store.InsertResult(context.Background(), result)
 	if err != nil {
@@ -366,6 +398,35 @@ func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err er
 		return
 	}
 	return
+}
+
+//addResultForZerothCycle for graph
+func addResultForZerothCycle(deps Dependencies, result []db.Result) {
+
+	// set default value [0,0]
+	var zerothResult []db.Result
+	for _, v := range result {
+		var r db.Result
+
+		// copy all fields
+		r = v
+
+		// set cycle & FValue to [0,0]
+		r.Cycle = 0
+		r.FValue = 0
+
+		zerothResult = append(zerothResult, r)
+
+	}
+
+	// insert current cycle result into Database
+	_, err := deps.Store.InsertResult(context.Background(), zerothResult)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error inserting result data")
+		// send error
+		deps.WsErrCh <- err
+		return
+	}
 }
 
 func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) (err error) {
@@ -413,7 +474,7 @@ func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) 
 	}
 
 	// update ct value in DB
-	_, err = deps.Store.UpsertWellTargets(context.Background(), targets, experimentValues.experimentID)
+	_, err = deps.Store.UpsertWellTargets(context.Background(), targets, experimentValues.experimentID, false)
 	if err != nil {
 		// send error
 		logger.WithField("err", err.Error()).Error("Error upsert wells")

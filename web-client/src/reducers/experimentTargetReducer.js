@@ -6,7 +6,7 @@ import {
 import { addIsActiveFlag } from 'selectors/experimentTargetSelector';
 
 const listExperimentTargetInitialState = fromJS({
-	isLoading: true,
+	isLoading: false,
 	list: [],
 	graphTargets: [],
 });
@@ -39,6 +39,8 @@ export const listExperimentTargetsReducer = (
 			error: fromJS(action.payload.error),
 			isLoading: false,
 		});
+	case listExperimentTargetActions.resetExperimentTargets:
+		return listExperimentTargetInitialState;
 	default:
 		return state;
 	}

@@ -47,9 +47,9 @@ func (m *DBMockStore) ListStages(ctx context.Context, t uuid.UUID) (s []Stage, e
 	return args.Get(0).([]Stage), args.Error(1)
 }
 
-func (m *DBMockStore) CreateStage(ctx context.Context, stg Stage) (s Stage, err error) {
+func (m *DBMockStore) CreateStages(ctx context.Context, stg []Stage) (s []Stage, err error) {
 	args := m.Called(ctx, stg)
-	return args.Get(0).(Stage), args.Error(1)
+	return args.Get(0).([]Stage), args.Error(1)
 }
 
 func (m *DBMockStore) UpdateStage(ctx context.Context, s Stage) (err error) {
@@ -197,16 +197,16 @@ func (m *DBMockStore) GetWellTarget(ctx context.Context, i int32, wellID uuid.UU
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 
-func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget, id uuid.UUID) (wt []WellTarget, err error) {
-	args := m.Called(ctx, w, id)
+func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget, id uuid.UUID, s bool) (wt []WellTarget, err error) {
+	args := m.Called(ctx, w, id, s)
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 func (m *DBMockStore) ListStageSteps(ctx context.Context, id uuid.UUID) (s []StageStep, err error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).([]StageStep), args.Error(1)
 }
-func (m *DBMockStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID) (err error) {
-	args := m.Called(ctx, t, id)
+func (m *DBMockStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID, i uint16) (err error) {
+	args := m.Called(ctx, t, id, i)
 	return args.Error(1)
 }
 
@@ -224,8 +224,8 @@ func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (w 
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
 
-func (m *DBMockStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID) (err error) {
-	args := m.Called(ctx, t, id)
+func (m *DBMockStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID, s string) (err error) {
+	args := m.Called(ctx, t, id, s)
 	return args.Error(1)
 }
 
@@ -256,5 +256,20 @@ func (m *DBMockStore) ListExperimentTemperature(ctx context.Context, id uuid.UUI
 
 func (m *DBMockStore) InsertExperimentTemperature(ctx context.Context, r ExperimentTemperature) (err error) {
 	args := m.Called(ctx, r)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ListNotification(ctx context.Context, id uuid.UUID) (result []Notification, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]Notification), args.Error(1)
+}
+
+func (m *DBMockStore) InsertNotification(ctx context.Context, r Notification) (err error) {
+	args := m.Called(ctx, r)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) MarkNotificationasRead(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
 	return args.Error(1)
 }

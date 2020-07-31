@@ -2,7 +2,10 @@ import Button from './Button';
 import { Card, CardBody } from './Card';
 import CheckBox from './Checkbox';
 import {
-	Dropdown, DropdownToggle, DropdownMenu, DropdownItem,
+	Dropdown,
+	DropdownToggle,
+	DropdownMenu,
+	DropdownItem,
 } from './Dropdown';
 import { Modal, ModalBody } from './Modal';
 import Form from './Form';
@@ -10,6 +13,9 @@ import FormGroup from './FormGroup';
 import FormError from './FormError';
 import { Row, Col } from './Grid';
 import Input from './Input';
+import InputGroup from './InputGroup';
+import InputGroupAddon from './InputGroupAddon';
+import InputGroupWithAddonText from './InputGroupWithAddonText';
 import Label from './Label';
 import { Nav, NavItem, NavLink } from './Nav';
 import { Popover, PopoverHeader, PopoverBody } from './Popover';
@@ -34,6 +40,9 @@ export {
 	Row,
 	Col,
 	Input,
+	InputGroup,
+	InputGroupAddon,
+	InputGroupWithAddonText,
 	Label,
 	Modal,
 	ModalBody,

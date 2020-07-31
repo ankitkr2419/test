@@ -19,7 +19,8 @@ const (
 
 	getExpTempQuery = `SELECT * FROM experiment_temperatures
 		WHERE
-		experiment_id = $1`
+		experiment_id = $1
+		ORDER BY created_at ASC`
 )
 
 // ExperimentTemperature stores temp as it increases
@@ -29,6 +30,7 @@ type ExperimentTemperature struct {
 	LidTemp      float32   `db:"lid_temp" json:"lid_temp"`
 	Cycle        uint16    `db:"cycle" json:"cycle"`
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) ListExperimentTemperature(ctx context.Context, experimentID uuid.UUID) (t []ExperimentTemperature, err error) {

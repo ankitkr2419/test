@@ -61,6 +61,28 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		// Initialize stages 1 holding & 1 cycle stage
+
+		stgs := []db.Stage{
+			{
+				Type:        hold,
+				TemplateID:  createdTemp.ID,
+				RepeatCount: 0,
+			},
+			{
+				Type:        cycle,
+				TemplateID:  createdTemp.ID,
+				RepeatCount: 0,
+			},
+		}
+
+		createdTemp.Stages, err = deps.Store.CreateStages(req.Context(), stgs)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error create target")
+			return
+		}
+
 		respBytes, err = json.Marshal(createdTemp)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling targets data")

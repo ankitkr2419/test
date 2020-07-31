@@ -1,5 +1,6 @@
 /* eslint-disable implicit-arrow-linebreak */
 import { fromJS, List } from 'immutable';
+import { parseFloatWrapper } from 'utils/helpers';
 import { getTargetOption } from './targetHelper';
 
 // const action types
@@ -8,6 +9,7 @@ export const targetStateActions = {
 	ADD_THRESHOLD_VALUE: 'ADD_THRESHOLD_VALUE',
 	SET_CHECKED_STATE: 'SET_CHECKED_STATE',
 	UPDATE_LIST: 'UPDATE_LIST',
+	SET_THRESHOLD_ERROR: 'SET_THRESHOLD_ERROR',
 };
 
 // Initial state wrap with fromJS for immutability
@@ -34,7 +36,11 @@ export const isCheckable = (state, index) => {
 const addTargetId = (state, { targetId, index }) => state.setIn(['targetList', index, 'selectedTarget'], targetId);
 
 // function will set threshold flag w.r.t index
-const addThresholdValue = (state, { threshold, index }) => state.setIn(['targetList', index, 'threshold'], parseFloat(threshold) || '');
+const addThresholdValue = (state, { threshold, index }) => state.setIn(['targetList', index, 'threshold'], parseFloatWrapper(threshold));
+
+// function will set threshold error flag
+const setThresholdError = (state, { thresholdError, index }) => state.setIn(['targetList', index, 'thresholdError'], thresholdError);
+
 
 // function will set isChecked flag w.r.t index
 const setCheckedState = (state, { checked, index }) => state.setIn(['targetList', index, 'isChecked'], checked);
@@ -94,6 +100,8 @@ const targetStateReducer = (state, action) => {
 		return addTargetId(state, action.value);
 	case targetStateActions.ADD_THRESHOLD_VALUE:
 		return addThresholdValue(state, action.value);
+	case targetStateActions.SET_THRESHOLD_ERROR:
+		return setThresholdError(state, action.value);
 	case targetStateActions.SET_CHECKED_STATE:
 		return setCheckedState(state, action.value);
 	case targetStateActions.UPDATE_LIST:

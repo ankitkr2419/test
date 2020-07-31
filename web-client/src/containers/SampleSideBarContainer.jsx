@@ -16,6 +16,7 @@ import createSampleStateReducer, {
 } from 'components/Plate/Sidebar/Sample/createSampleState';
 import { addWell, addWellReset } from 'action-creators/wellActionCreators';
 import { taskOptions } from 'components/Plate/plateConstant';
+import { getSampleTargetList, getInitSampleTargetList } from 'components/Plate/Sidebar/Sample/sampleHelper';
 
 const SampleSideBarContainer = (props) => {
 	// constant
@@ -45,22 +46,30 @@ const SampleSideBarContainer = (props) => {
 			key,
 			value,
 		});
+		// console log on sample sidebar opened or closed
+		if (key === 'isSideBarOpen') {
+			console.info(`Sample Drawer ${value ? 'Opened' : 'Closed'}`);
+		}
 	};
 
-	// reset local state
-	const resetLocalState = () => {
-		sampleStateDispatch({ type: createSampleActions.RESET_VALUES });
-	};
-
-	// update targets to local state, so every time list will contain original target list
+	// update targets to local state, so every time list will contain
+	// original target list with each target selected
 	const addTargetsToLocalState = useCallback(() => {
 		if (experimentTargetsList !== null && experimentTargetsList.size !== 0) {
-			updateCreateSampleWrapper('targets', experimentTargetsList);
+			updateCreateSampleWrapper('targets', getInitSampleTargetList(experimentTargetsList));
 		}
 	}, [experimentTargetsList]);
 
+	// reset local state
+	const resetLocalState = useCallback(() => {
+		sampleStateDispatch({ type: createSampleActions.RESET_VALUES });
+		// after local state reset update targets to local state so that for a newly selected well
+		// original target list is shown
+		addTargetsToLocalState();
+	}, [addTargetsToLocalState]);
+
 	useEffect(() => {
-		// on page laod, Load target list to local
+		// on page load, Load target list to local
 		addTargetsToLocalState();
 	}, [addTargetsToLocalState]);
 
@@ -71,13 +80,13 @@ const SampleSideBarContainer = (props) => {
 			dispatch(addWellReset());
 			addTargetsToLocalState();
 		}
-	}, [areWellsCreated, addTargetsToLocalState, dispatch]);
+	}, [areWellsCreated, addTargetsToLocalState, dispatch, resetLocalState]);
 
 	useEffect(() => {
 		// this effect will run when operator is trying to update well data
 		if (updateWell !== null) {
 			const {
-				sample_name, sample_id, task, position,
+				sample_name, sample_id, task, position, targets,
 			} = updateWell;
 			// set data to local state for update
 			sampleStateDispatch({
@@ -90,7 +99,7 @@ const SampleSideBarContainer = (props) => {
 						label: sample_name,
 						value: sample_id,
 					},
-					targets: experimentTargetsList,
+					targets: getSampleTargetList(targets, experimentTargetsList),
 					task:{
 						label: task,
 						value: task,
@@ -107,11 +116,11 @@ const SampleSideBarContainer = (props) => {
 	const addNewLocalSample = (sample) => {
 		dispatch(addSampleLocallyCreated(sample));
 	};
-
-	const onCrossClickHandler = (id) => {
+	// helper function to select or unselect a target stored in targets list in local state
+	const onTargetClickHandler = (index) => {
 		sampleStateDispatch({
-			type: createSampleActions.deleteTarget,
-			value: id,
+			type: createSampleActions.TOGGLE_TARGET,
+			value: index,
 		});
 	};
 
@@ -130,7 +139,7 @@ const SampleSideBarContainer = (props) => {
 			sampleOptions={sampleList}
 			isSampleListLoading={isSampleListLoading}
 			taskOptions={taskOptions}
-			onCrossClickHandler={onCrossClickHandler}
+			onTargetClickHandler={onTargetClickHandler}
 			addButtonClickHandler={addButtonClickHandler}
 			isSampleStateValid={isSampleStateValid}
 			resetLocalState={resetLocalState}

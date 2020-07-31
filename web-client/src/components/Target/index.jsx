@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import {
@@ -13,7 +13,8 @@ import {
 
 import { covertToSelectOption } from 'utils/helpers';
 import TargetHeader from './TargetHeader';
-import { checkIfIdPresentInList } from './targetHelper';
+import { checkIfIdPresentInList, validateThreshold } from './targetHelper';
+import { MIN_THRESHOLD, MAX_THRESHOLD } from './targetConstants';
 
 const TargetActions = styled.div`
   justify-content: space-between;
@@ -39,6 +40,8 @@ const TargetComponent = (props) => {
 		navigateToStageWizard,
 		editTemplate,
 		isNoTargetSelected,
+		setThresholdError,
+		isThresholdInvalid,
 	} = props;
 
 	const isTargetDisabled = (ele) => {
@@ -48,15 +51,31 @@ const TargetComponent = (props) => {
 		return false;
 	};
 
-	const getFilteredOptionsList = useMemo(
-		() => {
-			if (isLoginTypeAdmin === true) {
-				return listTargetReducer
-					.filter(ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState));
+	// set threshold error flag true if threshold is invalid
+	const onThresholdBlurHandler = useCallback(
+		(threshold, index) => {
+			if (validateThreshold(threshold) === false) {
+				setThresholdError(true, index);
 			}
 		},
-		[listTargetReducer, selectedTargetState, isLoginTypeAdmin],
+		[setThresholdError],
 	);
+
+	// reset threshold error flag to false on focus on input field
+	const onThresholdFocusHandler = useCallback(
+		(index) => {
+			setThresholdError(false, index);
+		},
+		[setThresholdError],
+	);
+
+	const getFilteredOptionsList = useMemo(() => {
+		if (isLoginTypeAdmin === true) {
+			return listTargetReducer.filter(
+				ele => !checkIfIdPresentInList(ele.get('id'), selectedTargetState),
+			);
+		}
+	}, [listTargetReducer, selectedTargetState, isLoginTypeAdmin]);
 
 	const getTargetRows = useMemo(
 		() => selectedTargetState.map((ele, index) => (
@@ -76,7 +95,11 @@ const TargetComponent = (props) => {
 					// if it's a admin he can select targets from master targets
 					<Select
 						className="flex-100 px-2"
-						options={covertToSelectOption(getFilteredOptionsList, 'name', 'id')}
+						options={covertToSelectOption(
+							getFilteredOptionsList,
+							'name',
+							'id',
+						)}
 						placeholder="Please select target."
 						onChange={(selectedTarget) => {
 							onTargetSelect(selectedTarget, index);
@@ -99,12 +122,14 @@ const TargetComponent = (props) => {
 					type="number"
 					name={`threshold${index}`}
 					index={`threshold${index}`}
-					placeholder="Type here..."
+					placeholder={`${MIN_THRESHOLD} - ${MAX_THRESHOLD}`}
 					value={ele.threshold === undefined ? '' : ele.threshold}
-					min="0"
 					onChange={(event) => {
 						onThresholdChange(event.target.value, index);
 					}}
+					onBlur={() => onThresholdBlurHandler(ele.threshold, index)}
+					onFocus={() => onThresholdFocusHandler(index)}
+					invalid={ele.thresholdError}
 				/>
 			</TargetListItem>
 		)),
@@ -116,10 +141,12 @@ const TargetComponent = (props) => {
 			isLoginTypeOperator,
 			isLoginTypeAdmin,
 			getFilteredOptionsList,
+			onThresholdBlurHandler,
+			onThresholdFocusHandler,
 		],
 	);
 	return (
-		<div className="d-flex flex-column overflow-hidden flex-100 py-5">
+		<div className="d-flex flex-column overflow-hidden flex-100 pt-5 pb-4">
 			<TargetHeader
 				isLoginTypeAdmin={isLoginTypeAdmin}
 				isLoginTypeOperator={isLoginTypeOperator}
@@ -143,7 +170,9 @@ const TargetComponent = (props) => {
 							color="primary"
 							onClick={navigateToStageWizard}
 							className="mx-auto mb-3"
-							disabled={isTargetListUpdated === true || isViewStagesEnabled === false}
+							disabled={
+								isTargetListUpdated === true || isViewStagesEnabled === false
+							}
 						>
               View Stages
 						</Button>
@@ -162,12 +191,29 @@ const TargetComponent = (props) => {
 						color="primary"
 						onClick={onSaveClick}
 						className="mx-auto"
-						disabled={isTargetListUpdated === false || isNoTargetSelected}
+						disabled={
+							isTargetListUpdated === false ||
+							isNoTargetSelected === true ||
+							isThresholdInvalid === true
+						}
 					>
             Save
 					</Button>
 				</TargetActions>
 			</div>
+			{isThresholdInvalid && (
+				<div className="d-flex">
+					<div className="flex-70 px-5">
+						<Text
+							Tag="p"
+							size={14}
+							className="text-right text-danger px-5 mb-0"
+						>
+              Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
+						</Text>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

@@ -38,6 +38,10 @@ export const fetchExperimentTargetsFailed = errorResponse => ({
 	},
 });
 
+export const resetExperimentTargets = () => ({
+	type: listExperimentTargetActions.resetExperimentTargets,
+});
+
 export const updateExperimentTargetFilters = (index, key, value) => ({
 	type: listExperimentTargetActions.updateGraphFilters,
 	payload: {

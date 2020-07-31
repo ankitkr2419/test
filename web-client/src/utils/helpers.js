@@ -66,3 +66,20 @@ export const formatTime = createSelector(
 		return `${h}:${m}:${s}`;
 	},
 );
+
+//  To avoid parseFloat returning NaN return the value as it is or else return parsed output
+export const parseFloatWrapper = (value) => {
+	if (value === undefined || value === '' || value === null) {
+		return value;
+	}
+	return parseFloat(value);
+};
+
+// Get the time differnce in current and start time in minutes
+export const getTimeDiff = (startTime, currTime) => {
+	const hour_diff = currTime.getHours() - startTime.getHours();
+	const min_diff = currTime.getMinutes() - startTime.getMinutes();
+	const sec_diff = currTime.getSeconds() - startTime.getSeconds();
+	const time_diff = min_diff + hour_diff * 60 + sec_diff / 60;
+	return time_diff;
+};

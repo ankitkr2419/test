@@ -34,8 +34,8 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 				return
 			}
 
-			for i, w := range wells {
-				for _, t := range welltargets {
+			for _, t := range welltargets {
+				for i, w := range wells {
 					if w.Position == t.WellPosition {
 						wells[i].Targets = append(w.Targets, t)
 					}
@@ -116,7 +116,7 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 			}
 		}
 
-		createdTargets, err := deps.Store.UpsertWellTargets(req.Context(), targets, expID)
+		createdTargets, err := deps.Store.UpsertWellTargets(req.Context(), targets, expID, true)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error upsert wells")

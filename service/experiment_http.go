@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -145,6 +147,17 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		wells, err := deps.Store.ListWells(req.Context(), expID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching wells data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// validate of NC,PC or NTC set for wells
+
+		isValid, response := db.ValidateExperiment(wells)
+
 		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
@@ -174,7 +187,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID)
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -189,17 +202,49 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		setExperimentValues(config.ActiveWells("activeWells"), targetDetails, expID, plcStage)
+		var ICTargetID uuid.UUID
 
+		for _, t := range targetDetails {
+			if t.DyePosition == int32(config.GetICPosition()) {
+				ICTargetID = t.TargetID
+			}
+
+		}
+
+		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
+
+		WellTargets := initializeWellTargets()
+
+		// update well targets value in DB
+		_, err = deps.Store.UpsertWellTargets(context.Background(), WellTargets, experimentValues.experimentID, false)
+		if err != nil {
+			// send error
+			logger.WithField("err", err.Error()).Error("Error upsert wells")
+			return
+		}
 		//experimentRunning set true
 		experimentRunning = true
 
 		//invoke monitor
 		go monitorExperiment(deps)
 
+		if !isValid {
+			respBytes, err := json.Marshal(response)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error marshaling experiments data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write(respBytes)
+			return
+		}
+
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`{"msg":"experiment started"}`))
+		return
 	})
 }
 
@@ -220,7 +265,7 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID)
+		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)

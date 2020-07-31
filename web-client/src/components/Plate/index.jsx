@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { ExperimentGraphContainer } from 'containers/ExperimentGraphContainer';
 import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
 import SampleSideBarContainer from 'containers/SampleSideBarContainer';
+import { EXPERIMENT_STATUS } from 'appConstants';
 import Header from './Header';
 
 import GridWrapper from './Grid/GridWrapper';
@@ -11,7 +12,7 @@ import GridComponent from './Grid';
 import WellGridHeader from './Grid/WellGridHeader';
 
 import './Plate.scss';
-import { EXPERIMENT_STATUS } from 'appConstants';
+
 
 const Plate = (props) => {
 	const {
@@ -25,6 +26,7 @@ const Plate = (props) => {
 		toggleMultiSelectOption,
 		activeWells,
 		experimentTemplate,
+		resetSelectedWells,
 	} = props;
 
 	// getExperimentStatus will return us current experiment status
@@ -34,6 +36,9 @@ const Plate = (props) => {
 
 	// local state to maintain well data which is selected for updation
 	const [updateWell, setUpdateWell] = useState(null);
+
+	// local state to manage toggling of graphSidebar
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	/**
 	 *
@@ -66,12 +71,20 @@ const Plate = (props) => {
 		setUpdateWell(selectedWell.toJS());
 	};
 
+	// hleper function to open sidebar and show graph of selected well
+	const showGraphOfWell = (index) => {
+		// set selected well index
+		setSelectedWell(index, true);
+		setIsSidebarOpen(true);
+	};
+
 	return (
 		<div className="plate-content d-flex flex-column h-100 position-relative">
 			<Header
 				experimentTemplate={experimentTemplate}
 				isExperimentSucceeded={experimentStatus === EXPERIMENT_STATUS.success}
 				experimentDetails={experimentDetails}
+				experimentId={experimentId}
 			/>
 			<GridWrapper className="plate-body flex-100">
 				<WellGridHeader
@@ -84,6 +97,7 @@ const Plate = (props) => {
 					isGroupSelectionOn={isMultiSelectionOptionOn}
 					onWellClickHandler={onWellClickHandler}
 					onWellUpdateClickHandler={onWellUpdateClickHandler}
+					showGraphOfWell={showGraphOfWell}
 				/>
 			</GridWrapper>
 			<SampleSideBarContainer
@@ -92,7 +106,13 @@ const Plate = (props) => {
 				experimentTargetsList={experimentTargetsList}
 				updateWell={updateWell}
 			/>
-			<ExperimentGraphContainer experimentStatus={experimentStatus} />
+			<ExperimentGraphContainer
+				experimentStatus={experimentStatus}
+				isSidebarOpen={isSidebarOpen}
+				setIsSidebarOpen={setIsSidebarOpen}
+				resetSelectedWells={resetSelectedWells}
+				isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+			/>
 		</div>
 	);
 };

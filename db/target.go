@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	getTargetListQuery = `SELECT * FROM targets
-		ORDER BY name ASC`
+	getTargetListQuery = `SELECT targets.* FROM targets
+			ORDER BY name ASC`
 
 	insertTargetsQuery1 = `INSERT INTO targets(
 				name,

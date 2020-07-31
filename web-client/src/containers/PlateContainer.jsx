@@ -6,6 +6,7 @@ import {
 	setSelectedWell as setSelectedWellAction,
 	setMultiSelectedWell as setMultiSelectedWellAction,
 	toggleMultiSelectOption as toggleMultiSelectOptionAction,
+	resetSelectedWells as resetSelectedWellAction,
 	fetchWells,
 } from 'action-creators/wellActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
@@ -30,6 +31,15 @@ const PlateContainer = () => {
 	// activeWells means the well which are allowed to configure
 	const activeWells = useSelector(getActiveLoadedWells);
 
+	// set isPlateRoute true on mount and false on unmount
+	useEffect(() => {
+		// isPlateRoute use in appHeader to manage visibility of header buttons
+		dispatch(setIsPlateRoute(true));
+		return () => {
+			dispatch(setIsPlateRoute(false));
+		};
+	}, [dispatch]);
+
 	useEffect(() => {
 		if (experimentId !== null) {
 			// fetching configured wells data
@@ -47,6 +57,10 @@ const PlateContainer = () => {
 		dispatch(setSelectedWellAction(index, isWellSelected));
 	};
 
+	const resetSelectedWells = () => {
+		dispatch(resetSelectedWellAction());
+	};
+
 	const setMultiSelectedWell = (index, isWellSelected) => {
 		dispatch(setMultiSelectedWellAction(index, isWellSelected));
 	};
@@ -60,6 +74,7 @@ const PlateContainer = () => {
 		<Plate
 			wells={wellListReducer.get('defaultList')}
 			setSelectedWell={setSelectedWell}
+			resetSelectedWells={resetSelectedWells}
 			experimentTargetsList={experimentTargetsList}
 			positions={positions}
 			experimentId={experimentId}

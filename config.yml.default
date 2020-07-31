@@ -18,6 +18,8 @@ dyes:
     position: 5
     targets: ["TB"]
 
+ic_position: 6         # IC: internal Control Position
+
 activeWells: [7,1,5,32,51,87]
 
 redlowerlimit: 5
