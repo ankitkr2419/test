@@ -102,7 +102,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 func sendGraph(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	graphResult, err := getGraph(deps, experimentValues.experimentID, experimentValues.activeWells, experimentValues.targets)
+	graphResult, err := getGraph(deps, experimentValues.experimentID, experimentValues.activeWells, experimentValues.targets, experimentValues.plcStage.CycleCount)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("error in fetching data")
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -201,7 +201,7 @@ func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn
 
 }
 
-func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails) (respBytes []byte, err error) {
+func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, t_cycles uint16) (respBytes []byte, err error) {
 
 	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
 	if err != nil {
@@ -209,8 +209,12 @@ func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets 
 		return
 	}
 
-	// analyseResult returns data required for ploting graph
-	Finalresult := analyseResult(DBResult, wells, targets)
+	Finalresult := make([]graph, 0)
+
+	if len(DBResult) > 0 {
+		// analyseResult returns data required for ploting graph
+		Finalresult = analyseResult(DBResult, wells, targets, t_cycles)
+	}
 
 	Result := resultGraph{
 		Type: "Graph",
