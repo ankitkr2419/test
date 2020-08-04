@@ -30,7 +30,7 @@ const (
 		name = $1,
 		description = $2,
 		updated_at = $3
-		where id = $4S AND publish = false`
+		where id = $4 AND publish = false`
 
 	deleteTemplateQuery = `DELETE FROM templates WHERE id = $1`
 
