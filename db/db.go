@@ -50,9 +50,12 @@ type Storer interface {
 	UpdateStopTimeExperiments(context.Context, time.Time, uuid.UUID, string) error
 	GetResult(context.Context, uuid.UUID) ([]Result, error)
 	UpdateColorWell(context.Context, string, uuid.UUID) error
+	PublishTemplate(context.Context, uuid.UUID) error
+	ListPublishedTemplates(context.Context) ([]Template, error)
 	ListExperimentTemperature(context.Context, uuid.UUID) ([]ExperimentTemperature, error)
 	InsertExperimentTemperature(context.Context, ExperimentTemperature) error
 	ListNotification(context.Context, uuid.UUID) ([]Notification, error)
 	InsertNotification(context.Context, Notification) error
 	MarkNotificationasRead(context.Context, uuid.UUID) error
+	CheckIfICTargetAdded(context.Context, uuid.UUID) (WarnResponse, error)
 }
