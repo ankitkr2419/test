@@ -128,6 +128,18 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
+	// add default User
+	u := db.User{
+		Username: "admin",
+		Password: service.MD5Hash("admin"),
+		Role:     "administrator",
+	}
+	db.AddDefaultUser(store, u)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		return
+	}
+
 	var addr = flag.String("addr", "localhost:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
 	router := service.InitRouter(deps)

@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"net/http"
@@ -86,4 +88,12 @@ func LogNotification(deps Dependencies, msg string) {
 		return
 	}
 	return
+}
+
+//MD5Hash return hashed string
+func MD5Hash(s string) string {
+	// hash string to [16]uint8
+	hash := md5.Sum([]byte(s))
+
+	return hex.EncodeToString(hash[:])
 }

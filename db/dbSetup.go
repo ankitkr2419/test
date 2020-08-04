@@ -75,3 +75,17 @@ func makeDyeList(configDyes Config) (Dyes []Dye) {
 	}
 	return
 }
+
+// AddDefaultUser to DB
+
+func AddDefaultUser(s Storer, u User) error {
+
+	err := s.InsertUser(context.Background(), u)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("Default user added")
+	return nil
+
+}
