@@ -233,9 +233,20 @@ func (m *DBMockStore) GetResult(ctx context.Context, id uuid.UUID) (result []Res
 	args := m.Called(ctx, id)
 	return args.Get(0).([]Result), args.Error(1)
 }
+
 func (m *DBMockStore) UpdateColorWell(ctx context.Context, s string, id uuid.UUID) (err error) {
 	args := m.Called(ctx, s, id)
 	return args.Error(1)
+}
+
+func (m *DBMockStore) PublishTemplate(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ListPublishedTemplates(ctx context.Context) (t []Template, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Template), args.Error(1)
 }
 
 func (m *DBMockStore) ListExperimentTemperature(ctx context.Context, id uuid.UUID) (result []ExperimentTemperature, err error) {
@@ -261,4 +272,9 @@ func (m *DBMockStore) InsertNotification(ctx context.Context, r Notification) (e
 func (m *DBMockStore) MarkNotificationasRead(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
 	return args.Error(1)
+}
+
+func (m *DBMockStore) CheckIfICTargetAdded(ctx context.Context, id uuid.UUID) (WarnResponse, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(WarnResponse), args.Error(1)
 }

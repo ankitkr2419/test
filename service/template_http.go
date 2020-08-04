@@ -195,3 +195,99 @@ func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write([]byte(`{"msg":"template deleted successfully"}`))
 	})
 }
+
+func publishTemplateHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		id, err := parseUUID(vars["id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		t, err := deps.Store.ListTemplateTargets(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		ss, err := deps.Store.ListStageSteps(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// validate template
+		errorResp, valid := db.ValidateTemplate(t, ss)
+
+		if !valid {
+			respBytes, err := json.Marshal(errorResp)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error marshaling template data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write(respBytes)
+			rw.Header().Add("Content-Type", "application/json")
+			return
+		}
+
+		err = deps.Store.PublishTemplate(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		resp, err := deps.Store.CheckIfICTargetAdded(req.Context(), id)
+		if err != nil {
+			if err.Error() == "Record Not Found" {
+				// no Internal control added
+				respBytes, err := json.Marshal(resp)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error marshaling template data")
+					rw.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				rw.Header().Add("Content-Type", "application/json")
+				rw.WriteHeader(http.StatusAccepted)
+				rw.Write(respBytes)
+				return
+			}
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"msg":"template published successfully"}`))
+
+		rw.Header().Add("Content-Type", "application/json")
+		return
+	})
+}
+
+func listPublishedTemplateHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		t, err := deps.Store.ListPublishedTemplates(req.Context())
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		respBytes, err := json.Marshal(t)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling templates data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(respBytes)
+	})
+}
