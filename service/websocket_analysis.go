@@ -166,7 +166,7 @@ func wellColorAnalysis(Result []db.Result, DBWellTargets []db.WellTarget, DBWell
 	}
 }
 
-func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails) (finalResult []graph) {
+func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16) (finalResult []graph) {
 
 	// ex: for 8 active wells * 6 targets * no of cycle
 	for _, aw := range wells {
@@ -180,7 +180,7 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 					wellResult.ExperimentID = r.ExperimentID
 					wellResult.TargetID = r.TargetID
 					wellResult.Threshold = r.Threshold
-					wellResult.TotalCycles = experimentValues.plcStage.CycleCount
+					wellResult.TotalCycles = cycles
 
 					// if cycle found do not add again!
 					if !found(r.Cycle, wellResult.Cycle) {
