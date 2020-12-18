@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS labwares;
+
+DROP TYPE IF EXISTS labware_type;

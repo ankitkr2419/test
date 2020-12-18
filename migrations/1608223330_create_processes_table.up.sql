@@ -1,0 +1,15 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+CREATE TYPE process_type AS 
+ENUM('piercing','tip_pickup_discard','aspire_dispense','heating', 'shaking', 'magnet', 'delay');
+
+CREATE TABLE IF NOT EXISTS processes(
+ id uuid primary key default uuid_generate_v4(),
+ type process_type,
+ recipe_id uuid ,
+sequence_num int,
+name varchar(50) NOT NULL,
+ created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CONSTRAINT unqsequence UNIQUE(recipe_id, sequence_num),
+FOREIGN KEY (recipe_id) REFERENCES recipes(id));
