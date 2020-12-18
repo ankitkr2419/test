@@ -1,8 +1,8 @@
-CREATE TYPE labware_type AS ENUM('extraction', 'pcr');
+CREATE TYPE cartridge_type AS ENUM('extraction', 'pcr');
 
-CREATE TABLE IF NOT EXISTS labwares(
+CREATE TABLE IF NOT EXISTS cartridges(
  number serial primary key,
- type labware_type DEFAULT 'extraction',
+ type cartridge_type DEFAULT 'extraction',
  wells int DEFAULT 8 NOT NULL,
  distances decimal[] NOT NULL,
  heights decimal[] NOT NULL,
