@@ -5,5 +5,4 @@ CREATE TABLE IF NOT EXISTS users(
     password varchar(50) NOT NULL,
     role role_type,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-);
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP);

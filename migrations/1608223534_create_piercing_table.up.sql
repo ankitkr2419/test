@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS piercing(
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY (id) REFERENCES processes(id),
- FOREIGN KEY (cartridge_id, type) REFERENCES cartridges(id, type));
+ FOREIGN KEY (cartridge_id, type) REFERENCES cartridges(labware_id, type));
