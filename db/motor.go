@@ -18,8 +18,6 @@ const (
 							fast)
 							VALUES %s `
 	insertMotorQuery2 = `ON CONFLICT DO NOTHING;`
-
-	// getMotors = `SELECT * FROM motors`
 )
 
 type Motor struct {
@@ -41,12 +39,6 @@ func (s *pgStore) InsertMotor(ctx context.Context, motors []Motor) (err error) {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
 	}
-
-	// err = s.db.Select(&DBmotors, getMotors)
-	// if err != nil {
-	// 	logger.WithField("err", err.Error()).Error("Error listing motor")
-	// 	return
-	// }
 	return
 }
 
