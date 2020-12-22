@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS piercing(
  discard discard_type DEFAULT 'at_pickup_passing',
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- FOREIGN KEY (id) REFERENCES processes(id),
- FOREIGN KEY (cartridge_id, type) REFERENCES cartridges(labware_id, type));
+ FOREIGN KEY (id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE,
+ FOREIGN KEY (cartridge_id, type) REFERENCES cartridges(labware_id, type) ON UPDATE CASCADE ON DELETE CASCADE);

@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS recipes(
  labware_id int NOT NULL,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- FOREIGN KEY (labware_id) references labwares(id));
+ FOREIGN KEY (labware_id) references labwares(id) ON UPDATE CASCADE ON DELETE CASCADE);
