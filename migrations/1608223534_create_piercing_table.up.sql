@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS piercing(
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  PRIMARY KEY (id, well_num),
  FOREIGN KEY (id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE,
- FOREIGN KEY (cartridge_id, type) REFERENCES cartridges(labware_id, type) ON UPDATE CASCADE ON DELETE CASCADE);
+ FOREIGN KEY (cartridge_id, type, well_num) REFERENCES cartridges(labware_id, type, well_num) ON UPDATE CASCADE ON DELETE CASCADE);
