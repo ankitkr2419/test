@@ -1,0 +1,61 @@
+motor:
+  - number: 1
+    name: "K1_Syringe_Module_LH"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 2
+    name: "K2_Syringe_Module_RH"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 3
+    name: "K3_Syringe_LH"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 4
+    name: "K4_Syringe_RH"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 5
+    name: "K5_Deck"
+    ramp: 100
+    steps: 160
+    slow: 500
+    fast: 2000
+  - number: 6
+    name: "K6_Magnet_UpDown"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 7
+    name: "K7_Magnet_Rev_Fwd"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 8
+    name: "K8_Shaker"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 9
+    name: "K9_Syringe_Module_LHRH"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000
+  - number: 10
+    name: "K10_Syringe_LHRH"
+    ramp: 100
+    steps: 200
+    slow: 500
+    fast: 2000

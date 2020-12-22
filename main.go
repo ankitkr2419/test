@@ -34,6 +34,12 @@ func main() {
 	// simulator config file to configure controls & wells in simulator
 	config.Load("simulator")
 
+	// config file to configure motors
+	config.Load("motor_config")
+
+	// config file to configure consumable distance
+	config.Load("consumable_config")
+
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
 	cliApp.Version = "1.0.0"
@@ -125,6 +131,20 @@ func startApp(plcName string, test bool) (err error) {
 	err = db.Setup(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Dyes & Targets failed")
+		return
+	}
+
+	// setup Db with motors
+	err = db.SetupMotor(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Motors failed")
+		return
+	}
+
+	// setup Db with consumable distance
+	err = db.SetupConsumable(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Cosumable Distance failed")
 		return
 	}
 

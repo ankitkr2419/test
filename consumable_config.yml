@@ -1,0 +1,91 @@
+ConsumableDistance:
+  - name: "deck_zero"
+    distance: 0.00
+    description: "callibration variable for the deck"
+  - name: "deck_start"
+    distance: 0.00
+    description: "desk start point"
+  - name: "deck_end"
+    distance: 370.00
+    description: "desk end point"
+  - name: "shaker_start"
+    distance: 63.90
+    description: "shaker start point"
+  - name: "shaker_end"
+    distance: 113.90
+    description: "shaker end point"
+  - name: "extraction_cartridge_start"
+    distance: 127.66
+    description: "extraction cartridge start point"
+  - name: "extraction_cartridge_end"
+    distance: 211.97
+    description: "extraction cartridge end point"
+  - name: "PCR_cartridge_start"
+    distance: 255.19
+    description: "PCR cartridge start point"
+  - name: "PCR_cartridge_end"
+    distance: 295.66
+    description: "PCR cartridge end point"
+  - name: "PCR_collection_start"
+    distance: 297.60
+    description: "PCR collection start point"
+  - name: "PCR_collection_end"
+    distance: 329.60
+    description: "PCR collection end point"
+  - name: "discard_small_hole"
+    distance: 344.60
+    description: "discard small hole point"
+  - name: "discard_big_hole"
+    distance: 354.60
+    description: "discard big hole point"
+  - name: "syring_zero"
+    distance: 0.00
+    description: "syring zero point"
+  - name: "syring_start"
+    distance: 0.00
+    description: "syring start point"
+  - name: "syring_end_max"
+    distance: 133.00
+    description: "syring end max point"
+  - name: "pickup_piercing_tip_fast"
+    distance: 103.00
+    description: "pickup piercing tip fast point"
+  - name: "pickup_piercing_tip_slow"
+    distance: 5.00
+    description: "pickup piercing tip slow point"
+  - name: "up_with_piercing_tip"
+    distance: 59.00
+    description: "up with piercing point"
+  - name: "piercing_height"
+    distance: 31.00
+    description: "piercing height point"
+  - name: "piercing_tip_discard_height"
+    distance: 83.9
+    description: "piercing tip discard height point"
+  - name: "discard_tip_slow_up"
+    distance: 7.5
+    description: "discard tip slow up"
+  - name: "discard_tip_fast_up"
+    distance: 137.5
+    description: "discard tip fast up point"
+  - name: "pcr_tip"
+    distance: 13.52
+    description: "pcr tip point"
+  - name: "extraction_tip"
+    distance: 26.27
+    description: "extraction tip point"
+  - name: "piercing_tip"
+    distance: 39.02
+    description: "piercing tip point"
+  - name: "sample_tube"
+    distance: 54.65
+    description: "sample tube point"
+  - name: "shaker_tube"
+    distance: 97.76
+    description: "shaker tube point"
+  - name: "extraction_collection_tube"
+    distance: 233.50
+    description: "extraction collection tube point"
+  - name: "pcr_collection_tube"
+    distance: 316.75
+    description: "pcr collection tube point"
