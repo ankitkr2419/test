@@ -40,6 +40,15 @@ func main() {
 	// config file to configure consumable distance
 	config.Load("consumable_config")
 
+	// config file to configure labware
+	config.Load("labware_config")
+
+	// config file to configure labware
+	config.Load("tips_tubes_config")
+
+	// config file to configure cartraidge
+	config.Load("cartraidge_config")
+
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
 	cliApp.Version = "1.0.0"
@@ -145,6 +154,27 @@ func startApp(plcName string, test bool) (err error) {
 	err = db.SetupConsumable(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Cosumable Distance failed")
+		return
+	}
+
+	// setup Db with labware
+	err = db.SetupLabware(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Labware failed")
+		return
+	}
+
+	// setup Db with tipstube
+	err = db.SetupTipsTubes(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup TipsTubes failed")
+		return
+	}
+
+	// setup Db with cartraidge
+	err = db.SetupCartraidge(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Cartraidge failed")
 		return
 	}
 

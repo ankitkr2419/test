@@ -1,0 +1,15 @@
+Cartraidge:
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wells: 8
+    distances:  [17.5, 7.9, 7.9, 7.9, 9.9, 11.9, 11.9, 9.4]
+    heights: [2, 2, 2, 2, 2, 2, 2, 2] 
+    volumes:  [10, 10, 10, 10, 10, 10, 10, 10]
+  - labwareID: 1
+    type: "pcr"
+    description: "PCR Cartraidge"
+    wells: 4
+    distances:  [5, 6.9, 6.9, 6.9]
+    heights: [2, 2, 2, 2] 
+    volumes:  [10, 10, 10, 10]

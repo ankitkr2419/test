@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -32,6 +33,35 @@ type ConsumableConfig struct {
 		Name        string
 		Distance    float64
 		Description string
+	}
+}
+
+type LabwareConfig struct {
+	Labware []struct {
+		ID          int
+		Name        string
+		Description string
+	}
+}
+
+type TipsTubesConfig struct {
+	TipsTubes []struct {
+		LabwareID int
+		Name      string
+		Volume    float64
+		Height    float64
+	}
+}
+
+type CartraidgeConfig struct {
+	Cartraidge []struct {
+		LabwareID   int
+		Type        string
+		Description string
+		Wells       int
+		Distances   []float64
+		Heights     []float64
+		Volumes     []float64
 	}
 }
 
@@ -131,7 +161,7 @@ func SetupMotor(s Storer) (err error) {
 	return
 }
 
-// DBSetuo initializes consumable distance in DB
+// DBSetup initializes consumable distance in DB
 func SetupConsumable(s Storer) (err error) {
 	var config ConsumableConfig
 	err = viper.Unmarshal(&config)
@@ -152,6 +182,72 @@ func SetupConsumable(s Storer) (err error) {
 	logger.Info("Consumable_Distance Added in Database")
 	return
 
+}
+
+// DBSetup initializes labware in DB
+func SetupLabware(s Storer) (err error) {
+	var config LabwareConfig
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+
+	// create labware list
+	LabwareList := makeLabwareList(config)
+
+	// add distances to DB
+	err = s.InsertLabware(context.Background(), LabwareList)
+	if err != nil {
+		return
+	}
+
+	logger.Info("Labware Added in Database")
+	return
+}
+
+// DBSetup initializes tips and tubes in DB
+func SetupTipsTubes(s Storer) (err error) {
+	var config TipsTubesConfig
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+	fmt.Println(config)
+	// create tipstubes list
+	TipesTubesList := makeTipesTubesList(config)
+
+	// add distances to DB
+	err = s.InsertTipsTubes(context.Background(), TipesTubesList)
+	if err != nil {
+		return
+	}
+
+	logger.Info("Tips and Tubes Added in Database")
+	return
+}
+
+// DBSetup initializes cartraidge in DB
+func SetupCartraidge(s Storer) (err error) {
+	var config CartraidgeConfig
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+	fmt.Println(config)
+	// create cartraidge list
+	CartraidgeList := makeCartraidgeList(config)
+
+	// add distances to DB
+	err = s.InsertCartraidge(context.Background(), CartraidgeList)
+	if err != nil {
+		return
+	}
+
+	logger.Info("Cartraidge Added in Database")
+	return
 }
 
 func makeMotorList(configMotors MotorConfig) (Motors []Motor) {
@@ -176,6 +272,44 @@ func makeConsumableDistanceList(configConsumable ConsumableConfig) (ConsumableDi
 		consumableDistance.Description = c.Description
 
 		ConsumableDistances = append(ConsumableDistances, consumableDistance)
+	}
+	return
+}
+
+func makeLabwareList(configLabware LabwareConfig) (Labwares []Labware) {
+	labware := Labware{}
+	for _, l := range configLabware.Labware {
+		labware.ID = l.ID
+		labware.Name = l.Name
+		labware.Description = l.Description
+		Labwares = append(Labwares, labware)
+	}
+	return
+}
+
+func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) {
+	tipstubes := TipsTubes{}
+	for _, t := range configTipsTubes.TipsTubes {
+		tipstubes.LabwareID = t.LabwareID
+		tipstubes.Name = t.Name
+		tipstubes.Volume = t.Volume
+		tipstubes.Height = t.Height
+		TipsTube = append(TipsTube, tipstubes)
+	}
+	return
+}
+
+func makeCartraidgeList(configCartraidge CartraidgeConfig) (Cartraidges []Cartraidge) {
+	cartraidge := Cartraidge{}
+	for _, c := range configCartraidge.Cartraidge {
+		cartraidge.LabwareID = c.LabwareID
+		cartraidge.Type = c.Type
+		cartraidge.Description = c.Description
+		cartraidge.Wells = c.Wells
+		cartraidge.Distances = c.Distances
+		cartraidge.Heights = c.Heights
+		cartraidge.Volumes = c.Volumes
+		Cartraidges = append(Cartraidges, cartraidge)
 	}
 	return
 }

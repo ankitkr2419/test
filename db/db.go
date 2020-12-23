@@ -62,4 +62,7 @@ type Storer interface {
 	CheckIfICTargetAdded(context.Context, uuid.UUID) (WarnResponse, error)
 	InsertMotor(context.Context, []Motor) error
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
+	InsertLabware(context.Context, []Labware) error
+	InsertTipsTubes(context.Context, []TipsTubes) error
+	InsertCartraidge(context.Context, []Cartraidge) error
 }
