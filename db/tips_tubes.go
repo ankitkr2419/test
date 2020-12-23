@@ -11,6 +11,7 @@ import (
 const (
 	insertTipsTubesQuery1 = `INSERT INTO tips_and_tubes(
 							labware_id,
+							consumable_distance_id,
 							name,
 							volume,
 							height)
@@ -19,10 +20,11 @@ const (
 )
 
 type TipsTubes struct {
-	LabwareID int     `db:"labware_id"`
-	Name      string  `db:"name"`
-	Volume    float64 `db:"volume"`
-	Height    float64 `db:"height"`
+	LabwareID            int     `db:"labware_id"`
+	ConsumabledistanceID int     `db:"consumable_distance_id"`
+	Name                 string  `db:"name"`
+	Volume               float64 `db:"volume"`
+	Height               float64 `db:"height"`
 }
 
 func (s *pgStore) InsertTipsTubes(ctx context.Context, tipstubes []TipsTubes) (err error) {
@@ -42,7 +44,7 @@ func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 	values := make([]string, 0, len(tipstubes))
 
 	for _, t := range tipstubes {
-		values = append(values, fmt.Sprintf("(%v, '%v', %v, %v)", t.LabwareID, t.Name, t.Volume, t.Height))
+		values = append(values, fmt.Sprintf("(%v, %v, '%v', %v, %v)", t.LabwareID, t.ConsumabledistanceID, t.Name, t.Volume, t.Height))
 	}
 
 	stmt := fmt.Sprintf(insertTipsTubesQuery1,

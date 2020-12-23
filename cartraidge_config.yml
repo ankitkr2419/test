@@ -2,14 +2,84 @@ Cartraidge:
   - labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
-    wells: 8
-    distances:  [17.5, 7.9, 7.9, 7.9, 9.9, 11.9, 11.9, 9.4]
-    heights: [2, 2, 2, 2, 2, 2, 2, 2] 
-    volumes:  [10, 10, 10, 10, 10, 10, 10, 10]
+    wellNum: 1
+    distance: 17.5
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wellNum: 2
+    distance: 24.5
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wellNum: 3
+    distance: 33.3
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wellNum: 4
+    distance: 41.20
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wellNum: 5
+    distance: 51.10
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wellNum: 6
+    distance: 62.99
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wellNum: 7
+    distance: 74.90
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "extraction"
+    description: "Extraction Cartraidge"
+    wellNum: 8
+    distance: 84.3
+    height: 2
+    volume: 10
   - labwareID: 1
     type: "pcr"
     description: "PCR Cartraidge"
-    wells: 4
-    distances:  [5, 6.9, 6.9, 6.9]
-    heights: [2, 2, 2, 2] 
-    volumes:  [10, 10, 10, 10]
+    wellNum: 1
+    distance: 5
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "pcr"
+    description: "PCR Cartraidge"
+    wellNum: 2
+    distance: 11.9
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "pcr"
+    description: "PCR Cartraidge"
+    wellNum: 3
+    distance: 18.8
+    height: 2
+    volume: 10
+  - labwareID: 1
+    type: "pcr"
+    description: "PCR Cartraidge"
+    wellNum: 4
+    distance: 25.70
+    height: 2
+    volume: 10

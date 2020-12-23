@@ -13,22 +13,22 @@ const (
 							labware_id,
 							type,
 							description,
-							wells,
-							distances,
-							heights,
-							volumes)
+							well_num,
+							distance,
+							height,
+							volume)
 							VALUES %s `
 	insertCartraidgeQuery2 = `ON CONFLICT DO NOTHING;`
 )
 
 type Cartraidge struct {
-	LabwareID   int       `db:"labware_id"`
-	Type        string    `db:"type"`
-	Description string    `db:"description"`
-	Wells       int       `db:"wells"`
-	Distances   []float64 `db:"distances"`
-	Heights     []float64 `db:"heights"`
-	Volumes     []float64 `db:"volumes"`
+	LabwareID   int     `db:"labware_id"`
+	Type        string  `db:"type"`
+	Description string  `db:"description"`
+	WellNum     int     `db:"wells_num"`
+	Distance    float64 `db:"distance"`
+	Height      float64 `db:"height"`
+	Volume      float64 `db:"volume"`
 }
 
 func (s *pgStore) InsertCartraidge(ctx context.Context, cartraidges []Cartraidge) (err error) {
@@ -48,18 +48,7 @@ func makeCartraidgeQuery(cartraidge []Cartraidge) string {
 	values := make([]string, 0, len(cartraidge))
 
 	for _, c := range cartraidge {
-		distances, heights, volumes := []string{}, []string{}, []string{}
-		for i := 0; i < c.Wells; i++ {
-			distances = append(distances, fmt.Sprintf("%v", c.Distances[i]))
-			heights = append(heights, fmt.Sprintf("%v", c.Heights[i]))
-			volumes = append(volumes, fmt.Sprintf("%v", c.Volumes[i]))
-		}
-
-		d := "{" + strings.Join(distances, ",") + "}"
-		h := "{" + strings.Join(heights, ",") + "}"
-		v := "{" + strings.Join(volumes, ",") + "}"
-
-		values = append(values, fmt.Sprintf("(%v, '%v', '%v', %v, '%v', '%v', '%v')", c.LabwareID, c.Type, c.Description, c.Wells, d, h, v))
+		values = append(values, fmt.Sprintf("(%v, '%v', '%v', %v, %v,  %v, %v)", c.LabwareID, c.Type, c.Description, c.WellNum, c.Distance, c.Height, c.Volume))
 	}
 
 	stmt := fmt.Sprintf(insertCartraidgeQuery1,

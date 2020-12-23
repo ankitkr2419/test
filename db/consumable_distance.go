@@ -10,6 +10,7 @@ import (
 
 const (
 	insertConsDistaceQuery1 = `INSERT INTO consumable_distances(
+							id,
 							name,
 							distance,
 							description)
@@ -18,6 +19,7 @@ const (
 )
 
 type ConsumableDistance struct {
+	ID          int     `db:"id"`
 	Name        string  `db:"name"`
 	Distance    float64 `db:"distance"`
 	Description string  `db:"description"`
@@ -40,7 +42,7 @@ func makeConsumableQuery(consumabledistance []ConsumableDistance) string {
 	values := make([]string, 0, len(consumabledistance))
 
 	for _, c := range consumabledistance {
-		values = append(values, fmt.Sprintf("('%v', %v, '%v') ", c.Name, c.Distance, c.Description))
+		values = append(values, fmt.Sprintf("(%v, '%v', %v, '%v') ", c.ID, c.Name, c.Distance, c.Description))
 	}
 
 	stmt := fmt.Sprintf(insertConsDistaceQuery1,

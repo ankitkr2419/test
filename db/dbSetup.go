@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -30,6 +29,7 @@ type MotorConfig struct {
 
 type ConsumableConfig struct {
 	ConsumableDistance []struct {
+		ID          int
 		Name        string
 		Distance    float64
 		Description string
@@ -46,10 +46,11 @@ type LabwareConfig struct {
 
 type TipsTubesConfig struct {
 	TipsTubes []struct {
-		LabwareID int
-		Name      string
-		Volume    float64
-		Height    float64
+		LabwareID            int
+		ConsumabledistanceID int
+		Name                 string
+		Volume               float64
+		Height               float64
 	}
 }
 
@@ -58,10 +59,10 @@ type CartraidgeConfig struct {
 		LabwareID   int
 		Type        string
 		Description string
-		Wells       int
-		Distances   []float64
-		Heights     []float64
-		Volumes     []float64
+		WellNum     int
+		Distance    float64
+		Height      float64
+		Volume      float64
 	}
 }
 
@@ -214,7 +215,7 @@ func SetupTipsTubes(s Storer) (err error) {
 		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
 		return
 	}
-	fmt.Println(config)
+
 	// create tipstubes list
 	TipesTubesList := makeTipesTubesList(config)
 
@@ -236,7 +237,7 @@ func SetupCartraidge(s Storer) (err error) {
 		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
 		return
 	}
-	fmt.Println(config)
+
 	// create cartraidge list
 	CartraidgeList := makeCartraidgeList(config)
 
@@ -267,6 +268,7 @@ func makeMotorList(configMotors MotorConfig) (Motors []Motor) {
 func makeConsumableDistanceList(configConsumable ConsumableConfig) (ConsumableDistances []ConsumableDistance) {
 	consumableDistance := ConsumableDistance{}
 	for _, c := range configConsumable.ConsumableDistance {
+		consumableDistance.ID = c.ID
 		consumableDistance.Name = c.Name
 		consumableDistance.Distance = c.Distance
 		consumableDistance.Description = c.Description
@@ -291,6 +293,7 @@ func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) 
 	tipstubes := TipsTubes{}
 	for _, t := range configTipsTubes.TipsTubes {
 		tipstubes.LabwareID = t.LabwareID
+		tipstubes.ConsumabledistanceID = t.ConsumabledistanceID
 		tipstubes.Name = t.Name
 		tipstubes.Volume = t.Volume
 		tipstubes.Height = t.Height
@@ -305,10 +308,10 @@ func makeCartraidgeList(configCartraidge CartraidgeConfig) (Cartraidges []Cartra
 		cartraidge.LabwareID = c.LabwareID
 		cartraidge.Type = c.Type
 		cartraidge.Description = c.Description
-		cartraidge.Wells = c.Wells
-		cartraidge.Distances = c.Distances
-		cartraidge.Heights = c.Heights
-		cartraidge.Volumes = c.Volumes
+		cartraidge.WellNum = c.WellNum
+		cartraidge.Distance = c.Distance
+		cartraidge.Height = c.Height
+		cartraidge.Volume = c.Volume
 		Cartraidges = append(Cartraidges, cartraidge)
 	}
 	return
