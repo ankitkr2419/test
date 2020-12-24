@@ -56,6 +56,7 @@ type TipsTubesConfig struct {
 
 type CartraidgeConfig struct {
 	Cartraidge []struct {
+		ID          int
 		LabwareID   int
 		Type        string
 		Description string
@@ -305,6 +306,7 @@ func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) 
 func makeCartraidgeList(configCartraidge CartraidgeConfig) (Cartraidges []Cartraidge) {
 	cartraidge := Cartraidge{}
 	for _, c := range configCartraidge.Cartraidge {
+		cartraidge.ID = c.ID
 		cartraidge.LabwareID = c.LabwareID
 		cartraidge.Type = c.Type
 		cartraidge.Description = c.Description

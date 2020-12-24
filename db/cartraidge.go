@@ -10,6 +10,7 @@ import (
 
 const (
 	insertCartraidgeQuery1 = `INSERT INTO cartridges(
+							id,
 							labware_id,
 							type,
 							description,
@@ -22,6 +23,7 @@ const (
 )
 
 type Cartraidge struct {
+	ID          int     `db:"id"`
 	LabwareID   int     `db:"labware_id"`
 	Type        string  `db:"type"`
 	Description string  `db:"description"`
@@ -48,7 +50,7 @@ func makeCartraidgeQuery(cartraidge []Cartraidge) string {
 	values := make([]string, 0, len(cartraidge))
 
 	for _, c := range cartraidge {
-		values = append(values, fmt.Sprintf("(%v, '%v', '%v', %v, %v,  %v, %v)", c.LabwareID, c.Type, c.Description, c.WellNum, c.Distance, c.Height, c.Volume))
+		values = append(values, fmt.Sprintf("(%v, %v, '%v', '%v', %v, %v,  %v, %v)", c.ID, c.LabwareID, c.Type, c.Description, c.WellNum, c.Distance, c.Height, c.Volume))
 	}
 
 	stmt := fmt.Sprintf(insertCartraidgeQuery1,

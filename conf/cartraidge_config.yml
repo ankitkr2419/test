@@ -1,82 +1,94 @@
 Cartraidge:
-  - labwareID: 1
+  - id: 1
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 1
     distance: 17.5
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 2
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 2
     distance: 24.5
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 3
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 3
     distance: 33.3
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 4
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 4
     distance: 41.20
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 5
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 5
     distance: 51.10
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 6
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 6
     distance: 62.99
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 7
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 7
     distance: 74.90
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 8
+    labwareID: 1
     type: "extraction"
     description: "Extraction Cartraidge"
     wellNum: 8
     distance: 84.3
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 9
+    labwareID: 1
     type: "pcr"
     description: "PCR Cartraidge"
     wellNum: 1
     distance: 5
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 10
+    labwareID: 1
     type: "pcr"
     description: "PCR Cartraidge"
     wellNum: 2
     distance: 11.9
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 11
+    labwareID: 1
     type: "pcr"
     description: "PCR Cartraidge"
     wellNum: 3
     distance: 18.8
     height: 2
     volume: 10
-  - labwareID: 1
+  - id: 12
+    labwareID: 1
     type: "pcr"
     description: "PCR Cartraidge"
     wellNum: 4
