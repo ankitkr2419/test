@@ -46,8 +46,8 @@ func main() {
 	// config file to configure labware
 	config.Load("tips_tubes_config")
 
-	// config file to configure cartraidge
-	config.Load("cartraidge_config")
+	// config file to configure cartridge
+	config.Load("cartridge_config")
 
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
@@ -171,10 +171,10 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	// setup Db with cartraidge
-	err = db.SetupCartraidge(store)
+	// setup Db with cartridge
+	err = db.SetupCartridge(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Cartraidge failed")
+		logger.WithField("err", err.Error()).Error("Setup Cartridge failed")
 		return
 	}
 

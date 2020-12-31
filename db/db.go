@@ -64,5 +64,5 @@ type Storer interface {
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
 	InsertLabware(context.Context, []Labware) error
 	InsertTipsTubes(context.Context, []TipsTubes) error
-	InsertCartraidge(context.Context, []Cartraidge) error
+	InsertCartridge(context.Context, []Cartridge) error
 }

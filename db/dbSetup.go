@@ -54,8 +54,8 @@ type TipsTubesConfig struct {
 	}
 }
 
-type CartraidgeConfig struct {
-	Cartraidge []struct {
+type CartridgeConfig struct {
+	Cartridge []struct {
 		ID          int
 		LabwareID   int
 		Type        string
@@ -230,25 +230,25 @@ func SetupTipsTubes(s Storer) (err error) {
 	return
 }
 
-// DBSetup initializes cartraidge in DB
-func SetupCartraidge(s Storer) (err error) {
-	var config CartraidgeConfig
+// DBSetup initializes cartridge in DB
+func SetupCartridge(s Storer) (err error) {
+	var config CartridgeConfig
 	err = viper.Unmarshal(&config)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
 		return
 	}
 
-	// create cartraidge list
-	CartraidgeList := makeCartraidgeList(config)
+	// create cartridge list
+	CartridgeList := makeCartridgeList(config)
 
 	// add distances to DB
-	err = s.InsertCartraidge(context.Background(), CartraidgeList)
+	err = s.InsertCartridge(context.Background(), CartridgeList)
 	if err != nil {
 		return
 	}
 
-	logger.Info("Cartraidge Added in Database")
+	logger.Info("Cartridge Added in Database")
 	return
 }
 
@@ -303,18 +303,18 @@ func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) 
 	return
 }
 
-func makeCartraidgeList(configCartraidge CartraidgeConfig) (Cartraidges []Cartraidge) {
-	cartraidge := Cartraidge{}
-	for _, c := range configCartraidge.Cartraidge {
-		cartraidge.ID = c.ID
-		cartraidge.LabwareID = c.LabwareID
-		cartraidge.Type = c.Type
-		cartraidge.Description = c.Description
-		cartraidge.WellNum = c.WellNum
-		cartraidge.Distance = c.Distance
-		cartraidge.Height = c.Height
-		cartraidge.Volume = c.Volume
-		Cartraidges = append(Cartraidges, cartraidge)
+func makeCartridgeList(configCartridge CartridgeConfig) (Cartridges []Cartridge) {
+	cartridge := Cartridge{}
+	for _, c := range configCartridge.Cartridge {
+		cartridge.ID = c.ID
+		cartridge.LabwareID = c.LabwareID
+		cartridge.Type = c.Type
+		cartridge.Description = c.Description
+		cartridge.WellNum = c.WellNum
+		cartridge.Distance = c.Distance
+		cartridge.Height = c.Height
+		cartridge.Volume = c.Volume
+		Cartridges = append(Cartridges, cartridge)
 	}
 	return
 }

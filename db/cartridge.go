@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	insertCartraidgeQuery1 = `INSERT INTO cartridges(
+	insertCartridgeQuery1 = `INSERT INTO cartridges(
 							id,
 							labware_id,
 							type,
@@ -19,10 +19,10 @@ const (
 							height,
 							volume)
 							VALUES %s `
-	insertCartraidgeQuery2 = `ON CONFLICT DO NOTHING;`
+	insertCartridgeQuery2 = `ON CONFLICT DO NOTHING;`
 )
 
-type Cartraidge struct {
+type Cartridge struct {
 	ID          int     `db:"id"`
 	LabwareID   int     `db:"labware_id"`
 	Type        string  `db:"type"`
@@ -33,8 +33,8 @@ type Cartraidge struct {
 	Volume      float64 `db:"volume"`
 }
 
-func (s *pgStore) InsertCartraidge(ctx context.Context, cartraidges []Cartraidge) (err error) {
-	stmt := makeCartraidgeQuery(cartraidges)
+func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge) (err error) {
+	stmt := makeCartridgeQuery(cartridges)
 
 	_, err = s.db.Exec(
 		stmt,
@@ -46,17 +46,17 @@ func (s *pgStore) InsertCartraidge(ctx context.Context, cartraidges []Cartraidge
 	return
 }
 
-func makeCartraidgeQuery(cartraidge []Cartraidge) string {
-	values := make([]string, 0, len(cartraidge))
+func makeCartridgeQuery(cartridge []Cartridge) string {
+	values := make([]string, 0, len(cartridge))
 
-	for _, c := range cartraidge {
+	for _, c := range cartridge {
 		values = append(values, fmt.Sprintf("(%v, %v, '%v', '%v', %v, %v,  %v, %v)", c.ID, c.LabwareID, c.Type, c.Description, c.WellNum, c.Distance, c.Height, c.Volume))
 	}
 
-	stmt := fmt.Sprintf(insertCartraidgeQuery1,
+	stmt := fmt.Sprintf(insertCartridgeQuery1,
 		strings.Join(values, ","))
 
-	stmt += insertCartraidgeQuery2
+	stmt += insertCartridgeQuery2
 
 	return stmt
 }
