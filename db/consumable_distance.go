@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -19,10 +20,12 @@ const (
 )
 
 type ConsumableDistance struct {
-	ID          int     `db:"id"`
-	Name        string  `db:"name"`
-	Distance    float64 `db:"distance"`
-	Description string  `db:"description"`
+	ID          int       `db:"id" json:"id"`
+	Name        string    `db:"name" json:"name"`
+	Distance    float64   `db:"distance" json:"distance"`
+	Description string    `db:"description" json:"description"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) InsertConsumableDistance(ctx context.Context, consumabledistances []ConsumableDistance) (err error) {

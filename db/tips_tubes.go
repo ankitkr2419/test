@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -20,11 +21,13 @@ const (
 )
 
 type TipsTubes struct {
-	LabwareID            int     `db:"labware_id"`
-	ConsumabledistanceID int     `db:"consumable_distance_id"`
-	Name                 string  `db:"name"`
-	Volume               float64 `db:"volume"`
-	Height               float64 `db:"height"`
+	LabwareID            int       `db:"labware_id" json:"labware_id"`
+	ConsumabledistanceID int       `db:"consumable_distance_id" json:"consumable_distance_id"`
+	Name                 string    `db:"name" json:"name"`
+	Volume               float64   `db:"volume" json:"volume"`
+	Height               float64   `db:"height" json:"height"`
+	CreatedAt            time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt            time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) InsertTipsTubes(ctx context.Context, tipstubes []TipsTubes) (err error) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -21,12 +22,14 @@ const (
 )
 
 type Motor struct {
-	Number int    `db:"number"`
-	Name   string `db:"name"`
-	Ramp   int    `db:"ramp"`
-	Steps  int    `db:"steps"`
-	Slow   int    `db:"slow"`
-	Fast   int    `db:"fast"`
+	Number    int       `db:"number" json:"number"`
+	Name      string    `db:"name" json:"name"`
+	Ramp      int       `db:"ramp" json:"ramp"`
+	Steps     int       `db:"steps" json:"steps"`
+	Slow      int       `db:"slow" json:"slow"`
+	Fast      int       `db:"fast" json:"fast"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) InsertMotor(ctx context.Context, motors []Motor) (err error) {

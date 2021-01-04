@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -23,14 +24,16 @@ const (
 )
 
 type Cartridge struct {
-	ID          int     `db:"id"`
-	LabwareID   int     `db:"labware_id"`
-	Type        string  `db:"type"`
-	Description string  `db:"description"`
-	WellNum     int     `db:"wells_num"`
-	Distance    float64 `db:"distance"`
-	Height      float64 `db:"height"`
-	Volume      float64 `db:"volume"`
+	ID          int       `db:"id" json:"id"`
+	LabwareID   int       `db:"labware_id" json:"labware_id"`
+	Type        string    `db:"type" json:"type"`
+	Description string    `db:"description" json:"description"`
+	WellNum     int       `db:"wells_num" json:"wells_num"`
+	Distance    float64   `db:"distance" json:"distance"`
+	Height      float64   `db:"height" json:"height"`
+	Volume      float64   `db:"volume" json:"volume"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge) (err error) {

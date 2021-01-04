@@ -18,9 +18,9 @@ const (
 )
 
 type Labware struct {
-	ID          int    `db:"id"`
-	Name        string `db:"name"`
-	Description string `db:"description"`
+	ID          int    `db:"id" json:"id"`
+	Name        string `db:"name" json:"name"`
+	Description string `db:"description" json:"description"`
 }
 
 func (s *pgStore) InsertLabware(ctx context.Context, labwares []Labware) (err error) {
