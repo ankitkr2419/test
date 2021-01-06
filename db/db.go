@@ -60,4 +60,9 @@ type Storer interface {
 	InsertUser(context.Context, User) error
 	ValidateUser(context.Context, User) error
 	CheckIfICTargetAdded(context.Context, uuid.UUID) (WarnResponse, error)
+	InsertMotor(context.Context, []Motor) error
+	InsertConsumableDistance(context.Context, []ConsumableDistance) error
+	InsertLabware(context.Context, []Labware) error
+	InsertTipsTubes(context.Context, []TipsTubes) error
+	InsertCartridge(context.Context, []Cartridge) error
 }
