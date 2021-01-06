@@ -103,6 +103,8 @@ func main() {
 func startApp(plcName string, test bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
+	var driverDeckA plc.DeckDriver
+	var driverDeckB plc.DeckDriver
 
 	if plcName != "simulator" && plcName != "compact32" {
 		logger.Error("Unsupported PLC. Valid PLC: 'simulator' or 'compact32'")
@@ -118,6 +120,8 @@ func startApp(plcName string, test bool) (err error) {
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
 		driver = compact32.NewCompact32Driver(exit, test)
+		driverDeckA = compact32.NewCompact32DeckADriver(exit, test)
+		driverDeckB = compact32.NewCompact32DeckBDriver(exit, test)
 	} else {
 		driver = simulator.NewSimulator(exit)
 	}
@@ -129,11 +133,13 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	deps := service.Dependencies{
-		Store:   store,
-		Plc:     driver,
-		ExitCh:  exit,
-		WsErrCh: websocketErr,
-		WsMsgCh: websocketMsg,
+		Store:    store,
+		Plc:      driver,
+		PlcDeckA: driverDeckA,
+		PlcDeckB: driverDeckB,
+		ExitCh:   exit,
+		WsErrCh:  websocketErr,
+		WsMsgCh:  websocketMsg,
 	}
 
 	// setup Db with dyes & targets

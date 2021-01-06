@@ -41,3 +41,7 @@ type Driver interface {
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
 }
+
+type DeckDriver interface {
+	Check() bool
+}
