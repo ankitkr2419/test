@@ -46,7 +46,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 
 func (d *Compact32Deck) Resume() (response string, err error) {
 
-	//m.resumeMotorWithPulses(wrotePulses - completedPulses)
+	//m.ResumeMotorWithPulses(wrotePulses - completedPulses)
 
 	// if already on then throw error
 	if d.isMotorOff() == false {
@@ -68,7 +68,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		return "", err
 	}
 
-	response, err = d.resumeMotorWithPulses(wrotePulses - completedPulses)
+	response, err = d.ResumeMotorWithPulses(wrotePulses - completedPulses)
 	if err != nil {
 		fmt.Println(response, "resumeMotorWithPulse")
 		return
@@ -89,7 +89,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	// Write 0 Pulses
-	//response, err = m.resumeMotorWithPulses(uint16(1))
+	//response, err = m.ResumeMotorWithPulses(uint16(1))
 	aborted = true
 	completedPulses = 0
 	if err != nil {
@@ -103,7 +103,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	return "ABORT SUCCESS", nil
 }
 
-func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, err error) {
+func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
 
 	// Write Pulses
 	var pulseAddressBytes = []byte{0x10, 0xCA}
