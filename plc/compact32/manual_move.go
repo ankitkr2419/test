@@ -15,8 +15,8 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 }
 
 func (d *Compact32Deck) Pause() (response string, err error) {
-	var onOffAddressBytes = []byte{0x08, 0x00}
-	onOffAddressUint16 := binary.BigEndian.Uint16(onOffAddressBytes)
+	// var onOffAddressBytes = []byte{0x08, 0x00}
+	onOffAddressUint16 := MODBUS_EXTRACTION["A"]["M"][0] //binary.BigEndian.Uint16(onOffAddressBytes)
 
 	results, err := d.DeckDriver.ReadCoils(onOffAddressUint16, uint16(1))
 	if err != nil {
@@ -106,8 +106,8 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
 
 	// Write Pulses
-	var pulseAddressBytes = []byte{0x10, 0xCA}
-	pulseAddressUint16 := binary.BigEndian.Uint16(pulseAddressBytes)
+	//var pulseAddressBytes = []byte{0x10, 0xCA}
+	pulseAddressUint16 := MODBUS_EXTRACTION["A"]["M"][202] //binary.BigEndian.Uint16(pulseAddressBytes)
 
 	results, err := d.DeckDriver.WriteSingleRegister(pulseAddressUint16, pulses)
 	//results, err = m.Client.WriteSingleRegister(pulseAddressUint16, uint16(500))
@@ -126,8 +126,8 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 	}
 	fmt.Printf("read ReadHoldingRegisters_Pulse : %+v \n", binary.BigEndian.Uint16(results))
 
-	var onOffAddressBytes = []byte{0x08, 0x00}
-	onOffAddressUint16 := binary.BigEndian.Uint16(onOffAddressBytes)
+	// var onOffAddressBytes = []byte{0x08, 0x00}
+	onOffAddressUint16 := MODBUS_EXTRACTION["A"]["M"][0] //binary.BigEndian.Uint16(onOffAddressBytes)
 
 	//var completionAddressBytes = []byte{0x08, 0x01}
 	//completionAddressUint16 := binary.BigEndian.Uint16(completionAddressBytes)
@@ -140,7 +140,7 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 	//}
 	//fmt.Printf("Wrote Off Completion Forcefully. res : %+v \n", results)
 
-	err = d.DeckDriver.WriteSingleCoil(onOffAddressUint16, uint16(0xff00))
+	err = d.DeckDriver.WriteSingleCoil(onOffAddressUint16, ON)
 	//results, err = m.Client.WriteSingleCoil(onOffAddressUint16, uint16(0xff00))
 	if err != nil {
 		fmt.Println("err : ", err)
