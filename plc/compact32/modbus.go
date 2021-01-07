@@ -9,6 +9,19 @@ const (
 	OFF = uint16(0x0000)
 )
 
+const (
+	UP   = uint16(1)
+	DOWN = uint16(0)
+	FWD  = uint16(1)
+	REV  = uint16(0)
+)
+
+// *** NOTE ***
+// For Syringe UP means DOWN and DOWN means UP
+// This is because of hardware compatibility
+// 1 means towards sensor, 0 means against sensor
+// ************
+
 /* Modbus Mappings:
  *
  * "D" => {
