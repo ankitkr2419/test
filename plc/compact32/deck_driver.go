@@ -41,26 +41,26 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	//var wg sync.WaitGroup
 
-	var speedAddressBytes = []byte{0x10, 0xC8}
-	speedAddressUint16 := binary.BigEndian.Uint16(speedAddressBytes)
+	//var speedAddressBytes = []byte{0x10, 0xC8}
+	speedAddressUint16 := MODBUS_EXTRACTION["A"]["D"][200] //binary.BigEndian.Uint16(speedAddressBytes)
 
-	var pulseAddressBytes = []byte{0x10, 0xCA}
-	pulseAddressUint16 := binary.BigEndian.Uint16(pulseAddressBytes)
+	//var pulseAddressBytes = []byte{0x10, 0xCA}
+	pulseAddressUint16 := MODBUS_EXTRACTION["A"]["D"][202] // binary.BigEndian.Uint16(pulseAddressBytes)
 
-	var rampAddressBytes = []byte{0x10, 0xCC}
-	rampAddressUint16 := binary.BigEndian.Uint16(rampAddressBytes)
+	//var rampAddressBytes = []byte{0x10, 0xCC}
+	rampAddressUint16 := MODBUS_EXTRACTION["A"]["D"][204] //binary.BigEndian.Uint16(rampAddressBytes)
 
-	var directionAddressBytes = []byte{0x10, 0xCE}
-	directionAddressUint16 := binary.BigEndian.Uint16(directionAddressBytes)
+	//var directionAddressBytes = []byte{0x10, 0xCE}
+	directionAddressUint16 := MODBUS_EXTRACTION["A"]["D"][206] // binary.BigEndian.Uint16(directionAddressBytes)
 
-	var motorNumAddressBytes = []byte{0x10, 0xE2}
-	motorNumAddressUint16 := binary.BigEndian.Uint16(motorNumAddressBytes)
+	//var motorNumAddressBytes = []byte{0x10, 0xE2}
+	motorNumAddressUint16 := MODBUS_EXTRACTION["A"]["D"][226] //binary.BigEndian.Uint16(motorNumAddressBytes)
 
-	var onOffAddressBytes = []byte{0x08, 0x00}
-	onOffAddressUint16 := binary.BigEndian.Uint16(onOffAddressBytes)
+	//var onOffAddressBytes = []byte{0x08, 0x00}
+	onOffAddressUint16 := MODBUS_EXTRACTION["A"]["M"][0] //binary.BigEndian.Uint16(onOffAddressBytes)
 
-	var completionAddressBytes = []byte{0x08, 0x01}
-	completionAddressUint16 := binary.BigEndian.Uint16(completionAddressBytes)
+	//var completionAddressBytes = []byte{0x08, 0x01}
+	completionAddressUint16 := MODBUS_EXTRACTION["A"]["M"][1] //binary.BigEndian.Uint16(completionAddressBytes)
 
 	sensorAddressUint16 := MODBUS_EXTRACTION["A"]["M"][2]
 
@@ -78,7 +78,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	//}
 
 	// OFF The motor
-	err = d.DeckDriver.WriteSingleCoil(onOffAddressUint16, uint16(0x0000))
+	err = d.DeckDriver.WriteSingleCoil(onOffAddressUint16, OFF)
 
 	if err != nil {
 		fmt.Println("err : ", err)
@@ -87,7 +87,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Printf("Wrote Off motor. res : %+v \n", results)
 
 	// results, err = d.DeckDriver.WriteSingleCoil(completionAddressUint16, completion)
-	err = d.DeckDriver.WriteSingleCoil(completionAddressUint16, uint16(0x0000))
+	err = d.DeckDriver.WriteSingleCoil(completionAddressUint16, OFF)
 	if err != nil {
 		fmt.Println("err : ", err)
 		return
@@ -184,7 +184,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				}
 			}
 
-			if direction == uint16(0) {
+			if direction == uint16(0) && pulse != uint16(19999) {
 				goto skipSensor
 			}
 			results, err = d.DeckDriver.ReadCoils(sensorAddressUint16, uint16(1))
@@ -205,7 +205,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 					d.SwitchOffMotor()
 					sensorHasCut = false
 					time.Sleep(100 * time.Millisecond)
-					response, err = d.SetupMotor(uint16(2000), uint16(2000), uint16(100), uint16(0), uint16(motorNum))
+					response, err = d.SetupMotor(uint16(2000), uint16(2000), uint16(100), REV, motorNum)
 					if err != nil {
 						return
 					}
@@ -244,7 +244,7 @@ forLoop1:
 	fmt.Println("After Blocking")
 
 	// OFF The motor
-	err = d.DeckDriver.WriteSingleCoil(onOffAddressUint16, uint16(0x0000))
+	err = d.DeckDriver.WriteSingleCoil(onOffAddressUint16, OFF)
 
 	if err != nil {
 		fmt.Println("err : ", err)
