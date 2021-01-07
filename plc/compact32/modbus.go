@@ -58,110 +58,90 @@ var LOOKUP map[string]string = map[string]string{
 	"heartbeat": "D101",
 }
 
-var MODBUS_DECK_A map[string]map[int]uint16 = map[string]map[int]uint16{
-	// Data Registers
-	"D": map[int]uint16{
-		200: uint16(0x10C8), // Motor Speed (W)
-		202: uint16(0x10CA), // Motor Pulses (W)
-		204: uint16(0x10CC), // Motor Ramp Rate (W)
-		206: uint16(0x10CE), // Motor Direction. 1=Towards Sensor, 0=Against Sensor (W)
-		208: uint16(0x10D0), // Shaker Temperature Set Value (W)
-		210: uint16(0x10D2), // Shaker Temperature present value LH (R)
-		212: uint16(0x10D4), // Pulses Executed (R)
-		214: uint16(0x10D6), // Heartbeat. PC=2, PLC=1, time=200ms (W/R)
-		216: uint16(0x10D8), // Shaker RPM present value (R)
-		218: uint16(0x10DA), // Shaker RPM set value (Note 1) (W)
-		220: uint16(0x10DC), // Shaker selection (Note 2) (W)
-		222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
-		224: uint16(0x10E0), // Shaker temperature present value RH (R)
-		226: uint16(0x10E2), // Motor Number (W)
-
-		/*
-		   ***Note 1: Shaker RPM***
-		   1 = 500 RPM
-		   2 = 600 RPM
-		   3 = 700 RPM
-		   4 = 800 RPM
-		   5 = 900 RPM
-		   6 = 1000 RPM
-		   7 = 1100 RPM
-		   8 = 1200 RPM
-
-		   ***Note 2: Shaker selection***
-		   1 = LH shaker ON
-		   2 = RH Shaker ON
-		   3 = LH + RH shaker ON
-
-		   ***Note 3: Shaker heater selection***
-		   1 = LH shaker heater ON
-		   2 = RH shaker heater ON
-		   3 = LH + RH shaker heater ON
-		*/
+var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[string]map[int]uint16{
+	// Deck A
+	"A": map[string]map[int]uint16{
+		// Data Registers
+		"D": map[int]uint16{
+			200: uint16(0x10C8), // Motor Speed (W)
+			202: uint16(0x10CA), // Motor Pulses (W)
+			204: uint16(0x10CC), // Motor Ramp Rate (W)
+			206: uint16(0x10CE), // Motor Direction. 1=Towards Sensor, 0=Against Sensor (W)
+			208: uint16(0x10D0), // Shaker Temperature Set Value (W)
+			210: uint16(0x10D2), // Shaker Temperature present value LH (R)
+			212: uint16(0x10D4), // Pulses Executed (R)
+			214: uint16(0x10D6), // Heartbeat. PC=2, PLC=1, time=200ms (W/R)
+			216: uint16(0x10D8), // Shaker RPM present value (R)
+			218: uint16(0x10DA), // Shaker RPM set value (Note 1) (W)
+			220: uint16(0x10DC), // Shaker selection (Note 2) (W)
+			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
+			224: uint16(0x10E0), // Shaker temperature present value RH (R)
+			226: uint16(0x10E2), // Motor Number (W)
+		},
+		// Coil registers: ON:0xFF00, OFF: 0x0000
+		"M": map[int]uint16{
+			0: uint16(0x0800), // Motor ON/OFF . (W)
+			1: uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
+			2: uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
+			3: uint16(0x0803), // Heater ON/OFF (W)
+			4: uint16(0x0804), // PID calibration LH ON/OFF (W)
+			5: uint16(0x0805), // Shaker ON/OFF (W)
+			6: uint16(0x0806), // UV Light ON/OFF (W)
+			7: uint16(0x0807), // Light ON/OFF (W)
+			8: uint16(0x0808), // PID calibration RH ON/OFF (W)
+		},
 	},
-	// Coil registers: ON:0xFF00, OFF: 0x0000
-	"M": map[int]uint16{
-		0: uint16(0x0800), // Motor ON/OFF . (W)
-		1: uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
-		2: uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
-		3: uint16(0x0803), // Heater ON/OFF (W)
-		4: uint16(0x0804), // PID calibration LH ON/OFF (W)
-		5: uint16(0x0805), // Shaker ON/OFF (W)
-		6: uint16(0x0806), // UV Light ON/OFF (W)
-		7: uint16(0x0807), // Light ON/OFF (W)
-		8: uint16(0x0808), // PID calibration RH ON/OFF (W)
+	// Deck B
+	"B": map[string]map[int]uint16{
+		// Data Registers
+		"D": map[int]uint16{
+			200: uint16(0x10C8), // Motor Speed (W)
+			202: uint16(0x10CA), // Motor Pulses (W)
+			204: uint16(0x10CC), // Motor Ramp Rate (W)
+			206: uint16(0x10CE), // Motor Direction. 1=Towards Sensor, 0=Against Sensor (W)
+			208: uint16(0x10D0), // Shaker Temperature Set Value (W)
+			210: uint16(0x10D2), // Shaker Temperature present value LH (R)
+			212: uint16(0x10D4), // Pulses Executed (R)
+			214: uint16(0x10D6), // Heartbeat. PC=2, PLC=1, time=200ms (W/R)
+			216: uint16(0x10D8), // Shaker RPM present value (R)
+			218: uint16(0x10DA), // Shaker RPM set value (Note 1) (W)
+			220: uint16(0x10DC), // Shaker selection (Note 2) (W)
+			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
+			224: uint16(0x10E0), // Shaker temperature present value RH (R)
+			226: uint16(0x10E2), // Motor Number (W)
+		},
+		// Coil registers: ON:0xFF00, OFF: 0x0000
+		"M": map[int]uint16{
+			0: uint16(0x0800), // Motor ON/OFF . (W)
+			1: uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
+			2: uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
+			3: uint16(0x0803), // Heater ON/OFF (W)
+			4: uint16(0x0804), // PID calibration LH ON/OFF (W)
+			5: uint16(0x0805), // Shaker ON/OFF (W)
+			6: uint16(0x0806), // UV Light ON/OFF (W)
+			7: uint16(0x0807), // Light ON/OFF (W)
+			8: uint16(0x0808), // PID calibration RH ON/OFF (W)
+		},
 	},
-}
+	/*
+	   ***Note 1: Shaker RPM***
+	   1 = 500 RPM
+	   2 = 600 RPM
+	   3 = 700 RPM
+	   4 = 800 RPM
+	   5 = 900 RPM
+	   6 = 1000 RPM
+	   7 = 1100 RPM
+	   8 = 1200 RPM
 
-var MODBUS_DECK_B map[string]map[int]uint16 = map[string]map[int]uint16{
-	// Data Registers
-	"D": map[int]uint16{
-		200: uint16(0x10C8), // Motor Speed (W)
-		202: uint16(0x10CA), // Motor Pulses (W)
-		204: uint16(0x10CC), // Motor Ramp Rate (W)
-		206: uint16(0x10CE), // Motor Direction. 1=Towards Sensor, 0=Against Sensor (W)
-		208: uint16(0x10D0), // Shaker Temperature Set Value (W)
-		210: uint16(0x10D2), // Shaker Temperature present value LH (R)
-		212: uint16(0x10D4), // Pulses Executed (R)
-		214: uint16(0x10D6), // Heartbeat. PC=2, PLC=1, time=200ms (W/R)
-		216: uint16(0x10D8), // Shaker RPM present value (R)
-		218: uint16(0x10DA), // Shaker RPM set value (Note 1) (W)
-		220: uint16(0x10DC), // Shaker selection (Note 2) (W)
-		222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
-		224: uint16(0x10E0), // Shaker temperature present value RH (R)
-		226: uint16(0x10E2), // Motor Number (W)
+	   ***Note 2: Shaker selection***
+	   1 = LH shaker ON
+	   2 = RH Shaker ON
+	   3 = LH + RH shaker ON
 
-		/*
-		   ***Note 1: Shaker RPM***
-		   1 = 500 RPM
-		   2 = 600 RPM
-		   3 = 700 RPM
-		   4 = 800 RPM
-		   5 = 900 RPM
-		   6 = 1000 RPM
-		   7 = 1100 RPM
-		   8 = 1200 RPM
-
-		   ***Note 2: Shaker selection***
-		   1 = LH shaker ON
-		   2 = RH Shaker ON
-		   3 = LH + RH shaker ON
-
-		   ***Note 3: Shaker heater selection***
-		   1 = LH shaker heater ON
-		   2 = RH shaker heater ON
-		   3 = LH + RH shaker heater ON
-		*/
-	},
-	// Coil registers: ON:0xFF00, OFF: 0x0000
-	"M": map[int]uint16{
-		0: uint16(0x0800), // Motor ON/OFF . (W)
-		1: uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
-		2: uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
-		3: uint16(0x0803), // Heater ON/OFF (W)
-		4: uint16(0x0804), // PID calibration LH ON/OFF (W)
-		5: uint16(0x0805), // Shaker ON/OFF (W)
-		6: uint16(0x0806), // UV Light ON/OFF (W)
-		7: uint16(0x0807), // Light ON/OFF (W)
-		8: uint16(0x0808), // PID calibration RH ON/OFF (W)
-	},
+	   ***Note 3: Shaker heater selection***
+	   1 = LH shaker heater ON
+	   2 = RH shaker heater ON
+	   3 = LH + RH shaker heater ON
+	*/
 }
