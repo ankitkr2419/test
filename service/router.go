@@ -65,6 +65,10 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/labware", createLabwareHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridge", createCartridgeHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tiptube", createTipTubeHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/homing", homingHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/deckHoming", deckHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/syringeHoming", syringeHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/syringeModuleHoming", syringeModuleHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/magnetHoming", magnetHandler(deps)).Methods(http.MethodGet)
 	return
 }

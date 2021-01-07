@@ -293,7 +293,7 @@ func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
 	}
 	//fmt.Printf("Wrote Off motor Forcefully. res : %+v \n", results)
 
-	//response, err = m.readD2000()
+	//response, err = m.ReadD2000()
 	//if err != nil {
 	//	fmt.Println("err : ", err)
 	//	return "", err
@@ -310,7 +310,317 @@ func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
 
 }
 
-// func (d *Compact32Deck) DeckHoming() (response string, err error) {
-// 	response, err = d.deckHoming()
-// 	return
-// }
+func (d *Compact32Deck) IsRunInProgress() (response string, err error) {
+
+	// check if motor is On -> if so then throw error
+
+	if d.IsMotorOff() == false {
+		err = fmt.Errorf("Previous run is already in Progress. Abort it or let it finish.")
+		return "", err
+	}
+
+	// check if D2000 has any value and completion bit is Off
+	// This means that Run In Progres but PAUSED.
+
+	response, err = d.ReadD2000()
+	if err != nil {
+		fmt.Println("err : ", err)
+		return "", err
+	}
+
+	if d.IsCompletionBitOff() && wrotePulses > 0 {
+		err = fmt.Errorf("Previous RUN is in PAUSED state. RESUME it or ABORT it at first.")
+		return "", err
+	}
+
+	return "Your RUN is GOOD to GO", nil
+}
+
+func (d *Compact32Deck) IsMotorOff() bool {
+
+	var onOffAddressBytes = []byte{0x08, 0x00}
+	onOffAddressUint16 := binary.BigEndian.Uint16(onOffAddressBytes)
+
+	results, err := d.DeckDriver.ReadCoils(onOffAddressUint16, uint16(1))
+	if err != nil {
+		fmt.Println("err : ", err)
+		return false
+	}
+	fmt.Printf("Read On/Off Coil. res : %+v \n", results)
+
+	var resultsInt int
+	resultsInt = 10 // something unique
+	if len(results) > 0 {
+		resultsInt = int(results[0])
+	}
+
+	if resultsInt == 0 {
+		return true
+	}
+
+	return false
+}
+
+func (d *Compact32Deck) ReadD2000() (response string, err error) {
+	var D2000AddressBytes = []byte{0x17, 0xD0}
+	D2000AddressBytesUint16 := binary.BigEndian.Uint16(D2000AddressBytes)
+
+	results, err := d.DeckDriver.ReadHoldingRegisters(D2000AddressBytesUint16, uint16(1))
+	if err != nil {
+		fmt.Println("err : ", err)
+	}
+	fmt.Printf("Read D2000AddressBytesUint16. res : %+v \n", results)
+	//if len(results) > 0 {
+	//	completedPulses = uint16(results[0])
+	//}
+
+	var D800AddressBytes = []byte{0x10, 0xD4}
+	D800AddressBytesUint16 := binary.BigEndian.Uint16(D800AddressBytes)
+
+	results, err = d.DeckDriver.ReadHoldingRegisters(D800AddressBytesUint16, uint16(1))
+	if err != nil {
+		fmt.Println("err : ", err)
+		return "", err
+	}
+
+	fmt.Printf("Read D800AddressBytesUint16. res : %+v \n", results)
+	if len(results) > 0 {
+		completedPulses = binary.BigEndian.Uint16(results)
+	} else {
+		err = fmt.Errorf("couldn't read D800")
+		return "", err
+	}
+	fmt.Println("Read D800 Pulses -> ", completedPulses)
+
+	//fmt.Printf("read ReadHoldingRegisters_Speed : %+v ", )
+
+	return "D800 Reading SUCESS", nil
+
+}
+
+func (d *Compact32Deck) IsCompletionBitOff() bool {
+
+	var completionAddressBytes = []byte{0x08, 0x01}
+	completionAddressUint16 := binary.BigEndian.Uint16(completionAddressBytes)
+
+	results, err := d.DeckDriver.ReadCoils(completionAddressUint16, uint16(1))
+	if err != nil {
+		fmt.Println("err : ", err)
+		return false
+	}
+	fmt.Printf("Read Completion Coil. res : %+v \n", results)
+
+	var resultsInt int
+	resultsInt = 10 // something unique
+	if len(results) > 0 {
+		resultsInt = int(results[0])
+	}
+
+	if resultsInt == 0 {
+		return true
+	}
+
+	return false
+}
+
+func (d *Compact32Deck) SyringeHoming() (response string, err error) {
+	// M2
+	var sensorAddressBytes = []byte{0x08, 0x02}
+	sensorAddressUint16 := binary.BigEndian.Uint16(sensorAddressBytes)
+
+	sensorHasCut = false
+	fmt.Println("Syringe is moving down until sensor not cut")
+	response, err = d.SetupMotor(uint16(2000), uint16(26666), uint16(100), uint16(1), uint16(10), uint16(0xff00), sensorAddressUint16)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(100 * time.Millisecond)
+	sensorHasCut = false
+	fmt.Println("Aspiring and getting cut then aspiring 2000")
+	response, err = d.SetupMotor(uint16(2000), uint16(19999), uint16(100), uint16(0), uint16(10), uint16(0xff00), uint16(sensorAddressUint16))
+	if err != nil {
+		return
+	}
+	time.Sleep(100 * time.Millisecond)
+
+	fmt.Println("Syringe dispencing again")
+	response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), uint16(1), uint16(10), uint16(0xff00), uint16(sensorAddressUint16))
+	if err != nil {
+		return
+	}
+
+	fmt.Println("Syringe homing is completed")
+
+	return "SYRINGE HOMING COMPLETED", nil
+}
+
+func (d *Compact32Deck) SyringeModuleHoming() (response string, err error) {
+
+	// M2
+
+	var sensorAddressBytes = []byte{0x08, 0x02}
+	sensorAddressUint16 := binary.BigEndian.Uint16(sensorAddressBytes)
+
+	// Make motor go way up fast
+	// K9
+	sensorHasCut = false
+	fmt.Println("Syringe Module moving Up")
+	response, err = d.SetupMotor(uint16(2000), uint16(29999), uint16(100), uint16(1), uint16(9), uint16(0xff00), uint16(sensorAddressUint16))
+	if err != nil {
+		return
+	}
+
+	sensorHasCut = false
+	//response, err = m.SwitchOffMotor()
+	fmt.Println("++++++++After First Fast Moving Up and getting Cut++++++++")
+
+	time.Sleep(100 * time.Millisecond)
+
+	// Make motor go down 2000 pulses slow
+	// K9
+	fmt.Println("+++++++++Syringe Module moving Down 20 mm or More!!+++++++++++")
+	response, err = d.SetupMotor(uint16(2000), uint16(19999), uint16(100), uint16(0), uint16(9), uint16(0xff00), sensorAddressUint16)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	// Make motor go up very slow
+	// K9
+
+	fmt.Println("Syringe Module moving Up")
+	response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), uint16(1), uint16(9), uint16(0xff00), uint16(sensorAddressUint16))
+	if err != nil {
+		return
+	}
+
+	//response, err = m.SwitchOffMotor()
+	fmt.Println("++++++++After Final Slow Moving Up and getting Cut++++++++")
+
+	return "SYRINGE HOMING SUCCESS", nil
+}
+
+func (d *Compact32Deck) MagnetHoming() (response string, err error) {
+	response, err = d.MagnetUpDownHoming()
+	if err != nil {
+		return
+	}
+	response, err = d.MagnetFwdRevHoming()
+	if err != nil {
+		return
+	}
+
+	time.Sleep(100 * time.Millisecond)
+	fmt.Println("Moving Magnet Back by 50mm")
+	sensorHasCut = false
+	response, err = d.SetupMotor(uint16(2000), uint16(10000), uint16(100), uint16(0), uint16(7), uint16(0xff00), uint16(0x0000))
+	if err != nil {
+		return
+	}
+
+	return "MAGNET HOMING SUCCESS", nil
+}
+
+func (d *Compact32Deck) MagnetUpDownHoming() (response string, err error) {
+
+	// M2
+	var sensorAddressBytes = []byte{0x08, 0x02}
+	sensorAddressUint16 := binary.BigEndian.Uint16(sensorAddressBytes)
+
+	sensorHasCut = false
+	fmt.Println("Magnet is moving up")
+	response, err = d.SetupMotor(uint16(2000), uint16(29999), uint16(100), uint16(1), uint16(6), uint16(0xff00), sensorAddressUint16)
+	if err != nil {
+		return
+	}
+
+	sensorHasCut = false
+	time.Sleep(100 * time.Millisecond)
+	fmt.Println("Magnet is moving down by and after not cut -> 2000")
+	response, err = d.SetupMotor(uint16(2000), uint16(19999), uint16(100), uint16(0), uint16(6), uint16(0xff00), sensorAddressUint16)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	fmt.Println("Magnet is moving up again by 2999 till sensor cuts")
+	response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), uint16(1), uint16(6), uint16(0xff00), sensorAddressUint16)
+
+	fmt.Println("Magnet Up/Down homing is completed.")
+
+	return "MAGNET UP/DOWN HOMING SUCCESS", nil
+}
+
+func (d *Compact32Deck) MagnetFwdRevHoming() (response string, err error) {
+
+	// M2
+	var sensorAddressBytes = []byte{0x08, 0x02}
+	sensorAddressUint16 := binary.BigEndian.Uint16(sensorAddressBytes)
+
+	sensorHasCut = false
+	fmt.Println("Magnet is moving forward")
+	response, err = d.SetupMotor(uint16(2000), uint16(29999), uint16(100), uint16(1), uint16(7), uint16(0xff00), sensorAddressUint16)
+	if err != nil {
+		return
+	}
+
+	sensorHasCut = false
+	time.Sleep(100 * time.Millisecond)
+	fmt.Println("Magnet is moving back by and after not cut -> 2000")
+	response, err = d.SetupMotor(uint16(2000), uint16(19999), uint16(100), uint16(0), uint16(7), uint16(0xff00), sensorAddressUint16)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	fmt.Println("Magnet is moving forward again by 2999")
+	response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), uint16(1), uint16(7), uint16(0xff00), sensorAddressUint16)
+
+	fmt.Println("Magnet Up/Down homing is completed.")
+
+	return "MAGNET FWD/REV HOMING SUCCESS", nil
+}
+
+func (d *Compact32Deck) Homing() (response string, err error) {
+	aborted = false
+	// check if run is already running, i.e check if motor is on and completion is off
+	response, err = d.IsRunInProgress()
+	if err != nil {
+		return
+	}
+
+	fmt.Println("Moving Syringe DOWN till sensor cuts it")
+	response, err = d.SyringeHoming()
+	if err != nil {
+		return
+	}
+
+	fmt.Println("Moving Syringe Module UP till sensor cuts it")
+	response, err = d.SyringeModuleHoming()
+	if err != nil {
+		return
+	}
+
+	fmt.Println("Moving deck forward till sensor cuts it")
+	response, err = d.DeckHoming()
+	if err != nil {
+		return
+	}
+	// Move deck forward till sensor cuts it
+
+	fmt.Println("Homing Magnet")
+	response, err = d.MagnetHoming()
+	if err != nil {
+		return
+	}
+	//response, err = m.runForward()
+	//if err != nil {
+	//	return
+	//}
+
+	return "HOMING SUCCESS", nil
+}
