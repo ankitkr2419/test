@@ -58,6 +58,32 @@ var LOOKUP map[string]string = map[string]string{
 	"heartbeat": "D101",
 }
 
+/* MODBUS_EXTRACTION Mappings:
+ *
+ *	"A" => {
+		"D" => {
+	 		101 => uint16(0x0065)
+	 		2000 => uint16(0x07D0)
+  		},
+   		"M" => {
+	 		8: uint16(0x0808)
+  		 }
+	}
+	"B" => {
+		"D" => {
+	 		200: uint16(0x10C8)
+			226: uint16(0x10E2)
+  		},
+   		"M" => {
+	 		0: uint16(0x0800)
+  		 }
+	}
+
+
+   So, MODBUS_EXTRACTION["A"]["D"][101] will give us the exact modbus address of 0x0065 for DECK A.
+   And MODBUS_EXTRACTION["B"]["M"][0] will give us the exact modbus address of 0x0800 for DECK B.
+*/
+
 var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[string]map[int]uint16{
 	// Deck A
 	"A": map[string]map[int]uint16{
