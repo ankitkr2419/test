@@ -50,3 +50,36 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		}
 	})
 }
+
+func pauseHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		response, err := deps.PlcDeckA.Pause()
+		if err != nil {
+			fmt.Fprintf(rw, err.Error())
+		} else {
+			fmt.Fprintf(rw, response)
+		}
+	})
+}
+
+func resumeHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		response, err := deps.PlcDeckA.Resume()
+		if err != nil {
+			fmt.Fprintf(rw, err.Error())
+		} else {
+			fmt.Fprintf(rw, response)
+		}
+	})
+}
+
+func abortHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		response, err := deps.PlcDeckA.Abort()
+		if err != nil {
+			fmt.Fprintf(rw, err.Error())
+		} else {
+			fmt.Fprintf(rw, response)
+		}
+	})
+}

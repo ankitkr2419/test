@@ -58,4 +58,8 @@ type DeckDriver interface {
 	IsCompletionBitOff() bool
 	SetupMotor(uint16, uint16, uint16, uint16, uint16, uint16, uint16) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
+	Pause() (string, error)
+	Resume() (string, error)
+	Abort() (string, error)
+	resumeMotorWithPulses(uint16) (string, error)
 }
