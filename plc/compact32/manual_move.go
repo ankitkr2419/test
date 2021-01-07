@@ -95,7 +95,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
 
-	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION["A"]["M"][202], pulses)
+	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION["A"]["D"][202], pulses)
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
@@ -104,7 +104,7 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 	wrotePulses = pulses
 	fmt.Println("Wrote Pulses ---> ", wrotePulses)
 
-	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION["A"]["M"][202], uint16(1))
+	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION["A"]["D"][202], uint16(1))
 	if err != nil {
 		fmt.Println("err : ", err)
 		return
