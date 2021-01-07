@@ -44,4 +44,7 @@ type Driver interface {
 
 type DeckDriver interface {
 	Check() bool
+	DeckHoming() (string, error)
+	SwitchOffMotor() (string, error)
+	SetupMotor(uint16, uint16, uint16, uint16, uint16, uint16, uint16) (string, error)
 }

@@ -196,7 +196,7 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	var addr = flag.String("addr", "localhost:"+strconv.Itoa(config.AppPort()), "http service address")
+	var addr = flag.String("addr", "0.0.0.0:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
 	router := service.InitRouter(deps)
 
