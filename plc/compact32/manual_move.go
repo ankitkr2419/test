@@ -34,7 +34,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		return "", err
 	}
 
-	response, err = d.switchOffMotor()
+	response, err = d.SwitchOffMotor()
 	if err != nil {
 		return "", err
 	}
@@ -49,12 +49,12 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 	//m.ResumeMotorWithPulses(wrotePulses - completedPulses)
 
 	// if already on then throw error
-	if d.isMotorOff() == false {
+	if d.IsMotorOff() == false {
 		err = fmt.Errorf("System is already running")
 		return "", err
 	}
 
-	response, err = d.readD2000()
+	response, err = d.ReadD2000()
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
@@ -82,7 +82,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	fmt.Println("aborting the operation....")
 
 	fmt.Println("switching motor off....")
-	response, err = d.switchOffMotor()
+	response, err = d.SwitchOffMotor()
 	if err != nil {
 		fmt.Println(err)
 		return "", err
