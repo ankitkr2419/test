@@ -70,5 +70,6 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/syringeHoming", syringeHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/syringeModuleHoming", syringeModuleHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/magnetHoming", magnetHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/manual", manualHandler(deps)).Methods(http.MethodPost)
 	return
 }

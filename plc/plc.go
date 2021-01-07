@@ -57,4 +57,5 @@ type DeckDriver interface {
 	ReadD2000() (string, error)
 	IsCompletionBitOff() bool
 	SetupMotor(uint16, uint16, uint16, uint16, uint16, uint16, uint16) (string, error)
+	ManualMovement(uint16, uint16, uint16) (string, error)
 }
