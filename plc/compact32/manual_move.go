@@ -8,17 +8,13 @@ import (
 func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
 	sensorHasCut = false
 	aborted = false
-	// var sensorAddressBytes = []byte{0x08, 0x02}
-	// sensorAddressUint16 := binary.BigEndian.Uint16(sensorAddressBytes)
 
 	return d.SetupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
 }
 
 func (d *Compact32Deck) Pause() (response string, err error) {
-	// var onOffAddressBytes = []byte{0x08, 0x00}
-	onOffAddressUint16 := MODBUS_EXTRACTION["A"]["M"][0] //binary.BigEndian.Uint16(onOffAddressBytes)
 
-	results, err := d.DeckDriver.ReadCoils(onOffAddressUint16, uint16(1))
+	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION["A"]["M"][0], uint16(1))
 	if err != nil {
 		fmt.Println("err : ", err)
 	}
@@ -39,14 +35,11 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		return "", err
 	}
 
-	// Read D212 here and get rid of go routine
 	return "Motor PAUSED Successfully", nil
 
 }
 
 func (d *Compact32Deck) Resume() (response string, err error) {
-
-	//m.ResumeMotorWithPulses(wrotePulses - completedPulses)
 
 	// if already on then throw error
 	if d.IsMotorOff() == false {
@@ -89,15 +82,12 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	// Write 0 Pulses
-	//response, err = m.ResumeMotorWithPulses(uint16(1))
 	aborted = true
 	completedPulses = 0
 	if err != nil {
 		fmt.Println(err)
 		return "", err
 	}
-	// Just go to homing position.
-	// For now just simulating
 	fmt.Println("Simulation : homing the machine.")
 
 	return "ABORT SUCCESS", nil
@@ -105,12 +95,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
 
-	// Write Pulses
-	//var pulseAddressBytes = []byte{0x10, 0xCA}
-	pulseAddressUint16 := MODBUS_EXTRACTION["A"]["M"][202] //binary.BigEndian.Uint16(pulseAddressBytes)
-
-	results, err := d.DeckDriver.WriteSingleRegister(pulseAddressUint16, pulses)
-	//results, err = m.Client.WriteSingleRegister(pulseAddressUint16, uint16(500))
+	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION["A"]["M"][202], pulses)
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
@@ -119,35 +104,18 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 	wrotePulses = pulses
 	fmt.Println("Wrote Pulses ---> ", wrotePulses)
 
-	results, err = d.DeckDriver.ReadHoldingRegisters(pulseAddressUint16, uint16(1))
+	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION["A"]["M"][202], uint16(1))
 	if err != nil {
 		fmt.Println("err : ", err)
 		return
 	}
 	fmt.Printf("read ReadHoldingRegisters_Pulse : %+v \n", binary.BigEndian.Uint16(results))
 
-	// var onOffAddressBytes = []byte{0x08, 0x00}
-	onOffAddressUint16 := MODBUS_EXTRACTION["A"]["M"][0] //binary.BigEndian.Uint16(onOffAddressBytes)
-
-	//var completionAddressBytes = []byte{0x08, 0x01}
-	//completionAddressUint16 := binary.BigEndian.Uint16(completionAddressBytes)
-
-	//results, err = m.Client.WriteSingleCoil(completionAddressUint16, uint16(0x0000))
-	////results, err = m.Client.WriteSingleCoil(onOffAddressUint16, uint16(0xff00))
-	//if err != nil {
-	//	fmt.Println("err : ", err)
-	//	return "", err
-	//}
-	//fmt.Printf("Wrote Off Completion Forcefully. res : %+v \n", results)
-
-	err = d.DeckDriver.WriteSingleCoil(onOffAddressUint16, ON)
-	//results, err = m.Client.WriteSingleCoil(onOffAddressUint16, uint16(0xff00))
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION["A"]["M"][0], ON)
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
 	}
-	fmt.Printf("Wrote On motor Forcefully. res : %+v \n", results)
 
 	return "RESUMED with pulses.", nil
-
 }
