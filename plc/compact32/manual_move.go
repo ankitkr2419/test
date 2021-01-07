@@ -39,7 +39,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		return "", err
 	}
 
-	// Read D800 here and get rid of go routine
+	// Read D212 here and get rid of go routine
 	return "Motor PAUSED Successfully", nil
 
 }
@@ -54,7 +54,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		return "", err
 	}
 
-	response, err = d.ReadD2000()
+	response, err = d.ReadExecutedPulses()
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err

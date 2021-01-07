@@ -123,8 +123,6 @@ func NewCompact32DeckADriver(exit chan error, test bool) plc.DeckDriver {
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
 
-	C32.Check()
-
 	return &C32 // plc Driver
 }
 
@@ -146,8 +144,6 @@ func NewCompact32DeckBDriver(exit chan error, test bool) plc.DeckDriver {
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
-
-	C32.Check()
 
 	return &C32 // plc Driver
 }

@@ -43,7 +43,6 @@ type Driver interface {
 }
 
 type DeckDriver interface {
-	Check() bool
 	Homing() (string, error)
 	DeckHoming() (string, error)
 	SyringeHoming() (string, error)
@@ -54,7 +53,7 @@ type DeckDriver interface {
 	SwitchOffMotor() (string, error)
 	IsRunInProgress() (string, error)
 	IsMotorOff() bool
-	ReadD2000() (string, error)
+	ReadExecutedPulses() (string, error)
 	IsCompletionBitOff() bool
 	SetupMotor(uint16, uint16, uint16, uint16, uint16) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
