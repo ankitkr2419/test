@@ -6,18 +6,28 @@ import (
 	"time"
 )
 
-func (d *Compact32Deck) Check() bool {
-	return true
-}
+const (
+	UP   = uint16(1)
+	DOWN = uint16(0)
+	FWD  = uint16(1)
+	REV  = uint16(0)
+)
+
+// *** NOTE ***
+// For Syringe UP means DOWN and DOWN means UP
+// This is because of hardware compatibility
+// 1 means towards sensor, 0 means against sensor
+// ************
 
 var wrotePulses uint16 = 0
 var completedPulses uint16 = 0
 var sensorHasCut = false
 var aborted = false
-
 var statusChannel2 = make(chan int)
 
-var pause = make(chan int)
+func (d *Compact32Deck) Check() bool {
+	return true
+}
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum, onOff, completion uint16) (response string, err error) {
 	//var choice int = 0
