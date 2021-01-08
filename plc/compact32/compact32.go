@@ -31,6 +31,7 @@ type Compact32 struct {
 }
 
 type Compact32Deck struct {
+	name       string
 	ExitCh     chan error
 	DeckDriver Compact32Driver
 }
@@ -105,7 +106,7 @@ func NewCompact32Driver(exit chan error, test bool) plc.Driver {
 }
 
 // Compact32 Driver for Deck A
-func NewCompact32DeckADriver(exit chan error, test bool) plc.DeckDriver {
+func NewCompact32DeckADriver(exit chan error, test bool, name string) plc.DeckDriver {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler.BaudRate = 9600
@@ -122,6 +123,7 @@ func NewCompact32DeckADriver(exit chan error, test bool) plc.DeckDriver {
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
+	C32.name = name
 
 	return &C32 // plc Driver
 }
