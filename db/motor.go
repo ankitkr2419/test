@@ -19,6 +19,8 @@ const (
 							fast)
 							VALUES %s `
 	insertMotorQuery2 = `ON CONFLICT DO NOTHING;`
+	selectMotorsQuery = `SELECT * 
+						FROM motors`
 )
 
 type Motor struct {
@@ -58,4 +60,13 @@ func makeMotorQuery(motor []Motor) string {
 	stmt += insertMotorQuery2
 
 	return stmt
+}
+
+func (s *pgStore) GetAllMotors() (motor []Motor, err error) {
+	err = s.db.Select(&motor, selectMotorsQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing well details")
+		return
+	}
+	return
 }

@@ -154,6 +154,11 @@ func startApp(plcName string, test bool) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Motors failed")
 		return
+	} else {
+		err = deps.PlcDeckA.SelectAllMotors()
+		if err != nil {
+			return
+		}
 	}
 
 	// setup Db with consumable distance

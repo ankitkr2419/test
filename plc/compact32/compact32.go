@@ -2,6 +2,7 @@ package compact32
 
 import (
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"time"
 
@@ -33,6 +34,7 @@ type Compact32 struct {
 type Compact32Deck struct {
 	ExitCh     chan error
 	DeckDriver Compact32Driver
+	Store      db.Storer
 }
 
 func NewCompact32Driver(exit chan error, test bool) plc.Driver {
