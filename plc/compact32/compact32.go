@@ -134,7 +134,7 @@ func NewCompact32DeckBDriver(exit chan error, test bool) plc.DeckDriver {
 	handler.DataBits = 8
 	handler.Parity = "E"
 	handler.StopBits = 1
-	handler.SlaveId = byte(1)
+	handler.SlaveId = byte(2)
 	handler.Timeout = 200 * time.Millisecond
 
 	handler.Connect()
