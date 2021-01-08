@@ -43,6 +43,7 @@ type Driver interface {
 }
 
 type DeckDriver interface {
+	NameOfDeck() string
 	Homing() (string, error)
 	DeckHoming() (string, error)
 	SyringeHoming() (string, error)
