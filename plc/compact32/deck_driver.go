@@ -6,14 +6,26 @@ import (
 	"time"
 )
 
-var wrotePulses uint16 = 0
-var completedPulses uint16 = 0
-var sensorHasCut = false
-var aborted = false
+var wrotePulses = map[string]uint16{
+	"A": 0,
+	"B": 0,
+}
+var executedPulses = map[string]uint16{
+	"A": 0,
+	"B": 0,
+}
+var sensorHasCut = map[string]bool{
+	"A": false,
+	"B": false,
+}
+var aborted = map[string]bool{
+	"A": false,
+	"B": false,
+}
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
-	if aborted {
+	if aborted[d.name] {
 		err := fmt.Errorf("Machine in ABORTED STATE")
 		return "", err
 	}
@@ -45,7 +57,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "", err
 	}
 	fmt.Println("Wrote Pulse. res : ", results)
-	wrotePulses = pulse
+	wrotePulses[d.name] = pulse
 
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][200], speed)
 	if err != nil {
@@ -90,7 +102,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	go func() {
 		for {
-			if aborted {
+			if aborted[d.name] {
 				statusChannel <- 2
 				return
 			}
@@ -118,12 +130,12 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				if int(results[0]) == 3 && pulse != uint16(19999) {
 					fmt.Println("Sensor returned ---> ", results[0])
 					statusChannel <- 3
-					sensorHasCut = true
+					sensorHasCut[d.name] = true
 					return
 				} else if int(results[0]) == 2 && pulse == uint16(19999) {
 					fmt.Println("Sensor returned ---> ", results[0])
 					d.SwitchOffMotor()
-					sensorHasCut = false
+					sensorHasCut[d.name] = false
 					time.Sleep(100 * time.Millisecond)
 					response, err = d.SetupMotor(uint16(2000), uint16(2000), uint16(100), REV, motorNum)
 					if err != nil {
@@ -168,8 +180,8 @@ forLoop1:
 		return
 	}
 
-	wrotePulses = 0
-	completedPulses = 0
+	wrotePulses[d.name] = 0
+	executedPulses[d.name] = 0
 	return "RUN Completed", nil
 }
 
@@ -200,7 +212,7 @@ func (d *Compact32Deck) IsRunInProgress() (response string, err error) {
 		return "", err
 	}
 
-	if d.IsCompletionBitOff() && wrotePulses > 0 {
+	if d.IsCompletionBitOff() && wrotePulses[d.name] > 0 {
 		err = fmt.Errorf("Previous RUN is in PAUSED state. RESUME it or ABORT it at first.")
 		return "", err
 	}
@@ -240,12 +252,12 @@ func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
 
 	fmt.Printf("Read D212AddressBytesUint16. res : %+v \n", results)
 	if len(results) > 0 {
-		completedPulses = binary.BigEndian.Uint16(results)
+		executedPulses[d.name] = binary.BigEndian.Uint16(results)
 	} else {
 		err = fmt.Errorf("couldn't read D212")
 		return "", err
 	}
-	fmt.Println("Read D212 Pulses -> ", completedPulses)
+	fmt.Println("Read D212 Pulses -> ", executedPulses[d.name])
 
 	return "D212 Reading SUCESS", nil
 
@@ -274,7 +286,7 @@ func (d *Compact32Deck) IsCompletionBitOff() bool {
 
 func (d *Compact32Deck) Homing() (response string, err error) {
 
-	aborted = false
+	aborted[d.name] = false
 	// check if run is already running, i.e check if motor is on and completion is off
 	response, err = d.IsRunInProgress()
 	if err != nil {
@@ -378,7 +390,7 @@ func (d *Compact32Deck) DeckHoming() (response string, err error) {
 		return
 	}
 
-	//	sensorHasCut = false
+	//	sensorHasCut[d.name] = false
 	time.Sleep(100 * time.Millisecond)
 	fmt.Println("Deck is moving back by and after not cut -> 2000")
 	response, err = d.SetupMotor(uint16(2000), uint16(19999), uint16(100), REV, uint16(5))
