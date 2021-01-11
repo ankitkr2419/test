@@ -32,6 +32,7 @@ type Compact32 struct {
 }
 
 type Compact32Deck struct {
+	name       string
 	ExitCh     chan error
 	DeckDriver Compact32Driver
 	Store      db.Storer
@@ -124,6 +125,7 @@ func NewCompact32DeckADriver(exit chan error, test bool) plc.DeckDriver {
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
+	C32.name = "A"
 
 	return &C32 // plc Driver
 }
@@ -136,7 +138,7 @@ func NewCompact32DeckBDriver(exit chan error, test bool) plc.DeckDriver {
 	handler.DataBits = 8
 	handler.Parity = "E"
 	handler.StopBits = 1
-	handler.SlaveId = byte(1)
+	handler.SlaveId = byte(2)
 	handler.Timeout = 200 * time.Millisecond
 
 	handler.Connect()
@@ -146,6 +148,7 @@ func NewCompact32DeckBDriver(exit chan error, test bool) plc.DeckDriver {
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
+	C32.name = "B"
 
 	return &C32 // plc Driver
 }

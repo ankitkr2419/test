@@ -4,20 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Manual struct {
-	MotorNum  int `json:"motor_number"`
-	Pulses    int `json:"pulses"`
-	Direction int `json:"direction"`
+	Deck      string `json:"deck"`
+	MotorNum  int    `json:"motor_number"`
+	Pulses    int    `json:"pulses"`
+	Direction int    `json:"direction"`
 }
 
 func manualHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		var response string
+		var err error
 
 		var m Manual
 		fmt.Println(req.Body)
-		err := json.NewDecoder(req.Body).Decode(&m)
+		err = json.NewDecoder(req.Body).Decode(&m)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			fmt.Println("Error decoding manual data")
@@ -25,6 +30,11 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		switch {
+		case m.Deck != "A" && m.Deck != "B":
+			rw.WriteHeader(http.StatusBadRequest)
+			err = fmt.Errorf("Use A or B deck or leave it blank")
+			fmt.Println(err)
+			return
 		case m.MotorNum <= 4 || m.MotorNum > 10:
 			rw.WriteHeader(http.StatusBadRequest)
 			err = fmt.Errorf("Select motor num in only in between 5-10")
@@ -42,44 +52,108 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		response, err := deps.PlcDeckA.ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
+		switch m.Deck {
+		case "A", "B":
+			response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
+		case "":
+			// TODO: Handle errors in better manner
+			go deps.PlcDeck["A"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
+			go deps.PlcDeck["B"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
+		default:
+			err = fmt.Errorf("Please check your deck")
+		}
+
 		if err != nil {
 			fmt.Fprintf(rw, err.Error())
+			fmt.Println(err.Error())
+			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			fmt.Fprintf(rw, response)
+			fmt.Fprintf(rw, response+" Manual Movements in Progress")
+			rw.WriteHeader(http.StatusOK)
 		}
 	})
 }
 
 func pauseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		response, err := deps.PlcDeckA.Pause()
+
+		var response string
+		var err error
+
+		vars := mux.Vars(req)
+		deck := vars["id"]
+		switch deck {
+		case "":
+			response, err = bothDeckOperation(deps, "Pause")
+		case "A", "B":
+			response, err = singleDeckOperation(deps, deck, "Pause")
+		default:
+			err = fmt.Errorf("Check you deck name")
+		}
+
 		if err != nil {
 			fmt.Fprintf(rw, err.Error())
+			fmt.Println(err.Error())
+			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
 			fmt.Fprintf(rw, response)
+			rw.WriteHeader(http.StatusOK)
 		}
 	})
 }
 
 func resumeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		response, err := deps.PlcDeckA.Resume()
+
+		var response string
+		var err error
+
+		vars := mux.Vars(req)
+		deck := vars["id"]
+		switch deck {
+		case "":
+			response, err = bothDeckOperation(deps, "Resume")
+		case "A", "B":
+			response, err = singleDeckOperation(deps, deck, "Resume")
+		default:
+			err = fmt.Errorf("Check you deck name")
+		}
+
 		if err != nil {
 			fmt.Fprintf(rw, err.Error())
+			fmt.Println(err.Error())
+			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
 			fmt.Fprintf(rw, response)
+			rw.WriteHeader(http.StatusOK)
 		}
 	})
 }
 
 func abortHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		response, err := deps.PlcDeckA.Abort()
+
+		var response string
+		var err error
+
+		vars := mux.Vars(req)
+		deck := vars["id"]
+		switch deck {
+		case "":
+			response, err = bothDeckOperation(deps, "Abort")
+		case "A", "B":
+			response, err = singleDeckOperation(deps, deck, "Abort")
+		default:
+			err = fmt.Errorf("Check you deck name")
+		}
+
 		if err != nil {
 			fmt.Fprintf(rw, err.Error())
+			fmt.Println(err.Error())
+			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
 			fmt.Fprintf(rw, response)
+			rw.WriteHeader(http.StatusOK)
 		}
 	})
 }

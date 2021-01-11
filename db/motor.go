@@ -11,6 +11,8 @@ import (
 
 const (
 	insertMotorQuery1 = `INSERT INTO motors(
+							id,
+							deck,
 							number,
 							name,
 							ramp,
@@ -24,6 +26,8 @@ const (
 )
 
 type Motor struct {
+	ID        int       `db:"id" json:"id"`
+	Deck      string    `db:"deck" json:"deck"`
 	Number    int       `db:"number" json:"number"`
 	Name      string    `db:"name" json:"name"`
 	Ramp      int       `db:"ramp" json:"ramp"`
@@ -51,7 +55,7 @@ func makeMotorQuery(motor []Motor) string {
 	values := make([]string, 0, len(motor))
 
 	for _, m := range motor {
-		values = append(values, fmt.Sprintf("(%v, '%v', %v, %v, %v, %v)", m.Number, m.Name, m.Ramp, m.Steps, m.Slow, m.Fast))
+		values = append(values, fmt.Sprintf("(%v, '%v', %v, '%v', %v, %v, %v, %v)", m.ID, m.Deck, m.Number, m.Name, m.Ramp, m.Steps, m.Slow, m.Fast))
 	}
 
 	stmt := fmt.Sprintf(insertMotorQuery1,

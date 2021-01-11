@@ -6,15 +6,19 @@ import (
 )
 
 func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
-	sensorHasCut = false
-	aborted = false
+	sensorHasCut[d.name] = false
+	aborted[d.name] = false
 
 	return d.SetupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
 }
 
+func (d *Compact32Deck) NameOfDeck() string {
+	return d.name
+}
+
 func (d *Compact32Deck) Pause() (response string, err error) {
 
-	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION["A"]["M"][0], uint16(1))
+	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][0], uint16(1))
 	if err != nil {
 		fmt.Println("err : ", err)
 	}
@@ -53,15 +57,15 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		return "", err
 	}
 
-	if int(wrotePulses) <= int(completedPulses) {
-		err = fmt.Errorf("CompletedPulses is greater than wrote Pulses that means nothing to resume.")
-		wrotePulses = 0
-		completedPulses = 0
+	if int(wrotePulses[d.name]) <= int(executedPulses[d.name]) {
+		err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
+		wrotePulses[d.name] = 0
+		executedPulses[d.name] = 0
 
 		return "", err
 	}
 
-	response, err = d.ResumeMotorWithPulses(wrotePulses - completedPulses)
+	response, err = d.ResumeMotorWithPulses(wrotePulses[d.name] - executedPulses[d.name])
 	if err != nil {
 		fmt.Println(response, "resumeMotorWithPulse")
 		return
@@ -82,8 +86,9 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	// Write 0 Pulses
-	aborted = true
-	completedPulses = 0
+	aborted[d.name] = true
+	executedPulses[d.name] = 0
+	wrotePulses[d.name] = 0
 	if err != nil {
 		fmt.Println(err)
 		return "", err
@@ -95,23 +100,23 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
 
-	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION["A"]["D"][202], pulses)
+	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulses)
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
 	}
 	fmt.Println("Wrote Pulse. res : ", binary.BigEndian.Uint16(results))
-	wrotePulses = pulses
+	wrotePulses[d.name] = pulses
 	fmt.Println("Wrote Pulses ---> ", wrotePulses)
 
-	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION["A"]["D"][202], uint16(1))
+	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][202], uint16(1))
 	if err != nil {
 		fmt.Println("err : ", err)
 		return
 	}
 	fmt.Printf("read ReadHoldingRegisters_Pulse : %+v \n", binary.BigEndian.Uint16(results))
 
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION["A"]["M"][0], ON)
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
