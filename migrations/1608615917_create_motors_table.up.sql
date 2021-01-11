@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS motors(
- number int PRIMARY KEY,
+ id int PRIMARY KEY,
+ deck varchar(1) NOT NULL,
+ number int,
  name varchar(50) NOT NULL,
  ramp int default 100 NOT NULL,
  steps int default 200 NOT NULL,
