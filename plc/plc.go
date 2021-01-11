@@ -62,5 +62,4 @@ type DeckDriver interface {
 	Resume() (string, error)
 	Abort() (string, error)
 	ResumeMotorWithPulses(uint16) (string, error)
-	SelectAllMotors() error
 }

@@ -159,7 +159,7 @@ func startApp(plcName string, test bool) (err error) {
 		logger.WithField("err", err.Error()).Error("Setup Motors failed")
 		return
 	} else {
-		err = deps.PlcDeckA.SelectAllMotors()
+		err = compact32.SelectAllMotors(store)
 		if err != nil {
 			return
 		}
