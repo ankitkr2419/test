@@ -93,7 +93,6 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		fmt.Println(err)
 		return "", err
 	}
-	fmt.Println("Simulation : homing the machine.")
 
 	return "ABORT SUCCESS", nil
 }
@@ -107,12 +106,12 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 	}
 	fmt.Println("Wrote Pulse. res : ", binary.BigEndian.Uint16(results))
 	wrotePulses[d.name] = pulses
-	fmt.Println("Wrote Pulses ---> ", wrotePulses)
+	fmt.Println("Wrote Pulses ---> ", wrotePulses[d.name])
 
 	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][202], uint16(1))
 	if err != nil {
 		fmt.Println("err : ", err)
-		return
+		return "", err
 	}
 	fmt.Printf("read ReadHoldingRegisters_Pulse : %+v \n", binary.BigEndian.Uint16(results))
 

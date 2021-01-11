@@ -10,10 +10,14 @@ const (
 )
 
 const (
-	UP   = uint16(1)
-	DOWN = uint16(0)
-	FWD  = uint16(1)
-	REV  = uint16(0)
+	UP          = uint16(1)
+	DOWN        = uint16(0)
+	FWD         = uint16(1)
+	REV         = uint16(0)
+	syringeUP   = uint16(0)
+	syringeDOWN = uint16(1)
+	sensorUncut = 2
+	sensorCut   = 3
 )
 
 // *** NOTE ***

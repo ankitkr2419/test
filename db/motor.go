@@ -69,7 +69,7 @@ func makeMotorQuery(motor []Motor) string {
 func (s *pgStore) GetAllMotors() (motor []Motor, err error) {
 	err = s.db.Select(&motor, selectMotorsQuery)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing well details")
+		logger.WithField("err", err.Error()).Error("Error listing motor details")
 		return
 	}
 	return
