@@ -59,7 +59,7 @@ func makeConsumableQuery(consumabledistance []ConsumableDistance) string {
 	return stmt
 }
 
-func (s *pgStore) GetAllConsDistances() (consumabledistance []ConsumableDistance, err error) {
+func (s *pgStore) ListConsDistances() (consumabledistance []ConsumableDistance, err error) {
 	err = s.db.Select(&consumabledistance, getAllConsDistanceQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing consumable distance details")

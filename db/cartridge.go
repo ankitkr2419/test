@@ -66,7 +66,7 @@ func makeCartridgeQuery(cartridge []Cartridge) string {
 	return stmt
 }
 
-func (s *pgStore) GetAllCartridges() (cartridge []Cartridge, err error) {
+func (s *pgStore) ListCartridges() (cartridge []Cartridge, err error) {
 	err = s.db.Select(&cartridge, selectAllCartridgeQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing cartridge details")

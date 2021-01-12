@@ -67,7 +67,7 @@ var tipstubes = make(map[string]map[string]float64)
 var cartridges = make(map[int]map[string]float64)
 
 func SelectAllMotors(store db.Storer) (err error) {
-	allMotors, err := store.GetAllMotors()
+	allMotors, err := store.ListMotors()
 	if err != nil {
 		return
 	}
@@ -84,7 +84,7 @@ func SelectAllMotors(store db.Storer) (err error) {
 }
 
 func SelectAllConsDistances(store db.Storer) (err error) {
-	allConsDistances, err := store.GetAllConsDistances()
+	allConsDistances, err := store.ListConsDistances()
 	if err != nil {
 		return
 	}
@@ -96,7 +96,7 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 }
 
 func SelectAllLabwares(store db.Storer) (err error) {
-	allLabwares, err := store.GetAllLabwares()
+	allLabwares, err := store.ListLabwares()
 	if err != nil {
 		return
 	}
@@ -108,7 +108,7 @@ func SelectAllLabwares(store db.Storer) (err error) {
 }
 
 func SelectAllTipsTubes(store db.Storer) (err error) {
-	allTipsTubes, err := store.GetAllTipsTubes()
+	allTipsTubes, err := store.ListTipsTubes()
 	if err != nil {
 		return
 	}
@@ -124,7 +124,7 @@ func SelectAllTipsTubes(store db.Storer) (err error) {
 }
 
 func SelectAllCartridge(store db.Storer) (err error) {
-	allCartridges, err := store.GetAllCartridges()
+	allCartridges, err := store.ListCartridges()
 	if err != nil {
 		return
 	}

@@ -60,7 +60,7 @@ func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 	return stmt
 }
 
-func (s *pgStore) GetAllTipsTubes() (tipstubes []TipsTubes, err error) {
+func (s *pgStore) ListTipsTubes() (tipstubes []TipsTubes, err error) {
 	err = s.db.Select(&tipstubes, getTipsTubesQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")

@@ -53,7 +53,7 @@ func makeLabwareQuery(labware []Labware) string {
 	return stmt
 }
 
-func (s *pgStore) GetAllLabwares() (labwares []Labware, err error) {
+func (s *pgStore) ListLabwares() (labwares []Labware, err error) {
 	err = s.db.Select(&labwares, getallLabwares)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing labware details")
