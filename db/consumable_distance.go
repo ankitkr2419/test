@@ -17,6 +17,9 @@ const (
 							description)
 							VALUES %s `
 	insertConsDistaceQuery2 = ` ON CONFLICT DO NOTHING;`
+
+	getAllConsDistanceQuery = `SELECT *
+							FROM consumable_distances`
 )
 
 type ConsumableDistance struct {
@@ -54,4 +57,13 @@ func makeConsumableQuery(consumabledistance []ConsumableDistance) string {
 	stmt += insertConsDistaceQuery2
 
 	return stmt
+}
+
+func (s *pgStore) GetAllConsDistances() (consumabledistance []ConsumableDistance, err error) {
+	err = s.db.Select(&consumabledistance, getAllConsDistanceQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing consumable distance details")
+		return
+	}
+	return
 }

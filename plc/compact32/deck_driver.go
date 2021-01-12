@@ -3,7 +3,6 @@ package compact32
 import (
 	"encoding/binary"
 	"fmt"
-	"mylab/cpagent/db"
 	"time"
 )
 
@@ -32,24 +31,6 @@ var runInProgress = map[string]bool{
 	"B": false,
 }
 
-const (
-	K1_Syringe_Module_LH = uint16(iota + 1)
-	K2_Syringe_Module_RH
-	K3_Syringe_LH
-	K4_Syringe_RH
-	K5_Deck
-	K6_Magnet_Up_Down
-	K7_Magnet_Rev_Fwd
-	K8_Shaker
-	K9_Syringe_Module_LHRH
-	K10_Syringe_LHRH
-)
-
-type DeckNumber struct {
-	Deck   string
-	Number uint16
-}
-
 // All these are special + max Pulses
 const (
 	initialSensorCutDeckPulses          = uint16(59199)
@@ -61,25 +42,6 @@ const (
 	finalSensorCutPulses                = uint16(2999)
 	moveMagnetAfterFinalCutPulses       = uint16(10000)
 )
-
-var motors = make(map[DeckNumber]map[string]uint16)
-
-func SelectAllMotors(store db.Storer) (err error) {
-	allMotors, err := store.GetAllMotors()
-	if err != nil {
-		return
-	}
-
-	for _, motor := range allMotors {
-		deckAndNumber := DeckNumber{Deck: motor.Deck, Number: uint16(motor.Number)}
-		motors[deckAndNumber] = make(map[string]uint16)
-		motors[deckAndNumber]["ramp"] = uint16(motor.Ramp)
-		motors[deckAndNumber]["steps"] = uint16(motor.Steps)
-		motors[deckAndNumber]["slow"] = uint16(motor.Slow)
-		motors[deckAndNumber]["fast"] = uint16(motor.Fast)
-	}
-	return
-}
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 

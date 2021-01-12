@@ -170,6 +170,11 @@ func startApp(plcName string, test bool) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Cosumable Distance failed")
 		return
+	} else {
+		err = compact32.SelectAllConsDistances(store)
+		if err != nil {
+			return
+		}
 	}
 
 	// setup Db with labware
@@ -177,6 +182,11 @@ func startApp(plcName string, test bool) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Labware failed")
 		return
+	} else {
+		err = compact32.SelectAllLabwares(store)
+		if err != nil {
+			return
+		}
 	}
 
 	// setup Db with tipstube
@@ -184,6 +194,11 @@ func startApp(plcName string, test bool) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup TipsTubes failed")
 		return
+	} else {
+		err = compact32.SelectAllTipsTubes(store)
+		if err != nil {
+			return
+		}
 	}
 
 	// setup Db with cartridge
@@ -191,6 +206,11 @@ func startApp(plcName string, test bool) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Cartridge failed")
 		return
+	} else {
+		err = compact32.SelectAllCartridge(store)
+		if err != nil {
+			return
+		}
 	}
 
 	// add default User
