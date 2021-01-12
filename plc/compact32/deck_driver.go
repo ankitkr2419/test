@@ -6,43 +6,6 @@ import (
 	"time"
 )
 
-var wrotePulses = map[string]uint16{
-	"A": 0,
-	"B": 0,
-}
-var executedPulses = map[string]uint16{
-	"A": 0,
-	"B": 0,
-}
-var sensorHasCut = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var aborted = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var paused = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var runInProgress = map[string]bool{
-	"A": false,
-	"B": false,
-}
-
-// All these are special + max Pulses
-const (
-	initialSensorCutDeckPulses          = uint16(59199)
-	initialSensorCutSyringePulses       = uint16(26666)
-	initialSensorCutSyringeModulePulses = uint16(29999)
-	initialSensorCutMagnetPulses        = uint16(29999)
-	moveOppositeSensorPulses            = uint16(19999)
-	reverseAfterNonCutPulses            = uint16(2000)
-	finalSensorCutPulses                = uint16(2999)
-	moveMagnetAfterFinalCutPulses       = uint16(10000)
-)
-
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
 	wrotePulses[d.name] = 0
