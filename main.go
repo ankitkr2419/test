@@ -120,8 +120,8 @@ func startApp(plcName string, test bool) (err error) {
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
 		driver = compact32.NewCompact32Driver(exit, test)
-		driverDeckA = compact32.NewCompact32DeckADriver(exit, test)
-		driverDeckB = compact32.NewCompact32DeckBDriver(exit, test)
+		driverDeckA = compact32.NewCompact32DeckDriver(exit, test, "A", byte(1))
+		driverDeckB = compact32.NewCompact32DeckDriver(exit, test, "B", byte(2))
 	} else {
 		driver = simulator.NewSimulator(exit)
 	}
