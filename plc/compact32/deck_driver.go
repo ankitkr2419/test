@@ -23,6 +23,14 @@ var aborted = map[string]bool{
 	"A": false,
 	"B": false,
 }
+var paused = map[string]bool{
+	"A": false,
+	"B": false,
+}
+var runInProgress = map[string]bool{
+	"A": false,
+	"B": false,
+}
 
 const (
 	K1_Syringe_Module_LH = uint16(iota + 1)
@@ -42,7 +50,7 @@ type DeckNumber struct {
 	Number uint16
 }
 
-// All these are max Pulses
+// All these are special + max Pulses
 const (
 	initialSensorCutDeckPulses          = uint16(59199)
 	initialSensorCutSyringePulses       = uint16(26666)
@@ -133,6 +141,15 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	}
 	fmt.Println("Wrote motorNum. res : ", results)
 
+	for {
+		if paused[d.name] {
+			fmt.Println("Machine in PAUSED state")
+		} else {
+			break
+		}
+		time.Sleep(400 * time.Millisecond)
+	}
+
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
 	if err != nil {
 		fmt.Println("err : ", err)
@@ -192,11 +209,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				response, err = d.SetupMotor(motors[deckAndNumber]["fast"], reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], REV, motorNum)
 				//statusChannel <- 4
 				return
-			} else {
-				fmt.Println("Sensor returned ---> ", results[0])
-				d.SwitchOffMotor()
-				err = fmt.Errorf("unexpected result value from Sensor")
-				return
 			}
 		}
 
@@ -208,7 +220,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		case finalSensorCutPulses:
 			time.Sleep(20 * time.Millisecond)
 		default:
-			time.Sleep(1 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 
@@ -224,52 +236,6 @@ func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
 	}
 
 	return "SUCCESS", nil
-}
-
-func (d *Compact32Deck) IsRunInProgress() (response string, err error) {
-
-	if d.IsMotorOff() == false {
-		err = fmt.Errorf("Previous run is already in Progress. Abort it or let it finish.")
-		return "", err
-	}
-
-	// check if D212 has any value and completion bit is Off
-	// This means that Run In Progres but PAUSED.
-
-	response, err = d.ReadExecutedPulses()
-	if err != nil {
-		fmt.Println("err : ", err)
-		return "", err
-	}
-
-	if d.IsCompletionBitOff() && wrotePulses[d.name] > 0 {
-		err = fmt.Errorf("Previous RUN is in PAUSED state. RESUME it or ABORT it at first.")
-		return "", err
-	}
-
-	return "Your RUN is GOOD to GO", nil
-}
-
-func (d *Compact32Deck) IsMotorOff() bool {
-
-	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][0], uint16(1))
-	if err != nil {
-		fmt.Println("err : ", err)
-		return false
-	}
-	fmt.Printf("Read On/Off Coil. res : %+v \n", results)
-
-	var resultsInt int
-	resultsInt = 10 // something unique
-	if len(results) > 0 {
-		resultsInt = int(results[0])
-	}
-
-	if resultsInt == 0 {
-		return true
-	}
-
-	return false
 }
 
 func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
@@ -293,35 +259,16 @@ func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
 
 }
 
-func (d *Compact32Deck) IsCompletionBitOff() bool {
-
-	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
-	if err != nil {
-		fmt.Println("err : ", err)
-		return false
-	}
-	fmt.Printf("Read Completion Coil. res : %+v \n", results)
-
-	var resultsInt int
-	resultsInt = 10 // something unique
-	if len(results) > 0 {
-		resultsInt = int(results[0])
-	}
-	if resultsInt == 0 {
-		return true
-	}
-
-	return false
-}
-
 func (d *Compact32Deck) Homing() (response string, err error) {
 
 	aborted[d.name] = false
-	// check if run is already running, i.e check if motor is on and completion is off
-	response, err = d.IsRunInProgress()
-	if err != nil {
+
+	if runInProgress[d.name] {
+		err = fmt.Errorf("previous run is already in progress... wait or abort it")
 		return
 	}
+
+	runInProgress[d.name] = true
 
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.SyringeHoming()
@@ -346,6 +293,8 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	if err != nil {
 		return
 	}
+
+	runInProgress[d.name] = false
 
 	fmt.Println("Homing Completed Successfully")
 

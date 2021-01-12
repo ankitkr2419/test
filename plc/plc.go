@@ -52,10 +52,7 @@ type DeckDriver interface {
 	MagnetUpDownHoming() (string, error)
 	MagnetFwdRevHoming() (string, error)
 	SwitchOffMotor() (string, error)
-	IsRunInProgress() (string, error)
-	IsMotorOff() bool
 	ReadExecutedPulses() (string, error)
-	IsCompletionBitOff() bool
 	SetupMotor(uint16, uint16, uint16, uint16, uint16) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
 	Pause() (string, error)

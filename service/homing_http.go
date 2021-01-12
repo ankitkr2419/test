@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -188,27 +189,49 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 func singleDeckOperation(deps Dependencies, deck, operation string) (response string, err error) {
 	switch deck {
 	case "A", "B":
-		switch operation {
-		case "Homing":
-			response, err = deps.PlcDeck[deck].Homing()
-		case "SyringeHoming":
-			response, err = deps.PlcDeck[deck].SyringeHoming()
-		case "SyringeModuleHoming":
-			response, err = deps.PlcDeck[deck].SyringeModuleHoming()
-		case "DeckHoming":
-			response, err = deps.PlcDeck[deck].DeckHoming()
-		case "MagnetHoming":
-			response, err = deps.PlcDeck[deck].MagnetHoming()
-		case "Pause":
-			response, err = deps.PlcDeck[deck].Pause()
-		case "Resume":
-			response, err = deps.PlcDeck[deck].Resume()
-		case "Abort":
-			response, err = deps.PlcDeck[deck].Abort()
 
-		default:
-			err = fmt.Errorf("Invalid Operation")
+		// Compact32Deck is the type of deps.PlcDeck[deck]
+		result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(operation).Call([]reflect.Value{})
+
+		/*
+			switch operation {
+			case "Homing":
+				response, err = deps.PlcDeck[deck].Homing()
+			case "SyringeHoming":
+				response, err = deps.PlcDeck[deck].SyringeHoming()
+			case "SyringeModuleHoming":
+				response, err = deps.PlcDeck[deck].SyringeModuleHoming()
+			case "DeckHoming":
+				response, err = deps.PlcDeck[deck].DeckHoming()
+			case "MagnetHoming":
+				response, err = deps.PlcDeck[deck].MagnetHoming()
+			case "Pause":
+				response, err = deps.PlcDeck[deck].Pause()
+			case "Resume":
+				response, err = deps.PlcDeck[deck].Resume()
+			case "Abort":
+				response, err = deps.PlcDeck[deck].Abort()
+
+			default:
+				err = fmt.Errorf("Invalid Operation")
+			}
+		*/
+		if len(result) != 2 {
+			fmt.Println("result is different in this reflect Call !", result)
+			return "", fmt.Errorf("unexpected length result")
 		}
+
+		fmt.Println("Correct Result: ", result)
+		response = result[0].String()
+		if len(response) > 0 {
+			return
+		}
+		errRes := result[1].Interface()
+		if errRes != nil {
+			fmt.Println(errRes)
+			return "", fmt.Errorf("%v", errRes)
+		}
+
 	default:
 		err = fmt.Errorf("Check your deck name")
 	}

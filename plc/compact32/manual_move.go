@@ -6,10 +6,23 @@ import (
 )
 
 func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
+
+	if runInProgress[d.name] {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return "", err
+	}
 	sensorHasCut[d.name] = false
 	aborted[d.name] = false
+	runInProgress[d.name] = true
 
-	return d.SetupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
+	response, err = d.SetupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
+	if err != nil {
+		runInProgress[d.name] = false
+		return "", fmt.Errorf("there was some issue doing manual movement")
+	}
+	runInProgress[d.name] = false
+
+	return
 }
 
 func (d *Compact32Deck) NameOfDeck() string {
@@ -18,26 +31,20 @@ func (d *Compact32Deck) NameOfDeck() string {
 
 func (d *Compact32Deck) Pause() (response string, err error) {
 
-	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][0], uint16(1))
-	if err != nil {
+	// If machine is already PAUSED OR
+	// run is not in Progress
+	if paused[d.name] || !runInProgress[d.name] {
 		fmt.Println("err : ", err)
-	}
-	fmt.Printf("Read On/Off Coil. res : %+v \n", results)
-
-	var resultsInt int
-	if len(results) > 0 {
-		resultsInt = int(results[0])
-	}
-
-	if resultsInt == 0 {
-		err = fmt.Errorf("system is already in paused state")
-		return "", err
+		err = fmt.Errorf("Machine is already in PAUSED/IDLE state")
+		return
 	}
 
 	response, err = d.SwitchOffMotor()
 	if err != nil {
 		return "", err
 	}
+
+	paused[d.name] = true
 
 	return "Motor PAUSED Successfully", nil
 
@@ -46,8 +53,8 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 func (d *Compact32Deck) Resume() (response string, err error) {
 
 	// if already on then throw error
-	if d.IsMotorOff() == false {
-		err = fmt.Errorf("System is already running")
+	if !paused[d.name] || !runInProgress[d.name] {
+		err = fmt.Errorf("System is already running, or done with the run")
 		return "", err
 	}
 
@@ -71,6 +78,8 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		return
 	}
 
+	paused[d.name] = false
+
 	return "RESUMED Successfully.", nil
 }
 
@@ -85,14 +94,11 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return "", err
 	}
 
-	// Write 0 Pulses
 	aborted[d.name] = true
 	executedPulses[d.name] = 0
 	wrotePulses[d.name] = 0
-	if err != nil {
-		fmt.Println(err)
-		return "", err
-	}
+	paused[d.name] = false
+	runInProgress[d.name] = false
 
 	return "ABORT SUCCESS", nil
 }

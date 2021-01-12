@@ -21,7 +21,6 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		var m Manual
-		fmt.Println(req.Body)
 		err = json.NewDecoder(req.Body).Decode(&m)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
