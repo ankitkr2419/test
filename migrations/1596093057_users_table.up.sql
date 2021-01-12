@@ -1,10 +1,8 @@
+CREATE TYPE role_type AS  ENUM('admin', 'operator', 'engineer');
 
-CREATE TABLE users
-(
-    username varchar(250),
-    password varchar(250),
-    role varchar(250),
+CREATE TABLE IF NOT EXISTS users(
+    username varchar(50) PRIMARY KEY,
+    password varchar(50) NOT NULL,
+    role role_type,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unquser UNIQUE (username, role)
-);
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP);

@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS piercing;
+
+DROP TYPE IF EXISTS discard_type;

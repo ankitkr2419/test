@@ -1,0 +1,6 @@
+TipsTubes:
+  - labwareID: 1
+    consumabledistanceID: 103
+    name: "piercing_tip"
+    volume: 700.00
+    height: 93.00

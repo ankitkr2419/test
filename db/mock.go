@@ -288,3 +288,28 @@ func (m *DBMockStore) CheckIfICTargetAdded(ctx context.Context, id uuid.UUID) (W
 	args := m.Called(ctx, id)
 	return args.Get(0).(WarnResponse), args.Error(1)
 }
+
+func (m *DBMockStore) InsertMotor(ctx context.Context, motors []Motor) (err error) {
+	args := m.Called(ctx, motors)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) InsertConsumableDistance(ctx context.Context, c []ConsumableDistance) (err error) {
+	args := m.Called(ctx, c)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) InsertLabware(ctx context.Context, l []Labware) (err error) {
+	args := m.Called(ctx, l)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err error) {
+	args := m.Called(ctx, t)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge) (err error) {
+	args := m.Called(ctx, c)
+	return args.Error(1)
+}

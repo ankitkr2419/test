@@ -1,0 +1,4 @@
+Labware:
+  - id: 1
+    name: "Covid"
+    description: "Covid Labware"

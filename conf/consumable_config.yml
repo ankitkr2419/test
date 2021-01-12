@@ -1,0 +1,121 @@
+ConsumableDistance:
+  - id: 1
+    name: "deck_start"
+    distance: 0.00
+    description: "desk start point"
+  - id: 2
+    name: "deck_end"
+    distance: 370.00
+    description: "desk end point"
+  - id: 3
+    name: "shaker_start"
+    distance: 63.90
+    description: "shakers area start point"
+  - id: 4
+    name: "shaker_end"
+    distance: 113.90
+    description: "shakers area end point"
+  - id: 5
+    name: "extraction_cartridge_start"
+    distance: 127.66
+    description: "extraction cartridge area start point"
+  - id: 6
+    name: "extraction_cartridge_end"
+    distance: 211.97
+    description: "extraction cartridge area end point"
+  - id: 7
+    name: "PCR_cartridge_start"
+    distance: 255.19
+    description: "PCR cartridge area start point"
+  - id: 8
+    name: "PCR_cartridge_end"
+    distance: 295.66
+    description: "PCR cartridge area end point"
+  - id: 9
+    name: "PCR_collection_start"
+    distance: 297.60
+    description: "PCR collection area start point"
+  - id: 10
+    name: "PCR_collection_end"
+    distance: 329.60
+    description: "PCR collection area end point"
+  - id: 11
+    name: "discard_small_hole"
+    distance: 344.60
+    description: "syringe module will get rid of the tip from this hole"
+  - id: 12
+    name: "discard_big_hole"
+    distance: 354.60
+    description: "syringe module will get tip into this hole"
+  - id: 101
+    name: "pcr_tip"
+    distance: 13.52
+    description: "PCR tip at the 1st position"
+  - id: 102
+    name: "extraction_tip"
+    distance: 26.27
+    description: "extraction tip at the 2nd position"
+  - id: 103
+    name: "piercing_tip"
+    distance: 39.02
+    description: "piercing tip at the 3rd position"
+  - id: 151
+    name: "sample_tube"
+    distance: 54.65
+    description: "swap or blood or other sample holding tube"
+  - id: 152
+    name: "shaker_tube"
+    distance: 97.76
+    description: "tube for performing shaking and also heating"
+  - id: 153
+    name: "extraction_collection_tube"
+    distance: 233.50
+    description: "output from extraction process kept here"
+  - id: 154
+    name: "pcr_collection_tube"
+    distance: 316.75
+    description: "output from pcr process kept here"
+  - id: 201
+    name: "syring_start"
+    distance: 0.00
+    description: "syring start point"
+  - id: 202
+    name: "syring_end_max"
+    distance: 133.00
+    description: "syringe max down limit"
+  - id: 301
+    name: "syringe_module_fast_down"
+    distance: 103.00
+    description: "syringe module goes this much down at fast for picking up the piercing tip ( before turning slow) from the homing position"
+  - id: 302
+    name: "syringe_module_slow_down"
+    distance: 5.00
+    description: "syringe module goes this much down at slow for picking up the piercing tip after coming fast down"
+  - id: 303
+    name: "pickup_piercing_tip_up"
+    distance: 59.00
+    description: "syringe module goes this much up at fast after picking up the piercing tip"
+  - id: 304
+    name: "piercing_height"
+    distance: 31.00
+    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil"
+  - id: 305
+    name: "piercing_tip_discard_height"
+    distance: 83.9
+    description: "syringe module goes this much down fast with the piercing tip, to enter inside the discard_hole_big for the start of the discarding tip"
+  - id: 306
+    name: "discard_tip_and_slow_up"
+    distance: 7.5
+    description: "syringe module goes this much up slow with the piercing tip, to discard the piercing  tip inside the discard_hole_small"
+  - id: 307
+    name: "discard_tip_and_fast_up"
+    distance: 137.5
+    description: "syringe module goes this much up fast after the piercing tip has been removed"
+  - id: 1001
+    name: "deck_a_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All distances on deck and tips and tubes distances  will be adjusted according to this variable"
+  - id: 1002
+    name: "syringe_a_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
