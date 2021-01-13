@@ -52,8 +52,8 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 
 func (d *Compact32Deck) Resume() (response string, err error) {
 
-	// if already on then throw error
-	if !paused[d.name] || !runInProgress[d.name] {
+	// if paused only then resume
+	if !paused[d.name] {
 		err = fmt.Errorf("System is already running, or done with the run")
 		return "", err
 	}
@@ -90,7 +90,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	fmt.Println("switching motor off....")
 	response, err = d.SwitchOffMotor()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("From deck ", d.name, err)
 		return "", err
 	}
 
