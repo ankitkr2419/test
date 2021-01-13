@@ -15,7 +15,7 @@ func deckHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "DeckHoming")
@@ -42,7 +42,7 @@ func syringeHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "SyringeHoming")
@@ -69,7 +69,7 @@ func syringeModuleHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "SyringeModuleHoming")
@@ -96,7 +96,7 @@ func magnetHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "MagnetHoming")
@@ -124,7 +124,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "Homing")
@@ -160,20 +160,10 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 	for {
 		switch {
 		case deckAErr != nil:
-			fmt.Printf("Error %s deck A", operation)
-			// abort Deck B Operation as Well
-			response, err = deps.PlcDeck["B"].Abort()
-			if err != nil {
-				return
-			}
+			fmt.Printf("Error %s deck A", operation, deckAErr)
 			return "", deckAErr
 		case deckBErr != nil:
-			fmt.Printf("Error %s deck B", operation)
-			// Abort Deck A Operation as well
-			response, err = deps.PlcDeck["A"].Abort()
-			if err != nil {
-				return
-			}
+			fmt.Printf("Error %s deck B", operation, deckBErr)
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
@@ -192,30 +182,10 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 
 		// Compact32Deck is the type of deps.PlcDeck[deck]
 		result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(operation).Call([]reflect.Value{})
+		// TODO : variadic parameters ought to be handled as well
+		//  this will make Call to any method generic
+		// TODO : Handle Panics with recover()
 
-		/*
-			switch operation {
-			case "Homing":
-				response, err = deps.PlcDeck[deck].Homing()
-			case "SyringeHoming":
-				response, err = deps.PlcDeck[deck].SyringeHoming()
-			case "SyringeModuleHoming":
-				response, err = deps.PlcDeck[deck].SyringeModuleHoming()
-			case "DeckHoming":
-				response, err = deps.PlcDeck[deck].DeckHoming()
-			case "MagnetHoming":
-				response, err = deps.PlcDeck[deck].MagnetHoming()
-			case "Pause":
-				response, err = deps.PlcDeck[deck].Pause()
-			case "Resume":
-				response, err = deps.PlcDeck[deck].Resume()
-			case "Abort":
-				response, err = deps.PlcDeck[deck].Abort()
-
-			default:
-				err = fmt.Errorf("Invalid Operation")
-			}
-		*/
 		if len(result) != 2 {
 			fmt.Println("result is different in this reflect Call !", result)
 			return "", fmt.Errorf("unexpected length result")

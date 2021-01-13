@@ -67,7 +67,7 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			fmt.Fprintf(rw, response+" Manual Movements in Progress")
+			fmt.Fprintf(rw, response+" Manual Movements in Progress/Done")
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
@@ -80,7 +80,7 @@ func pauseHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "Pause")
@@ -108,7 +108,7 @@ func resumeHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "Resume")
@@ -136,7 +136,9 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
+
+		fmt.Println("Inside ABORT... value of deck:", deck, len(deck))
 		switch deck {
 		case "":
 			response, err = bothDeckOperation(deps, "Abort")
