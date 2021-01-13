@@ -114,7 +114,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				// Towards Sensor
 				case 1:
 					if (positions[deckAndNumber] - distanceMoved) < 0 {
-						return "", fmt.Errorf("Motor Just moved to negative distnace!")
+						return "", fmt.Errorf("Motor Just moved to negative distance!")
 					}
 					positions[deckAndNumber] -= distanceMoved
 				default:
@@ -140,15 +140,14 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				response, err = d.SwitchOffMotor()
 				//statusChannel <- 3
 				sensorHasCut[d.name] = true
-				positions[deckAndNumber] = 0
-				// TODO caliberation
+				positions[deckAndNumber] = calibs[deckAndNumber]
 				return
 			} else if int(results[0]) == sensorUncut && pulse == moveOppositeSensorPulses {
 				fmt.Println("Sensor returned ---> ", results[0])
 				response, err = d.SwitchOffMotor()
 				sensorHasCut[d.name] = false
 				time.Sleep(100 * time.Millisecond)
-				response, err = d.SetupMotor(motors[deckAndNumber]["fast"], reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], REV, motorNum)
+				response, err = d.SetupMotor(motors[deckAndNumber]["fast"], reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
 				//statusChannel <- 4
 				return
 			}
