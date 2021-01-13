@@ -68,6 +68,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	}
 	fmt.Println("Wrote motorNum. res : ", results)
 
+	// Check if User has paused the run/operation
 	for {
 		if paused[d.name] {
 			fmt.Println("Machine in PAUSED state")
@@ -109,10 +110,10 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				distanceMoved := float64(pulse) / float64(motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
 				switch direction {
 				// Away from Sensor
-				case 0:
+				case REV:
 					positions[deckAndNumber] += distanceMoved
 				// Towards Sensor
-				case 1:
+				case FWD:
 					if (positions[deckAndNumber] - distanceMoved) < 0 {
 						return "", fmt.Errorf("Motor Just moved to negative distance!")
 					}
@@ -120,7 +121,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				default:
 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
 				}
-				//statusChannel <- 1
 				return "RUN Completed", nil
 			}
 		}
@@ -138,7 +138,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			if int(results[0]) == sensorCut && pulse != moveOppositeSensorPulses {
 				fmt.Println("Sensor returned ---> ", results[0])
 				response, err = d.SwitchOffMotor()
-				//statusChannel <- 3
 				sensorHasCut[d.name] = true
 				positions[deckAndNumber] = calibs[deckAndNumber]
 				return
@@ -148,7 +147,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				sensorHasCut[d.name] = false
 				time.Sleep(100 * time.Millisecond)
 				response, err = d.SetupMotor(motors[deckAndNumber]["fast"], reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
-				//statusChannel <- 4
 				return
 			}
 		}
@@ -252,7 +250,6 @@ func (d *Compact32Deck) SyringeHoming() (response string, err error) {
 
 	fmt.Println("Syringe is moving down until sensor not cut")
 
-	// response, err = d.SetupMotor(uint16(2000), uint16(26666), uint16(100), UP, uint16(10))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], uint16(initialSensorCutSyringePulses), motors[deckAndNumber]["ramp"], syringeDOWN, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -261,7 +258,6 @@ func (d *Compact32Deck) SyringeHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Aspiring and getting cut then aspiring 2000")
-	//response, err = d.SetupMotor(uint16(2000), uint16(19999), uint16(100), DOWN, uint16(10))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], moveOppositeSensorPulses, motors[deckAndNumber]["ramp"], syringeUP, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -269,7 +265,6 @@ func (d *Compact32Deck) SyringeHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Syringe dispencing again")
-	// response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), UP, uint16(10))
 	response, err = d.SetupMotor(motors[deckAndNumber]["slow"], finalSensorCutPulses, motors[deckAndNumber]["ramp"], syringeDOWN, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -285,7 +280,6 @@ func (d *Compact32Deck) SyringeModuleHoming() (response string, err error) {
 	deckAndNumber := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
 
 	fmt.Println("Syringe Module moving Up")
-	// response, err = d.SetupMotor(uint16(2000), initialSensorCutSyringeModulePulses, uint16(100), UP, uint16(9))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], initialSensorCutSyringeModulePulses, motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -296,7 +290,6 @@ func (d *Compact32Deck) SyringeModuleHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Syringe Module moving Down 20 mm or More.")
-	// response, err = d.SetupMotor(uint16(2000), moveOppositeSensorPulses, uint16(100), DOWN, uint16(9))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], moveOppositeSensorPulses, motors[deckAndNumber]["ramp"], DOWN, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -305,7 +298,6 @@ func (d *Compact32Deck) SyringeModuleHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Syringe Module moving Up")
-	// response, err = d.SetupMotor(uint16(500), finalSensorCutPulses, uint16(100), UP, uint16(9))
 	response, err = d.SetupMotor(motors[deckAndNumber]["slow"], finalSensorCutPulses, motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -321,16 +313,13 @@ func (d *Compact32Deck) DeckHoming() (response string, err error) {
 	deckAndNumber := DeckNumber{Deck: d.name, Number: K5_Deck}
 
 	fmt.Println("Deck is moving forward")
-	// response, err = d.SetupMotor(uint16(2000), initialSensorCutDeckPulses, uint16(100), FWD, uint16(5))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], initialSensorCutDeckPulses, motors[deckAndNumber]["ramp"], FWD, deckAndNumber.Number)
 	if err != nil {
 		return
 	}
 
-	//	sensorHasCut[d.name] = false
 	time.Sleep(100 * time.Millisecond)
 	fmt.Println("Deck is moving back by and after not cut -> 2000")
-	// response, err = d.SetupMotor(uint16(2000), moveOppositeSensorPulses, uint16(100), REV, uint16(5))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], moveOppositeSensorPulses, motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -339,7 +328,6 @@ func (d *Compact32Deck) DeckHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Deck is moving forward again by 2999")
-	// response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), FWD, uint16(5))
 	response, err = d.SetupMotor(motors[deckAndNumber]["slow"], finalSensorCutPulses, motors[deckAndNumber]["ramp"], FWD, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -366,7 +354,6 @@ func (d *Compact32Deck) MagnetHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 	fmt.Println("Moving Magnet Back by 50mm")
 
-	// response, err = d.SetupMotor(uint16(2000), uint16(10000), uint16(100), REV, uint16(7))
 	// TODO: Use consumable distance var instead of moveMagnetAfterFinalCutPulses
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], moveMagnetAfterFinalCutPulses, motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
 	if err != nil {
@@ -381,7 +368,6 @@ func (d *Compact32Deck) MagnetUpDownHoming() (response string, err error) {
 	deckAndNumber := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
 
 	fmt.Println("Magnet is moving up")
-	// response, err = d.SetupMotor(uint16(2000), initialSensorCutMagnetPulses, uint16(100), UP, uint16(6))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], initialSensorCutMagnetPulses, motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -389,7 +375,6 @@ func (d *Compact32Deck) MagnetUpDownHoming() (response string, err error) {
 
 	time.Sleep(100 * time.Millisecond)
 	fmt.Println("Magnet is moving down by and after not cut -> 2000")
-	// response, err = d.SetupMotor(uint16(2000), moveOppositeSensorPulses, uint16(100), DOWN, uint16(6))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], moveOppositeSensorPulses, motors[deckAndNumber]["ramp"], DOWN, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -398,7 +383,6 @@ func (d *Compact32Deck) MagnetUpDownHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Magnet is moving up again by 2999 till sensor cuts")
-	// response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), UP, uint16(6))
 	response, err = d.SetupMotor(motors[deckAndNumber]["slow"], finalSensorCutPulses, motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
 
 	fmt.Println("Magnet Up/Down homing is completed.")
@@ -411,7 +395,6 @@ func (d *Compact32Deck) MagnetFwdRevHoming() (response string, err error) {
 	deckAndNumber := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 
 	fmt.Println("Magnet is moving forward")
-	// response, err = d.SetupMotor(uint16(2000), initialSensorCutMagnetPulses, uint16(100), FWD, uint16(7))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], initialSensorCutMagnetPulses, motors[deckAndNumber]["ramp"], FWD, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -419,7 +402,6 @@ func (d *Compact32Deck) MagnetFwdRevHoming() (response string, err error) {
 
 	time.Sleep(100 * time.Millisecond)
 	fmt.Println("Magnet is moving back by and after not cut -> 2000")
-	// response, err = d.SetupMotor(uint16(2000), moveOppositeSensorPulses, uint16(100), REV, uint16(7))
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], moveOppositeSensorPulses, motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
 	if err != nil {
 		return
@@ -428,7 +410,6 @@ func (d *Compact32Deck) MagnetFwdRevHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Magnet is moving forward again by 2999")
-	// response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), FWD, uint16(7))
 	response, err = d.SetupMotor(motors[deckAndNumber]["slow"], finalSensorCutPulses, motors[deckAndNumber]["ramp"], FWD, deckAndNumber.Number)
 
 	fmt.Println("Magnet Up/Down homing is completed.")
