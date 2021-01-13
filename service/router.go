@@ -74,5 +74,15 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/pause/{deck:[A-B]?}", pauseHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/resume/{deck:[A-B]?}", resumeHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/abort/{deck:[A-B]?}", abortHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/piercing", createPiercingHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/piercing", listPiercingHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/piercing/{id}", showPiercingHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/piercing/{id}", deletePiercingHandler(deps)).Methods(http.MethodDelete)
+	router.HandleFunc("/piercing/{id}", updatePiercingHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/aspireDispense", createAspireDispenseHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/aspireDispense", listAspireDispenseHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/aspireDispense/{id}", showAspireDispenseHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/aspireDispense/{id}", deleteAspireDispenseHandler(deps)).Methods(http.MethodDelete)
+	router.HandleFunc("/aspireDispense/{id}", updateAspireDispenseHandler(deps)).Methods(http.MethodPut)
 	return
 }
