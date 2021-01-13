@@ -194,6 +194,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	}
 
 	runInProgress[d.name] = true
+	defer d.ResetRunInProgress()
 
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.SyringeHoming()
@@ -218,8 +219,6 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	if err != nil {
 		return
 	}
-
-	runInProgress[d.name] = false
 
 	fmt.Println("Homing Completed Successfully")
 
@@ -326,6 +325,9 @@ func (d *Compact32Deck) DeckHoming() (response string, err error) {
 	fmt.Println("Deck is moving forward again by 2999")
 	// response, err = d.SetupMotor(uint16(500), uint16(2999), uint16(100), FWD, uint16(5))
 	response, err = d.SetupMotor(motors[deckAndNumber]["slow"], finalSensorCutPulses, motors[deckAndNumber]["ramp"], FWD, K5_Deck)
+	if err != nil {
+		return
+	}
 
 	fmt.Println("Deck homing is completed.")
 
