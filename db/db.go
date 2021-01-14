@@ -65,4 +65,9 @@ type Storer interface {
 	InsertLabware(context.Context, []Labware) error
 	InsertTipsTubes(context.Context, []TipsTubes) error
 	InsertCartridge(context.Context, []Cartridge) error
+	ListMotors() ([]Motor, error)
+	ListConsDistances() ([]ConsumableDistance, error)
+	ListLabwares() ([]Labware, error)
+	ListTipsTubes() ([]TipsTubes, error)
+	ListCartridges() ([]Cartridge, error)
 }

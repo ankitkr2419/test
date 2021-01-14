@@ -20,7 +20,9 @@ const (
 							height,
 							volume)
 							VALUES %s `
-	insertCartridgeQuery2 = `ON CONFLICT DO NOTHING;`
+	insertCartridgeQuery2   = `ON CONFLICT DO NOTHING;`
+	selectAllCartridgeQuery = `SELECT *
+							FROM cartridges`
 )
 
 type Cartridge struct {
@@ -28,7 +30,7 @@ type Cartridge struct {
 	LabwareID   int       `db:"labware_id" json:"labware_id"`
 	Type        string    `db:"type" json:"type"`
 	Description string    `db:"description" json:"description"`
-	WellNum     int       `db:"wells_num" json:"wells_num"`
+	WellNum     int       `db:"well_num" json:"well_num"`
 	Distance    float64   `db:"distance" json:"distance"`
 	Height      float64   `db:"height" json:"height"`
 	Volume      float64   `db:"volume" json:"volume"`
@@ -62,4 +64,13 @@ func makeCartridgeQuery(cartridge []Cartridge) string {
 	stmt += insertCartridgeQuery2
 
 	return stmt
+}
+
+func (s *pgStore) ListCartridges() (cartridge []Cartridge, err error) {
+	err = s.db.Select(&cartridge, selectAllCartridgeQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing cartridge details")
+		return
+	}
+	return
 }

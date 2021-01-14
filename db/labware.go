@@ -15,6 +15,8 @@ const (
 							description)
 							VALUES %s `
 	insertLabwareQuery2 = `ON CONFLICT DO NOTHING;`
+	getallLabwares      = `SELECT *
+						FROM labwares`
 )
 
 type Labware struct {
@@ -49,4 +51,13 @@ func makeLabwareQuery(labware []Labware) string {
 	stmt += insertLabwareQuery2
 
 	return stmt
+}
+
+func (s *pgStore) ListLabwares() (labwares []Labware, err error) {
+	err = s.db.Select(&labwares, getallLabwares)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing labware details")
+		return
+	}
+	return
 }

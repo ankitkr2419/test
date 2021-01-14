@@ -32,7 +32,7 @@ func (suite *CartridgeHandlerTestSuite) TestCreateCartridgeSuccess() {
 		ID: 1, LabwareID: 1, Type: "extraction", Description: "extraction cartridge", WellNum: 1, Distance: 17.5, Height: 2.0, Volume: 10.0,
 	}, nil)
 
-	body := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"extraction","description":"extraction cartridge","wells_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	body := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"extraction","description":"extraction cartridge","well_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/cartridge",
 		"/cartridge",
@@ -40,7 +40,7 @@ func (suite *CartridgeHandlerTestSuite) TestCreateCartridgeSuccess() {
 		createCartridgeHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"extraction","description":"extraction cartridge","wells_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	output := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"extraction","description":"extraction cartridge","well_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
@@ -53,7 +53,7 @@ func (suite *CartridgeHandlerTestSuite) TestCreateCartridgeFailure() {
 		ID: 1, LabwareID: 1, Type: "extraction", Description: "extraction cartridge", WellNum: 1, Distance: 17.5, Height: 2, Volume: 10,
 	}, nil)
 
-	body := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"extraction","description":"extraction cartridge","wells_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	body := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"extraction","description":"extraction cartridge","well_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/cartridge",
 		"/cartridge",
@@ -61,7 +61,7 @@ func (suite *CartridgeHandlerTestSuite) TestCreateCartridgeFailure() {
 		createCartridgeHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"pcr","description":"extraction cartridge","wells_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	output := fmt.Sprintf(`{"id":1,"labware_id":1,"type":"pcr","description":"extraction cartridge","well_num":1,"distance":17.5,"height":2,"volume":10,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.NotEqual(suite.T(), output, recorder.Body.String())

@@ -41,3 +41,23 @@ type Driver interface {
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
 }
+
+type DeckDriver interface {
+	NameOfDeck() string
+	Homing() (string, error)
+	DeckHoming() (string, error)
+	SyringeHoming() (string, error)
+	SyringeModuleHoming() (string, error)
+	MagnetHoming() (string, error)
+	MagnetUpDownHoming() (string, error)
+	MagnetFwdRevHoming() (string, error)
+	SwitchOffMotor() (string, error)
+	ReadExecutedPulses() (string, error)
+	SetupMotor(uint16, uint16, uint16, uint16, uint16) (string, error)
+	ManualMovement(uint16, uint16, uint16) (string, error)
+	ResetRunInProgress()
+	Pause() (string, error)
+	Resume() (string, error)
+	Abort() (string, error)
+	ResumeMotorWithPulses(uint16) (string, error)
+}

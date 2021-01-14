@@ -18,6 +18,8 @@ type Config struct {
 
 type MotorConfig struct {
 	Motor []struct {
+		ID     int
+		Deck   string
 		Number int
 		Name   string
 		Ramp   int
@@ -255,6 +257,8 @@ func SetupCartridge(s Storer) (err error) {
 func makeMotorList(configMotors MotorConfig) (Motors []Motor) {
 	motor := Motor{}
 	for _, d := range configMotors.Motor {
+		motor.ID = d.ID
+		motor.Deck = d.Deck
 		motor.Number = d.Number
 		motor.Name = d.Name
 		motor.Ramp = d.Ramp

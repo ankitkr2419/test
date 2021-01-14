@@ -313,3 +313,28 @@ func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge) (err e
 	args := m.Called(ctx, c)
 	return args.Error(1)
 }
+
+func (m *DBMockStore) ListCartridges() (c []Cartridge, err error) {
+	args := m.Called(c)
+	return args.Get(0).([]Cartridge), args.Error(1)
+}
+
+func (m *DBMockStore) ListTipsTubes() (t []TipsTubes, err error) {
+	args := m.Called(t)
+	return args.Get(0).([]TipsTubes), args.Error(1)
+}
+
+func (m *DBMockStore) ListLabwares() (l []Labware, err error) {
+	args := m.Called(l)
+	return args.Get(0).([]Labware), args.Error(1)
+}
+
+func (m *DBMockStore) ListConsDistances() (c []ConsumableDistance, err error) {
+	args := m.Called(c)
+	return args.Get(0).([]ConsumableDistance), args.Error(1)
+}
+
+func (m *DBMockStore) ListMotors() (motor []Motor, err error) {
+	args := m.Called(motor)
+	return args.Get(0).([]Motor), args.Error(1)
+}

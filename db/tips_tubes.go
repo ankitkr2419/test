@@ -18,6 +18,8 @@ const (
 							height)
 							VALUES %s `
 	insertTipsTubesQuery2 = `ON CONFLICT DO NOTHING;`
+	getTipsTubesQuery     = `SELECT *
+							FROM tips_and_tubes`
 )
 
 type TipsTubes struct {
@@ -56,4 +58,13 @@ func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 	stmt += insertTipsTubesQuery2
 
 	return stmt
+}
+
+func (s *pgStore) ListTipsTubes() (tipstubes []TipsTubes, err error) {
+	err = s.db.Select(&tipstubes, getTipsTubesQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
+		return
+	}
+	return
 }

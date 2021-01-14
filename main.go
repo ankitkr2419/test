@@ -103,6 +103,8 @@ func main() {
 func startApp(plcName string, test bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
+	var driverDeckA plc.DeckDriver
+	var driverDeckB plc.DeckDriver
 
 	if plcName != "simulator" && plcName != "compact32" {
 		logger.Error("Unsupported PLC. Valid PLC: 'simulator' or 'compact32'")
@@ -118,6 +120,8 @@ func startApp(plcName string, test bool) (err error) {
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
 		driver = compact32.NewCompact32Driver(exit, test)
+		driverDeckA = compact32.NewCompact32DeckDriver(exit, test, "A", byte(1))
+		driverDeckB = compact32.NewCompact32DeckDriver(exit, test, "B", byte(2))
 	} else {
 		driver = simulator.NewSimulator(exit)
 	}
@@ -128,9 +132,15 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
+	plcDeckMap := map[string]plc.DeckDriver{
+		"A": driverDeckA,
+		"B": driverDeckB,
+	}
+
 	deps := service.Dependencies{
 		Store:   store,
 		Plc:     driver,
+		PlcDeck: plcDeckMap,
 		ExitCh:  exit,
 		WsErrCh: websocketErr,
 		WsMsgCh: websocketMsg,
@@ -150,10 +160,21 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
+	err = compact32.SelectAllMotors(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Motors failed")
+		return
+	}
+
 	// setup Db with consumable distance
 	err = db.SetupConsumable(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Cosumable Distance failed")
+		return
+	}
+	err = compact32.SelectAllConsDistances(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Cosumable Distances failed")
 		return
 	}
 
@@ -163,6 +184,11 @@ func startApp(plcName string, test bool) (err error) {
 		logger.WithField("err", err.Error()).Error("Setup Labware failed")
 		return
 	}
+	err = compact32.SelectAllLabwares(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Labwares failed")
+		return
+	}
 
 	// setup Db with tipstube
 	err = db.SetupTipsTubes(store)
@@ -170,11 +196,21 @@ func startApp(plcName string, test bool) (err error) {
 		logger.WithField("err", err.Error()).Error("Setup TipsTubes failed")
 		return
 	}
+	err = compact32.SelectAllTipsTubes(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Tips and Tubes failed")
+		return
+	}
 
 	// setup Db with cartridge
 	err = db.SetupCartridge(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Cartridge failed")
+		return
+	}
+	err = compact32.SelectAllCartridge(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
 		return
 	}
 
@@ -190,7 +226,7 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	var addr = flag.String("addr", "localhost:"+strconv.Itoa(config.AppPort()), "http service address")
+	var addr = flag.String("addr", "0.0.0.0:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
 	router := service.InitRouter(deps)
 
