@@ -338,3 +338,53 @@ func (m *DBMockStore) ListMotors() (motor []Motor, err error) {
 	args := m.Called(motor)
 	return args.Get(0).([]Motor), args.Error(1)
 }
+
+func (m *DBMockStore) ShowPiercing(ctx context.Context, id uuid.UUID) (p Piercing, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Piercing), args.Error(1)
+}
+
+func (m *DBMockStore) ListPiercing(ctx context.Context) (p []Piercing, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Piercing), args.Error(1)
+}
+
+func (m *DBMockStore) CreatePiercing(ctx context.Context, p Piercing) (pi Piercing, err error) {
+	args := m.Called(ctx, p)
+	return args.Get(0).(Piercing), args.Error(1)
+}
+
+func (m *DBMockStore) DeletePiercing(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
+	args := m.Called(ctx, p)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (ad AspireDispense, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(AspireDispense), args.Error(1)
+}
+
+func (m *DBMockStore) ListAspireDispense(ctx context.Context) (ad []AspireDispense, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]AspireDispense), args.Error(1)
+}
+
+func (m *DBMockStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (a AspireDispense, err error) {
+	args := m.Called(ctx, ad)
+	return args.Get(0).(AspireDispense), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteAspireDispense(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (err error) {
+	args := m.Called(ctx, ad)
+	return args.Error(1)
+}
