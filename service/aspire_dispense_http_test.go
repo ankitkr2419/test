@@ -163,6 +163,23 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
+func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseFailure() {
+	testUUID := uuid.New()
+	suite.dbMock.On("ShowAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{}, fmt.Errorf("Error showing aspire dispense"))
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/aspireDispense/{id}",
+		"/aspireDispense/"+testUUID.String(),
+		"",
+		showAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ""
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 	testUUID := uuid.New()
 	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{
@@ -196,6 +213,25 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
+func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
+	testUUID := uuid.New()
+	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{}, fmt.Errorf("Error creating aspire dispense"))
+
+	body := fmt.Sprintf(`{"id":"%s","category":"well_to_well","well_no_source":1,"aspire_height":2,"aspire_mixing_volume":3,"aspire_no_of_cycles":4,"aspire_volume":5,"dispense_height":6,"dispense_mixing_volume":7,"dispense_no_of_cycles":8,"dispense_vol":9,"dispense_blow":10,"well_to_destination":11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+
+	recorder := makeHTTPCall(http.MethodPut,
+		"/aspireDispense/{id}",
+		"/aspireDispense/"+testUUID.String(),
+		body,
+		updateAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), "", recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
 func (suite *AspireDispenseHandlerTestSuite) TestDeleteAspireDispenseSuccess() {
 	testUUID := uuid.New()
 	suite.dbMock.On("DeleteAspireDispense", mock.Anything, mock.Anything).Return(
@@ -210,6 +246,22 @@ func (suite *AspireDispenseHandlerTestSuite) TestDeleteAspireDispenseSuccess() {
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), `{"msg":"aspire dispense deleted successfully"}`, recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestDeleteAspireDispenseFailure() {
+	testUUID := uuid.New()
+	suite.dbMock.On("DeleteAspireDispense", mock.Anything, mock.Anything).Return("", fmt.Errorf("Error deleting aspire dispense"))
+
+	recorder := makeHTTPCall(http.MethodDelete,
+		"/aspireDispense/{id}",
+		"/aspireDispense/"+testUUID.String(),
+		"",
+		deleteAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), "", recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
