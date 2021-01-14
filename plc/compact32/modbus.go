@@ -14,14 +14,14 @@ const (
 	DOWN        = uint16(0)
 	FWD         = uint16(1)
 	REV         = uint16(0)
-	syringeUP   = uint16(0)
-	syringeDOWN = uint16(1)
+	ASPIRE      = uint16(0)
+	DISPENSE    = uint16(1)
 	sensorUncut = 2
 	sensorCut   = 3
 )
 
 // *** NOTE ***
-// For Syringe UP means DOWN and DOWN means UP
+// For Syringe ASPIRE means syringe goes UP and DISPENSE means syringe goes DOWN
 // This is because of hardware compatibility
 // 1 means towards sensor, 0 means against sensor
 // ************
