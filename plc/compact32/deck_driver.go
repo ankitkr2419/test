@@ -96,6 +96,9 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	for {
 		if aborted[d.name] {
+			// Write executed pulses to Position
+			positions[deckAndNumber] += float64(executedPulses[d.name]) / float64(motors[deckAndNumber]["steps"])
+			fmt.Println("pos", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
@@ -119,6 +122,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				// Away from Sensor
 				case REV:
 					positions[deckAndNumber] += distanceMoved
+					fmt.Println("pos", positions[deckAndNumber])
 				// Towards Sensor
 				case FWD:
 					if (positions[deckAndNumber] - distanceMoved) < 0 {
@@ -126,10 +130,12 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 						fmt.Println("Motor Just moved to negative distance!")
 					}
 					positions[deckAndNumber] -= distanceMoved
+					fmt.Println("pos", positions[deckAndNumber])
 				default:
 					fmt.Println("Unknown Direction was found")
 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
 				}
+				fmt.Println("pos", positions[deckAndNumber])
 				return "RUN Completed", nil
 			}
 		}
@@ -154,6 +160,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				}
 				sensorHasCut[d.name] = true
 				positions[deckAndNumber] = calibs[deckAndNumber]
+				fmt.Println("pos", positions[deckAndNumber])
 				return
 			}
 		}
