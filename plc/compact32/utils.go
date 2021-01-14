@@ -9,6 +9,13 @@ type DeckNumber struct {
 	Number uint16
 }
 
+// Each Cartridge can be uniquely identified by these fields
+type UniqueCartridge struct {
+	CartridgeID   int64
+	CartridgeType string
+	WellNum       int64
+}
+
 // motors
 const (
 	K1_Syringe_Module_LH = uint16(iota + 1)
@@ -96,8 +103,8 @@ var positions = map[DeckNumber]float64{
 var motors = make(map[DeckNumber]map[string]uint16)
 var consDistance = make(map[string]float64)
 var tipstubes = make(map[string]map[string]interface{})
-var cartridges = make(map[int]map[string]interface{})
-var cartridgeWells = make(map[int]map[string]float64)
+var labwares = make(map[int]string)
+var cartridges = make(map[UniqueCartridge]map[string]float64)
 var calibs = make(map[DeckNumber]float64)
 
 func SelectAllMotors(store db.Storer) (err error) {
@@ -168,10 +175,10 @@ func SelectAllCartridges(store db.Storer) (err error) {
 		return
 	}
 
+	cartridgeType := make(map[int64]string)
+
 	for _, cartridge := range allCartridges {
-		cartridges[cartridge.ID] = make(map[string]interface{})
-		cartridges[cartridge.ID]["type"] = cartridge.Type
-		cartridges[cartridge.ID]["description"] = cartridge.Description
+		cartridgeType[cartridge.ID] = cartridge.Type
 	}
 
 	allCartridgeWells, err := store.ListCartridgeWells()
@@ -180,11 +187,15 @@ func SelectAllCartridges(store db.Storer) (err error) {
 	}
 
 	for _, well := range allCartridgeWells {
-		cartridgeWells[well.ID] = make(map[string]float64)
-		cartridgeWells[well.ID]["well_num"] = float64(well.WellNum)
-		cartridgeWells[well.ID]["distance"] = well.Distance
-		cartridgeWells[well.ID]["height"] = well.Height
-		cartridgeWells[well.ID]["volume"] = well.Volume
+		uniqueCartridge := UniqueCartridge{
+			CartridgeID:   well.ID,
+			CartridgeType: cartridgeType[well.ID],
+			WellNum:       well.WellNum,
+		}
+		cartridges[uniqueCartridge] = make(map[string]float64)
+		cartridges[uniqueCartridge]["distance"] = well.Distance
+		cartridges[uniqueCartridge]["height"] = well.Height
+		cartridges[uniqueCartridge]["volume"] = well.Volume
 	}
 	return
 }

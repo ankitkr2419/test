@@ -30,7 +30,7 @@ const (
 )
 
 type Cartridge struct {
-	ID          int       `db:"id" json:"id"`
+	ID          int64     `db:"id" json:"id"`
 	Type        string    `db:"type" json:"type"`
 	Description string    `db:"description" json:"description"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
@@ -38,8 +38,8 @@ type Cartridge struct {
 }
 
 type CartridgeWells struct {
-	ID        int       `db:"id" json:"id"`
-	WellNum   int       `db:"well_num" json:"well_num"`
+	ID        int64     `db:"id" json:"id"`
+	WellNum   int64     `db:"well_num" json:"well_num"`
 	Distance  float64   `db:"distance" json:"distance"`
 	Height    float64   `db:"height" json:"height"`
 	Volume    float64   `db:"volume" json:"volume"`
