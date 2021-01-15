@@ -32,7 +32,6 @@ const (
 	moveOppositeSensorPulses            = uint16(19999)
 	reverseAfterNonCutPulses            = uint16(2000)
 	finalSensorCutPulses                = uint16(2999)
-	moveMagnetAfterFinalCutPulses       = uint16(10000)
 )
 
 var wrotePulses = map[string]uint16{
