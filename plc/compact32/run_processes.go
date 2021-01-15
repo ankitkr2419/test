@@ -10,6 +10,18 @@ func (d *Compact32Deck) RunProcesses() (response string, err error) {
 	var labwareID, source_well, destination_well, aspire_cycles, dispense_cycles int64
 	var asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64
 
+	//***********************
+	//Process initial Setup *
+	//***********************
+	if runInProgress[d.name] {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return "", err
+	}
+	sensorHasCut[d.name] = false
+	aborted[d.name] = false
+	runInProgress[d.name] = true
+	defer d.ResetRunInProgress()
+
 	// Only extractions
 	// 1. well_to_well
 	category = "well_to_well"

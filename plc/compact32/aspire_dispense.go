@@ -35,38 +35,29 @@ variables: category, cartridgeType string,
   19. move syringe module down at fast till base
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
-  22. blow the air out
+  22. dispense by that dis_vol
   23. move syringe module up
+  24. dispense blow out air
 
 ********/
 
 func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID, source, destination, aspire_cycles, dispense_cycles int64, asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64) (response string, err error) {
-
-	if runInProgress[d.name] {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return "", err
-	}
-	sensorHasCut[d.name] = false
-	aborted[d.name] = false
-	runInProgress[d.name] = true
-	defer d.ResetRunInProgress()
 
 	var sourceCartridge, destinationCartridge map[string]float64
 	var sourcePosition, destinationPosition, distToTravel, position, tipHeight float64
 	var ok bool
 	var direction, pulses uint16
 	var deckAndMotor DeckNumber
-
 	deckAndMotor.Deck = d.name
+
+	//-----------------
+	// Get Tip Height -
+	//-----------------
 	if tipHeight, ok = tipstubes[cartridgeType+"_tip"]["height"]; !ok {
 		err = fmt.Errorf(cartridgeType + "_tip doesn't exist for tipstubes")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-
-	//
-	// ALGORITHM's 1 to 8 steps are implemented below
-	//
 
 	/*** GET THE CARTRIDGES
 	E.g :
@@ -104,7 +95,30 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 		CartridgeType: cartridgeType,
 	}
 
-	// Get Source Position
+	//*************************************************
+	// ALGORITHM's 1 to 8 steps are implemented below *
+	//*************************************************
+	//  1. Check the category of operation
+	//  2. if category is well_to_well then goto 3 else if category is shaker_to_well then goto 5  else 7
+	//  3. store the source_well position into sourcePosition variable
+	//  4. store the destination_well position into destinationPosition variable; goto 9
+	//  5. store the shaker position into sourcePosition variable
+	//  6. store the destination_well position into destinationPosition variable; goto 9
+	//  7. store the source_well position into sourcePosition variable
+	//  8. store the shaker position into destinationPosition variable
+	//
+
+	// NOTE : below position is added to sourcePosition/destinationPosition
+	// But only when they are wells
+	if position, ok = consDistance[cartridgeType+"_cartridge_start"]; !ok {
+		err = fmt.Errorf(cartridgeType + "_cartridge_start doesn't exist for consuamble distances")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	//----------------------
+	// Get Source Position -
+	//----------------------
 	switch category {
 	case "well_to_well", "well_to_shaker":
 		uniqueCartridge.WellNum = source
@@ -114,6 +128,8 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 			return "", err
 		}
 		sourcePosition, ok = sourceCartridge["distance"]
+		sourcePosition += position
+		fmt.Println("sourcePosition: ", sourcePosition)
 	case "shaker_to_well":
 		sourcePosition, ok = consDistance["shaker_tube"]
 	default:
@@ -127,17 +143,9 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 		return "", err
 	}
 
-	// NOTE : below position is added to sourcePosition as well as destinationPosition
-	if position, ok = consDistance[cartridgeType+"_cartridge_start"]; !ok {
-		sourcePosition += position
-		fmt.Println("sourcePosition: ", sourcePosition)
-	} else {
-		err = fmt.Errorf(cartridgeType + "_cartridge_start doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	// Get Destination Position
+	//---------------------------
+	// Get Destination Position -
+	//---------------------------
 	switch category {
 	case "well_to_well", "shaker_to_well":
 		uniqueCartridge.WellNum = destination
@@ -147,19 +155,20 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 			return "", err
 		}
 		destinationPosition, ok = destinationCartridge["distance"]
+		destinationPosition += position
+		fmt.Println("destinationPosition: ", destinationPosition)
 	case "well_to_shaker":
 		destinationPosition, ok = consDistance["shaker_tube"]
+		// default already handled in source Position
 	}
 	if !ok {
 		err = fmt.Errorf("destination doesn't exist for dispensing")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	destinationPosition += position
-	fmt.Println("destinationPosition: ", destinationPosition)
 
 	//
-	// ALGORITHM's 9th step is implemented below
+	// 9. setup the motor of syringe module to go up atleast 30mm above deck
 	//
 
 	// TODO: Check if its only LH /RH or both !!!
@@ -197,7 +206,8 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 skipExtractionTipUp:
 
 	//
-	// ALGORITHM's 10th step is implemented below
+	// 10. calculate the current position difference for deck;
+	//      if its positive then direction is 1(towards sensor) else 0(oppose sensor)
 	//
 
 	deckAndMotor.Number = K5_Deck
@@ -218,8 +228,12 @@ skipExtractionTipUp:
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
+	//*************************
+	// REACHING ASPIRE SOURCE *
+	//*************************
+
 	//
-	// ALGORITHM's 11th step is implemented below
+	// 11. move deck to match the sourcePosition with help of difference calculated
 	//
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
@@ -230,8 +244,12 @@ skipExtractionTipUp:
 
 skipDeckToSourcePosition:
 
+	//***********
+	// ASPIRING *
+	//***********
+
 	//
-	// ALGORITHM's 12th step is implemented below
+	//   12. move syringe module down at fast till base
 	//
 
 	// We know the concrete direction here onwards till Deck Movement
@@ -254,7 +272,7 @@ skipDeckToSourcePosition:
 	time.Sleep(100 * time.Millisecond)
 
 	//
-	// ALGORITHM's 13th step is implemented below
+	//   13. setup the syringe module motor with aspire height
 	//
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * asp_height))
@@ -267,7 +285,8 @@ skipDeckToSourcePosition:
 	time.Sleep(100 * time.Millisecond)
 
 	//
-	// ALGORITHM's 14th step is implemented below
+	//   14. pickup and drop that asp_mix_vol for number of aspire_cycles
+	//       these cycles should be fast
 	//
 
 	deckAndMotor.Number = K10_Syringe_LHRH
@@ -288,6 +307,7 @@ skipDeckToSourcePosition:
 
 		time.Sleep(100 * time.Millisecond)
 
+		// Dispense
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
@@ -296,10 +316,12 @@ skipDeckToSourcePosition:
 	}
 skipAspireCycles:
 
+	//
+	//   15. pickup asp_vol slow
+	//
+
 	pulses = uint16(math.Round(oneMicroLitrePulses * asp_vol))
-	//
-	// ALGORITHM's 15th step is implemented below
-	//
+
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {
 		return
@@ -308,7 +330,7 @@ skipAspireCycles:
 	time.Sleep(100 * time.Millisecond)
 
 	//
-	// ALGORITHM's 16th step is implemented below
+	//   16. move syringe module up slow till just above base
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
@@ -326,7 +348,7 @@ skipAspireCycles:
 	deckAndMotor.Number = K10_Syringe_LHRH
 
 	//
-	// ALGORITHM's 17th step is implemented below
+	//  17. take air in 5ul
 	//
 	// Just aspire 5 ul Pulses for now
 	// TODO: Remove this hardcoded volume
@@ -338,8 +360,12 @@ skipAspireCycles:
 
 	time.Sleep(100 * time.Millisecond)
 
+	//********************************
+	// REACHING DISPENSE DESTINATION *
+	//********************************
+
 	//
-	// ALGORITHM's 18th step is implemented below
+	// 18. Move slowly to destinationPosition by calculating the difference of Positions
 	//
 
 	deckAndMotor.Number = K5_Deck
@@ -369,8 +395,11 @@ skipAspireCycles:
 
 skipDeckToDestinationPosition:
 
+	//*************
+	// DISPENCING *
+	//*************
 	//
-	// ALGORITHM's 19th step is implemented below
+	//   19. move syringe module down at fast till base
 	//
 
 	// We know the concrete direction here onwards
@@ -393,9 +422,8 @@ skipDeckToDestinationPosition:
 	time.Sleep(100 * time.Millisecond)
 
 	//
-	// ALGORITHM's 20th step is implemented below
+	//   20. setup the syringe module motor with dispense height
 	//
-
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * dis_height))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
@@ -406,9 +434,8 @@ skipDeckToDestinationPosition:
 	time.Sleep(100 * time.Millisecond)
 
 	//
-	// ALGORITHM's 21th step is implemented below
+	//   21. pickup and drop that dis_mix_vol for number of dis_cycles
 	//
-
 	deckAndMotor.Number = K10_Syringe_LHRH
 	pulses = uint16(math.Round(oneMicroLitrePulses * dis_mix_vol))
 
@@ -417,6 +444,7 @@ skipDeckToDestinationPosition:
 	}
 	for cycleNumber := int64(1); cycleNumber <= dispense_cycles; cycleNumber++ {
 		// Dispense
+		// CHECK : should these operations be fast ?
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
@@ -424,6 +452,7 @@ skipDeckToDestinationPosition:
 
 		time.Sleep(100 * time.Millisecond)
 
+		// Aspire
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
 			return
@@ -433,7 +462,7 @@ skipDeckToDestinationPosition:
 skipDispenseCycles:
 
 	//
-	// ALGORITHM's 22nd step is implemented below
+	//    22. dispense by that dis_vol
 	//
 	pulses = uint16(math.Round(oneMicroLitrePulses * dis_vol))
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
@@ -444,7 +473,7 @@ skipDispenseCycles:
 	time.Sleep(100 * time.Millisecond)
 
 	//
-	// ALGORITHM's 23th step is implemented below
+	//   23. move syringe module up
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
@@ -462,8 +491,11 @@ skipDispenseCycles:
 		return
 	}
 
+	//
+	//   24. dispense blow out air
+	//
 	deckAndMotor.Number = K10_Syringe_LHRH
-	// blowing air after we are UP
+
 	pulses = uint16(math.Round(oneMicroLitrePulses * dis_blow))
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
