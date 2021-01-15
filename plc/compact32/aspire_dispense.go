@@ -276,6 +276,9 @@ skipDeckToSourcePosition:
 	oneMicroLitrePulses := 25.0
 	pulses = uint16(math.Round(oneMicroLitrePulses * asp_mix_vol))
 
+	if asp_mix_vol == 0 {
+		goto skipAspireCycles
+	}
 	for cycleNumber := int64(1); cycleNumber <= aspire_cycles; cycleNumber++ {
 		// Aspire
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
@@ -291,6 +294,7 @@ skipDeckToSourcePosition:
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
+skipAspireCycles:
 
 	pulses = uint16(math.Round(oneMicroLitrePulses * asp_vol))
 	//
@@ -408,6 +412,9 @@ skipDeckToDestinationPosition:
 	deckAndMotor.Number = K10_Syringe_LHRH
 	pulses = uint16(math.Round(oneMicroLitrePulses * dis_mix_vol))
 
+	if dis_mix_vol == 0 {
+		goto skipDispenseCycles
+	}
 	for cycleNumber := int64(1); cycleNumber <= dispense_cycles; cycleNumber++ {
 		// Dispense
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
@@ -423,12 +430,13 @@ skipDeckToDestinationPosition:
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
+skipDispenseCycles:
 
 	//
 	// ALGORITHM's 22nd step is implemented below
 	//
 	pulses = uint16(math.Round(oneMicroLitrePulses * dis_vol))
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
@@ -449,7 +457,7 @@ skipDeckToDestinationPosition:
 	distToTravel = positions[deckAndMotor] + tipHeight - position
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
-	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
