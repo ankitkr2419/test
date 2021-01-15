@@ -108,7 +108,6 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	switch category {
 	case "well_to_well", "well_to_shaker":
 		uniqueCartridge.WellNum = source
-		// What if we ignore the below ok ?
 		if sourceCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("sourceCartridge doesn't exist")
 			fmt.Println("Error: ", err)
@@ -142,7 +141,6 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	switch category {
 	case "well_to_well", "shaker_to_well":
 		uniqueCartridge.WellNum = destination
-		// What if we ignore the below ok ?
 		if destinationCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("destinationCartridge doesn't exist")
 			fmt.Println("Error: ", err)
@@ -160,26 +158,6 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	destinationPosition += position
 	fmt.Println("destinationPosition: ", destinationPosition)
 
-	/*
-		Id: 303
-		Name : pickup_piercing_tip_up
-		Distance: 59
-		Description: syringe module goes this much up at fast after picking up the piercing tip
-
-		Just like above invent this
-		Id: 311
-		Name : pickup_extraction_tip_up
-		Distance: 118
-		Descrption: syringe module goes this much up at fast after picking up the extraction tip
-
-		And this
-		Id: 312
-		Name : pickup_pcr_tip_up
-		Distance: 118
-		Descrption: syringe module goes this much up at fast after picking up the pcr tip
-
-	*/
-
 	//
 	// ALGORITHM's 9th step is implemented below
 	//
@@ -187,8 +165,8 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	// TODO: Check if its only LH /RH or both !!!
 	// Go UP with extraction/pcr tip
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
-	if position, ok = consDistance["pickup_"+cartridgeType+"_tip_up"]; !ok {
-		err = fmt.Errorf("pickup_" + cartridgeType + "_tip_up doesn't exist for consuamble distances")
+	if position, ok = consDistance["pickup_tip_up"]; !ok {
+		err = fmt.Errorf("pickup_tip_up doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -256,9 +234,8 @@ skipDeckToSourcePosition:
 	// ALGORITHM's 12th step is implemented below
 	//
 
-	// We know the concrete direction here onwards
+	// We know the concrete direction here onwards till Deck Movement
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
-	// TODO Add deck_base in consDistance
 	if position = consDistance["deck_base"]; ok {
 		distToTravel = position - (positions[deckAndMotor] + tipHeight)
 	} else {
@@ -301,7 +278,6 @@ skipDeckToSourcePosition:
 
 	for cycleNumber := int64(1); cycleNumber <= aspire_cycles; cycleNumber++ {
 		// Aspire
-		// TODO: Calculate pulses from volume
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
 			return
@@ -332,8 +308,8 @@ skipDeckToSourcePosition:
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	if position, ok = consDistance["pickup_"+cartridgeType+"_tip_up"]; !ok {
-		err = fmt.Errorf("pickup_" + cartridgeType + "_tip_up doesn't exist for consuamble distances")
+	if position, ok = consDistance["pickup_tip_up"]; !ok {
+		err = fmt.Errorf("pickup_tip_up doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -358,12 +334,6 @@ skipDeckToSourcePosition:
 
 	time.Sleep(100 * time.Millisecond)
 
-	//18. Move slowly to destinationPosition by calculating the difference of Positions
-	//19. move syringe module down at slow till base
-	//20. setup the syringe module motor with dispense height
-	//21. pickup and drop that dis_mix_vol for number of dis_cycles
-	//22. blow the air out
-	//23. move syringe module up
 	//
 	// ALGORITHM's 18th step is implemented below
 	//
@@ -401,7 +371,6 @@ skipDeckToDestinationPosition:
 
 	// We know the concrete direction here onwards
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
-	// TODO Add deck_base in consDistance
 	if position = consDistance["deck_base"]; ok {
 		distToTravel = position - (positions[deckAndMotor] + tipHeight)
 	} else {
@@ -471,8 +440,8 @@ skipDeckToDestinationPosition:
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	if position, ok = consDistance["pickup_"+cartridgeType+"_tip_up"]; !ok {
-		err = fmt.Errorf("pickup_" + cartridgeType + "_tip_up doesn't exist for consuamble distances")
+	if position, ok = consDistance["pickup_tip_up"]; !ok {
+		err = fmt.Errorf("pickup_tip_up doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
