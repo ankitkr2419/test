@@ -140,7 +140,7 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 			deckAndNumber.Number = uint16(cd.ID - 1000)
 			calibs[deckAndNumber] = cd.Distance
 		case cd.ID > 1050 && cd.ID <= 1060:
-			deckAndNumber.Deck = "A"
+			deckAndNumber.Deck = "B"
 			deckAndNumber.Number = uint16(cd.ID - 1050)
 			calibs[deckAndNumber] = cd.Distance
 		}
