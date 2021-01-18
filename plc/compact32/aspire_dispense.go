@@ -154,6 +154,7 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 			fmt.Println("Error: ", err)
 			return "", err
 		}
+		fmt.Println(destinationCartridge)
 		destinationPosition, ok = destinationCartridge["distance"]
 		destinationPosition += position
 		fmt.Println("destinationPosition: ", destinationPosition)
@@ -184,14 +185,14 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0:
+	case distToTravel > 0.1:
 		direction = 1
-	case distToTravel < 0:
+	case distToTravel < -0.1:
 		distToTravel *= -1
 		direction = 0
 	default:
 		// Skip the setUpMotor Step
-		goto skipExtractionTipUp
+		goto skipTipUp
 	}
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
@@ -203,7 +204,7 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	}
 	time.Sleep(100 * time.Millisecond)
 
-skipExtractionTipUp:
+skipTipUp:
 
 	//
 	// 10. calculate the current position difference for deck;
@@ -216,15 +217,16 @@ skipExtractionTipUp:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0:
+	case distToTravel > 0.1:
 		direction = 1
-	case distToTravel < 0:
+	case distToTravel < -0.1:
 		distToTravel *= -1
 		direction = 0
 	default:
 		// Skip the setUpMotor Step
 		goto skipDeckToSourcePosition
 	}
+	fmt.Println(distToTravel)
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
@@ -374,9 +376,9 @@ skipAspireCycles:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0:
+	case distToTravel > 0.1:
 		direction = 1
-	case distToTravel < 0:
+	case distToTravel < -0.1:
 		distToTravel *= -1
 		direction = 0
 	default:
