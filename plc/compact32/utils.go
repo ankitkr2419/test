@@ -1,6 +1,7 @@
 package compact32
 
 import (
+	"fmt"
 	"mylab/cpagent/db"
 )
 
@@ -144,6 +145,7 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 			calibs[deckAndNumber] = cd.Distance
 		}
 	}
+	fmt.Println("Calibs:--->", calibs)
 	return
 }
 

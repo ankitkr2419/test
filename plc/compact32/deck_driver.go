@@ -20,6 +20,8 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "", err
 	}
 
+	fmt.Println("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction)
+
 	// Switch OFF The motor
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
@@ -122,7 +124,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				// Away from Sensor
 				case REV:
 					positions[deckAndNumber] += distanceMoved
-					fmt.Println("pos", positions[deckAndNumber])
 				// Towards Sensor
 				case FWD:
 					if (positions[deckAndNumber] - distanceMoved) < 0 {
@@ -130,7 +131,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 						fmt.Println("Motor Just moved to negative distance!")
 					}
 					positions[deckAndNumber] -= distanceMoved
-					fmt.Println("pos", positions[deckAndNumber])
 				default:
 					fmt.Println("Unknown Direction was found")
 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
