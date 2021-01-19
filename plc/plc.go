@@ -55,6 +55,7 @@ type DeckDriver interface {
 	ReadExecutedPulses() (string, error)
 	SetupMotor(uint16, uint16, uint16, uint16, uint16) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
+	ResetRunInProgress()
 	Pause() (string, error)
 	Resume() (string, error)
 	Abort() (string, error)

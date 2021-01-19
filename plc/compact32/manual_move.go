@@ -14,15 +14,18 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 	sensorHasCut[d.name] = false
 	aborted[d.name] = false
 	runInProgress[d.name] = true
+	defer d.ResetRunInProgress()
 
 	response, err = d.SetupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
 	if err != nil {
-		runInProgress[d.name] = false
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
-	runInProgress[d.name] = false
 
 	return
+}
+
+func (d *Compact32Deck) ResetRunInProgress() {
+	runInProgress[d.name] = false
 }
 
 func (d *Compact32Deck) NameOfDeck() string {
