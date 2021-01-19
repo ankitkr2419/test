@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS aspire_dispense(
  dispense_no_of_cycles int,
  dispense_vol float,
  dispense_blow float,
- well_to_destination int,
+ well_no_destination int,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  PRIMARY KEY (id),

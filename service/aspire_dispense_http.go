@@ -11,13 +11,13 @@ import (
 
 func listAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		t, err := deps.Store.ListAspireDispense(req.Context())
+		list, err := deps.Store.ListAspireDispense(req.Context())
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		respBytes, err := json.Marshal(t)
+		respBytes, err := json.Marshal(list)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling aspire dispense data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -32,22 +32,22 @@ func listAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var t db.AspireDispense
-		err := json.NewDecoder(req.Body).Decode(&t)
+		var adobj db.AspireDispense
+		err := json.NewDecoder(req.Body).Decode(&adobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding aspire dispense data")
 			return
 		}
 
-		valid, respBytes := validate(t)
+		valid, respBytes := validate(adobj)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
 		var createdTemp db.AspireDispense
-		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), t)
+		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error create aspire dispense")
@@ -130,23 +130,23 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var t db.AspireDispense
+		var adobj db.AspireDispense
 
-		err = json.NewDecoder(req.Body).Decode(&t)
+		err = json.NewDecoder(req.Body).Decode(&adobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding aspire dispense data")
 			return
 		}
 
-		valid, respBytes := validate(t)
+		valid, respBytes := validate(adobj)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		t.ID = id
-		err = deps.Store.UpdateAspireDispense(req.Context(), t)
+		adobj.ID = id
+		err = deps.Store.UpdateAspireDispense(req.Context(), adobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error update aspire dispense")

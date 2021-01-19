@@ -11,13 +11,13 @@ import (
 
 func listPiercingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		t, err := deps.Store.ListPiercing(req.Context())
+		list, err := deps.Store.ListPiercing(req.Context())
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		respBytes, err := json.Marshal(t)
+		respBytes, err := json.Marshal(list)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling piercing data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -32,22 +32,22 @@ func listPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var t db.Piercing
-		err := json.NewDecoder(req.Body).Decode(&t)
+		var pobj db.Piercing
+		err := json.NewDecoder(req.Body).Decode(&pobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
 			return
 		}
 
-		valid, respBytes := validate(t)
+		valid, respBytes := validate(pobj)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
 		var createdTemp db.Piercing
-		createdTemp, err = deps.Store.CreatePiercing(req.Context(), t)
+		createdTemp, err = deps.Store.CreatePiercing(req.Context(), pobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error create piercing")
@@ -130,23 +130,23 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var t db.Piercing
+		var pobj db.Piercing
 
-		err = json.NewDecoder(req.Body).Decode(&t)
+		err = json.NewDecoder(req.Body).Decode(&pobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
 			return
 		}
 
-		valid, respBytes := validate(t)
+		valid, respBytes := validate(pobj)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		t.ID = id
-		err = deps.Store.UpdatePiercing(req.Context(), t)
+		pobj.ID = id
+		err = deps.Store.UpdatePiercing(req.Context(), pobj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error update piercing")
