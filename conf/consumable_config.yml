@@ -111,6 +111,10 @@ ConsumableDistance:
     name: "discard_tip_and_fast_up"
     distance: 137.5
     description: "syringe module goes this much up fast after the piercing tip has been removed"
+  - id: 601
+    name: "magnet_reverse_after_homing"
+    distance: 50
+    description: "magnet goes here after completing homing everytime homing is called"
   - id: 1001
     name: "syringe_module_a_lh_zero"
     distance: 0
