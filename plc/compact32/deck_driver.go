@@ -416,7 +416,7 @@ func (d *Compact32Deck) MagnetFwdRevHoming() (response string, err error) {
 	}
 
 	// We know the concrete direction here, its reverse
-	distToTravel = positions[deckAndNumber] - magnetReverseAfterHoming
+	distToTravel = magnetReverseAfterHoming - positions[deckAndNumber]
 	pulses = uint16(math.Round(float64(motors[deckAndNumber]["steps"]) * distToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], pulses, motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)

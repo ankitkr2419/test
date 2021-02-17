@@ -9,6 +9,9 @@ import (
 	"mylab/cpagent/plc"
 	"mylab/cpagent/plc/compact32"
 	"mylab/cpagent/plc/simulator"
+
+	"github.com/goburrow/modbus"
+
 	"mylab/cpagent/service"
 	"net/http"
 	"os"
@@ -103,6 +106,7 @@ func main() {
 func startApp(plcName string, test bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
+	var handler *modbus.RTUClientHandler
 	var driverDeckA plc.DeckDriver
 	var driverDeckB plc.DeckDriver
 
@@ -120,8 +124,8 @@ func startApp(plcName string, test bool) (err error) {
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
 		driver = compact32.NewCompact32Driver(exit, test)
-		driverDeckA = compact32.NewCompact32DeckDriver(exit, test, "A", byte(1))
-		driverDeckB = compact32.NewCompact32DeckDriver(exit, test, "B", byte(2))
+		driverDeckA, handler = compact32.NewCompact32DeckDriver(exit, test, "A")
+		driverDeckB = compact32.NewCompact32DeckDriverB(exit, test, "B", byte(2), handler)
 	} else {
 		driver = simulator.NewSimulator(exit)
 	}
