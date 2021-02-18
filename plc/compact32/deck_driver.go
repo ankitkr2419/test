@@ -4,8 +4,11 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
+	"sync"
 	"time"
 )
+
+var newLock sync.Mutex
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
@@ -21,54 +24,75 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	}
 
 	// Switch OFF The motor
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
+	// Error----
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error writing Switch Off : ", err, d.name)
 		return
 	}
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error writing Completion Off : ", err, d.name)
 		return "", err
 	}
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulse)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error writing pulse : ", err, d.name)
 		return "", err
 	}
 	fmt.Println("Wrote Pulse. res : ", results)
 	wrotePulses[d.name] = pulse
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][200], speed)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error writing speed : ", err, d.name)
 		return "", err
 	}
 	fmt.Println("Wrote Speed. res : ", results)
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][204], ramp)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error writing RAMP : ", err, d.name)
 		return "", err
 	}
 	fmt.Println("Wrote Ramp. res : ", results)
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][206], direction)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error writing direction : ", err, d.name)
 		return "", err
 	}
 	fmt.Println("Wrote direction. res : ", results)
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][226], motorNum)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error writing motor num: ", err, d.name)
 		return "", err
 	}
 	fmt.Println("Wrote motorNum. res : ", results)
-
 	// Check if User has paused the run/operation
 	for {
 		if paused[d.name] {
@@ -78,16 +102,22 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 		time.Sleep(400 * time.Millisecond)
 	}
-
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error Writing On/Off : ", err, d.name)
 		return "", err
 	}
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][0], uint16(1))
+	newLock.Unlock()
+
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("error Reading On/Off : ", err, d.name)
 		return "", err
 	}
 	fmt.Printf("Read On/Off Coil. res : %+v \n", results)
@@ -99,15 +129,25 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
+		newLock.Lock()
+		time.Sleep(100 * time.Millisecond)
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
+		newLock.Unlock()
+
+		// Error---
 		if err != nil {
-			fmt.Println("err : ", err)
-			return "", err
+			fmt.Println("error while reading completion  : ", err, d.name)
+			time.Sleep(100 * time.Millisecond)
+			// return "", err
 		}
+
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
 				fmt.Println("Completion returned ---> ", results)
-				d.SwitchOffMotor()
+				response, err = d.SwitchOffMotor()
+				if err != nil {
+					fmt.Println("err: from setUp--> ", err, d.name)
+				}
 				distanceMoved := float64(pulse) / float64(motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
 				switch direction {
 				// Away from Sensor
@@ -117,7 +157,8 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				case FWD:
 					if (positions[deckAndNumber] - distanceMoved) < 0 {
 						positions[deckAndNumber] = 0
-						return "", fmt.Errorf("Motor Just moved to negative distance!")
+						fmt.Println("Motor Just moved to negative distance!")
+						// return "", fmt.Errorf()
 					}
 					positions[deckAndNumber] -= distanceMoved
 				default:
@@ -130,22 +171,34 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		if direction == REV && pulse != moveOppositeSensorPulses {
 			goto skipSensor
 		}
+		newLock.Lock()
+		time.Sleep(100 * time.Millisecond)
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][2], uint16(1))
+		newLock.Unlock()
 		if err != nil {
-			fmt.Println("err : ", err)
+			fmt.Println("error reading Sensor : ", err, d.name)
 			return "", err
 		}
+
 		fmt.Println("Sensor returned ---> ", results)
 		if len(results) > 0 {
 			if int(results[0]) == sensorCut && pulse != moveOppositeSensorPulses {
 				fmt.Println("Sensor returned ---> ", results[0])
 				response, err = d.SwitchOffMotor()
+				if err != nil {
+					fmt.Println("err : ", err, d.name)
+					return "", err
+				}
 				sensorHasCut[d.name] = true
 				positions[deckAndNumber] = calibs[deckAndNumber]
 				return
 			} else if int(results[0]) == sensorUncut && pulse == moveOppositeSensorPulses {
 				fmt.Println("Sensor returned ---> ", results[0])
 				response, err = d.SwitchOffMotor()
+				if err != nil {
+					fmt.Println("err : ", err, d.name)
+					return "", err
+				}
 				sensorHasCut[d.name] = false
 				time.Sleep(100 * time.Millisecond)
 				response, err = d.SetupMotor(motors[deckAndNumber]["fast"], reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
@@ -157,9 +210,9 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		switch pulse {
 		// Avoiding initialSensorCutMagnetPulses as its duplicate
 		case initialSensorCutSyringeModulePulses, initialSensorCutDeckPulses, initialSensorCutSyringePulses:
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(400 * time.Millisecond)
 		case finalSensorCutPulses:
-			time.Sleep(20 * time.Millisecond)
+			time.Sleep(200 * time.Millisecond)
 		default:
 			time.Sleep(500 * time.Millisecond)
 		}
@@ -170,11 +223,15 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
 
+	newLock.Lock()
+	time.Sleep(100 * time.Millisecond)
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
+	newLock.Unlock()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("Inside SwitchMotor err : ", err, d.name)
 		return "", err
 	}
+	fmt.Println("Switched off the motor--> for ", d.name)
 
 	return "SUCCESS", nil
 }
@@ -183,7 +240,7 @@ func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
 
 	results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][212], uint16(1))
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("err : ", err, d.name)
 		return "", err
 	}
 
@@ -411,7 +468,7 @@ func (d *Compact32Deck) MagnetFwdRevHoming() (response string, err error) {
 
 	if magnetReverseAfterHoming, ok = consDistance["magnet_reverse_after_homing"]; !ok {
 		err = fmt.Errorf("magnet_reverse_after_homing doesn't exist")
-		fmt.Println("Error: ", err)
+		fmt.Println("Error: ", err, d.name)
 		return "", err
 	}
 
