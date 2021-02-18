@@ -29,7 +29,7 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		switch {
-		case m.Deck != "A" && m.Deck != "B":
+		case m.Deck != "A" && m.Deck != "B" && m.Deck != "":
 			rw.WriteHeader(http.StatusBadRequest)
 			err = fmt.Errorf("Use A or B deck or leave it blank")
 			fmt.Println(err)
