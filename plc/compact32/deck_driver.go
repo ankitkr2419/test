@@ -26,7 +26,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// Switch OFF The motor
 	newLock.Lock()
 	time.Sleep(200 * time.Millisecond)
-	// Error----
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
 	newLock.Unlock()
 	if err != nil {
@@ -134,11 +133,10 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
 		newLock.Unlock()
 
-		// Error---
 		if err != nil {
 			fmt.Println("error while reading completion  : ", err, d.name)
 			time.Sleep(100 * time.Millisecond)
-			// return "", err
+			// Making this more tolerant, thus not returning from here
 		}
 
 		if len(results) > 0 {

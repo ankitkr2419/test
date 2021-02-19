@@ -2,13 +2,11 @@ package compact32
 
 import (
 	"encoding/binary"
-	"sync"
 
 	"github.com/goburrow/modbus"
 )
 
 type Compact32ModbusDriver struct {
-	sync.RWMutex
 	Client modbus.Client
 }
 
@@ -30,7 +28,6 @@ func (d *Compact32ModbusDriver) ReadHoldingRegisters(address, quantity uint16) (
 }
 
 func (d *Compact32ModbusDriver) ReadSingleRegister(address uint16) (value uint16, err error) {
-	// Don't take lock as ReadHoldingRegisters does take a lock! Otherwise, deadlock
 	var data []byte
 	data, err = d.ReadHoldingRegisters(address, uint16(1))
 	if err != nil {
@@ -47,7 +44,6 @@ func (d *Compact32ModbusDriver) ReadCoils(address, quantity uint16) (results []b
 }
 
 func (d *Compact32ModbusDriver) ReadSingleCoil(address uint16) (value uint16, err error) {
-	// Don't take lock as ReadCoils does take a lock! Otherwise, deadlock
 	var data []byte
 	data, err = d.ReadCoils(address, uint16(1))
 	if err != nil {
