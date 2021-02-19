@@ -19,6 +19,7 @@ var masterLock sync.Mutex
 
 func (d *Compact32ModbusDriver) WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
 	masterLock.Lock()
+	defer masterLock.Unlock()
 	time.Sleep(200 * time.Millisecond)
 	results, err = d.Client.WriteMultipleRegisters(address, quantity, value)
 	masterLock.Unlock()
@@ -27,17 +28,17 @@ func (d *Compact32ModbusDriver) WriteMultipleRegisters(address, quantity uint16,
 
 func (d *Compact32ModbusDriver) WriteSingleRegister(address, value uint16) (results []byte, err error) {
 	masterLock.Lock()
+	defer masterLock.Unlock()
 	time.Sleep(200 * time.Millisecond)
 	results, err = d.Client.WriteSingleRegister(address, value)
-	masterLock.Unlock()
 	return
 }
 
 func (d *Compact32ModbusDriver) ReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
 	masterLock.Lock()
+	defer masterLock.Unlock()
 	time.Sleep(200 * time.Millisecond)
 	results, err = d.Client.ReadHoldingRegisters(address, quantity)
-	masterLock.Unlock()
 	return
 }
 
@@ -54,9 +55,9 @@ func (d *Compact32ModbusDriver) ReadSingleRegister(address uint16) (value uint16
 
 func (d *Compact32ModbusDriver) ReadCoils(address, quantity uint16) (results []byte, err error) {
 	masterLock.Lock()
+	defer masterLock.Unlock()
 	time.Sleep(200 * time.Millisecond)
 	results, err = d.Client.ReadCoils(address, quantity)
-	masterLock.Unlock()
 	return
 }
 
@@ -74,8 +75,8 @@ func (d *Compact32ModbusDriver) ReadSingleCoil(address uint16) (value uint16, er
 
 func (d *Compact32ModbusDriver) WriteSingleCoil(address, value uint16) (err error) {
 	masterLock.Lock()
+	defer masterLock.Unlock()
 	time.Sleep(200 * time.Millisecond)
 	_, err = d.Client.WriteSingleCoil(address, value)
-	masterLock.Unlock()
 	return
 }
