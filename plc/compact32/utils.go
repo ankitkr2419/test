@@ -34,6 +34,12 @@ const (
 	finalSensorCutPulses                = uint16(2999)
 )
 
+// Special Speeds
+const (
+	homingFastSpeed = uint16(2000)
+	homingSlowSpeed = uint16(500)
+)
+
 var wrotePulses = map[string]uint16{
 	"A": 0,
 	"B": 0,
