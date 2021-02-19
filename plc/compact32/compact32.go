@@ -107,7 +107,7 @@ func NewCompact32Driver(exit chan error, test bool) plc.Driver {
 
 // Compact32 Driver for Deck A and B
 // TODO: Use test to Configure the Deck Operations
-func NewCompact32DeckDriver(exit chan error, test bool, deck string) (plc.DeckDriver, *modbus.RTUClientHandler) {
+func NewCompact32DeckDriverA(exit chan error, test bool) (plc.DeckDriver, *modbus.RTUClientHandler) {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler.BaudRate = 9600
@@ -125,19 +125,19 @@ func NewCompact32DeckDriver(exit chan error, test bool, deck string) (plc.DeckDr
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
-	C32.name = deck
+	C32.name = "A"
 
 	return &C32, handler // plc Driver
 }
 
-func NewCompact32DeckDriverB(exit chan error, test bool, deck string, slaveId byte, handler *modbus.RTUClientHandler) plc.DeckDriver {
+func NewCompact32DeckDriverB(exit chan error, test bool, handler *modbus.RTUClientHandler) plc.DeckDriver {
 	/* Modbus RTU/ASCII */
 	handler2 := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler2.BaudRate = 9600
 	handler2.DataBits = 8
 	handler2.Parity = "E"
 	handler2.StopBits = 1
-	handler2.SlaveId = slaveId
+	handler2.SlaveId = byte(2)
 	handler2.Timeout = 200 * time.Millisecond
 
 	handler2.Connect()
@@ -147,7 +147,7 @@ func NewCompact32DeckDriverB(exit chan error, test bool, deck string, slaveId by
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
-	C32.name = deck
+	C32.name = "B"
 
 	return &C32 // plc Driver
 }
