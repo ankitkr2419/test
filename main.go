@@ -222,7 +222,7 @@ func startApp(plcName string, test bool) (err error) {
 	u := db.User{
 		Username: "admin",
 		Password: service.MD5Hash("admin"),
-		Role:     "administrator",
+		Role:     "admin",
 	}
 	db.AddDefaultUser(store, u)
 	if err != nil {
