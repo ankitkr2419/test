@@ -1,181 +1,181 @@
 motor: 
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 1
     name: K1_Syringe_Module_LH_A
     number: 1
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 2
     name: K2_Syringe_Module_RH_A
     number: 2
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 3
     name: K3_Syringe_LH_A
     number: 3
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 4
     name: K4_Syringe_RH_A
     number: 4
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 5
     name: K5_Deck_A
     number: 5
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 160
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 6
     name: K6_Magnet_Up_Down_A
     number: 6
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 7
     name: K7_Magnet_Rev_Fwd_A
     number: 7
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 8
     name: K8_Shaker_A
     number: 8
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 9
     name: K9_Syringe_Module_LHRH_A
     number: 9
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: A
-    fast: 2000
+    fast: 16000
     id: 10
     name: K10_Syringe_LHRH_A
     number: 10
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 11
     name: K1_Syringe_Module_LH_B
     number: 1
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 12
     name: K2_Syringe_Module_RH_B
     number: 2
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 13
     name: K3_Syringe_LH_B
     number: 3
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 14
     name: K4_Syringe_RH_B
     number: 4
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 15
     name: K5_Deck_B
     number: 5
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 160
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 16
     name: K6_Magnet_Up_Down_B
     number: 6
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 17
     name: K7_Magnet_Rev_Fwd_B
     number: 7
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 18
     name: K8_Shaker_B
     number: 8
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 19
     name: K9_Syringe_Module_LHRH_B
     number: 9
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
   - 
     deck: B
-    fast: 2000
+    fast: 16000
     id: 20
     name: K10_Syringe_LHRH_B
     number: 10
     ramp: 100
-    slow: 500
+    slow: 1000
     steps: 200
