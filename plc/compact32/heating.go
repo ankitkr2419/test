@@ -55,25 +55,53 @@ func (d *Compact32Deck) Heat(temperature, shaker uint16, followup bool, heatTime
 		return "", err
 	}
 
+	// //Pid calibration for LH
+	// fmt.Println("pid for lh on ")
+	// err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][4], ON)
+	// if err != nil {
+	// 	fmt.Println("err pid: ", err)
+	// 	return "", err
+	// }
+
 	//select shaker for heating
 	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][222], shaker)
 	if err != nil {
 		fmt.Println("err 5: ", err)
 		return "", err
-	}
+	} //Pid calibration
+
 	fmt.Printf("shaker result %v", result)
 
 	//Set Temperature for shakers
-	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], temperature)
+	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(650))
 	if err != nil {
 		fmt.Println("err 6: ", err)
 		return "", err
 	}
 	fmt.Printf("temperature result %v", result)
+	result, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][208], uint16(1))
+	if err != nil {
+		fmt.Println("err 6: ", err)
+		return "", err
+	}
+	fmt.Printf("temperature result reading %v", result)
 
 	if !followup {
-		t = time.AfterFunc(heatTime, d.SwitchOffHeater)
+		t = time.AfterFunc(heatTime, d.SwitchOffTheHeater)
 	}
+
+	go func() {
+		for {
+			result, err = d.DeckDriver.ReadHoldingRegisters(uint16(0x11F8), uint16(1))
+			if err != nil {
+				fmt.Println("err 6: ", err)
+
+			}
+			fmt.Println("D504 reading: ", result)
+			time.Sleep(time.Second)
+		}
+	}()
+
 shakerSelectionLoop:
 	for {
 		switch shaker {
@@ -87,6 +115,7 @@ shakerSelectionLoop:
 				return "", err
 			}
 			setTemp = binary.BigEndian.Uint16(results)
+			fmt.Println(setTemp)
 
 		case 2:
 			if setTemp >= temperature {
@@ -98,6 +127,7 @@ shakerSelectionLoop:
 				return "", err
 			}
 			setTemp = binary.BigEndian.Uint16(results)
+			fmt.Println(setTemp)
 
 		case 3:
 			if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
@@ -109,15 +139,25 @@ shakerSelectionLoop:
 				return "", err
 			}
 			setTemp1 = binary.BigEndian.Uint16(results)
+			fmt.Println(setTemp1)
+
 			results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
 			if err != nil {
 				fmt.Println("err :shaker 3.2 ", err)
 				return "", err
 			}
 			setTemp2 = binary.BigEndian.Uint16(results)
+			fmt.Println(setTemp2)
 
 		}
 
+	}
+
+	time.Sleep(time.Minute * 15)
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][8], OFF)
+	if err != nil {
+		fmt.Println("err pid: ", err)
+		return "", err
 	}
 
 	if followup {
@@ -140,10 +180,11 @@ shakerSelectionLoop:
 
 		}
 	}
+
 	return
 }
 
-func (d *Compact32Deck) SwitchOffHeater() {
+func (d *Compact32Deck) SwitchOffTheHeater() {
 	err := d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], OFF)
 	if err != nil {
 		fmt.Println("err : ", err)

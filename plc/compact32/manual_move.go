@@ -97,6 +97,12 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return "", err
 	}
 
+	response, err = d.SwitchOffHeater()
+	if err != nil {
+		fmt.Println("From deck ", d.name, err)
+		return "", err
+	}
+
 	aborted[d.name] = true
 	executedPulses[d.name] = 0
 	wrotePulses[d.name] = 0
