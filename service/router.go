@@ -80,5 +80,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/aspireDispense/{id}", showAspireDispenseHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/aspireDispense/{id}", deleteAspireDispenseHandler(deps)).Methods(http.MethodDelete)
 	router.HandleFunc("/aspireDispense/{id}", updateAspireDispenseHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/heating/{id}/{deck:[A-B]}", plcHeatingHandler(deps)).Methods(http.MethodGet)
+
 	return
 }

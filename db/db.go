@@ -80,4 +80,5 @@ type Storer interface {
 	CreateAspireDispense(context.Context, AspireDispense) (AspireDispense, error)
 	DeleteAspireDispense(context.Context, uuid.UUID) error
 	UpdateAspireDispense(context.Context, AspireDispense) error
+	GetHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error)
 }
