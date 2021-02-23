@@ -2,48 +2,48 @@ TipsTubes:
   - id : 1
     name : 'extraction_tip_1000ul'
     type: 'tip'
-    allowed_positions: [1,2]
+    allowedPositions: [1,2]
     volume: 1000
     height: 98
   
   - id : 2
     name : 'pcr_tip_1000ul'
     type: 'tip'
-    allowed_positions: [1,2]
+    allowedPositions: [1,2]
     volume: 1000
     height: 98
   
   - id : 3
     name : 'piercing_tip'
     type: 'tip'
-    allowed_positions: [3]
+    allowedPositions: [3]
     volume: 0.00
     height: 39
   
   - id : 4
     name : 'sample_tube'
     type: 'tube'
-    allowed_positions: [4]
+    allowedPositions: [4]
     volume: 1500
     height: 43.70
   
   - id : 5
     name : 'shaker_tube'
     type: 'tube'
-    allowed_positions: [5]
+    allowedPositions: [5]
     volume: 5000
     height: 58.88
   
   - id : 6
     name : 'extraction_collection_tube'
     type: 'tube'
-    allowed_positions: [7]
+    allowedPositions: [7]
     volume: 1500
     height: 43.70
   
   - id : 7
     name : 'pcr_collection_tube'
     type: 'tube'
-    allowed_positions: [9]
+    allowedPositions: [9]
     volume: 200
     height: 15.80
