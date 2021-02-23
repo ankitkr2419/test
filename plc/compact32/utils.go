@@ -1,6 +1,7 @@
 package compact32
 
 import (
+	"fmt"
 	"mylab/cpagent/db"
 )
 
@@ -95,8 +96,7 @@ var positions = map[DeckNumber]float64{
 
 var motors = make(map[DeckNumber]map[string]uint16)
 var consDistance = make(map[string]float64)
-var labwares = make(map[int]string)
-var tipstubes = make(map[string]map[string]float64)
+var tipstubes = make(map[string]map[string]interface{})
 var cartridges = make(map[int]map[string]float64)
 var calibs = make(map[DeckNumber]float64)
 
@@ -145,18 +145,6 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 // 1001- 1050 for deck A
 // 1051- 1100 for deck B
 
-func SelectAllLabwares(store db.Storer) (err error) {
-	allLabwares, err := store.ListLabwares()
-	if err != nil {
-		return
-	}
-
-	for _, labware := range allLabwares {
-		labwares[labware.ID] = labware.Name
-	}
-	return
-}
-
 func SelectAllTipsTubes(store db.Storer) (err error) {
 	allTipsTubes, err := store.ListTipsTubes()
 	if err != nil {
@@ -164,16 +152,18 @@ func SelectAllTipsTubes(store db.Storer) (err error) {
 	}
 
 	for _, tiptube := range allTipsTubes {
-		tipstubes[tiptube.Name] = make(map[string]float64)
-		tipstubes[tiptube.Name]["labware_id"] = float64(tiptube.LabwareID)
-		tipstubes[tiptube.Name]["consumable_distance_id"] = float64(tiptube.ConsumabledistanceID)
+		tipstubes[tiptube.Name] = make(map[string]interface{})
+		tipstubes[tiptube.Name]["id"] = tiptube.ID
+		tipstubes[tiptube.Name]["type"] = tiptube.Type
+		tipstubes[tiptube.Name]["allowed_positions"] = tiptube.AllowedPositions
 		tipstubes[tiptube.Name]["volume"] = tiptube.Volume
 		tipstubes[tiptube.Name]["height"] = tiptube.Height
 	}
+	fmt.Println("allTipsTubes": allTipsTubes)
 	return
 }
 
-func SelectAllCartridge(store db.Storer) (err error) {
+func SelectAllCartridges(store db.Storer) (err error) {
 	allCartridges, err := store.ListCartridges()
 	if err != nil {
 		return
@@ -181,7 +171,6 @@ func SelectAllCartridge(store db.Storer) (err error) {
 
 	for _, cartridge := range allCartridges {
 		cartridges[cartridge.ID] = make(map[string]float64)
-		cartridges[cartridge.ID]["labware_id"] = float64(cartridge.LabwareID)
 		cartridges[cartridge.ID]["wells_num"] = float64(cartridge.WellNum)
 		cartridges[cartridge.ID]["distance"] = cartridge.Distance
 		cartridges[cartridge.ID]["height"] = cartridge.Height
