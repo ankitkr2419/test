@@ -38,34 +38,32 @@ type ConsumableConfig struct {
 	}
 }
 
-type LabwareConfig struct {
-	Labware []struct {
-		ID          int
-		Name        string
-		Description string
-	}
-}
-
 type TipsTubesConfig struct {
 	TipsTubes []struct {
-		LabwareID            int
-		ConsumabledistanceID int
-		Name                 string
-		Volume               float64
-		Height               float64
+		ID               int64
+		Name             string
+		Type             string
+		AllowedPositions []int64
+		Volume           float64
+		Height           float64
 	}
 }
 
-type CartridgeConfig struct {
-	Cartridge []struct {
+type CartridgesConfig struct {
+	Cartridges []struct {
 		ID          int
-		LabwareID   int
 		Type        string
 		Description string
-		WellNum     int
-		Distance    float64
-		Height      float64
-		Volume      float64
+	}
+}
+
+type CartridgeWellsConfig struct {
+	CartridgeWells []struct {
+		ID       int
+		WellNum  int
+		Distance float64
+		Height   float64
+		Volume   float64
 	}
 }
 
@@ -188,28 +186,6 @@ func SetupConsumable(s Storer) (err error) {
 
 }
 
-// DBSetup initializes labware in DB
-func SetupLabware(s Storer) (err error) {
-	var config LabwareConfig
-	err = viper.Unmarshal(&config)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
-		return
-	}
-
-	// create labware list
-	LabwareList := makeLabwareList(config)
-
-	// add distances to DB
-	err = s.InsertLabware(context.Background(), LabwareList)
-	if err != nil {
-		return
-	}
-
-	logger.Info("Labware Added in Database")
-	return
-}
-
 // DBSetup initializes tips and tubes in DB
 func SetupTipsTubes(s Storer) (err error) {
 	var config TipsTubesConfig
@@ -233,8 +209,8 @@ func SetupTipsTubes(s Storer) (err error) {
 }
 
 // DBSetup initializes cartridge in DB
-func SetupCartridge(s Storer) (err error) {
-	var config CartridgeConfig
+func SetupCartridges(s Storer) (err error) {
+	var config CartridgesConfig
 	err = viper.Unmarshal(&config)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
@@ -283,22 +259,11 @@ func makeConsumableDistanceList(configConsumable ConsumableConfig) (ConsumableDi
 	return
 }
 
-func makeLabwareList(configLabware LabwareConfig) (Labwares []Labware) {
-	labware := Labware{}
-	for _, l := range configLabware.Labware {
-		labware.ID = l.ID
-		labware.Name = l.Name
-		labware.Description = l.Description
-		Labwares = append(Labwares, labware)
-	}
-	return
-}
-
 func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) {
 	tipstubes := TipsTubes{}
 	for _, t := range configTipsTubes.TipsTubes {
-		tipstubes.LabwareID = t.LabwareID
-		tipstubes.ConsumabledistanceID = t.ConsumabledistanceID
+		tipstubes.Type = t.Type
+		tipstubes.AllowedPositions = t.AllowedPositions
 		tipstubes.Name = t.Name
 		tipstubes.Volume = t.Volume
 		tipstubes.Height = t.Height
@@ -307,7 +272,7 @@ func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) 
 	return
 }
 
-func makeCartridgeList(configCartridge CartridgeConfig) (Cartridges []Cartridge) {
+func makeCartridgeList(configCartridge CartridgesConfig) (Cartridges []Cartridge) {
 	cartridge := Cartridge{}
 	for _, c := range configCartridge.Cartridge {
 		cartridge.ID = c.ID
