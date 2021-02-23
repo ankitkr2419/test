@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -210,23 +211,31 @@ func SetupTipsTubes(s Storer) (err error) {
 
 // DBSetup initializes cartridge in DB
 func SetupCartridges(s Storer) (err error) {
-	var config CartridgesConfig
-	err = viper.Unmarshal(&config)
+	var cartridgesConfig CartridgesConfig
+	var wellsConfig CartridgeWellsConfig
+	err = viper.Unmarshal(&cartridgesConfig)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgesConfig")
+		return
+	}
+	err = viper.Unmarshal(&wellsConfig)
+	fmt.Println("wellsConfig: ", wellsConfig)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgeWellsConfig")
 		return
 	}
 
 	// create cartridge list
-	CartridgeList := makeCartridgeList(config)
+	cartridgesList := makeCartridgeList(cartridgesConfig)
+	wellsList := makeCartridgeWellsList(wellsConfig)
 
 	// add distances to DB
-	err = s.InsertCartridge(context.Background(), CartridgeList)
+	err = s.InsertCartridge(context.Background(), cartridgesList, wellsList)
 	if err != nil {
 		return
 	}
 
-	logger.Info("Cartridge Added in Database")
+	logger.Info("Cartridges Added in Database")
 	return
 }
 
@@ -253,7 +262,6 @@ func makeConsumableDistanceList(configConsumable ConsumableConfig) (ConsumableDi
 		consumableDistance.Name = c.Name
 		consumableDistance.Distance = c.Distance
 		consumableDistance.Description = c.Description
-
 		ConsumableDistances = append(ConsumableDistances, consumableDistance)
 	}
 	return
@@ -274,16 +282,24 @@ func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) 
 
 func makeCartridgeList(configCartridge CartridgesConfig) (Cartridges []Cartridge) {
 	cartridge := Cartridge{}
-	for _, c := range configCartridge.Cartridge {
+	for _, c := range configCartridge.Cartridges {
 		cartridge.ID = c.ID
-		cartridge.LabwareID = c.LabwareID
 		cartridge.Type = c.Type
 		cartridge.Description = c.Description
-		cartridge.WellNum = c.WellNum
-		cartridge.Distance = c.Distance
-		cartridge.Height = c.Height
-		cartridge.Volume = c.Volume
 		Cartridges = append(Cartridges, cartridge)
+	}
+	return
+}
+
+func makeCartridgeWellsList(configCartridge CartridgeWellsConfig) (cartridgeWells []CartridgeWells) {
+	cartridgeWell := CartridgeWells{}
+	for _, c := range configCartridge.CartridgeWells {
+		cartridgeWell.ID = c.ID
+		cartridgeWell.WellNum = c.WellNum
+		cartridgeWell.Distance = c.Distance
+		cartridgeWell.Height = c.Height
+		cartridgeWell.Volume = c.Volume
+		cartridgeWells = append(cartridgeWells, cartridgeWell)
 	}
 	return
 }
