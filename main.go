@@ -50,7 +50,10 @@ func main() {
 	config.Load("tips_tubes_config")
 
 	// config file to configure cartridge
-	config.Load("cartridge_config")
+	config.Load("cartridges_config")
+
+	// config file to configure cartridge wells
+	config.Load("cartridge_wells_config")
 
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()

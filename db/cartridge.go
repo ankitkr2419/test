@@ -51,8 +51,6 @@ func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge, c
 	stmt1 := makeCartridgeQuery(cartridges)
 	stmt2 := makeCartridgeWellsQuery(cartridgeWells)
 
-	fmt.Println("stmt1: ", stmt1, "\nstmt2: ", stmt2)
-
 	_, err = s.db.Exec(
 		stmt1,
 	)

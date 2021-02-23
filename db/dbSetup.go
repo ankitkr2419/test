@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/lib/pq"
 
@@ -216,13 +215,11 @@ func SetupCartridges(s Storer) (err error) {
 	var cartridgesConfig CartridgesConfig
 	var wellsConfig CartridgeWellsConfig
 	err = viper.Unmarshal(&cartridgesConfig)
-	fmt.Println("cartridgesConfig: ", cartridgesConfig)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgesConfig")
 		return
 	}
 	err = viper.Unmarshal(&wellsConfig)
-	fmt.Println("wellsConfig: ", wellsConfig)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgeWellsConfig")
 		return
