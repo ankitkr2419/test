@@ -12,9 +12,11 @@ import (
 const (
 	insertCartridgeQuery1 = `INSERT INTO cartridges(
 							id,
-							labware_id,
 							type,
-							description,
+							description)
+							VALUES %s `
+	insertCartridgeWellsQuery1 = `INSERT INTO cartridge_wells(
+							id,
 							well_num,
 							distance,
 							height,
@@ -23,6 +25,8 @@ const (
 	insertCartridgeQuery2   = `ON CONFLICT DO NOTHING;`
 	selectAllCartridgeQuery = `SELECT *
 							FROM cartridges`
+	selectAllCartridgeWellsQuery = `SELECT *
+							FROM cartridge_wells`
 )
 
 type Cartridge struct {
@@ -43,11 +47,22 @@ type CartridgeWells struct {
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
-func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge) (err error) {
-	stmt := makeCartridgeQuery(cartridges)
+func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge, cartridgeWells []CartridgeWells) (err error) {
+	stmt1 := makeCartridgeQuery(cartridges)
+	stmt2 := makeCartridgeWellsQuery(cartridgeWells)
+
+	fmt.Println("stmt1: ", stmt1, "\nstmt2: ", stmt2)
 
 	_, err = s.db.Exec(
-		stmt,
+		stmt1,
+	)
+	if err != nil {
+		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
+		return
+	}
+
+	_, err = s.db.Exec(
+		stmt2,
 	)
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
@@ -60,7 +75,7 @@ func makeCartridgeQuery(cartridge []Cartridge) string {
 	values := make([]string, 0, len(cartridge))
 
 	for _, c := range cartridge {
-		values = append(values, fmt.Sprintf("(%v, %v, '%v')", c.ID, c.Type, c.Description)) //, c.WellNum, c.Distance, c.Height, c.Volume))
+		values = append(values, fmt.Sprintf("(%v, '%v', '%v')", c.ID, c.Type, c.Description))
 	}
 
 	stmt := fmt.Sprintf(insertCartridgeQuery1,
@@ -68,6 +83,20 @@ func makeCartridgeQuery(cartridge []Cartridge) string {
 
 	stmt += insertCartridgeQuery2
 
+	return stmt
+}
+
+func makeCartridgeWellsQuery(cartridgeWells []CartridgeWells) string {
+	values := make([]string, 0, len(cartridgeWells))
+
+	for _, c := range cartridgeWells {
+		values = append(values, fmt.Sprintf("(%v, %v, %v, %v, %v)", c.ID, c.WellNum, c.Distance, c.Height, c.Volume))
+	}
+
+	stmt := fmt.Sprintf(insertCartridgeQuery1,
+		strings.Join(values, ","))
+
+	stmt += insertCartridgeQuery2
 	return stmt
 }
 

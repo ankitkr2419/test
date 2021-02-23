@@ -63,7 +63,7 @@ type Storer interface {
 	InsertMotor(context.Context, []Motor) error
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
 	InsertTipsTubes(context.Context, []TipsTubes) error
-	InsertCartridge(context.Context, []Cartridge) error
+	InsertCartridge(context.Context, []Cartridge, []CartridgeWells) error
 	ListMotors() ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes() ([]TipsTubes, error)
