@@ -24,21 +24,21 @@ ConsumableDistance:
     distance: 211.97
     description: "extraction cartridge area end point"
   - id: 7
-    name: "PCR_cartridge_start"
+    name: "pcr_cartridge_start"
     distance: 255.19
-    description: "PCR cartridge area start point"
+    description: "pcr cartridge area start point"
   - id: 8
-    name: "PCR_cartridge_end"
+    name: "pcr_cartridge_end"
     distance: 295.66
-    description: "PCR cartridge area end point"
+    description: "pcr cartridge area end point"
   - id: 9
-    name: "PCR_collection_start"
+    name: "pcr_collection_start"
     distance: 297.60
-    description: "PCR collection area start point"
+    description: "pcr collection area start point"
   - id: 10
-    name: "PCR_collection_end"
+    name: "pcr_collection_end"
     distance: 329.60
-    description: "PCR collection area end point"
+    description: "pcr collection area end point"
   - id: 11
     name: "discard_small_hole"
     distance: 344.60
@@ -50,7 +50,7 @@ ConsumableDistance:
   - id: 101
     name: "pcr_tip"
     distance: 13.52
-    description: "PCR tip at the 1st position"
+    description: "pcr tip at the 1st position"
   - id: 102
     name: "extraction_tip"
     distance: 26.27
