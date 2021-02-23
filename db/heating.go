@@ -29,13 +29,13 @@ const (
 
 func (s *pgStore) GetHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
 
-	//create process record
+	// get heating record
 	err = s.db.Get(&heating,
 		getHeatingQuery,
 		id,
 	)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating heating")
+		logger.WithField("err", err.Error()).Error("Error getting heating")
 		return
 	}
 	return
