@@ -97,7 +97,8 @@ var positions = map[DeckNumber]float64{
 var motors = make(map[DeckNumber]map[string]uint16)
 var consDistance = make(map[string]float64)
 var tipstubes = make(map[string]map[string]interface{})
-var cartridges = make(map[int]map[string]float64)
+var cartridges = make(map[int]map[string]interface{})
+var cartridgeWells = make(map[int]map[string]float64)
 var calibs = make(map[DeckNumber]float64)
 
 func SelectAllMotors(store db.Storer) (err error) {
@@ -159,7 +160,7 @@ func SelectAllTipsTubes(store db.Storer) (err error) {
 		tipstubes[tiptube.Name]["volume"] = tiptube.Volume
 		tipstubes[tiptube.Name]["height"] = tiptube.Height
 	}
-	fmt.Println("allTipsTubes": allTipsTubes)
+	fmt.Println("allTipsTubes", allTipsTubes)
 	return
 }
 
@@ -170,11 +171,22 @@ func SelectAllCartridges(store db.Storer) (err error) {
 	}
 
 	for _, cartridge := range allCartridges {
-		cartridges[cartridge.ID] = make(map[string]float64)
-		cartridges[cartridge.ID]["wells_num"] = float64(cartridge.WellNum)
-		cartridges[cartridge.ID]["distance"] = cartridge.Distance
-		cartridges[cartridge.ID]["height"] = cartridge.Height
-		cartridges[cartridge.ID]["volume"] = cartridge.Volume
+		cartridges[cartridge.ID] = make(map[string]interface{})
+		cartridges[cartridge.ID]["type"] = cartridge.Type
+		cartridges[cartridge.ID]["description"] = cartridge.Description
+	}
+
+	allCartridgeWells, err := store.ListCartridgeWells()
+	if err != nil {
+		return
+	}
+
+	for _, well := range allCartridgeWells {
+		cartridgeWells[well.ID] = make(map[string]float64)
+		cartridgeWells[well.ID]["wells_num"] = float64(well.WellNum)
+		cartridgeWells[well.ID]["distance"] = well.Distance
+		cartridgeWells[well.ID]["height"] = well.Height
+		cartridgeWells[well.ID]["volume"] = well.Volume
 	}
 	return
 }

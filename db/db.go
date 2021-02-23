@@ -68,6 +68,7 @@ type Storer interface {
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes() ([]TipsTubes, error)
 	ListCartridges() ([]Cartridge, error)
+	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
 	ListPiercing(context.Context) ([]Piercing, error)
 	CreatePiercing(context.Context, Piercing) (Piercing, error)

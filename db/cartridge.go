@@ -108,3 +108,12 @@ func (s *pgStore) ListCartridges() (cartridge []Cartridge, err error) {
 	}
 	return
 }
+
+func (s *pgStore) ListCartridgeWells() (cartridgeWells []CartridgeWells, err error) {
+	err = s.db.Select(&cartridgeWells, selectAllCartridgeWellsQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing cartridgeWells details")
+		return
+	}
+	return
+}
