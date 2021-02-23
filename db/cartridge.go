@@ -10,19 +10,19 @@ import (
 )
 
 const (
-	insertCartridgeQuery1 = `INSERT INTO cartridges(
+	insertCartridgeQuery = `INSERT INTO cartridges(
 							id,
 							type,
 							description)
 							VALUES %s `
-	insertCartridgeWellsQuery1 = `INSERT INTO cartridge_wells(
+	insertCartridgeWellsQuery = `INSERT INTO cartridge_wells(
 							id,
 							well_num,
 							distance,
 							height,
 							volume)
 							VALUES %s `
-	insertCartridgeQuery2   = `ON CONFLICT DO NOTHING;`
+	onConflictDoNothing     = `ON CONFLICT DO NOTHING;`
 	selectAllCartridgeQuery = `SELECT *
 							FROM cartridges`
 	selectAllCartridgeWellsQuery = `SELECT *
@@ -78,10 +78,10 @@ func makeCartridgeQuery(cartridge []Cartridge) string {
 		values = append(values, fmt.Sprintf("(%v, '%v', '%v')", c.ID, c.Type, c.Description))
 	}
 
-	stmt := fmt.Sprintf(insertCartridgeQuery1,
+	stmt := fmt.Sprintf(insertCartridgeQuery,
 		strings.Join(values, ","))
 
-	stmt += insertCartridgeQuery2
+	stmt += onConflictDoNothing
 
 	return stmt
 }
@@ -93,10 +93,10 @@ func makeCartridgeWellsQuery(cartridgeWells []CartridgeWells) string {
 		values = append(values, fmt.Sprintf("(%v, %v, %v, %v, %v)", c.ID, c.WellNum, c.Distance, c.Height, c.Volume))
 	}
 
-	stmt := fmt.Sprintf(insertCartridgeQuery1,
+	stmt := fmt.Sprintf(insertCartridgeWellsQuery,
 		strings.Join(values, ","))
 
-	stmt += insertCartridgeQuery2
+	stmt += onConflictDoNothing
 	return stmt
 }
 
