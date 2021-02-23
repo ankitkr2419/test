@@ -192,9 +192,7 @@ func (d *Compact32Deck) SwitchOffHeater() (response string, err error) {
 		fmt.Println("err Switching off the heater: ", err)
 		return "", err
 	}
-	fmt.Println("Switched off the motor--> for ", d.name)
-
-	//
+	fmt.Println("Switched off the heater--> for deck ", d.name)
 
 	return "SUCCESS", nil
 }
