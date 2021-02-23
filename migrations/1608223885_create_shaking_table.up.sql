@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS shaking(
  id uuid PRIMARY KEY,
- set_temperature boolean DEFAULT FALSE,
+ with_temp boolean DEFAULT FALSE,
  follow_temp boolean DEFAULT FALSE,
  temperature int,
  rpm_1 int,
