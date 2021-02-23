@@ -1,7 +1,6 @@
 package compact32
 
 import (
-	"fmt"
 	"mylab/cpagent/db"
 )
 
@@ -160,7 +159,6 @@ func SelectAllTipsTubes(store db.Storer) (err error) {
 		tipstubes[tiptube.Name]["volume"] = tiptube.Volume
 		tipstubes[tiptube.Name]["height"] = tiptube.Height
 	}
-	fmt.Println("allTipsTubes", allTipsTubes)
 	return
 }
 
@@ -183,7 +181,7 @@ func SelectAllCartridges(store db.Storer) (err error) {
 
 	for _, well := range allCartridgeWells {
 		cartridgeWells[well.ID] = make(map[string]float64)
-		cartridgeWells[well.ID]["wells_num"] = float64(well.WellNum)
+		cartridgeWells[well.ID]["well_num"] = float64(well.WellNum)
 		cartridgeWells[well.ID]["distance"] = well.Distance
 		cartridgeWells[well.ID]["height"] = well.Height
 		cartridgeWells[well.ID]["volume"] = well.Volume

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/lib/pq"
+
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -44,7 +46,7 @@ type TipsTubesConfig struct {
 		ID               int64
 		Name             string
 		Type             string
-		AllowedPositions []int64
+		AllowedPositions pq.Int64Array
 		Volume           float64
 		Height           float64
 	}
@@ -197,10 +199,10 @@ func SetupTipsTubes(s Storer) (err error) {
 	}
 
 	// create tipstubes list
-	TipesTubesList := makeTipesTubesList(config)
+	tipsTubesList := makeTipsTubesList(config)
 
 	// add distances to DB
-	err = s.InsertTipsTubes(context.Background(), TipesTubesList)
+	err = s.InsertTipsTubes(context.Background(), tipsTubesList)
 	if err != nil {
 		return
 	}
@@ -214,6 +216,7 @@ func SetupCartridges(s Storer) (err error) {
 	var cartridgesConfig CartridgesConfig
 	var wellsConfig CartridgeWellsConfig
 	err = viper.Unmarshal(&cartridgesConfig)
+	fmt.Println("cartridgesConfig: ", cartridgesConfig)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgesConfig")
 		return
@@ -267,15 +270,16 @@ func makeConsumableDistanceList(configConsumable ConsumableConfig) (ConsumableDi
 	return
 }
 
-func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) {
+func makeTipsTubesList(configTipsTubes TipsTubesConfig) (allTipsTubes []TipsTubes) {
 	tipstubes := TipsTubes{}
 	for _, t := range configTipsTubes.TipsTubes {
+		tipstubes.ID = t.ID
 		tipstubes.Type = t.Type
 		tipstubes.AllowedPositions = t.AllowedPositions
 		tipstubes.Name = t.Name
 		tipstubes.Volume = t.Volume
 		tipstubes.Height = t.Height
-		TipsTube = append(TipsTube, tipstubes)
+		allTipsTubes = append(allTipsTubes, tipstubes)
 	}
 	return
 }

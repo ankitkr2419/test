@@ -26,7 +26,7 @@ const (
 )
 
 type TipsTubes struct {
-	ID               int           `db:"id" json:"id"`
+	ID               int64         `db:"id" json:"id"`
 	Name             string        `db:"name" json:"name"`
 	Type             string        `db:"type" json:"type"`
 	AllowedPositions pq.Int64Array `db:"allowed_positions" json:"allowed_positions"`
@@ -53,7 +53,12 @@ func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 	values := make([]string, 0, len(tipstubes))
 
 	for _, t := range tipstubes {
-		values = append(values, fmt.Sprintf("(%v, %v, %v, '%v', %v, %v)", t.ID, t.Name, t.Type, t.AllowedPositions, t.Volume, t.Height))
+		positions := "{"
+		for _, pos := range t.AllowedPositions {
+			positions = fmt.Sprintf("%s%v,", positions, pos)
+		}
+		positions = positions[:len(positions)-1] + "}"
+		values = append(values, fmt.Sprintf("(%v, '%v', '%v', '%v', %v, %v)", t.ID, t.Name, t.Type, positions, t.Volume, t.Height))
 	}
 
 	stmt := fmt.Sprintf(insertTipsTubesQuery1,
