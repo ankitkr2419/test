@@ -33,21 +33,21 @@ func (d *Compact32Deck) Heat(temperature, shaker uint16, followup bool, heatTime
 	// validation for temperature
 	if temperature > uint16(1200) || temperature <= uint16(200) {
 		err = fmt.Errorf("%v not in valid range of 20 to 120", temperature)
-		fmt.Println("Error 1: ", err)
+		fmt.Println("Error Temperature not in valid range: ", err)
 		return "", err
 	}
 
 	//validation for heatTime
 	if heatTime > time.Duration(3660*time.Second) || heatTime < time.Duration(10*time.Second) {
 		err = fmt.Errorf("%v not in valid range of 10sec to 1hr 60sec", heatTime)
-		fmt.Println("Error 2: ", err)
+		fmt.Println("Error Duration for heating not in valid range: ", err)
 		return "", err
 	}
 
 	//validation for shaker
 	if shaker > 3 || shaker < 1 {
 		err = fmt.Errorf("%v not in valid range of 1-3", shaker)
-		fmt.Println("Error 3: ", err)
+		fmt.Println("Error shaker number not in valid range: ", err)
 		return "", err
 	}
 
@@ -61,7 +61,7 @@ func (d *Compact32Deck) Heat(temperature, shaker uint16, followup bool, heatTime
 	//Set Temperature for shakers
 	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], temperature)
 	if err != nil {
-		fmt.Println("err 6: ", err)
+		fmt.Println("Error failed to write temperature: ", err)
 		return "", err
 	}
 	fmt.Printf("Set Temperature %v", result)
@@ -91,12 +91,12 @@ shakerSelectionLoop:
 	for {
 
 		if aborted[d.name] {
-			err = fmt.Errorf("Operation was ABORTED!")
+			err = fmt.Errorf("operation was ABORTED \n")
 			return "", err
 		}
 
 		if done {
-			return "Operation was successful", nil
+			return "Operation was successful \n", nil
 		}
 
 		time.Sleep(time.Millisecond * 300)
@@ -113,7 +113,7 @@ shakerSelectionLoop:
 			}
 			results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
 			if err != nil {
-				fmt.Printf("err :shaker %v ---%v", shaker, err)
+				fmt.Printf("Error failed to read shaker %v temperature ---%v \n", shaker, err)
 				return "", err
 			}
 			setTemp = binary.BigEndian.Uint16(results)
@@ -125,7 +125,7 @@ shakerSelectionLoop:
 			}
 			results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
 			if err != nil {
-				fmt.Println("err :shaker 3.1 ", err)
+				fmt.Printf("Error failed to read shaker 1 temperature ----%v \n", err)
 				return "", err
 			}
 			setTemp1 = binary.BigEndian.Uint16(results)
@@ -133,7 +133,7 @@ shakerSelectionLoop:
 
 			results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
 			if err != nil {
-				fmt.Println("err :shaker 3.2 ", err)
+				fmt.Printf("Error failed to read shaker 2 temperature ----%v \n", err)
 				return "", err
 			}
 			setTemp2 = binary.BigEndian.Uint16(results)
@@ -172,8 +172,6 @@ shakerSelectionLoop:
 			}
 			// delay of 300 ms for checking the expired time to avoid too much loop
 			time.Sleep(time.Millisecond * 300)
-			continue
-
 		}
 	}
 
@@ -182,7 +180,7 @@ shakerSelectionLoop:
 func (d *Compact32Deck) SwitchOffTheHeater() {
 	_, err := d.SwitchOffHeater()
 	if err != nil {
-		fmt.Println("err : ", err)
+		fmt.Println("Error failed to switch heater off : ", err)
 		return
 	}
 }
