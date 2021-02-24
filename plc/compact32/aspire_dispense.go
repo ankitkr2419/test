@@ -9,7 +9,7 @@ import (
 /****ALGORITHM******
 // TODO: check for height and volumes constraint at insertion process itself
 variables: category, cartridgeType string,
-			labwareID, type, source_well, destination_well, aspire_cycles, dispense_cycles int64,
+			cartridgeID, type, source_well, destination_well, aspire_cycles, dispense_cycles int64,
 			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64
 
   1. Check the category of operation
@@ -41,7 +41,7 @@ variables: category, cartridgeType string,
 
 ********/
 
-func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID, source, destination, aspire_cycles, dispense_cycles int64, asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64) (response string, err error) {
+func (d *Compact32Deck) AspireDispense(category, cartridgeType string, cartridgeID, source, destination, aspire_cycles, dispense_cycles int64, asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64) (response string, err error) {
 
 	var sourceCartridge, destinationCartridge map[string]float64
 	var sourcePosition, destinationPosition, distToTravel, position, tipHeight float64
@@ -53,8 +53,15 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	//-----------------
 	// Get Tip Height -
 	//-----------------
-	if tipHeight, ok = tipstubes[cartridgeType+"_tip"]["height"]; !ok {
+	var tipHeightInter interface{}
+	if tipHeightInter, ok = tipstubes[cartridgeType+"_tip"]["height"]; !ok {
 		err = fmt.Errorf(cartridgeType + "_tip doesn't exist for tipstubes")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	if tipHeight, ok = tipHeightInter.(float64); !ok {
+		err = fmt.Errorf(cartridgeType + "_tip has unknown type!")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -63,11 +70,11 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	E.g :
 	********** for well_to_well category only ***********
 	Suppose
-		labwareID = 1 && cartridgeType = "extraction" && source = 2 && destination= 4
+		cartridgeID = 1 && cartridgeType = "extraction" && source = 2 && destination= 4
 	Then
 		sourceCartridge =
 		- id: 2
-			labwareID: 1
+			cartridgeID: 1
 			type: "extraction"
 			description: "Extraction Cartridge"
 			wellNum: 2
@@ -78,7 +85,7 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	And
 		destinationCartridge =
 		- id: 4
-			labwareID: 1
+			cartridgeID: 1
 			type: "extraction"
 			description: "Extraction Cartridge"
 			wellNum: 4
@@ -91,7 +98,7 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, labwareID
 	*/
 
 	uniqueCartridge := UniqueCartridge{
-		LabwareID:     labwareID,
+		CartridgeID:   cartridgeID,
 		CartridgeType: cartridgeType,
 	}
 
