@@ -22,6 +22,7 @@ const (
 const (
 	getAspireDispenseQuery = `SELECT id,
 						category,
+						cartridge_type,
 						source_position,
 						aspire_height,
 						aspire_mixing_volume,
@@ -45,6 +46,7 @@ const (
 	createAspireDispenseQuery = `INSERT INTO aspire_dispense (
 						id,
 						category,
+						cartridge_type,
 						source_position,
 						aspire_height,
 						aspire_mixing_volume,
@@ -60,6 +62,7 @@ const (
 						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`
 	updateAspireDispenseQuery = `UPDATE aspire_dispense SET (
 						category,
+						cartridge_type,
 						source_position,
 						aspire_height,
 						aspire_mixing_volume,
@@ -77,22 +80,23 @@ const (
 )
 
 type AspireDispense struct {
-	ID                   uuid.UUID `db:"id" json:"id"`
-	Category             Category  `db:"category" json:"category"`
-	SourcePosition       int64     `db:"source_position" json:"source_position"`
-	AspireHeight         float64   `db:"aspire_height" json:"aspire_height"`
-	AspireMixingVolume   float64   `db:"aspire_mixing_volume" json:"aspire_mixing_volume"`
-	AspireNoOfCycles     int64     `db:"aspire_no_of_cycles" json:"aspire_no_of_cycles"`
-	AspireVolume         float64   `db:"aspire_volume" json:"aspire_volume"`
-	AspireAirVolume      float64   `db:"aspire_air_volume" json:"aspire_air_volume"`
-	DispenseHeight       float64   `db:"dispense_height" json:"dispense_height"`
-	DispenseMixingVolume float64   `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
-	DispenseNoOfCycles   int64     `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
-	DispenseVolume       float64   `db:"dispense_volume" json:"dispense_volume"`
-	DispenseBlowVolume   float64   `db:"dispense_blow_volume" json:"dispense_blow_volume"`
-	DestinationPosition  int64     `db:"destination_position" json:"destination_position"`
-	CreatedAt            time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt            time.Time `db:"updated_at" json:"updated_at"`
+	ID                   uuid.UUID     `db:"id" json:"id"`
+	Category             Category      `db:"category" json:"category"`
+	CartridgeType        CartridgeType `db:"cartridge_type" json:"cartridge_type"`
+	SourcePosition       int64         `db:"source_position" json:"source_position"`
+	AspireHeight         float64       `db:"aspire_height" json:"aspire_height"`
+	AspireMixingVolume   float64       `db:"aspire_mixing_volume" json:"aspire_mixing_volume"`
+	AspireNoOfCycles     int64         `db:"aspire_no_of_cycles" json:"aspire_no_of_cycles"`
+	AspireVolume         float64       `db:"aspire_volume" json:"aspire_volume"`
+	AspireAirVolume      float64       `db:"aspire_air_volume" json:"aspire_air_volume"`
+	DispenseHeight       float64       `db:"dispense_height" json:"dispense_height"`
+	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
+	DispenseNoOfCycles   int64         `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
+	DispenseVolume       float64       `db:"dispense_volume" json:"dispense_volume"`
+	DispenseBlowVolume   float64       `db:"dispense_blow_volume" json:"dispense_blow_volume"`
+	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
+	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
+	UpdatedAt            time.Time     `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (dbAspireDispense AspireDispense, err error) {
@@ -119,6 +123,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		createAspireDispenseQuery,
 		ad.ID,
 		ad.Category,
+		ad.CartridgeType,
 		ad.SourcePosition,
 		ad.AspireHeight,
 		ad.AspireMixingVolume,
@@ -159,6 +164,7 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 	_, err = s.db.Exec(
 		updateAspireDispenseQuery,
 		ad.Category,
+		ad.CartridgeType,
 		ad.SourcePosition,
 		ad.AspireHeight,
 		ad.AspireMixingVolume,

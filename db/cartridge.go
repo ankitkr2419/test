@@ -29,12 +29,14 @@ const (
 							FROM cartridge_wells`
 )
 
+type CartridgeType string
+
 type Cartridge struct {
-	ID          int64     `db:"id" json:"id"`
-	Type        string    `db:"type" json:"type"`
-	Description string    `db:"description" json:"description"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
+	ID          int64         `db:"id" json:"id"`
+	Type        CartridgeType `db:"type" json:"type"`
+	Description string        `db:"description" json:"description"`
+	CreatedAt   time.Time     `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time     `db:"updated_at" json:"updated_at"`
 }
 
 type CartridgeWells struct {

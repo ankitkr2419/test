@@ -13,7 +13,7 @@ type DeckNumber struct {
 // Each Cartridge can be uniquely identified by these fields
 type UniqueCartridge struct {
 	CartridgeID   int64
-	CartridgeType string
+	CartridgeType db.CartridgeType
 	WellNum       int64
 }
 
@@ -177,7 +177,7 @@ func SelectAllCartridges(store db.Storer) (err error) {
 		return
 	}
 
-	cartridgeType := make(map[int64]string)
+	cartridgeType := make(map[int64]db.CartridgeType)
 
 	for _, cartridge := range allCartridges {
 		cartridgeType[cartridge.ID] = cartridge.Type

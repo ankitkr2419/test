@@ -42,7 +42,7 @@ variables: category, cartridgeType string,
 
 ********/
 
-func (d *Compact32Deck) AspireDispense(category, cartridgeType string, cartridgeID, source, destination, aspire_cycles, dispense_cycles int64, asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64) (response string, err error) {
+func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {
 
 	var sourceCartridge, destinationCartridge map[string]float64
 	var sourcePosition, destinationPosition, distToTravel, position, tipHeight float64
@@ -55,14 +55,14 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, cartridge
 	// Get Tip Height -
 	//-----------------
 	var tipHeightInter interface{}
-	if tipHeightInter, ok = tipstubes[cartridgeType+"_tip"]["height"]; !ok {
-		err = fmt.Errorf(cartridgeType + "_tip doesn't exist for tipstubes")
+	if tipHeightInter, ok = tipstubes[tipType]["height"]; !ok {
+		err = fmt.Errorf(tipType + " tip doesn't exist for tipstubes")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
 
 	if tipHeight, ok = tipHeightInter.(float64); !ok {
-		err = fmt.Errorf(cartridgeType + "_tip has unknown type!")
+		err = fmt.Errorf(tipType + " tip has unknown type!")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -100,7 +100,7 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, cartridge
 
 	uniqueCartridge := UniqueCartridge{
 		CartridgeID:   cartridgeID,
-		CartridgeType: db.CartridgeType(cartridgeType),
+		CartridgeType: ad.CartridgeType,
 	}
 
 	//*************************************************
@@ -118,8 +118,8 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, cartridge
 
 	// NOTE : below position is added to sourcePosition/destinationPosition
 	// But only when they are wells
-	if position, ok = consDistance[cartridgeType+"_cartridge_start"]; !ok {
-		err = fmt.Errorf(cartridgeType + "_cartridge_start doesn't exist for consuamble distances")
+	if position, ok = consDistance[string(ad.CartridgeType)+"_start"]; !ok {
+		err = fmt.Errorf(string(ad.CartridgeType) + "_cartridge_start doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -127,9 +127,9 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, cartridge
 	//----------------------
 	// Get Source Position -
 	//----------------------
-	switch category {
+	switch ad.Category {
 	case "well_to_well", "well_to_shaker":
-		uniqueCartridge.WellNum = source
+		uniqueCartridge.WellNum = ad.SourcePosition
 		if sourceCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("sourceCartridge doesn't exist")
 			fmt.Println("Error: ", err)
@@ -154,9 +154,9 @@ func (d *Compact32Deck) AspireDispense(category, cartridgeType string, cartridge
 	//---------------------------
 	// Get Destination Position -
 	//---------------------------
-	switch category {
+	switch ad.Category {
 	case "well_to_well", "shaker_to_well":
-		uniqueCartridge.WellNum = destination
+		uniqueCartridge.WellNum = ad.DestinationPosition
 		if destinationCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("destinationCartridge doesn't exist")
 			fmt.Println("Error: ", err)
@@ -285,7 +285,7 @@ skipDeckToSourcePosition:
 	//   13. setup the syringe module motor with aspire height
 	//
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * asp_height))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * ad.AspireHeight))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
@@ -303,12 +303,12 @@ skipDeckToSourcePosition:
 	// for volume :-> 25 pulses = 1 microLitres
 	// NOTE: Store volumes in microLitres only
 	oneMicroLitrePulses := 25.0
-	pulses = uint16(math.Round(oneMicroLitrePulses * asp_mix_vol))
+	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireMixingVolume))
 
-	if asp_mix_vol == 0 {
+	if ad.AspireMixingVolume == 0 {
 		goto skipAspireCycles
 	}
-	for cycleNumber := int64(1); cycleNumber <= aspire_cycles; cycleNumber++ {
+	for cycleNumber := int64(1); cycleNumber <= ad.AspireNoOfCycles; cycleNumber++ {
 		// Aspire
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
@@ -330,7 +330,7 @@ skipAspireCycles:
 	//   15. pickup asp_vol slow
 	//
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * asp_vol))
+	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireVolume))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {
@@ -434,7 +434,7 @@ skipDeckToDestinationPosition:
 	//
 	//   20. setup the syringe module motor with dispense height
 	//
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * dis_height))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * ad.DispenseHeight))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
@@ -447,12 +447,12 @@ skipDeckToDestinationPosition:
 	//   21. pickup and drop that dis_mix_vol for number of dis_cycles
 	//
 	deckAndMotor.Number = K10_Syringe_LHRH
-	pulses = uint16(math.Round(oneMicroLitrePulses * dis_mix_vol))
+	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseMixingVolume))
 
-	if dis_mix_vol == 0 {
+	if ad.DispenseMixingVolume == 0 {
 		goto skipDispenseCycles
 	}
-	for cycleNumber := int64(1); cycleNumber <= dispense_cycles; cycleNumber++ {
+	for cycleNumber := int64(1); cycleNumber <= ad.DispenseNoOfCycles; cycleNumber++ {
 		// Dispense
 		// CHECK : should these operations be fast ?
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
@@ -474,7 +474,7 @@ skipDispenseCycles:
 	//
 	//    22. dispense by that dis_vol
 	//
-	pulses = uint16(math.Round(oneMicroLitrePulses * dis_vol))
+	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseVolume))
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
@@ -506,7 +506,7 @@ skipDispenseCycles:
 	//
 	deckAndMotor.Number = K10_Syringe_LHRH
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * dis_blow))
+	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseBlowVolume))
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return

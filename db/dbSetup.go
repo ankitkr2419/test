@@ -54,7 +54,7 @@ type TipsTubesConfig struct {
 type CartridgesConfig struct {
 	Cartridges []struct {
 		ID          int64
-		Type        string
+		Type        CartridgeType
 		Description string
 	}
 }

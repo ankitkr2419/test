@@ -16,19 +16,19 @@ ConsumableDistance:
     distance: 113.90
     description: "shakers area end point"
   - id: 5
-    name: "extraction_cartridge_start"
+    name: "cartridge_1_start"
     distance: 127.66
     description: "extraction cartridge area start point"
   - id: 6
-    name: "extraction_cartridge_end"
+    name: "cartridge_1_end"
     distance: 211.97
     description: "extraction cartridge area end point"
   - id: 7
-    name: "pcr_cartridge_start"
+    name: "cartridge_2_start"
     distance: 255.19
     description: "pcr cartridge area start point"
   - id: 8
-    name: "pcr_cartridge_end"
+    name: "cartridge_2_end"
     distance: 295.66
     description: "pcr cartridge area end point"
   - id: 9
