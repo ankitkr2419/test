@@ -17,6 +17,8 @@ const (
 	well_to_deck   Category = "well_to_deck"
 	deck_to_well   Category = "deck_to_well"
 	deck_to_deck   Category = "deck_to_deck"
+	shaker_to_deck Category = "shaker_to_deck"
+	deck_to_shaker Category = "deck_to_shaker"
 )
 
 const (
