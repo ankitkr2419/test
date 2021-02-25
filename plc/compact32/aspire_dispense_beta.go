@@ -325,6 +325,7 @@ skipDeckToSourcePosition:
 		time.Sleep(100 * time.Millisecond)
 
 		// Dispense
+		// TODO: Call a separate function for this kind of setup, as it only DISPENCING
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
