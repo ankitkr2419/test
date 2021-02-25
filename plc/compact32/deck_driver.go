@@ -217,6 +217,13 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 	aborted[d.name] = false
 
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
+	if err != nil {
+		fmt.Println("Inside Switch off Shaker err : ", err, d.name)
+		return "", err
+	}
+	fmt.Println("Switched off the shaker--> for ", d.name)
+
 	if runInProgress[d.name] {
 		err = fmt.Errorf("previous run is already in progress... wait or abort it")
 		return
