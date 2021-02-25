@@ -31,7 +31,7 @@ variables: category, cartridgeType string,
    these cycles should be fast
   15. pickup asp_vol slow
   16. move syringe module up slow till just above base
-  17. take air in 5ul
+  17. take airVolume in
   18. Move slowly to destinationPosition by calculating the difference of Positions
   19. move syringe module down at fast till base
   20. setup the syringe module motor with dispense height
@@ -128,7 +128,7 @@ func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int
 	// Get Source Position -
 	//----------------------
 	switch ad.Category {
-	case "well_to_well", "well_to_shaker":
+	case "well_to_well", "well_to_shaker", "well_to_deck":
 		uniqueCartridge.WellNum = ad.SourcePosition
 		if sourceCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("sourceCartridge doesn't exist")
@@ -140,6 +140,10 @@ func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int
 		fmt.Println("sourcePosition: ", sourcePosition)
 	case "shaker_to_well":
 		sourcePosition, ok = consDistance["shaker_tube"]
+	case "deck_to_well", "deck_to_deck":
+		// TODO: Check source Positions
+		fmt.Println("This is the position---> ", "pos_"+string(ad.SourcePosition))
+		sourcePosition, ok = consDistance["pos_"+string(ad.SourcePosition)]
 	default:
 		err = fmt.Errorf("category is invalid for aspire_dispense opeartion")
 		fmt.Println("Error: ", err)
@@ -155,7 +159,7 @@ func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int
 	// Get Destination Position -
 	//---------------------------
 	switch ad.Category {
-	case "well_to_well", "shaker_to_well":
+	case "well_to_well", "shaker_to_well", "deck_to_well":
 		uniqueCartridge.WellNum = ad.DestinationPosition
 		if destinationCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("destinationCartridge doesn't exist")
@@ -168,6 +172,9 @@ func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int
 		fmt.Println("destinationPosition: ", destinationPosition)
 	case "well_to_shaker":
 		destinationPosition, ok = consDistance["shaker_tube"]
+	case "well_to_deck", "deck_to_deck":
+		fmt.Println("This is the position---> ", "pos_"+string(ad.DestinationPosition))
+		destinationPosition, ok = consDistance["pos_"+string(ad.DestinationPosition)]
 		// default already handled in source Position
 	}
 	if !ok {
@@ -358,11 +365,9 @@ skipAspireCycles:
 	deckAndMotor.Number = K10_Syringe_LHRH
 
 	//
-	//  17. take air in 5ul
+	//  17. take airVolume in
 	//
-	// Just aspire 5 ul Pulses for now
-	// TODO: Remove this hardcoded volume
-	pulses = uint16(math.Round(oneMicroLitrePulses * 5))
+	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireAirVolume))
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {
 		return
