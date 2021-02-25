@@ -119,7 +119,7 @@ func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int
 	// NOTE : below position is added to sourcePosition/destinationPosition
 	// But only when they are wells
 	if position, ok = consDistance[string(ad.CartridgeType)+"_start"]; !ok {
-		err = fmt.Errorf(string(ad.CartridgeType) + "_cartridge_start doesn't exist for consuamble distances")
+		err = fmt.Errorf(string(ad.CartridgeType) + "_start doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -138,12 +138,12 @@ func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int
 		sourcePosition, ok = sourceCartridge["distance"]
 		sourcePosition += position
 		fmt.Println("sourcePosition: ", sourcePosition)
-	case "shaker_to_well":
+	case "shaker_to_well", "shaker_to_deck":
 		sourcePosition, ok = consDistance["shaker_tube"]
-	case "deck_to_well", "deck_to_deck":
+	case "deck_to_well", "deck_to_deck", "deck_to_shaker":
 		// TODO: Check source Positions
-		fmt.Println("This is the position---> ", "pos_"+string(ad.SourcePosition))
-		sourcePosition, ok = consDistance["pos_"+string(ad.SourcePosition)]
+		fmt.Println("This is the position---> ", "pos_"+fmt.Sprintf("%d", ad.SourcePosition))
+		sourcePosition, ok = consDistance["pos_"+fmt.Sprintf("%d", ad.SourcePosition)]
 	default:
 		err = fmt.Errorf("category is invalid for aspire_dispense opeartion")
 		fmt.Println("Error: ", err)
@@ -170,11 +170,11 @@ func (d *Compact32Deck) AspireDispenseBeta(ad db.AspireDispense, cartridgeID int
 		destinationPosition, ok = destinationCartridge["distance"]
 		destinationPosition += position
 		fmt.Println("destinationPosition: ", destinationPosition)
-	case "well_to_shaker":
+	case "well_to_shaker", "deck_to_shaker":
 		destinationPosition, ok = consDistance["shaker_tube"]
-	case "well_to_deck", "deck_to_deck":
-		fmt.Println("This is the position---> ", "pos_"+string(ad.DestinationPosition))
-		destinationPosition, ok = consDistance["pos_"+string(ad.DestinationPosition)]
+	case "well_to_deck", "deck_to_deck", "shaker_to_deck":
+		fmt.Println("This is the position---> ", "pos_"+fmt.Sprintf("%d", ad.DestinationPosition))
+		destinationPosition, ok = consDistance["pos_"+fmt.Sprintf("%d", ad.DestinationPosition)]
 		// default already handled in source Position
 	}
 	if !ok {
