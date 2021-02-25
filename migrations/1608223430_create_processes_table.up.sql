@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 CREATE TYPE process_type AS 
-ENUM('piercing','tip_operation','aspire_dispense','heating', 'shaking', 'magnet', 'delay');
+ENUM('piercing','tip_operation','tip_docking','aspire_dispense','heating', 'shaking', 'magnet', 'delay');
 
 CREATE TABLE IF NOT EXISTS processes(
  id uuid PRIMARY KEY default uuid_generate_v4(),
