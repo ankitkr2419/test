@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS heating(
- id uuid primary key,
+ id uuid primary key DEFAULT uuid_generate_v4(),
  temperature int,
  follow_temp boolean DEFAULT FALSE,
  duration int,

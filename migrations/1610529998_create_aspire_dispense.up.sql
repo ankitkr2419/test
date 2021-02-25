@@ -2,7 +2,7 @@ CREATE TYPE aspire_dispense_type AS ENUM ('well_to_shaker', 'shaker_to_well', 'w
 CREATE TYPE aspire_dispense_cartridge_type AS ENUM('cartridge_1', 'cartridge_2');
 
 CREATE TABLE IF NOT EXISTS aspire_dispense(
- id uuid PRIMARY KEY,
+ id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
  category aspire_dispense_type,
  cartridge_type aspire_dispense_cartridge_type,
  source_position int,

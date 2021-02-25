@@ -1,7 +1,7 @@
 CREATE TYPE tip_dock_type AS ENUM ('cartridge_1', 'deck', 'cartridge_2');
 
 CREATE TABLE  tip_dock(
- id uuid PRIMARY KEY,
+ id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
  type tip_dock_type DEFAULT 'deck',
  position int CHECK (position<10),
  process_id uuid,
