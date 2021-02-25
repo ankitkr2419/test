@@ -1,4 +1,4 @@
-CREATE TYPE aspire_dispense_type AS ENUM ('well_to_shaker', 'shaker_to_well', 'well_to_well', 'well_to_deck', 'deck_to_well', 'deck_to_deck');
+CREATE TYPE aspire_dispense_type AS ENUM ('well_to_shaker', 'shaker_to_well', 'well_to_well', 'well_to_deck', 'deck_to_well', 'deck_to_deck', 'shaker_to_deck', 'deck_to_shaker');
 CREATE TYPE aspire_dispense_cartridge_type AS ENUM('cartridge_1', 'cartridge_2');
 
 CREATE TABLE IF NOT EXISTS aspire_dispense(
