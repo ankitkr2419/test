@@ -161,7 +161,7 @@ ConsumableDistance:
     description: "magnet goes here after completing homing everytime homing is called"
   - id: 1001
     name: "syringe_module_a_lh_zero"
-    distance: 0
+    distance: -3.5
     description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
   - id: 1002
     name: "syringe_module_a_rh_zero"
