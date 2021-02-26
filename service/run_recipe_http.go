@@ -83,6 +83,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, processes []
 				return "", err
 			}
 			fmt.Println(ad)
+			// ad.run()
 			// Call Deck Process here
 		case "Heating":
 			// Get the Heating process
@@ -91,6 +92,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, processes []
 			// if err != nil {
 			// return "", err
 			// }
+			// ht.run()
 		case "Shaking":
 			// Get the Shaking process
 			// TODO: Below ID is reference ID, so please conform
@@ -98,6 +100,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, processes []
 			// if err != nil {
 			// return "", err
 			// }
+			// sh.run()
 		case "Piercing":
 			// Get the Piercing process
 			// TODO: Below ID is reference ID, so please conform
@@ -106,6 +109,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, processes []
 				return "", err
 			}
 			fmt.Println(pi)
+			// pi.run()
 		case "Magnet":
 		case "TipOperation":
 		case "TipDocking":
@@ -129,7 +133,6 @@ func runRecipeOnBothDeck(ctx context.Context, deps Dependencies, deck string, pr
 	// then delegate the deck chossing till before fetching invidual process
 	go func() {
 		deckAResponse, deckAErr = runRecipe(ctx, deps, "A", processes, recipe)
-
 	}()
 	go func() {
 		deckBResponse, deckBErr = runRecipe(ctx, deps, "B", processes, recipe)
