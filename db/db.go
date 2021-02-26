@@ -71,8 +71,16 @@ type Storer interface {
 	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
 	ShowRecipe(context.Context, uuid.UUID) (Recipe, error)
+	CreateRecipe(context.Context, Recipe) (Recipe, error)
+	DeleteRecipe(context.Context, uuid.UUID) error
+	UpdateRecipe(context.Context, Recipe) error
+	ListRecipe(context.Context) ([]Recipe, error)
 	// ListProcesses by Recipe ID
 	ListProcess(context.Context, uuid.UUID) ([]Process, error)
+	ShowProcess(context.Context, uuid.UUID) (Process, error)
+	CreateProcess(context.Context, Process) (Process, error)
+	DeleteProcess(context.Context, uuid.UUID) error
+	UpdateProcess(context.Context, Process) error
 	ListPiercing(context.Context) ([]Piercing, error)
 	CreatePiercing(context.Context, Piercing) (Piercing, error)
 	DeletePiercing(context.Context, uuid.UUID) error
