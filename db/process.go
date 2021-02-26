@@ -19,7 +19,7 @@ const (
 						FROM processes
 						WHERE id = $1`
 	selectProcessQuery = `SELECT *
-						FROM processes where recipe_id = $1 `
+						FROM processes where recipe_id = $1 ORDER BY sequence_num`
 	deleteProcessQuery = `DELETE FROM processes
 						WHERE id = $1`
 	createProcessQuery = `INSERT INTO processes (
