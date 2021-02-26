@@ -78,6 +78,11 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/aspireDispense/{id}", showAspireDispenseHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/aspireDispense/{id}", deleteAspireDispenseHandler(deps)).Methods(http.MethodDelete)
 	router.HandleFunc("/aspireDispense/{id}", updateAspireDispenseHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/recipe", createRecipeHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/recipe", listRecipeHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/recipe/{id}", showRecipeHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/recipe/{id}", deleteRecipeHandler(deps)).Methods(http.MethodDelete)
+	router.HandleFunc("/recipe/{id}", updateRecipeHandler(deps)).Methods(http.MethodPut)
 	router.HandleFunc("/run/{id}/{deck:[A-B]?}", runRecipeHandler(deps)).Methods(http.MethodGet)
 	return
 }
