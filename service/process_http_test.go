@@ -81,7 +81,7 @@ func (suite *ProcessHandlerTestSuite) TestCreateProcessFailure() {
 
 func (suite *ProcessHandlerTestSuite) TestListProcessSuccess() {
 	testUUID := uuid.New()
-	suite.dbMock.On("ListProcess", mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("ListProcesses", mock.Anything, mock.Anything).Return(
 		[]db.Process{
 			db.Process{
 				ID:             testUUID,
@@ -97,7 +97,7 @@ func (suite *ProcessHandlerTestSuite) TestListProcessSuccess() {
 		"/process/{id}",
 		"/process/"+testUUID.String(),
 		"",
-		listProcessHandler(Dependencies{Store: suite.dbMock}),
+		listProcessesHandler(Dependencies{Store: suite.dbMock}),
 	)
 	output := fmt.Sprintf(`[{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
@@ -106,7 +106,7 @@ func (suite *ProcessHandlerTestSuite) TestListProcessSuccess() {
 }
 
 func (suite *ProcessHandlerTestSuite) TestListProcessFailure() {
-	suite.dbMock.On("ListProcess", mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("ListProcesses", mock.Anything, mock.Anything).Return(
 		[]db.Process{}, fmt.Errorf("Error fetching process"))
 
 	recorder := makeHTTPCall(
@@ -114,7 +114,7 @@ func (suite *ProcessHandlerTestSuite) TestListProcessFailure() {
 		"/process/{id}",
 		"/process/"+testUUID.String(),
 		"",
-		listProcessHandler(Dependencies{Store: suite.dbMock}),
+		listProcessesHandler(Dependencies{Store: suite.dbMock}),
 	)
 	output := ""
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)

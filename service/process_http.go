@@ -9,7 +9,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func listProcessHandler(deps Dependencies) http.HandlerFunc {
+func listProcessesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
@@ -19,7 +19,7 @@ func listProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		list, err := deps.Store.ListProcess(req.Context(), id)
+		list, err := deps.Store.ListProcesses(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)

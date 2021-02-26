@@ -30,11 +30,9 @@ const (
 						VALUES ($1, $2, $3, $4) RETURNING id`
 	updateProcessQuery = `UPDATE processes SET (
 						name,
-						type,
-						recipe_id,
 						sequence_num,
 						updated_at)
-						VALUES ($1, $2, $3, $4, $5) WHERE id = $6`
+						VALUES ($1, $2, $3) WHERE id = $4`
 )
 
 type Process struct {
@@ -56,7 +54,7 @@ func (s *pgStore) ShowProcess(ctx context.Context, id uuid.UUID) (dbProcess Proc
 	return
 }
 
-func (s *pgStore) ListProcess(ctx context.Context, id uuid.UUID) (dbProcess []Process, err error) {
+func (s *pgStore) ListProcesses(ctx context.Context, id uuid.UUID) (dbProcess []Process, err error) {
 	err = s.db.Select(&dbProcess, selectProcessQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching process")
@@ -101,8 +99,6 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	_, err = s.db.Exec(
 		updateProcessQuery,
 		p.Name,
-		p.Type,
-		p.RecipeID,
 		p.SequenceNumber,
 		time.Now(),
 		p.ID,

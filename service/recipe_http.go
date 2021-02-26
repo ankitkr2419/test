@@ -9,9 +9,9 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func listRecipeHandler(deps Dependencies) http.HandlerFunc {
+func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		list, err := deps.Store.ListRecipe(req.Context())
+		list, err := deps.Store.ListRecipes(req.Context())
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)

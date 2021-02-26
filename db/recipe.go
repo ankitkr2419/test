@@ -83,7 +83,7 @@ func (s *pgStore) ShowRecipe(ctx context.Context, id uuid.UUID) (dbRecipe Recipe
 	return
 }
 
-func (s *pgStore) ListRecipe(ctx context.Context) (dbRecipe []Recipe, err error) {
+func (s *pgStore) ListRecipes(ctx context.Context) (dbRecipe []Recipe, err error) {
 	err = s.db.Select(&dbRecipe, selectRecipesQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching recipe")

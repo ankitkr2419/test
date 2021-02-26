@@ -93,9 +93,9 @@ func (suite *RecipeHandlerTestSuite) TestCreateRecipeFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *RecipeHandlerTestSuite) TestListRecipeSuccess() {
+func (suite *RecipeHandlerTestSuite) TestListRecipesSuccess() {
 	testRecipeUUID := uuid.New()
-	suite.dbMock.On("ListRecipe", mock.Anything, mock.Anything).Return(
+	suite.dbMock.On("ListRecipes", mock.Anything, mock.Anything).Return(
 		[]db.Recipe{
 			db.Recipe{
 				ID:                 testRecipeUUID,
@@ -118,7 +118,7 @@ func (suite *RecipeHandlerTestSuite) TestListRecipeSuccess() {
 		"/recipe",
 		"/recipe",
 		"",
-		listRecipeHandler(Dependencies{Store: suite.dbMock}),
+		listRecipesHandler(Dependencies{Store: suite.dbMock}),
 	)
 	output := fmt.Sprintf(`[{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
@@ -126,8 +126,8 @@ func (suite *RecipeHandlerTestSuite) TestListRecipeSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *RecipeHandlerTestSuite) TestListRecipeFailure() {
-	suite.dbMock.On("ListRecipe", mock.Anything, mock.Anything).Return(
+func (suite *RecipeHandlerTestSuite) TestListRecipesFailure() {
+	suite.dbMock.On("ListRecipes", mock.Anything, mock.Anything).Return(
 		[]db.Recipe{}, fmt.Errorf("Error fetching recipe"))
 
 	recorder := makeHTTPCall(
@@ -135,7 +135,7 @@ func (suite *RecipeHandlerTestSuite) TestListRecipeFailure() {
 		"/recipe",
 		"/recipe",
 		"",
-		listRecipeHandler(Dependencies{Store: suite.dbMock}),
+		listRecipesHandler(Dependencies{Store: suite.dbMock}),
 	)
 	output := ""
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)

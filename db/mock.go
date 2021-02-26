@@ -359,7 +359,7 @@ func (m *DBMockStore) ShowRecipe(ctx context.Context, id uuid.UUID) (p Recipe, e
 	return args.Get(0).(Recipe), args.Error(1)
 }
 
-func (m *DBMockStore) ListRecipe(ctx context.Context) (p []Recipe, err error) {
+func (m *DBMockStore) ListRecipes(ctx context.Context) (p []Recipe, err error) {
 	args := m.Called(ctx)
 	return args.Get(0).([]Recipe), args.Error(1)
 }
@@ -384,7 +384,7 @@ func (m *DBMockStore) ShowProcess(ctx context.Context, id uuid.UUID) (p Process,
 	return args.Get(0).(Process), args.Error(1)
 }
 
-func (m *DBMockStore) ListProcess(ctx context.Context, id uuid.UUID) (p []Process, err error) {
+func (m *DBMockStore) ListProcesses(ctx context.Context, id uuid.UUID) (p []Process, err error) {
 	args := m.Called(ctx)
 	return args.Get(0).([]Process), args.Error(1)
 }

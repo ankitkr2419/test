@@ -35,7 +35,7 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		// Get Processes associated with recipe
-		processes, err := deps.Store.ListProcess(req.Context(), recipeID)
+		processes, err := deps.Store.ListProcesses(req.Context(), recipeID)
 		if err != nil {
 			fmt.Fprintf(rw, err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
