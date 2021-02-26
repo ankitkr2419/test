@@ -46,8 +46,8 @@ func (suite *ProcessHandlerTestSuite) TestCreateProcessSuccess() {
 
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/process",
-		"/process",
+		"/processes",
+		"/processes",
 		body,
 		createProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -66,8 +66,8 @@ func (suite *ProcessHandlerTestSuite) TestCreateProcessFailure() {
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 
 	recorder := makeHTTPCall(http.MethodPost,
-		"/process",
-		"/process",
+		"/processes",
+		"/processes",
 		body,
 		createProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -94,8 +94,8 @@ func (suite *ProcessHandlerTestSuite) TestListProcessSuccess() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		"",
 		listProcessesHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -111,8 +111,8 @@ func (suite *ProcessHandlerTestSuite) TestListProcessFailure() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		"",
 		listProcessesHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -133,8 +133,8 @@ func (suite *ProcessHandlerTestSuite) TestShowProcessSuccess() {
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		"",
 		showProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -150,8 +150,8 @@ func (suite *ProcessHandlerTestSuite) TestShowProcessFailure() {
 	suite.dbMock.On("ShowProcess", mock.Anything, mock.Anything).Return(db.Process{}, fmt.Errorf("Error showing process"))
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		"",
 		showProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -175,8 +175,8 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessSuccess() {
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		body,
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -194,8 +194,8 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessFailure() {
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		body,
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -213,8 +213,8 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessSuccess() {
 		nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		"",
 		deleteProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -229,8 +229,8 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessFailure() {
 	suite.dbMock.On("DeleteProcess", mock.Anything, mock.Anything).Return("", fmt.Errorf("Error deleting process"))
 
 	recorder := makeHTTPCall(http.MethodDelete,
-		"/process/{id}",
-		"/process/"+testUUID.String(),
+		"/processes/{id}",
+		"/processes/"+testUUID.String(),
 		"",
 		deleteProcessHandler(Dependencies{Store: suite.dbMock}),
 	)

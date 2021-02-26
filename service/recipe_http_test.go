@@ -60,8 +60,8 @@ func (suite *RecipeHandlerTestSuite) TestCreateRecipeSuccess() {
 
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/recipe",
-		"/recipe",
+		"/recipes",
+		"/recipes",
 		body,
 		createRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -80,8 +80,8 @@ func (suite *RecipeHandlerTestSuite) TestCreateRecipeFailure() {
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_1":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 
 	recorder := makeHTTPCall(http.MethodPost,
-		"/recipe",
-		"/recipe",
+		"/recipes",
+		"/recipes",
 		body,
 		createRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -115,8 +115,8 @@ func (suite *RecipeHandlerTestSuite) TestListRecipesSuccess() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/recipe",
-		"/recipe",
+		"/recipes",
+		"/recipes",
 		"",
 		listRecipesHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -132,8 +132,8 @@ func (suite *RecipeHandlerTestSuite) TestListRecipesFailure() {
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
-		"/recipe",
-		"/recipe",
+		"/recipes",
+		"/recipes",
 		"",
 		listRecipesHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -161,8 +161,8 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeSuccess() {
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/recipe/{id}",
-		"/recipe/"+testRecipeUUID.String(),
+		"/recipes/{id}",
+		"/recipes/"+testRecipeUUID.String(),
 		"",
 		showRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -178,8 +178,8 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeFailure() {
 	suite.dbMock.On("ShowRecipe", mock.Anything, mock.Anything).Return(db.Recipe{}, fmt.Errorf("Error showing recipe"))
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/recipe/{id}",
-		"/recipe/"+testRecipeUUID.String(),
+		"/recipes/{id}",
+		"/recipes/"+testRecipeUUID.String(),
 		"",
 		showRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -210,8 +210,8 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/recipe/{id}",
-		"/recipe/"+testRecipeUUID.String(),
+		"/recipes/{id}",
+		"/recipes/"+testRecipeUUID.String(),
 		body,
 		updateRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -229,8 +229,8 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeFailure() {
 	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/recipe/{id}",
-		"/recipe/"+testRecipeUUID.String(),
+		"/recipes/{id}",
+		"/recipes/"+testRecipeUUID.String(),
 		body,
 		updateRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -248,8 +248,8 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeSuccess() {
 		nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
-		"/recipe/{id}",
-		"/recipe/"+testRecipeUUID.String(),
+		"/recipes/{id}",
+		"/recipes/"+testRecipeUUID.String(),
 		"",
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -264,8 +264,8 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeFailure() {
 	suite.dbMock.On("DeleteRecipe", mock.Anything, mock.Anything).Return("", fmt.Errorf("Error deleting recipe"))
 
 	recorder := makeHTTPCall(http.MethodDelete,
-		"/recipe/{id}",
-		"/recipe/"+testRecipeUUID.String(),
+		"/recipes/{id}",
+		"/recipes/"+testRecipeUUID.String(),
 		"",
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
