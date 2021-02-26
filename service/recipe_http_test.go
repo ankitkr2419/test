@@ -28,8 +28,8 @@ func TestRecipeTestSuite(t *testing.T) {
 	suite.Run(t, new(RecipeHandlerTestSuite))
 }
 
-var testUUID = uuid.New()
-var testName = "testName"
+var testRecipeUUID = uuid.New()
+var testRecipeName = "testRecipeName"
 var testDescription = "testDescription"
 var position1 int64 = 1
 var position2 int64 = 2
@@ -44,8 +44,8 @@ var position9 int64 = 7
 func (suite *RecipeHandlerTestSuite) TestCreateRecipeSuccess() {
 
 	suite.dbMock.On("CreateRecipe", mock.Anything, mock.Anything).Return(db.Recipe{
-		ID:                 testUUID,
-		Name:               testName,
+		ID:                 testRecipeUUID,
+		Name:               testRecipeName,
 		Description:        testDescription,
 		Position1:          position1,
 		Position2:          position2,
@@ -58,14 +58,14 @@ func (suite *RecipeHandlerTestSuite) TestCreateRecipeSuccess() {
 		Position9:          position9,
 	}, nil)
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
+	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/recipe",
 		"/recipe",
 		body,
 		createRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
+	output := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
@@ -74,10 +74,10 @@ func (suite *RecipeHandlerTestSuite) TestCreateRecipeSuccess() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestCreateRecipeFailure() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("CreateRecipe", mock.Anything, mock.Anything).Return(db.Recipe{}, fmt.Errorf("Error creating recipe"))
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_1":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
+	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_1":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/recipe",
@@ -94,12 +94,12 @@ func (suite *RecipeHandlerTestSuite) TestCreateRecipeFailure() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestListRecipeSuccess() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("ListRecipe", mock.Anything, mock.Anything).Return(
 		[]db.Recipe{
 			db.Recipe{
-				ID:                 testUUID,
-				Name:               testName,
+				ID:                 testRecipeUUID,
+				Name:               testRecipeName,
 				Description:        testDescription,
 				Position1:          position1,
 				Position2:          position2,
@@ -120,7 +120,7 @@ func (suite *RecipeHandlerTestSuite) TestListRecipeSuccess() {
 		"",
 		listRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, testName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
+	output := fmt.Sprintf(`[{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -144,10 +144,10 @@ func (suite *RecipeHandlerTestSuite) TestListRecipeFailure() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestShowRecipeSuccess() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("ShowRecipe", mock.Anything, mock.Anything).Return(db.Recipe{
-		ID:                 testUUID,
-		Name:               testName,
+		ID:                 testRecipeUUID,
+		Name:               testRecipeName,
 		Description:        testDescription,
 		Position1:          position1,
 		Position2:          position2,
@@ -162,11 +162,11 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/recipe/{id}",
-		"/recipe/"+testUUID.String(),
+		"/recipe/"+testRecipeUUID.String(),
 		"",
 		showRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
+	output := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
@@ -174,12 +174,12 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeSuccess() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestShowRecipeFailure() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("ShowRecipe", mock.Anything, mock.Anything).Return(db.Recipe{}, fmt.Errorf("Error showing recipe"))
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/recipe/{id}",
-		"/recipe/"+testUUID.String(),
+		"/recipe/"+testRecipeUUID.String(),
 		"",
 		showRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -191,10 +191,10 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeFailure() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("UpdateRecipe", mock.Anything, mock.Anything).Return(db.Recipe{
-		ID:                 testUUID,
-		Name:               testName,
+		ID:                 testRecipeUUID,
+		Name:               testRecipeName,
 		Description:        testDescription,
 		Position1:          position1,
 		Position2:          position2,
@@ -207,11 +207,11 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
 		Position9:          position9,
 	}, nil)
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
+	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/recipe/{id}",
-		"/recipe/"+testUUID.String(),
+		"/recipe/"+testRecipeUUID.String(),
 		body,
 		updateRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -223,14 +223,14 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestUpdateRecipeFailure() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("UpdateRecipe", mock.Anything, mock.Anything).Return(db.Recipe{}, fmt.Errorf("Error creating recipe"))
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
+	body := fmt.Sprintf(`{"id":"%s","name":"%s","description":"%s","pos_1":%d,"pos_2":%d,"pos_3":%d,"pos_4":%d,"pos_5":%d,"pos_cartridge_1":%d,"pos_7":%d,"pos_cartridge_2":%d,"pos_9":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testRecipeUUID, testRecipeName, testDescription, position1, position2, position3, position4, position5, cartridge1pos, position7, cartridge2pos, position9)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/recipe/{id}",
-		"/recipe/"+testUUID.String(),
+		"/recipe/"+testRecipeUUID.String(),
 		body,
 		updateRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -242,14 +242,14 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeFailure() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestDeleteRecipeSuccess() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("DeleteRecipe", mock.Anything, mock.Anything).Return(
-		testUUID,
+		testRecipeUUID,
 		nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
 		"/recipe/{id}",
-		"/recipe/"+testUUID.String(),
+		"/recipe/"+testRecipeUUID.String(),
 		"",
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -260,12 +260,12 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeSuccess() {
 }
 
 func (suite *RecipeHandlerTestSuite) TestDeleteRecipeFailure() {
-	testUUID := uuid.New()
+	testRecipeUUID := uuid.New()
 	suite.dbMock.On("DeleteRecipe", mock.Anything, mock.Anything).Return("", fmt.Errorf("Error deleting recipe"))
 
 	recorder := makeHTTPCall(http.MethodDelete,
 		"/recipe/{id}",
-		"/recipe/"+testUUID.String(),
+		"/recipe/"+testRecipeUUID.String(),
 		"",
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
