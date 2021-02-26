@@ -299,18 +299,13 @@ func (m *DBMockStore) InsertConsumableDistance(ctx context.Context, c []Consumab
 	return args.Error(1)
 }
 
-func (m *DBMockStore) InsertLabware(ctx context.Context, l []Labware) (err error) {
-	args := m.Called(ctx, l)
-	return args.Error(1)
-}
-
 func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err error) {
 	args := m.Called(ctx, t)
 	return args.Error(1)
 }
 
-func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge) (err error) {
-	args := m.Called(ctx, c)
+func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []CartridgeWells) (err error) {
+	args := m.Called(ctx, c, w)
 	return args.Error(1)
 }
 
@@ -322,11 +317,6 @@ func (m *DBMockStore) ListCartridges() (c []Cartridge, err error) {
 func (m *DBMockStore) ListTipsTubes() (t []TipsTubes, err error) {
 	args := m.Called(t)
 	return args.Get(0).([]TipsTubes), args.Error(1)
-}
-
-func (m *DBMockStore) ListLabwares() (l []Labware, err error) {
-	args := m.Called(l)
-	return args.Get(0).([]Labware), args.Error(1)
 }
 
 func (m *DBMockStore) ListConsDistances() (c []ConsumableDistance, err error) {

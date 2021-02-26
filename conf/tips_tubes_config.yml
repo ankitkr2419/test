@@ -1,6 +1,49 @@
 TipsTubes:
-  - labwareID: 1
-    consumabledistanceID: 103
-    name: "piercing_tip"
-    volume: 700.00
-    height: 93.00
+  - id : 1
+    name : 'extraction_tip_1000ul'
+    type: 'tip'
+    allowedPositions: [1,2]
+    volume: 1000
+    height: 98
+  
+  - id : 2
+    name : 'pcr_tip_1000ul'
+    type: 'tip'
+    allowedPositions: [1,2]
+    volume: 1000
+    height: 98
+  
+  - id : 3
+    name : 'piercing_tip'
+    type: 'tip'
+    allowedPositions: [3]
+    volume: 0.00
+    height: 39
+  
+  - id : 4
+    name : 'sample_tube'
+    type: 'tube'
+    allowedPositions: [4]
+    volume: 1500
+    height: 43.70
+  
+  - id : 5
+    name : 'shaker_tube'
+    type: 'tube'
+    allowedPositions: [5]
+    volume: 5000
+    height: 58.88
+  
+  - id : 6
+    name : 'extraction_collection_tube'
+    type: 'tube'
+    allowedPositions: [7]
+    volume: 1500
+    height: 43.70
+  
+  - id : 7
+    name : 'pcr_collection_tube'
+    type: 'tube'
+    allowedPositions: [9]
+    volume: 200
+    height: 15.80

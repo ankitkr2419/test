@@ -62,14 +62,13 @@ type Storer interface {
 	CheckIfICTargetAdded(context.Context, uuid.UUID) (WarnResponse, error)
 	InsertMotor(context.Context, []Motor) error
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
-	InsertLabware(context.Context, []Labware) error
 	InsertTipsTubes(context.Context, []TipsTubes) error
-	InsertCartridge(context.Context, []Cartridge) error
+	InsertCartridge(context.Context, []Cartridge, []CartridgeWells) error
 	ListMotors() ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
-	ListLabwares() ([]Labware, error)
 	ListTipsTubes() ([]TipsTubes, error)
 	ListCartridges() ([]Cartridge, error)
+	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
 	ListPiercing(context.Context) ([]Piercing, error)
 	CreatePiercing(context.Context, Piercing) (Piercing, error)

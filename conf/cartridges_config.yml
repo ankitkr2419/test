@@ -1,0 +1,7 @@
+Cartridges:
+  - id: 1
+    type: "cartridge_1"
+    description: "cartridge_1 8 wells"
+  - id: 2
+    type: "cartridge_2"
+    description: "cartridge_2 4 wells"

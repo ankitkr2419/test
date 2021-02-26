@@ -24,21 +24,21 @@ ConsumableDistance:
     distance: 211.97
     description: "extraction cartridge area end point"
   - id: 7
-    name: "PCR_cartridge_start"
+    name: "pcr_cartridge_start"
     distance: 255.19
-    description: "PCR cartridge area start point"
+    description: "pcr cartridge area start point"
   - id: 8
-    name: "PCR_cartridge_end"
+    name: "pcr_cartridge_end"
     distance: 295.66
-    description: "PCR cartridge area end point"
+    description: "pcr cartridge area end point"
   - id: 9
-    name: "PCR_collection_start"
+    name: "pcr_collection_start"
     distance: 297.60
-    description: "PCR collection area start point"
+    description: "pcr collection area start point"
   - id: 10
-    name: "PCR_collection_end"
+    name: "pcr_collection_end"
     distance: 329.60
-    description: "PCR collection area end point"
+    description: "pcr collection area end point"
   - id: 11
     name: "discard_small_hole"
     distance: 344.60
@@ -47,10 +47,46 @@ ConsumableDistance:
     name: "discard_big_hole"
     distance: 354.60
     description: "syringe module will get tip into this hole"
+  - id: 51
+    name: "pos_1"
+    distance: 13.52
+    description: "position 1 on deck, here pcr tip may reside"
+  - id: 52
+    name: "pos_2"
+    distance: 26.27
+    description: "position 2 on deck, here extraction tip may reside"
+  - id: 53
+    name: "pos_3"
+    distance: 39.02
+    description: "position 3 on deck, here piercing tip may reside"
+  - id: 54
+    name: "pos_4"
+    distance: 54.65
+    description: "position 4 on deck, here sample tube  may reside"
+  - id: 55
+    name: "pos_5"
+    distance: 97.76
+    description: "position 5 on deck, here lysis tube (swap or blood or other sample holding tube) may reside"
+  - id: 56
+    name: "pos_6"
+    distance: 127.66
+    description: "position 6 on deck, here cartridge 1 starts"
+  - id: 57
+    name: "pos_7"
+    distance: 233.50
+    description: "position 7 on deck, here elusion tube may reside"
+  - id: 58
+    name: "pos_8"
+    distance: 255.19
+    description: "position 8 on deck, here cartridge 2 may reside"
+  - id: 59
+    name: "pos_9"
+    distance: 313.6
+    description: "position 9 on deck, here pcr tube may reside"
   - id: 101
     name: "pcr_tip"
     distance: 13.52
-    description: "PCR tip at the 1st position"
+    description: "pcr tip at the 1st position"
   - id: 102
     name: "extraction_tip"
     distance: 26.27
