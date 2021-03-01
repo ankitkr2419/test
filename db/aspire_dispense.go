@@ -37,6 +37,7 @@ const (
 						dispense_volume,
 						dispense_blow_volume,
 						destination_position,
+						process_id,
 						created_at,
 						updated_at
 						FROM aspire_dispense
@@ -46,7 +47,6 @@ const (
 	deleteAspireDispenseQuery = `DELETE FROM aspire_dispense
 						WHERE id = $1`
 	createAspireDispenseQuery = `INSERT INTO aspire_dispense (
-						id,
 						category,
 						cartridge_type,
 						source_position,
@@ -60,8 +60,9 @@ const (
 						dispense_no_of_cycles,
 						dispense_volume,
 						dispense_blow_volume,
-						destination_position)
-						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`
+						destination_position,
+						process_id)
+						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`
 	updateAspireDispenseQuery = `UPDATE aspire_dispense SET (
 						category,
 						cartridge_type,
@@ -78,7 +79,7 @@ const (
 						dispense_blow_volume,
 						destination_position,
 						updated_at) = 
-						($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE id = $15`
+						($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) WHERE id = $16`
 )
 
 type AspireDispense struct {
@@ -97,6 +98,7 @@ type AspireDispense struct {
 	DispenseVolume       float64       `db:"dispense_volume" json:"dispense_volume"`
 	DispenseBlowVolume   float64       `db:"dispense_blow_volume" json:"dispense_blow_volume"`
 	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
+	ProcessID            uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt            time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -123,7 +125,6 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 	var lastInsertID uuid.UUID
 	err = s.db.QueryRow(
 		createAspireDispenseQuery,
-		ad.ID,
 		ad.Category,
 		ad.CartridgeType,
 		ad.SourcePosition,
@@ -138,6 +139,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		ad.DispenseVolume,
 		ad.DispenseBlowVolume,
 		ad.DestinationPosition,
+		ad.ProcessID,
 	).Scan(&lastInsertID)
 
 	if err != nil {
