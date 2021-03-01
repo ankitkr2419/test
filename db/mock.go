@@ -354,6 +354,61 @@ func (m *DBMockStore) UpdatePiercing(ctx context.Context, p Piercing) (err error
 	return args.Error(1)
 }
 
+func (m *DBMockStore) ShowRecipe(ctx context.Context, id uuid.UUID) (p Recipe, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Recipe), args.Error(1)
+}
+
+func (m *DBMockStore) ListRecipes(ctx context.Context) (p []Recipe, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Recipe), args.Error(1)
+}
+
+func (m *DBMockStore) CreateRecipe(ctx context.Context, p Recipe) (pi Recipe, err error) {
+	args := m.Called(ctx, p)
+	return args.Get(0).(Recipe), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteRecipe(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateRecipe(ctx context.Context, p Recipe) (err error) {
+	args := m.Called(ctx, p)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ShowProcess(ctx context.Context, id uuid.UUID) (p Process, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Process), args.Error(1)
+}
+
+func (m *DBMockStore) ListProcesses(ctx context.Context, id uuid.UUID) (p []Process, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Process), args.Error(1)
+}
+
+func (m *DBMockStore) CreateProcess(ctx context.Context, p Process) (pi Process, err error) {
+	args := m.Called(ctx, p)
+	return args.Get(0).(Process), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateProcess(ctx context.Context, p Process) (err error) {
+	args := m.Called(ctx, p)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ListCartridgeWells() (cw []CartridgeWells, err error) {
+	args := m.Called()
+	return args.Get(0).([]CartridgeWells), args.Error(1)
+}
+
 func (m *DBMockStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (ad AspireDispense, err error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(AspireDispense), args.Error(1)
