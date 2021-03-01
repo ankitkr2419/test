@@ -59,10 +59,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 		return "", err
 	}
 
+	var cartridgeID int64
 	// No cartridge selected so cartridge_id by default is 0
 	// Depending on cartridge_1 or cartridge_2 type we shall
 	//  select cartridge_id from recipe field
-	// var cartridgeID int64 = 0
+
+	var tipType = "extraction_tip_1000ul"
 	//  No tip selected
 	//  This field will be set when a tip is picked up
 	//  We will get its id from recipe and its details from tipsTubes map
@@ -78,6 +80,13 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 			fmt.Println(ad)
+
+			if ad.CartridgeType == db.Cartridge1 {
+				cartridgeID = recipe.Cartridge1Position
+			} else {
+				cartridgeID = recipe.Cartridge2Position
+			}
+			response, err = deps.PlcDeck[deck].AspireDispenseBeta(ad, cartridgeID, tipType)
 			// ad.run()
 			// Call Deck Process here
 		case "Heating":
