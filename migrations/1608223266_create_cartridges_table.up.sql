@@ -1,15 +1,9 @@
-CREATE TYPE cartridge_type AS ENUM('extraction', 'pcr');
-
+CREATE TYPE cartridge_type AS ENUM('cartridge_1', 'cartridge_2');
+ 
 CREATE TABLE IF NOT EXISTS cartridges(
- id int NOT NULL,
- labware_id int NOT NULL,
- type cartridge_type DEFAULT 'extraction',
+ id int PRIMARY KEY,
+ type cartridge_type DEFAULT 'cartridge_1',
  description varchar(250),
- well_num int NOT NULL,
- distance decimal NOT NULL,
- height decimal NOT NULL,
- volume decimal NOT NULL,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- FOREIGN KEY (labware_id) REFERENCES labwares(id) ON UPDATE CASCADE ON DELETE CASCADE,
- PRIMARY KEY (id));
+ updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

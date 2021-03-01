@@ -9,27 +9,6 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func listPiercingHandler(deps Dependencies) http.HandlerFunc {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		list, err := deps.Store.ListPiercing(req.Context())
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		respBytes, err := json.Marshal(list)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling piercing data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
-	})
-}
-
 func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var pobj db.Piercing
@@ -96,28 +75,6 @@ func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write(respBytes)
-	})
-}
-
-func deletePiercingHandler(deps Dependencies) http.HandlerFunc {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
-		id, err := parseUUID(vars["id"])
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		err = deps.Store.DeletePiercing(req.Context(), id)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while deleting piercing")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"piercing deleted successfully"}`))
 	})
 }
 

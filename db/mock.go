@@ -299,18 +299,13 @@ func (m *DBMockStore) InsertConsumableDistance(ctx context.Context, c []Consumab
 	return args.Error(1)
 }
 
-func (m *DBMockStore) InsertLabware(ctx context.Context, l []Labware) (err error) {
-	args := m.Called(ctx, l)
-	return args.Error(1)
-}
-
 func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err error) {
 	args := m.Called(ctx, t)
 	return args.Error(1)
 }
 
-func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge) (err error) {
-	args := m.Called(ctx, c)
+func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []CartridgeWells) (err error) {
+	args := m.Called(ctx, c, w)
 	return args.Error(1)
 }
 
@@ -322,11 +317,6 @@ func (m *DBMockStore) ListCartridges() (c []Cartridge, err error) {
 func (m *DBMockStore) ListTipsTubes() (t []TipsTubes, err error) {
 	args := m.Called(t)
 	return args.Get(0).([]TipsTubes), args.Error(1)
-}
-
-func (m *DBMockStore) ListLabwares() (l []Labware, err error) {
-	args := m.Called(l)
-	return args.Get(0).([]Labware), args.Error(1)
 }
 
 func (m *DBMockStore) ListConsDistances() (c []ConsumableDistance, err error) {
@@ -362,6 +352,61 @@ func (m *DBMockStore) DeletePiercing(ctx context.Context, id uuid.UUID) (err err
 func (m *DBMockStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	args := m.Called(ctx, p)
 	return args.Error(1)
+}
+
+func (m *DBMockStore) ShowRecipe(ctx context.Context, id uuid.UUID) (p Recipe, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Recipe), args.Error(1)
+}
+
+func (m *DBMockStore) ListRecipes(ctx context.Context) (p []Recipe, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Recipe), args.Error(1)
+}
+
+func (m *DBMockStore) CreateRecipe(ctx context.Context, p Recipe) (pi Recipe, err error) {
+	args := m.Called(ctx, p)
+	return args.Get(0).(Recipe), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteRecipe(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateRecipe(ctx context.Context, p Recipe) (err error) {
+	args := m.Called(ctx, p)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ShowProcess(ctx context.Context, id uuid.UUID) (p Process, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Process), args.Error(1)
+}
+
+func (m *DBMockStore) ListProcesses(ctx context.Context, id uuid.UUID) (p []Process, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Process), args.Error(1)
+}
+
+func (m *DBMockStore) CreateProcess(ctx context.Context, p Process) (pi Process, err error) {
+	args := m.Called(ctx, p)
+	return args.Get(0).(Process), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateProcess(ctx context.Context, p Process) (err error) {
+	args := m.Called(ctx, p)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) ListCartridgeWells() (cw []CartridgeWells, err error) {
+	args := m.Called()
+	return args.Get(0).([]CartridgeWells), args.Error(1)
 }
 
 func (m *DBMockStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (ad AspireDispense, err error) {

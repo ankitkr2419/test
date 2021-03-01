@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 
+	"github.com/lib/pq"
+
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -38,34 +40,32 @@ type ConsumableConfig struct {
 	}
 }
 
-type LabwareConfig struct {
-	Labware []struct {
-		ID          int
-		Name        string
-		Description string
-	}
-}
-
 type TipsTubesConfig struct {
 	TipsTubes []struct {
-		LabwareID            int
-		ConsumabledistanceID int
-		Name                 string
-		Volume               float64
-		Height               float64
+		ID               int64
+		Name             string
+		Type             string
+		AllowedPositions pq.Int64Array
+		Volume           float64
+		Height           float64
 	}
 }
 
-type CartridgeConfig struct {
-	Cartridge []struct {
+type CartridgesConfig struct {
+	Cartridges []struct {
 		ID          int
-		LabwareID   int
 		Type        string
 		Description string
-		WellNum     int
-		Distance    float64
-		Height      float64
-		Volume      float64
+	}
+}
+
+type CartridgeWellsConfig struct {
+	CartridgeWells []struct {
+		ID       int
+		WellNum  int
+		Distance float64
+		Height   float64
+		Volume   float64
 	}
 }
 
@@ -188,28 +188,6 @@ func SetupConsumable(s Storer) (err error) {
 
 }
 
-// DBSetup initializes labware in DB
-func SetupLabware(s Storer) (err error) {
-	var config LabwareConfig
-	err = viper.Unmarshal(&config)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
-		return
-	}
-
-	// create labware list
-	LabwareList := makeLabwareList(config)
-
-	// add distances to DB
-	err = s.InsertLabware(context.Background(), LabwareList)
-	if err != nil {
-		return
-	}
-
-	logger.Info("Labware Added in Database")
-	return
-}
-
 // DBSetup initializes tips and tubes in DB
 func SetupTipsTubes(s Storer) (err error) {
 	var config TipsTubesConfig
@@ -220,10 +198,10 @@ func SetupTipsTubes(s Storer) (err error) {
 	}
 
 	// create tipstubes list
-	TipesTubesList := makeTipesTubesList(config)
+	tipsTubesList := makeTipsTubesList(config)
 
 	// add distances to DB
-	err = s.InsertTipsTubes(context.Background(), TipesTubesList)
+	err = s.InsertTipsTubes(context.Background(), tipsTubesList)
 	if err != nil {
 		return
 	}
@@ -233,24 +211,31 @@ func SetupTipsTubes(s Storer) (err error) {
 }
 
 // DBSetup initializes cartridge in DB
-func SetupCartridge(s Storer) (err error) {
-	var config CartridgeConfig
-	err = viper.Unmarshal(&config)
+func SetupCartridges(s Storer) (err error) {
+	var cartridgesConfig CartridgesConfig
+	var wellsConfig CartridgeWellsConfig
+	err = viper.Unmarshal(&cartridgesConfig)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgesConfig")
+		return
+	}
+	err = viper.Unmarshal(&wellsConfig)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgeWellsConfig")
 		return
 	}
 
 	// create cartridge list
-	CartridgeList := makeCartridgeList(config)
+	cartridgesList := makeCartridgeList(cartridgesConfig)
+	wellsList := makeCartridgeWellsList(wellsConfig)
 
 	// add distances to DB
-	err = s.InsertCartridge(context.Background(), CartridgeList)
+	err = s.InsertCartridge(context.Background(), cartridgesList, wellsList)
 	if err != nil {
 		return
 	}
 
-	logger.Info("Cartridge Added in Database")
+	logger.Info("Cartridges Added in Database")
 	return
 }
 
@@ -277,48 +262,45 @@ func makeConsumableDistanceList(configConsumable ConsumableConfig) (ConsumableDi
 		consumableDistance.Name = c.Name
 		consumableDistance.Distance = c.Distance
 		consumableDistance.Description = c.Description
-
 		ConsumableDistances = append(ConsumableDistances, consumableDistance)
 	}
 	return
 }
 
-func makeLabwareList(configLabware LabwareConfig) (Labwares []Labware) {
-	labware := Labware{}
-	for _, l := range configLabware.Labware {
-		labware.ID = l.ID
-		labware.Name = l.Name
-		labware.Description = l.Description
-		Labwares = append(Labwares, labware)
-	}
-	return
-}
-
-func makeTipesTubesList(configTipsTubes TipsTubesConfig) (TipsTube []TipsTubes) {
+func makeTipsTubesList(configTipsTubes TipsTubesConfig) (allTipsTubes []TipsTubes) {
 	tipstubes := TipsTubes{}
 	for _, t := range configTipsTubes.TipsTubes {
-		tipstubes.LabwareID = t.LabwareID
-		tipstubes.ConsumabledistanceID = t.ConsumabledistanceID
+		tipstubes.ID = t.ID
+		tipstubes.Type = t.Type
+		tipstubes.AllowedPositions = t.AllowedPositions
 		tipstubes.Name = t.Name
 		tipstubes.Volume = t.Volume
 		tipstubes.Height = t.Height
-		TipsTube = append(TipsTube, tipstubes)
+		allTipsTubes = append(allTipsTubes, tipstubes)
 	}
 	return
 }
 
-func makeCartridgeList(configCartridge CartridgeConfig) (Cartridges []Cartridge) {
+func makeCartridgeList(configCartridge CartridgesConfig) (Cartridges []Cartridge) {
 	cartridge := Cartridge{}
-	for _, c := range configCartridge.Cartridge {
+	for _, c := range configCartridge.Cartridges {
 		cartridge.ID = c.ID
-		cartridge.LabwareID = c.LabwareID
 		cartridge.Type = c.Type
 		cartridge.Description = c.Description
-		cartridge.WellNum = c.WellNum
-		cartridge.Distance = c.Distance
-		cartridge.Height = c.Height
-		cartridge.Volume = c.Volume
 		Cartridges = append(Cartridges, cartridge)
+	}
+	return
+}
+
+func makeCartridgeWellsList(configCartridge CartridgeWellsConfig) (cartridgeWells []CartridgeWells) {
+	cartridgeWell := CartridgeWells{}
+	for _, c := range configCartridge.CartridgeWells {
+		cartridgeWell.ID = c.ID
+		cartridgeWell.WellNum = c.WellNum
+		cartridgeWell.Distance = c.Distance
+		cartridgeWell.Height = c.Height
+		cartridgeWell.Volume = c.Volume
+		cartridgeWells = append(cartridgeWells, cartridgeWell)
 	}
 	return
 }

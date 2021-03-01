@@ -1,0 +1,62 @@
+CartridgeWells:
+  - id: 1
+    wellNum: 1
+    distance: 9.62
+    height: 24.01
+    volume: 700
+  - id: 1
+    wellNum: 2
+    distance: 18.52
+    height: 24.01
+    volume: 700
+  - id: 1
+    wellNum: 3
+    distance: 27.42
+    height: 24.01
+    volume: 700
+  - id: 1
+    wellNum: 4
+    distance: 36.32
+    height: 24.01
+    volume: 700
+  - id: 1
+    wellNum: 5
+    distance:  46.24
+    height: 34.57
+    volume: 1900
+  - id: 1
+    wellNum: 6
+    distance: 57.14
+    height: 38.13
+    volume: 2100
+  - id: 1
+    wellNum: 7
+    distance: 67.99
+    height: 38.13
+    volume: 2100
+  - id: 1
+    wellNum: 8
+    distance: 77.34
+    height: 17.43
+    volume: 300
+  - id: 2
+    wellNum: 1
+    distance: 5
+    height: 14.10
+    volume: 200
+  - id: 2
+    wellNum: 2
+    distance: 11.9
+    height: 14.10
+    volume: 200
+  - id: 2
+    wellNum: 3
+    distance: 18.8
+    height: 14.10
+    volume: 200
+  - id: 2
+    wellNum: 4
+    distance: 25.70
+    height: 14.10
+    volume: 200
+

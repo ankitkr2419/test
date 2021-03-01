@@ -50,7 +50,10 @@ func main() {
 	config.Load("tips_tubes_config")
 
 	// config file to configure cartridge
-	config.Load("cartridge_config")
+	config.Load("cartridges_config")
+
+	// config file to configure cartridge wells
+	config.Load("cartridge_wells_config")
 
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
@@ -182,18 +185,6 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	// setup Db with labware
-	err = db.SetupLabware(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Labware failed")
-		return
-	}
-	err = compact32.SelectAllLabwares(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Select All Labwares failed")
-		return
-	}
-
 	// setup Db with tipstube
 	err = db.SetupTipsTubes(store)
 	if err != nil {
@@ -207,12 +198,12 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	// setup Db with cartridge
-	err = db.SetupCartridge(store)
+	err = db.SetupCartridges(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Cartridge failed")
 		return
 	}
-	err = compact32.SelectAllCartridge(store)
+	err = compact32.SelectAllCartridges(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
 		return
