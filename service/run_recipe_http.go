@@ -86,9 +86,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			} else {
 				cartridgeID = recipe.Cartridge2Position
 			}
-			response, err = deps.PlcDeck[deck].AspireDispenseBeta(ad, cartridgeID, tipType)
-			// ad.run()
-			// Call Deck Process here
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, cartridgeID, tipType)
+			if err != nil {
+				return "", err
+			}
 		case "Heating":
 			// Get the Heating process
 			// TODO: Below ID is reference ID, so please conform
