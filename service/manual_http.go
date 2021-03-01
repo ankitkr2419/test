@@ -54,10 +54,6 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		switch m.Deck {
 		case "A", "B":
 			response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
-		case "":
-			// TODO: Handle errors in better manner
-			go deps.PlcDeck["A"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
-			go deps.PlcDeck["B"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
 		default:
 			err = fmt.Errorf("Please check your deck")
 		}
@@ -82,8 +78,6 @@ func pauseHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 		switch deck {
-		case "":
-			response, err = bothDeckOperation(deps, "Pause")
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Pause")
 		default:
@@ -111,7 +105,6 @@ func resumeHandler(deps Dependencies) http.HandlerFunc {
 		deck := vars["deck"]
 		switch deck {
 		case "":
-			response, err = bothDeckOperation(deps, "Resume")
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Resume")
 		default:
@@ -140,8 +133,6 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 
 		fmt.Println("Inside ABORT... value of deck:", deck, len(deck))
 		switch deck {
-		case "":
-			response, err = bothDeckOperation(deps, "Abort")
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Abort")
 		default:
