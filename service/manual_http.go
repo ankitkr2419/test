@@ -54,6 +54,10 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		switch m.Deck {
 		case "A", "B":
 			response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
+		case "":
+			// TODO: Handle errors in better manner
+			go deps.PlcDeck["A"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
+			go deps.PlcDeck["B"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
 		default:
 			err = fmt.Errorf("Please check your deck")
 		}

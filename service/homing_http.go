@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -15,8 +16,10 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["deck"]
+		deck := vars["id"]
 		switch deck {
+		case "":
+			response, err = bothDeckOperation(deps, "Homing")
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Homing")
 		default:
@@ -32,6 +35,47 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
+}
+
+func bothDeckOperation(deps Dependencies, operation string) (response string, err error) {
+
+	var deckAResponse, deckBResponse string
+	var deckAErr, deckBErr error
+
+	go func() {
+		deckAResponse, deckAErr = singleDeckOperation(deps, "A", operation)
+	}()
+	go func() {
+		deckBResponse, deckBErr = singleDeckOperation(deps, "B", operation)
+	}()
+
+	for {
+		switch {
+		case deckAErr != nil:
+			fmt.Printf("Error %s deck A", operation)
+			// abort Deck B Operation as Well
+			response, err = deps.PlcDeck["B"].Abort()
+			if err != nil {
+				return
+			}
+			return "", deckAErr
+		case deckBErr != nil:
+			fmt.Printf("Error %s deck B", operation)
+			// Abort Deck A Operation as well
+			response, err = deps.PlcDeck["A"].Abort()
+			if err != nil {
+				return
+			}
+			return "", deckBErr
+		case deckAResponse != "" && deckBResponse != "":
+			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
+			fmt.Println(operationSuccessMsg)
+			return operationSuccessMsg, nil
+		default:
+			// Only check every 400 milli second
+			time.Sleep(400 * time.Millisecond)
+		}
+	}
 }
 
 func singleDeckOperation(deps Dependencies, deck, operation string) (response string, err error) {
