@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
-	"github.com/google/uuid"
 
+	"github.com/google/uuid"
 
 	"github.com/gorilla/mux"
 )
@@ -109,18 +109,21 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			// fmt.Printf("heat object %v", heat)
 			// ht, err := deps.PlcDeck[deck].Heating(uint16(heat.Temperature), heat.FollowTemp, heat.Duration)
 			// if err != nil {
-				// return "", err
+			// return "", err
 			// }
 			// fmt.Println(ht)
 
 		case "Shaking":
-			// Get the Shaking process
-			// sh, err := deps.Store.ShowShaking(req.Context(), p.ID)
-			// if err != nil {
-			// return "", err
-			// }
-			// fmt.Println(sh)
-			// sh.run()
+			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
+
+			fmt.Printf("shaker object %v", shaker)
+
+			sha, err := deps.PlcDeck[deck].Shaking(shaker)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(sha)
+
 		case "Piercing":
 			// Get the Piercing process
 			// TODO: Below ID is reference ID, so please conform

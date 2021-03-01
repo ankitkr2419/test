@@ -23,7 +23,7 @@ import (
 	is specified.
 11. After all this process is done switch the shaker and the heater off.
 */
-func (d *Compact32Deck) Shake(shakerData db.Shaker) (result string, err error) {
+func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error) {
 
 	var shakerNo = 3
 

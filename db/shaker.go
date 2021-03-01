@@ -19,16 +19,12 @@ type Shaker struct {
 	Rpm2        int           `json:"rpm_2" db:"rpm_2"`
 	Time1       time.Duration `json:"time_1" db:"time_1"`
 	Time2       time.Duration `json:"time_2" db:"time_2"`
-	RecipeID    uuid.UUID     `json:"recipe_id" db:"recipe_id"`
 	CreatedAt   time.Time     `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time     `json:"updated_at" db:"updated_at"`
 }
 
 const (
-	getShakerQuery = `SELECT s.*,p.recipe_id 
-	FROM shaking as s join processes as p 
-	on s.process_id = p.id WHERE 
-	p.recipe_id = $1`
+	getShakerQuery = `SELECT * FROM shaking where id = $1`
 )
 
 func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker Shaker, err error) {

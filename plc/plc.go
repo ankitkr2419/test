@@ -70,5 +70,5 @@ type DeckDriver interface {
 	AttachDetach(db.AttachDetach) (response string, err error)
 	AddDelay(db.Delay) (string, error)
 	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
-	Shake(db.Shaker) (string, error)
+	Shaking(db.Shaker) (string, error)
 }

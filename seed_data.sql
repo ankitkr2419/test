@@ -43,6 +43,13 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a305783
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd789','TipDocking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de7', 11, 'TD-C1-5' );
 
 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd767','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 7, 'AD-SD-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd768','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 8, 'AD-DS-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('2557f792-e60f-4f91-a79e-575349b5b1e5','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 9, 'SH-NH-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('8fc9e765-3120-4617-9085-e9b81d589030','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 10, 'SH-WH-NF-6' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('4cc37963-c564-43d4-b277-7c58ef5a0dc7','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 11, 'SH-WH-FT-7' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('6543f226-098d-4f35-afd0-ab692382924c','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 12, 'SH-NH-8' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('bbd4c820-1eab-4e3f-a508-4b986bc5227b','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 13, 'SH-NH-9' );
 
 --  For cartridge_2
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 9, 'AD-WW-c2-1-2' ); 
@@ -61,6 +68,8 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139732','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d12', 2, 'TO-DK' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139743','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 1, 'TO-PK-3' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139733','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 2, 'TO-DK' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 15, 'AD-SD-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd770','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 16, 'AD-DS-5' );
 
 -- For piercing processes
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139733','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d14', 1, 'PI-C1-ALL' ); 
@@ -126,3 +135,9 @@ INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3
 INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c085','cartridge_2','{1,2,3,4}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139736');
 INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c086','cartridge_2','{2,4}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139737');
 INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c087','cartridge_2','{1,3}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139738');
+--Insert into shaking
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('bbe172f0-e315-4ebd-83ab-c1c0b531e2f6','2557f792-e60f-4f91-a79e-575349b5b1e5',false,false,0,500,800,60,60);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('a03fc110-5b9e-4461-b114-dfd21bae77d8','8fc9e765-3120-4617-9085-e9b81d589030',true,false,0,500,800,120,120);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('2066b0aa-7688-4fa7-bba1-c5836a3ab01b','4cc37963-c564-43d4-b277-7c58ef5a0dc7',true,true,600,500,800,180,180);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('c6d62e6c-1c19-4d3d-862e-a8dc5f8c2629','6543f226-098d-4f35-afd0-ab692382924c',false,false,0,6500,14500,240,240);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('0c911dfc-2993-4992-8fa6-e6d779e8814b','bbd4c820-1eab-4e3f-a508-4b986bc5227b',false,false,0,500,800,300,300);
