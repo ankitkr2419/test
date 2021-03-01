@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -34,19 +33,9 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		// Get Processes associated with recipe
-		processes, err := deps.Store.ListProcesses(req.Context(), recipeID)
-		if err != nil {
-			fmt.Fprintf(rw, err.Error())
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
 		switch deck {
-		case "":
-			response, err = runRecipeOnBothDeck(req.Context(), deps, deck, processes, recipe)
 		case "A", "B":
-			response, err = runRecipe(req.Context(), deps, deck, processes, recipe)
+			response, err = runRecipe(req.Context(), deps, deck, recipe)
 		default:
 			err = fmt.Errorf("Check you deck name")
 		}
@@ -62,7 +51,13 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func runRecipe(ctx context.Context, deps Dependencies, deck string, processes []db.Process, recipe db.Recipe) (response string, err error) {
+func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Recipe) (response string, err error) {
+
+	// Get Processes associated with recipe
+	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
+	if err != nil {
+		return "", err
+	}
 
 	// No cartridge selected so cartridge_id by default is 0
 	// Depending on cartridge_1 or cartridge_2 type we shall
@@ -122,37 +117,4 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, processes []
 	}
 
 	return
-}
-
-func runRecipeOnBothDeck(ctx context.Context, deps Dependencies, deck string, processes []db.Process, recipe db.Recipe) (response string, err error) {
-
-	var deckAResponse, deckBResponse string
-	var deckAErr, deckBErr error
-
-	//  If we need both recipes to go at the same pace
-	// then delegate the deck chossing till before fetching invidual process
-	go func() {
-		deckAResponse, deckAErr = runRecipe(ctx, deps, "A", processes, recipe)
-	}()
-	go func() {
-		deckBResponse, deckBErr = runRecipe(ctx, deps, "B", processes, recipe)
-	}()
-
-	for {
-		switch {
-		case deckAErr != nil:
-			fmt.Printf("Error deck A %v", deckAErr)
-			return "", deckAErr
-		case deckBErr != nil:
-			fmt.Printf("Error deck B %v", deckBErr)
-			return "", deckBErr
-		case deckAResponse != "" && deckBResponse != "":
-			operationSuccessMsg := fmt.Sprintf("Success for both Decks!")
-			fmt.Println(operationSuccessMsg)
-			return operationSuccessMsg, nil
-		default:
-			// Only check every 400 milli second
-			time.Sleep(400 * time.Millisecond)
-		}
-	}
 }
