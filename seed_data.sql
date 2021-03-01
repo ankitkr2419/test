@@ -11,6 +11,11 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('3b47f63
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1eac','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 6, 'AD-DD-4-5' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd767','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 7, 'AD-SD-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd768','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 8, 'AD-DS-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('2fa97b44-f3c3-460a-9585-9932b2de1ac2','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 17, 'HT-FT-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('42479aae-7342-43af-a9d3-520fbffc0f24','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 18, 'HT-FF-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('fee69b9e-0898-4078-bc28-655ebddbfb5b','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 19, 'HT-FT-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8724e7213cb','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 20, 'HT-FF-5' );
+
 
 --  For cartridge_2
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 9, 'AD-WW-c2-1-2' ); 
@@ -42,4 +47,11 @@ INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_posit
 INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_position,aspire_height,aspire_mixing_volume,aspire_no_of_cycles,aspire_volume,aspire_air_volume,dispense_height,dispense_mixing_volume,dispense_no_of_cycles,dispense_volume,dispense_blow_volume,destination_position)VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1ea1','a3057838-d5e2-4ac2-9e4b-7d1e4fefd769', 'shaker_to_deck', 'cartridge_2', 7, 40, 100,2, 100,10, 40 , 100, 2, 100, 10, 9);
 INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_position,aspire_height,aspire_mixing_volume,aspire_no_of_cycles,aspire_volume,aspire_air_volume,dispense_height,dispense_mixing_volume,dispense_no_of_cycles,dispense_volume,dispense_blow_volume,destination_position)VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1ea2','a3057838-d5e2-4ac2-9e4b-7d1e4fefd770', 'deck_to_shaker', 'cartridge_2', 7, 40, 100,2, 100,10, 40 , 100, 2, 100, 10, 7);
 
+
+-- For Heating
+
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('659057e1-8a41-4f2e-a94e-1ffc60aea5a6','2fa97b44-f3c3-460a-9585-9932b2de1ac2',20,true,'20');
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('1cdb0a53-f151-4b37-8d8d-8741a044150c','42479aae-7342-43af-a9d3-520fbffc0f24',20,false,'20');
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('bee80d98-098a-4677-b3fb-6932278231b8','fee69b9e-0898-4078-bc28-655ebddbfb5b',20,true,'20');
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('e0e974f4-2269-4b79-a5be-842be95f02bb','1d3334e5-5779-423d-83d5-b8724e7213cb',20,false,'20');
 

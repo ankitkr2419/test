@@ -62,5 +62,5 @@ type DeckDriver interface {
 	Resume() (string, error)
 	Abort() (string, error)
 	ResumeMotorWithPulses(uint16) (string, error)
-	Heat(uint16, uint16, bool, time.Duration) (string, error)
+	Heating(uint16, bool, time.Duration) (string, error)
 }

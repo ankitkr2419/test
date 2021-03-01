@@ -13,18 +13,14 @@ type Heating struct {
 	Temperature float64       `json:"temperature" db:"temperature"`
 	FollowTemp  bool          `json:"follow_temp" db:"follow_temp"`
 	Duration    time.Duration `json:"duration" db:"duration"`
-	RecipeID    uuid.UUID     `json:"recipe_id" db:"recipe_id"`
-	ShakerNo    int           `json:"shaker_no" db:"shaker_no"`
+	ProcessID   uuid.UUID     `json:"process_id" db:"process_id"`
 	CreatedAt   time.Time     `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time     `json:"updated_at" db:"updated_at"`
 }
 
 const (
 	//get heating data with recipe_id
-	getHeatingQuery = `SELECT h.*,p.recipe_id 
-			FROM heating as h join processes as p 
-			on h.id=p.id WHERE 
-			h.id = $1`
+	getHeatingQuery = `SELECT * FROM heating where process_id = $1`
 )
 
 func (s *pgStore) GetHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {

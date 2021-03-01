@@ -22,7 +22,10 @@ import (
 12. continously read the register to check if the temperature is set after each 300 ms
 13. after reading apply decimal point to 1 decimal places for any further use.
 */
-func (d *Compact32Deck) Heat(temperature, shaker uint16, followup bool, heatTime time.Duration) (response string, err error) {
+func (d *Compact32Deck) Heating(temperature uint16, followup bool, heatTime time.Duration) (response string, err error) {
+
+	//here we are hardcoding the shaker no in future this is to be fetched dynamically.
+	shaker := uint16(3)
 
 	heatTime = heatTime * time.Second
 	var setTemp, setTemp1, setTemp2 uint16 = 0, 0, 0
