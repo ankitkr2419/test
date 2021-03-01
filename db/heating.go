@@ -23,7 +23,7 @@ const (
 	getHeatingQuery = `SELECT * FROM heating where process_id = $1`
 )
 
-func (s *pgStore) GetHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
+func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
 
 	// get heating record
 	err = s.db.Get(&heating,
