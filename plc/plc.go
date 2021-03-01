@@ -64,7 +64,7 @@ type DeckDriver interface {
 	Resume() (string, error)
 	Abort() (string, error)
 	ResumeMotorWithPulses(uint16) (string, error)
-	RunProcesses() (string, error)
-	AspireDispense(category, cartridgeType string, labwareID, source, destination, aspire_cycles, dispense_cycles int64, asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64) (response string, err error)
+	// RunProcesses() (string, error)
+	// AspireDispense(category, cartridgeType string, labwareID, source, destination, aspire_cycles, dispense_cycles int64, asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64) (response string, err error)
 	AspireDispenseBeta(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
 }
