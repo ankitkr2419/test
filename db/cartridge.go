@@ -31,6 +31,11 @@ const (
 
 type CartridgeType string
 
+const (
+	Cartridge1 = "cartridge_1"
+	Cartridge2 = "cartridge_2"
+)
+
 type Cartridge struct {
 	ID          int64         `db:"id" json:"id"`
 	Type        CartridgeType `db:"type" json:"type"`
