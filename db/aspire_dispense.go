@@ -41,11 +41,11 @@ const (
 						created_at,
 						updated_at
 						FROM aspire_dispense
-						WHERE id = $1`
+						WHERE process_id = $1`
 	selectAspireDispenseQuery = `SELECT *
 						FROM aspire_dispense`
 	deleteAspireDispenseQuery = `DELETE FROM aspire_dispense
-						WHERE id = $1`
+						WHERE process_id = $1`
 	createAspireDispenseQuery = `INSERT INTO aspire_dispense (
 						category,
 						cartridge_type,
@@ -79,7 +79,7 @@ const (
 						dispense_blow_volume,
 						destination_position,
 						updated_at) = 
-						($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) WHERE id = $16`
+						($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) WHERE process_id = $16`
 )
 
 type AspireDispense struct {
