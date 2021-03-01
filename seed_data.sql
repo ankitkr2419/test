@@ -3,24 +3,24 @@ INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, po
 
 --  Insert into processes
 --  For Cartridge_1
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139612','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 1, 'AD-WW-c1-1-2' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('4fa5c4e3-699c-47bb-ac7a-b26d04efaeb5','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 2, 'AD-WS-c1-1' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('fb88bada-ced7-4fa2-b845-4bb91e74341e','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 3, 'AD-SW-c1-2' );        
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('38a20548-85bf-4c3b-82bc-4d87b87f2dbe','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 4, 'AD-DW-c1-4-2' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('3b47f63e-fb02-460b-864f-edc4a302af5a','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 5, 'AD-WD-c1-2-5' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1eac','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 6, 'AD-DD-4-5' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd767','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 7, 'AD-SD-5' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd768','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 8, 'AD-DS-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139612','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 1, 'AD-WW-c1-1-2' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('4fa5c4e3-699c-47bb-ac7a-b26d04efaeb5','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 2, 'AD-WS-c1-1' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('fb88bada-ced7-4fa2-b845-4bb91e74341e','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 3, 'AD-SW-c1-2' );        
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('38a20548-85bf-4c3b-82bc-4d87b87f2dbe','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 4, 'AD-DW-c1-4-2' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('3b47f63e-fb02-460b-864f-edc4a302af5a','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 5, 'AD-WD-c1-2-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1eac','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 6, 'AD-DD-4-5' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd767','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 7, 'AD-SD-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd768','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 8, 'AD-DS-5' );
 
 --  For cartridge_2
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 9, 'AD-WW-c2-1-2' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('cd446adb-f7ed-4368-aa65-b0e04fdd2c81','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 10, 'AD-WS-c2-1' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('e6e7f15e-a06d-4d04-ac60-4de113fd8c42','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 11, 'AD-SW-c2-2' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('62c1afc8-87cb-4bb6-833e-b5716cbf71cd','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 12, 'AD-DW-c2-4-2' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3b7da1c-a402-4b81-9e76-eeac4782b779','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 13, 'AD-WD-c2-2-5' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd766','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 14, 'AD-DD-4-5' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 15, 'AD-SD-5' );
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd770','aspire_dispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 16, 'AD-DS-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 9, 'AD-WW-c2-1-2' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('cd446adb-f7ed-4368-aa65-b0e04fdd2c81','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 10, 'AD-WS-c2-1' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('e6e7f15e-a06d-4d04-ac60-4de113fd8c42','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 11, 'AD-SW-c2-2' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('62c1afc8-87cb-4bb6-833e-b5716cbf71cd','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 12, 'AD-DW-c2-4-2' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3b7da1c-a402-4b81-9e76-eeac4782b779','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 13, 'AD-WD-c2-2-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd766','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 14, 'AD-DD-4-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 15, 'AD-SD-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd770','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 16, 'AD-DS-5' );
 
 -- Insert into aspire_dispense process
 --  For cartridge_1
