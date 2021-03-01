@@ -63,11 +63,11 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/motor", createMotorHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/consumabledistance", createConsumableDistanceHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tiptube", createTipTubeHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/homing/{deck:[A-B]?}", homingHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/homing/{deck:[A-B]}", homingHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/manual", manualHandler(deps)).Methods(http.MethodPost)
-	router.HandleFunc("/pause/{deck:[A-B]?}", pauseHandler(deps)).Methods(http.MethodGet)
-	router.HandleFunc("/resume/{deck:[A-B]?}", resumeHandler(deps)).Methods(http.MethodGet)
-	router.HandleFunc("/abort/{deck:[A-B]?}", abortHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/pause/{deck:[A-B]}", pauseHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/resume/{deck:[A-B]}", resumeHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/abort/{deck:[A-B]}", abortHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/piercing", createPiercingHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/piercing/{id}", showPiercingHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/piercing/{id}", updatePiercingHandler(deps)).Methods(http.MethodPut)
@@ -84,6 +84,6 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/processes/{id}", showProcessHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/processes/{id}", deleteProcessHandler(deps)).Methods(http.MethodDelete)
 	router.HandleFunc("/processes/{id}", updateProcessHandler(deps)).Methods(http.MethodPut)
-	router.HandleFunc("/run/{id}/{deck:[A-B]?}", runRecipeHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/run/{id}/{deck:[A-B]}", runRecipeHandler(deps)).Methods(http.MethodGet)
 	return
 }
