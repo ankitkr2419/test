@@ -1,6 +1,9 @@
 package plc
 
-import "time"
+import (
+	"mylab/cpagent/db"
+	"time"
+)
 
 type Status int32
 
@@ -63,4 +66,5 @@ type DeckDriver interface {
 	Abort() (string, error)
 	ResumeMotorWithPulses(uint16) (string, error)
 	Heating(uint16, bool, time.Duration) (string, error)
+	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
 }

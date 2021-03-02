@@ -1,7 +1,7 @@
 ConsumableDistance:
   - id: 1
     name: "deck_start"
-    distance: 0.00
+    distance: 13.52
     description: "desk start point"
   - id: 2
     name: "deck_end"
@@ -16,19 +16,19 @@ ConsumableDistance:
     distance: 113.90
     description: "shakers area end point"
   - id: 5
-    name: "extraction_cartridge_start"
+    name: "cartridge_1_start"
     distance: 127.66
     description: "extraction cartridge area start point"
   - id: 6
-    name: "extraction_cartridge_end"
+    name: "cartridge_1_end"
     distance: 211.97
     description: "extraction cartridge area end point"
   - id: 7
-    name: "pcr_cartridge_start"
+    name: "cartridge_2_start"
     distance: 255.19
     description: "pcr cartridge area start point"
   - id: 8
-    name: "pcr_cartridge_end"
+    name: "cartridge_2_end"
     distance: 295.66
     description: "pcr cartridge area end point"
   - id: 9
@@ -147,6 +147,14 @@ ConsumableDistance:
     name: "discard_tip_and_fast_up"
     distance: 137.5
     description: "syringe module goes this much up fast after the piercing tip has been removed"
+  - id: 310
+    name: "deck_base"
+    distance: 117
+    description: "syringe module is this much distance from its zero homing position to deck"
+  - id: 401
+    name: "pickup_tip_up"
+    distance: 59
+    description: "syringe module goes to this position at fast after picking up any tip, or as per requirement"
   - id: 601
     name: "magnet_reverse_after_homing"
     distance: 50
@@ -169,7 +177,7 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
   - id: 1005
     name: "deck_a_zero"
-    distance: 0
+    distance: 12.4
     description: "All distances on deck as well as tips and tubes distances will be adjusted according to this variable"
   - id: 1006
     name: "magnet_up_down_a_zero"
@@ -185,49 +193,49 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All shaker horizontal distances will be fixed here"
   - id: 1009
     name: "syringe_module_a_lh_rh_zero"
-    distance: 0
+    distance: 3.5
     description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
   - id: 1010
     name: "syringe_a_lh_rh_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
   - id: 1051
-    name: "syringe_module_a_lh_zero"
+    name: "syringe_module_b_lh_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
   - id: 1052
-    name: "syringe_module_a_rh_zero"
+    name: "syringe_module_b_rh_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
   - id: 1053
-    name: "syringe_a_lh_zero"
+    name: "syringe_b_lh_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
   - id: 1054
-    name: "syringe_a_rh_zero"
+    name: "syringe_b_rh_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
   - id: 1055
-    name: "deck_a_zero"
-    distance: 0
+    name: "deck_b_zero"
+    distance: 9.5
     description: "All distances on deck as well as tips and tubes distances will be adjusted according to this variable"
   - id: 1056
-    name: "magnet_up_down_a_zero"
+    name: "magnet_up_down_b_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All magnet horizontal distances will be fixed here"
   - id: 1057
-    name: "magnet_rev_fwd_a_zero"
+    name: "magnet_rev_fwd_b_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All magnet vertical distances will be fixed here"
   - id: 1058
-    name: "shaker_a_zero"
+    name: "shaker_b_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All shaker horizontal distances will be fixed here"
   - id: 1059
-    name: "syringe_module_a_lh_rh_zero"
-    distance: 0
+    name: "syringe_module_b_lh_rh_zero"
+    distance: 5
     description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
   - id: 1060
-    name: "syringe_a_lh_rh_zero"
+    name: "syringe_b_lh_rh_zero"
     distance: 0
     description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"

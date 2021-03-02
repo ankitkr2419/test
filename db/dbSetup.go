@@ -53,16 +53,16 @@ type TipsTubesConfig struct {
 
 type CartridgesConfig struct {
 	Cartridges []struct {
-		ID          int
-		Type        string
+		ID          int64
+		Type        CartridgeType
 		Description string
 	}
 }
 
 type CartridgeWellsConfig struct {
 	CartridgeWells []struct {
-		ID       int
-		WellNum  int
+		ID       int64
+		WellNum  int64
 		Distance float64
 		Height   float64
 		Volume   float64

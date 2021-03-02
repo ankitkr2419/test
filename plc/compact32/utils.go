@@ -1,12 +1,20 @@
 package compact32
 
 import (
+	"fmt"
 	"mylab/cpagent/db"
 )
 
 type DeckNumber struct {
 	Deck   string
 	Number uint16
+}
+
+// Each Cartridge can be uniquely identified by these fields
+type UniqueCartridge struct {
+	CartridgeID   int64
+	CartridgeType db.CartridgeType
+	WellNum       int64
 }
 
 // motors
@@ -96,8 +104,8 @@ var positions = map[DeckNumber]float64{
 var motors = make(map[DeckNumber]map[string]uint16)
 var consDistance = make(map[string]float64)
 var tipstubes = make(map[string]map[string]interface{})
-var cartridges = make(map[int]map[string]interface{})
-var cartridgeWells = make(map[int]map[string]float64)
+var labwares = make(map[int]string)
+var cartridges = make(map[UniqueCartridge]map[string]float64)
 var calibs = make(map[DeckNumber]float64)
 
 func SelectAllMotors(store db.Storer) (err error) {
@@ -132,11 +140,12 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 			deckAndNumber.Number = uint16(cd.ID - 1000)
 			calibs[deckAndNumber] = cd.Distance
 		case cd.ID > 1050 && cd.ID <= 1060:
-			deckAndNumber.Deck = "A"
+			deckAndNumber.Deck = "B"
 			deckAndNumber.Number = uint16(cd.ID - 1050)
 			calibs[deckAndNumber] = cd.Distance
 		}
 	}
+	fmt.Println("Calibs:--->", calibs)
 	return
 }
 
@@ -168,10 +177,10 @@ func SelectAllCartridges(store db.Storer) (err error) {
 		return
 	}
 
+	cartridgeType := make(map[int64]db.CartridgeType)
+
 	for _, cartridge := range allCartridges {
-		cartridges[cartridge.ID] = make(map[string]interface{})
-		cartridges[cartridge.ID]["type"] = cartridge.Type
-		cartridges[cartridge.ID]["description"] = cartridge.Description
+		cartridgeType[cartridge.ID] = cartridge.Type
 	}
 
 	allCartridgeWells, err := store.ListCartridgeWells()
@@ -180,11 +189,15 @@ func SelectAllCartridges(store db.Storer) (err error) {
 	}
 
 	for _, well := range allCartridgeWells {
-		cartridgeWells[well.ID] = make(map[string]float64)
-		cartridgeWells[well.ID]["well_num"] = float64(well.WellNum)
-		cartridgeWells[well.ID]["distance"] = well.Distance
-		cartridgeWells[well.ID]["height"] = well.Height
-		cartridgeWells[well.ID]["volume"] = well.Volume
+		uniqueCartridge := UniqueCartridge{
+			CartridgeID:   well.ID,
+			CartridgeType: cartridgeType[well.ID],
+			WellNum:       well.WellNum,
+		}
+		cartridges[uniqueCartridge] = make(map[string]float64)
+		cartridges[uniqueCartridge]["distance"] = well.Distance
+		cartridges[uniqueCartridge]["height"] = well.Height
+		cartridges[uniqueCartridge]["volume"] = well.Volume
 	}
 	return
 }

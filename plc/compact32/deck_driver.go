@@ -20,6 +20,8 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "", err
 	}
 
+	fmt.Println("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction)
+
 	// Switch OFF The motor
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
@@ -96,6 +98,9 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	for {
 		if aborted[d.name] {
+			// Write executed pulses to Position
+			positions[deckAndNumber] += float64(executedPulses[d.name]) / float64(motors[deckAndNumber]["steps"])
+			fmt.Println("pos", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
@@ -130,6 +135,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 					fmt.Println("Unknown Direction was found")
 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
 				}
+				fmt.Println("pos", positions[deckAndNumber])
 				return "RUN Completed", nil
 			}
 		}
@@ -154,6 +160,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				}
 				sensorHasCut[d.name] = true
 				positions[deckAndNumber] = calibs[deckAndNumber]
+				fmt.Println("pos", positions[deckAndNumber])
 				return
 			}
 		}
@@ -222,6 +229,13 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 	aborted[d.name] = false
 
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
+	if err != nil {
+		fmt.Println("Inside Switch off Shaker err : ", err, d.name)
+		return "", err
+	}
+	fmt.Println("Switched off the shaker--> for ", d.name)
+
 	if runInProgress[d.name] {
 		err = fmt.Errorf("previous run is already in progress... wait or abort it")
 		return
@@ -262,7 +276,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 // ***NOTE***
 // * In Syringe Sensor is DOWN and not UP.
 // * This is exactly opposite of Syringe Module and Magnet Up/Down
-// * Thus we need syringeUP and syringeDOWN
+// * Thus we need ASPIRE (syringe going UP) and DISPENSE (syringe going DOWN)
 
 func (d *Compact32Deck) SyringeHoming() (response string, err error) {
 
@@ -270,7 +284,7 @@ func (d *Compact32Deck) SyringeHoming() (response string, err error) {
 
 	fmt.Println("Syringe is moving down until sensor not cut")
 
-	response, err = d.SetupMotor(homingFastSpeed, initialSensorCutSyringePulses, motors[deckAndNumber]["ramp"], syringeDOWN, deckAndNumber.Number)
+	response, err = d.SetupMotor(homingFastSpeed, initialSensorCutSyringePulses, motors[deckAndNumber]["ramp"], DISPENSE, deckAndNumber.Number)
 	if err != nil {
 		return
 	}
@@ -278,14 +292,14 @@ func (d *Compact32Deck) SyringeHoming() (response string, err error) {
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Aspiring and getting cut then aspiring 2000")
-	response, err = d.SetupMotor(homingFastSpeed, reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], syringeUP, deckAndNumber.Number)
+	response, err = d.SetupMotor(homingFastSpeed, reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], ASPIRE, deckAndNumber.Number)
 	if err != nil {
 		return
 	}
 	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println("Syringe dispencing again")
-	response, err = d.SetupMotor(homingSlowSpeed, finalSensorCutPulses, motors[deckAndNumber]["ramp"], syringeDOWN, deckAndNumber.Number)
+	response, err = d.SetupMotor(homingSlowSpeed, finalSensorCutPulses, motors[deckAndNumber]["ramp"], DISPENSE, deckAndNumber.Number)
 	if err != nil {
 		return
 	}
