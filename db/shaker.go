@@ -24,7 +24,7 @@ type Shaker struct {
 }
 
 const (
-	getShakerQuery = `SELECT * FROM shaking where id = $1`
+	getShakerQuery = `SELECT * FROM shaking where process_id = $1`
 )
 
 func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker Shaker, err error) {
@@ -34,7 +34,7 @@ func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker S
 		shakerID,
 	)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error getting shaking")
+		logger.WithField("err", err.Error()).Error("Error getting shaking data")
 		return
 	}
 
