@@ -62,7 +62,7 @@ func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, hea
 		return "", err
 	}
 
-	//Set Temperature for shakers
+	//Set Temperature for heater
 	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], temperature)
 	if err != nil {
 		fmt.Println("Error failed to write temperature: ", err)
