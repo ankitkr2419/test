@@ -159,6 +159,10 @@ ConsumableDistance:
     name: "magnet_reverse_after_homing"
     distance: 50
     description: "magnet goes here after completing homing everytime homing is called"
+  - id: 602
+    name: "magnet_detach_for_homing"
+    distance: 5.0
+    description: "magnet goes this distance for homing"
   - id: 1001
     name: "syringe_module_a_lh_zero"
     distance: 0
