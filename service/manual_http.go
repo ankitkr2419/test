@@ -29,9 +29,9 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		switch {
-		case m.Deck != "A" && m.Deck != "B" && m.Deck != "":
+		case m.Deck != "A" && m.Deck != "B":
 			rw.WriteHeader(http.StatusBadRequest)
-			err = fmt.Errorf("Use A or B deck or leave it blank")
+			err = fmt.Errorf("Use A or B deck only")
 			fmt.Println(err)
 			return
 		case m.MotorNum <= 4 || m.MotorNum > 10:
@@ -54,10 +54,6 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		switch m.Deck {
 		case "A", "B":
 			response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
-		case "":
-			// TODO: Handle errors in better manner
-			go deps.PlcDeck["A"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
-			go deps.PlcDeck["B"].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
 		default:
 			err = fmt.Errorf("Please check your deck")
 		}
