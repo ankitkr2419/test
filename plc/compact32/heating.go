@@ -22,9 +22,10 @@ import (
 12. continously read the register to check if the temperature is set after each 300 ms
 13. after reading apply decimal point to 1 decimal places for any further use.
 */
-func (d *Compact32Deck) Heating(temperature uint16, followup bool, heatTime time.Duration) (response string, err error) {
+func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, heatTime time.Duration) (response string, err error) {
 
-	//here we are hardcoding the shaker no in future this is to be fetched dynamically.
+	// here we are hardcoding the shaker no in future this is to be fetched dynamically.
+	// 3 is the value that needs to be passed for heating both the shakers.
 	shaker := uint16(3)
 
 	heatTime = heatTime * time.Second
@@ -84,7 +85,7 @@ func (d *Compact32Deck) Heating(temperature uint16, followup bool, heatTime time
 
 	// first check if not follow up then inside a go routine start timer(afterFunc does this by default)
 	// and start up the heating and when the timer is expired turn off the heater
-	if !followup {
+	if !follow_temperature {
 		fmt.Printf("inside not follow up")
 		t = time.AfterFunc(heatTime, d.SwitchOffTheHeater)
 	}
@@ -148,7 +149,7 @@ shakerSelectionLoop:
 
 	// if follow up is true then first let it reach the temperature then wait for
 	// specified duration and then turn the heater off
-	if followup {
+	if follow_temperature {
 		time.Sleep(heatTime)
 		d.SwitchOffHeater()
 		return
