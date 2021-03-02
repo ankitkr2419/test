@@ -1,5 +1,9 @@
 package plc
 
+import (
+	"mylab/cpagent/db"
+)
+
 type Status int32
 
 const (
@@ -60,4 +64,5 @@ type DeckDriver interface {
 	Resume() (string, error)
 	Abort() (string, error)
 	ResumeMotorWithPulses(uint16) (string, error)
+	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
 }
