@@ -16,9 +16,10 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		vars := mux.Vars(req)
-		deck := vars["id"]
+		deck := vars["deck"]
 		switch deck {
 		case "":
+			fmt.Println("At both deck!!!")
 			response, err = bothDeckOperation(deps, "Homing")
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Homing")
