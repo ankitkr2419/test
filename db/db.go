@@ -93,4 +93,5 @@ type Storer interface {
 	DeleteAspireDispense(context.Context, uuid.UUID) error
 	UpdateAspireDispense(context.Context, AspireDispense) error
 	ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error)
+	ShowAttachDetach(ctx context.Context, processID uuid.UUID) (AttachDetach, error)
 }

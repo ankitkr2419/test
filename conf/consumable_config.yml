@@ -47,6 +47,10 @@ ConsumableDistance:
     name: "discard_big_hole"
     distance: 354.60
     description: "syringe module will get tip into this hole"
+  - id: 13
+    name: "deck_move_for_magnet_attach"
+    distance: 85
+    description: "deck will be at this position from homing for attach or detach operation"   
   - id: 51
     name: "pos_1"
     distance: 13.52
@@ -179,6 +183,22 @@ ConsumableDistance:
     name: "magnet_detach_for_homing"
     distance: 5.0
     description: "magnet goes this distance for homing"
+  - id: 603
+    name: "magnet_down_step_1"
+    distance: 0.5
+    description: "This field sets the down height for the magnet first step"
+  - id: 604
+    name: "magnet_forward_step_1"
+    distance: 12.5
+    description: "This field sets the forward distance for the magnet"
+  - id: 605
+    name: "magnet_down_step_2"
+    distance: 75
+    description: "This field sets the down height for the magnet second step"
+  - id: 606
+    name: "magnet_forward_step_2"
+    distance: 2.5
+    description: "This field sets the forward distance for the magnet second step"
   - id: 1001
     name: "syringe_module_a_lh_zero"
     distance: 0
