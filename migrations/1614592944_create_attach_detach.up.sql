@@ -1,5 +1,5 @@
-CREATE TYPE operation  AS ENUM ('attach','detach');
-CREATE TYPE operation_type AS ENUM ('lysis', 'wash', 'illusion','full_detach', 'semi_detach');
+CREATE TYPE IF NOT EXISTS operation  AS ENUM ('attach','detach');
+CREATE TYPE IF NOT EXISTS operation_type AS ENUM ('lysis', 'wash', 'illusion','full_detach', 'semi_detach');
 
 
 CREATE TABLE IF NOT EXISTS attach_detach(
@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS attach_detach(
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  PRIMARY KEY (id),
- FOREIGN KEY (id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE);
+ FOREIGN KEY (process_id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE);

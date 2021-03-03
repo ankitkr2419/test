@@ -21,6 +21,10 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('fee69b9
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8724e7213cb','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 20, 'HT-FF-5' );
 
 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd068','AttachDetach', '6b7fcfa2-8337-4d79-829a-e9bd486a2de8', 20, 'ATDT-AT-1' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd968','AttachDetach', '6b7fcfa2-8337-4d79-829a-e9bd486a2de8', 21, 'ATDT-DT-1' );
+
+
 --  For cartridge_2
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 9, 'AD-WW-c2-1-2' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('cd446adb-f7ed-4368-aa65-b0e04fdd2c81','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 10, 'AD-WS-c2-1' );
@@ -59,9 +63,6 @@ INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_posit
 INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_position,aspire_height,aspire_mixing_volume,aspire_no_of_cycles,aspire_volume,aspire_air_volume,dispense_height,dispense_mixing_volume,dispense_no_of_cycles,dispense_volume,dispense_blow_volume,destination_position)VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1ea1','a3057838-d5e2-4ac2-9e4b-7d1e4fefd769', 'shaker_to_deck', 'cartridge_2', 7, 40, 100,2, 100,10, 10 , 100, 2, 100, 10, 9);
 INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_position,aspire_height,aspire_mixing_volume,aspire_no_of_cycles,aspire_volume,aspire_air_volume,dispense_height,dispense_mixing_volume,dispense_no_of_cycles,dispense_volume,dispense_blow_volume,destination_position)VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1ea2','a3057838-d5e2-4ac2-9e4b-7d1e4fefd770', 'deck_to_shaker', 'cartridge_2', 7, 10, 100,2, 100,10, 40 , 100, 2, 100, 10, 7);
 
-
-
-
 -- For Heating
 
 INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('659057e1-8a41-4f2e-a94e-1ffc60aea5a6','2fa97b44-f3c3-460a-9585-9932b2de1ac2',20,true,'20');
@@ -76,3 +77,7 @@ INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1e1b','a5d058e3-7ce3-4a42-b2da-690e47139732', 'discard', 0);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1eac','a5d058e3-7ce3-4a42-b2da-690e47139743', 'pickup', 3);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1e1c','a5d058e3-7ce3-4a42-b2da-690e47139733', 'discard', 0);
+
+-- attach Detach
+INSERT INTO attach_detach (id,operation,operation_type,process_id) VALUES('16587ff5-5d49-4ab7-b155-59069a380ff7','attach','wash','a3057838-d5e2-4ac2-9e4b-7d1e4fefd068');
+INSERT INTO attach_detach (id,operation,operation_type,process_id) VALUES('16587ff5-5d49-4ab7-b155-59069a380ff8','detach','full_detach','a3057838-d5e2-4ac2-9e4b-7d1e4fefd968');

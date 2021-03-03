@@ -9,17 +9,119 @@ import (
 /* ****** ALGORITHM *******
 
  */
-func (d *Compact32Deck) AttachDetach(db.AttachDetach) (response string, err error) {
+func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err error) {
+
+	switch ad.Operation {
+	case "attach":
+		response, err = d.Attach(ad.OperationType)
+		if err != nil {
+			fmt.Printf("error in attach process %v \n", err.Error())
+		}
+		return
+	case "detach":
+		response, err = d.Detach(ad.OperationType)
+		if err != nil {
+			fmt.Printf("error in attach process %v \n", err.Error())
+		}
+		return
+	}
+	return
+
+}
+func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
+
+	fmt.Println("In Detach process")
+	var magnetBackPosition, magnetUpPosition float64
+	var ok bool
+	var direction, pulses uint16
+
+	deckMagnetUpDown := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
+	// motor desc for magnet fwd/rev motion
+	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
+	// step 1 to calculate the relative position of the magnet from its current
+	// position to move the magnet backward for step 1.
+	if magnetBackPosition, ok = consDistance["magnet_backward_step_1"]; !ok {
+		err = fmt.Errorf("magnet_backward_step_1 doesn't exist for consuamble distances")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	// distance and direction setup for magnet for forward step 1
+	distanceToTravelBack := positions[deckMagnetFwdRev] - magnetBackPosition
+
+	switch {
+	// distToTravel > 0 means go towards the Sensor or FWD
+	case distanceToTravelBack > 0.1:
+		direction = 1
+	case distanceToTravelBack < -0.1:
+		distanceToTravelBack *= -1
+		direction = 0
+	default:
+		// Skip the setUpMotor Step
+		goto skipMagnetBackToSourcePosition
+	}
+
+	fmt.Printf("distance to travel fwd 2 %v \n", distanceToTravelBack)
+	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelBack))
+
+	// set up motor for attach step 2 Forward Motion
+	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], uint16(2000), motors[deckMagnetFwdRev]["ramp"], direction, K7_Magnet_Rev_Fwd)
+	if err != nil {
+		return
+	}
+	fmt.Println("magnet move forward 2")
+	fmt.Println(response)
+skipMagnetBackToSourcePosition:
+
+	// if operation type is semi detach then return after doing the first backward step.
+	if operationType == "semi_detach" {
+		return "Success", nil
+	}
+
+	// step 3 to go with the normal flow of full detach.
+	// to calculate the relative position of the magnet from its current
+	// position to move the magnet Downward for step 2.
+	if magnetUpPosition, ok = consDistance["magnet_up_step_1"]; !ok {
+		err = fmt.Errorf("magnet_down_step_2 doesn't exist for consuamble distances")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+	// distance and direction setup for magnet for forward step 1
+	distanceToTravelUp := positions[deckMagnetUpDown] - magnetUpPosition
+
+	switch {
+	// distToTravel > 0 means go towards the Sensor or FWD
+	case distanceToTravelUp > 0.1:
+		direction = 1
+	case distanceToTravelUp < -0.1:
+		distanceToTravelUp *= -1
+		direction = 0
+	default:
+		// Skip the setUpMotor Step
+		goto skipMagnetDownSecToSourcePosition
+	}
+	fmt.Printf("distance to travel up 1 %v \n", distanceToTravelUp)
+	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelUp))
+
+	// set up motor for attach step 2 Downward Motion
+	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, K6_Magnet_Up_Down)
+	if err != nil {
+		return
+	}
+	fmt.Println("magnet move upward 1")
+	fmt.Println(response)
+skipMagnetDownSecToSourcePosition:
+	return "Success", nil
+
+}
+
+func (d *Compact32Deck) Attach(operationType string) (response string, err error) {
+
+	fmt.Println("In Attach process")
 
 	var deckPosition, magnetDownFirstPosition, magnetFwdFirstPosition, magnetDownSecPosition, magnetFwdSecPosition float64
 	var ok bool
 	var direction, pulses uint16
-	// get the consumable deck position
-	if deckPosition, ok = consDistance["deck_move_for_magnet_attach"]; !ok {
-		err = fmt.Errorf("deck_move_for_magnet_attach doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
 
 	//-----------deck
 	// move the deck to the position where the magnet position is appropriate to shaker
@@ -28,6 +130,13 @@ func (d *Compact32Deck) AttachDetach(db.AttachDetach) (response string, err erro
 	deckMagnetUpDown := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
 	// motor desc for magnet fwd/rev motion
 	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
+	// get the consumable deck position
+
+	if deckPosition, ok = consDistance["deck_move_for_magnet_attach"]; !ok {
+		err = fmt.Errorf("deck_move_for_magnet_attach doesn't exist for consuamble distances")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
 
 	distToTravel := positions[deckAndNumber] - deckPosition
 	switch {
@@ -82,7 +191,7 @@ skipDeckToSourcePosition:
 	}
 
 	fmt.Printf("distance to travel down %v \n", distanceToTravelDown)
-	pulses = uint16(math.Round(float64(motors[deckAndNumber]["steps"]) * distanceToTravelDown))
+	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelDown))
 
 	// set up motor for attach step 1 Downward Motion
 	response, err = d.SetupMotor(motors[deckMagnetUpDown]["slow"], pulses, motors[deckMagnetUpDown]["ramp"], direction, K6_Magnet_Up_Down)
@@ -160,7 +269,7 @@ skipMagnetFwdToSourcePosition:
 	fmt.Println(response)
 
 skipMagnetDownSecToSourcePosition:
-	// step 3 to calculate the relative position of the magnet from its current
+	// step 4 to calculate the relative position of the magnet from its current
 	// position to move the magnet Downward for step 2.
 	if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2"]; !ok {
 		err = fmt.Errorf("magnet_forward_step_2 doesn't exist for consuamble distances")
