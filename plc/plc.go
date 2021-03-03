@@ -67,4 +67,5 @@ type DeckDriver interface {
 	ResumeMotorWithPulses(uint16) (string, error)
 	Heating(uint16, bool, time.Duration) (string, error)
 	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
+	TipOperation(to db.TipOperation) (response string, err error)
 }
