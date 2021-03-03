@@ -1,5 +1,9 @@
 -- Insert into recipe
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2de4','covid', 'Recipe for covid extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d11','tip 1', 'Recipe for maleria 1 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d12','tip 2', 'Recipe for maleria 2 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d13','tip 3', 'Recipe for maleria 3 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+
 
 --  Insert into processes
 --  For Cartridge_1
@@ -26,6 +30,11 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3b7da1
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd766','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 14, 'AD-DD-4-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 15, 'AD-SD-7' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd770','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 16, 'AD-DS-7' );
+
+-- Insert into processes 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139741','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d11', 1, 'TO-PK-1' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139742','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d12', 1, 'TO-PK-2' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139743','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 1, 'TO-PK-3' ); 
 
 -- Insert into aspire_dispense process
 --  For cartridge_1
@@ -57,3 +66,6 @@ INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('1cdb
 INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('bee80d98-098a-4677-b3fb-6932278231b8','fee69b9e-0898-4078-bc28-655ebddbfb5b',20,true,'20');
 INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('e0e974f4-2269-4b79-a5be-842be95f02bb','1d3334e5-5779-423d-83d5-b8724e7213cb',20,false,'20');
 
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('9207aa73-74b1-4bca-86ae-88e843ef1eaa','a5d058e3-7ce3-4a42-b2da-690e47139741', 'pickup', 1);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1eab','a5d058e3-7ce3-4a42-b2da-690e47139742', 'pickup', 2);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1eac','a5d058e3-7ce3-4a42-b2da-690e47139743', 'pickup', 3);
