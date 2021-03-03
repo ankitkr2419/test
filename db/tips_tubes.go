@@ -23,6 +23,8 @@ const (
 	insertTipsTubesQuery2 = `ON CONFLICT DO NOTHING;`
 	getTipsTubesQuery     = `SELECT *
 							FROM tips_and_tubes`
+	getTipByIDQuery = `SELECT *
+							FROM tips_and_tubes where id=$1`
 )
 
 type TipsTubes struct {
@@ -71,6 +73,15 @@ func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 
 func (s *pgStore) ListTipsTubes() (tipstubes []TipsTubes, err error) {
 	err = s.db.Select(&tipstubes, getTipsTubesQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
+		return
+	}
+	return
+}
+
+func (s *pgStore) ShowTip(id int64) (tip TipsTubes, err error) {
+	err = s.db.Select(&tip, getTipByIDQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
 		return
