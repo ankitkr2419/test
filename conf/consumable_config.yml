@@ -125,7 +125,7 @@ ConsumableDistance:
     description: "syringe module goes this much down at fast for picking up the piercing tip ( before turning slow) from the homing position"
   - id: 302
     name: "syringe_module_slow_down"
-    distance: 5.00
+    distance: 108.00
     description: "syringe module goes this much down at slow for picking up the piercing tip after coming fast down"
   - id: 303
     name: "pickup_piercing_tip_up"
@@ -147,6 +147,10 @@ ConsumableDistance:
     name: "discard_tip_and_fast_up"
     distance: 137.5
     description: "syringe module goes this much up fast after the piercing tip has been removed"
+  - id: 308
+    name: "resting_position"
+    distance: 10
+    description: "syringe module goes here for resting by default"
   - id: 310
     name: "deck_base"
     distance: 117
