@@ -155,6 +155,10 @@ ConsumableDistance:
     name: "deck_base"
     distance: 117
     description: "syringe module is this much distance from its zero homing position to deck"
+  - id: 311
+    name: "syringe_module_slow_down_for_discard"
+    distance: 127
+    description: "syringe module goes this much down at slow for discarding tip"
   - id: 401
     name: "pickup_tip_up"
     distance: 59
