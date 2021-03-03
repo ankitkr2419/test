@@ -232,12 +232,6 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	runInProgress[d.name] = true
 	defer d.ResetRunInProgress()
 
-	fmt.Println("Homing Magnet")
-	response, err = d.MagnetHoming()
-	if err != nil {
-		return
-	}
-
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.SyringeHoming()
 	if err != nil {
@@ -246,6 +240,12 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 	fmt.Println("Moving Syringe Module UP till sensor cuts it")
 	response, err = d.SyringeModuleHoming()
+	if err != nil {
+		return
+	}
+
+	fmt.Println("Homing Magnet")
+	response, err = d.MagnetHoming()
 	if err != nil {
 		return
 	}
