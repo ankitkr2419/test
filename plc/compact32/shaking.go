@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Shake : function
+// Shaking : function
 /* Alogrithm ******************
 1. Validate that rpm 2 and time 2 value is not set before setting rpm 1 and time 1
 2. Switch off the shaker bit first and reset the completion bit to avoid any inconsistency.
@@ -112,13 +112,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 			}
 			fmt.Printf("follow temp done %v", result)
 		}
-	}
-
-	//motor on
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
-	if err != nil {
-		fmt.Println("err starting shaker: ", err)
-		return "", err
 	}
 
 	//start shaker
