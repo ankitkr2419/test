@@ -18,10 +18,8 @@ func (d *Compact32Deck) TipOperation(to db.TipOperation) (response string, err e
 	case db.PickupTip:
 		response, err = d.TipPickup(to.Position)
 	case db.DiscardTip:
-		//
-		// response, err = d.TipDiscard()
+		response, err = d.TipDiscard()
 	}
-
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue doing Tip Operation. Error: %v", err)
@@ -196,4 +194,9 @@ skipDeckMove:
 
 	return "Tip PickUp was successfull", nil
 
+}
+
+// Currently only discarding at Discard box so avoid handling at_pickup_passing condition
+func (d *Compact32Deck) TipDiscard() (response string, err error) {
+	return
 }
