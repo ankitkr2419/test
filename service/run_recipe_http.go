@@ -64,11 +64,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 	// Depending on cartridge_1 or cartridge_2 type we shall
 	//  select cartridge_id from recipe field
 
-	var tipType = "extraction_tip_1000ul"
+	// currentTips will be maps of deck to TipsTubes
+	currentTips := map[string]db.TipsTubes{
+		"A": db.TipsTubes{},
+		"B": db.TipsTubes{},
+	}
 	//  No tip selected
 	//  This field will be set when a tip is picked up
 	//  We will get its id from recipe and its details from tipsTubes map
-	// var tipType string = ""
 
 	for _, p := range processes {
 		switch p.Type {
@@ -86,7 +89,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			} else {
 				cartridgeID = recipe.Cartridge2Position
 			}
-			response, err = deps.PlcDeck[deck].AspireDispense(ad, cartridgeID, tipType)
+			// TODO: Pass the complete Tip rather than just name for volume validations
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, cartridgeID, currentTips[deck].Name)
 			if err != nil {
 				return "", err
 			}
@@ -119,6 +123,28 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			// pi.run()
 		case "Magnet":
 		case "TipOperation":
+			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(to)
+
+			response, err = deps.PlcDeck[deck].TipOperation(to)
+			if err != nil {
+				return "", err
+			}
+
+			switch to.Type {
+			case db.PickupTip:
+				// Store Current Tip here
+				currentTips[deck], err = deps.Store.ShowTip(to.Position)
+				if err != nil {
+					return "", err
+				}
+			case db.DiscardTip:
+				currentTips[deck] = db.TipsTubes{}
+
+			}
 		case "TipDocking":
 		case "Delay":
 
