@@ -3,7 +3,33 @@ package compact32
 import (
 	"fmt"
 	"math"
+	"mylab/cpagent/db"
 )
+
+/****ALGORITHM******
+1. Check Operation type
+2. If its pickup then call Tip PickUp
+3. Else call discard
+********/
+
+func (d *Compact32Deck) TipOperation(to db.TipOperation) (response string, err error) {
+
+	switch to.Type {
+	case db.PickupTip:
+		response, err = d.TipPickup(to.Position)
+	case db.DiscardTip:
+		//
+		// response, err = d.TipDiscard()
+	}
+
+	if err != nil {
+		fmt.Println(err)
+		return "", fmt.Errorf("There was issue doing Tip Operation. Error: %v", err)
+	}
+
+	return "Tip Operation was successfull", nil
+
+}
 
 /****ALGORITHM******
 1. Move Syringe Module to Resting position
