@@ -35,7 +35,7 @@ func (d *Compact32Deck) TipOperation(to db.TipOperation) (response string, err e
 1. Move Syringe Module to Resting position
 2. Move Deck to the tip's position
 3. Move Syringe Module down fast to tip's base
-4. Move Syringe Module down slow to tip's inside
+4. Move Syringe Module down really slow to tip's inside
 5. Move Syringe Module up with tip to Resting position.
 
 ********/
@@ -167,7 +167,8 @@ skipDeckMove:
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
-	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	// Giving it real slow speed
+	response, err = d.SetupMotor(homingSlowSpeed, pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to tip's inside. Error: %v", err)
@@ -187,7 +188,7 @@ skipDeckMove:
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to resting position. Error: %v", err)
