@@ -123,10 +123,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 			fmt.Println(pi)
-			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeIDs[deck])
-			if err != nil {
-				return "", err
-			}
+			// response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeIDs[deck])
+			// if err != nil {
+			// return "", err
+			// }
 
 		case "Magnet":
 		case "TipOperation":
