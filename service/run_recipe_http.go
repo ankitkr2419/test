@@ -137,7 +137,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			switch to.Type {
 			case db.PickupTip:
 				// Store Current Tip here
-				currentTips[deck], err = deps.Store.ShowTip(to.Position)
+				tipID, err := getTipIDFromRecipePosition(recipe, to.Position)
+				if err != nil {
+					return "", err
+				}
+				currentTips[deck], err = deps.Store.ShowTip(tipID)
 				if err != nil {
 					return "", err
 				}
@@ -155,4 +159,18 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 	}
 
 	return
+}
+
+func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err error) {
+	// Currently only 3 positions are allowed for tips
+	switch position {
+	case 1:
+		return recipe.Position1, nil
+	case 2:
+		return recipe.Position2, nil
+	case 3:
+		return recipe.Position3, nil
+	}
+	err = fmt.Errorf("position is invalid to pickup the tip")
+	return 0, err
 }
