@@ -59,7 +59,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 		return "", err
 	}
 
-	var cartridgeID int64
+	currentCartridgeIDs := map[string]int64{
+		"A": 0,
+		"B": 0,
+	}
 	// No cartridge selected so cartridge_id by default is 0
 	// Depending on cartridge_1 or cartridge_2 type we shall
 	//  select cartridge_id from recipe field
@@ -85,12 +88,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			fmt.Println(ad)
 
 			if ad.CartridgeType == db.Cartridge1 {
-				cartridgeID = recipe.Cartridge1Position
+				currentCartridgeIDs[deck] = recipe.Cartridge1Position
 			} else {
-				cartridgeID = recipe.Cartridge2Position
+				currentCartridgeIDs[deck] = recipe.Cartridge2Position
 			}
 			// TODO: Pass the complete Tip rather than just name for volume validations
-			response, err = deps.PlcDeck[deck].AspireDispense(ad, cartridgeID, currentTips[deck].Name)
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeIDs[deck], currentTips[deck].Name)
 			if err != nil {
 				return "", err
 			}
@@ -120,7 +123,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 			fmt.Println(pi)
-			// pi.run()
+			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeIDs[deck])
+			if err != nil {
+				return "", err
+			}
+
 		case "Magnet":
 		case "TipOperation":
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
