@@ -167,6 +167,6 @@ skipDeckMove:
 		return "", fmt.Errorf("There was issue moving Syinge Module to resting position. Error: %v", err)
 	}
 
-	return "ASPIRE and DISPENSE was successful", nil
+	return "Tip PickUp was successfull", nil
 
 }
