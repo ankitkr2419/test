@@ -33,8 +33,11 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a305783
 
 -- Insert into processes 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139741','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d11', 1, 'TO-PK-1' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139731','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d11', 2, 'TO-DK' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139742','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d12', 1, 'TO-PK-2' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139732','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d12', 2, 'TO-DK' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139743','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 1, 'TO-PK-3' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139733','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 2, 'TO-DK' ); 
 
 -- Insert into aspire_dispense process
 --  For cartridge_1
@@ -67,5 +70,8 @@ INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('bee8
 INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('e0e974f4-2269-4b79-a5be-842be95f02bb','1d3334e5-5779-423d-83d5-b8724e7213cb',20,false,'20');
 
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('9207aa73-74b1-4bca-86ae-88e843ef1eaa','a5d058e3-7ce3-4a42-b2da-690e47139741', 'pickup', 1);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('9207aa73-74b1-4bca-86ae-88e843ef1e1a','a5d058e3-7ce3-4a42-b2da-690e47139731', 'discard', 0);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1eab','a5d058e3-7ce3-4a42-b2da-690e47139742', 'pickup', 2);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1e1b','a5d058e3-7ce3-4a42-b2da-690e47139732', 'discard', 0);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1eac','a5d058e3-7ce3-4a42-b2da-690e47139743', 'pickup', 3);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1e1c','a5d058e3-7ce3-4a42-b2da-690e47139733', 'discard', 0);
