@@ -104,9 +104,9 @@ INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-
 
 
 -- For Piercing
-INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c082','cartridge_1','{1,2,3,4,5,6,7,8}','a6d058e3-7ce3-4a42-b2da-690e37139733');
-INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c083','cartridge_1','{2,4,6,8}','a6d058e3-7ce3-4a42-b2da-690e37139734');
-INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c084','cartridge_1','{1,3,5,7}','a6d058e3-7ce3-4a42-b2da-690e37139735');
-INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c085','cartridge_2','{1,2,3,4}','a6d058e3-7ce3-4a42-b2da-690e37139736');
-INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c086','cartridge_2','{2,4}','a6d058e3-7ce3-4a42-b2da-690e37139737');
-INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c087','cartridge_2','{1,3}','a6d058e3-7ce3-4a42-b2da-690e37139738');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c082','cartridge_1','{1,2,3,4,5,6,7,8}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139733');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c083','cartridge_1','{2,4,6,8}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139734');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c084','cartridge_1','{1,3,5,7}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139735');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c085','cartridge_2','{1,2,3,4}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139736');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c086','cartridge_2','{2,4}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139737');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c087','cartridge_2','{1,3}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139738');
