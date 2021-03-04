@@ -46,6 +46,7 @@ func (d *Compact32Deck) TipPickup(pos int64) (response string, err error) {
 	var deckAndMotor DeckNumber
 	var position, distToTravel, restingPos float64
 	var direction, pulses uint16
+	var tipFast, tipSlow string
 	var ok bool
 	deckAndMotor.Deck = d.name
 
@@ -127,13 +128,26 @@ skipDeckMove:
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
+	// TODO: Handle this in non-harcoded way as tips add up in future
+	// We can do this by being aware of the tip.
+	// So, in future add a field like height of tip above the deck
+	switch pos {
+	// extraction tip
+	case 1, 2:
+		tipFast = "syringe_module_fast_down_1000_tip"
+		tipSlow = "syringe_module_slow_down_1000_tip"
+		// piercing tip
+	case 3:
+		tipFast = "syringe_module_fast_down_piercing_tip"
+		tipSlow = "syringe_module_slow_down_piercing_tip"
+	}
 	fmt.Println("Moving Syringe to tip's base")
-	if position, ok = consDistance["syringe_module_fast_down"]; !ok {
-		err = fmt.Errorf("syringe_module_fast_down doesn't exist for consumable distances")
+	if position, ok = consDistance[tipFast]; !ok {
+		err = fmt.Errorf(tipFast + " doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	// Here syringe_module_fast_down will always be greater
+	// Here tipFast will always be greater
 	// than resting_position
 	distToTravel = position - positions[deckAndMotor]
 
@@ -152,13 +166,13 @@ skipDeckMove:
 	//
 
 	fmt.Println("Moving Syringe to tip's inside")
-	if position, ok = consDistance["syringe_module_slow_down"]; !ok {
-		err = fmt.Errorf("syringe_module_slow_down doesn't exist for consumable distances")
+	if position, ok = consDistance[tipSlow]; !ok {
+		err = fmt.Errorf(tipSlow + " doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	// Here syringe_module_slow_down will always be greater
-	// than syringe_module_fast_down
+	// Here tipSlow will always be greater
+	// than tipFast
 	distToTravel = position - positions[deckAndMotor]
 
 	// We know Concrete Direction here, its DOWN
@@ -201,8 +215,9 @@ skipDeckMove:
 2. Move Deck to the big hole's position
 3. Move Syringe Module down fast to deck's base
 4. Move Syringe Module down really slow till enough inside big hole
-5. Move Syringe Module up slow with tip till deck base, to drop off the tip.
-6. Move Syringe Module up fast with tip to Resting position.
+5. Move Deck to the small hole's position
+6. Move Syringe Module up slow with tip till deck base, to drop off the tip.
+7. Move Syringe Module up fast with tip to Resting position.
 */
 
 // TODO: Currently only discarding at Discard box so avoiding at_pickup_passing condition
@@ -329,7 +344,7 @@ skipDeckMove:
 		return "", err
 	}
 	// Here syringe_module_slow_down_for_discard will always be greater
-	// than syringe_module_fast_down
+	// than tipFast
 	distToTravel = position - positions[deckAndMotor]
 
 	// We know Concrete Direction here, its DOWN
@@ -344,8 +359,33 @@ skipDeckMove:
 	}
 
 	//
-	// 5. Move Syringe Module up slow with tip till deck base, to drop off the tip.
+	//  5. Move Deck to the small hole's position
 	//
+
+	deckAndMotor.Number = K5_Deck
+
+	fmt.Println("Moving Deck to discard_small_hole")
+	if position, ok = consDistance["discard_small_hole"]; !ok {
+		err = fmt.Errorf("discard_small_hole doesn't exist for consumable distances")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+	distToTravel = positions[deckAndMotor] - position
+
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+
+	// We know concrete direction, here its towards sensor/ FWD
+	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
+	if err != nil {
+		fmt.Println(err)
+		return "", fmt.Errorf("There was issue moving Deck to discard_big_hole source. Error: %v", err)
+	}
+
+	//
+	// 6. Move Syringe Module up slow with tip till deck base, to drop off the tip.
+	//
+	deckAndMotor.Number = K9_Syringe_Module_LHRH
+
 	fmt.Println("Moving Syringe Module to drop off the tip")
 
 	if position, ok = consDistance["deck_base"]; !ok {
@@ -355,10 +395,9 @@ skipDeckMove:
 	}
 	// Here deck_base will always be lesser
 	// than syringe_module_slow_down_for_discard
-	distToTravel = position - positions[deckAndMotor]
+	distToTravel = positions[deckAndMotor] - position
 
 	// We know Concrete Direction here, its UP
-
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
 	// Giving it real slow speed
@@ -369,7 +408,7 @@ skipDeckMove:
 	}
 
 	//
-	// 6. Move Syringe Module up fast with tip to Resting position.
+	// 7. Move Syringe Module up fast with tip to Resting position.
 	//
 
 	fmt.Println("Moving Syringe Module to Resting Position")
