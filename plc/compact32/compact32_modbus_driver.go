@@ -12,7 +12,7 @@ type Compact32ModbusDriver struct {
 	Client modbus.Client
 }
 
-var delay = 200
+var delay = 50
 
 // We have 2 masters, only 1 should be allowed and that too with
 // 200ms delay for 9600 baud rate
