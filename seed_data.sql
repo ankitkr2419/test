@@ -52,12 +52,12 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139733','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 2, 'TO-DK' ); 
 
 -- For piercing processes
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e37139733','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d14', 1, 'PI-C1-ALL' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e37129734','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d15', 2, 'PI-C1-2-4-6-8-0' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e37129735','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d16', 3, 'PI-C1-1-3-5-7-9' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e37129736','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d17', 4, 'PI-C2-ALL' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e37129737','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d18', 5, 'PI-C2-2-4-6-8-0' ); 
-INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e37129738','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d19', 6, 'PI-C2-1-3-5-7-9' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139733','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d14', 1, 'PI-C1-ALL' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139734','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d15', 1, 'PI-C1-2-4-6-8-0' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139735','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d16', 1, 'PI-C1-1-3-5-7-9' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139736','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d17', 1, 'PI-C2-ALL' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139737','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d18', 1, 'PI-C2-2-4-6-8-0' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139738','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d19', 1, 'PI-C2-1-3-5-7-9' ); 
 
 -- Insert into aspire_dispense process
 --  For cartridge_1
@@ -104,4 +104,9 @@ INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-
 
 
 -- For Piercing
-INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c082'    )
+INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c082','cartridge_1','{1,2,3,4,5,6,7,8}','a6d058e3-7ce3-4a42-b2da-690e37139733');
+INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c083','cartridge_1','{2,4,6,8}','a6d058e3-7ce3-4a42-b2da-690e37139734');
+INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c084','cartridge_1','{1,3,5,7}','a6d058e3-7ce3-4a42-b2da-690e37139735');
+INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c085','cartridge_2','{1,2,3,4}','a6d058e3-7ce3-4a42-b2da-690e37139736');
+INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c086','cartridge_2','{2,4}','a6d058e3-7ce3-4a42-b2da-690e37139737');
+INSERT INTO piercing (id,type,cartridge_wells,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c087','cartridge_2','{1,3}','a6d058e3-7ce3-4a42-b2da-690e37139738');
