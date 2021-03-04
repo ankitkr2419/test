@@ -41,7 +41,7 @@ ConsumableDistance:
     description: "pcr collection area end point"
   - id: 11
     name: "discard_small_hole"
-    distance: 344.60
+    distance: 349.60
     description: "syringe module will get rid of the tip from this hole"
   - id: 12
     name: "discard_big_hole"
