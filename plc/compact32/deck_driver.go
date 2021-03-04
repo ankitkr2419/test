@@ -405,8 +405,9 @@ func (d *Compact32Deck) MagnetUpDownHoming() (response string, err error) {
 		return
 	}
 
-	fmt.Println("Magnet is moving down by and after not cut -> 2000")
-	response, err = d.SetupMotor(homingFastSpeed, reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], DOWN, deckAndNumber.Number)
+	// NOTE: Less Pulses used as 2000 cause magnet dash onto 1000ul tips at worst conditions.
+	fmt.Println("Magnet is moving down by and after not cut -> 400")
+	response, err = d.SetupMotor(homingFastSpeed, reverseAfterNonCutPulsesMagnet, motors[deckAndNumber]["ramp"], DOWN, deckAndNumber.Number)
 	if err != nil {
 		return
 	}
