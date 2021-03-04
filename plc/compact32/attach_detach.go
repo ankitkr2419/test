@@ -6,11 +6,9 @@ import (
 	"mylab/cpagent/db"
 )
 
-/* ****** ALGORITHM *******
-
- */
 func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err error) {
 
+	// Operation attach and detach
 	switch ad.Operation {
 	case "attach":
 		response, err = d.Attach(ad.OperationType)
@@ -28,6 +26,13 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 	return
 
 }
+
+/*Detach :
+ ****** ALGORITHM *******
+1. First move to 12.5 mm backward for the magnet to detach
+2. Then if it is semi-detach then stay there
+3. If it is full-detach then move up to 0.5 mm from the 0 position of the magnet.
+*/
 func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
 
 	fmt.Println("In Detach process")
@@ -115,6 +120,14 @@ skipMagnetDownSecToSourcePosition:
 
 }
 
+/*Attach :
+****** ALGORITHM *******
+1. Move the deck to the specified position (taken from the consumable_config)
+2. First move the magnet 0.5 mm down
+3. Then Move the magnet to at a distance of 12.5 mm forward
+4. Move the magnet down to 75 mm down behind shaker for attach
+5. At last move 5.5 mm forward for the magnet to attach
+*/
 func (d *Compact32Deck) Attach(operationType string) (response string, err error) {
 
 	fmt.Println("In Attach process")
@@ -236,6 +249,8 @@ skipMagnetDownToSourcePosition:
 	fmt.Println(response)
 
 skipMagnetFwdToSourcePosition:
+	// TODO: Set the height according to the operation type (wash,lysis,illusion)
+	// For now it has to be kept same for all.
 	// step 3 to calculate the relative position of the magnet from its current
 	// position to move the magnet Downward for step 2.
 	if magnetDownSecPosition, ok = consDistance["magnet_down_step_2"]; !ok {
@@ -269,6 +284,7 @@ skipMagnetFwdToSourcePosition:
 	fmt.Println(response)
 
 skipMagnetDownSecToSourcePosition:
+
 	// step 4 to calculate the relative position of the magnet from its current
 	// position to move the magnet Downward for step 2.
 	if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2"]; !ok {
