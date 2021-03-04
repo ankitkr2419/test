@@ -69,6 +69,7 @@ INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('1cdb
 INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('bee80d98-098a-4677-b3fb-6932278231b8','fee69b9e-0898-4078-bc28-655ebddbfb5b',20,true,'20');
 INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('e0e974f4-2269-4b79-a5be-842be95f02bb','1d3334e5-5779-423d-83d5-b8724e7213cb',20,false,'20');
 
+-- For Tip Operation
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('9207aa73-74b1-4bca-86ae-88e843ef1eaa','a5d058e3-7ce3-4a42-b2da-690e47139741', 'pickup', 1);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('9207aa73-74b1-4bca-86ae-88e843ef1e1a','a5d058e3-7ce3-4a42-b2da-690e47139731', 'discard', 0);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1eab','a5d058e3-7ce3-4a42-b2da-690e47139742', 'pickup', 2);
