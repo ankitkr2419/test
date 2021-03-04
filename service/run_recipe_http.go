@@ -118,6 +118,15 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 		case "Magnet":
 		case "TipOperation":
 		case "TipDocking":
+			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(td)
+			response, err = deps.PlcDeck[deck].TipDocking(td, cartridgeID)
+			if err != nil {
+				return "", err
+			}
 		case "Delay":
 
 		}

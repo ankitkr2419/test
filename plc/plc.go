@@ -65,4 +65,5 @@ type DeckDriver interface {
 	Abort() (string, error)
 	ResumeMotorWithPulses(uint16) (string, error)
 	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
+	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 }
