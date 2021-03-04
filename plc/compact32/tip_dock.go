@@ -8,6 +8,16 @@ import (
 
 /*TipDocking : to place the tip at rest position.
 ------ALOGORITHM
+1. First move the syringe module to the resting position
+2. Check it is not deck position  type so that cartidge_flow can be proceeded.
+3. Cartridge Flow : 1.1 first calculate the accurate position of the well
+                    1.2 Then travel to that position
+					1.3 Then set the syringe height to the specified value for docking
+					1.4 Return Success
+4. Deck Flow: If it is some position on the deck
+5. Move to that position on the deck by calculating the deck position
+6. At that position move the syring module to the specified height
+7. Return success
 */
 func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response string, err error) {
 
@@ -66,6 +76,7 @@ skipToRestPosition:
 			return "", err
 		}
 		uniqueCartridge.WellNum = td.Position
+
 		if cartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("cartridge doesn't exist")
 			fmt.Println("Error: ", err)

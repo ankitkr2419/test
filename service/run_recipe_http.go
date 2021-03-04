@@ -162,7 +162,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 			fmt.Println(td)
-			response, err = deps.PlcDeck[deck].TipDocking(td, cartridgeID)
+			if td.Type == db.Cartridge1 {
+				currentCartridgeIDs[deck] = recipe.Cartridge1Position
+			} else {
+				currentCartridgeIDs[deck] = recipe.Cartridge2Position
+			}
+			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeIDs[deck])
 			if err != nil {
 				return "", err
 			}
