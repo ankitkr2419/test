@@ -41,7 +41,7 @@ ConsumableDistance:
     description: "pcr collection area end point"
   - id: 11
     name: "discard_small_hole"
-    distance: 344.60
+    distance: 349.60
     description: "syringe module will get rid of the tip from this hole"
   - id: 12
     name: "discard_big_hole"
@@ -120,20 +120,20 @@ ConsumableDistance:
     distance: 133.00
     description: "syringe max down limit"
   - id: 301
-    name: "syringe_module_fast_down"
-    distance: 103.00
-    description: "syringe module goes this much down at fast for picking up the piercing tip ( before turning slow) from the homing position"
+    name: "syringe_module_fast_down_1000_tip"
+    distance: 101.00
+    description: "syringe module goes this much down at fast for picking up the 1000ul tip ( before turning slow) from the homing position"
   - id: 302
-    name: "syringe_module_slow_down"
-    distance: 5.00
-    description: "syringe module goes this much down at slow for picking up the piercing tip after coming fast down"
+    name: "syringe_module_slow_down_1000_tip"
+    distance: 106.00
+    description: "syringe module goes this much down at slow for picking up the 1000ul tip after coming fast down"
   - id: 303
     name: "pickup_piercing_tip_up"
     distance: 59.00
     description: "syringe module goes this much up at fast after picking up the piercing tip"
   - id: 304
     name: "piercing_height"
-    distance: 31.00
+    distance: 70.00
     description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil"
   - id: 305
     name: "piercing_tip_discard_height"
@@ -155,6 +155,18 @@ ConsumableDistance:
     name: "deck_base"
     distance: 117
     description: "syringe module is this much distance from its zero homing position to deck"
+  - id: 311
+    name: "syringe_module_slow_down_for_discard"
+    distance: 127
+    description: "syringe module goes this much down at slow for discarding tip"
+  - id: 321
+    name: "syringe_module_fast_down_piercing_tip"
+    distance: 111.00
+    description: "syringe module goes this much down at fast for picking up the piercing tip ( before turning slow) from the homing position"
+  - id: 322
+    name: "syringe_module_slow_down_piercing_tip"
+    distance: 114.00
+    description: "syringe module goes this much down at slow for picking up the piercing tip after coming fast down"
   - id: 401
     name: "pickup_tip_up"
     distance: 59

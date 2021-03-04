@@ -18,33 +18,39 @@ const (
 
 const (
 	getPiercingQuery = `SELECT id,
-						cartridge_ids,
+						type,
+						cartridge_wells,
 						discard,
+						process_id,
 						created_at,
 						updated_at
 						FROM piercing
-						WHERE id = $1`
+						WHERE process_id = $1`
 	selectPiercingQuery = `SELECT *
 						FROM piercing`
 	deletePiercingQuery = `DELETE FROM piercing
-						WHERE id = $1`
+						WHERE process_id = $1`
 	createPiercingQuery = `INSERT INTO piercing (
-						id,
-						cartridge_ids,
-						discard)
-						VALUES ($1, $2, $3) RETURNING id`
-	updatePiercingQuery = `UPDATE piercing SET (
-						cartridge_ids,
+						type,
+						cartridge_wells,
 						discard,
-						updated_at) = ($1, $2, $3) WHERE id = $4`
+						process_id)
+						VALUES ($1, $2, $3, $4) RETURNING id`
+	updatePiercingQuery = `UPDATE piercing SET (
+						type,
+						cartridge_wells,
+						discard,
+						updated_at) = ($1, $2, $3, $4) WHERE process_id = $5`
 )
 
 type Piercing struct {
-	ID           uuid.UUID     `db:"id" json:"id"`
-	CartridgeIDs pq.Int64Array `db:"cartridge_ids" json:"cartridge_ids"`
-	Discard      Discard       `db:"discard" json:"discard"`
-	CreatedAt    time.Time     `db:"created_at" json:"created_at"`
-	UpdatedAt    time.Time     `db:"updated_at" json:"updated_at"`
+	ID             uuid.UUID     `db:"id" json:"id"`
+	Type           CartridgeType `db:"type" json:"type"`
+	CartridgeWells pq.Int64Array `db:"cartridge_wells" json:"cartridge_wells"`
+	Discard        Discard       `db:"discard" json:"discard"`
+	ProcessID      uuid.UUID     `db:"process_id" json:"process_id"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at"`
+	UpdatedAt      time.Time     `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) ShowPiercing(ctx context.Context, id uuid.UUID) (dbPiercing Piercing, err error) {
@@ -70,8 +76,9 @@ func (s *pgStore) CreatePiercing(ctx context.Context, p Piercing) (createdPierci
 	err = s.db.QueryRow(
 		createPiercingQuery,
 		p.ID,
-		p.CartridgeIDs,
+		p.CartridgeWells,
 		p.Discard,
+		p.ProcessID,
 	).Scan(&lastInsertID)
 
 	if err != nil {
@@ -99,7 +106,8 @@ func (s *pgStore) DeletePiercing(ctx context.Context, id uuid.UUID) (err error) 
 func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	_, err = s.db.Exec(
 		updatePiercingQuery,
-		p.CartridgeIDs,
+		p.Type,
+		p.CartridgeWells,
 		p.Discard,
 		time.Now(),
 		p.ID,

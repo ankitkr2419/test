@@ -67,9 +67,11 @@ type Storer interface {
 	ListMotors() ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes() ([]TipsTubes, error)
+	ShowTip(id int64) (TipsTubes, error)
 	ListCartridges() ([]Cartridge, error)
 	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
+	ShowTipOperation(context.Context, uuid.UUID) (TipOperation, error)
 	ShowRecipe(context.Context, uuid.UUID) (Recipe, error)
 	CreateRecipe(context.Context, Recipe) (Recipe, error)
 	DeleteRecipe(context.Context, uuid.UUID) error
@@ -91,4 +93,5 @@ type Storer interface {
 	DeleteAspireDispense(context.Context, uuid.UUID) error
 	UpdateAspireDispense(context.Context, AspireDispense) error
 	ShowTipDocking(context.Context, uuid.UUID) (TipDock, error)
+	ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error)
 }

@@ -184,10 +184,22 @@ func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
 	if err != nil {
-		fmt.Println("Inside SwitchMotor err : ", err, d.name)
+		fmt.Println("err Switching motor off: ", err)
 		return "", err
 	}
-	fmt.Println("Switched off the motor--> for ", d.name)
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) SwitchOffHeater() (response string, err error) {
+
+	// Switch off Heater
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], OFF)
+	if err != nil {
+		fmt.Println("err Switching off the heater: ", err)
+		return "", err
+	}
+	fmt.Println("Switched off the heater--> for deck ", d.name)
 
 	return "SUCCESS", nil
 }
@@ -232,12 +244,6 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	runInProgress[d.name] = true
 	defer d.ResetRunInProgress()
 
-	fmt.Println("Homing Magnet")
-	response, err = d.MagnetHoming()
-	if err != nil {
-		return
-	}
-
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.SyringeHoming()
 	if err != nil {
@@ -246,6 +252,12 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 	fmt.Println("Moving Syringe Module UP till sensor cuts it")
 	response, err = d.SyringeModuleHoming()
+	if err != nil {
+		return
+	}
+
+	fmt.Println("Homing Magnet")
+	response, err = d.MagnetHoming()
 	if err != nil {
 		return
 	}

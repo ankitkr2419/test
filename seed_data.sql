@@ -3,6 +3,9 @@ INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, po
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2de5','tip_docking', 'Recipe for tip_docking position on deck', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2de6','tip_docking', 'Recipe for tip_docking position on cartridge 1', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2de7','tip_docking', 'Recipe for tip_docking position on cartridge 2', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d11','tip 1', 'Recipe for maleria 1 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d12','tip 2', 'Recipe for maleria 2 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d13','tip 3', 'Recipe for maleria 3 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 
 
 --  Insert into processes
@@ -15,6 +18,11 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('3b47f63
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1eac','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 6, 'AD-DD-4-5' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd767','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 7, 'AD-SD-7' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd768','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 8, 'AD-DS-7' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('2fa97b44-f3c3-460a-9585-9932b2de1ac2','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 17, 'HT-FT-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('42479aae-7342-43af-a9d3-520fbffc0f24','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 18, 'HT-FF-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('fee69b9e-0898-4078-bc28-655ebddbfb5b','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 19, 'HT-FT-5' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8724e7213cb','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 20, 'HT-FF-5' );
+
 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','TipDocking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de5', 9, 'TD-DECK-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd779','TipDocking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de6', 10, 'TD-C1-4' );
@@ -31,6 +39,14 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3b7da1
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd766','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 14, 'AD-DD-4-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 15, 'AD-SD-7' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd770','AspireDispense', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 16, 'AD-DS-7' );
+
+-- Insert into processes 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139741','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d11', 1, 'TO-PK-1' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139731','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d11', 2, 'TO-DK' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139742','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d12', 1, 'TO-PK-2' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139732','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d12', 2, 'TO-DK' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139743','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 1, 'TO-PK-3' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139733','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 2, 'TO-DK' ); 
 
 -- Insert into aspire_dispense process
 --  For cartridge_1
@@ -62,3 +78,17 @@ INSERT INTO tip_dock (id, type,position,height,process_id) VALUES ('bbe172f0-e31
 
 
 
+-- For Heating
+
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('659057e1-8a41-4f2e-a94e-1ffc60aea5a6','2fa97b44-f3c3-460a-9585-9932b2de1ac2',20,true,'20');
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('1cdb0a53-f151-4b37-8d8d-8741a044150c','42479aae-7342-43af-a9d3-520fbffc0f24',20,false,'20');
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('bee80d98-098a-4677-b3fb-6932278231b8','fee69b9e-0898-4078-bc28-655ebddbfb5b',20,true,'20');
+INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('e0e974f4-2269-4b79-a5be-842be95f02bb','1d3334e5-5779-423d-83d5-b8724e7213cb',20,false,'20');
+
+-- For Tip Operation
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('9207aa73-74b1-4bca-86ae-88e843ef1eaa','a5d058e3-7ce3-4a42-b2da-690e47139741', 'pickup', 1);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('9207aa73-74b1-4bca-86ae-88e843ef1e1a','a5d058e3-7ce3-4a42-b2da-690e47139731', 'discard', 0);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1eab','a5d058e3-7ce3-4a42-b2da-690e47139742', 'pickup', 2);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1e1b','a5d058e3-7ce3-4a42-b2da-690e47139732', 'discard', 0);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1eac','a5d058e3-7ce3-4a42-b2da-690e47139743', 'pickup', 3);
+INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1e1c','a5d058e3-7ce3-4a42-b2da-690e47139733', 'discard', 0);
