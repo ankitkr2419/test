@@ -132,9 +132,9 @@ ConsumableDistance:
     distance: 59.00
     description: "syringe module goes this much up at fast after picking up the piercing tip"
   - id: 304
-    name: "piercing_height"
-    distance: 70.00
-    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil"
+    name: "piercing_height_cartridge_1"
+    distance: 90.00
+    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_1"
   - id: 305
     name: "piercing_tip_discard_height"
     distance: 83.9
@@ -159,6 +159,10 @@ ConsumableDistance:
     name: "syringe_module_slow_down_for_discard"
     distance: 127
     description: "syringe module goes this much down at slow for discarding tip"
+  - id: 320
+    name: "piercing_height_cartridge_2"
+    distance: 88.00
+    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_2"
   - id: 321
     name: "syringe_module_fast_down_piercing_tip"
     distance: 111.00
