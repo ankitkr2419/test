@@ -149,7 +149,7 @@ ConsumableDistance:
     description: "syringe module goes this much up fast after the piercing tip has been removed"
   - id: 308
     name: "resting_position"
-    distance: 10
+    distance: 5
     description: "syringe module goes here for resting by default"
   - id: 310
     name: "deck_base"
