@@ -81,9 +81,9 @@ func (s *pgStore) ListTipsTubes() (tipstubes []TipsTubes, err error) {
 }
 
 func (s *pgStore) ShowTip(id int64) (tip TipsTubes, err error) {
-	err = s.db.Select(&tip, getTipByIDQuery, id)
+	err = s.db.Get(&tip, getTipByIDQuery, id)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
+		logger.WithField("err", err.Error()).Error("Error showing tipstubes details")
 		return
 	}
 	return
