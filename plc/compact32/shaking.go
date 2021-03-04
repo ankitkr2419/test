@@ -9,7 +9,7 @@ import (
 )
 
 // Shaking : function
-/* Alogrithm ******************
+/* Algorithm ******************
 1. Validate that rpm 2 and time 2 value is not set before setting rpm 1 and time 1
 2. Switch off the shaker bit first and reset the completion bit to avoid any inconsistency.
 3. Set the shaker , here in this case it is both the shaker.
@@ -159,18 +159,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 	}
 
 	return
-}
-func (d *Compact32Deck) SwitchOffHeater() (response string, err error) {
-
-	// Switch off Heater
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], OFF)
-	if err != nil {
-		fmt.Println("err Switching off the heater: ", err)
-		return "", err
-	}
-	fmt.Println("Switched off the heater--> for deck ", d.name)
-	return "SUCCESS", nil
-
 }
 
 func (d *Compact32Deck) SwitchOffShaker() (response string, err error) {
