@@ -91,13 +91,15 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 		case "Heating":
-			// Get the Heating process
-			// TODO: Below ID is reference ID, so please conform
-			// ht, err := deps.Store.ShowHeating(req.Context(), p.ID)
-			// if err != nil {
-			// return "", err
-			// }
-			// ht.run()
+			heat, err := deps.Store.ShowHeating(ctx, p.ID)
+
+			fmt.Printf("heat object %v", heat)
+			ht, err := deps.PlcDeck[deck].Heating(uint16(heat.Temperature), heat.FollowTemp, heat.Duration)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(ht)
+
 		case "Shaking":
 			// Get the Shaking process
 			// TODO: Below ID is reference ID, so please conform
