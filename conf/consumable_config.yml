@@ -121,11 +121,11 @@ ConsumableDistance:
     description: "syringe max down limit"
   - id: 301
     name: "syringe_module_fast_down"
-    distance: 103.00
+    distance: 101.00
     description: "syringe module goes this much down at fast for picking up the piercing tip ( before turning slow) from the homing position"
   - id: 302
     name: "syringe_module_slow_down"
-    distance: 108.00
+    distance: 106.00
     description: "syringe module goes this much down at slow for picking up the piercing tip after coming fast down"
   - id: 303
     name: "pickup_piercing_tip_up"
