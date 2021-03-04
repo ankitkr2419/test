@@ -375,7 +375,7 @@ skipDeckMove:
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
 	// We know concrete direction, here its towards sensor/ FWD
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
+	response, err = d.SetupMotor(homingSlowSpeed, pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to discard_big_hole source. Error: %v", err)
