@@ -7,7 +7,7 @@ import (
 )
 
 /*TipDocking : to place the tip at rest position.
-------ALOGORITHM
+------ALGORITHM
 1. First move the syringe module to the resting position
 2. Check it is not deck position  type so that cartidge_flow can be proceeded.
 3. Cartridge Flow : 1.1 first calculate the accurate position of the well
@@ -145,9 +145,6 @@ skipToRestPosition:
 
 skipToPositionSyringeHeight:
 
-	// Step 3 : Now move the syringe module to the given height
-	deckAndMotor = DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
-
 	distanceToTravel = positions[deckAndMotor] - td.Height
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
@@ -160,9 +157,9 @@ skipToPositionSyringeHeight:
 		// Skip the setUpMotor Step
 		goto skipToCompletion
 	}
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.SetupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)

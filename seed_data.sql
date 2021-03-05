@@ -69,9 +69,9 @@ INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_posit
 INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_position,aspire_height,aspire_mixing_volume,aspire_no_of_cycles,aspire_volume,aspire_air_volume,dispense_height,dispense_mixing_volume,dispense_no_of_cycles,dispense_volume,dispense_blow_volume,destination_position)VALUES ('8207aa73-74b1-4bca-86ae-88e843ef1ea2','a3057838-d5e2-4ac2-9e4b-7d1e4fefd770', 'deck_to_shaker', 'cartridge_2', 7, 10, 100,2, 100,10, 40 , 100, 2, 100, 10, 7);
 
 -- Processes for TipDocking
-INSERT INTO tip_dock (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f9','deck',8,10,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd769');
-INSERT INTO tip_dock (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','cartridge_1',4,12,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd779');
-INSERT INTO tip_dock (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f7','cartridge_2',5,11,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd789');
+INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f9','deck',8,10,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd769');
+INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','cartridge_1',4,12,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd779');
+INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f7','cartridge_2',5,11,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd789');
 
 
 
