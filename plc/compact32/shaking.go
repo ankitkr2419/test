@@ -34,8 +34,12 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 			return
 		}
 	} else {
-		if shakerData.Rpm2 == 0 || shakerData.Time2 == 0 {
-			err = errors.New("please check rpm 2 data")
+		if shakerData.Rpm2 == 0 && shakerData.Time2 != 0 {
+			err = errors.New("please check rpm 2 value")
+			return
+		}
+		if shakerData.Rpm2 != 0 && shakerData.Time2 == 0 {
+			err = errors.New("please check rpm  2 time value")
 			return
 		}
 	}
@@ -158,7 +162,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 		return "", err
 	}
 
-	return
+	return "Suceess", nil
 }
 
 func (d *Compact32Deck) SwitchOffShaker() (response string, err error) {
