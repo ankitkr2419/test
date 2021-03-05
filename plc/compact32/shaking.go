@@ -167,12 +167,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 
 func (d *Compact32Deck) SwitchOffShaker() (response string, err error) {
 
-	//motor off
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
-	if err != nil {
-		fmt.Println("err starting shaker: ", err)
-		return "", err
-	}
 	// Switch off shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
