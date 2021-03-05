@@ -71,7 +71,7 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelBack))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], uint16(2000), motors[deckMagnetFwdRev]["ramp"], direction, K7_Magnet_Rev_Fwd)
+	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
