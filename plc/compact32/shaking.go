@@ -152,6 +152,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 	t := time.AfterFunc(shakerData.Time1, func() {
 		//switch off shaker
 		d.SwitchOffShaker()
+		//switch off heater
+		d.SwitchOffHeater()
 	})
 
 skipToShakerRpm2:
@@ -189,6 +191,8 @@ skipToShakerRpm2:
 		t := time.AfterFunc(shakerData.Time2, func() {
 			//switch off shaker
 			d.SwitchOffShaker()
+			//switch off heater
+			d.SwitchOffHeater()
 		})
 
 	skipToShakerOff:
@@ -251,7 +255,7 @@ func (d *Compact32Deck) MonitorTemperature(shakerNo, temperature uint16) (result
 		if done {
 			return "Operation was successful \n", nil
 		}
-		time.Sleep(time.Millisecond * 300)
+		time.Sleep(time.Second * 5)
 		switch shakerNo {
 		case 1, 2:
 			if setTemp >= temperature {
