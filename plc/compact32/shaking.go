@@ -27,6 +27,12 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 
 	var shakerNo = 3
 
+	//check if aborted
+	if aborted[d.name] {
+		err = fmt.Errorf("Operation was ABORTED!")
+		return "", err
+	}
+
 	//validate that rpm 1 is definately set and futher
 	if shakerData.Rpm1 == 0 || shakerData.Time1 == 0 {
 		if shakerData.Rpm2 != 0 || shakerData.Time2 != 0 {
@@ -140,18 +146,33 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 	}
 
 	fmt.Printf("shaker started %v ", result1)
+	// TODO : move this to single method for every time it goes to sleep
 
 	//wait for time 1 duration
-	time.Sleep(time.Second * shakerData.Time1)
+	t := time.AfterFunc(shakerData.Time1, func() {
+		//switch off shaker
+		d.SwitchOffShaker()
+	})
+
+skipToShakerRpm2:
+	for {
+		select {
+		case n := <-t.C:
+			fmt.Printf("time expired %v", n)
+			break skipToShakerRpm2
+		default:
+			if aborted[d.name] {
+				err = fmt.Errorf("Operation was ABORTED!")
+				return "", err
+			}
+			// delay of 300 ms for checking the expired time to avoid too much loop
+			time.Sleep(time.Millisecond * 300)
+		}
+	}
 
 	//set shaker value with rpm 2 if it exists
 	if shakerData.Rpm2 != 0 {
-		//switch off the shaker
-		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
-		if err != nil {
-			fmt.Println("err starting shaker: ", err)
-			return "", err
-		}
+
 		//set shaker register with rpm 2
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.Rpm2))
 		if err != nil {
@@ -165,7 +186,26 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 			return "", err
 		}
 		//wait for time 2 duration
-		time.Sleep(time.Second * shakerData.Time2)
+		t := time.AfterFunc(shakerData.Time2, func() {
+			//switch off shaker
+			d.SwitchOffShaker()
+		})
+
+	skipToShakerOff:
+		for {
+			select {
+			case n := <-t.C:
+				fmt.Printf("time expired %v", n)
+				break skipToShakerOff
+			default:
+				if aborted[d.name] {
+					err = fmt.Errorf("Operation was ABORTED!")
+					return "", err
+				}
+				// delay of 300 ms for checking the expired time to avoid too much loop
+				time.Sleep(time.Millisecond * 300)
+			}
+		}
 
 	}
 
@@ -196,6 +236,7 @@ func (d *Compact32Deck) SwitchOffShaker() (response string, err error) {
 	return "SUCCESS", nil
 
 }
+
 func (d *Compact32Deck) MonitorTemperature(shakerNo, temperature uint16) (result string, err error) {
 	var setTemp, setTemp1, setTemp2 uint16 = 0, 0, 0
 
