@@ -12,6 +12,9 @@ INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, po
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d17','piercing all wells cartridge_2', 'piercing 4 well cartridge all wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d18','piercing only even wells cartridge_2', 'piercing 4 well cartridge only even wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d19','piercing only odd wells cartridge_2', 'piercing 4 well cartridge only odd wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d09','shaking', 'Recipe for maleria 3 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+
+
 
 --  Insert into processes
 --  For Cartridge_1
@@ -78,6 +81,13 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139736','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d17', 1, 'PI-C2-ALL' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139737','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d18', 1, 'PI-C2-2-4-6-8-0' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139738','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d19', 1, 'PI-C2-1-3-5-7-9' ); 
+-- shaking processes
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('2557f792-e60f-4f91-a79e-575349b5b1e5','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2d09', 1, 'sha-DK' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('8fc9e765-3120-4617-9085-e9b81d589030','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2d09', 2, 'sha-DK' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('4cc37963-c564-43d4-b277-7c58ef5a0dc7','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2d09', 3, 'sha-DK' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('6543f226-098d-4f35-afd0-ab692382924c','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2d09', 4, 'sha-DK' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('bbd4c820-1eab-4e3f-a508-4b986bc5227b','Shaking', '6b7fcfa2-8337-4d79-829a-e9bd486a2d09', 5, 'sha-DK' ); 
+
 
 -- Insert into aspire_dispense process
 --  For cartridge_1
