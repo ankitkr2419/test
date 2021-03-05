@@ -108,6 +108,23 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	//  Switch off UV Light
 	response, err = d.switchOffUVLight()
 	if err != nil {
+		fmt.Println("From deck ", d.name, err)
+		return "", err
+	}
+
+	// Switch off shaker
+	response, err = d.SwitchOffShaker()
+	if err != nil {
+		fmt.Println("From deck ", d.name, err)
+		return "", err
+	}
+
+	aborted[d.name] = true
+	wrotePulses[d.name] = 0
+	paused[d.name] = false
+	runInProgress[d.name] = false
+	response, err = d.ReadExecutedPulses()
+	if err != nil {
 		return
 	}
 

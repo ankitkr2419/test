@@ -113,6 +113,12 @@ INSERT INTO aspire_dispense (id, process_id,category,cartridge_type,source_posit
 INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f9','deck',8,10,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd769');
 INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','cartridge_1',4,12,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd779');
 INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f7','cartridge_2',5,11,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd789');
+--Insert into shaking
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('bbe172f0-e315-4ebd-83ab-c1c0b531e2f6','2557f792-e60f-4f91-a79e-575349b5b1e5',false,false,0,10500,14500,40,40);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('a03fc110-5b9e-4461-b114-dfd21bae77d8','8fc9e765-3120-4617-9085-e9b81d589030',true,false,600,500,800,60,60);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('2066b0aa-7688-4fa7-bba1-c5836a3ab01b','4cc37963-c564-43d4-b277-7c58ef5a0dc7',true,true,600,6500,10500,80,80);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('c6d62e6c-1c19-4d3d-862e-a8dc5f8c2629','6543f226-098d-4f35-afd0-ab692382924c',false,false,0,6500,14500,100,110);
+INSERT INTO shaking (id,process_id,with_temp,follow_temp,temperature,rpm_1,rpm_2,time_1,time_2) VALUES('0c911dfc-2993-4992-8fa6-e6d779e8814b','bbd4c820-1eab-4e3f-a508-4b986bc5227b',false,false,0,500,800,120,120);
 
 -- For Heating
 

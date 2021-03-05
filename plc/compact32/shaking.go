@@ -58,6 +58,13 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 		return "", err
 	}
 
+	//restart process motor
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	if err != nil {
+		fmt.Println("err starting shaker: ", err)
+		return "", err
+	}
+
 	//set shaker selection register
 	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][220], uint16(shakerNo))
 	if err != nil {
@@ -139,10 +146,22 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 
 	//set shaker value with rpm 2 if it exists
 	if shakerData.Rpm2 != 0 {
+		//switch off the shaker
+		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
+		if err != nil {
+			fmt.Println("err starting shaker: ", err)
+			return "", err
+		}
 		//set shaker register with rpm 2
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.Rpm2))
 		if err != nil {
 			fmt.Println("err : ", err)
+			return "", err
+		}
+		//switch on the shaker
+		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
+		if err != nil {
+			fmt.Println("err starting shaker: ", err)
 			return "", err
 		}
 		//wait for time 2 duration
