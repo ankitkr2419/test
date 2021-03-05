@@ -24,7 +24,7 @@ const (
 func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error) {
 	// get delay record
 	err = s.db.Get(&delay,
-		getHeatingQuery,
+		getDelayQuery,
 		id,
 	)
 	if err != nil {
