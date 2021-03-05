@@ -110,7 +110,7 @@ skipMagnetBackToSourcePosition:
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelUp))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, K6_Magnet_Up_Down)
+	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -199,7 +199,7 @@ skipDeckToSourcePosition:
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelDown))
 
 	// set up motor for attach step 1 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, K6_Magnet_Up_Down)
+	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -233,7 +233,7 @@ skipMagnetDownToSourcePosition:
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelFwd))
 
 	// set up motor for attach step 1 forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, K7_Magnet_Rev_Fwd)
+	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -268,7 +268,7 @@ skipMagnetFwdToSourcePosition:
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelDown))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, K6_Magnet_Up_Down)
+	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -302,7 +302,7 @@ skipMagnetDownSecToSourcePosition:
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelFwd))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], uint16(2000), motors[deckMagnetFwdRev]["ramp"], direction, K7_Magnet_Rev_Fwd)
+	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], uint16(2000), motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
