@@ -11,7 +11,7 @@ import (
 type Delay struct {
 	ID        uuid.UUID     `db:"id" json:"id"`
 	DelayTime time.Duration `db:"delay_time" json:"delay_time"`
-	ProcessID uuid.UUID     `db:"distance" json:"distance"`
+	ProcessID uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -28,7 +28,7 @@ func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err
 		id,
 	)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error getting heating")
+		logger.WithField("err", err.Error()).Error("Error getting delay process")
 		return
 	}
 	return
