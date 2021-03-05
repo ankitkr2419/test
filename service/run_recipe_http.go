@@ -158,6 +158,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			}
 		case "TipDocking":
 		case "Delay":
+			delay, err := deps.Store.ShowDelay(ctx, p.ID)
+			if err != nil {
+				return "", err
+			}
+			response, err = deps.PlcDeck[deck].AddDelay(delay)
+			if err != nil {
+				return "", err
+			}
 
 		}
 		// TODO: Instead of switch case, try using reflect
