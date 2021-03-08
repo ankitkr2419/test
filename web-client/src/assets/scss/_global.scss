@@ -211,7 +211,8 @@ button:focus {
 }
 
 // Checkbox
-.custom-checkbox {
+.custom-checkbox,
+.custom-radio {
 	.custom-control-label {
 		font-size: rem(18px);
 		line-height: rem(23px);
