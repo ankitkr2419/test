@@ -3,6 +3,7 @@ package compact32
 import (
 	"fmt"
 	"math"
+	"sort"
 	"mylab/cpagent/db"
 )
 
@@ -24,6 +25,8 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	var position, cartridgeStart, piercingHeight, distToTravel float64
 	var ok bool
 	var direction, pulses, piercingPulses uint16
+	// []int has direct method to get slice sorted
+	var wellsToBePierced []int
 	deckAndMotor.Deck = d.name
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	uniqueCartridge := UniqueCartridge{
@@ -96,12 +99,19 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 	piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
-	for _, wellNumber := range pi.CartridgeWells {
+
+	for well := range pi.CartridgeWells {
+		wellsToBePierced = append(wellsToBePierced, int(well))
+	}
+
+	sort.Ints(wellsToBePierced)
+	
+	for _, wellNumber := range wellsToBePierced {
 		//
 		// 4.1 Move deck to the well position
 		//
 		deckAndMotor.Number = K5_Deck
-		uniqueCartridge.WellNum = wellNumber
+		uniqueCartridge.WellNum = int64(wellNumber)
 		if position, ok = cartridges[uniqueCartridge]["distance"]; !ok {
 			err = fmt.Errorf("distance doesn't exist for well number %d", wellNumber)
 			fmt.Println("Error: ", err)
@@ -161,6 +171,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	//**************
 	// Tip Discard *
 	//**************
+	// TODO: Check if the option for discard is 'at_pick_passing'	
 	response, err = d.TipDiscard()
 	if err != nil {
 		err = fmt.Errorf("there was a problem while discarding the piercing tip")
