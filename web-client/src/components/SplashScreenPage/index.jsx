@@ -2,7 +2,7 @@ import React from 'react';
 
 import styled from 'styled-components'
 import { ImageIcon } from 'shared-components';
-import CirclelogoIcon from 'assets/images/mylab-logo-with-circle.svg';
+import CirclelogoIcon from 'assets/images/mylab-logo-with-circle.png';
 
 const SplashScreen = styled.div`
     background: url('/images/logo-bg.svg') left -4.875rem top -5.5rem no-repeat,

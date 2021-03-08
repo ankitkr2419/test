@@ -11,6 +11,7 @@ import TemplateLayout from 'layouts/TemplateLayout';
 import PrivateRoute from 'components/HOC/PrivateRoute';
 import SplashScreenContainer from 'containers/SplashScreenContainer';
 import LandingPageContainer from 'containers/LandingPageContainer';
+import RecipeListingContainer from 'containers/RecipeListingContainer';
 import { ROOT_URL_PATH } from './appConstants';
 
 export const routeDefinitions = [
@@ -60,6 +61,12 @@ export const routeDefinitions = [
 				exact: true,
 				component: LandingPageContainer,
 				key: 8,
+			},
+			{
+				path: `${ROOT_URL_PATH}recipe-listing`,
+				exact: true,
+				component: RecipeListingContainer,
+				key: 9,
 			},
 		],
 	},

@@ -9,9 +9,9 @@ import {
 
 // import SearchBox from 'shared-components/SearchBox';
 // import ButtonBar from 'shared-components/ButtonBar';
-import DeckCard from 'shared-components/DeckCard';
-import imgNoTemplate from 'assets/images/video-thumbnail.png';
+import imgNoTemplate from 'assets/images/video-thumbnail-poster.jpg';
 import styled from 'styled-components';
+import AppFooter from 'components/AppFooter';
 
 const VideoPlayButton = styled.button`
 	color:#7C7976;
@@ -41,17 +41,13 @@ const LandingScreenComponent = (props) => {
 					</VideoPlayButton>
 					</Center>
 				</CardBody>
-			</Card>
+			</Card>											
 			
 				{/* <SearchBox/> */}
 				
 				{/* <ButtonBar/> */}
 			</div>
-
-			<div className="d-flex justify-content-center align-items-center">
-				<DeckCard/>
-				<DeckCard/>
-			</div>
+			<AppFooter />
 		</div>
 	);
 };
