@@ -9,7 +9,7 @@ import (
 
 /****ALGORITHM******
 1. Call Tip Pick Up at position 3
-2. Make tip go to piercing_tip_rest_position
+2. Make tip go to piercing_tip_rest_position, handled in d.TipPickup(3)
 3. get cartridge start distance
 4. Pierce well after well
 	4.1 Move deck to the well position
@@ -39,6 +39,8 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	//*************
 
 	// 1. Call Tip Pick Up at position 3
+// 2. Make tip go to piercing_tip_rest_position, handled in d.TipPickup(3)
+
 
 	// 3rd position is where by default piercing tip is present
 	// TODO: Think about removing hard coded position 3
@@ -46,28 +48,6 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	response, err = d.TipPickup(3)
 	if err != nil {
 		return
-	}
-
-	// 2. Make tip go to piercing_tip_rest_position
-	// TODO: calculate this position based on deck_base, tip height and some offset
-	if position, ok = consDistance["piercing_tip_rest_position"]; !ok {
-		err = fmt.Errorf("piercing_tip_rest_position doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	distToTravel = position - positions[deckAndMotor]
-	// We know concrete direction here
-	//  piercing_tip_rest_position will be greater than resting_position
-
-	fmt.Println("Moving Syringe Module to reach the piercing_tip_rest_position")
-
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
-
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
-	if err != nil {
-		fmt.Println(err)
-		return "", fmt.Errorf("There was issue moving Syringe Module to piercing_tip_rest_position. error: %v ", err)
 	}
 
 	// 3. get cartridge start distance
@@ -104,6 +84,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		wellsToBePierced = append(wellsToBePierced, int(well))
 	}
 
+	// sort wells in Ascending Order
 	sort.Ints(wellsToBePierced)
 	
 	for _, wellNumber := range wellsToBePierced {

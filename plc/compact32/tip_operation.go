@@ -46,19 +46,27 @@ func (d *Compact32Deck) TipPickup(pos int64) (response string, err error) {
 	var deckAndMotor DeckNumber
 	var position, distToTravel, restingPos float64
 	var direction, pulses uint16
-	var tipFast, tipSlow string
+	var tipFast, tipSlow, restingPositionString string
 	var ok bool
 	deckAndMotor.Deck = d.name
 
 	//
-	// 1. Move Syringe Module to Resting position
+	// 1. Move Syringe Module to Resting position depending on tip type
 	//
+
+	// TODO: Remove this Hardcoding
+	// check if it is piercing tip
+	if pos == 3 {
+		restingPositionString = "piercing_tip_rest_position"
+	} else {
+		restingPositionString = "resting_position"
+	}
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	fmt.Println("Moving Syringe Module to resting position")
-	if restingPos, ok = consDistance["resting_position"]; !ok {
-		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
+	fmt.Println("Moving Syringe Module to",restingPositionString)
+	if restingPos, ok = consDistance[restingPositionString]; !ok {
+		err = fmt.Errorf("%v doesn't exist for consumable distances", restingPositionString)
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -187,10 +195,10 @@ skipDeckMove:
 	}
 
 	//
-	// 5. Move Syringe Module up with tip to Resting position.
+	// 5. Move Syringe Module up with tip to restingPositionString.
 	//
 
-	fmt.Println("Moving Syringe Module to Resting Position")
+	fmt.Println("Moving Syringe Module to ", restingPositionString)
 
 	// Here resting_position will always be lesser
 	// than whatever position earlier
@@ -203,7 +211,7 @@ skipDeckMove:
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
-		return "", fmt.Errorf("There was issue moving Syinge Module to resting position. Error: %v", err)
+		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v",restingPositionString,  err)
 	}
 
 	return "Tip PickUp was successfull", nil
