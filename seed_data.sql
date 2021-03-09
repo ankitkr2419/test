@@ -6,7 +6,12 @@ INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, po
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d11','tip 1', 'Recipe for maleria 1 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d12','tip 2', 'Recipe for maleria 2 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d13','tip 3', 'Recipe for maleria 3 extraction', 1, 2, 3, 4, 5, 1, 6, 2, 7);
-
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d14','piercing all wells cartridge_1', 'piercing 8 well cartridge all wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d15','piercing only even wells cartridge_1', 'piercing 8 well cartridge only even wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d16','piercing only odd wells cartridge_1', 'piercing 8 well cartridge only odd wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d17','piercing all wells cartridge_2', 'piercing 4 well cartridge all wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d18','piercing only even wells cartridge_2', 'piercing 4 well cartridge only even wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
+INSERT INTO recipes(id, name, description, pos_1, pos_2, pos_3, pos_4, pos_5, pos_cartridge_1, pos_7, pos_cartridge_2, pos_9) VALUES('6b7fcfa2-8337-4d79-829a-e9bd486a2d19','piercing only odd wells cartridge_2', 'piercing 4 well cartridge only odd wells', 1, 2, 3, 4, 5, 1, 6, 2, 7);
 
 --  Insert into processes
 --  For Cartridge_1
@@ -22,6 +27,13 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('2fa97b4
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('42479aae-7342-43af-a9d3-520fbffc0f24','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 18, 'HT-FF-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('fee69b9e-0898-4078-bc28-655ebddbfb5b','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 19, 'HT-FT-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8724e7213cb','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 20, 'HT-FF-5' );
+
+--Delay processes
+
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8724e5213cb','Delay', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 21, 'dl-50' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8524e5214cb','Delay', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 21, 'dl-60' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8424e5215cb','Delay', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 21, 'dl-70' );
+
 
 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','TipDocking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de5', 9, 'TD-DECK-5' );
@@ -47,6 +59,14 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139732','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d12', 2, 'TO-DK' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139743','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 1, 'TO-PK-3' ); 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a5d058e3-7ce3-4a42-b2da-690e47139733','TipOperation', '6b7fcfa2-8337-4d79-829a-e9bd486a2d13', 2, 'TO-DK' ); 
+
+-- For piercing processes
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139733','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d14', 1, 'PI-C1-ALL' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139734','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d15', 1, 'PI-C1-2-4-6-8-0' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139735','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d16', 1, 'PI-C1-1-3-5-7-9' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139736','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d17', 1, 'PI-C2-ALL' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139737','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d18', 1, 'PI-C2-2-4-6-8-0' ); 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a6d058e3-7ce3-4a42-b2da-690e37139738','Piercing', '6b7fcfa2-8337-4d79-829a-e9bd486a2d19', 1, 'PI-C2-1-3-5-7-9' ); 
 
 -- Insert into aspire_dispense process
 --  For cartridge_1
@@ -92,3 +112,17 @@ INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b1-4bca-86ae-88e843ef1e1b','a5d058e3-7ce3-4a42-b2da-690e47139732', 'discard', 0);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1eac','a5d058e3-7ce3-4a42-b2da-690e47139743', 'pickup', 3);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1e1c','a5d058e3-7ce3-4a42-b2da-690e47139733', 'discard', 0);
+
+-- For Delay
+INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',50,'1d3334e5-5779-423d-83d5-b8724e5213cb');
+INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',60,'1d3334e5-5779-423d-83d5-b8524e5214cb');
+INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',70,'1d3334e5-5779-423d-83d5-b8424e5215cb');
+
+
+-- For Piercing
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c082','cartridge_1','{1,2,3,4,5,6,7,8}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139733');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c083','cartridge_1','{2,4,6,8}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139734');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c084','cartridge_1','{1,3,5,7}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139735');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c085','cartridge_2','{1,2,3,4}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139736');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c086','cartridge_2','{2,4}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139737');
+INSERT INTO piercing (id,type,cartridge_wells,discard,process_id) VALUES ('7a7e3565-bdfd-4a2d-9b45-f2147d33c087','cartridge_2','{1,3}', 'at_discard_box','a6d058e3-7ce3-4a42-b2da-690e37139738');
