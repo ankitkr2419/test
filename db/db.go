@@ -92,6 +92,7 @@ type Storer interface {
 	CreateAspireDispense(context.Context, AspireDispense) (AspireDispense, error)
 	DeleteAspireDispense(context.Context, uuid.UUID) error
 	UpdateAspireDispense(context.Context, AspireDispense) error
+	ShowTipDocking(context.Context, uuid.UUID) (TipDock, error)
 	ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error)
 	ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error)
 }
