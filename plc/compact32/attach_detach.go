@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
-
-	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err error) {
@@ -75,7 +73,7 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 	if err != nil {
 		return
 	}
-	logger.Printf("magnet move backward 1")
+
 skipMagnetBackToSourcePosition:
 
 	// if operation type is semi detach then return after doing the first backward step.
@@ -113,8 +111,6 @@ skipMagnetBackToSourcePosition:
 	if err != nil {
 		return
 	}
-	logger.Printf("magnet move upward 1")
-	logger.Printf("%v", response)
 
 skipMagnetbackSecPosition:
 	// step 3 to go with the normal flow of full detach.
@@ -202,7 +198,6 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 		fmt.Printf("error in moving deck to required position")
 		return
 	}
-	logger.Printf("%s \n", response)
 
 skipDeckToSourcePosition:
 
@@ -235,8 +230,6 @@ skipDeckToSourcePosition:
 	if err != nil {
 		return
 	}
-	logger.Printf("magnet move downward 1")
-	logger.Printf("%v \n", response)
 
 skipMagnetDownToSourcePosition:
 
@@ -268,8 +261,6 @@ skipMagnetDownToSourcePosition:
 	if err != nil {
 		return
 	}
-	logger.Printf("magnet move forward 1")
-	logger.Printf("%v \n", response)
 
 skipMagnetFwdToSourcePosition:
 	// TODO: Set the height according to the operation type (wash,lysis,illusion)
@@ -302,8 +293,6 @@ skipMagnetFwdToSourcePosition:
 	if err != nil {
 		return
 	}
-	logger.Printf("magnet move downward 2")
-	logger.Printf("%v \n", response)
 
 skipMagnetDownSecToSourcePosition:
 
@@ -332,12 +321,10 @@ skipMagnetDownSecToSourcePosition:
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelFwd))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], uint16(2000), motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
-	logger.Printf("magnet move forward 2")
-	logger.Printf("%v \n", response)
 
 skipMagnetFwdSecToSourcePosition:
 	return "Success", nil

@@ -123,7 +123,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 			fmt.Println(pi)
-			// pi.run()
 
 			if string(pi.Type) == db.Cartridge1 {
 				currentCartridgeIDs[deck] = recipe.Cartridge1Position
