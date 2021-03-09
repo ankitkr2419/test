@@ -62,11 +62,11 @@ ConsumableDistance:
   - id: 54
     name: "pos_4"
     distance: 54.65
-    description: "position 4 on deck, here sample tube  may reside"
+    description: "position 4 on deck, here sample tube may reside"
   - id: 55
     name: "pos_5"
     distance: 97.76
-    description: "position 5 on deck, here lysis tube (swap or blood or other sample holding tube) may reside"
+    description: "position 5 on deck, here lysis tube (swap or blood or other sample holding tube) may reside. This tip is also known as reaction tube."
   - id: 56
     name: "pos_6"
     distance: 127.66
@@ -102,7 +102,7 @@ ConsumableDistance:
   - id: 152
     name: "shaker_tube"
     distance: 97.76
-    description: "tube for performing shaking and also heating"
+    description: "tube for performing shaking and also heating, also known as reaction tube."
   - id: 153
     name: "extraction_collection_tube"
     distance: 233.50
@@ -132,9 +132,9 @@ ConsumableDistance:
     distance: 59.00
     description: "syringe module goes this much up at fast after picking up the piercing tip"
   - id: 304
-    name: "piercing_height"
-    distance: 70.00
-    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil"
+    name: "piercing_height_cartridge_1"
+    distance: 90.00
+    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_1"
   - id: 305
     name: "piercing_tip_discard_height"
     distance: 83.9
@@ -158,15 +158,24 @@ ConsumableDistance:
   - id: 311
     name: "syringe_module_slow_down_for_discard"
     distance: 127
-    description: "syringe module goes this much down at slow for discarding tip"
+    description: "syringe module goes here at slow for discarding tip"
+  - id: 320
+    name: "piercing_height_cartridge_2"
+    distance: 88.00
+    description: "syringe module goes 
+    here fast with piercing tip for actual piercing of silver foil for cartridge_2"
   - id: 321
     name: "syringe_module_fast_down_piercing_tip"
     distance: 111.00
-    description: "syringe module goes this much down at fast for picking up the piercing tip ( before turning slow) from the homing position"
+    description: "syringe module goes here at fast for picking up the piercing tip ( before turning slow) from the homing position"
   - id: 322
     name: "syringe_module_slow_down_piercing_tip"
     distance: 114.00
-    description: "syringe module goes this much down at slow for picking up the piercing tip after coming fast down"
+    description: "syringe module goes here at slow for picking up the piercing tip after coming fast down"
+  - id: 323
+    name: "piercing_tip_rest_position"
+    distance: 65
+    description: "syringe module goes here at fast with piercing tip"
   - id: 401
     name: "pickup_tip_up"
     distance: 59
