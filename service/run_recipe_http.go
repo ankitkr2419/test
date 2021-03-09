@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
@@ -64,6 +65,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
+		return
+	}
+
+	if !deps.PlcDeck[deck].Reset() {
+		err = errors.New("failed to reset recipe in aborted state")
 		return
 	}
 

@@ -174,3 +174,8 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 
 	return "RESUMED with pulses.", nil
 }
+
+func (d *Compact32Deck) Reset() (ack bool) {
+	aborted[d.name] = false
+	return true
+}

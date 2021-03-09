@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"time"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 // Shaking : function
@@ -77,8 +79,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 		fmt.Println("err : ", err)
 		return "", err
 	}
-
-	fmt.Printf(" shaker selection value %v", results)
+	logger.Infof("selected shaker %v", results)
 
 	//set shaker register with rpm 1
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.Rpm1))
@@ -86,8 +87,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 		fmt.Println("err : ", err)
 		return "", err
 	}
-
-	fmt.Printf(" shaker rpm value %v", results)
 
 	if shakerData.WithTemp {
 		//check temperature limit
@@ -103,6 +102,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 			fmt.Println("failed to select heater shaker: ", err)
 			return "", err
 		}
+		logger.Infof("selected shaker %v", result)
 
 		//set heater value on selected shaker
 		result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(shakerData.Temperature))
@@ -110,8 +110,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 			fmt.Println("Error failed to write temperature: ", err)
 			return "", err
 		}
-
-		fmt.Printf("Set Temperature %v", result)
 
 		//heater on
 		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], ON)
@@ -127,7 +125,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 				fmt.Printf("failed to read heater value for shaker err : %v \n ", err)
 				return "", err
 			}
-			fmt.Printf("follow temp done %v", result)
+			logger.Debugf("follow temp done %v", result)
 		}
 	}
 
@@ -149,18 +147,17 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 	// TODO : move this to single method for every time it goes to sleep
 
 	//wait for time 1 duration
-	t := time.AfterFunc(shakerData.Time1, func() {
-		//switch off shaker
-		d.SwitchOffShaker()
-		//switch off heater
-		d.SwitchOffHeater()
-	})
+	t := time.NewTimer(shakerData.Time1 * time.Second)
 
 skipToShakerRpm2:
 	for {
 		select {
 		case n := <-t.C:
 			fmt.Printf("time expired %v", n)
+			//switch off shaker
+			d.SwitchOffShaker()
+			//switch off heater
+			d.SwitchOffHeater()
 			break skipToShakerRpm2
 		default:
 			if aborted[d.name] {
@@ -188,18 +185,17 @@ skipToShakerRpm2:
 			return "", err
 		}
 		//wait for time 2 duration
-		t := time.AfterFunc(shakerData.Time2, func() {
-			//switch off shaker
-			d.SwitchOffShaker()
-			//switch off heater
-			d.SwitchOffHeater()
-		})
+		t := time.NewTimer(shakerData.Time2 * time.Second)
 
 	skipToShakerOff:
 		for {
 			select {
 			case n := <-t.C:
 				fmt.Printf("time expired %v", n)
+				//switch off shaker
+				d.SwitchOffShaker()
+				//switch off heater
+				d.SwitchOffHeater()
 				break skipToShakerOff
 			default:
 				if aborted[d.name] {
@@ -273,25 +269,26 @@ func (d *Compact32Deck) MonitorTemperature(shakerNo, temperature uint16) (result
 				return "", err
 			}
 			setTemp = binary.BigEndian.Uint16(results)
-			fmt.Println(setTemp)
+
 		case 3:
 			if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
 				return "success", nil
 			}
+			time.Sleep(time.Second * 5)
 			results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
 			if err != nil {
 				fmt.Printf("Error failed to read shaker 1 temperature ----%v \n", err)
 				return "", err
 			}
 			setTemp1 = binary.BigEndian.Uint16(results)
-			fmt.Println(setTemp1)
+
+			time.Sleep(time.Second * 5)
 			results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
 			if err != nil {
 				fmt.Printf("Error failed to read shaker 2 temperature ----%v \n", err)
 				return "", err
 			}
 			setTemp2 = binary.BigEndian.Uint16(results)
-			fmt.Println(setTemp2)
 		}
 
 	}
