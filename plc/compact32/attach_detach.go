@@ -34,6 +34,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 1. First move to 12.5 mm backward for the magnet to detach
 2. Then if it is semi-detach then stay there
 3. If it is full-detach then move up to 0.5 mm from the 0 position of the magnet.
+4. Then move the magnet 20 mm back to avoid any chances of possible collision with the tips.
 */
 func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
 
@@ -67,7 +68,6 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 		goto skipMagnetBackToSourcePosition
 	}
 
-	fmt.Printf("distance to travel fwd 2 %v \n", distanceToTravelBack)
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelBack))
 
 	// set up motor for attach step 2 Forward Motion
@@ -76,7 +76,6 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 		return
 	}
 	logger.Printf("magnet move forward 2")
-	logger.Printf("%v \n", response)
 skipMagnetBackToSourcePosition:
 
 	// if operation type is semi detach then return after doing the first backward step.
@@ -84,11 +83,11 @@ skipMagnetBackToSourcePosition:
 		return "Success", nil
 	}
 
-	// step 3 to go with the normal flow of full detach.
+	// step 2 to go with the normal flow of full detach.
 	// to calculate the relative position of the magnet from its current
-	// position to move the magnet Downward for step 2.
+	// position to move the magnet Upward for step 2.
 	if magnetUpPosition, ok = consDistance["magnet_up_step_1"]; !ok {
-		err = fmt.Errorf("magnet_down_step_2 doesn't exist for consuamble distances")
+		err = fmt.Errorf("magnet_up_step_1 doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -104,9 +103,9 @@ skipMagnetBackToSourcePosition:
 		direction = 0
 	default:
 		// Skip the setUpMotor Step
-		goto skipMagnetDownSecToSourcePosition
+		goto skipMagnetbackSecPosition
 	}
-	fmt.Printf("distance to travel up 1 %v \n", distanceToTravelUp)
+
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelUp))
 
 	// set up motor for attach step 2 Downward Motion
@@ -116,7 +115,40 @@ skipMagnetBackToSourcePosition:
 	}
 	logger.Printf("magnet move upward 1")
 	logger.Printf("%v", response)
-skipMagnetDownSecToSourcePosition:
+
+skipMagnetbackSecPosition:
+	// step 3 to go with the normal flow of full detach.
+	// to calculate the relative position of the magnet from its current
+	// position to move the magnet backward for step 2.
+	if magnetUpPosition, ok = consDistance["magnet_back_step_2"]; !ok {
+		err = fmt.Errorf("magnet_back_step_1 doesn't exist for consuamble distances")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+	// distance and direction setup for magnet for backward step 2
+	distanceToTravelBack = positions[deckMagnetFwdRev] - magnetUpPosition
+
+	switch {
+	// distToTravel > 0 means go towards the Sensor or FWD
+	case distanceToTravelUp > 0.1:
+		direction = 1
+	case distanceToTravelUp < -0.1:
+		distanceToTravelUp *= -1
+		direction = 0
+	default:
+		// Skip the setUpMotor Step
+		goto skipMagnetToSuccessPosition
+	}
+
+	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelUp))
+
+	// set up motor for attach step 2 Downward Motion
+	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	if err != nil {
+		return
+	}
+
+skipMagnetToSuccessPosition:
 	return "Success", nil
 
 }
@@ -229,7 +261,6 @@ skipMagnetDownToSourcePosition:
 		// Skip the setUpMotor Step
 		goto skipMagnetFwdToSourcePosition
 	}
-	fmt.Printf("distance to travel forward %v \n", distanceToTravelFwd)
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelFwd))
 
 	// set up motor for attach step 1 forward Motion
@@ -264,7 +295,6 @@ skipMagnetFwdToSourcePosition:
 		// Skip the setUpMotor Step
 		goto skipMagnetDownSecToSourcePosition
 	}
-	fmt.Printf("distance to travel down 2 %v \n", distanceToTravelDown)
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelDown))
 
 	// set up motor for attach step 2 Downward Motion
