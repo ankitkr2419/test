@@ -61,7 +61,7 @@ You need to set username and password
 ### 6. Set config.yml
 Inside conf directory, create a clone file from config.yml.default and name it as config.yml. And let it be. 
 
-## Building Binary without rice
+## Building Binary without GUI Support
 This is only backend binary
 Make sure your PWD is same as this README's.
 ```
@@ -70,6 +70,18 @@ $ go build
 If build fails then make sure you were on 'master' branch. 
 If master branch build fails then we must have messed pretty bad, please contact us.
 
+
+## For Building with GUI Support
+Run the below command in the same PWD and a binary should be created
+NOTE: This will create binary for linux platform with amd64 architecture,
+in case yours is different please change build-binary's line number 9 accordingly.
+
+```
+sh build-binary.sh
+```
+Run it with sudo if permission denied is displayed for any operation.
+
+Please refer README inside web-client directory if you are facing any issue and then escalate to us.
 
 ### Run
 DEPENDENCY: Make sure that cpagent binary is built
@@ -85,8 +97,7 @@ $ ./cpagent start --plc simulator
 ```
 If you have followed all steps correctly the setup should start normally.
 
-## For Building and Running Binary with GUI
-Please refer README inside web-client directory.
+Congrats if your setup runs, else feel free to contact us.
 
 ### Testing
 
