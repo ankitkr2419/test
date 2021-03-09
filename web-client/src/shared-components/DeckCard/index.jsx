@@ -52,7 +52,7 @@ const DeckCardBox = styled.div`
 
 const CardOverlay= styled.div`
 	position: absolute;
-	display: block;
+	display: none;
 	width: 32rem;
 	height: 6.625rem;
 	top: 0;
