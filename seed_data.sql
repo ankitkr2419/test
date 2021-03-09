@@ -20,6 +20,13 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('42479aa
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('fee69b9e-0898-4078-bc28-655ebddbfb5b','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 19, 'HT-FT-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8724e7213cb','Heating', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 20, 'HT-FF-5' );
 
+--Delay processes
+
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8724e5213cb','Delay', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 21, 'dl-50' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8524e5214cb','Delay', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 21, 'dl-60' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e5-5779-423d-83d5-b8424e5215cb','Delay', '6b7fcfa2-8337-4d79-829a-e9bd486a2de4', 21, 'dl-70' );
+
+
 
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd068','AttachDetach', '6b7fcfa2-8337-4d79-829a-e9bd486a2de8', 20, 'ATDT-AT-1' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd968','AttachDetach', '6b7fcfa2-8337-4d79-829a-e9bd486a2de8', 21, 'ATDT-DT-1' );
@@ -81,3 +88,9 @@ INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b
 -- attach Detach
 INSERT INTO attach_detach (id,operation,operation_type,process_id) VALUES('16587ff5-5d49-4ab7-b155-59069a380ff7','attach','wash','a3057838-d5e2-4ac2-9e4b-7d1e4fefd068');
 INSERT INTO attach_detach (id,operation,operation_type,process_id) VALUES('16587ff5-5d49-4ab7-b155-59069a380ff8','detach','full_detach','a3057838-d5e2-4ac2-9e4b-7d1e4fefd968');
+-- For Delay
+INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',50,'1d3334e5-5779-423d-83d5-b8724e5213cb');
+INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',60,'1d3334e5-5779-423d-83d5-b8524e5214cb');
+INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',70,'1d3334e5-5779-423d-83d5-b8424e5215cb');
+
+

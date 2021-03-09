@@ -72,4 +72,5 @@ type DeckDriver interface {
 	TipDiscard() (response string, err error)
 	// Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
 	AttachDetach(db.AttachDetach) (response string, err error)
+	AddDelay(db.Delay) (string, error)
 }
