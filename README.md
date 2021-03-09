@@ -9,7 +9,7 @@ and graphical format. This machine will be industrial machine with Touch screen.
 We have used Golang boilerplate to kickstart any go api project.
 
 ## SetUp Steps
-### 1. Install Go
+### 1. Install Go Language
 Refer https://golang.org/doc/install, or for linux users 
 ```
 $ sudo snap install go --classic
@@ -20,7 +20,7 @@ $ go version
 ```
 If this shows blank, then please ask for help
 
-### 2. Install Postgres
+### 2. Install Postgres Server
 Refer https://www.postgresql.org/download/
 Select your OS flavour and follow steps for installation
 
@@ -44,7 +44,6 @@ CRITICAL STEPS:
 Set APP_NAME to MyLabDiscoveries if you want to run GUI application. 
 Set APP_PORT to 33001.
 NOTE: Failing to setup any of the above steps will give a 404 for API responses
-
 #### 5.2 Setting DB_URI
 (You may skip this step if you have already set correct DB_URI)
 Create a new database named cpagentdb
@@ -79,14 +78,14 @@ If master branch build fails then we must have messed pretty bad, please contact
 ## For Building with GUI Support
 Run the below command in the same PWD and a binary should be created
 NOTE: This will create binary for linux platform with amd64 architecture,
-in case yours is different please change build-binary's line number 9 accordingly.
+in case your's is different please change build-binary's line number 9 accordingly.
 
 ```
 sh build-binary.sh
 ```
 Run it with sudo if permission denied is displayed for any operation.
 
-Please refer README inside web-client directory if you are facing any issue and then escalate to us.
+Please refer README inside web-client directory if you are facing any issue and then escalate it to us.
 
 ### Run
 DEPENDENCY: Make sure that cpagent binary is built
@@ -94,7 +93,7 @@ Firstly run the migrations, make sure your PWD is same as this README's.
 ```
 $ ./cpagent migrate
 ```
-If that fails then conatact us.
+If this fails then contact us.
 
 Then type
 ```
