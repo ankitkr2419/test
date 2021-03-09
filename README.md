@@ -25,8 +25,13 @@ Refer https://www.postgresql.org/download/
 Select your OS flavour and follow steps for installation
 
 ### 3. Install npm 
-(Not sure if you may skip this step)
 Refer https://www.npmjs.com/get-npm for installation guide
+NOTE: Even if you have npm installed you need to follow this step
+
+Go inside web-client directory
+```
+npm install
+```
 
 ### 4. Install yarn
 Refer https://classic.yarnpkg.com/en/docs/install#debian-stable for linux users
