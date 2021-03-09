@@ -35,6 +35,10 @@
 @import '~bootstrap/scss/utilities';
 @import '~bootstrap/scss/print';
 
+//For Plugin
+@import "slick-carousel/slick/slick";
+@import "slick-carousel/slick/slick-theme";
+
 // Flex Grid
 @import './flex';
 

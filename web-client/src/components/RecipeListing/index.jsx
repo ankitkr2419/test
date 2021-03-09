@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import { Card, CardBody, Button, Row, Col } from 'core-components';
 import {
@@ -51,7 +51,7 @@ const RecipeListingComponent = (props) => {
 		<div className="ml-content">
 			<div className='landing-content'>
             <ConfirmationModal
-                isOpen={true}
+                isOpen={false}
             />
                 <RecipeFlowModal />
                 <TopContent className="d-flex justify-content-between align-items-center">
@@ -64,7 +64,6 @@ const RecipeListingComponent = (props) => {
                      <Button
                         color="secondary"
                         className="ml-auto"
-                        size="sm"
                     >	Clean Up       
 				</Button>
                     </div>

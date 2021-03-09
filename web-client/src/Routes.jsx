@@ -12,6 +12,7 @@ import PrivateRoute from 'components/HOC/PrivateRoute';
 import SplashScreenContainer from 'containers/SplashScreenContainer';
 import LandingPageContainer from 'containers/LandingPageContainer';
 import RecipeListingContainer from 'containers/RecipeListingContainer';
+import AllSetContainer from 'containers/AllSetContainer';
 import { ROOT_URL_PATH } from './appConstants';
 
 export const routeDefinitions = [
@@ -67,6 +68,12 @@ export const routeDefinitions = [
 				exact: true,
 				component: RecipeListingContainer,
 				key: 9,
+			},
+			{
+				path: `${ROOT_URL_PATH}all-set`,
+				exact: true,
+				component: AllSetContainer,
+				key: 10,
 			},
 		],
 	},

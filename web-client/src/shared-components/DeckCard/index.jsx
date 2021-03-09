@@ -8,7 +8,7 @@ import {
 	Button, 
 } from 'core-components';
 import ActionButton from "./ActionButton";
-// import { ProgressBar } from './reactstrap';
+import { Progress } from 'reactstrap';
 
 const DeckCardBox = styled.div`
   width: 32rem;
@@ -32,11 +32,16 @@ const DeckCardBox = styled.div`
 		line-height:1.688rem;
 		font-weight:bold;
 		color:#51575A;
+		border:1px solid transparent;
 		box-shadow: 0 -3px 6px rgba(0,0,0,0.16);
 		> label{
 			transform:rotate(-90deg);
 			white-space:nowrap;
 			margin-bottom:0;
+		}
+		&.active{
+			background-color:#B2DAD1;
+			border:1px solid #ffffff;
 		}
 	}
 	.deck-content{
@@ -46,6 +51,13 @@ const DeckCardBox = styled.div`
 			min-width:7.063rem;
 			height:2.5rem;
 			line-height:1.125rem;
+		}
+		.custom-progress-bar{
+			border-radius:7px;
+			background-color:#B2DAD1;
+			.progress-bar{
+				background-color:#10907A;
+			}
 		}
 	}
 `;
@@ -70,15 +82,14 @@ const DeckCard = (props) => {
 			<div className="d-flex justify-content-center align-items-center deck-title"> 
 				<Text Tag="label" size="20" >Deck A</Text>
 			</div>
-			<div className="d-flex justify-content-between align-items-center p-4 w-100 h-100 deck-content">
+			<div className="p-4 w-100 h-100 deck-content">
+			<div className="d-flex justify-content-between align-items-center">
 				<div className="d-none1">
-				<ActionButton/>
-				
-				<div className="d-none">
-					<Text Tag="h5">Recipe Name</Text>
-					<Text Tag="label">Current Processes - (Process Name)</Text>
-					{/* <ProgressBar variant="info" now={20} /> */}
-				</div>
+					<ActionButton/>
+					<div className="d-none1">
+						<Text Tag="h5" className="mb-2">Recipe Name</Text>
+						<Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
+					</div>
 				</div>
 				<Button
 					color="primary"
@@ -86,6 +97,9 @@ const DeckCard = (props) => {
 					size="sm"
 				>	Login       
 				</Button>
+				
+				</div>
+				<Progress value="2" className="custom-progress-bar"/>
 			</div>
 		</DeckCardBox>
 	);

@@ -1,73 +1,79 @@
 import React, { useState } from 'react';
 // import styled from 'styled-components';
-import { ButtonIcon} from 'shared-components';
+import { ButtonIcon, Center, ImageIcon} from 'shared-components';
 import { Button, Modal, ModalBody} from 'core-components';
-import {
-  Carousel,
-  CarouselItem,
-  CarouselControl,
-  CarouselIndicators,
-  CarouselCaption,
-  ModalHeader,
-  ModalFooter
-} from 'reactstrap';
+import Slide1 from '../../../assets/images/slide-1.jpg';
+import Slide2 from '../../../assets/images/slide-2.jpg';
+import Slide3 from '../../../assets/images/slide-3.jpg';
+import styled from 'styled-components';
+import Slider from "react-slick";
 
-const items = [
-    {
-      src: 'assets/images/slide-1.jpg',
-      altText: 'Slide 1',
-      caption: 'Slide 1'
-    },
-    {
-      src: 'assets/images/slide-2.jpg',
-      altText: 'Slide 2',
-      caption: 'Slide 2'
-    },
-    {
-      src: 'assets/images/slide-3.jpg',
-      altText: 'Slide 3',
-      caption: 'Slide 3'
+// const items = [
+//     {
+//       src: Slide1,
+//       altText: '',
+//       caption: ''
+//     },
+//     {
+//       src: Slide2,
+//       altText: '',
+//       caption: ''
+//     },
+//     {
+//       src: Slide3,
+//       altText: '',
+//       caption: ''
+//     }
+// ];
+
+const CloseButton = styled.div`
+		position:absolute;
+		top:1rem;
+		right:1rem;
+`;
+const RecipeFlowSlider = styled.div`
+  .slides{
+    .slides-inner-box{
+      width:43.5rem;
+      height:25rem;
+      margin:0 auto;
+      img{
+      border-radius:1.5rem !important;
+      box-shadow:0px 3px 6px rgba(0,0,0,0.16) !important;
+      }
     }
-];
-
+  }
+  .slick-dots{
+    bottom:-2.5rem !important;
+    li button:before{
+      font-size:0.75rem;
+    }
+    li.slick-active button:before{
+      transform:scale(1.5);
+      color:#F38220;
+    }
+  }
+`;
+const NextButton = styled.div`
+  position: absolute;
+  bottom: 1.5rem;
+  right: 6rem;
+`;
 
 
 const RecipeFlowModal = (props) => {
- 	const [activeIndex, setActiveIndex] = useState(0);
-    const [animating, setAnimating] = useState(false);
-
-    const next = () => {
-        if (animating) return;
-        const nextIndex = activeIndex === items.length - 1 ? 0 : activeIndex + 1;
-        setActiveIndex(nextIndex);
-    }
-
-    const previous = () => {
-        if (animating) return;
-        const nextIndex = activeIndex === 0 ? items.length - 1 : activeIndex - 1;
-        setActiveIndex(nextIndex);
-    }
-
-    const goToIndex = (newIndex) => {
-        if (animating) return;
-        setActiveIndex(newIndex);
-    }
-
-    const slides = items.map((item) => {
-      return (
-        <CarouselItem
-          onExiting={() => setAnimating(true)}
-          onExited={() => setAnimating(false)}
-          key={item.src}
-        >
-          <img src={item.src} alt={item.altText} />
-          <CarouselCaption captionText={item.caption} captionHeader={item.caption} />
-        </CarouselItem>
-      );
-    });
-
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
+    const settings = {
+      centerMode: true,
+      centerPadding: "78px",
+      dots: true,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false,
+    };
 	return (
 		<>
 			<ButtonIcon
@@ -76,29 +82,51 @@ const RecipeFlowModal = (props) => {
 				className='mx-2'
 				onClick={toggle}
 			/>
-			<Modal
+      <Modal
 				isOpen={true}
 				toggle={toggle}
 				centered
 				size='lg'
+        className="recipe-flow-modal"
 			>
-        <ModalHeader toggle={toggle}>Modal title</ModalHeader>
-				<ModalBody>
-          <Carousel
-            activeIndex={activeIndex}
-            next={next}
-            previous={previous}
-          >
-            <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={goToIndex} />
-            {slides}
-            <CarouselControl direction="prev" directionText="Previous" onClickHandler={previous} />
-            <CarouselControl direction="next" directionText="Next" onClickHandler={next} />
-          </Carousel>
+				<ModalBody className="py-5 px-0 recipe-flow-modal-body">
+          <CloseButton>
+            <ButtonIcon
+            size={34}
+            name="cross"
+            onClick={toggle}
+            className="ml-auto border-0"
+            />
+          </CloseButton>
+            <Center className="font-weight-bold mb-4">Name Name Name Name Name Name Name</Center>
+            <RecipeFlowSlider className="mb-4">
+              <Slider {...settings}>
+                  <div className="slides">
+                    <div className="slides-inner-box">
+                      <ImageIcon src={Slide1} alt=""/>
+                    </div>
+                  </div>
+                  <div className="slides">
+                    <div className="slides-inner-box">
+                      <ImageIcon src={Slide2} alt=""/>
+                    </div>
+                  </div>
+                  <div className="slides position-relative">
+                    <div className="slides-inner-box">
+                      <ImageIcon src={Slide3} alt=""/>
+                    </div>
+                  </div>
+                </Slider>  
+            </RecipeFlowSlider>
+            <NextButton>
+              <Button
+              color="outline-secondary"
+              size="sm"
+              >
+							Next
+						</Button>
+					</NextButton>          
 				</ModalBody>
-
-        <ModalFooter>
-          <Button color="secondary" onClick={toggle}>Next</Button>
-        </ModalFooter>
 			</Modal>
 		</>
 	);

@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 // import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Icon, Text } from 'shared-components';
+import { Icon } from 'shared-components';
 import { 
 } from 'core-components';
 
