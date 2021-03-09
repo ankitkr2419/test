@@ -209,7 +209,7 @@ ConsumableDistance:
     description: "This field sets the upward distance for the magnet first step Detach"
   - id: 609
     name: "magnet_back_step_2"
-    distance: 20
+    distance: 40
     description: "This field sets the backward distance for the magnet second step Detach"
   - id: 1001
     name: "syringe_module_a_lh_zero"

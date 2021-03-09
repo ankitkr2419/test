@@ -75,7 +75,7 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 	if err != nil {
 		return
 	}
-	logger.Printf("magnet move forward 2")
+	logger.Printf("magnet move backward 1")
 skipMagnetBackToSourcePosition:
 
 	// if operation type is semi detach then return after doing the first backward step.
@@ -120,30 +120,30 @@ skipMagnetbackSecPosition:
 	// step 3 to go with the normal flow of full detach.
 	// to calculate the relative position of the magnet from its current
 	// position to move the magnet backward for step 2.
-	if magnetUpPosition, ok = consDistance["magnet_back_step_2"]; !ok {
-		err = fmt.Errorf("magnet_back_step_1 doesn't exist for consuamble distances")
+	if magnetBackPosition, ok = consDistance["magnet_back_step_2"]; !ok {
+		err = fmt.Errorf("magnet_back_step_2 doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
 	// distance and direction setup for magnet for backward step 2
-	distanceToTravelBack = positions[deckMagnetFwdRev] - magnetUpPosition
+	distanceToTravelBack = positions[deckMagnetFwdRev] - magnetBackPosition
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelUp > 0.1:
+	case distanceToTravelBack > 0.1:
 		direction = 1
-	case distanceToTravelUp < -0.1:
-		distanceToTravelUp *= -1
+	case distanceToTravelBack < -0.1:
+		distanceToTravelBack *= -1
 		direction = 0
 	default:
 		// Skip the setUpMotor Step
 		goto skipMagnetToSuccessPosition
 	}
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelUp))
+	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelBack))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
