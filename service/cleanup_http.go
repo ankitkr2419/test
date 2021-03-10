@@ -19,7 +19,7 @@ func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "DiscardBoxCleanup")
 		default:
-			err = fmt.Errorf("Check you deck name")
+			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {
@@ -45,7 +45,7 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "RestoreDeck")
 		default:
-			err = fmt.Errorf("Check you deck name")
+			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {

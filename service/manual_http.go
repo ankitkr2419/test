@@ -81,7 +81,7 @@ func pauseHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Pause")
 		default:
-			err = fmt.Errorf("Check you deck name")
+			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {
@@ -108,7 +108,7 @@ func resumeHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Resume")
 		default:
-			err = fmt.Errorf("Check you deck name")
+			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {
@@ -136,7 +136,7 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Abort")
 		default:
-			err = fmt.Errorf("Check you deck name")
+			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {
