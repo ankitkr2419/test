@@ -10,7 +10,7 @@ import {
 const ActionBtn = styled.button`
 	position: absolute;
 	top:0;
-	right:7.75rem;
+	right:0;
 	z-index:2;
     display: block;
 	outline: none;
@@ -58,7 +58,7 @@ const ActionButton = (props) => {
 		<ActionBtn className="d-flex justify-content-center align-items-center">
             <div className="semi-circle-outter-box">
                 <div className="semi-circular-button">
-                    <Icon name='play' size={18} />
+                    <Icon name='play' size={18} className="ml-2"/>
 					<div className="btn-label font-weight-bold">RUN</div>
                 </div>
             </div>

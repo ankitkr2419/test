@@ -25,12 +25,6 @@ import Slider from "react-slick";
 //       caption: ''
 //     }
 // ];
-
-const CloseButton = styled.div`
-		position:absolute;
-		top:1rem;
-		right:1rem;
-`;
 const RecipeFlowSlider = styled.div`
   .slides{
     .slides-inner-box{
@@ -90,14 +84,16 @@ const RecipeFlowModal = (props) => {
         className="recipe-flow-modal"
 			>
 				<ModalBody className="py-5 px-0 recipe-flow-modal-body">
-          <CloseButton>
             <ButtonIcon
-            size={34}
+            position="absolute"
+            placement="right"
+            top={16}
+            right={16}
+            size={36}
             name="cross"
             onClick={toggle}
             className="ml-auto border-0"
             />
-          </CloseButton>
             <Center className="font-weight-bold mb-4">Name Name Name Name Name Name Name</Center>
             <RecipeFlowSlider className="mb-4">
               <Slider {...settings}>

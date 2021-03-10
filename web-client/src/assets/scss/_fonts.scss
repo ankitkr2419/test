@@ -56,6 +56,7 @@ $icon-tip-pickup: "\e930";
 $icon-tip-position: "\e931";
 $icon-up: "\e932";
 $icon-user-medium: "\e933";
+$icon-tick: "\e934";
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -399,5 +400,11 @@ $icon-user-medium: "\e933";
 .icon-user-medium {
 	&:before {
 		content: $icon-user-medium;
+	}
+}
+
+.icon-tick {
+	&:before {
+		content: $icon-tick;
 	}
 }

@@ -59,7 +59,23 @@ const DeckCardBox = styled.div`
 				background-color:#10907A;
 			}
 		}
+		.uv-light-button{
+			position:absolute;
+			right:244px;
+			top:0;
+		}
+		.resume-button{
+			position:absolute;
+			right:123px;
+			top:0;
+		}
+		.abort-button{
+			position:absolute;
+			right:21px;
+			top:0;
+		}
 	}
+
 `;
 
 const CardOverlay= styled.div`
@@ -85,7 +101,16 @@ const DeckCard = (props) => {
 			<div className="p-4 w-100 h-100 deck-content">
 			<div className="d-flex justify-content-between align-items-center">
 				<div className="d-none1">
-					<ActionButton/>
+					<div className="uv-light-button">
+						<ActionButton/>
+					</div>
+					<div className="resume-button">
+						<ActionButton/>
+					</div>
+					<div className="abort-button">
+						<ActionButton/>
+					</div>
+					
 					<div className="d-none1">
 						<Text Tag="h5" className="mb-2">Recipe Name</Text>
 						<Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
@@ -93,7 +118,7 @@ const DeckCard = (props) => {
 				</div>
 				<Button
 					color="primary"
-					className="ml-auto"
+					className="ml-auto d-none"
 					size="sm"
 				>	Login       
 				</Button>

@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 
-import styled from 'styled-components'
-import { Modal, ModalBody, Button} from 'core-components';
-import { ImageIcon, ButtonIcon, Icon, Text } from 'shared-components';
+import styled from 'styled-components';
+import { 
+	Modal, 
+	ModalBody, 
+	Button
+} from 'core-components';
+import { ImageIcon, ButtonIcon, Icon, Text} from 'shared-components';
 
 import CirclelogoIcon from 'assets/images/mylab-logo-with-circle.png';
 import thumbsUpGraphics from 'assets/images/thumbs-up-graphic.svg';
 
 import Radio from 'core-components/Radio';
+import OperatorLoginModal from 'components/modals/OperatorLoginModal';
 
 const SplashScreen = styled.div`
     background: url('/images/logo-bg.svg') left -4.875rem top -5.5rem no-repeat,
@@ -25,18 +30,43 @@ const OptionBox = styled.div`
 		width:15.125rem;
 		height:8.5rem;
 		margin-bottom: 2.125rem;
+		border:1px solid #DBDBDB;
+	}
+	.tick-icon-box{
+		position:absolute;
+		left:50%;
+		transform:translateX(-50%);
+		top:-1rem;
+		> button{
+			width:2.625rem;
+			height:2.625rem;
+		}
 	}
 `;
-const CloseButton = styled.div`
-		position:absolute;
-		top:1rem;
-		right:1rem;
+const ThumbBox = styled.div`
+	background-color: #F5F5F5;
+    border-radius: 0 2.25rem 2.25rem 0;
+`;
+//For Operator Login Form
+const OperatorLoginForm = styled.div`
+.has-border-left{
+	.form-control{
+		border-left:7px solid #F38220;
+	}
+}
+.link{
+	color:#3C70FF;
+}
 `;
 
 const SplashScreenComponent = (props) => {
        
 	const [modal, setModal] = useState(false);
 	const toggle = () => setModal(!modal);
+
+	// Operator Login Modal
+	const [operatorLoginModal, setOperatorLoginModal] = useState(false);
+	const toggleOperatorLoginModal = () => setOperatorLoginModal(!operatorLoginModal);
 
   return (
 		<SplashScreen className='splash-screen-content h-100 py-0 bg-white d-flex justify-content-center align-items-center'>
@@ -60,6 +90,10 @@ const SplashScreenComponent = (props) => {
 											className='mb-3'
 									/>
 									<div className="d-flex justify-content-center align-items-center flex-column mt-5">
+									<div className="position-relative">
+											<div className="tick-icon-box">
+												<ButtonIcon size={16} name='tick' className="border-success font-weight-bold text-success bg-white"/>
+											</div>
 										<Button
 											color="default"
 											className="font-weight-light border-1 border-gray shadow-none bg-white large-btn">
@@ -73,33 +107,43 @@ const SplashScreenComponent = (props) => {
 													/>
 											</div>
 										</Button>
-											
-										<Button
-											color="default"
-											className="font-weight-light border-1 border-gray shadow-none bg-white large-btn">
-												<div className="d-flex justify-content-center align-items-center flex-column">
-													<Text Tag="span">Fix Magnet Control</Text>
-													<Icon
-															size={21}
-															name="magnet"
-															onClick={toggle}
-															className="text-primary mt-3"
-													/>
-												</div>
+										</div>
+										<div className="position-relative">
+											<div className="tick-icon-box">
+												<ButtonIcon 
+													size={16} 
+													name='tick' 
+													className="border-success font-weight-bold text-success bg-white"/>
+											</div>
+											<Button
+												color="default"
+												className="font-weight-light border-1 border-gray shadow-none bg-white large-btn">
+													<div className="d-flex justify-content-center align-items-center flex-column">
+														<Text Tag="span">Fix Magnet Control</Text>
+														<Icon
+																size={21}
+																name="magnet"
+																onClick={toggle}
+																className="text-primary mt-3"
+														/>
+													</div>
 											</Button>
+										</div>
 									</div>
 							</OptionBox>
 						</div>
 						<div className="w-50 border-left">
-								<div className="d-flex justify-content-center align-items-center flex-column p-5">
-									<CloseButton>
-										<ButtonIcon
-										size={34}
+								<ThumbBox className="d-flex justify-content-center align-items-center flex-column p-5">
+									<ButtonIcon
+										position="absolute"
+										placement="right"
+										top={16}
+										right={16}
+										size={36}
 										name="cross"
 										onClick={toggle}
 										className="ml-auto border-0"
 										/>
-									</CloseButton>
 									<Radio
 									id='radio2'
 									name='radio1'
@@ -116,11 +160,15 @@ const SplashScreenComponent = (props) => {
 									>
 										Next
 									</Button>
-								</div>
+								</ThumbBox>
 							</div>
 						</div>
 				</ModalBody>
 			</Modal>
+
+			{/* Operator Login Modal */}
+
+		<OperatorLoginModal />
     </SplashScreen>
 	);
 };
