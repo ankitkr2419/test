@@ -5,7 +5,7 @@ CREATE TABLE  tip_docking(
  type tip_docking_type DEFAULT 'deck',
  position int CHECK (position<10),
  height decimal,
- process_id uuid,
+ process_id uuid UNIQUE NOT NULL,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY (process_id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE);
