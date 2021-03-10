@@ -51,6 +51,10 @@ ConsumableDistance:
     name: "deck_move_for_magnet_attach"
     distance: 100
     description: "deck will be at this position from homing for attach or detach operation"   
+  - id: 40
+    name: "discard_box_open_position"
+    distance: 200
+    description: "deck will go to this position on discard box open position"
   - id: 51
     name: "pos_1"
     distance: 13.52
@@ -116,7 +120,7 @@ ConsumableDistance:
     distance: 316.75
     description: "output from pcr process kept here"
   - id: 201
-    name: "syring_start"
+    name: "syringe_start"
     distance: 0.00
     description: "syring start point"
   - id: 202
