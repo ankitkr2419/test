@@ -171,7 +171,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		case initialSensorCutSyringeModulePulses, initialSensorCutDeckPulses, initialSensorCutSyringePulses:
 			time.Sleep(400 * time.Millisecond)
 		case finalSensorCutPulses:
-			time.Sleep(20 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		default:
 			time.Sleep(500 * time.Millisecond)
 		}
