@@ -27,7 +27,6 @@ func (d *Compact32ModbusDriver) WriteMultipleRegisters(address, quantity uint16,
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
 	results, err = d.Client.WriteMultipleRegisters(address, quantity, value)
-	masterLock.Unlock()
 	return
 }
 
