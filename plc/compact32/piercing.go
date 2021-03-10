@@ -80,7 +80,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
 
-	for well := range pi.CartridgeWells {
+	for _, well := range pi.CartridgeWells {
 		wellsToBePierced = append(wellsToBePierced, int(well))
 	}
 
@@ -115,8 +115,6 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			goto skipDeckMovement
 		}
 
-		fmt.Println("Completed Move Deck to reach the wellNum ", wellNumber)
-
 		pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
@@ -139,12 +137,17 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			return "", fmt.Errorf("There was issue moving Syringe Module DOWN to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
+		fmt.Println("Pierced WellNumber: ", wellNumber)
+
 		// WE know concrete direction here, its UP
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], piercingPulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 		if err != nil {
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module UP to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
+
+		fmt.Println("Got Up from WellNumber: ", wellNumber)
+
 		// 4.3 Repeat step 4.1 and  4.2 till another well exists
 	}
 
@@ -159,5 +162,5 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		return "", err
 	}
 
-	return "Successfully completed tip operation", nil
+	return "Successfully completed piercing operation", nil
 }
