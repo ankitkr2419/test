@@ -1,0 +1,30 @@
+@import '../../assets/scss/core';
+
+
+.landing-content {
+    position: relative;
+    @extend .flex-100;
+    padding: rem(40px 72px);
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: rem(225px);
+        background: transparent -moz-linear-gradient(110deg,
+                $pale 0%,
+                $tacao 58%,
+                $tango 100%) 0% 0% no-repeat padding-box;
+        background: transparent -webkit-linear-gradient(110deg,
+                $pale 0%,
+                $tacao 58%,
+                $tango 100%) 0% 0% no-repeat padding-box;
+        background: transparent linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="$pale", endColorstr="$tango", GradientType=1);
+        z-index: -1;
+    }
+}
