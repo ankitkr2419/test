@@ -24,7 +24,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			response, err = singleDeckOperation(deps, deck, "Homing")
 		default:
-			err = fmt.Errorf("Check you deck name")
+			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {

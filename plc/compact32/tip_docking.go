@@ -34,7 +34,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 	deckAndMotor = DeckNumber{Deck: d.name, Number: K5_Deck}
 
 	if position, ok = consDistance["resting_position"]; !ok {
-		err = fmt.Errorf("resting_position doesn't exist for consuamble distances")
+		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -71,7 +71,7 @@ skipToRestPosition:
 		// get the cartridge well distance
 		// distance to cartridge start + distance to the specified well
 		if cartridgePosition, ok = consDistance[td.Type+"_start"]; !ok {
-			err = fmt.Errorf(td.Type + "_start doesn't exist for consuamble distances")
+			err = fmt.Errorf(td.Type + "_start doesn't exist for consumable distances")
 			fmt.Println("Error: ", err)
 			return "", err
 		}
@@ -117,7 +117,7 @@ skipToRestPosition:
 	// calculate the position of the deck where the syringe module needs to dock
 	deckPosition = "pos_" + fmt.Sprintf("%d", td.Position)
 	if position, ok = consDistance[deckPosition]; !ok {
-		err = fmt.Errorf("%s doesn't exist for consuamble distances", deckPosition)
+		err = fmt.Errorf("%s doesn't exist for consumable distances", deckPosition)
 		fmt.Println("Error: ", err)
 		return "", err
 	}
