@@ -94,5 +94,6 @@ type Storer interface {
 	UpdateAspireDispense(context.Context, AspireDispense) error
 	ShowTipDocking(context.Context, uuid.UUID) (TipDock, error)
 	ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error)
+	ShowAttachDetach(ctx context.Context, processID uuid.UUID) (AttachDetach, error)
 	ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error)
 }

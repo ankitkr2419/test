@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS heating(
  temperature int,
  follow_temp boolean DEFAULT FALSE,
  duration int,
- process_id uuid,
+ process_id uuid UNIQUE NOT NULL,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY (process_id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE);
