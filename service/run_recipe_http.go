@@ -135,7 +135,17 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 
-		case "Magnet":
+		case "AttachDetach":
+			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
+			fmt.Printf("attach detach record %v \n", ad)
+			if err != nil {
+				return "", err
+			}
+			response, err = deps.PlcDeck[deck].AttachDetach(ad)
+			if err != nil {
+				return "", err
+			}
+
 		case "TipOperation":
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {

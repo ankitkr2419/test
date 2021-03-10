@@ -36,6 +36,8 @@ INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('1d3334e
 
 
 
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd068','AttachDetach', '6b7fcfa2-8337-4d79-829a-e9bd486a2de8', 20, 'ATDT-AT-1' );
+INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd968','AttachDetach', '6b7fcfa2-8337-4d79-829a-e9bd486a2de8', 21, 'ATDT-DT-1' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd769','TipDocking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de5', 9, 'TD-DECK-5' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd779','TipDocking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de6', 10, 'TD-C1-4' );
 INSERT INTO processes(id, type, recipe_id, sequence_num, name ) VALUES ('a3057838-d5e2-4ac2-9e4b-7d1e4fefd789','TipDocking', '6b7fcfa2-8337-4d79-829a-e9bd486a2de7', 11, 'TD-C1-5' );
@@ -93,11 +95,6 @@ INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-
 INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f8','cartridge_1',4,12,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd779');
 INSERT INTO tip_docking (id, type,position,height,process_id) VALUES ('bbe172f0-e315-4ebd-83ab-c1c0b531e2f7','cartridge_2',5,11,'a3057838-d5e2-4ac2-9e4b-7d1e4fefd789');
 
-
-
-
-
-
 -- For Heating
 
 INSERT INTO heating(id,process_id,temperature,follow_temp,duration) VALUES('659057e1-8a41-4f2e-a94e-1ffc60aea5a6','2fa97b44-f3c3-460a-9585-9932b2de1ac2',20,true,'20');
@@ -113,6 +110,9 @@ INSERT INTO tip_operation (id, process_id, type, position) VALUES ('a207aa73-74b
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1eac','a5d058e3-7ce3-4a42-b2da-690e47139743', 'pickup', 3);
 INSERT INTO tip_operation (id, process_id, type, position) VALUES ('b207aa73-74b1-4bca-86ae-88e843ef1e1c','a5d058e3-7ce3-4a42-b2da-690e47139733', 'discard', 0);
 
+-- attach Detach
+INSERT INTO attach_detach (id,operation,operation_type,process_id) VALUES('16587ff5-5d49-4ab7-b155-59069a380ff7','attach','wash','a3057838-d5e2-4ac2-9e4b-7d1e4fefd068');
+INSERT INTO attach_detach (id,operation,operation_type,process_id) VALUES('16587ff5-5d49-4ab7-b155-59069a380ff8','detach','full_detach','a3057838-d5e2-4ac2-9e4b-7d1e4fefd968');
 -- For Delay
 INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',50,'1d3334e5-5779-423d-83d5-b8724e5213cb');
 INSERT INTO delay (id, delay_time, process_id) VALUES ('9207aa73-74b1-4bca-85ae-88e843ef1eaa',60,'1d3334e5-5779-423d-83d5-b8524e5214cb');
