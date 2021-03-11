@@ -339,3 +339,13 @@ skipMagnetFwdSecToSourcePosition:
 	return "Success", nil
 
 }
+
+
+func (d *Compact32Deck) fullDetach() (response string, err error) {
+	// Calling AttachDetach below as this handles magnetState implicitly
+	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType:"full_detach"})
+	if err != nil {
+		fmt.Printf("error in magnet detach process %v \n", err.Error())
+	}
+	return
+}
