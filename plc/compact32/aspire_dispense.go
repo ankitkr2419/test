@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
-	"time"
 )
 
 /****ALGORITHM******
@@ -24,7 +23,6 @@ variables: category, cartridgeType string,
   9. setup the motor of syringe module to go up atleast 30mm above deck
   10. calculate the current position difference for deck;
    		if its positive then direction is 1(towards sensor) else 0(oppose sensor)
-	 10.1 Detach Magnet Fully if the deck is to move
   11. move deck to match the sourcePosition with help of difference calculated
   12. move syringe module down at fast till base
   13. setup the syringe module motor with aspire height
@@ -34,7 +32,6 @@ variables: category, cartridgeType string,
   16. move syringe module up slow till just above base
   17. take airVolume in
   18. Move slowly to destinationPosition by calculating the difference of Positions
-  	 18.1 Detach Magnet Fully if the deck is to move
   19. move syringe module down at fast till base
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
@@ -244,15 +241,6 @@ skipTipUp:
 	}
 	fmt.Println(distToTravel)
 
-	// 
-	// 10.1 Detach Magnet Fully if the deck is to move
-	// 
-	response, err = d.fullDetach()
-	if err != nil {
-		fmt.Println(err)
-		return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck to Aspire Source. Error: %v", err)
-	}
-
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
 	//*************************
@@ -399,17 +387,6 @@ skipAspireCycles:
 	default:
 		// Skip the setUpMotor Step
 		goto skipDeckToDestinationPosition
-	}
-
-	// 
-	// 18.1 Detach Magnet Fully if the deck is to move
-	// 
-
-	// NOTE: If magnet is already detached then below process won't move a thing.
-	response, err = d.fullDetach()
-	if err != nil {
-		fmt.Println(err)
-		return "", fmt.Errorf("There was issue Detaching Magnet before moving deck to Dispensing destination. Error: %v", err)
 	}
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
