@@ -49,6 +49,13 @@ const (
 	homingSlowSpeed = uint16(500)
 )
 
+// Magnet States
+const(
+	detached = iota
+	semiDetached
+	attached
+)
+
 var wrotePulses = map[string]uint16{
 	"A": 0,
 	"B": 0,
@@ -72,6 +79,11 @@ var paused = map[string]bool{
 var runInProgress = map[string]bool{
 	"A": false,
 	"B": false,
+}
+
+var magnetState = map[string]int{
+	"A": detached,
+	"B": detached,
 }
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)

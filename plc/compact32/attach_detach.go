@@ -15,11 +15,20 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
+		magnetState[d.name] = attached
 		return
 	case "detach":
 		response, err = d.Detach(ad.OperationType)
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
+		}
+
+		// NOTE: Below string literal is dependent on DB's operation_subtype
+		// Changing type in type should also be reflected here
+		if ad.OperationType == "semi_detach"{
+			magnetState[d.name] = semiDetached
+		} else {
+			magnetState[d.name] = detached
 		}
 		return
 	}
