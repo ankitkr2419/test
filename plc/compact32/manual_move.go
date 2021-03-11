@@ -1,7 +1,7 @@
 package compact32
 
 import (
-	"encoding/binary"
+	// "encoding/binary"
 	"fmt"
 )
 
@@ -33,7 +33,7 @@ func (d *Compact32Deck) NameOfDeck() string {
 }
 
 func (d *Compact32Deck) Pause() (response string, err error) {
-
+/*
 	// If machine is already PAUSED OR
 	// run is not in Progress
 	if paused[d.name] || !runInProgress[d.name] {
@@ -48,13 +48,13 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 	}
 
 	paused[d.name] = true
-
+*/
 	return "Motor PAUSED Successfully", nil
 
 }
 
 func (d *Compact32Deck) Resume() (response string, err error) {
-
+/*
 	// if paused only then resume
 	if !paused[d.name] {
 		err = fmt.Errorf("System is already running, or done with the run")
@@ -82,12 +82,13 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 	}
 
 	paused[d.name] = false
-
+*/
 	return "RESUMED Successfully.", nil
 }
 
 func (d *Compact32Deck) Abort() (response string, err error) {
 
+	/*
 	fmt.Println("aborting the operation....")
 
 	fmt.Println("switching motor off....")
@@ -112,12 +113,13 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		fmt.Println("err : ", err)
 		return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")
 	}
-
+*/
 	return "ABORT SUCCESS", nil
 }
 
 func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
 
+	/*
 	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulses)
 	if err != nil {
 		fmt.Println("err : ", err)
@@ -139,6 +141,7 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 		fmt.Println("err : ", err)
 		return "", err
 	}
+	*/
 
 	return "RESUMED with pulses.", nil
 }

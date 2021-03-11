@@ -46,19 +46,27 @@ func (d *Compact32Deck) TipPickup(pos int64) (response string, err error) {
 	var deckAndMotor DeckNumber
 	var position, distToTravel, restingPos float64
 	var direction, pulses uint16
-	var tipFast, tipSlow string
+	var tipFast, tipSlow, restingPositionString string
 	var ok bool
 	deckAndMotor.Deck = d.name
 
 	//
-	// 1. Move Syringe Module to Resting position
+	// 1. Move Syringe Module to Resting position depending on tip type
 	//
+
+	// TODO: Remove this Hardcoding
+	// check if it is piercing tip
+	if pos == 3 {
+		restingPositionString = "piercing_tip_rest_position"
+	} else {
+		restingPositionString = "resting_position"
+	}
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	fmt.Println("Moving Syringe Module to resting position")
-	if restingPos, ok = consDistance["resting_position"]; !ok {
-		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
+	fmt.Println("Moving Syringe Module to", restingPositionString)
+	if restingPos, ok = consDistance[restingPositionString]; !ok {
+		err = fmt.Errorf("%v doesn't exist for consumable distances", restingPositionString)
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -187,10 +195,10 @@ skipDeckMove:
 	}
 
 	//
-	// 5. Move Syringe Module up with tip to Resting position.
+	// 5. Move Syringe Module up with tip to restingPositionString.
 	//
 
-	fmt.Println("Moving Syringe Module to Resting Position")
+	fmt.Println("Moving Syringe Module to ", restingPositionString)
 
 	// Here resting_position will always be lesser
 	// than whatever position earlier
@@ -203,7 +211,7 @@ skipDeckMove:
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
-		return "", fmt.Errorf("There was issue moving Syinge Module to resting position. Error: %v", err)
+		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", restingPositionString, err)
 	}
 
 	return "Tip PickUp was successfull", nil
@@ -211,13 +219,12 @@ skipDeckMove:
 }
 
 /****ALGORITHM******
-1. Move Syringe Module to Resting position
-2. Move Deck to the big hole's position
-3. Move Syringe Module down fast to deck's base
-4. Move Syringe Module down really slow till enough inside big hole
-5. Move Deck to the small hole's position
-6. Move Syringe Module up slow with tip till deck base, to drop off the tip.
-7. Move Syringe Module up fast with tip to Resting position.
+1. Move Deck to the big hole's position
+2. Move Syringe Module down fast to deck's base
+3. Move Syringe Module down really slow till enough inside big hole
+4. Move Deck to the small hole's position
+5. Move Syringe Module up slow with tip till deck base, to drop off the tip.
+6. Move Syringe Module up fast with tip to Resting position.
 */
 
 // TODO: Currently only discarding at Discard box so avoiding at_pickup_passing condition
@@ -235,44 +242,14 @@ func (d *Compact32Deck) TipDiscard() (response string, err error) {
 	var ok bool
 	deckAndMotor.Deck = d.name
 
-	//
-	// 1. Move Syringe Module to Resting position
-	//
-
-	deckAndMotor.Number = K9_Syringe_Module_LHRH
-
-	fmt.Println("Moving Syringe Module to resting position")
 	if restingPos, ok = consDistance["resting_position"]; !ok {
 		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	distToTravel = positions[deckAndMotor] - restingPos
-
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0.1:
-		direction = 1
-	case distToTravel < -0.1:
-		distToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipSyringeModuleMove
-	}
-
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
-
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
-	if err != nil {
-		fmt.Println(err)
-		return "", fmt.Errorf("There was issue moving Syringe Module to resting position. Error: %v", err)
-	}
-
-skipSyringeModuleMove:
 
 	//
-	//  2. Move Deck to the big hole's position
+	//  1. Move Deck to the big hole's position
 	//
 
 	deckAndMotor.Number = K5_Deck
@@ -308,7 +285,7 @@ skipSyringeModuleMove:
 skipDeckMove:
 
 	//
-	// 3. Move Syringe Module down fast to deck base
+	// 2. Move Syringe Module down fast to deck base
 	//
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
@@ -334,7 +311,7 @@ skipDeckMove:
 	}
 
 	//
-	// 4. Move Syringe Module down really slow till enough inside big hole
+	// 3. Move Syringe Module down really slow till enough inside big hole
 	//
 
 	fmt.Println("Moving Syringe to deck base inside")
@@ -359,7 +336,7 @@ skipDeckMove:
 	}
 
 	//
-	//  5. Move Deck to the small hole's position
+	//  4. Move Deck to the small hole's position
 	//
 
 	deckAndMotor.Number = K5_Deck
@@ -382,7 +359,7 @@ skipDeckMove:
 	}
 
 	//
-	// 6. Move Syringe Module up slow with tip till deck base, to drop off the tip.
+	// 5. Move Syringe Module up slow with tip till deck base, to drop off the tip.
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
@@ -408,7 +385,7 @@ skipDeckMove:
 	}
 
 	//
-	// 7. Move Syringe Module up fast with tip to Resting position.
+	// 6. Move Syringe Module up fast with tip to Resting position.
 	//
 
 	fmt.Println("Moving Syringe Module to Resting Position")

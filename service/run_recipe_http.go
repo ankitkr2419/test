@@ -37,7 +37,7 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			response, err = runRecipe(req.Context(), deps, deck, recipe)
 		default:
-			err = fmt.Errorf("Check you deck name")
+			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {
@@ -123,12 +123,29 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				return "", err
 			}
 			fmt.Println(pi)
-			// response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeIDs[deck])
-			// if err != nil {
-			// return "", err
-			// }
 
-		case "Magnet":
+			if string(pi.Type) == db.Cartridge1 {
+				currentCartridgeIDs[deck] = recipe.Cartridge1Position
+			} else {
+				currentCartridgeIDs[deck] = recipe.Cartridge2Position
+			}
+
+			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeIDs[deck])
+			if err != nil {
+				return "", err
+			}
+
+		case "AttachDetach":
+			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
+			fmt.Printf("attach detach record %v \n", ad)
+			if err != nil {
+				return "", err
+			}
+			response, err = deps.PlcDeck[deck].AttachDetach(ad)
+			if err != nil {
+				return "", err
+			}
+
 		case "TipOperation":
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
@@ -157,6 +174,20 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 
 			}
 		case "TipDocking":
+			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(td)
+			if td.Type == db.Cartridge1 {
+				currentCartridgeIDs[deck] = recipe.Cartridge1Position
+			} else {
+				currentCartridgeIDs[deck] = recipe.Cartridge2Position
+			}
+			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeIDs[deck])
+			if err != nil {
+				return "", err
+			}
 		case "Delay":
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {

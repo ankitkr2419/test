@@ -119,7 +119,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// NOTE : below position is added to sourcePosition/destinationPosition
 	// But only when they are wells
 	if position, ok = consDistance[string(ad.CartridgeType)+"_start"]; !ok {
-		err = fmt.Errorf(string(ad.CartridgeType) + "_start doesn't exist for consuamble distances")
+		err = fmt.Errorf(string(ad.CartridgeType) + "_start doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -191,7 +191,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// Go UP with extraction/pcr tip
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	if position, ok = consDistance["pickup_tip_up"]; !ok {
-		err = fmt.Errorf("pickup_tip_up doesn't exist for consuamble distances")
+		err = fmt.Errorf("pickup_tip_up doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -274,7 +274,7 @@ skipDeckToSourcePosition:
 	if position = consDistance["deck_base"]; ok {
 		distToTravel = position - (positions[deckAndMotor] + tipHeight)
 	} else {
-		err = fmt.Errorf("deck_base doesn't exist for consuamble distances")
+		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -353,7 +353,7 @@ skipAspireCycles:
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
 	if position, ok = consDistance["pickup_tip_up"]; !ok {
-		err = fmt.Errorf("pickup_tip_up doesn't exist for consuamble distances")
+		err = fmt.Errorf("pickup_tip_up doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -423,7 +423,7 @@ skipDeckToDestinationPosition:
 	if position = consDistance["deck_base"]; ok {
 		distToTravel = position - (positions[deckAndMotor] + tipHeight)
 	} else {
-		err = fmt.Errorf("deck_base doesn't exist for consuamble distances")
+		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -494,7 +494,7 @@ skipDispenseCycles:
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
 	if position, ok = consDistance["pickup_tip_up"]; !ok {
-		err = fmt.Errorf("pickup_tip_up doesn't exist for consuamble distances")
+		err = fmt.Errorf("pickup_tip_up doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
