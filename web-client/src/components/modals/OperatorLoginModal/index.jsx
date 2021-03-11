@@ -39,7 +39,7 @@ const OperatorLoginModal = (props) => {
 	return (
 		<>
 		{/* Operator Login Modal */}
-		<Button color="primary" onClick={toggleOperatorLoginModal}>Operator Login</Button>
+		  <Button color="primary" onClick={toggleOperatorLoginModal}>Operator Login</Button>
 				<Modal isOpen={operatorLoginModal} toggle={toggleOperatorLoginModal} centered size="sm">
 				<ModalBody>
 					<Text Tag="h4" size="24" className="text-center text-primary mb-4">

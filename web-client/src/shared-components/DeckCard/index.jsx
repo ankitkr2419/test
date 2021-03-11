@@ -59,11 +59,11 @@ const DeckCardBox = styled.div`
 				background-color:#10907A;
 			}
 		}
-		.uv-light-button{
-			position:absolute;
-			right:244px;
-			top:0;
-		}
+		// .uv-light-button{
+		// 	position:absolute;
+		// 	right:244px;
+		// 	top:0;
+		// }
 		.resume-button{
 			position:absolute;
 			right:123px;
@@ -101,9 +101,9 @@ const DeckCard = (props) => {
 			<div className="p-4 w-100 h-100 deck-content">
 			<div className="d-flex justify-content-between align-items-center">
 				<div className="d-none1">
-					<div className="uv-light-button">
+					{/* <div className="uv-light-button">
 						<ActionButton/>
-					</div>
+					</div> */}
 					<div className="resume-button">
 						<ActionButton/>
 					</div>

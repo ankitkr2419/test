@@ -57,6 +57,7 @@ $icon-tip-position: "\e931";
 $icon-up: "\e932";
 $icon-user-medium: "\e933";
 $icon-tick: "\e934";
+$icon-upload: "\e935";
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -406,5 +407,11 @@ $icon-tick: "\e934";
 .icon-tick {
 	&:before {
 		content: $icon-tick;
+	}
+}
+
+.icon-upload {
+	&:before {
+		content: $icon-upload;
 	}
 }

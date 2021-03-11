@@ -29,8 +29,10 @@ const RecipeFlowSlider = styled.div`
   .slides{
     .slides-inner-box{
       width:43.5rem;
-      height:25rem;
+      height:100%;
+      // height:25rem;
       margin:0 auto;
+      overflow: hidden !important;
       img{
       border-radius:1.5rem !important;
       box-shadow:0px 3px 6px rgba(0,0,0,0.16) !important;
@@ -47,6 +49,24 @@ const RecipeFlowSlider = styled.div`
       color:#F38220;
     }
   }
+  .center {
+    .slick-list{
+      padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    }
+    .slick-center .slides-inner-box {
+      transform: scale(1.12);
+      overflow: hidden;
+      border-radius: 24px;
+      img{
+        transform: scale(1.12);
+      }
+    }
+    .slides{
+      -webkit-transition: all 0.3s ease-out;
+      transition: all 0.3s ease-out;
+    }
+  }
 `;
 const NextButton = styled.div`
   position: absolute;
@@ -58,9 +78,10 @@ const NextButton = styled.div`
 const RecipeFlowModal = (props) => {
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
-    const settings = {
+    const recipeFlowsettings = {
+      className: "center",
       centerMode: true,
-      centerPadding: "78px",
+      centerPadding: "70px",
       dots: true,
       infinite: true,
       speed: 500,
@@ -96,7 +117,7 @@ const RecipeFlowModal = (props) => {
             />
             <Center className="font-weight-bold mb-4">Name Name Name Name Name Name Name</Center>
             <RecipeFlowSlider className="mb-4">
-              <Slider {...settings}>
+              <Slider {...recipeFlowsettings}>
                   <div className="slides">
                     <div className="slides-inner-box">
                       <ImageIcon src={Slide1} alt=""/>
