@@ -51,16 +51,13 @@ const RecipeFlowSlider = styled.div`
   }
   .center {
     .slick-list{
-      padding-top: 20px !important;
-    padding-bottom: 20px !important;
+      padding-top: 30px !important;
+      padding-bottom: 30px !important;
     }
     .slick-center .slides-inner-box {
       transform: scale(1.12);
       overflow: hidden;
-      border-radius: 24px;
-      img{
-        transform: scale(1.12);
-      }
+      border-radius: 1.5rem;
     }
     .slides{
       -webkit-transition: all 0.3s ease-out;
@@ -81,7 +78,7 @@ const RecipeFlowModal = (props) => {
     const recipeFlowsettings = {
       className: "center",
       centerMode: true,
-      centerPadding: "70px",
+      centerPadding: "65px",
       dots: true,
       infinite: true,
       speed: 500,
