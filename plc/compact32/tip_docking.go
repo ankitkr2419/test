@@ -42,9 +42,9 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 	distanceToTravel = positions[syringeModuleDeckAndMotor] - position
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravel > 0.1:
+	case distanceToTravel > minimumMoveDistance:
 		direction = 1
-	case distanceToTravel < -0.1:
+	case distanceToTravel < (minimumMoveDistance * -1):
 		distanceToTravel *= -1
 		direction = 0
 	default:
@@ -92,9 +92,9 @@ skipToRestPosition:
 		distanceToTravel = positions[deckAndMotor] - (cartridgePosition + wellPosition)
 		switch {
 		// distToTravel > 0 means go towards the Sensor or FWD
-		case distanceToTravel > 0.1:
+		case distanceToTravel > minimumMoveDistance:
 			direction = 1
-		case distanceToTravel < -0.1:
+		case distanceToTravel < (minimumMoveDistance * -1):
 			distanceToTravel *= -1
 			direction = 0
 		default:
@@ -126,9 +126,9 @@ skipToRestPosition:
 	distanceToTravel = positions[deckAndMotor] - position
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravel > 0.1:
+	case distanceToTravel > minimumMoveDistance:
 		direction = 1
-	case distanceToTravel < -0.1:
+	case distanceToTravel < (minimumMoveDistance * -1):
 		distanceToTravel *= -1
 		direction = 0
 	default:
@@ -148,9 +148,9 @@ skipToPositionSyringeHeight:
 	distanceToTravel = positions[deckAndMotor] - td.Height
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravel > 0.1:
+	case distanceToTravel > minimumMoveDistance:
 		direction = 1
-	case distanceToTravel < -0.1:
+	case distanceToTravel < (minimumMoveDistance * -1):
 		distanceToTravel *= -1
 		direction = 0
 	default:
