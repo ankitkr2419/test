@@ -64,7 +64,7 @@ func (d *Compact32Deck) TipPickup(pos int64) (response string, err error) {
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	fmt.Println("Moving Syringe Module to",restingPositionString)
+	fmt.Println("Moving Syringe Module to", restingPositionString)
 	if restingPos, ok = consDistance[restingPositionString]; !ok {
 		err = fmt.Errorf("%v doesn't exist for consumable distances", restingPositionString)
 		fmt.Println("Error: ", err)
@@ -211,7 +211,7 @@ skipDeckMove:
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
-		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v",restingPositionString,  err)
+		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", restingPositionString, err)
 	}
 
 	return "Tip PickUp was successfull", nil
