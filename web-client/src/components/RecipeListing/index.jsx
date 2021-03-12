@@ -14,6 +14,8 @@ import RecipeFlowModal from 'components/modals/RecipeFlowModal';
 import ConfirmationModal from 'components/modals/ConfirmationModal';
 import { Fade } from 'reactstrap';
 import TrayDiscardModal from 'components/modals/TrayDiscardModal';
+import SearchBox from 'shared-components/SearchBox';
+import PaginationBox from 'shared-components/PaginationBox';
 
 const TopContent = styled.div`
 	margin-bottom:2.25rem;
@@ -81,69 +83,90 @@ const RecipeListingComponent = (props) => {
 								<Icon name="angle-left" size={32} className="text-white"/>
 								<HeadingTitle Tag="h5" className="text-white font-weight-bold ml-3 mb-0">Select a Recipe for Deck B</HeadingTitle>
 						</div>
-						<div className="">
-							<Icon name="download" size={19} className="text-white mr-3"/>
+						<div className="d-flex justify-content-center align-items-center">
+						<ButtonIcon
+							size={19}
+							name="download"
+							//onClick={toggleOperatorLoginModal}
+							className="border-0 text-white"
+						/>
+							{/* <Icon name="download" size={19} className="text-white mr-3"/> */}
 							<Button
 								color="secondary"
-								className="ml-auto"
+								className="ml-2"
 						>	Clean Up       
 						</Button>
 						<TrayDiscardModal />
+						<Button
+								color="secondary"
+								className="ml-2"
+						>	<Icon name="plus-1" size={14} className="text-primary mr-2"/> Add New Recipe       
+						</Button>
+						<ButtonIcon
+							size={36}
+							name="cross"
+							//onClick={toggleOperatorLoginModal}
+							className="border-0 text-white mr-2"
+						/>
 					</div>
 				</TopContent>
 				<Card>
-						<CardBody className="p-5">
-								<Row>
-										<Col>
-												<RecipeCard onClick={toggle}>
-														<div className="font-weight-bold recipe-heading">Name Name Name Name Name Name Name</div>
-														<div className="recipe-card-body">
-																<Text Tag="span" className="recipe-name">Total Processes -</Text>
-																<Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">347 </Text>
-																<Fade in={fadeIn} tag="h5" className="m-0 d-none">
-																<div className="recipe-action d-flex justify-content-between align-items-center">
-																		<div className="d-flex justify-content-between align-items-center">
-																				<ButtonIcon
-																						size={14}
-																						name='play'
-																						className="border-gray text-primary"
-																						//onClick={toggleExportDataModal}
-																				/>
-																				<ButtonIcon
-																						size={14}
-																						name='edit-pencil'
-																						className="border-gray text-primary"
-																						//onClick={toggleExportDataModal}
-																				/>
-																				<ButtonIcon
-																						size={14}
-																						name='upload'
-																						className="border-gray text-primary"
-																						//onClick={toggleExportDataModal}
-																				/>
-																		</div>
+					<CardBody className="p-5">
+						<div className="d-flex justify-content-between align-items-center">
+							<SearchBox />
+							<PaginationBox />
+						</div>
+						<Row>
+								<Col>
+										<RecipeCard onClick={toggle}>
+												<div className="font-weight-bold recipe-heading">Name Name Name Name Name Name Name</div>
+												<div className="recipe-card-body">
+														<Text Tag="span" className="recipe-name">Total Processes -</Text>
+														<Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">347 </Text>
+														<Fade in={fadeIn} tag="h5" className="m-0 d-none">
+														<div className="recipe-action d-flex justify-content-between align-items-center">
+																<div className="d-flex justify-content-between align-items-center">
 																		<ButtonIcon
-																				size={20}
-																				name='minus-1'
+																				size={14}
+																				name='play'
+																				className="border-gray text-primary"
+																				//onClick={toggleExportDataModal}
+																		/>
+																		<ButtonIcon
+																				size={14}
+																				name='edit-pencil'
+																				className="border-gray text-primary"
+																				//onClick={toggleExportDataModal}
+																		/>
+																		<ButtonIcon
+																				size={14}
+																				name='publish'
 																				className="border-gray text-primary"
 																				//onClick={toggleExportDataModal}
 																		/>
 																</div>
-														</Fade>
-														</div> 
-												</RecipeCard>
-										</Col>
-										<Col>
-												<RecipeCard>
-														<div className="font-weight-bold recipe-heading">Name Name Name Name Name Name Name</div>
-														<div className="recipe-card-body">
-																<Text Tag="span" className="recipe-name">Total Processes -</Text>
-																<Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">347 </Text>
+																<ButtonIcon
+																		size={20}
+																		name='minus-1'
+																		className="border-gray text-primary"
+																		//onClick={toggleExportDataModal}
+																/>
 														</div>
-												</RecipeCard>
-										</Col>
-								</Row>
-						</CardBody>
+												</Fade>
+												</div> 
+										</RecipeCard>
+								</Col>
+								<Col>
+										<RecipeCard>
+												<div className="font-weight-bold recipe-heading">Name Name Name Name Name Name Name</div>
+												<div className="recipe-card-body">
+														<Text Tag="span" className="recipe-name">Total Processes -</Text>
+														<Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">347 </Text>
+												</div>
+										</RecipeCard>
+								</Col>
+						</Row>
+					</CardBody>
 				</Card>
 			</div>
       <AppFooter />
