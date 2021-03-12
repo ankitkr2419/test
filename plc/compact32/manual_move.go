@@ -24,12 +24,24 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 	return
 }
 
+func (d *Compact32Deck) NameOfDeck() string {
+	return d.name
+}
+
+func (d *Compact32Deck) SetRunInProgress() {
+	runInProgress[d.name] = true
+}
+
 func (d *Compact32Deck) ResetRunInProgress() {
 	runInProgress[d.name] = false
 }
 
-func (d *Compact32Deck) NameOfDeck() string {
-	return d.name
+func (d *Compact32Deck) SetTimerInProgress() {
+	timerInProgress[d.name] = true
+}
+
+func (d *Compact32Deck) ResetTimerInProgress() {
+	timerInProgress[d.name] = false
 }
 
 func (d *Compact32Deck) Pause() (response string, err error) {
@@ -42,15 +54,16 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		return
 	}
 
-	response, err = d.SwitchOffMotor()
-	if err != nil {
-		return "", err
+	if !timerInProgress[d.name] {
+		response, err = d.SwitchOffMotor()
+		if err != nil {
+			return "", err
+		}
 	}
 
 	paused[d.name] = true
 
-	return "Motor PAUSED Successfully", nil
-
+	return "Operation PAUSED Successfully", nil
 }
 
 func (d *Compact32Deck) Resume() (response string, err error) {
@@ -61,29 +74,31 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		return "", err
 	}
 
-	response, err = d.ReadExecutedPulses()
-	if err != nil {
-		fmt.Println("err : ", err)
-		return "", err
-	}
+	if !timerInProgress[d.name] {
+		response, err = d.ReadExecutedPulses()
+		if err != nil {
+			fmt.Println("err : ", err)
+			return "", err
+		}
 
-	if int(wrotePulses[d.name]) <= int(executedPulses[d.name]) {
-		err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
-		wrotePulses[d.name] = 0
-		executedPulses[d.name] = 0
+		if int(wrotePulses[d.name]) <= int(executedPulses[d.name]) {
+			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
+			wrotePulses[d.name] = 0
+			executedPulses[d.name] = 0
 
-		return "", err
-	}
+			return "", err
+		}
 
-	response, err = d.ResumeMotorWithPulses(wrotePulses[d.name] - executedPulses[d.name])
-	if err != nil {
-		fmt.Println(response, "resumeMotorWithPulse")
-		return
+		response, err = d.ResumeMotorWithPulses(wrotePulses[d.name] - executedPulses[d.name])
+		if err != nil {
+			fmt.Println(response, "resumeMotorWithPulse")
+			return
+		}
 	}
 
 	paused[d.name] = false
 
-	return "RESUMED Successfully.", nil
+	return "Operation RESUMED Successfully.", nil
 }
 
 func (d *Compact32Deck) Abort() (response string, err error) {
