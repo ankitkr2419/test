@@ -90,9 +90,10 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 
 /*
 ALGORITHM
+	1. 	Calculate UV Time in Seconds
 	1.  Start UV Light
 	2.  Start Timer
-	3.  Monitor for PAUSE and abort
+	3.  Monitor for PAUSE and abort or completion
 	4.  If Paused then monitor for resumed
 */
 
@@ -100,6 +101,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
+
 	var totalTime, timeElapsed int64
 	var t *time.Timer
 
@@ -112,6 +114,9 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	runInProgress[d.name] = true
 	defer d.ResetRunInProgress()
 
+	//
+	// 1. 	Calculate UV Time in Seconds
+	//
 	totalTime, err = calculateUVTimeInSeconds(uvTime)
 	if err != nil {
 		return "", err
@@ -121,11 +126,24 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	d.SetTimerInProgress()
 	defer d.ResetTimerInProgress()
 
-skipToStartTimer:
-	// start the timer
+skipToStartUVTimer:
+	//
+	// 2. Start UV Light
+	//
+	response, err = d.switchOnUVLight()
+	if err != nil {
+		return
+	}
+
+	//
+	// 3. start the timer
+	//
 	t = time.NewTimer(time.Duration(totalTime) * time.Second)
 	time1 := time.Now()
 	for {
+		//
+		//   Monitor for PAUSE and abort or completion
+		//
 		select {
 		// wait for the timer to finish
 		case n := <-t.C:
@@ -142,6 +160,11 @@ skipToStartTimer:
 			}
 			// if paused then
 			if paused[d.name] {
+				//  Switch off UV Light
+				response, err = d.switchOffUVLight()
+				if err != nil {
+					return
+				}
 				// stop the timer
 				t.Stop()
 				//note the time when paused was hit
@@ -157,14 +180,15 @@ skipToStartTimer:
 					return "SUCCESS", nil
 				}
 				// else wait for the process to be resumed
-				for {
-					time.Sleep(time.Millisecond * 300)
-					if !paused[d.name] {
-						// when resumed go again to timer start
-						goto skipToStartTimer
-					}
-				}
 
+				//
+				// 4.  If Paused then monitor for resumed
+				//
+				response, err = waitUntilResumed(d.name)
+				if err != nil {
+					return
+				}
+				goto skipToStartUVTimer
 			}
 		}
 	}
@@ -172,26 +196,41 @@ skipToStartTimer:
 	return "UV Light Completed Successfully", nil
 }
 
+func waitUntilResumed(deck string) (response string, err error) {
+	for {
+		time.Sleep(time.Millisecond * 300)
+		if !paused[deck] {
+			// when resumed go again to timer start
+			return "Resumed", nil
+		}
+		if aborted[deck] {
+			err = fmt.Errorf("Operation was Aborted!")
+			return "", err
+		}
+	}
+}
+
 func calculateUVTimeInSeconds(uvTime string) (totalTime int64, err error) {
 
+	var hours, minutes, seconds int64
 	timeArr := strings.Split(uvTime, ":")
 	if len(timeArr) != 3 {
 		err = fmt.Errorf("time format isn't of the form HH:MM:SS")
 		return 0, err
 	}
-	hours, err := strconv.ParseInt(timeArr[0], 10, 64)
-	if err != nil || hours > 99 || hours < 0 {
-		err = fmt.Errorf("please check hours format, valid range: [0,99]")
+
+	hours, err = parseIntRange(timeArr[0], "hours", 0, 24)
+	if err != nil {
 		return 0, err
 	}
-	minutes, err := strconv.ParseInt(timeArr[1], 10, 64)
-	if err != nil || minutes > 59 || minutes < 0 {
-		err = fmt.Errorf("please check minutes format, valid range: [0,59]")
+
+	minutes, err = parseIntRange(timeArr[1], "minutes", 0, 59)
+	if err != nil {
 		return 0, err
 	}
-	seconds, err := strconv.ParseInt(timeArr[2], 10, 64)
-	if err != nil || seconds > 59 || seconds < 0 {
-		err = fmt.Errorf("please check seconds format, valid range: [0,59]")
+
+	seconds, err = parseIntRange(timeArr[2], "seconds", 0, 59)
+	if err != nil {
 		return 0, err
 	}
 
@@ -202,5 +241,14 @@ func calculateUVTimeInSeconds(uvTime string) (totalTime int64, err error) {
 		return 0, err
 	}
 
+	return
+}
+
+func parseIntRange(timeString, unit string, min, max int64) (value int64, err error) {
+	value, err = strconv.ParseInt(timeString, 10, 64)
+	if err != nil || value > max || value < min {
+		err = fmt.Errorf("please check %v format, valid range: [%d,%d]", unit, min, max)
+		return 0, err
+	}
 	return
 }
