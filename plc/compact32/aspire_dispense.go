@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
-	"time"
 )
 
 /****ALGORITHM******
@@ -217,7 +216,6 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-	time.Sleep(100 * time.Millisecond)
 
 skipTipUp:
 
@@ -257,7 +255,6 @@ skipTipUp:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to Aspire Source. Error: %v", err)
 	}
-	time.Sleep(100 * time.Millisecond)
 
 skipDeckToSourcePosition:
 
@@ -286,7 +283,6 @@ skipDeckToSourcePosition:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip to deck base. Error: %v", err)
 	}
-	time.Sleep(100 * time.Millisecond)
 
 	//
 	//   13. setup the syringe module motor with aspire height
@@ -299,8 +295,7 @@ skipDeckToSourcePosition:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-	time.Sleep(100 * time.Millisecond)
-
+	
 	//
 	//   14. pickup and drop that asp_mix_vol for number of aspire_cycles
 	//       these cycles should be fast
@@ -322,15 +317,12 @@ skipDeckToSourcePosition:
 			return
 		}
 
-		time.Sleep(100 * time.Millisecond)
-
 		// Dispense
 		// TODO: Call a separate function for this kind of setup, as it only DISPENCING
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
-		time.Sleep(100 * time.Millisecond)
 	}
 skipAspireCycles:
 
@@ -344,8 +336,6 @@ skipAspireCycles:
 	if err != nil {
 		return
 	}
-
-	time.Sleep(100 * time.Millisecond)
 
 	//
 	//   16. move syringe module up slow till just above base
@@ -374,7 +364,6 @@ skipAspireCycles:
 		return
 	}
 
-	time.Sleep(100 * time.Millisecond)
 
 	//********************************
 	// REACHING DISPENSE DESTINATION *
@@ -407,7 +396,6 @@ skipAspireCycles:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to Dispense Destination. Error: %v", err)
 	}
-	time.Sleep(100 * time.Millisecond)
 
 skipDeckToDestinationPosition:
 
@@ -435,7 +423,6 @@ skipDeckToDestinationPosition:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip to deck base. Error: %v", err)
 	}
-	time.Sleep(100 * time.Millisecond)
 
 	//
 	//   20. setup the syringe module motor with dispense height
@@ -447,7 +434,6 @@ skipDeckToDestinationPosition:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-	time.Sleep(100 * time.Millisecond)
 
 	//
 	//   21. pickup and drop that dis_mix_vol for number of dis_cycles
@@ -466,14 +452,11 @@ skipDeckToDestinationPosition:
 			return
 		}
 
-		time.Sleep(100 * time.Millisecond)
-
 		// Aspire
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
-		time.Sleep(100 * time.Millisecond)
 	}
 skipDispenseCycles:
 
@@ -485,8 +468,6 @@ skipDispenseCycles:
 	if err != nil {
 		return
 	}
-
-	time.Sleep(100 * time.Millisecond)
 
 	//
 	//   23. move syringe module up
@@ -517,8 +498,6 @@ skipDispenseCycles:
 	if err != nil {
 		return
 	}
-
-	time.Sleep(100 * time.Millisecond)
 
 	return "ASPIRE and DISPENSE was successful", nil
 }

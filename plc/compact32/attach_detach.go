@@ -15,11 +15,21 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
+		magnetState[d.name] = attached
 		return
 	case "detach":
 		response, err = d.Detach(ad.OperationType)
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
+		}
+
+		// NOTE: Below string literal "semi_detach" is dependent on db schema 
+		// operation_type is its'd db variable
+		// Make sure that db changes are reflected at here as well
+		if ad.OperationType == "semi_detach"{
+			magnetState[d.name] = semiDetached
+		} else {
+			magnetState[d.name] = detached
 		}
 		return
 	}
@@ -329,4 +339,16 @@ skipMagnetDownSecToSourcePosition:
 skipMagnetFwdSecToSourcePosition:
 	return "Success", nil
 
+}
+
+
+func (d *Compact32Deck) fullDetach() (response string, err error) {
+	// Calling AttachDetach below as this handles magnetState implicitly
+	// WARNING: Be careful of below string literals "detach" and "full_detach", 
+	// any changes in db schema of magnets should be reflected in these as well.
+	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType:"full_detach"})
+	if err != nil {
+		fmt.Printf("error in magnet detach process %v \n", err.Error())
+	}
+	return
 }
