@@ -102,7 +102,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
 
-	var totalTime, timeElapsed int64
+	var totalTime, timeElapsed, remainingTime int64
 	var t *time.Timer
 
 	if runInProgress[d.name] {
@@ -121,6 +121,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	if err != nil {
 		return "", err
 	}
+	remainingTime = totalTime
 
 	// set the timer in progress variable to specify that it is not a motor operation.
 	d.SetTimerInProgress()
@@ -138,7 +139,7 @@ skipToStartUVTimer:
 	//
 	// 3. start the timer
 	//
-	t = time.NewTimer(time.Duration(totalTime) * time.Second)
+	t = time.NewTimer(time.Duration(remainingTime) * time.Second)
 	time1 := time.Now()
 	for {
 		//
@@ -170,13 +171,13 @@ skipToStartUVTimer:
 				//note the time when paused was hit
 				time2 := time.Now()
 				// calculate the time elapsed in Seconds
-				timeElapsed = int64(time2.Sub(time1) / time.Second)
+				timeElapsed += int64(time2.Sub(time1) / time.Second)
 				// calculate the remaining time
-				totalTime = totalTime - timeElapsed
+				remainingTime = totalTime - timeElapsed
 
-				logger.Infof("remaining time %v and elapsed time %v", totalTime, timeElapsed)
+				logger.Infof("remaining time %v and elapsed time %v", remainingTime, timeElapsed)
 				// if the remaining time is less than a sec then time is over
-				if totalTime < 2 {
+				if remainingTime < 2 {
 					return "SUCCESS", nil
 				}
 				// else wait for the process to be resumed
