@@ -121,12 +121,17 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	aborted[d.name] = true
 	wrotePulses[d.name] = 0
 	paused[d.name] = false
-	runInProgress[d.name] = false
-	response, err = d.ReadExecutedPulses()
-	if err != nil {
-		fmt.Println("err : ", err)
-		return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")
+
+	// If no runInProgress and timer is in progress, that means no need to read pulses
+	if runInProgress[d.name] && !timerInProgress[d.name] {
+		response, err = d.ReadExecutedPulses()
+		if err != nil {
+			fmt.Println("err : ", err)
+			return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")
+		}
 	}
+	runInProgress[d.name] = false
+	timerInProgress[d.name] = false
 
 	return "ABORT SUCCESS", nil
 }
