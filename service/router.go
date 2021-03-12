@@ -87,5 +87,6 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/run/{id}/{deck:[A-B]}", runRecipeHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/discard-box/cleanup/{deck:[A-B]}", discardBoxCleanupHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/restore-deck/{deck:[A-B]}", restoreDeckHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/uv/{time}/{deck:[A-B]}", uvLightHandler(deps)).Methods(http.MethodGet)
 	return
 }
