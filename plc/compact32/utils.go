@@ -48,6 +48,11 @@ const (
 	minimumMoveDistance = 0.3
 )
 
+// 120 Seconds is the minimum UVLight On Time
+const (
+	minimumUVLightOnTime int64 = 2 * 60
+)
+
 // Special Speeds
 const (
 	homingFastSpeed = uint16(2000)
@@ -89,6 +94,11 @@ var runInProgress = map[string]bool{
 var magnetState = map[string]int{
 	"A": detached,
 	"B": detached,
+}
+
+var timerInProgress = map[string]bool{
+	"A": false,
+	"B": false,
 }
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
