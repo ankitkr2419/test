@@ -74,10 +74,6 @@ var executedPulses = map[string]uint16{
 	"A": 0,
 	"B": 0,
 }
-var sensorHasCut = map[string]bool{
-	"A": false,
-	"B": false,
-}
 var aborted = map[string]bool{
 	"A": false,
 	"B": false,

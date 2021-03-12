@@ -22,7 +22,6 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 		return
 	}
 	aborted[d.name] = false
-	sensorHasCut[d.name] = false
 	runInProgress[d.name] = true
 	defer d.ResetRunInProgress()
 
@@ -61,7 +60,6 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
-	sensorHasCut[d.name] = false
 	aborted[d.name] = false
 	runInProgress[d.name] = true
 	defer d.ResetRunInProgress()

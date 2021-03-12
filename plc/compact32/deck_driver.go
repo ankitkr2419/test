@@ -164,7 +164,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 					fmt.Println("Sensor err : ", err, d.name)
 					return "", err
 				}
-				sensorHasCut[d.name] = true
 				positions[deckAndNumber] = calibs[deckAndNumber]
 				fmt.Println("pos", positions[deckAndNumber])
 				return

@@ -11,7 +11,6 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
-	sensorHasCut[d.name] = false
 	aborted[d.name] = false
 	runInProgress[d.name] = true
 	defer d.ResetRunInProgress()
