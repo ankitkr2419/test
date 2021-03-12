@@ -66,9 +66,9 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelBack > 0.1:
+	case distanceToTravelBack > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelBack < -0.1:
+	case distanceToTravelBack < (minimumMoveDistance * -1):
 		distanceToTravelBack *= -1
 		direction = 0
 	default:
@@ -104,9 +104,9 @@ skipMagnetBackToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelUp > 0.1:
+	case distanceToTravelUp > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelUp < -0.1:
+	case distanceToTravelUp < (minimumMoveDistance * -1):
 		distanceToTravelUp *= -1
 		direction = 0
 	default:
@@ -136,9 +136,9 @@ skipMagnetbackSecPosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelBack > 0.1:
+	case distanceToTravelBack > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelBack < -0.1:
+	case distanceToTravelBack < (minimumMoveDistance * -1):
 		distanceToTravelBack *= -1
 		direction = 0
 	default:
@@ -191,9 +191,9 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	distToTravel := positions[deckAndNumber] - deckPosition
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0.1:
+	case distToTravel > minimumMoveDistance:
 		direction = 1
-	case distToTravel < -0.1:
+	case distToTravel < (minimumMoveDistance * -1):
 		distToTravel *= -1
 		direction = 0
 	default:
@@ -223,9 +223,9 @@ skipDeckToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelDown > 0.1:
+	case distanceToTravelDown > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelDown < -0.1:
+	case distanceToTravelDown < (minimumMoveDistance * -1):
 		distanceToTravelDown *= -1
 		direction = 0
 	default:
@@ -255,9 +255,9 @@ skipMagnetDownToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelFwd > 0.1:
+	case distanceToTravelFwd > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelFwd < -0.1:
+	case distanceToTravelFwd < (minimumMoveDistance * -1):
 		distanceToTravelFwd *= -1
 		direction = 0
 	default:
@@ -287,9 +287,9 @@ skipMagnetFwdToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelDown > 0.1:
+	case distanceToTravelDown > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelDown < -0.1:
+	case distanceToTravelDown < (minimumMoveDistance * -1):
 		distanceToTravelDown *= -1
 		direction = 0
 	default:
@@ -318,9 +318,9 @@ skipMagnetDownSecToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelFwd > 0.1:
+	case distanceToTravelFwd > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelFwd < -0.1:
+	case distanceToTravelFwd < (minimumMoveDistance * -1):
 		distanceToTravelFwd *= -1
 		direction = 0
 	default:

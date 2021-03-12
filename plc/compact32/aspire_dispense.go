@@ -199,9 +199,9 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0.1:
+	case distToTravel > minimumMoveDistance:
 		direction = 1
-	case distToTravel < -0.1:
+	case distToTravel < (minimumMoveDistance * -1):
 		distToTravel *= -1
 		direction = 0
 	default:
@@ -230,9 +230,9 @@ skipTipUp:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0.1:
+	case distToTravel > minimumMoveDistance:
 		direction = 1
-	case distToTravel < -0.1:
+	case distToTravel < (minimumMoveDistance * -1):
 		distToTravel *= -1
 		direction = 0
 	default:
@@ -379,9 +379,9 @@ skipAspireCycles:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0.1:
+	case distToTravel > minimumMoveDistance:
 		direction = 1
-	case distToTravel < -0.1:
+	case distToTravel < (minimumMoveDistance * -1):
 		distToTravel *= -1
 		direction = 0
 	default:
