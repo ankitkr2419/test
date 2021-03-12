@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -30,32 +30,41 @@ const OperatorLoginForm = styled.div`
 
 
 const OperatorLoginModal = (props) => {
+
+	const { 
+		operatorLoginModalOpen,
+		toggleOperatorLoginModal,
+		handleEmailChange,
+		handlePasswordChange,
+		handleLoginButtonClick
+	} = props;
+
 	//const { confirmationText, isOpen, confirmationClickHandler } = props;
 
 	// const toggleModal = () => {};
 	// Operator Login Modal
-	const [operatorLoginModal, setOperatorLoginModal] = useState(false);
-	const toggleOperatorLoginModal = () => setOperatorLoginModal(!operatorLoginModal);
+	// const [operatorLoginModal, setOperatorLoginModal] = useState(false);
+	// const toggleOperatorLoginModal = () => setOperatorLoginModal(!operatorLoginModal);
 	return (
 		<>
 		{/* Operator Login Modal */}
-		  <Button color="primary" onClick={toggleOperatorLoginModal}>Operator Login</Button>
-				<Modal isOpen={operatorLoginModal} toggle={toggleOperatorLoginModal} centered size="sm">
-				<ModalBody>
-					<Text Tag="h4" size="24" className="text-center text-primary mb-4">
-						Welcome
-					</Text>
-					<ButtonIcon
-						position="absolute"
-						placement="right"
-						top={16}
-						right={16}
-						size={36}
-						name="cross"
-						onClick={toggleOperatorLoginModal}
-						className="border-0"
-					/>
-					<Form>
+		{/* <Button color="primary" onClick={toggleOperatorLoginModal}>Operator Login</Button> */}
+		<Modal isOpen={operatorLoginModalOpen} toggle={toggleOperatorLoginModal} centered size="sm">
+			<ModalBody>
+				<Text Tag="h4" size="24" className="text-center text-primary mb-4">
+					Welcome
+				</Text>
+				<ButtonIcon
+					position="absolute"
+					placement="right"
+					top={16}
+					right={16}
+					size={36}
+					name="cross"
+					onClick={toggleOperatorLoginModal}
+					className="border-0"
+				/>
+				<Form>
 					<OperatorLoginForm className="col-10 mx-auto">
 						<Row>
 							<Col>
@@ -67,14 +76,16 @@ const OperatorLoginModal = (props) => {
 											name='username'
 											id='username'
 											placeholder='Type here'
-											value=""
+											onChange={handleEmailChange}
+											// value=""
 										/>
 										<FormError>Incorrect username</FormError>
 									</Col>
 								</FormGroup>
 							</Col>
-							</Row>
-							<Row>
+						</Row>
+					
+						<Row>
 							<Col>
 								<FormGroup row className="has-border-left d-flex align-items-center">
 									<Label for='password' sm={3}>Password</Label>
@@ -84,25 +95,31 @@ const OperatorLoginModal = (props) => {
 											name='password'
 											id='password'
 											placeholder='Type here'
-											value=""
+											onChange={handlePasswordChange}
+											// value=""
 										/>
 										<FormError>Incorrect password</FormError>
 									</Col>
 								</FormGroup>
 							</Col>
 						</Row>
+					
 						<Center className='my-3'>
-							<Button color='primary'>
+							<Button 
+								color='primary'
+								onClick={handleLoginButtonClick}
+							>
 								Login
 							</Button>
 						</Center>
+					
 						<Center>
 							<a href="!#" className="link">
 								Forgot username or password?
 							</a> 
 						</Center>
 					</OperatorLoginForm>
-					</Form>
+				</Form>
 			</ModalBody>
 		</Modal>
 		</>

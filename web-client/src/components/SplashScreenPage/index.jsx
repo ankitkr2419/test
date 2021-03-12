@@ -49,7 +49,7 @@ const SplashScreenComponent = (props) => {
 					/>
 			</div>
 			{/* Homing Confirmation Popup */}
-      <Button color="danger" onClick={toggle}>Alert pop up2</Button>
+      		<Button color="danger" onClick={toggle}>Alert pop up2</Button>
 				<Modal isOpen={modal} toggle={toggle} centered size="sm">
 					<ModalBody className="p-0">
 						<OptionBox className="p-5">

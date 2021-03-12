@@ -9,6 +9,7 @@ import {
 } from 'core-components';
 import ActionButton from "./ActionButton";
 import { Progress } from 'reactstrap';
+import OperatorLoginModalContainer from 'containers/OperatorLoginModalContainer';
 
 const DeckCardBox = styled.div`
   width: 32rem;
@@ -92,6 +93,12 @@ const CardOverlay= styled.div`
 	cursor: pointer;
 `;
 const DeckCard = (props) => {
+
+	const {
+        operatorLoginModalOpen,
+        toggleOperatorLoginModal
+    } = props;
+
 	return (
 		<DeckCardBox className="d-flex justify-content-start align-items-center">
 			<CardOverlay />
@@ -103,7 +110,7 @@ const DeckCard = (props) => {
 				<div className="d-none1">
 					{/* <div className="uv-light-button">
 						<ActionButton/>
-					</div> */}
+					</div>  */}
 					<div className="resume-button">
 						<ActionButton/>
 					</div>
@@ -118,10 +125,16 @@ const DeckCard = (props) => {
 				</div>
 				<Button
 					color="primary"
-					className="ml-auto d-none"
+					className="ml-auto d-flex"
 					size="sm"
-				>	Login       
+					onClick={toggleOperatorLoginModal}
+				>	Login
 				</Button>
+
+				<OperatorLoginModalContainer 
+					operatorLoginModalOpen={operatorLoginModalOpen}
+					toggleOperatorLoginModal={toggleOperatorLoginModal}
+				/>
 				
 				</div>
 				<Progress value="2" className="custom-progress-bar"/>
