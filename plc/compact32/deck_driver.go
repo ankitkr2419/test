@@ -209,6 +209,30 @@ func (d *Compact32Deck) SwitchOffHeater() (response string, err error) {
 	return "SUCCESS", nil
 }
 
+func (d *Compact32Deck) switchOnUVLight() (response string, err error) {
+
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][6], ON)
+	if err != nil {
+		fmt.Println("err Switching on the UV Light: ", err)
+		return "", err
+	}
+	fmt.Println("Switched on the UV Light--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
+
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][6], OFF)
+	if err != nil {
+		fmt.Println("err Switching off the UV Light: ", err)
+		return "", err
+	}
+	fmt.Println("Switched off the UV Light--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
 func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
 
 	results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][212], uint16(1))
