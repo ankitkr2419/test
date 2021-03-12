@@ -237,7 +237,7 @@ func calculateUVTimeInSeconds(uvTime string) (totalTime int64, err error) {
 	totalTime = hours*60*60 + minutes*60 + seconds
 
 	if totalTime < minimumUVLightOnTime {
-		err = fmt.Errorf("please check your time. minimum time is : ", minimumUVLightOnTime, " seconds")
+		err = fmt.Errorf("please check your time. minimum time is : %v seconds", minimumUVLightOnTime)
 		return 0, err
 	}
 
