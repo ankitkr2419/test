@@ -43,6 +43,11 @@ const (
 	finalSensorCutPulses                = uint16(2999)
 )
 
+// minimum Distance for Any motor movement
+const(
+	minimumMoveDistance = 0.1
+)
+
 // Special Speeds
 const (
 	homingFastSpeed = uint16(2000)
