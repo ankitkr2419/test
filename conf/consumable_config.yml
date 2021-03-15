@@ -198,7 +198,7 @@ ConsumableDistance:
     description: "This field sets the down height for the magnet first step attach"
   - id: 604
     name: "magnet_forward_step_1"
-    distance: 12.5
+    distance: 10.5
     description: "This field sets the forward distance for the magnet attach"
   - id: 605
     name: "magnet_down_step_2"
@@ -206,7 +206,7 @@ ConsumableDistance:
     description: "This field sets the down height for the magnet second step attach"
   - id: 606
     name: "magnet_forward_step_2"
-    distance: 5.5
+    distance: 3.5
     description: "This field sets the forward distance for the magnet second step attach"
   - id: 607
     name: "magnet_backward_step_1"
