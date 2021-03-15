@@ -149,6 +149,11 @@ skipToStartUVTimer:
 		// wait for the timer to finish
 		case n := <-t.C:
 			fmt.Printf("delay time over %v", n)
+			//  Switch off UV Light
+			response, err = d.switchOffUVLight()
+			if err != nil {
+				return
+			}
 			return "SUCCESS", nil
 		// or check for its pause/abort
 		default:
