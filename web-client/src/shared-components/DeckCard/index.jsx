@@ -54,9 +54,13 @@ const DeckCardBox = styled.div`
 		}
 		.custom-progress-bar{
 			border-radius:7px;
-			background-color:#B2DAD1;
+			background-color:#B2DAD131;
+			border: 2px solid #B2DAD131;
 			.progress-bar{
-				background-color:#10907A;
+				//background-color:#10907A;
+				border-radius:7px 0px 0px 7px;
+				background-color:#72B5E6;
+				animation: blink 1s linear infinite;
 			}
 		}
 		// .uv-light-button{
@@ -75,13 +79,23 @@ const DeckCardBox = styled.div`
 			top:0;
 		}
 	}
-
+	@keyframes blink{
+		0%{
+			background-color:#9D9D9D;
+		}
+		50%{
+			background-color:#72B5E6;
+		}
+		100%{
+			background-color:#9D9D9D;
+		}
+	}
 `;
 
 const CardOverlay= styled.div`
 	position: absolute;
 	display: none;
-	width: 32rem;
+	width: 50%;
 	height: 6.625rem;
 	top: 0;
 	left: 0;
@@ -113,7 +127,11 @@ const DeckCard = (props) => {
 					
 					<div className="d-none1">
 						<Text Tag="h5" className="mb-2">Recipe Name</Text>
-						<Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
+						{/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text> */}
+						<Text Tag="label" className="mb-1">
+							<Text Tag="span"> 1 Hr </Text>
+							<Text Tag="span">8 min remaining</Text>
+							</Text>
 					</div>
 				</div>
 				<Button
@@ -124,7 +142,7 @@ const DeckCard = (props) => {
 				</Button>
 				
 				</div>
-				<Progress value="2" className="custom-progress-bar"/>
+				<Progress value="50" className="custom-progress-bar"/>
 			</div>
 		</DeckCardBox>
 	);

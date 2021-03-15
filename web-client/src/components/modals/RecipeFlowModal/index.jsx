@@ -95,7 +95,7 @@ const RecipeFlowModal = (props) => {
 				onClick={toggle}
 			/>
       <Modal
-				isOpen={true}
+				isOpen={false}
 				toggle={toggle}
 				centered
 				size='lg'
