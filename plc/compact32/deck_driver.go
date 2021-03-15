@@ -92,19 +92,14 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		time.Sleep(400 * time.Millisecond)
 	}
 
+	// Switching Motor ON
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
 	if err != nil {
 		fmt.Println("error Writing On/Off : ", err, d.name)
 		return "", err
 	}
 
-	results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][0], uint16(1))
-	if err != nil {
-		fmt.Println("error Reading On/Off : ", err, d.name)
-		return "", err
-	}
-	fmt.Printf("Read On/Off Coil. res : %+v \n", results)
-
+	// Our Run is in Progress
 	fmt.Println("Blocked")
 
 	for {
