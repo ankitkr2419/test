@@ -105,7 +105,7 @@ ConsumableDistance:
     description: "swap or blood or other sample holding tube"
   - id: 152
     name: "shaker_tube"
-    distance: 97.76
+    distance: 100
     description: "tube for performing shaking and also heating, also known as reaction tube."
   - id: 153
     name: "extraction_collection_tube"
