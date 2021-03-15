@@ -36,7 +36,8 @@ const OperatorLoginModal = (props) => {
 		toggleOperatorLoginModal,
 		handleEmailChange,
 		handlePasswordChange,
-		handleLoginButtonClick
+		handleLoginButtonClick,
+		authData
 	} = props;
 
 	//const { confirmationText, isOpen, confirmationClickHandler } = props;
@@ -77,7 +78,7 @@ const OperatorLoginModal = (props) => {
 											id='username'
 											placeholder='Type here'
 											onChange={handleEmailChange}
-											// value=""
+											invalid={authData.email.invalid}
 										/>
 										<FormError>Incorrect username</FormError>
 									</Col>
@@ -96,7 +97,7 @@ const OperatorLoginModal = (props) => {
 											id='password'
 											placeholder='Type here'
 											onChange={handlePasswordChange}
-											// value=""
+											invalid={authData.password.invalid}
 										/>
 										<FormError>Incorrect password</FormError>
 									</Col>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import DeckCard from 'shared-components/DeckCard';
 
 const DeckCardContainer = (props) => {
-    const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(true);
+    const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
     const toggleOperatorLoginModal = () => setOperatorLoginModalOpen(!operatorLoginModalOpen);
     
     return(
