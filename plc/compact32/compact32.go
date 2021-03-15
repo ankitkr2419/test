@@ -115,7 +115,7 @@ func NewCompact32DeckDriverA(exit chan error, test bool) (plc.DeckDriver, *modbu
 	handler.Parity = "E"
 	handler.StopBits = 1
 	handler.SlaveId = byte(1)
-	handler.Timeout = 50 * time.Millisecond
+	handler.Timeout = 200 * time.Millisecond
 
 	handler.Connect()
 	driver := Compact32ModbusDriver{}
@@ -138,7 +138,7 @@ func NewCompact32DeckDriverB(exit chan error, test bool, handler *modbus.RTUClie
 	handler2.Parity = "E"
 	handler2.StopBits = 1
 	handler2.SlaveId = byte(2)
-	handler2.Timeout = 50 * time.Millisecond
+	handler2.Timeout = 200 * time.Millisecond
 
 	handler2.Connect()
 	driver := Compact32ModbusDriver{}

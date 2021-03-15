@@ -110,7 +110,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
-		time.Sleep(200 * time.Millisecond)
+		// time.Sleep(200 * time.Millisecond)
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
 		if err != nil {
 			fmt.Println("error while reading completion  : ", err, d.name)
