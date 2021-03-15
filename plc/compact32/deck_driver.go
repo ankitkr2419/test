@@ -20,7 +20,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "", err
 	}
 
-	// 
+	//
 	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
 	//
 	if magnetState[d.name] != detached && motorNum == K5_Deck {
@@ -30,8 +30,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck. Error: %v", err)
 		}
 	}
- 
-	
 
 	fmt.Println("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction)
 
