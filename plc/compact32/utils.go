@@ -44,8 +44,8 @@ const (
 )
 
 // minimum Distance for Any motor movement
-const(
-	minimumMoveDistance = 0.1
+const (
+	minimumMoveDistance = 0.3
 )
 
 // Special Speeds
@@ -55,7 +55,7 @@ const (
 )
 
 // Magnet States
-const(
+const (
 	detached = iota
 	semiDetached
 	attached
