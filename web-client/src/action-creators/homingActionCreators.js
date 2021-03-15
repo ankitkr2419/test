@@ -1,5 +1,6 @@
 import {
-  homingActions
+  homingActions,
+  deckHomingActions
 } from "actions/homingActions";
 
 export const homingActionInitiated = () => ({
@@ -19,4 +20,23 @@ export const homingActionFailed = (serverErrors) => ({
   payload: {
     serverErrors
   }
-})
+});
+
+export const deckHomingActionInitiated = (params) => ({
+  type: deckHomingActions.deckHomingActionInitiated,
+  payload: {
+    params
+  }
+});
+
+export const deckHomingActionSuccess = () => ({
+  type: deckHomingActions.deckHomingActionSuccess,
+  payload: {}
+});
+
+export const deckHomingActionFailed = (serverErrors) => ({
+  type: deckHomingActions.deckHomingActionFailed,
+  payload: {
+    serverErrors
+  }
+});
