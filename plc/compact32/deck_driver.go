@@ -20,7 +20,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "", err
 	}
 
-	// 
+	//
 	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
 	//
 	if magnetState[d.name] != detached && motorNum == K5_Deck {
@@ -30,8 +30,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck. Error: %v", err)
 		}
 	}
- 
-	
 
 	fmt.Println("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction)
 
@@ -94,19 +92,14 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		time.Sleep(400 * time.Millisecond)
 	}
 
+	// Switching Motor ON
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
 	if err != nil {
 		fmt.Println("error Writing On/Off : ", err, d.name)
 		return "", err
 	}
 
-	results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][0], uint16(1))
-	if err != nil {
-		fmt.Println("error Reading On/Off : ", err, d.name)
-		return "", err
-	}
-	fmt.Printf("Read On/Off Coil. res : %+v \n", results)
-
+	// Our Run is in Progress
 	fmt.Println("Blocked")
 
 	for {
@@ -117,7 +110,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
-		time.Sleep(200 * time.Millisecond)
+		// time.Sleep(200 * time.Millisecond)
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
 		if err != nil {
 			fmt.Println("error while reading completion  : ", err, d.name)

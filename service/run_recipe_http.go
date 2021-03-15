@@ -193,10 +193,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			if err != nil {
 				return "", err
 			}
-			response, err = deps.PlcDeck[deck].AddDelay(delay)
-			if err != nil {
-				return "", err
-			}
+			fmt.Print(delay)
+			// response, err = deps.PlcDeck[deck].AddDelay(delay)
+			// if err != nil {
+			// return "", err
+			// }
 
 		}
 		// TODO: Instead of switch case, try using reflect

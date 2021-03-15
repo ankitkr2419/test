@@ -23,10 +23,10 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
 
-		// NOTE: Below string literal "semi_detach" is dependent on db schema 
+		// NOTE: Below string literal "semi_detach" is dependent on db schema
 		// operation_type is its'd db variable
 		// Make sure that db changes are reflected at here as well
-		if ad.OperationType == "semi_detach"{
+		if ad.OperationType == "semi_detach" {
 			magnetState[d.name] = semiDetached
 		} else {
 			magnetState[d.name] = detached
@@ -182,8 +182,10 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 	// get the consumable deck position
 
-	if deckPosition, ok = consDistance["deck_move_for_magnet_attach"]; !ok {
-		err = fmt.Errorf("deck_move_for_magnet_attach doesn't exist for consuamble distances")
+	// deck will be at this position from homing for attach or detach operation
+	// We are using shaker_tube to maintain consistency
+	if deckPosition, ok = consDistance["shaker_tube"]; !ok {
+		err = fmt.Errorf("shaker_tube doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -341,12 +343,11 @@ skipMagnetFwdSecToSourcePosition:
 
 }
 
-
 func (d *Compact32Deck) fullDetach() (response string, err error) {
 	// Calling AttachDetach below as this handles magnetState implicitly
-	// WARNING: Be careful of below string literals "detach" and "full_detach", 
+	// WARNING: Be careful of below string literals "detach" and "full_detach",
 	// any changes in db schema of magnets should be reflected in these as well.
-	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType:"full_detach"})
+	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType: "full_detach"})
 	if err != nil {
 		fmt.Printf("error in magnet detach process %v \n", err.Error())
 	}
