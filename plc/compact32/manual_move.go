@@ -117,6 +117,12 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return "", err
 	}
 
+	//  Switch off UV Light
+	response, err = d.switchOffUVLight()
+	if err != nil {
+		return
+	}
+
 	aborted[d.name] = true
 	wrotePulses[d.name] = 0
 	paused[d.name] = false
@@ -129,6 +135,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 			return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")
 		}
 	}
+
 	runInProgress[d.name] = false
 	timerInProgress[d.name] = false
 
