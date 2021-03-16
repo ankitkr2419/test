@@ -42,6 +42,7 @@ import { fetchSamplesSaga } from './samplesSaga';
 import { addWellsSaga, fetchWellsSaga } from './wellSaga';
 import { runExperimentSaga, stopExperimentSaga } from './runExperimentSaga';
 import { fetchActiveWellsSaga } from './actionWellSaga';
+import { operatorLoginModalSaga } from 'sagas/operatorLoginModalSaga';
 
 const allSagas = [
 	createTemplateSaga(),
@@ -69,6 +70,7 @@ const allSagas = [
 	runExperimentSaga(),
 	stopExperimentSaga(),
 	fetchActiveWellsSaga(),
+	operatorLoginModalSaga(),
 ];
 
 export default function* rootSaga() {

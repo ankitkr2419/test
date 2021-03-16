@@ -35,6 +35,7 @@ import { wellGraphReducer } from 'reducers/wellGraphReducer';
 import { socketReducer } from 'reducers/socketReducer';
 import { modalReducer } from 'reducers/modalReducer';
 import { temperatureGraphReducer } from 'reducers/temperatureGraphReducer';
+import { operatorLoginModalReducer } from 'reducers/operatorLoginModalReducer';
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -65,6 +66,7 @@ const rootReducer = combineReducers({
 	socketReducer,
 	modalReducer,
 	temperatureGraphReducer,
+	operatorLoginModalReducer,
 });
 
 export default rootReducer;

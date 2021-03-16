@@ -1,11 +1,20 @@
-import React, {useReducer, useCallback} from 'react';
+import React, { useReducer } from 'react';
 
 import {reducer, initialState, authDataStateActions} from "components/modals/OperatorLoginModal/state"
 import {EMAIL_REGEX, PASSWORD_REGEX} from "components/modals/OperatorLoginModal/constants"
-
 import OperatorLoginModal from 'components/modals/OperatorLoginModal';
 
+import { operatorLoginInitiated } from 'action-creators/operatorLoginModalActionCreators';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { Redirect } from 'react-router';
+
 const OperatorLoginModalContainer = (props) => {
+
+    const {
+        operatorLoginModalOpen,
+        toggleOperatorLoginModal
+    } = props;
 
     const {
         SET_EMAIL,
@@ -14,27 +23,28 @@ const OperatorLoginModalContainer = (props) => {
         SET_PASSWORD_INVALID,
     } = authDataStateActions;
 
-    const {
-        operatorLoginModalOpen,
-        toggleOperatorLoginModal
-    } = props;
-    
+    const dispatch = useDispatch();
+    const operatorLoginModalReducer = useSelector((state) => state.operatorLoginModalReducer);
+    const { isOperatorLoggedIn, error } = operatorLoginModalReducer.toJS();
+
     const [authData, setAuthData] = useReducer(reducer, initialState);
 
     //change local state value of email
-    const handleEmailChange = useCallback((event) => {
+    const handleEmailChange = (event) => {
         const email = event.target.value;
         setAuthData({ type:SET_EMAIL, payload:{value:email} });
-    }, [SET_EMAIL]);
+        setAuthData({type:SET_EMAIL_INVALID, payload:{invalid:false}});
+    };
     
     //change local state value of password
-    const handlePasswordChange = useCallback((event) => {
+    const handlePasswordChange = (event) => {
         const password = event.target.value;
         setAuthData({ type:SET_PASSWORD, payload:{value:password} });
-    }, [SET_PASSWORD]);
+        setAuthData({type:SET_PASSWORD_INVALID, payload:{invalid:false}});
+    };
     
     //email and password validation and setting local state
-    const handleLoginButtonClick = useCallback(() => {
+    const handleLoginButtonClick = () => {
         const email = authData.email.value;
         const password = authData.password.value;
 
@@ -43,7 +53,15 @@ const OperatorLoginModalContainer = (props) => {
         
         setAuthData({type:SET_EMAIL_INVALID, payload:{invalid:invalidEmail}});
         setAuthData({type:SET_PASSWORD_INVALID, payload:{invalid:invalidPassword}});
-    }, [authData, SET_EMAIL_INVALID, SET_PASSWORD_INVALID]);
+
+        if(!invalidEmail && !invalidPassword){
+            dispatch(operatorLoginInitiated({email:email, password: password, role: "admin"}));
+        }
+    }   
+
+    if (isOperatorLoggedIn && !error) {
+        return <Redirect to="/plate"/>
+    }
 
     return(
         <OperatorLoginModal 
