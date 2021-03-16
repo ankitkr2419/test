@@ -210,7 +210,7 @@ ConsumableDistance:
     description: "This field sets the forward distance for the magnet second step attach"
   - id: 607
     name: "magnet_backward_step_1"
-    distance: 12.5
+    distance: 10.5
     description: "This field sets the backward distance for the magnet first step Detach"
   - id: 608
     name: "magnet_up_step_1"
