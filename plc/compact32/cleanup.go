@@ -17,12 +17,16 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
 
-	if runInProgress[d.name] {
-		err = fmt.Errorf("previous run is already in progress... wait or abort it")
+	if temp, ok := runInProgress.Load(d.name); !ok {
+		err = fmt.Errorf("runInProgress isn't loaded!")
 		return
+	} else if temp.(bool) {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return 
 	}
-	aborted[d.name] = false
-	runInProgress[d.name] = true
+
+	aborted.Store(d.name, false)
+	runInProgress.Store(d.name ,true)
 	defer d.ResetRunInProgress()
 
 	fmt.Println("Deck is moving to discard_box_open_position")
@@ -56,12 +60,17 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
 
-	if runInProgress[d.name] {
+
+	if temp, ok := runInProgress.Load(d.name); !ok {
+		err = fmt.Errorf("runInProgress isn't loaded!")
+		return
+	} else if temp.(bool) {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
-	aborted[d.name] = false
-	runInProgress[d.name] = true
+
+	aborted.Store(d.name, false)
+	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
 	fmt.Println("Deck is moving to deck_start")
@@ -105,13 +114,16 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	var totalTime, timeElapsed, remainingTime int64
 	var t *time.Timer
 
-	if runInProgress[d.name] {
+	if temp, ok := runInProgress.Load(d.name); !ok {
+		err = fmt.Errorf("runInProgress isn't loaded!")
+		return
+	} else if temp.(bool) {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
 
-	aborted[d.name] = false
-	runInProgress[d.name] = true
+	aborted.Store(d.name, false)
+	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
 	//
@@ -159,13 +171,20 @@ skipToStartUVTimer:
 		default:
 			// delay of 300 ms to reduce CPU usage
 			time.Sleep(time.Millisecond * 300)
-			if aborted[d.name] {
+			if temp, ok := aborted.Load(d.name); !ok {
+				err = fmt.Errorf("aborted isn't loaded!")
+				return
+			} else if temp.(bool) {
 				t.Stop()
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}
+
 			// if paused then
-			if paused[d.name] {
+			if temp, ok := paused.Load(d.name); !ok {
+				err = fmt.Errorf("paused isn't loaded!")
+				return
+			} else if temp.(bool) {
 				//  Switch off UV Light
 				response, err = d.switchOffUVLight()
 				if err != nil {
@@ -205,11 +224,18 @@ skipToStartUVTimer:
 func waitUntilResumed(deck string) (response string, err error) {
 	for {
 		time.Sleep(time.Millisecond * 300)
-		if !paused[deck] {
+		if temp, ok := paused.Load(deck); !ok {
+			err = fmt.Errorf("paused isn't loaded!")
+			return
+		} else if !temp.(bool) {
 			// when resumed go again to timer start
 			return "Resumed", nil
 		}
-		if aborted[deck] {
+
+		if temp, ok := aborted.Load(deck); !ok {
+			err = fmt.Errorf("aborted isn't loaded!")
+			return 
+		} else if temp.(bool) {
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err
 		}
