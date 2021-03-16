@@ -16,7 +16,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	var results []byte
 
 	if aborted[d.name] {
-		err := fmt.Errorf("Machine in ABORTED STATE")
+		err := fmt.Errorf("Machine in ABORTED STATE for deck: %v", d.name)
 		return "", err
 	}
 
@@ -31,7 +31,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 	}
 
-	fmt.Println("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction)
+	fmt.Println("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
 
 	// Switch OFF The motor
 
@@ -85,7 +85,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// Check if User has paused the run/operation
 	for {
 		if paused[d.name] {
-			fmt.Println("Machine in PAUSED state")
+			fmt.Println("Machine in PAUSED state for deck: %v", d.name)
 		} else {
 			break
 		}
@@ -100,7 +100,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	}
 
 	// Our Run is in Progress
-	fmt.Println("Blocked")
+	fmt.Println("Movements in Progress for deck: ", d.name)
 
 	for {
 		if aborted[d.name] {
@@ -121,7 +121,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
-				fmt.Println("Completion returned ---> ", results)
+				fmt.Println("Completion returned ---> ", results, d.name)
 				response, err = d.SwitchOffMotor()
 				if err != nil {
 					fmt.Println("err: from setUp--> ", err, d.name)
@@ -136,14 +136,14 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				case FWD:
 					if (positions[deckAndNumber] - distanceMoved) < 0 {
 						positions[deckAndNumber] = 0
-						fmt.Println("Motor Just moved to negative distance!")
+						fmt.Println("Motor Just moved to negative distance for deck: ", d.name)
 					}
 					positions[deckAndNumber] -= distanceMoved
 				default:
 					fmt.Println("Unknown Direction was found")
 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
 				}
-				fmt.Println("pos", positions[deckAndNumber])
+				fmt.Println("pos", positions[deckAndNumber], d.name)
 				return "RUN Completed", nil
 			}
 		}
@@ -157,17 +157,17 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return "", err
 		}
 
-		fmt.Println("Sensor returned ---> ", results)
+		fmt.Println("Sensor returned ---> ", results, d.name)
 		if len(results) > 0 {
 			if int(results[0]) == sensorCut {
-				fmt.Println("Sensor returned ---> ", results[0])
+				fmt.Println("Sensor returned ---> ", results[0], d.name)
 				response, err = d.SwitchOffMotor()
 				if err != nil {
 					fmt.Println("Sensor err : ", err, d.name)
 					return "", err
 				}
 				positions[deckAndNumber] = calibs[deckAndNumber]
-				fmt.Println("pos", positions[deckAndNumber])
+				fmt.Println("pos", positions[deckAndNumber], d.name)
 				return
 			}
 		}
