@@ -46,6 +46,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 */
 func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
 
+	// TODO: Check if already detached, then avoid all below claculations
 	var magnetBackPosition, magnetUpPosition float64
 	var ok bool
 	var direction, pulses uint16
@@ -169,6 +170,7 @@ skipMagnetToSuccessPosition:
 */
 func (d *Compact32Deck) Attach(operationType string) (response string, err error) {
 
+	// TODO: Check if already attached, then avoid all below claculations
 	var deckPosition, magnetDownFirstPosition, magnetFwdFirstPosition, magnetDownSecPosition, magnetFwdSecPosition float64
 	var ok bool
 	var direction, pulses uint16
