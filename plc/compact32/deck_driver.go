@@ -114,8 +114,9 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
 		if err != nil {
 			fmt.Println("error while reading completion  : ", err, d.name)
-			time.Sleep(100 * time.Millisecond)
-			// Making this more tolerant, thus not returning from here
+			// time.Sleep(100 * time.Millisecond)
+			// Let this reading failure be intolerant
+			return
 		}
 
 		if len(results) > 0 {
@@ -124,6 +125,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 				response, err = d.SwitchOffMotor()
 				if err != nil {
 					fmt.Println("err: from setUp--> ", err, d.name)
+					return
 				}
 				distanceMoved := float64(pulse) / float64(motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
 				switch direction {
