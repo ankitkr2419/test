@@ -9,8 +9,8 @@ import (
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
-	wrotePulses[d.name] = 0
-	executedPulses[d.name] = 0
+	wrotePulses.Store(d.name,  0)
+	executedPulses.Store(d.name, 0)
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
 
 	var results []byte
@@ -53,7 +53,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "", err
 	}
 	fmt.Println("Wrote Pulse. res : ", results)
-	wrotePulses[d.name] = pulse
+	wrotePulses.Store(d.name, pulse)
 
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][200], speed)
 	if err != nil {

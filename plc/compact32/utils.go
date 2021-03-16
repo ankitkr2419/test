@@ -3,6 +3,7 @@ package compact32
 import (
 	"fmt"
 	"mylab/cpagent/db"
+	"sync"
 )
 
 type DeckNumber struct {
@@ -66,6 +67,9 @@ const (
 	attached
 )
 
+var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress sync.Map
+
+/*
 var wrotePulses = map[string]uint16{
 	"A": 0,
 	"B": 0,
@@ -96,6 +100,7 @@ var timerInProgress = map[string]bool{
 	"A": false,
 	"B": false,
 }
+*/
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
 var positions = map[DeckNumber]float64{
