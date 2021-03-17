@@ -332,8 +332,7 @@ func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (
 		 }
 	}
 
-	// TODO: Remove this
-	logger.Infoln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
+	logger.Debugln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
 
 	createdProcess, err := store.CreatePiercing(context.Background(), p)
 	if err != nil {
