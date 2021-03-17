@@ -1,58 +1,56 @@
 package db
 
-import(
-	// "database/sql"
+import (
 	"os"
-	// "github.com/jmoiron/sqlx"
 	"context"
-	"strings"
-	"strconv"
-	"time"
-	"fmt"
 	"encoding/csv"
-	"io"
+	"fmt"
 	"github.com/google/uuid"
+	"io"
+	"strconv"
+	"strings"
+	"time"
 
 	_ "github.com/lib/pq"
 	logger "github.com/sirupsen/logrus"
-
 )
 
 var sequenceNumber int64 = 0
 var createdRecipe Recipe
-// done will help us clean up
-var done bool 
 
-func ImportCSV(recipeName, csvPath string) (err error){
+// done will help us clean up
+var done bool
+
+func ImportCSV(recipeName, csvPath string) (err error) {
 
 	// Create DB conn
 	var store Storer
-	store, err = Init() 
+	store, err = Init()
 	if err != nil {
 		logger.Errorln("err", err.Error())
 		return
 	}
-	
+
 	// open csvPath file for reading
 	csvfile, err := os.Open(csvPath)
 	if err != nil {
 		logger.Errorln("Couldn't open the csv file", err)
 		return
-	}	
+	}
 
-	// Add the recipe entry into the database for the given recipe name here 
+	// Add the recipe entry into the database for the given recipe name here
 	r := Recipe{
-		Name: recipeName,
-		Description: "Covid Recipe",
-		Position1: 1,
-		Position2: 2,
-		Position3: 3,
-		Position4: 4,
-		Position5: 5,
+		Name:               recipeName,
+		Description:        "Covid Recipe",
+		Position1:          1,
+		Position2:          2,
+		Position3:          3,
+		Position4:          4,
+		Position5:          5,
 		Cartridge1Position: 1,
-		Position7: 6,
+		Position7:          6,
 		Cartridge2Position: 2,
-		Position9: 7,
+		Position9:          7,
 	}
 
 	// Create Recipe
@@ -90,12 +88,12 @@ func ImportCSV(recipeName, csvPath string) (err error){
 			}
 			logger.Infoln("Record-> ", record)
 			err = createProcesses(record[1:], store)
-			if err != nil{
+			if err != nil {
 				err = fmt.Errorf("Couldn't insert process entry.")
 				logger.Errorln(err)
 				return err
 			}
-			
+
 		}
 	}
 
@@ -105,14 +103,14 @@ func ImportCSV(recipeName, csvPath string) (err error){
 
 // NOTE: Passing db connection as function parameter isn't the best approach
 // But this avoids populating Storer interface with CSV Methods
-func createProcesses(record []string, store Storer) (err error){
+func createProcesses(record []string, store Storer) (err error) {
 	sequenceNumber++
 
 	p := Process{
-		Name: "Process",
-		Type: record[0],
+		Name:           "Process",
+		Type:           record[0],
 		SequenceNumber: sequenceNumber,
-		RecipeID: createdRecipe.ID,
+		RecipeID:       createdRecipe.ID,
 	}
 	// Insert into processes, note created processID
 	createdProcess, err := store.CreateProcess(context.Background(), p)
@@ -120,9 +118,9 @@ func createProcesses(record []string, store Storer) (err error){
 		logger.Errorln("Error creating Process: ", p)
 		return
 	}
-	// Create database entry for individual process here 
+	// Create database entry for individual process here
 	// based on the name in record[0]
-	switch record[0]{
+	switch record[0] {
 	case "AspireDispense":
 		err = createAspireDispenseProcess(record[1:], createdProcess.ID, store)
 	case "AttachDetach":
@@ -148,119 +146,119 @@ func createProcesses(record []string, store Storer) (err error){
 	}
 	return nil
 }
-	
+
 // WARN: DB changes will also need to be reflected in below functions!
-func createAspireDispenseProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	 logger.Info("Inside aspire dispense create Process. Record: ", record,". ProcessID:" ,processID)
+func createAspireDispenseProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside aspire dispense create Process. Record: ", record, ". ProcessID:", processID)
 
 	//  record[0] is Category
-	 if len(record[0]) != 2 {
+	if len(record[0]) != 2 {
 		err = fmt.Errorf("Category is supposed to be only 2 characters. Category: %v", record[0])
 		logger.Errorln(err)
 		return
-	 }
+	}
 
-	 a := AspireDispense{
-		ProcessID : processID,
-	 }
+	a := AspireDispense{
+		ProcessID: processID,
+	}
 
-	 switch {
-		 case strings.EqualFold(record[0], "WS"):
-			a.Category = WS
-		case strings.EqualFold(record[0], "SW"):
-			a.Category = SW
-		case strings.EqualFold(record[0], "WW"):
-			a.Category = WW
-		case strings.EqualFold(record[0], "WD"):
-			a.Category = WD
-		case strings.EqualFold(record[0], "DW"):
-			a.Category = DW
-		case strings.EqualFold(record[0], "DD"):
-			a.Category = DD
-		case strings.EqualFold(record[0], "SD"):
-			a.Category = SD
-		case strings.EqualFold(record[0], "DS"):
-			a.Category = DS
-		default:
-			err = fmt.Errorf("Category is supposed to be only from these [WW, WS,SW,DD,DS,SD,DW,WD].Current Category: %v", record[0])
-			logger.Errorln(err)
-			return
-	 }
+	switch {
+	case strings.EqualFold(record[0], "WS"):
+		a.Category = WS
+	case strings.EqualFold(record[0], "SW"):
+		a.Category = SW
+	case strings.EqualFold(record[0], "WW"):
+		a.Category = WW
+	case strings.EqualFold(record[0], "WD"):
+		a.Category = WD
+	case strings.EqualFold(record[0], "DW"):
+		a.Category = DW
+	case strings.EqualFold(record[0], "DD"):
+		a.Category = DD
+	case strings.EqualFold(record[0], "SD"):
+		a.Category = SD
+	case strings.EqualFold(record[0], "DS"):
+		a.Category = DS
+	default:
+		err = fmt.Errorf("Category is supposed to be only from these [WW, WS,SW,DD,DS,SD,DW,WD].Current Category: %v", record[0])
+		logger.Errorln(err)
+		return
+	}
 
 	// record[1] is CartridgeType
-	 switch record[1]{
-	 case "1":
+	switch record[1] {
+	case "1":
 		a.CartridgeType = Cartridge1
-	 case "2":
+	case "2":
 		a.CartridgeType = Cartridge2
-	 default:
+	default:
 		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[1])
 		logger.Errorln(err)
 		return
-	 }
-	
-	 if a.SourcePosition, err = strconv.ParseInt(record[2], 10, 64); err!= nil{
+	}
+
+	if a.SourcePosition, err = strconv.ParseInt(record[2], 10, 64); err != nil {
 		logger.Errorln(err, record[2])
 		return
-	 } 
-	 if a.AspireHeight, err = strconv.ParseFloat(record[3], 64); err != nil{
+	}
+	if a.AspireHeight, err = strconv.ParseFloat(record[3], 64); err != nil {
 		logger.Errorln(err, record[3])
 		return
-	 }
-	 if a.AspireMixingVolume, err  = strconv.ParseFloat(record[4], 64); err != nil{
+	}
+	if a.AspireMixingVolume, err = strconv.ParseFloat(record[4], 64); err != nil {
 		logger.Errorln(err, record[4])
 		return
-	 }
-	 if a.AspireNoOfCycles, err  = strconv.ParseInt(record[5], 10, 64); err != nil{
+	}
+	if a.AspireNoOfCycles, err = strconv.ParseInt(record[5], 10, 64); err != nil {
 		logger.Errorln(err, record[5])
 		return
-	 }
-	 if a.AspireVolume, err = strconv.ParseFloat(record[6], 64); err != nil{
+	}
+	if a.AspireVolume, err = strconv.ParseFloat(record[6], 64); err != nil {
 		logger.Errorln(err, record[6])
 		return
-	 }
-	 if a.AspireAirVolume, err = strconv.ParseFloat(record[7], 64); err != nil{
+	}
+	if a.AspireAirVolume, err = strconv.ParseFloat(record[7], 64); err != nil {
 		logger.Errorln(err, record[7])
 		return
-	 }
-	 if a.DispenseHeight, err = strconv.ParseFloat(record[8], 64); err != nil{
+	}
+	if a.DispenseHeight, err = strconv.ParseFloat(record[8], 64); err != nil {
 		logger.Errorln(err, record[8])
 		return
-	 }
-	 if a.DispenseMixingVolume, err = strconv.ParseFloat(record[9], 64); err != nil{
+	}
+	if a.DispenseMixingVolume, err = strconv.ParseFloat(record[9], 64); err != nil {
 		logger.Errorln(err, record[9])
 		return
-	 }
-	 if a.DispenseNoOfCycles, err = strconv.ParseInt(record[10], 10, 64); err != nil{
+	}
+	if a.DispenseNoOfCycles, err = strconv.ParseInt(record[10], 10, 64); err != nil {
 		logger.Errorln(err, record[10])
 		return
-	 }
-	 if a.DispenseVolume, err = strconv.ParseFloat(record[11], 64); err != nil{
-		 logger.Errorln(err, record[11])
+	}
+	if a.DispenseVolume, err = strconv.ParseFloat(record[11], 64); err != nil {
+		logger.Errorln(err, record[11])
 		return
-	 }
-	 if a.DispenseBlowVolume, err = strconv.ParseFloat(record[12], 64); err != nil{
-		 logger.Errorln(err, record[12])
+	}
+	if a.DispenseBlowVolume, err = strconv.ParseFloat(record[12], 64); err != nil {
+		logger.Errorln(err, record[12])
 		return
-	 }
-	 if a.DestinationPosition, err = strconv.ParseInt(record[13], 10, 64); err != nil{
-		 logger.Errorln(err, record[13])
+	}
+	if a.DestinationPosition, err = strconv.ParseInt(record[13], 10, 64); err != nil {
+		logger.Errorln(err, record[13])
 		return
-	 }
+	}
 
-	 createdProcess, err := store.CreateAspireDispense(context.Background(), a)
-	 if err != nil {
+	createdProcess, err := store.CreateAspireDispense(context.Background(), a)
+	if err != nil {
 		logger.Errorln(err)
 		return
-	 }
+	}
 
-	 logger.Info("AspireDispense Record Inserted->", createdProcess)
+	logger.Info("AspireDispense Record Inserted->", createdProcess)
 
-	 return nil
+	return nil
 }
 
-func createAttachDetachProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	logger.Info("Inside attach detach create Process. Record: ", record,". ProcessID:" ,processID)
+func createAttachDetachProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside attach detach create Process. Record: ", record, ". ProcessID:", processID)
 	a := AttachDetach{
 		Operation: record[0],
 		ProcessID: processID,
@@ -268,8 +266,8 @@ func createAttachDetachProcess(record []string, processID uuid.UUID, store Store
 
 	createdProcess, err := store.CreateAttachDetach(context.Background(), a)
 	if err != nil {
-	   logger.Errorln(err)
-	   return
+		logger.Errorln(err)
+		return
 	}
 
 	logger.Info("AttachDetach Record Inserted->", createdProcess)
@@ -277,67 +275,66 @@ func createAttachDetachProcess(record []string, processID uuid.UUID, store Store
 	return nil
 }
 
-func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	logger.Info("Inside delay create Process. Record: ", record,". ProcessID:" ,processID)
-	
+func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside delay create Process. Record: ", record, ". ProcessID:", processID)
+
 	d := Delay{
-	ProcessID : processID,
+		ProcessID: processID,
 	}
-	if delay, err := strconv.ParseInt(record[0], 10, 64); err != nil{
+	if delay, err := strconv.ParseInt(record[0], 10, 64); err != nil {
 		logger.Errorln(err, record[0])
-	    return err
+		return err
 	} else {
 		d.DelayTime = time.Duration(delay)
 	}
 
 	createdProcess, err := store.CreateDelay(context.Background(), d)
 	if err != nil {
-	   logger.Errorln(err)
-	   return
+		logger.Errorln(err)
+		return
 	}
 
 	logger.Info("Delay Record Inserted->", createdProcess)
 	return nil
 }
 
-func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	logger.Info("Inside piercing create Process. Record: ", record,". ProcessID:" ,processID)
+func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside piercing create Process. Record: ", record, ". ProcessID:", processID)
 
-	
 	p := Piercing{
 		ProcessID: processID,
-		Discard: at_discard_box,
+		Discard:   at_discard_box,
 	}
 
 	// record[0] is CartridgeType
-	switch record[0]{
+	switch record[0] {
 	case "1":
-	   p.Type = Cartridge1
+		p.Type = Cartridge1
 	case "2":
-	   p.Type = Cartridge2
+		p.Type = Cartridge2
 	default:
-	   err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[0])
-	   logger.Errorln(err)
-	   return
+		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[0])
+		logger.Errorln(err)
+		return
 	}
 
 	wells := strings.Split(record[1], ",")
 
-	for _, well := range wells{
-		if wellInteger, err := strconv.ParseInt(well, 10, 64); err != nil{
+	for _, well := range wells {
+		if wellInteger, err := strconv.ParseInt(well, 10, 64); err != nil {
 			logger.Errorln(err, well)
 			return err
-		 } else {
-			 p.CartridgeWells = append(p.CartridgeWells, wellInteger)
-		 }
+		} else {
+			p.CartridgeWells = append(p.CartridgeWells, wellInteger)
+		}
 	}
 
 	logger.Debugln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
 
 	createdProcess, err := store.CreatePiercing(context.Background(), p)
 	if err != nil {
-	   logger.Errorln(err)
-	   return
+		logger.Errorln(err)
+		return
 	}
 
 	logger.Info("Piercing Record Inserted->", createdProcess)
@@ -345,16 +342,16 @@ func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (
 	return nil
 }
 
-func createTipOperationProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	logger.Info("Inside tip operation create Process. Record: ", record,". ProcessID:" ,processID)
+func createTipOperationProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside tip operation create Process. Record: ", record, ". ProcessID:", processID)
 
 	t := TipOperation{
 		ProcessID: processID,
 	}
 
 	t.Type = TipOps(record[0])
-	if t.Type == PickupTip{
-		if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil{
+	if t.Type == PickupTip {
+		if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil {
 			logger.Errorln(err, record[1])
 			return err
 		}
@@ -362,8 +359,8 @@ func createTipOperationProcess(record []string, processID uuid.UUID, store Store
 
 	createdProcess, err := store.CreateTipOperation(context.Background(), t)
 	if err != nil {
-	   logger.Errorln(err)
-	   return
+		logger.Errorln(err)
+		return
 	}
 
 	logger.Info("Tip Operation Record Inserted->", createdProcess)
@@ -371,28 +368,28 @@ func createTipOperationProcess(record []string, processID uuid.UUID, store Store
 	return nil
 }
 
-func createTipDockingProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	logger.Info("Inside tip docking create Process. Record: ", record,". ProcessID:" ,processID)
+func createTipDockingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside tip docking create Process. Record: ", record, ". ProcessID:", processID)
 
-t := TipDock{
-	ProcessID: processID,
-}
+	t := TipDock{
+		ProcessID: processID,
+	}
 
-	t.Type =  record[0] 
-	if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil{
+	t.Type = record[0]
+	if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil {
 		logger.Errorln(err, record[1])
 		return err
 	}
 
-	if t.Height, err = strconv.ParseFloat(record[12], 64); err != nil{
+	if t.Height, err = strconv.ParseFloat(record[12], 64); err != nil {
 		logger.Errorln(err, record[12])
-	   return
+		return
 	}
 
 	createdProcess, err := store.CreateTipDocking(context.Background(), t)
 	if err != nil {
-	   logger.Errorln(err)
-	   return
+		logger.Errorln(err)
+		return
 	}
 
 	logger.Info("Tip Docking Record Inserted->", createdProcess)
@@ -400,16 +397,15 @@ t := TipDock{
 	return nil
 }
 
-func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	logger.Info("Inside shaking create Process. Record: ", record,". ProcessID:" ,processID)
+func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside shaking create Process. Record: ", record, ". ProcessID:", processID)
 	return nil
 }
 
-func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (err error){
-	logger.Info("Inside heating create Process. Record: ", record,". ProcessID:" ,processID)
+func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
+	logger.Info("Inside heating create Process. Record: ", record, ". ProcessID:", processID)
 	return nil
 }
-
 
 func clearFailedRecipe(store Storer) {
 	if !done {
