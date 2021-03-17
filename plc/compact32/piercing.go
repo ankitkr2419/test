@@ -8,15 +8,12 @@ import (
 )
 
 /****ALGORITHM******
-1. Call Tip Pick Up at position 3
-2. Make tip go to piercing_tip_rest_position, handled in d.TipPickup(3)
-3. get cartridge start distance
-4. Pierce well after well
-	4.1 Move deck to the well position
-	4.2 Pierce and come back up
-	4.3 Repeat step 4.1 and 4.2 till well exists
-5. Call Tip Discard
 
+1. get cartridge start distance
+2. Pierce well after well
+	2.1 Move deck to the well position
+	2.2 Pierce and come back up
+	2.3 Repeat step 2.1 and 2.2 till well exists
 ********/
 
 func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
@@ -34,23 +31,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		CartridgeType: pi.Type,
 	}
 
-	//*************
-	// Tip Pickup *
-	//*************
-
-	// 1. Call Tip Pick Up at position 3
-// 2. Make tip go to piercing_tip_rest_position, handled in d.TipPickup(3)
-
-
-	// 3rd position is where by default piercing tip is present
-	// TODO: Think about removing hard coded position 3
-	// One way is to separate out the tip pickup operation
-	response, err = d.TipPickup(3)
-	if err != nil {
-		return
-	}
-
-	// 3. get cartridge start distance
+	// 1. get cartridge start distance
 
 	if cartridgeStart, ok = consDistance[string(pi.Type)+"_start"]; !ok {
 		err = fmt.Errorf(string(pi.Type) + "_start doesn't exist for consumable distances")
@@ -65,7 +46,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		return "", err
 	}
 
-	// 4. Pierce well after well
+	// 2. Pierce well after well
 
 	//*************************
 	// Pierce Well after Well *
@@ -89,7 +70,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	
 	for _, wellNumber := range wellsToBePierced {
 		//
-		// 4.1 Move deck to the well position
+		// 2.1 Move deck to the well position
 		//
 		deckAndMotor.Number = K5_Deck
 		uniqueCartridge.WellNum = int64(wellNumber)
@@ -126,7 +107,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	skipDeckMovement:
 		fmt.Println("Completed Move Deck to reach the wellNum ", wellNumber)
 
-		// 4.2 Pierce and come back up
+		// 2.2 Pierce and come back up
 
 		// WE know concrete direction here, its DOWN
 		deckAndMotor.Number = K9_Syringe_Module_LHRH
@@ -148,18 +129,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		fmt.Println("Got Up from WellNumber: ", wellNumber)
 
-		// 4.3 Repeat step 4.1 and  4.2 till another well exists
-	}
-
-	// 5. Call Tip Discard
-	//**************
-	// Tip Discard *
-	//**************
-	// TODO: Check if the option for discard is 'at_pick_passing'	
-	response, err = d.TipDiscard()
-	if err != nil {
-		err = fmt.Errorf("there was a problem while discarding the piercing tip")
-		return "", err
+		// 2.3 Repeat step 2.1 and  2.2 till another well exists
 	}
 
 	return "Successfully completed piercing operation", nil
