@@ -43,3 +43,29 @@ export const EXPERIMENT_STATUS = {
 	success: 'success',
 	failed: 'failed',
 };
+
+export const ROUTES = {
+	landing: "landing",
+	splashScreen: "splashscreen"
+};
+
+export const API_ENDPOINTS = {
+	homing: "homing/",
+	run: "run",
+	pause: "pause",
+	resume: "resume",
+	abort: "abort",
+	discardDeck: "discard-box/cleanup",
+	restoreDeck: "restore-deck",
+	recipeListing: "recipes"
+};
+
+export const MODAL_MESSAGE = {
+	setPosition : "Please check the position of tip and magnet!",
+	homingConfirmation: "Homing Confirmation"
+};
+
+export const MODAL_BTN = {
+	okay: "Okay",
+	cancel: "Cancel"
+};

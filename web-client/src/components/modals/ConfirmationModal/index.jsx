@@ -4,9 +4,7 @@ import { Button, Modal, ModalBody } from 'core-components';
 import { Center, Text, ButtonGroup } from 'shared-components';
 
 const ConfirmationModal = (props) => {
-	const { confirmationText, isOpen, confirmationClickHandler } = props;
-
-	const toggleModal = () => {};
+	const { confirmationText, isOpen, confirmationClickHandler, successBtn, cancelBtn, toggleModal } = props;
 
 	return (
 		<Modal isOpen={isOpen} toggle={toggleModal} centered size="md">
@@ -17,6 +15,7 @@ const ConfirmationModal = (props) => {
 
 				<Center className="text-center p-0 m-0 pt-5">
 					<ButtonGroup>
+					{successBtn && (
 						<Button
 							onClick={() => {
 								confirmationClickHandler(true);
@@ -24,8 +23,10 @@ const ConfirmationModal = (props) => {
 							color="primary"
 							className="mr-4"
 						>
-              Yes
+              {successBtn}
 						</Button>
+					)}
+					{cancelBtn && (
 						<Button
 							color="secondary"
 							className="mr-4"
@@ -33,8 +34,10 @@ const ConfirmationModal = (props) => {
 								confirmationClickHandler(false);
 							}}
 						>
-              No
+							{cancelBtn}
 						</Button>
+					)}
+
 					</ButtonGroup>
 				</Center>
 			</ModalBody>

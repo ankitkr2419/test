@@ -60,7 +60,7 @@ const OperatorLoginModalContainer = (props) => {
     }   
 
     if (isOperatorLoggedIn && !error) {
-        return <Redirect to="/plate"/>
+        return <Redirect to="/recipe-listing"/>
     }
 
     return(

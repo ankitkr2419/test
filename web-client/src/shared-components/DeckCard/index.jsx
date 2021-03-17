@@ -111,17 +111,17 @@ const DeckCard = (props) => {
 					{/* <div className="uv-light-button">
 						<ActionButton/>
 					</div>  */}
-					<div className="resume-button">
+					{/* <div className="resume-button">
 						<ActionButton/>
 					</div>
 					<div className="abort-button">
 						<ActionButton/>
-					</div>
+					</div> */}
 					
-					<div className="d-none1">
+					{/* <div className="d-none1">
 						<Text Tag="h5" className="mb-2">Recipe Name</Text>
 						<Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
-					</div>
+					</div> */}
 				</div>
 				<Button
 					color="primary"
@@ -137,7 +137,7 @@ const DeckCard = (props) => {
 				/>
 				
 				</div>
-				<Progress value="2" className="custom-progress-bar"/>
+				{/* <Progress value="2" className="custom-progress-bar"/> */}
 			</div>
 		</DeckCardBox>
 	);

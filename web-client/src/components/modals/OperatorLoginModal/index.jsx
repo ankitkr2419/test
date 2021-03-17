@@ -78,6 +78,7 @@ const OperatorLoginModal = (props) => {
 											id='username'
 											placeholder='Type here'
 											onChange={handleEmailChange}
+											value={authData.email.value}
 											invalid={authData.email.invalid}
 										/>
 										<FormError>Incorrect username</FormError>
@@ -97,6 +98,7 @@ const OperatorLoginModal = (props) => {
 											id='password'
 											placeholder='Type here'
 											onChange={handlePasswordChange}
+											value={authData.password.value}
 											invalid={authData.password.invalid}
 										/>
 										<FormError>Incorrect password</FormError>

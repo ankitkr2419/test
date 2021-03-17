@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from "react-router-dom";
 
 import styled from 'styled-components';
 import { 
@@ -12,6 +13,10 @@ import { ImageIcon, ButtonIcon, Icon, Text} from 'shared-components';
 import CirclelogoIcon from 'assets/images/mylab-logo-with-circle.png';
 import OperatorLoginModal from 'components/modals/OperatorLoginModal';
 import TimeModal from 'components/modals/TimeModal';
+import thumbsUpGraphics from 'assets/images/thumbs-up-graphic.svg';
+import { ROUTES } from "appConstants"
+
+import Radio from 'core-components/Radio';
 
 const SplashScreen = styled.div`
     background: url('/images/logo-bg.svg') left -4.875rem top -5.5rem no-repeat,
@@ -19,7 +24,8 @@ const SplashScreen = styled.div`
     .circle-image{
         margin-right: 14.313rem;
         margin-left: auto;
-    }
+    };
+    cursor: pointer
 `;
 
 const OptionBox = styled.div`
@@ -36,16 +42,21 @@ const OptionBox = styled.div`
 	}
 `;
 const SplashScreenComponent = (props) => {
-       
+
 	const [modal, setModal] = useState(false);
+  const history = useHistory();
 	const toggle = () => setModal(!modal);
 
+  const redirectToLandingPage = () => {
+    return history.push(ROUTES.landing)
+  }
+
   return (
-		<SplashScreen className='splash-screen-content h-100 py-0 bg-white d-flex justify-content-center align-items-center'>
+		<SplashScreen className='splash-screen-content h-100 py-0 bg-white d-flex justify-content-center align-items-center' onClick={redirectToLandingPage}>
 			<div className="circle-image">
-					<ImageIcon 
-					src={CirclelogoIcon} 
-					alt="My Lab" 
+					<ImageIcon
+					src={CirclelogoIcon}
+					alt="My Lab"
 					/>
 			</div>
 			{/* Homing Confirmation Popup */}
@@ -108,8 +119,9 @@ const SplashScreenComponent = (props) => {
 
 			{/* Operator Login Modal */}
 
-			<OperatorLoginModal />
-			<TimeModal />
+			{/* <OperatorLoginModal />
+			<TimeModal /> */}
+			{/* Alert pop up2 */}
     </SplashScreen>
 	);
 };
