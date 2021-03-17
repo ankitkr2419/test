@@ -147,7 +147,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		return
 	}
 
-	err = s.db.Get(&createdAspireDispense, getAspireDispenseQuery, lastInsertID)
+	err = s.db.Get(&createdAspireDispense, getAspireDispenseQuery, ad.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting aspire dispense")
 		return
