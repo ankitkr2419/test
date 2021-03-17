@@ -26,7 +26,7 @@ const (
 	createTipOperationQuery = `INSERT INTO tip_operation (
 						type,
 						position,
-						process_id,)
+						process_id)
 						VALUES ($1, $2, $3) RETURNING id`
 	updateTipOperationQuery = `UPDATE tip_operation SET (
 						type,
@@ -77,7 +77,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, t TipOperation) (creat
 
 	err = s.db.Get(&createdTipOperation, getTipOperationQuery, t.ProcessID)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting TipOperation")
+		logger.WithField("err", err.Error()).Error("Error in getting Tip Operation")
 		return
 	}
 	return
