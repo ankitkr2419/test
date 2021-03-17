@@ -16,12 +16,7 @@ const (
 )
 
 const (
-	getTipOperationQuery = `SELECT id,
-						type,
-						position,
-						process_id,
-						created_at,
-						updated_at
+	getTipOperationQuery = `SELECT *
 						FROM tip_operation
 						WHERE process_id = $1`
 	selectTipOperationQuery = `SELECT *
@@ -80,7 +75,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, t TipOperation) (creat
 		return
 	}
 
-	err = s.db.Get(&createdTipOperation, getTipOperationQuery, lastInsertID)
+	err = s.db.Get(&createdTipOperation, getTipOperationQuery, t.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting TipOperation")
 		return
