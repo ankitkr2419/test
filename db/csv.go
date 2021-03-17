@@ -5,7 +5,7 @@ import(
 	"os"
 	// "github.com/jmoiron/sqlx"
 	"context"
-	// "fmt"
+	"fmt"
 	"encoding/csv"
 	"io"
 	"github.com/google/uuid"
@@ -17,21 +17,23 @@ import(
 
 var sequenceNumber int64 = 0
 var createdRecipe Recipe
+// done will help us clean up
+var done bool 
 
-func ImportCSV(recipeName, csvPath string){
+func ImportCSV(recipeName, csvPath string) (err error){
 
 	// Create DB conn
 	var store Storer
-	store, err := Init() 
+	store, err = Init() 
 	if err != nil {
-		logger.Fatalln("err", err.Error())
+		logger.Errorln("err", err.Error())
 		return
 	}
 	
 	// open csvPath file for reading
 	csvfile, err := os.Open(csvPath)
 	if err != nil {
-		logger.Fatalln("Couldn't open the csv file", err)
+		logger.Errorln("Couldn't open the csv file", err)
 		return
 	}	
 
@@ -45,18 +47,19 @@ func ImportCSV(recipeName, csvPath string){
 		Position4: 4,
 		Position5: 5,
 		Cartridge1Position: 1,
-		Position7: 7,
+		Position7: 6,
 		Cartridge2Position: 2,
-		Position9: 9,
+		Position9: 7,
 	}
 
 	// Create Recipe
 	createdRecipe, err = store.CreateRecipe(context.Background(), r)
 	if err != nil {
-		logger.Fatalln("Couldn't insert recipe entry", err)
+		logger.Errorln("Couldn't insert recipe entry", err)
 		return
 	}
 	logger.Info("Created Recipe-> ", createdRecipe)
+	defer clearFailedRecipe(store)
 
 	// Parse the csv file
 	csvReader := csv.NewReader(csvfile)
@@ -72,25 +75,35 @@ func ImportCSV(recipeName, csvPath string){
 			break
 		}
 		if err != nil {
-			logger.Fatalln("error while reading a record from csvReader:", err)
+			logger.Errorln("error while reading a record from csvReader:", err)
+			return err
 		}
+
 		if record[0] != "DUMMY" {
-			logger.Infoln("Record-> ", record)
-			err = store.createProcesses(record[1:])
-			if err != nil{
-				logger.Fatalln("Couldn't insert process entry", err)
-				return
+			if len(record) < 2 || record[1] == "" {
+				err = fmt.Errorf("record has unexpected length or empty process name, maybe CSV is over.")
+				logger.Warnln(err, record)
+				break
 			}
-			// Create database entry for individual process here 
-			// based on the name in record[1]
+			logger.Infoln("Record-> ", record)
+			err = createProcesses(record[1:], store)
+			if err != nil{
+				err = fmt.Errorf("Couldn't insert process entry.")
+				logger.Errorln(err)
+				return err
+			}
+			
 		}
 	}
-	return
+
+	done = true
+	return nil
 }
 
-func (s *pgStore) createProcesses(record []string) (err error){
+// NOTE: Passing db connection as function parameter isn't the best approach
+// But this avoids populating Storer interface with CSV Methods
+func createProcesses(record []string, store Storer) (err error){
 	sequenceNumber++
-	// start transaction
 
 	p := Process{
 		Name: "Process",
@@ -99,23 +112,35 @@ func (s *pgStore) createProcesses(record []string) (err error){
 		RecipeID: createdRecipe.ID,
 	}
 	// Insert into processes, note created processID
-	createdProcess, err := s.CreateProcess(context.Background(), p)
+	createdProcess, err := store.CreateProcess(context.Background(), p)
 	if err != nil {
-		logger.Fatalln("Couldn't insert process entry", err, p)
 		return
 	}
+	// Create database entry for individual process here 
+	// based on the name in record[0]
 	switch record[0]{
 			case "AspireDispense":
-					s.createAspireDispenseProcess(record, createdProcess.ID)
+				createAspireDispenseProcess(record[1:], createdProcess.ID, store)
 			default:
-			logger.Fatalln("unknown process found in csv!: ", record[0])
-			return
+				err = fmt.Errorf("unknown process found in csv!: %v ", record[0])
+				return
 	}
-	//end transaction
 	return nil
 }
 	
-func (s *pgStore) createAspireDispenseProcess(record []string,processID uuid.UUID) (err error){
-	 
+func createAspireDispenseProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	 logger.Info("Inside aspire dispense create Process. Record: ", record,". ProcessID:" ,processID)
 	 return nil
+}
+
+
+func clearFailedRecipe(store Storer) {
+	if !done {
+		err := store.DeleteRecipe(context.Background(), createdRecipe.ID)
+		if err != nil {
+			logger.Warnln("Couldn't cleanUp the partial recipe with ID: ", createdRecipe.ID)
+			return
+		}
+	}
+	logger.Info("Partial recipe cleaned up")
 }
