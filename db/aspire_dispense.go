@@ -22,24 +22,7 @@ const (
 )
 
 const (
-	getAspireDispenseQuery = `SELECT id,
-						category,
-						cartridge_type,
-						source_position,
-						aspire_height,
-						aspire_mixing_volume,
-						aspire_no_of_cycles,
-						aspire_volume,
-						aspire_air_volume,
-						dispense_height,
-						dispense_mixing_volume,
-						dispense_no_of_cycles,
-						dispense_volume,
-						dispense_blow_volume,
-						destination_position,
-						process_id,
-						created_at,
-						updated_at
+	getAspireDispenseQuery = `SELECT *
 						FROM aspire_dispense
 						WHERE process_id = $1`
 	selectAspireDispenseQuery = `SELECT *
