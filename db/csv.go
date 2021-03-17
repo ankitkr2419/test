@@ -7,6 +7,7 @@ import(
 	"context"
 	"strings"
 	"strconv"
+	"time"
 	"fmt"
 	"encoding/csv"
 	"io"
@@ -159,7 +160,9 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 		return
 	 }
 
-	 a := AspireDispense{}
+	 a := AspireDispense{
+		ProcessID : processID,
+	 }
 
 	 switch {
 		 case strings.EqualFold(record[0], "WS"):
@@ -184,19 +187,18 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 			return
 	 }
 
-
+	// record[1] is CartridgeType
 	 switch record[1]{
 	 case "1":
 		a.CartridgeType = Cartridge1
 	 case "2":
 		a.CartridgeType = Cartridge2
 	 default:
-		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[0])
+		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[1])
 		logger.Errorln(err)
 		return
 	 }
 	
-	//  ParseInt(s string, base int, bitSize int) (i int64, err error)
 	 if a.SourcePosition, err = strconv.ParseInt(record[2], 10, 64); err!= nil{
 		logger.Errorln(err, record[2])
 		return
@@ -245,7 +247,6 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 		 logger.Errorln(err, record[13])
 		return
 	 }
-	 a.ProcessID = processID
 
 	 createdProcess, err := store.CreateAspireDispense(context.Background(), a)
 	 if err != nil {
@@ -260,16 +261,88 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 
 func createAttachDetachProcess(record []string, processID uuid.UUID, store Storer) (err error){
 	logger.Info("Inside attach detach create Process. Record: ", record,". ProcessID:" ,processID)
+	a := AttachDetach{
+		Operation: record[0],
+		ProcessID: processID,
+	}
+
+	createdProcess, err := store.CreateAttachDetach(context.Background(), a)
+	if err != nil {
+	   logger.Errorln(err)
+	   return
+	}
+
+	logger.Info("AttachDetach Record Inserted->", createdProcess)
+
 	return nil
 }
 
 func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err error){
 	logger.Info("Inside delay create Process. Record: ", record,". ProcessID:" ,processID)
+	
+	d := Delay{
+	ProcessID : processID,
+	}
+	if delay, err := strconv.ParseInt(record[0], 10, 64); err != nil{
+		logger.Errorln(err, record[0])
+	    return err
+	} else {
+		d.DelayTime = time.Duration(delay)
+	}
+
+	createdProcess, err := store.CreateDelay(context.Background(), d)
+	if err != nil {
+	   logger.Errorln(err)
+	   return
+	}
+
+	logger.Info("Delay Record Inserted->", createdProcess)
 	return nil
 }
 
 func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (err error){
 	logger.Info("Inside piercing create Process. Record: ", record,". ProcessID:" ,processID)
+
+	
+	p := Piercing{
+		ProcessID: processID,
+		Discard: at_discard_box,
+	}
+
+	// record[0] is CartridgeType
+	switch record[0]{
+	case "1":
+	   p.Type = Cartridge1
+	case "2":
+	   p.Type = Cartridge2
+	default:
+	   err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[0])
+	   logger.Errorln(err)
+	   return
+	}
+
+	wells := strings.Split(record[1], ",")
+
+	for _, well := range wells{
+		if wellInteger, err := strconv.ParseInt(well, 10, 64); err != nil{
+			logger.Errorln(err, well)
+			return err
+		 } else {
+			 p.CartridgeWells = append(p.CartridgeWells, wellInteger)
+		 }
+	}
+
+	// TODO: Remove this
+	logger.Infoln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
+
+	createdProcess, err := store.CreatePiercing(context.Background(), p)
+	if err != nil {
+	   logger.Errorln(err)
+	   return
+	}
+
+	logger.Info("Piercing Record Inserted->", createdProcess)
+
 	return nil
 }
 
