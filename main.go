@@ -99,6 +99,25 @@ func main() {
 				return db.RollbackMigrations(c.Args().Get(0))
 			},
 		},
+		{
+			Name:  "import",
+			Usage: "import recipe csv [--recipename RECIPE_NAME] [--csv CSV_ABSOLUTE_PATH] ",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "recipename",
+					Value: "recipe",
+					Usage: "put recipe name",
+				},
+				&cli.StringFlag{
+					Name:  "csv",
+					Value: "recipe.csv",
+					Usage: "put recipe's csv file path",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				return db.ImportCSV(c.String("recipename"), c.String("csv"))
+			},
+		},
 	}
 
 	if err := cliApp.Run(os.Args); err != nil {
@@ -247,3 +266,4 @@ func startApp(plcName string, test bool) (err error) {
 	server.Run(*addr)
 	return
 }
+
