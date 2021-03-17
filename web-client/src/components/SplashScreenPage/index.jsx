@@ -44,14 +44,14 @@ const OptionBox = styled.div`
 const SplashScreenComponent = (props) => {
 
 	const [modal, setModal] = useState(false);
-  const history = useHistory();
+	const history = useHistory();
 	const toggle = () => setModal(!modal);
 
-  const redirectToLandingPage = () => {
-    return history.push(ROUTES.landing)
-  }
+	const redirectToLandingPage = () => {
+		return history.push(ROUTES.landing)
+	}
 
-  return (
+	return (
 		<SplashScreen className='splash-screen-content h-100 py-0 bg-white d-flex justify-content-center align-items-center' onClick={redirectToLandingPage}>
 			<div className="circle-image">
 					<ImageIcon
@@ -60,8 +60,8 @@ const SplashScreenComponent = (props) => {
 					/>
 			</div>
 			{/* Homing Confirmation Popup */}
-      		<Button color="danger" onClick={toggle}>Alert pop up2</Button>
-				<Modal isOpen={modal} toggle={toggle} centered size="sm">
+      		{/* <Button color="danger" onClick={toggle}>Alert pop up2</Button> */}
+				{/* <Modal isOpen={modal} toggle={toggle} centered size="sm">
 					<ModalBody className="p-0">
 						<OptionBox className="p-5">
 							<ButtonIcon
@@ -93,7 +93,7 @@ const SplashScreenComponent = (props) => {
 													className='mb-3'
 												/>
 										</div>
-									</div>
+									</div> */}
 									{/* <Button
 										color="default"
 										className="font-weight-light border-1 border-gray shadow-none bg-white large-btn">
@@ -107,7 +107,7 @@ const SplashScreenComponent = (props) => {
 												/>
 										</div>
 									</Button> */}
-									<Button
+									{/* <Button
 										color="primary"
 									>
 										Yes
@@ -115,7 +115,7 @@ const SplashScreenComponent = (props) => {
 							</div>
 						</OptionBox>
 				</ModalBody>
-			</Modal>
+			</Modal> */}
 
 			{/* Operator Login Modal */}
 
