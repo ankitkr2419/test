@@ -7,8 +7,8 @@ import { Text } from 'shared-components';
 import {
 	Button, 
 } from 'core-components';
-import ActionButton from "./ActionButton";
-import { Progress } from 'reactstrap';
+// import ActionButton from "./ActionButton";
+// import { Progress } from 'reactstrap';
 import OperatorLoginModalContainer from 'containers/OperatorLoginModalContainer';
 
 const DeckCardBox = styled.div`

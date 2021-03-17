@@ -11,12 +11,12 @@ import {
 import { ImageIcon, ButtonIcon, Icon, Text} from 'shared-components';
 
 import CirclelogoIcon from 'assets/images/mylab-logo-with-circle.png';
-import OperatorLoginModal from 'components/modals/OperatorLoginModal';
-import TimeModal from 'components/modals/TimeModal';
-import thumbsUpGraphics from 'assets/images/thumbs-up-graphic.svg';
+// import OperatorLoginModal from 'components/modals/OperatorLoginModal';
+// import TimeModal from 'components/modals/TimeModal';
+// import thumbsUpGraphics from 'assets/images/thumbs-up-graphic.svg';
 import { ROUTES } from "appConstants"
 
-import Radio from 'core-components/Radio';
+// import Radio from 'core-components/Radio';
 
 const SplashScreen = styled.div`
     background: url('/images/logo-bg.svg') left -4.875rem top -5.5rem no-repeat,
