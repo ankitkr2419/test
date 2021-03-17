@@ -114,16 +114,32 @@ func createProcesses(record []string, store Storer) (err error){
 	// Insert into processes, note created processID
 	createdProcess, err := store.CreateProcess(context.Background(), p)
 	if err != nil {
+		logger.Errorln("Error creating Process: ", p)
 		return
 	}
 	// Create database entry for individual process here 
 	// based on the name in record[0]
 	switch record[0]{
-			case "AspireDispense":
-				createAspireDispenseProcess(record[1:], createdProcess.ID, store)
-			default:
-				err = fmt.Errorf("unknown process found in csv!: %v ", record[0])
-				return
+	case "AspireDispense":
+		createAspireDispenseProcess(record[1:], createdProcess.ID, store)
+	case "AttachDetach":
+		createAttachDetachProcess(record[1:], createdProcess.ID, store)
+	case "Delay":
+		createDelayProcess(record[1:], createdProcess.ID, store)
+	case "Piercing":
+		createPiercingProcess(record[1:], createdProcess.ID, store)
+	case "TipOperation":
+		createTipOperationProcess(record[1:], createdProcess.ID, store)
+	case "TipDocking":
+		createTipDockingProcess(record[1:], createdProcess.ID, store)
+	case "Shaking":
+		createShakingProcess(record[1:], createdProcess.ID, store)
+	case "Heating":
+		createHeatingProcess(record[1:], createdProcess.ID, store)
+	default:
+		err = fmt.Errorf("unknown process found in csv!: %v ", record[0])
+		logger.Errorln(err)
+		return
 	}
 	return nil
 }
@@ -131,6 +147,41 @@ func createProcesses(record []string, store Storer) (err error){
 func createAspireDispenseProcess(record []string, processID uuid.UUID, store Storer) (err error){
 	 logger.Info("Inside aspire dispense create Process. Record: ", record,". ProcessID:" ,processID)
 	 return nil
+}
+
+func createAttachDetachProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	logger.Info("Inside attach detach create Process. Record: ", record,". ProcessID:" ,processID)
+	return nil
+}
+
+func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	logger.Info("Inside delay create Process. Record: ", record,". ProcessID:" ,processID)
+	return nil
+}
+
+func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	logger.Info("Inside piercing create Process. Record: ", record,". ProcessID:" ,processID)
+	return nil
+}
+
+func createTipOperationProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	logger.Info("Inside tip operation create Process. Record: ", record,". ProcessID:" ,processID)
+	return nil
+}
+
+func createTipDockingProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	logger.Info("Inside tip docking create Process. Record: ", record,". ProcessID:" ,processID)
+	return nil
+}
+
+func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	logger.Info("Inside shaking create Process. Record: ", record,". ProcessID:" ,processID)
+	return nil
+}
+
+func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (err error){
+	logger.Info("Inside heating create Process. Record: ", record,". ProcessID:" ,processID)
+	return nil
 }
 
 
