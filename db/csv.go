@@ -5,6 +5,8 @@ import(
 	"os"
 	// "github.com/jmoiron/sqlx"
 	"context"
+	"strings"
+	"strconv"
 	"fmt"
 	"encoding/csv"
 	"io"
@@ -146,8 +148,105 @@ func createProcesses(record []string, store Storer) (err error){
 	return nil
 }
 	
+// WARN: DB changes will also need to be reflected in below functions!
 func createAspireDispenseProcess(record []string, processID uuid.UUID, store Storer) (err error){
 	 logger.Info("Inside aspire dispense create Process. Record: ", record,". ProcessID:" ,processID)
+
+	//  record[0] is Category
+	 if len(record[0]) != 2 {
+		err = fmt.Errorf("Category is supposed to be only 2 characters. Category: %v", record[0])
+		logger.Errorln(err)
+		return
+	 }
+
+	 a := AspireDispense{}
+
+	 switch {
+		 case strings.EqualFold(record[0], "WS"):
+			a.Category = WS
+		case strings.EqualFold(record[0], "SW"):
+			a.Category = SW
+		case strings.EqualFold(record[0], "WW"):
+			a.Category = WW
+		case strings.EqualFold(record[0], "WD"):
+			a.Category = WD
+		case strings.EqualFold(record[0], "DW"):
+			a.Category = DW
+		case strings.EqualFold(record[0], "DD"):
+			a.Category = DD
+		case strings.EqualFold(record[0], "SD"):
+			a.Category = SD
+		case strings.EqualFold(record[0], "DS"):
+			a.Category = DS
+		default:
+			err = fmt.Errorf("Category is supposed to be only from these [WW, WS,SW,DD,DS,SD,DW,WD].Current Category: %v", record[0])
+			logger.Errorln(err)
+			return
+	 }
+
+
+	 switch record[1]{
+	 case "1":
+		a.CartridgeType = Cartridge1
+	 case "2":
+		a.CartridgeType = Cartridge2
+	 default:
+		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[0])
+		logger.Errorln(err)
+		return
+	 }
+	
+	//  ParseInt(s string, base int, bitSize int) (i int64, err error)
+	 if a.SourcePosition, err = strconv.ParseInt(record[2], 10, 64); err!= nil{
+		logger.Errorln(err, record[2])
+		return
+	 } 
+	 if a.AspireHeight, err = strconv.ParseFloat(record[3], 64); err != nil{
+		logger.Errorln(err, record[3])
+		return
+	 }
+	 if a.AspireMixingVolume, err  = strconv.ParseFloat(record[4], 64); err != nil{
+		logger.Errorln(err, record[4])
+		return
+	 }
+	 if a.AspireNoOfCycles, err  = strconv.ParseInt(record[5], 10, 64); err != nil{
+		logger.Errorln(err, record[5])
+		return
+	 }
+	 if a.AspireVolume, err = strconv.ParseFloat(record[6], 64); err != nil{
+		logger.Errorln(err, record[6])
+		return
+	 }
+	 if a.AspireAirVolume, err = strconv.ParseFloat(record[7], 64); err != nil{
+		logger.Errorln(err, record[7])
+		return
+	 }
+	 if a.DispenseHeight, err = strconv.ParseFloat(record[8], 64); err != nil{
+		logger.Errorln(err, record[8])
+		return
+	 }
+	 if a.DispenseMixingVolume, err = strconv.ParseFloat(record[9], 64); err != nil{
+		logger.Errorln(err, record[9])
+		return
+	 }
+	 if a.DispenseNoOfCycles, err = strconv.ParseInt(record[10], 10, 64); err != nil{
+		logger.Errorln(err, record[10])
+		return
+	 }
+	 if a.DispenseVolume, err = strconv.ParseFloat(record[11], 64); err != nil{
+		 logger.Errorln(err, record[11])
+		return
+	 }
+	 if a.DispenseBlowVolume, err = strconv.ParseFloat(record[12], 64); err != nil{
+		 logger.Errorln(err, record[12])
+		return
+	 }
+	 if a.DestinationPosition, err = strconv.ParseInt(record[13], 10, 64); err != nil{
+		 logger.Errorln(err, record[13])
+		return
+	 }
+	 a.ProcessID = processID
+
 	 return nil
 }
 
