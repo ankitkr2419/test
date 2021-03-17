@@ -15,15 +15,22 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	var results []byte
 
-	if aborted[d.name] {
-		err := fmt.Errorf("Machine in ABORTED STATE for deck: %v", d.name)
+	if temp, ok := aborted.Load(d.name); !ok {
+		err = fmt.Errorf("aborted isn't loaded!")
+		return
+	} else if temp.(bool) {
+		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v", d.name)
 		return "", err
 	}
 
 	//
 	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
 	//
-	if magnetState[d.name] != detached && motorNum == K5_Deck {
+
+	if temp, ok := magnetState.Load(d.name); !ok {
+		err = fmt.Errorf("aborted isn't loaded!")
+		return
+	} else if temp.(int)  != detached && motorNum == K5_Deck {
 		response, err = d.fullDetach()
 		if err != nil {
 			fmt.Println(err)
@@ -84,12 +91,15 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Println("Wrote motorNum. res : ", results)
 	// Check if User has paused the run/operation
 	for {
-		if paused[d.name] {
+		if temp, ok := paused.Load(d.name); !ok {
+			err = fmt.Errorf("paused isn't loaded!")
+			return
+		} else if temp.(bool) {
 			fmt.Println("Machine in PAUSED state for deck: %v", d.name)
+			time.Sleep(400 * time.Millisecond)
 		} else {
 			break
 		}
-		time.Sleep(400 * time.Millisecond)
 	}
 
 	// Switching Motor ON
@@ -103,18 +113,23 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Println("Movements in Progress for deck: ", d.name)
 
 	for {
-		if aborted[d.name] {
+		if temp, ok := aborted.Load(d.name); !ok {
+			err = fmt.Errorf("aborted isn't loaded!")
+			return
+		} else if temp2, ok := executedPulses.Load(d.name); !ok {
+			err = fmt.Errorf("aborted isn't loaded!")
+			return
 			// Write executed pulses to Position
-			positions[deckAndNumber] += float64(executedPulses[d.name]) / float64(motors[deckAndNumber]["steps"])
+		} else if temp.(bool){
+			positions[deckAndNumber] += float64(temp2.(int)) / float64(motors[deckAndNumber]["steps"])
 			fmt.Println("pos", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
-		// time.Sleep(200 * time.Millisecond)
+
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
 		if err != nil {
 			fmt.Println("error while reading completion  : ", err, d.name)
-			// time.Sleep(100 * time.Millisecond)
 			// Let this reading failure be intolerant
 			return
 		}
@@ -245,12 +260,12 @@ func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
 
 	fmt.Printf("Read D212AddressBytesUint16. res : %+v \n", results)
 	if len(results) > 0 {
-		executedPulses[d.name] = binary.BigEndian.Uint16(results)
+		executedPulses.Store(d.name, binary.BigEndian.Uint16(results) )
 	} else {
 		err = fmt.Errorf("couldn't read D212")
 		return "", err
 	}
-	fmt.Println("Read D212 Pulses -> ", executedPulses[d.name])
+	fmt.Println("Read D212 Pulses -> ",  binary.BigEndian.Uint16(results))
 
 	return "D212 Reading SUCESS", nil
 
@@ -258,7 +273,7 @@ func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
 
 func (d *Compact32Deck) Homing() (response string, err error) {
 
-	aborted[d.name] = false
+	aborted.Store(d.name, false)
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
@@ -267,12 +282,15 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	}
 	fmt.Println("Switched off the shaker--> for ", d.name)
 
-	if runInProgress[d.name] {
-		err = fmt.Errorf("previous run is already in progress... wait or abort it")
+	if temp, ok := runInProgress.Load(d.name); !ok {
+		err = fmt.Errorf("runInProgress isn't loaded!")
 		return
+	} else if temp.(bool) {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return "", err
 	}
-
-	runInProgress[d.name] = true
+	
+	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
