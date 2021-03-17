@@ -24,6 +24,14 @@ If this shows blank, then please ask for help
 Refer https://www.postgresql.org/download/
 Select your OS flavour and follow steps for installation
 
+If password authentication fails then refer https://askubuntu.com/questions/413585/postgres-password-authentication-fails
+
+Don't forget to restart postgresql
+
+```
+$ sudo systemctl restart postgresql
+```
+
 ### 3. Install npm 
 Refer https://www.npmjs.com/get-npm for installation guide
 NOTE: Even if you have npm installed you need to follow this step
