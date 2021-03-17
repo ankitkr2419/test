@@ -347,11 +347,56 @@ func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (
 
 func createTipOperationProcess(record []string, processID uuid.UUID, store Storer) (err error){
 	logger.Info("Inside tip operation create Process. Record: ", record,". ProcessID:" ,processID)
+
+	t := TipOperation{
+		ProcessID: processID,
+	}
+
+	t.Type = TipOps(record[0])
+	if t.Type == PickupTip{
+		if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil{
+			logger.Errorln(err, record[1])
+			return err
+		}
+	}
+
+	createdProcess, err := store.CreateTipOperation(context.Background(), t)
+	if err != nil {
+	   logger.Errorln(err)
+	   return
+	}
+
+	logger.Info("Tip Operation Record Inserted->", createdProcess)
+
 	return nil
 }
 
 func createTipDockingProcess(record []string, processID uuid.UUID, store Storer) (err error){
 	logger.Info("Inside tip docking create Process. Record: ", record,". ProcessID:" ,processID)
+
+t := TipDock{
+	ProcessID: processID,
+}
+
+	t.Type =  record[0] 
+	if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil{
+		logger.Errorln(err, record[1])
+		return err
+	}
+
+	if t.Height, err = strconv.ParseFloat(record[12], 64); err != nil{
+		logger.Errorln(err, record[12])
+	   return
+	}
+
+	createdProcess, err := store.CreateTipDocking(context.Background(), t)
+	if err != nil {
+	   logger.Errorln(err)
+	   return
+	}
+
+	logger.Info("Tip Docking Record Inserted->", createdProcess)
+
 	return nil
 }
 
