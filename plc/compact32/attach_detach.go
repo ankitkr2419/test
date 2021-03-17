@@ -15,7 +15,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
-		magnetState[d.name] = attached
+		magnetState.Store(d.name, attached)
 		return
 	case "detach":
 		response, err = d.Detach(ad.OperationType)
@@ -27,9 +27,9 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		// operation_type is its'd db variable
 		// Make sure that db changes are reflected at here as well
 		if ad.OperationType == "semi_detach" {
-			magnetState[d.name] = semiDetached
+			magnetState.Store( d.name, semiDetached)
 		} else {
-			magnetState[d.name] = detached
+			magnetState.Store(d.name, detached)
 		}
 		return
 	}
@@ -46,6 +46,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 */
 func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
 
+	// TODO: Check if already detached, then avoid all below claculations
 	var magnetBackPosition, magnetUpPosition float64
 	var ok bool
 	var direction, pulses uint16
@@ -169,6 +170,7 @@ skipMagnetToSuccessPosition:
 */
 func (d *Compact32Deck) Attach(operationType string) (response string, err error) {
 
+	// TODO: Check if already attached, then avoid all below claculations
 	var deckPosition, magnetDownFirstPosition, magnetFwdFirstPosition, magnetDownSecPosition, magnetFwdSecPosition float64
 	var ok bool
 	var direction, pulses uint16
