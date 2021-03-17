@@ -121,23 +121,25 @@ func createProcesses(record []string, store Storer) (err error){
 	// based on the name in record[0]
 	switch record[0]{
 	case "AspireDispense":
-		createAspireDispenseProcess(record[1:], createdProcess.ID, store)
+		err = createAspireDispenseProcess(record[1:], createdProcess.ID, store)
 	case "AttachDetach":
-		createAttachDetachProcess(record[1:], createdProcess.ID, store)
+		err = createAttachDetachProcess(record[1:], createdProcess.ID, store)
 	case "Delay":
-		createDelayProcess(record[1:], createdProcess.ID, store)
+		err = createDelayProcess(record[1:], createdProcess.ID, store)
 	case "Piercing":
-		createPiercingProcess(record[1:], createdProcess.ID, store)
+		err = createPiercingProcess(record[1:], createdProcess.ID, store)
 	case "TipOperation":
-		createTipOperationProcess(record[1:], createdProcess.ID, store)
+		err = createTipOperationProcess(record[1:], createdProcess.ID, store)
 	case "TipDocking":
-		createTipDockingProcess(record[1:], createdProcess.ID, store)
+		err = createTipDockingProcess(record[1:], createdProcess.ID, store)
 	case "Shaking":
-		createShakingProcess(record[1:], createdProcess.ID, store)
+		err = createShakingProcess(record[1:], createdProcess.ID, store)
 	case "Heating":
-		createHeatingProcess(record[1:], createdProcess.ID, store)
+		err = createHeatingProcess(record[1:], createdProcess.ID, store)
 	default:
 		err = fmt.Errorf("unknown process found in csv!: %v ", record[0])
+	}
+	if err != nil {
 		logger.Errorln(err)
 		return
 	}
@@ -194,4 +196,5 @@ func clearFailedRecipe(store Storer) {
 		}
 	}
 	logger.Info("Partial recipe cleaned up")
+	return
 }
