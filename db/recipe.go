@@ -9,20 +9,7 @@ import (
 )
 
 const (
-	getRecipeQuery = `SELECT id,
-						name,
-						description,
-						pos_1,
-						pos_2,
-						pos_3,
-						pos_4,
-						pos_5,
-						pos_cartridge_1,
-						pos_7,
-						pos_cartridge_2,
-						pos_9,
-						created_at,
-						updated_at
+	getRecipeQuery = `SELECT *
 						FROM recipes
 						WHERE id = $1`
 	selectRecipesQuery = `SELECT *
@@ -55,8 +42,6 @@ const (
 						pos_cartridge_2,
 						pos_9,
 						updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) WHERE id = $13`
-	updateProcessesCountQuery = `UPDATE recipes r SET process_count = (SELECT COUNT(*) FROM processes p WHERE p.recipe_id = r.id)`
-	updateProcessCountQuery   = updateProcessesCountQuery + ` WHERE id = $1`
 )
 
 type Recipe struct {
@@ -78,12 +63,6 @@ type Recipe struct {
 }
 
 func (s *pgStore) ShowRecipe(ctx context.Context, id uuid.UUID) (dbRecipe Recipe, err error) {
-	// Before Showing Recipes Always Update the Process Count for that Recipe
-	_, err = s.db.Exec(
-		updateProcessCountQuery,
-		id,
-	)
-
 	err = s.db.Get(&dbRecipe, getRecipeQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching recipe")
@@ -93,11 +72,6 @@ func (s *pgStore) ShowRecipe(ctx context.Context, id uuid.UUID) (dbRecipe Recipe
 }
 
 func (s *pgStore) ListRecipes(ctx context.Context) (dbRecipe []Recipe, err error) {
-	// Before Listing Recipes Always Update the Process Count
-	_, err = s.db.Exec(
-		updateProcessesCountQuery,
-	)
-
 	err = s.db.Select(&dbRecipe, selectRecipesQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching recipes")
