@@ -15,11 +15,21 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
+		magnetState.Store(d.name, attached)
 		return
 	case "detach":
 		response, err = d.Detach(ad.OperationType)
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
+		}
+
+		// NOTE: Below string literal "semi_detach" is dependent on db schema
+		// operation_type is its'd db variable
+		// Make sure that db changes are reflected at here as well
+		if ad.OperationType == "semi_detach" {
+			magnetState.Store( d.name, semiDetached)
+		} else {
+			magnetState.Store(d.name, detached)
 		}
 		return
 	}
@@ -36,6 +46,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 */
 func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
 
+	// TODO: Check if already detached, then avoid all below claculations
 	var magnetBackPosition, magnetUpPosition float64
 	var ok bool
 	var direction, pulses uint16
@@ -56,9 +67,9 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelBack > 0.1:
+	case distanceToTravelBack > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelBack < -0.1:
+	case distanceToTravelBack < (minimumMoveDistance * -1):
 		distanceToTravelBack *= -1
 		direction = 0
 	default:
@@ -94,9 +105,9 @@ skipMagnetBackToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelUp > 0.1:
+	case distanceToTravelUp > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelUp < -0.1:
+	case distanceToTravelUp < (minimumMoveDistance * -1):
 		distanceToTravelUp *= -1
 		direction = 0
 	default:
@@ -126,9 +137,9 @@ skipMagnetbackSecPosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelBack > 0.1:
+	case distanceToTravelBack > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelBack < -0.1:
+	case distanceToTravelBack < (minimumMoveDistance * -1):
 		distanceToTravelBack *= -1
 		direction = 0
 	default:
@@ -159,6 +170,7 @@ skipMagnetToSuccessPosition:
 */
 func (d *Compact32Deck) Attach(operationType string) (response string, err error) {
 
+	// TODO: Check if already attached, then avoid all below claculations
 	var deckPosition, magnetDownFirstPosition, magnetFwdFirstPosition, magnetDownSecPosition, magnetFwdSecPosition float64
 	var ok bool
 	var direction, pulses uint16
@@ -172,8 +184,10 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 	// get the consumable deck position
 
-	if deckPosition, ok = consDistance["deck_move_for_magnet_attach"]; !ok {
-		err = fmt.Errorf("deck_move_for_magnet_attach doesn't exist for consuamble distances")
+	// deck will be at this position from homing for attach or detach operation
+	// We are using shaker_tube to maintain consistency
+	if deckPosition, ok = consDistance["shaker_tube"]; !ok {
+		err = fmt.Errorf("shaker_tube doesn't exist for consuamble distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
@@ -181,9 +195,9 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	distToTravel := positions[deckAndNumber] - deckPosition
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > 0.1:
+	case distToTravel > minimumMoveDistance:
 		direction = 1
-	case distToTravel < -0.1:
+	case distToTravel < (minimumMoveDistance * -1):
 		distToTravel *= -1
 		direction = 0
 	default:
@@ -213,9 +227,9 @@ skipDeckToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelDown > 0.1:
+	case distanceToTravelDown > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelDown < -0.1:
+	case distanceToTravelDown < (minimumMoveDistance * -1):
 		distanceToTravelDown *= -1
 		direction = 0
 	default:
@@ -245,9 +259,9 @@ skipMagnetDownToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelFwd > 0.1:
+	case distanceToTravelFwd > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelFwd < -0.1:
+	case distanceToTravelFwd < (minimumMoveDistance * -1):
 		distanceToTravelFwd *= -1
 		direction = 0
 	default:
@@ -277,9 +291,9 @@ skipMagnetFwdToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelDown > 0.1:
+	case distanceToTravelDown > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelDown < -0.1:
+	case distanceToTravelDown < (minimumMoveDistance * -1):
 		distanceToTravelDown *= -1
 		direction = 0
 	default:
@@ -308,9 +322,9 @@ skipMagnetDownSecToSourcePosition:
 
 	switch {
 	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelFwd > 0.1:
+	case distanceToTravelFwd > minimumMoveDistance:
 		direction = 1
-	case distanceToTravelFwd < -0.1:
+	case distanceToTravelFwd < (minimumMoveDistance * -1):
 		distanceToTravelFwd *= -1
 		direction = 0
 	default:
@@ -329,4 +343,15 @@ skipMagnetDownSecToSourcePosition:
 skipMagnetFwdSecToSourcePosition:
 	return "Success", nil
 
+}
+
+func (d *Compact32Deck) fullDetach() (response string, err error) {
+	// Calling AttachDetach below as this handles magnetState implicitly
+	// WARNING: Be careful of below string literals "detach" and "full_detach",
+	// any changes in db schema of magnets should be reflected in these as well.
+	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType: "full_detach"})
+	if err != nil {
+		fmt.Printf("error in magnet detach process %v \n", err.Error())
+	}
+	return
 }

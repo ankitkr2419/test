@@ -3,6 +3,7 @@ package compact32
 import (
 	"fmt"
 	"mylab/cpagent/db"
+	"sync"
 )
 
 type DeckNumber struct {
@@ -43,36 +44,30 @@ const (
 	finalSensorCutPulses                = uint16(2999)
 )
 
+// minimum Distance for Any motor movement
+const (
+	minimumMoveDistance = 0.3
+)
+
+// 120 Seconds is the minimum UVLight On Time
+const (
+	minimumUVLightOnTime int64 = 2 * 60
+)
+
 // Special Speeds
 const (
 	homingFastSpeed = uint16(2000)
 	homingSlowSpeed = uint16(500)
 )
 
-var wrotePulses = map[string]uint16{
-	"A": 0,
-	"B": 0,
-}
-var executedPulses = map[string]uint16{
-	"A": 0,
-	"B": 0,
-}
-var sensorHasCut = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var aborted = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var paused = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var runInProgress = map[string]bool{
-	"A": false,
-	"B": false,
-}
+// Magnet States
+const (
+	detached = iota
+	semiDetached
+	attached
+)
+
+var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress sync.Map
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
 var positions = map[DeckNumber]float64{

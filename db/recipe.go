@@ -9,20 +9,7 @@ import (
 )
 
 const (
-	getRecipeQuery = `SELECT id,
-						name,
-						description,
-						pos_1,
-						pos_2,
-						pos_3,
-						pos_4,
-						pos_5,
-						pos_cartridge_1,
-						pos_7,
-						pos_cartridge_2,
-						pos_9,
-						created_at,
-						updated_at
+	getRecipeQuery = `SELECT *
 						FROM recipes
 						WHERE id = $1`
 	selectRecipesQuery = `SELECT *
@@ -70,6 +57,7 @@ type Recipe struct {
 	Position7          int64     `db:"pos_7" json:"pos_7"`
 	Cartridge2Position int64     `db:"pos_cartridge_2" json:"pos_cartridge_2"`
 	Position9          int64     `db:"pos_9" json:"pos_9"`
+	ProcessCount       int64     `db:"process_count" json:"process_count"`
 	CreatedAt          time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt          time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -86,7 +74,7 @@ func (s *pgStore) ShowRecipe(ctx context.Context, id uuid.UUID) (dbRecipe Recipe
 func (s *pgStore) ListRecipes(ctx context.Context) (dbRecipe []Recipe, err error) {
 	err = s.db.Select(&dbRecipe, selectRecipesQuery)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching recipe")
+		logger.WithField("err", err.Error()).Error("Error fetching recipes")
 		return
 	}
 	return

@@ -72,7 +72,10 @@ func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, hea
 	fmt.Printf("Set Temperature %v", result)
 
 	// first check aborted if yes then exit
-	if aborted[d.name] {
+	if temp, ok := aborted.Load(d.name); !ok {
+		err = fmt.Errorf("aborted isn't loaded!")
+		return
+	} else if temp.(bool) {
 		err = fmt.Errorf("Operation was ABORTED!")
 		return "", err
 	}
@@ -95,8 +98,11 @@ func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, hea
 shakerSelectionLoop:
 	for {
 
-		if aborted[d.name] {
-			err = fmt.Errorf("operation was ABORTED \n")
+		if temp, ok := aborted.Load(d.name); !ok {
+			err = fmt.Errorf("aborted isn't loaded!")
+			return
+		} else if temp.(bool) {
+			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
 
@@ -171,7 +177,10 @@ shakerSelectionLoop:
 			fmt.Println("Heating Was Successful")
 			return "SUCCESS", nil
 		default:
-			if aborted[d.name] {
+			if temp, ok := aborted.Load(d.name); !ok {
+				err = fmt.Errorf("aborted isn't loaded!")
+				return
+			} else if temp.(bool) {
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}

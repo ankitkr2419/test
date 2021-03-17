@@ -105,9 +105,9 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		switch {
 		// distToTravel > 0 means go towards the Sensor or FWD
-		case distToTravel > 0.1:
+		case distToTravel > minimumMoveDistance:
 			direction = 1
-		case distToTravel < -0.1:
+		case distToTravel < (minimumMoveDistance * -1):
 			distToTravel *= -1
 			direction = 0
 		default:

@@ -47,10 +47,6 @@ ConsumableDistance:
     name: "discard_big_hole"
     distance: 354.60
     description: "syringe module will get tip into this hole"
-  - id: 13
-    name: "deck_move_for_magnet_attach"
-    distance: 100
-    description: "deck will be at this position from homing for attach or detach operation"   
   - id: 40
     name: "discard_box_open_position"
     distance: 200
@@ -202,7 +198,7 @@ ConsumableDistance:
     description: "This field sets the down height for the magnet first step attach"
   - id: 604
     name: "magnet_forward_step_1"
-    distance: 12.5
+    distance: 10.5
     description: "This field sets the forward distance for the magnet attach"
   - id: 605
     name: "magnet_down_step_2"
@@ -210,11 +206,11 @@ ConsumableDistance:
     description: "This field sets the down height for the magnet second step attach"
   - id: 606
     name: "magnet_forward_step_2"
-    distance: 5.5
+    distance: 3.5
     description: "This field sets the forward distance for the magnet second step attach"
   - id: 607
     name: "magnet_backward_step_1"
-    distance: 12.5
+    distance: 10.5
     description: "This field sets the backward distance for the magnet first step Detach"
   - id: 608
     name: "magnet_up_step_1"
@@ -282,7 +278,7 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
   - id: 1055
     name: "deck_b_zero"
-    distance: 13
+    distance: 13.5
     description: "All distances on deck as well as tips and tubes distances will be adjusted according to this variable"
   - id: 1056
     name: "magnet_up_down_b_zero"
@@ -298,7 +294,7 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All shaker horizontal distances will be fixed here"
   - id: 1059
     name: "syringe_module_b_lh_rh_zero"
-    distance: 6.5
+    distance: 5.5
     description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
   - id: 1060
     name: "syringe_b_lh_rh_zero"
