@@ -247,6 +247,14 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 	 }
 	 a.ProcessID = processID
 
+	 createdProcess, err := store.CreateAspireDispense(context.Background(), a)
+	 if err != nil {
+		logger.Errorln(err)
+		return
+	 }
+
+	 logger.Info("AspireDispense Record Inserted->", createdProcess)
+
 	 return nil
 }
 
@@ -293,7 +301,9 @@ func clearFailedRecipe(store Storer) {
 			logger.Warnln("Couldn't cleanUp the partial recipe with ID: ", createdRecipe.ID)
 			return
 		}
+		logger.Info("Partial recipe cleaned up")
+		return
 	}
-	logger.Info("Partial recipe cleaned up")
+	logger.Info("complete recipe inserted successfully")
 	return
 }
