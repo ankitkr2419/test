@@ -1,12 +1,12 @@
 import React from 'react';
 
-import DeckCard from 'shared-components/DeckCard';
+import DeckCardContainer from 'containers/DeckCardContainer';
 
 const AppFooter = (props) => {
 	return (
         <div className="d-flex justify-content-center align-items-center">
-            <DeckCard/>
-            <DeckCard/>
+            <DeckCardContainer/>
+            <DeckCardContainer/>
 		</div>
 	);
 };

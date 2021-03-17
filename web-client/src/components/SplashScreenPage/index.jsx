@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 
-import styled from 'styled-components'
-import { Modal, ModalBody, Button} from 'core-components';
-import { ImageIcon, ButtonIcon, Icon, Text } from 'shared-components';
+import styled from 'styled-components';
+import { 
+	Modal, 
+	ModalBody, 
+	Button,
+	CheckBox
+} from 'core-components';
+import { ImageIcon, ButtonIcon, Icon, Text} from 'shared-components';
 
 import CirclelogoIcon from 'assets/images/mylab-logo-with-circle.png';
+import OperatorLoginModal from 'components/modals/OperatorLoginModal';
+import TimeModal from 'components/modals/TimeModal';
 import thumbsUpGraphics from 'assets/images/thumbs-up-graphic.svg';
 import { ROUTES } from "appConstants"
 
@@ -22,20 +29,18 @@ const SplashScreen = styled.div`
 `;
 
 const OptionBox = styled.div`
-	background-color:#F5F5F5;
-	border-radius:36px 0 0 36px;
 	.large-btn{
-		width:15.125rem;
-		height:8.5rem;
+		width:16.75rem;
+		height:6.25rem;
+		background-color:#F5F5F5;
 		margin-bottom: 2.125rem;
+		border:1px solid #DBDBDB;
+		border-radius:1rem;
+	}
+	.title-heading{
+		color:
 	}
 `;
-const CloseButton = styled.div`
-		position:absolute;
-		top:1rem;
-		right:1rem;
-`;
-
 const SplashScreenComponent = (props) => {
 
 	const [modal, setModal] = useState(false);
@@ -54,6 +59,68 @@ const SplashScreenComponent = (props) => {
 					alt="My Lab"
 					/>
 			</div>
+			{/* Homing Confirmation Popup */}
+      		<Button color="danger" onClick={toggle}>Alert pop up2</Button>
+				<Modal isOpen={modal} toggle={toggle} centered size="sm">
+					<ModalBody className="p-0">
+						<OptionBox className="p-5">
+							<ButtonIcon
+									position="absolute"
+									placement="right"
+									top={16}
+									right={16}
+									size={36}
+									name="cross"
+									onClick={toggle}
+									className="ml-auto border-0"
+							/>
+							
+							<div className="d-flex justify-content-center align-items-center flex-column mt-5">
+								<Text Tag="label" size="20" className="mb-4 title-heading">Homing Confirmation</Text>
+									<div
+										className="d-flex justify-content-center align-items-center font-weight-light border-1 border-gray shadow-none bg-gray large-btn">
+											<div className="d-flex justify-content-center align-items-center flex-column">
+												<Icon
+													size={21}
+													name="tip-pickup"
+													onClick={toggle}
+													className="text-primary mt-3 mb-3"
+												/>
+												<CheckBox
+													id='tip-discard'
+													name='tip-discard'
+													label='Tip Discard'
+													className='mb-3'
+												/>
+										</div>
+									</div>
+									{/* <Button
+										color="default"
+										className="font-weight-light border-1 border-gray shadow-none bg-white large-btn">
+											<div className="d-flex justify-content-center align-items-center flex-column">
+												<Text Tag="span">Tip Discard</Text>
+												<Icon
+														size={21}
+														name="tip-pickup"
+														onClick={toggle}
+														className="text-primary mt-3"
+												/>
+										</div>
+									</Button> */}
+									<Button
+										color="primary"
+									>
+										Yes
+									</Button>
+							</div>
+						</OptionBox>
+				</ModalBody>
+			</Modal>
+
+			{/* Operator Login Modal */}
+
+			{/* <OperatorLoginModal />
+			<TimeModal /> */}
 			{/* Alert pop up2 */}
     </SplashScreen>
 	);

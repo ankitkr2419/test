@@ -25,18 +25,14 @@ import Slider from "react-slick";
 //       caption: ''
 //     }
 // ];
-
-const CloseButton = styled.div`
-		position:absolute;
-		top:1rem;
-		right:1rem;
-`;
 const RecipeFlowSlider = styled.div`
   .slides{
     .slides-inner-box{
       width:43.5rem;
-      height:25rem;
+      height:100%;
+      // height:25rem;
       margin:0 auto;
+      overflow: hidden !important;
       img{
       border-radius:1.5rem !important;
       box-shadow:0px 3px 6px rgba(0,0,0,0.16) !important;
@@ -53,6 +49,21 @@ const RecipeFlowSlider = styled.div`
       color:#F38220;
     }
   }
+  .center {
+    .slick-list{
+      padding-top: 30px !important;
+      padding-bottom: 30px !important;
+    }
+    .slick-center .slides-inner-box {
+      transform: scale(1.12);
+      overflow: hidden;
+      border-radius: 1.5rem;
+    }
+    .slides{
+      -webkit-transition: all 0.3s ease-out;
+      transition: all 0.3s ease-out;
+    }
+  }
 `;
 const NextButton = styled.div`
   position: absolute;
@@ -64,9 +75,10 @@ const NextButton = styled.div`
 const RecipeFlowModal = (props) => {
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
-    const settings = {
+    const recipeFlowsettings = {
+      className: "center",
       centerMode: true,
-      centerPadding: "78px",
+      centerPadding: "65px",
       dots: true,
       infinite: true,
       speed: 500,
@@ -90,17 +102,19 @@ const RecipeFlowModal = (props) => {
         className="recipe-flow-modal"
 			>
 				<ModalBody className="py-5 px-0 recipe-flow-modal-body">
-          <CloseButton>
             <ButtonIcon
-            size={34}
+            position="absolute"
+            placement="right"
+            top={16}
+            right={16}
+            size={36}
             name="cross"
             onClick={toggle}
             className="ml-auto border-0"
             />
-          </CloseButton>
             <Center className="font-weight-bold mb-4">Name Name Name Name Name Name Name</Center>
             <RecipeFlowSlider className="mb-4">
-              <Slider {...settings}>
+              <Slider {...recipeFlowsettings}>
                   <div className="slides">
                     <div className="slides-inner-box">
                       <ImageIcon src={Slide1} alt=""/>

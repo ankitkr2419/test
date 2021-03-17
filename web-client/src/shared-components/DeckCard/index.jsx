@@ -9,6 +9,7 @@ import {
 } from 'core-components';
 import ActionButton from "./ActionButton";
 import { Progress } from 'reactstrap';
+import OperatorLoginModalContainer from 'containers/OperatorLoginModalContainer';
 
 const DeckCardBox = styled.div`
   width: 32rem;
@@ -59,7 +60,23 @@ const DeckCardBox = styled.div`
 				background-color:#10907A;
 			}
 		}
+		// .uv-light-button{
+		// 	position:absolute;
+		// 	right:244px;
+		// 	top:0;
+		// }
+		.resume-button{
+			position:absolute;
+			right:123px;
+			top:0;
+		}
+		.abort-button{
+			position:absolute;
+			right:21px;
+			top:0;
+		}
 	}
+
 `;
 
 const CardOverlay= styled.div`
@@ -76,6 +93,12 @@ const CardOverlay= styled.div`
 	cursor: pointer;
 `;
 const DeckCard = (props) => {
+
+	const {
+        operatorLoginModalOpen,
+        toggleOperatorLoginModal
+    } = props;
+
 	return (
 		<DeckCardBox className="d-flex justify-content-start align-items-center">
 			<CardOverlay />
@@ -85,21 +108,36 @@ const DeckCard = (props) => {
 			<div className="p-4 w-100 h-100 deck-content">
 			<div className="d-flex justify-content-between align-items-center">
 				<div className="d-none1">
-					<ActionButton/>
-					<div className="d-none1">
+					{/* <div className="uv-light-button">
+						<ActionButton/>
+					</div>  */}
+					{/* <div className="resume-button">
+						<ActionButton/>
+					</div>
+					<div className="abort-button">
+						<ActionButton/>
+					</div> */}
+					
+					{/* <div className="d-none1">
 						<Text Tag="h5" className="mb-2">Recipe Name</Text>
 						<Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
-					</div>
+					</div> */}
 				</div>
 				<Button
 					color="primary"
-					className="ml-auto"
+					className="ml-auto d-flex"
 					size="sm"
-				>	Login       
+					onClick={toggleOperatorLoginModal}
+				>	Login
 				</Button>
+
+				<OperatorLoginModalContainer 
+					operatorLoginModalOpen={operatorLoginModalOpen}
+					toggleOperatorLoginModal={toggleOperatorLoginModal}
+				/>
 				
 				</div>
-				<Progress value="2" className="custom-progress-bar"/>
+				{/* <Progress value="2" className="custom-progress-bar"/> */}
 			</div>
 		</DeckCardBox>
 	);
