@@ -113,14 +113,14 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Println("Movements in Progress for deck: ", d.name)
 
 	for {
-		if temp, ok := aborted.Load(d.name); !ok {
+		if temp1, ok := aborted.Load(d.name); !ok {
 			err = fmt.Errorf("aborted isn't loaded!")
 			return
 		} else if temp2, ok := executedPulses.Load(d.name); !ok {
-			err = fmt.Errorf("aborted isn't loaded!")
+			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
 			// Write executed pulses to Position
-		} else if temp.(bool){
+		} else if temp1.(bool){
 			positions[deckAndNumber] += float64(temp2.(int)) / float64(motors[deckAndNumber]["steps"])
 			fmt.Println("pos", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")

@@ -61,7 +61,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 	if temp, ok := runInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("runInProgress isn't loaded!")
 		return
-	} else if temp.(bool) {
+	} else if !temp.(bool) {
 		err = fmt.Errorf("Machine is already in IDLE state")
 		return "", err
 	}
@@ -90,11 +90,10 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 	if temp, ok := paused.Load(d.name); !ok {
 		err = fmt.Errorf("paused isn't loaded!")
 		return
-	} else if temp.(bool) {
+	} else if !temp.(bool) {
 		err = fmt.Errorf("System is already running, or done with the run")
 		return "", err
 	}
-
 
 	if temp, ok := timerInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("timerInProgress isn't loaded!")
@@ -106,10 +105,9 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			return "", err
 		}
 
-
-		if temp1, ok1 := wrotePulses.Load(d.name); !ok1 {
+		if temp1, ok := wrotePulses.Load(d.name); !ok {
 			err = fmt.Errorf("wrotePulses isn't loaded!")
-		} else if  temp2, ok2 := executedPulses.Load(d.name); !ok2{
+		} else if temp2, ok := executedPulses.Load(d.name); !ok{
 			err = fmt.Errorf("executedPulses isn't loaded!")
 		} else if temp1.(int) <= temp2.(int) {
 			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
@@ -159,10 +157,10 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
 
-	if temp1, ok1 := runInProgress.Load(d.name); !ok1 {
+	if temp1, ok := runInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("runInProgress isn't loaded!")
 		return
-	} else if  temp2, ok2 := timerInProgress.Load(d.name); !ok2{
+	} else if  temp2, ok := timerInProgress.Load(d.name); !ok{
 		err = fmt.Errorf("timerInProgress isn't loaded!")
 		return
 	} else if temp1.(bool) && !temp2.(bool) {
