@@ -1,7 +1,7 @@
 package compact32
 
 import (
-	// "encoding/binary"
+	"encoding/binary"
 	"fmt"
 	"time"
 )
@@ -24,7 +24,6 @@ import (
 */
 func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, heatTime time.Duration) (response string, err error) {
 
-	/*
 	// here we are hardcoding the shaker no in future this is to be fetched dynamically.
 	// 3 is the value that needs to be passed for heating both the shakers.
 	shaker := uint16(3)
@@ -189,8 +188,6 @@ shakerSelectionLoop:
 		}
 	}
 
-	*/
-	return "SUCCESS", nil
 }
 
 func (d *Compact32Deck) SwitchOffTheHeater() {
