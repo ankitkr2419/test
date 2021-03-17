@@ -3,8 +3,8 @@ package compact32
 import (
 	"fmt"
 	"math"
-	"sort"
 	"mylab/cpagent/db"
+	"sort"
 )
 
 /****ALGORITHM******
@@ -30,9 +30,9 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		CartridgeID:   cartridgeID,
 		CartridgeType: pi.Type,
 	}
-
+	//
 	// 1. get cartridge start distance
-
+	//
 	if cartridgeStart, ok = consDistance[string(pi.Type)+"_start"]; !ok {
 		err = fmt.Errorf(string(pi.Type) + "_start doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
@@ -46,8 +46,9 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		return "", err
 	}
 
+	//
 	// 2. Pierce well after well
-
+	//
 	//*************************
 	// Pierce Well after Well *
 	//*************************
@@ -60,14 +61,13 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 	piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 
-
 	for _, well := range pi.CartridgeWells {
 		wellsToBePierced = append(wellsToBePierced, int(well))
 	}
 
 	// sort wells in Ascending Order
 	sort.Ints(wellsToBePierced)
-	
+
 	for _, wellNumber := range wellsToBePierced {
 		//
 		// 2.1 Move deck to the well position
