@@ -101,7 +101,7 @@ func main() {
 		},
 		{
 			Name:  "import",
-			Usage: "import recipe csv [--recipename RECIPE_NAME] [--csv CSV_ABSOLUTE_PATH] ",
+			Usage: "import [--recipename RECIPE_NAME] [--csv CSV_ABSOLUTE_PATH] ",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:  "recipename",
@@ -111,7 +111,7 @@ func main() {
 				&cli.StringFlag{
 					Name:  "csv",
 					Value: "recipe.csv",
-					Usage: "put recipe's csv file path",
+					Usage: "put recipe's csv complete file path",
 				},
 			},
 			Action: func(c *cli.Context) error {
