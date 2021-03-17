@@ -11,14 +11,14 @@ import (
 type Category string
 
 const (
-	well_to_shaker Category = "well_to_shaker"
-	shaker_to_well Category = "shaker_to_well"
-	well_to_well   Category = "well_to_well"
-	well_to_deck   Category = "well_to_deck"
-	deck_to_well   Category = "deck_to_well"
-	deck_to_deck   Category = "deck_to_deck"
-	shaker_to_deck Category = "shaker_to_deck"
-	deck_to_shaker Category = "deck_to_shaker"
+	WS Category = "well_to_shaker"
+	SW Category = "shaker_to_well"
+	WW Category = "well_to_well"
+	WD Category = "well_to_deck"
+	DW Category = "deck_to_well"
+	DD Category = "deck_to_deck"
+	SD Category = "shaker_to_deck"
+	DS Category = "deck_to_shaker"
 )
 
 const (
