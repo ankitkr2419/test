@@ -32,7 +32,7 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 
 	err = s.db.Get(&td, getTipDockQuery, pid)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing tip docking details")
+		logger.WithField("err", err.Error()).Error("Error getting tip docking details")
 		return
 	}
 	return
