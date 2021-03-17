@@ -1,12 +1,12 @@
 package db
 
 import (
-	"os"
 	"context"
 	"encoding/csv"
 	"fmt"
 	"github.com/google/uuid"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -381,11 +381,6 @@ func createTipDockingProcess(record []string, processID uuid.UUID, store Storer)
 		return err
 	}
 
-	if t.Height, err = strconv.ParseFloat(record[12], 64); err != nil {
-		logger.Errorln(err, record[12])
-		return
-	}
-
 	createdProcess, err := store.CreateTipDocking(context.Background(), t)
 	if err != nil {
 		logger.Errorln(err)
@@ -399,6 +394,63 @@ func createTipDockingProcess(record []string, processID uuid.UUID, store Storer)
 
 func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
 	logger.Info("Inside shaking create Process. Record: ", record, ". ProcessID:", processID)
+
+	s := Shaking{
+		ProcessID: processID,
+	}
+
+	if s.WithTemp, err = strconv.ParseBool(record[0]); err != nil {
+		logger.Errorln(err, record[0])
+		return err
+	}
+
+	if s.FollowTemp, err = strconv.ParseBool(record[1]); err != nil {
+		logger.Errorln(err, record[1])
+		return err
+	}
+
+	// Current Temperature is accurate only to 1 decimal point
+	// In db we only store its multiplication by 10
+	// As PLC can't handle decimals
+	if temperature, err := strconv.ParseFloat(record[2], 64); err != nil {
+		logger.Errorln(err, record[2])
+		return err
+	} else {
+		s.Temperature = int64(temperature * 10)
+	}
+
+	if s.RPM1, err = strconv.ParseInt(record[3], 10, 64); err != nil {
+		logger.Errorln(err, record[3])
+		return err
+	}
+
+	if time1, err := strconv.ParseInt(record[4], 10, 64); err != nil {
+		logger.Errorln(err, record[4])
+		return err
+	} else {
+		s.Time1 = time.Duration(time1)
+	}
+
+	if s.RPM2, err = strconv.ParseInt(record[5], 10, 64); err != nil {
+		logger.Errorln(err, record[5])
+		return err
+	}
+
+	if time2, err := strconv.ParseInt(record[6], 10, 64); err != nil {
+		logger.Errorln(err, record[6])
+		return err
+	} else {
+		s.Time2 = time.Duration(time2)
+	}
+
+	createdProcess, err := store.CreateShaking(context.Background(), s)
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
+	logger.Info("Shaking Record Inserted->", createdProcess)
+
 	return nil
 }
 
