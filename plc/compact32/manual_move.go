@@ -66,9 +66,6 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		return "", err
 	}
 
-
-
-
 	if temp, ok := timerInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("timerInProgress isn't loaded!")
 		return
@@ -107,13 +104,13 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 
 		if temp1, ok := wrotePulses.Load(d.name); !ok {
 			err = fmt.Errorf("wrotePulses isn't loaded!")
-		} else if temp2, ok := executedPulses.Load(d.name); !ok{
+		} else if temp2, ok := executedPulses.Load(d.name); !ok {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 		} else if temp1.(int) <= temp2.(int) {
 			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
 			wrotePulses.Store(d.name, 0)
 			executedPulses.Store(d.name, 0)
-		} else{
+		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
 			response, err = d.ResumeMotorWithPulses(uint16(temp1.(int) - temp2.(int)))
 		}
@@ -151,7 +148,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return
 	}
 
-	aborted.Store(d.name , true)
+	aborted.Store(d.name, true)
 	wrotePulses.Store(d.name, 0)
 	paused.Store(d.name, false)
 
@@ -160,7 +157,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	if temp1, ok := runInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("runInProgress isn't loaded!")
 		return
-	} else if  temp2, ok := timerInProgress.Load(d.name); !ok{
+	} else if temp2, ok := timerInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("timerInProgress isn't loaded!")
 		return
 	} else if temp1.(bool) && !temp2.(bool) {

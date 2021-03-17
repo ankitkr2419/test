@@ -27,7 +27,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		// operation_type is its'd db variable
 		// Make sure that db changes are reflected at here as well
 		if ad.OperationType == "semi_detach" {
-			magnetState.Store( d.name, semiDetached)
+			magnetState.Store(d.name, semiDetached)
 		} else {
 			magnetState.Store(d.name, detached)
 		}

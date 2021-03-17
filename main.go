@@ -266,4 +266,3 @@ func startApp(plcName string, test bool) (err error) {
 	server.Run(*addr)
 	return
 }
-
