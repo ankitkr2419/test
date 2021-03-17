@@ -69,39 +69,6 @@ const (
 
 var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress sync.Map
 
-/*
-var wrotePulses = map[string]uint16{
-	"A": 0,
-	"B": 0,
-}
-var executedPulses = map[string]uint16{
-	"A": 0,
-	"B": 0,
-}
-var aborted = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var paused = map[string]bool{
-	"A": false,
-	"B": false,
-}
-var runInProgress = map[string]bool{
-	"A": false,
-	"B": false,
-}
-
-var magnetState = map[string]int{
-	"A": detached,
-	"B": detached,
-}
-
-var timerInProgress = map[string]bool{
-	"A": false,
-	"B": false,
-}
-*/
-
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
 var positions = map[DeckNumber]float64{
 	// Deck A and its Motors
