@@ -96,6 +96,7 @@ type Storer interface {
 	ShowTipDocking(context.Context, uuid.UUID) (TipDock, error)
 	CreateTipDocking(context.Context, TipDock) (TipDock, error)
 	ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error)
+	CreateHeating(context.Context, Heating) (Heating, error)
 	CreateAttachDetach(context.Context, AttachDetach) (AttachDetach, error)
 	ShowAttachDetach(ctx context.Context, processID uuid.UUID) (AttachDetach, error)
 	CreateDelay(context.Context, Delay) (Delay, error)
