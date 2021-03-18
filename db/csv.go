@@ -72,8 +72,8 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 		logger.Errorln("error while reading a record from csvReader:", err)
 		return err
 	}
-	if strings.EqualFold(record[0], "VERSION") {
-		logger.Errorln("No version found for csv:", err)
+	if !strings.EqualFold(record[0], "VERSION") {
+		logger.Errorln("No version found for csv:", record[0])
 		return err
 	}
 
@@ -97,7 +97,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 			return err
 		}
 
-		if strings.EqualFold(record[0], "DUMMY") {
+		if !strings.EqualFold(record[0], "DUMMY") {
 			if len(record) < 2 || record[1] == "" {
 				err = fmt.Errorf("record has unexpected length or empty process name, maybe CSV is over.")
 				logger.Warnln(err, record)
