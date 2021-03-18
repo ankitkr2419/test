@@ -428,13 +428,11 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 	}
 
 	// Current Temperature is accurate only to 1 decimal point
-	// In db we only store its multiplication by 10
+	// While sending it to PLC  we need to multiply by 10
 	// As PLC can't handle decimals
-	if temperature, err := strconv.ParseFloat(record[2], 64); err != nil {
+	if s.Temperature, err = strconv.ParseFloat(record[2], 64); err != nil {
 		logger.Errorln(err, record[2])
 		return err
-	} else {
-		s.Temperature = int64(temperature * 10)
 	}
 
 	if s.RPM1, err = strconv.ParseInt(record[3], 10, 64); err != nil {
@@ -474,6 +472,40 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 
 func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
 	logger.Info("Inside heating create Process. Record: ", record, ". ProcessID:", processID)
+
+	h := Heating{
+		ProcessID: processID,
+	}
+	
+	// Current Temperature is accurate only to 1 decimal point
+	// While sending it to PLC  we need to multiply by 10
+	// As PLC can't handle decimals
+	if h.Temperature, err = strconv.ParseFloat(record[0], 64); err != nil {
+		logger.Errorln(err, record[0])
+		return err
+	}
+
+	if h.FollowTemp, err = strconv.ParseBool(record[1]); err != nil {
+		logger.Errorln(err, record[1])
+		return err
+	}
+
+	if time1, err := strconv.ParseInt(record[2], 10, 64); err != nil {
+		logger.Errorln(err, record[4])
+		return err
+	} else {
+		h.Duration = time.Duration(time1)
+	}
+
+	createdProcess, err := store.CreateHeating(context.Background(), h)
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
+	logger.Info("Heating Record Inserted->", createdProcess)
+
+
 	return nil
 }
 
