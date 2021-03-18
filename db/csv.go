@@ -23,7 +23,6 @@ var done bool
 
 func ImportCSV(recipeName, csvPath string) (err error) {
 
-	// Create DB conn
 	var store Storer
 	store, err = Init()
 	if err != nil {
