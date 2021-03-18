@@ -19,8 +19,13 @@ type Heating struct {
 }
 
 const (
-	//get heating data with recipe_id
 	getHeatingQuery = `SELECT * FROM heating where process_id = $1`
+	createHeatingQuery = `INSERT INTO heating (
+		temperature,
+		follow_temp,
+		duration,
+		process_id)
+		VALUES ($1, $2, $3, $4) RETURNING id`
 )
 
 func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
@@ -36,4 +41,28 @@ func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heatin
 	}
 	return
 
+}
+
+func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdHeating Heating, err error) {
+	var lastInsertID uuid.UUID
+
+	err = s.db.QueryRow(
+		createHeatingQuery,
+		h.Temperature,
+		h.FollowTemp,
+		h.Duration,
+		h.ProcessID,
+	).Scan(&lastInsertID)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error creating Heating")
+		return
+	}
+
+	err = s.db.Get(&createdHeating, getHeatingQuery, h.ProcessID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in getting Heating")
+		return
+	}
+	return
 }
