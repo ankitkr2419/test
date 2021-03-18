@@ -60,6 +60,8 @@ $icon-tick: "\e934";
 $icon-publish: "\e935";
 $icon-download-1: "\e936";
 $icon-published: "\e937";
+$icon-timer: "\e938";
+$icon-process: "\e939";
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -427,5 +429,17 @@ $icon-published: "\e937";
 .icon-published {
 	&:before {
 		content: $icon-published;
+	}
+}
+
+.icon-timer {
+	&:before {
+		content: $icon-timer;
+	}
+}
+
+.icon-process {
+	&:before {
+		content: $icon-process;
 	}
 }
