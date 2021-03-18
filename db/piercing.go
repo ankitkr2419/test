@@ -17,13 +17,7 @@ const (
 )
 
 const (
-	getPiercingQuery = `SELECT id,
-						type,
-						cartridge_wells,
-						discard,
-						process_id,
-						created_at,
-						updated_at
+	getPiercingQuery = `SELECT *
 						FROM piercing
 						WHERE process_id = $1`
 	selectPiercingQuery = `SELECT *
@@ -75,7 +69,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, p Piercing) (createdPierci
 	var lastInsertID uuid.UUID
 	err = s.db.QueryRow(
 		createPiercingQuery,
-		p.ID,
+		p.Type,
 		p.CartridgeWells,
 		p.Discard,
 		p.ProcessID,
@@ -86,7 +80,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, p Piercing) (createdPierci
 		return
 	}
 
-	err = s.db.Get(&createdPiercing, getPiercingQuery, lastInsertID)
+	err = s.db.Get(&createdPiercing, getPiercingQuery, p.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting Piercing")
 		return

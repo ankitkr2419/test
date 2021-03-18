@@ -72,6 +72,7 @@ type Storer interface {
 	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
 	ShowTipOperation(context.Context, uuid.UUID) (TipOperation, error)
+	CreateTipOperation(context.Context, TipOperation) (TipOperation, error)
 	ShowRecipe(context.Context, uuid.UUID) (Recipe, error)
 	CreateRecipe(context.Context, Recipe) (Recipe, error)
 	DeleteRecipe(context.Context, uuid.UUID) error
@@ -93,7 +94,13 @@ type Storer interface {
 	DeleteAspireDispense(context.Context, uuid.UUID) error
 	UpdateAspireDispense(context.Context, AspireDispense) error
 	ShowTipDocking(context.Context, uuid.UUID) (TipDock, error)
+	CreateTipDocking(context.Context, TipDock) (TipDock, error)
 	ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error)
+	CreateHeating(context.Context, Heating) (Heating, error)
+	CreateAttachDetach(context.Context, AttachDetach) (AttachDetach, error)
 	ShowAttachDetach(ctx context.Context, processID uuid.UUID) (AttachDetach, error)
+	CreateDelay(context.Context, Delay) (Delay, error)
 	ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error)
+	CreateShaking(context.Context, Shaking) (Shaking, error)
+	ShowShaking(ctx context.Context, id uuid.UUID) (shaking Shaking, err error)
 }

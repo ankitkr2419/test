@@ -9,7 +9,7 @@ import (
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
-	wrotePulses.Store(d.name,  0)
+	wrotePulses.Store(d.name, 0)
 	executedPulses.Store(d.name, 0)
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
 
@@ -30,7 +30,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	if temp, ok := magnetState.Load(d.name); !ok {
 		err = fmt.Errorf("aborted isn't loaded!")
 		return
-	} else if temp.(int)  != detached && motorNum == K5_Deck {
+	} else if temp.(int) != detached && motorNum == K5_Deck {
 		response, err = d.fullDetach()
 		if err != nil {
 			fmt.Println(err)
@@ -120,7 +120,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
 			// Write executed pulses to Position
-		} else if temp1.(bool){
+		} else if temp1.(bool) {
 			positions[deckAndNumber] += float64(temp2.(int)) / float64(motors[deckAndNumber]["steps"])
 			fmt.Println("pos", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
@@ -260,12 +260,12 @@ func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
 
 	fmt.Printf("Read D212AddressBytesUint16. res : %+v \n", results)
 	if len(results) > 0 {
-		executedPulses.Store(d.name, binary.BigEndian.Uint16(results) )
+		executedPulses.Store(d.name, binary.BigEndian.Uint16(results))
 	} else {
 		err = fmt.Errorf("couldn't read D212")
 		return "", err
 	}
-	fmt.Println("Read D212 Pulses -> ",  binary.BigEndian.Uint16(results))
+	fmt.Println("Read D212 Pulses -> ", binary.BigEndian.Uint16(results))
 
 	return "D212 Reading SUCESS", nil
 
