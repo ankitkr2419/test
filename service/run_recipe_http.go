@@ -94,7 +94,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
 
 			fmt.Printf("heat object %v", heat)
-			ht, err := deps.PlcDeck[deck].Heating(uint16(heat.Temperature), heat.FollowTemp, heat.Duration)
+			// Current Temperature is accurate only to 1 decimal point
+			// While sending it to PLC  we need to multiply by 10
+			// As PLC can't handle decimals
+			ht, err := deps.PlcDeck[deck].Heating(uint16(heat.Temperature * 10), heat.FollowTemp, heat.Duration)
 			if err != nil {
 				return "", err
 			}

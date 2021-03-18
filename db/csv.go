@@ -505,7 +505,6 @@ func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (e
 
 	logger.Info("Heating Record Inserted->", createdProcess)
 
-
 	return nil
 }
 
