@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 // import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Text } from 'shared-components';
+import { Text, Icon } from 'shared-components';
 import {
 	Button, 
 } from 'core-components';
@@ -79,6 +79,37 @@ const DeckCardBox = styled.div`
 			right:21px;
 			top:0;
 		}
+		.hour-label{
+			background-color:#F5E3D3;
+			border-radius:4px 0 0 4px;
+			border-right:2px solid #F38220;
+			padding:3px 4px;
+			font-size:0.875rem;
+			line-height:1rem;
+		}
+		.min-label{
+			font-size:0.875rem;
+			line-height:1rem;
+		}
+		.process-count-label{
+			background-color:#F5E3D3;
+			border-radius:4px;
+			padding:3px 4px;
+			font-size:1.125rem;
+			line-height:1rem;
+		}
+		.process-total-count{
+			font-size:0.875rem;
+			line-height:1rem;
+		}
+		.process-remaining{
+			font-size:10px;
+			line-height:11px;
+		}
+		// add this class while login 
+		&.logged-in{
+			background:#ffffff;
+		}
 	}
 	@keyframes blink{
 		0%{
@@ -113,7 +144,7 @@ const DeckCard = (props) => {
 			<div className="d-flex justify-content-center align-items-center deck-title"> 
 				<Text Tag="label" size="20" >Deck A</Text>
 			</div>
-			<div className="p-4 w-100 h-100 deck-content">
+			<div className="p-4 w-100 h-100 deck-content logged-in1">
 			<div className="d-flex justify-content-between align-items-center">
 				<div className="d-none1">
 					{/* <div className="uv-light-button">
@@ -127,13 +158,22 @@ const DeckCard = (props) => {
 					</div>
 					
 					<div className="d-none1">
-						<Text Tag="h5" className="mb-2">Recipe Name</Text>
-						{/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text> */}
-						<Text Tag="label" className="mb-1">
-							<Text Tag="span"> 1 Hr </Text>
-							<Text Tag="span">8 min remaining</Text>
+							<Text Tag="h5" size="18" className="mb-2 font-weight-bold recipe-name">Recipe Name</Text>
+							{/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text> */}
+							{/* <Text Tag="label" className="mb-1 d-flex align-items-center">
+								<Icon name='timer' size={19} className="text-primary"/>
+								<Text Tag="span" className="hour-label font-weight-bold ml-2"> 1 Hr </Text>
+								<Text Tag="span" className="min-label ml-2 font-weight-bold">8 min</Text>
+								<Text Tag="span" className="ml-1">remaining</Text>
+							</Text> */}
+
+							<Text Tag="label" className="mb-1 d-flex align-items-center">
+								<Icon name='process' size={19} className="text-primary"/>
+								<Text Tag="span" className="process-count-label font-weight-bold ml-2"> 4 
+								<Text Tag="span" className="process-total-count font-weight-bold">/10 </Text> </Text>
+								<Text Tag="span" className="ml-1 process-remaining">Processes remaining</Text>
 							</Text>
-					</div>
+						</div>
 				</div>
 				<Button
 					color="primary"
