@@ -108,7 +108,7 @@ func createProcesses(record []string, store Storer) (err error) {
 
 	p := Process{
 		Name:           "Process",
-		Type:           record[0],
+		Type:           strings.TrimSpace(record[0]),
 		SequenceNumber: sequenceNumber,
 		RecipeID:       createdRecipe.ID,
 	}
