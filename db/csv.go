@@ -120,7 +120,7 @@ func createProcesses(record []string, store Storer) (err error) {
 	}
 	// Create database entry for individual process here
 	// based on the name in record[0]
-	switch record[0] {
+	switch strings.TrimSpace(record[0]) {
 	case "AspireDispense":
 		err = createAspireDispenseProcess(record[1:], createdProcess.ID, store)
 	case "AttachDetach":
@@ -163,21 +163,21 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 	}
 
 	switch {
-	case strings.EqualFold(record[0], "WS"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "WS"):
 		a.Category = WS
-	case strings.EqualFold(record[0], "SW"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "SW"):
 		a.Category = SW
-	case strings.EqualFold(record[0], "WW"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "WW"):
 		a.Category = WW
-	case strings.EqualFold(record[0], "WD"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "WD"):
 		a.Category = WD
-	case strings.EqualFold(record[0], "DW"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "DW"):
 		a.Category = DW
-	case strings.EqualFold(record[0], "DD"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "DD"):
 		a.Category = DD
-	case strings.EqualFold(record[0], "SD"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "SD"):
 		a.Category = SD
-	case strings.EqualFold(record[0], "DS"):
+	case strings.EqualFold(strings.TrimSpace(record[0]), "DS"):
 		a.Category = DS
 	default:
 		err = fmt.Errorf("Category is supposed to be only from these [WW, WS,SW,DD,DS,SD,DW,WD].Current Category: %v", record[0])
@@ -187,17 +187,14 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 
 	// record[1] is CartridgeType
 	switch record[1] {
-	case "0", "":
-		err = fmt.Errorf("CartridgeType is Absent! Current Cartridge Category: %v", record[1])
-		logger.Warnln(err)
 	case "1":
 		a.CartridgeType = Cartridge1
 	case "2":
 		a.CartridgeType = Cartridge2
 	default:
-		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[1])
-		logger.Errorln(err)
-		return
+		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v. Setting Cartridge Type to 1", record[1])
+		a.CartridgeType = Cartridge1
+		logger.Warnln(err)
 	}
 
 	if a.SourcePosition, err = strconv.ParseInt(record[2], 10, 64); err != nil {
