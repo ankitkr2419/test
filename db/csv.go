@@ -187,6 +187,9 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 
 	// record[1] is CartridgeType
 	switch record[1] {
+	case "0", "":
+		err = fmt.Errorf("CartridgeType is Absent! Current Cartridge Category: %v", record[1])
+		logger.Warnln(err)
 	case "1":
 		a.CartridgeType = Cartridge1
 	case "2":
