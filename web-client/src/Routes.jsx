@@ -9,6 +9,10 @@ import PlateContainer from 'containers/PlateContainer';
 import ActivityContainer from 'containers/ActivityContainer';
 import TemplateLayout from 'layouts/TemplateLayout';
 import PrivateRoute from 'components/HOC/PrivateRoute';
+import SplashScreenContainer from 'containers/SplashScreenContainer';
+import LandingPageContainer from 'containers/LandingPageContainer';
+import RecipeListingContainer from 'containers/RecipeListingContainer';
+import AllSetContainer from 'containers/AllSetContainer';
 import { ROOT_URL_PATH } from './appConstants';
 
 export const routeDefinitions = [
@@ -40,6 +44,36 @@ export const routeDefinitions = [
 				exact: true,
 				component: ActivityContainer,
 				key: 5,
+			},
+			{
+				path: `${ROOT_URL_PATH}splashscreen`,
+				exact: true,
+				component: SplashScreenContainer,
+				key: 6,
+			},
+			{
+				path: `${ROOT_URL_PATH}landing`,
+				exact: true,
+				component: LandingPageContainer,
+				key: 7,
+			},
+			{
+				path: `${ROOT_URL_PATH}deckcard`,
+				exact: true,
+				component: LandingPageContainer,
+				key: 8,
+			},
+			{
+				path: `${ROOT_URL_PATH}recipe-listing`,
+				exact: true,
+				component: RecipeListingContainer,
+				key: 9,
+			},
+			{
+				path: `${ROOT_URL_PATH}all-set`,
+				exact: true,
+				component: AllSetContainer,
+				key: 10,
 			},
 		],
 	},

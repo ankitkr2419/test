@@ -23,6 +23,7 @@ db/application_test\.yml
 /web-client/npm-debug.log*
 /web-client/yarn-debug.log*
 /web-client/yarn-error.log*
+/web-client/yarn.lock
 
 config\.yml
 

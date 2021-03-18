@@ -28,7 +28,6 @@ export function* addStep(actions) {
 			payload: {
 				method: HTTP_METHODS.POST,
 				body,
-				reqPath: 'steps',
 				successAction,
 				failureAction,
 			},

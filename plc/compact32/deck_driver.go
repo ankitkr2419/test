@@ -289,7 +289,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
-	
+
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 

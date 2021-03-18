@@ -68,7 +68,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 
 
 
-	
+
 	if temp, ok := timerInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("timerInProgress isn't loaded!")
 		return
