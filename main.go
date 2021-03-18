@@ -228,6 +228,8 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
+	compact32.LoadUtils()
+
 	// add default User
 	u := db.User{
 		Username: "admin",
