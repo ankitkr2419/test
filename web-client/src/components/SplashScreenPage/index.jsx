@@ -59,9 +59,10 @@ const SplashScreenComponent = (props) => {
 					alt="My Lab"
 					/>
 			</div>
+			{/* can be used in future */}
 			{/* Homing Confirmation Popup */}
       		{/* <Button color="danger" onClick={toggle}>Alert pop up2</Button> */}
-				{/* <Modal isOpen={modal} toggle={toggle} centered size="sm">
+				{/* <Modal isOpen={true} toggle={toggle} centered size="sm">
 					<ModalBody className="p-0">
 						<OptionBox className="p-5">
 							<ButtonIcon
@@ -93,8 +94,8 @@ const SplashScreenComponent = (props) => {
 													className='mb-3'
 												/>
 										</div>
-									</div> */}
-									{/* <Button
+									</div>
+									<Button
 										color="default"
 										className="font-weight-light border-1 border-gray shadow-none bg-white large-btn">
 											<div className="d-flex justify-content-center align-items-center flex-column">
@@ -106,8 +107,8 @@ const SplashScreenComponent = (props) => {
 														className="text-primary mt-3"
 												/>
 										</div>
-									</Button> */}
-									{/* <Button
+									</Button>
+									<Button
 										color="primary"
 									>
 										Yes
