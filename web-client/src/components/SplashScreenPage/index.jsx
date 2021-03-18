@@ -49,23 +49,25 @@ const SplashScreenComponent = (props) => {
 					/>
 			</div>
 			{/* Homing Confirmation Popup */}
-      <Button color="danger" onClick={toggle}>Alert pop up2</Button>
+      <Button color="success" onClick={toggle}>Homing Confirmation</Button>
 				<Modal isOpen={modal} toggle={toggle} centered size="sm">
 					<ModalBody className="p-0">
-						<OptionBox className="p-5">
-							<ButtonIcon
-									position="absolute"
-									placement="right"
-									top={16}
-									right={16}
-									size={36}
-									name="cross"
-									onClick={toggle}
-									className="ml-auto border-0"
-							/>
-							
-							<div className="d-flex justify-content-center align-items-center flex-column mt-5">
-								<Text Tag="label" size="20" className="mb-4 title-heading">Homing Confirmation</Text>
+					<div className="d-flex justify-content-center align-items-center modal-heading">
+						<Text className="mb-0 title font-weight-bold">Deck B</Text>
+						<ButtonIcon
+							position="absolute"
+							placement="right"
+							top={0}
+							right={16}
+							size={36}
+							name="cross"
+							onClick={toggle}
+							className="border-0"
+						/>
+					</div>
+						<OptionBox className="p-4">
+							<div className="d-flex justify-content-center align-items-center flex-column mb-3">
+								<Text Tag="label" size="20" className="mb-4 title-heading font-weight-bold">Homing Confirmation</Text>
 									<div
 										className="d-flex justify-content-center align-items-center font-weight-light border-1 border-gray shadow-none bg-gray large-btn">
 											<div className="d-flex justify-content-center align-items-center flex-column">
@@ -99,7 +101,7 @@ const SplashScreenComponent = (props) => {
 									<Button
 										color="primary"
 									>
-										Yes
+										Okay
 									</Button>
 							</div>
 						</OptionBox>

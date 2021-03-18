@@ -11,7 +11,8 @@ import ActionButton from "./ActionButton";
 import { Progress } from 'reactstrap';
 
 const DeckCardBox = styled.div`
-  width: 32rem;
+	width:50%;  
+// width: 32rem;
   height: 6.625rem;
 	position:relative;
 	box-shadow:0px -3px 6px rgba(0,0,0,0.16);
