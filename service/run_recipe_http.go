@@ -59,22 +59,15 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 		return "", err
 	}
 
-	currentCartridgeIDs := map[string]int64{
-		"A": 0,
-		"B": 0,
-	}
+	var currentCartridgeID int64
 	// No cartridge selected so cartridge_id by default is 0
 	// Depending on cartridge_1 or cartridge_2 type we shall
 	//  select cartridge_id from recipe field
 
-	// currentTips will be maps of deck to TipsTubes
-	currentTips := map[string]db.TipsTubes{
-		"A": db.TipsTubes{},
-		"B": db.TipsTubes{},
-	}
+	var currentTip db.TipsTubes
 	//  No tip selected
 	//  This field will be set when a tip is picked up
-	//  We will get its id from recipe and its details from tipsTubes map
+	//  We will get its id from recipe and its details from tipsTubes
 
 	for _, p := range processes {
 		switch p.Type {
@@ -88,12 +81,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			fmt.Println(ad)
 
 			if ad.CartridgeType == db.Cartridge1 {
-				currentCartridgeIDs[deck] = recipe.Cartridge1Position
+				currentCartridgeID = recipe.Cartridge1Position
 			} else {
-				currentCartridgeIDs[deck] = recipe.Cartridge2Position
+				currentCartridgeID = recipe.Cartridge2Position
 			}
 			// TODO: Pass the complete Tip rather than just name for volume validations
-			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeIDs[deck], currentTips[deck].Name)
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
 			if err != nil {
 				return "", err
 			}
@@ -125,12 +118,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			fmt.Println(pi)
 
 			if string(pi.Type) == db.Cartridge1 {
-				currentCartridgeIDs[deck] = recipe.Cartridge1Position
+				currentCartridgeID = recipe.Cartridge1Position
 			} else {
-				currentCartridgeIDs[deck] = recipe.Cartridge2Position
+				currentCartridgeID = recipe.Cartridge2Position
 			}
 
-			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeIDs[deck])
+			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
@@ -165,12 +158,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 				if err != nil {
 					return "", err
 				}
-				currentTips[deck], err = deps.Store.ShowTip(tipID)
+				currentTip, err = deps.Store.ShowTip(tipID)
 				if err != nil {
 					return "", err
 				}
 			case db.DiscardTip:
-				currentTips[deck] = db.TipsTubes{}
+				currentTip = db.TipsTubes{}
 
 			}
 		case "TipDocking":
@@ -180,11 +173,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 			}
 			fmt.Println(td)
 			if td.Type == db.Cartridge1 {
-				currentCartridgeIDs[deck] = recipe.Cartridge1Position
+				currentCartridgeID = recipe.Cartridge1Position
 			} else {
-				currentCartridgeIDs[deck] = recipe.Cartridge2Position
+				currentCartridgeID = recipe.Cartridge2Position
 			}
-			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeIDs[deck])
+			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
@@ -209,7 +202,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 }
 
 func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err error) {
-	// Currently only 3 positions are allowed for tips
+	// Currently only 3 positions are allowed for tips deck version 1.2
+	// TODO: Change this for version 1.3
 	switch position {
 	case 1:
 		return recipe.Position1, nil
