@@ -9,6 +9,13 @@ import (
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
+	// TODO: Deprecate minimumMoveDistance and remove gotos
+	// Also put the direction by distToTravel change in a function
+	if pulse < minimumPulsesThreshold {
+		fmt.Println("Current pulse: ", pulse, " is less than minimumPulsesThreshold. Avoiding Motor Movements for motor:", motorNum, ", deck: ", d.name)
+		return "SUCCESS", nil
+	}
+
 	wrotePulses.Store(d.name, 0)
 	executedPulses.Store(d.name, 0)
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
