@@ -13,13 +13,10 @@ const RecipeListingContainer = (props) => {
 
 	useEffect(() => dispatch(recipeListingInitiated()), []);
 
-	console.log("RECIPE ACTION REDUCER: ", recipeActionReducer.response);
-	console.log("isLoading: ", isLoading);
-
 	return  (
 		<>
 			{/* {(!isLoading) && <Loader/>} */}
-			{<RecipeListingComponent recipeData={response}/>}
+			{(response) && <RecipeListingComponent recipeData={response}/>}
 		</>
 	);
 };

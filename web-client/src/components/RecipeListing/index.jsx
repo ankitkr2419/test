@@ -33,8 +33,6 @@ const RecipeListingComponent = (props) => {
 	recipeData.push(recipeData[0]);
 	recipeData.push(recipeData[0]);
 
-	console.log("RECIPE DATA: ", recipeData);
-
 	return (
 		<div className="ml-content">
 			<div className='landing-content px-2'>
@@ -62,7 +60,7 @@ const RecipeListingComponent = (props) => {
 						<CardBody className="p-5">
 							{/* <div style={{columns:2}}> */}
 								{recipeData.map((value, index) => (
-									<Col><RecipeCard key={index} recipeName={value.name} processCount={value.process_count} /></Col>
+									<Col key={index}><RecipeCard recipeName={value.name} processCount={value.process_count} /></Col>
 								))}
 							{/* </div> */}
 						</CardBody>
