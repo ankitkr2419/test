@@ -42,6 +42,7 @@ const (
 	reverseAfterNonCutPulses            = uint16(2000)
 	reverseAfterNonCutPulsesMagnet      = uint16(400)
 	finalSensorCutPulses                = uint16(2999)
+	minimumPulsesThreshold 				= uint16(20)
 )
 
 // minimum Distance for Any motor movement

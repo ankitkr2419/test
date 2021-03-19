@@ -35,9 +35,10 @@ variables: category, cartridgeType string,
   19. move syringe module down at fast till base
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
-  22. dispense by that dis_vol
+  22. Dispense completely
   23. move syringe module up
-  24. dispense blow out air
+  24. call syringe homing
+
 
 ********/
 
@@ -459,10 +460,17 @@ skipDeckToDestinationPosition:
 	}
 skipDispenseCycles:
 
-	//
-	//    22. dispense by that dis_vol
-	//
-	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseVolume))
+
+// 
+// 22. Dispense completely
+// 
+	if (ad.DispenseVolume + ad.DispenseBlowVolume) < (ad.AspireAirVolume + ad.AspireVolume){
+		err = fmt.Errorf("Can't dispense partially!")
+		return
+	}
+
+	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.DispenseVolume + ad.DispenseBlowVolume)))
+	pulses += reverseAfterNonCutPulses
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
@@ -488,12 +496,10 @@ skipDispenseCycles:
 	}
 
 	//
-	//   24. dispense blow out air
+	//    24.  call syringe homing
 	//
-	deckAndMotor.Number = K10_Syringe_LHRH
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseBlowVolume))
-	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	response, err = d.SyringeHoming()
 	if err != nil {
 		return
 	}

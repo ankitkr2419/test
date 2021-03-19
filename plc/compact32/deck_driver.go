@@ -9,6 +9,13 @@ import (
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
+	// TODO: Deprecate minimumMoveDistance and remove gotos
+	// Also put the direction by distToTravel change in a function
+	if pulse < minimumPulsesThreshold {
+		fmt.Println("Current pulse: ", pulse, " is less than minimumPulsesThreshold. Avoiding Motor Movements for motor:", motorNum, ", deck: ", d.name)
+		return "SUCCESS", nil
+	}
+
 	wrotePulses.Store(d.name, 0)
 	executedPulses.Store(d.name, 0)
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
@@ -338,14 +345,8 @@ func (d *Compact32Deck) SyringeHoming() (response string, err error) {
 		return
 	}
 
-	fmt.Println("Aspiring and getting cut then aspiring 2000")
+	fmt.Println("Aspiring and getting cut then aspiring 2000 pulses")
 	response, err = d.SetupMotor(homingFastSpeed, reverseAfterNonCutPulses, motors[deckAndNumber]["ramp"], ASPIRE, deckAndNumber.Number)
-	if err != nil {
-		return
-	}
-
-	fmt.Println("Syringe dispencing again")
-	response, err = d.SetupMotor(homingSlowSpeed, finalSensorCutPulses, motors[deckAndNumber]["ramp"], DISPENSE, deckAndNumber.Number)
 	if err != nil {
 		return
 	}

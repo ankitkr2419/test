@@ -180,6 +180,10 @@ ConsumableDistance:
     name: "piercing_tip_rest_position"
     distance: 65
     description: "syringe module goes here at fast with piercing tip"
+  - id: 324
+    name: "piercing_tip_above_well_position"
+    distance: 75
+    description: "syringe module goes here at fast with piercing tip"
   - id: 401
     name: "pickup_tip_up"
     distance: 59
