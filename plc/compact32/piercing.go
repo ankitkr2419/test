@@ -133,10 +133,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 			// piercingHeight will be always less than current position
 			distToTravel = positions[deckAndMotor] - piercingHeight
-			if distToTravel < 0 {
-				panic("distToTravel is less")
-			}
-
+			
 			piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
 		}
 
