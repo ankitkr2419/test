@@ -197,7 +197,13 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Re
 		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
 
-	return
+	// Home the machine
+	response, err = deps.PlcDeck[deck].Homing()
+	if err != nil {
+		return
+	}
+
+	return "SUCCESS", nil
 }
 
 func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err error) {
