@@ -99,6 +99,25 @@ func main() {
 				return db.RollbackMigrations(c.Args().Get(0))
 			},
 		},
+		{
+			Name:  "import",
+			Usage: "import [--recipename RECIPE_NAME] [--csv CSV_ABSOLUTE_PATH] ",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "recipename",
+					Value: "recipe",
+					Usage: "put recipe name",
+				},
+				&cli.StringFlag{
+					Name:  "csv",
+					Value: "recipe.csv",
+					Usage: "put recipe's csv complete file path",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				return db.ImportCSV(c.String("recipename"), c.String("csv"))
+			},
+		},
 	}
 
 	if err := cliApp.Run(os.Args); err != nil {
@@ -208,6 +227,8 @@ func startApp(plcName string, test bool) (err error) {
 		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
 		return
 	}
+
+	compact32.LoadUtils()
 
 	// add default User
 	u := db.User{

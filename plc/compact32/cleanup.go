@@ -22,11 +22,11 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 		return
 	} else if temp.(bool) {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return 
+		return
 	}
 
 	aborted.Store(d.name, false)
-	runInProgress.Store(d.name ,true)
+	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
 	fmt.Println("Deck is moving to discard_box_open_position")
@@ -59,7 +59,6 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	var ok bool
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
-
 
 	if temp, ok := runInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("runInProgress isn't loaded!")
@@ -234,7 +233,7 @@ func waitUntilResumed(deck string) (response string, err error) {
 
 		if temp, ok := aborted.Load(deck); !ok {
 			err = fmt.Errorf("aborted isn't loaded!")
-			return 
+			return
 		} else if temp.(bool) {
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err

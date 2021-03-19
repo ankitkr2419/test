@@ -17,8 +17,11 @@ type Delay struct {
 }
 
 const (
-	//get delay data with recipe_id
 	getDelayQuery = `SELECT * FROM delay where process_id = $1`
+	createDelayQuery = `INSERT INTO delay (
+		delay_time,
+		process_id)
+		VALUES ($1, $2) RETURNING id`
 )
 
 func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error) {
@@ -29,6 +32,27 @@ func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err
 	)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error getting delay process")
+		return
+	}
+	return
+}
+
+func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay, err error) {
+	var lastInsertID uuid.UUID
+	err = s.db.QueryRow(
+		createDelayQuery,
+		d.DelayTime,
+		d.ProcessID,
+	).Scan(&lastInsertID)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error creating Delay")
+		return
+	}
+
+	err = s.db.Get(&createdDelay, getDelayQuery, d.ProcessID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in getting Delay")
 		return
 	}
 	return

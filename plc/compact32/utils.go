@@ -42,6 +42,7 @@ const (
 	reverseAfterNonCutPulses            = uint16(2000)
 	reverseAfterNonCutPulsesMagnet      = uint16(400)
 	finalSensorCutPulses                = uint16(2999)
+	minimumPulsesThreshold 				= uint16(20)
 )
 
 // minimum Distance for Any motor movement
@@ -68,6 +69,24 @@ const (
 )
 
 var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress sync.Map
+
+
+func LoadUtils(){
+	wrotePulses.Store("A", 0)
+	wrotePulses.Store("B", 0)
+	executedPulses.Store("A", 0)
+	executedPulses.Store("B", 0)
+	aborted.Store("A", false)
+	aborted.Store("B", false)
+	paused.Store("A", false)
+	paused.Store("B", false)	
+	runInProgress.Store("A", false)
+	runInProgress.Store("B", false)
+	timerInProgress.Store("A", false)
+	timerInProgress.Store("B", false)
+	magnetState.Store("A", detached)
+	magnetState.Store("B", detached)
+}
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
 var positions = map[DeckNumber]float64{

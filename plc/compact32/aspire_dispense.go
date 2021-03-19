@@ -35,9 +35,10 @@ variables: category, cartridgeType string,
   19. move syringe module down at fast till base
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
-  22. dispense by that dis_vol
+  22. Dispense completely
   23. move syringe module up
-  24. dispense blow out air
+  24. call syringe homing
+
 
 ********/
 
@@ -127,7 +128,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// Get Source Position -
 	//----------------------
 	switch ad.Category {
-	case "well_to_well", "well_to_shaker", "well_to_deck":
+	case db.WW, db.WS, db.WD:
 		uniqueCartridge.WellNum = ad.SourcePosition
 		if sourceCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("sourceCartridge doesn't exist")
@@ -137,9 +138,9 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 		sourcePosition, ok = sourceCartridge["distance"]
 		sourcePosition += position
 		fmt.Println("sourcePosition: ", sourcePosition)
-	case "shaker_to_well", "shaker_to_deck":
+	case db.SW, db.SD:
 		sourcePosition, ok = consDistance["shaker_tube"]
-	case "deck_to_well", "deck_to_deck", "deck_to_shaker":
+	case db.DW, db.DD, db.DS:
 		// TODO: Check source Positions
 		fmt.Println("This is the position---> ", "pos_"+fmt.Sprintf("%d", ad.SourcePosition))
 		sourcePosition, ok = consDistance["pos_"+fmt.Sprintf("%d", ad.SourcePosition)]
@@ -158,7 +159,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// Get Destination Position -
 	//---------------------------
 	switch ad.Category {
-	case "well_to_well", "shaker_to_well", "deck_to_well":
+	case db.WW, db.SW, db.DW:
 		uniqueCartridge.WellNum = ad.DestinationPosition
 		if destinationCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("destinationCartridge doesn't exist")
@@ -169,9 +170,9 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 		destinationPosition, ok = destinationCartridge["distance"]
 		destinationPosition += position
 		fmt.Println("destinationPosition: ", destinationPosition)
-	case "well_to_shaker", "deck_to_shaker":
+	case db.WS, db.DS:
 		destinationPosition, ok = consDistance["shaker_tube"]
-	case "well_to_deck", "deck_to_deck", "shaker_to_deck":
+	case db.WD, db.DD, db.SD:
 		fmt.Println("This is the position---> ", "pos_"+fmt.Sprintf("%d", ad.DestinationPosition))
 		destinationPosition, ok = consDistance["pos_"+fmt.Sprintf("%d", ad.DestinationPosition)]
 		// default already handled in source Position
@@ -295,7 +296,7 @@ skipDeckToSourcePosition:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-	
+
 	//
 	//   14. pickup and drop that asp_mix_vol for number of aspire_cycles
 	//       these cycles should be fast
@@ -363,7 +364,6 @@ skipAspireCycles:
 	if err != nil {
 		return
 	}
-
 
 	//********************************
 	// REACHING DISPENSE DESTINATION *
@@ -460,10 +460,17 @@ skipDeckToDestinationPosition:
 	}
 skipDispenseCycles:
 
-	//
-	//    22. dispense by that dis_vol
-	//
-	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseVolume))
+
+// 
+// 22. Dispense completely
+// 
+	if (ad.DispenseVolume + ad.DispenseBlowVolume) < (ad.AspireAirVolume + ad.AspireVolume){
+		err = fmt.Errorf("Can't dispense partially!")
+		return
+	}
+
+	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.DispenseVolume + ad.DispenseBlowVolume)))
+	pulses += reverseAfterNonCutPulses
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
@@ -489,12 +496,10 @@ skipDispenseCycles:
 	}
 
 	//
-	//   24. dispense blow out air
+	//    24.  call syringe homing
 	//
-	deckAndMotor.Number = K10_Syringe_LHRH
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseBlowVolume))
-	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	response, err = d.SyringeHoming()
 	if err != nil {
 		return
 	}
