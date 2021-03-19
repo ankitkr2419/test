@@ -50,10 +50,7 @@ const OperatorLoginModalContainer = (props) => {
         dispatch(operatorLoginInitiated({email:email, password: password, role: "admin"}));
     }
 
-    console.log(`isOperatorLoggedIn: ${isOperatorLoggedIn} && error: ${error}`);
-
     if (isOperatorLoggedIn && !error) {
-        console.log("INSIDE!");
         return <Redirect to="/recipe-listing"/>
     }
 

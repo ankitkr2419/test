@@ -1,18 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Card, CardBody, Button, Row, Col } from 'core-components';
 import {
 	Icon,
-    Text,
-    ButtonIcon
 } from 'shared-components';
-
 
 import styled from 'styled-components';
 import AppFooter from 'components/AppFooter';
 import RecipeFlowModal from 'components/modals/RecipeFlowModal';
 import ConfirmationModal from 'components/modals/ConfirmationModal';
-import { Fade } from 'reactstrap';
 import TrayDiscardModal from 'components/modals/TrayDiscardModal';
 import RecipeCard from 'components/RecipeListing/RecipeCard';
 
@@ -26,8 +22,15 @@ const HeadingTitle = styled.label`
 `;
 
 const RecipeListingComponent = (props) => {
-    const [fadeIn, setFadeIn] = useState(true);
-    const toggle = () => setFadeIn(!fadeIn);
+
+	const {
+		recipeData
+	} = props;
+
+	recipeData.push(recipeData[0]);
+	recipeData.push(recipeData[0]);
+
+	console.log("RECIPE DATA: ", recipeData);
 
 	return (
 		<div className="ml-content">
@@ -36,7 +39,6 @@ const RecipeListingComponent = (props) => {
 						isOpen={false}
 				/>
 				<RecipeFlowModal/>
-			
 
 				<TopContent className="d-flex justify-content-between align-items-center mx-5">
 						<div className="d-flex align-items-center">
@@ -55,10 +57,11 @@ const RecipeListingComponent = (props) => {
 				</TopContent>
 				<Card>
 						<CardBody className="p-5">
-								<Row>
-										<Col> <RecipeCard /> </Col>
-										<Col> <RecipeCard /> </Col>
-								</Row>
+							{/* <div style={{columns:2}}> */}
+								{recipeData.map((value, index) => (
+									<Col><RecipeCard key={index} recipeName={value.name} processCount={value.process_count} /></Col>
+								))}
+							{/* </div> */}
 						</CardBody>
 				</Card>
 			</div>

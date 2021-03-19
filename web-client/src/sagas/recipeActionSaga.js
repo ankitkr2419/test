@@ -99,8 +99,8 @@ export function* recipeListing(){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: API_ENDPOINTS.recipeListing,
-        recipeListingSuccess,
-        recipeListingFailed
+        successAction: recipeListingSuccess,
+        failureAction: recipeListingFailed,
       }
     })
   } catch(error) {

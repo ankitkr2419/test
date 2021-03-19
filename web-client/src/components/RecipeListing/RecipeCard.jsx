@@ -42,13 +42,21 @@ const RecipeCardStyle = styled.div`
 `;
 
 const RecipeCard = (props) => {
+    // const [fadeIn, setFadeIn] = useState(true);
+    // const toggle = () => setFadeIn(!fadeIn);
+
+    const {
+        recipeName,
+        processCount,
+    } = props;
+
     const { toggle } = props;
     return(
         <RecipeCardStyle onClick={toggle}>
-            <div className="font-weight-bold recipe-heading">Name Name Name Name Name Name Name</div>
+            <div className="font-weight-bold recipe-heading">{recipeName}</div>
             <div className="recipe-card-body">
             <Text Tag="span" className="recipe-name">Total Processes -</Text>
-            <Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">347 </Text>
+            <Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">{processCount} </Text>
             {/* <Fade in={fadeIn} tag="h5" className="m-0 d-none">
                     <div className="recipe-action d-flex justify-content-between align-items-center">
                         <div className="d-flex justify-content-between align-items-center">

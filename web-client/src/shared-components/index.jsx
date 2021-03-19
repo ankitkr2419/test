@@ -15,6 +15,7 @@ import { TargetList, TargetListHeader, TargetListItem } from './Target';
 import { StyledUl, StyledLi, CustomButton } from './ListElements';
 import Text from './Text';
 import ImageIcon from './ImageIcon';
+import Loader from './Loader';
 
 export {
 	ButtonGroup,
@@ -38,4 +39,5 @@ export {
 	StyledLi,
 	CustomButton,
 	ImageIcon,
+	Loader,
 };
