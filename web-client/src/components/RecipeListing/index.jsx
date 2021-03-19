@@ -27,6 +27,9 @@ const RecipeListingComponent = (props) => {
 		recipeData
 	} = props;
 
+	//sample to generate more rows : will be deleted
+	recipeData.push(recipeData[0]);
+	recipeData.push(recipeData[0]);
 	recipeData.push(recipeData[0]);
 	recipeData.push(recipeData[0]);
 
