@@ -35,7 +35,12 @@ label{
 
 
 const TimeModal = (props) => {
-	//const { confirmationText, isOpen, confirmationClickHandler } = props;
+	const { 
+		// confirmationText, 
+		// isOpen, 
+		// confirmationClickHandler,
+		buttonText,
+	 } = props;
 
 	// const toggleModal = () => {};
 	// Operator Login Modal
@@ -44,7 +49,7 @@ const TimeModal = (props) => {
 	return (
 		<>
 		{/* Operator Login Modal */}
-		  <Button color="primary" onClick={toggleTimeModal}>Time Modal</Button>
+		  <Button color="primary" onClick={toggleTimeModal}>{buttonText}</Button>
 				<Modal isOpen={timeModal} toggle={toggleTimeModal} centered size="sm">
 				<ModalBody>
 					<div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
@@ -101,8 +106,8 @@ const TimeModal = (props) => {
 									</Col>
 								</FormGroup>
 							</Col>
-							</Row>
-							<Center className='my-3'>
+						</Row>
+						<Center className='my-3'>
 							<Button color='primary'>
 							 Next
 							</Button>

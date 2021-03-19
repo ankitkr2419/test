@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useHistory } from "react-router-dom";
 
 import styled from 'styled-components';
-import { 
-	Modal, 
-	ModalBody, 
-	Button,
-	CheckBox
-} from 'core-components';
-import { ImageIcon, ButtonIcon, Icon, Text} from 'shared-components';
+// import { 
+// 	Modal, 
+// 	ModalBody, 
+// 	Button,
+// 	CheckBox
+// } from 'core-components';
+import { ImageIcon, /*ButtonIcon, Icon, Text*/} from 'shared-components';
 
 import CirclelogoIcon from 'assets/images/mylab-logo-with-circle.png';
 // import OperatorLoginModal from 'components/modals/OperatorLoginModal';
@@ -28,24 +28,24 @@ const SplashScreen = styled.div`
     cursor: pointer
 `;
 
-const OptionBox = styled.div`
-	.large-btn{
-		width:16.75rem;
-		height:6.25rem;
-		background-color:#F5F5F5;
-		margin-bottom: 2.125rem;
-		border:1px solid #DBDBDB;
-		border-radius:1rem;
-	}
-	.title-heading{
-		color:
-	}
-`;
+// const OptionBox = styled.div`
+// 	.large-btn{
+// 		width:16.75rem;
+// 		height:6.25rem;
+// 		background-color:#F5F5F5;
+// 		margin-bottom: 2.125rem;
+// 		border:1px solid #DBDBDB;
+// 		border-radius:1rem;
+// 	}
+// 	.title-heading{
+// 		color:
+// 	}
+// `;
 const SplashScreenComponent = (props) => {
 
-	const [modal, setModal] = useState(false);
+	// const [modal, setModal] = useState(false);
 	const history = useHistory();
-	const toggle = () => setModal(!modal);
+	// const toggle = () => setModal(!modal);
 
 	const redirectToLandingPage = () => {
 		return history.push(ROUTES.landing)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import styled from 'styled-components';
 // import { Link } from 'react-router-dom';
@@ -94,16 +94,16 @@ const CardOverlay= styled.div`
 `;
 const DeckCard = (props) => {
 
-	const {
-        operatorLoginModalOpen,
-        toggleOperatorLoginModal
-    } = props;
+	const { cardName } = props;
+	
+	const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
+    const toggleOperatorLoginModal = () => setOperatorLoginModalOpen(!operatorLoginModalOpen);
 
 	return (
 		<DeckCardBox className="d-flex justify-content-start align-items-center">
 			<CardOverlay />
 			<div className="d-flex justify-content-center align-items-center deck-title"> 
-				<Text Tag="label" size="20" >Deck A</Text>
+				<Text Tag="label" size="20" >{cardName}</Text>
 			</div>
 			<div className="p-4 w-100 h-100 deck-content">
 			<div className="d-flex justify-content-between align-items-center">

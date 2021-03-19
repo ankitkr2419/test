@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 // import styled from 'styled-components';
 import { ButtonIcon, Center, ImageIcon} from 'shared-components';
 import { Button, Modal, ModalBody} from 'core-components';
@@ -73,8 +73,10 @@ const NextButton = styled.div`
 
 
 const RecipeFlowModal = (props) => {
-    const [modal, setModal] = useState(false);
-    const toggle = () => setModal(!modal);
+  const { modal, toggle } = props;
+    // const [modal, setModal] = useState(true);
+    // const toggle = () => setModal(!modal);
+
     const recipeFlowsettings = {
       className: "center",
       centerMode: true,
@@ -88,14 +90,14 @@ const RecipeFlowModal = (props) => {
     };
 	return (
 		<>
-			<ButtonIcon
+			{/* <ButtonIcon
 				size={34}
 				name='external-link'
 				className='mx-2'
 				onClick={toggle}
-			/>
+			/> */}
       <Modal
-				isOpen={true}
+				isOpen={modal}
 				toggle={toggle}
 				centered
 				size='lg'
@@ -103,14 +105,14 @@ const RecipeFlowModal = (props) => {
 			>
 				<ModalBody className="py-5 px-0 recipe-flow-modal-body">
             <ButtonIcon
-            position="absolute"
-            placement="right"
-            top={16}
-            right={16}
-            size={36}
-            name="cross"
-            onClick={toggle}
-            className="ml-auto border-0"
+              position="absolute"
+              placement="right"
+              top={16}
+              right={16}
+              size={36}
+              name="cross"
+              onClick={toggle}
+              className="ml-auto border-0"
             />
             <Center className="font-weight-bold mb-4">Name Name Name Name Name Name Name</Center>
             <RecipeFlowSlider className="mb-4">

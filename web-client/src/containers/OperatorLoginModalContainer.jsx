@@ -1,7 +1,6 @@
 import React, { useReducer } from 'react';
 
 import {reducer, initialState, authDataStateActions} from "components/modals/OperatorLoginModal/state"
-import {EMAIL_REGEX, PASSWORD_REGEX} from "components/modals/OperatorLoginModal/constants"
 import OperatorLoginModal from 'components/modals/OperatorLoginModal';
 
 import { operatorLoginInitiated } from 'action-creators/operatorLoginModalActionCreators';
@@ -47,19 +46,14 @@ const OperatorLoginModalContainer = (props) => {
     const handleLoginButtonClick = () => {
         const email = authData.email.value;
         const password = authData.password.value;
-
-        const invalidEmail = !EMAIL_REGEX.test(email);
-        const invalidPassword = !PASSWORD_REGEX.test(password);
         
-        setAuthData({type:SET_EMAIL_INVALID, payload:{invalid:invalidEmail}});
-        setAuthData({type:SET_PASSWORD_INVALID, payload:{invalid:invalidPassword}});
+        dispatch(operatorLoginInitiated({email:email, password: password, role: "admin"}));
+    }
 
-        if(!invalidEmail && !invalidPassword){
-            dispatch(operatorLoginInitiated({email:email, password: password, role: "admin"}));
-        }
-    }   
+    console.log(`isOperatorLoggedIn: ${isOperatorLoggedIn} && error: ${error}`);
 
     if (isOperatorLoggedIn && !error) {
+        console.log("INSIDE!");
         return <Redirect to="/recipe-listing"/>
     }
 
