@@ -128,9 +128,12 @@ func startApp(plcName string, test bool) (err error) {
 	if plcName == "compact32" {
 		driver = compact32.NewCompact32Driver(exit, test)
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(exit, test)
-		driverDeckB = compact32.NewCompact32DeckDriverB(exit, test, handler)
+		driverDeckB = compact32.NewCompact32DeckDriverB(exit, test, handler)	
 	} else {
 		driver = simulator.NewSimulator(exit)
+		driverDeckA = simulator.NewUISimulator(exit,"A")
+		driverDeckB = simulator.NewUISimulator(exit,"B")
+
 	}
 
 	store, err = db.Init()
