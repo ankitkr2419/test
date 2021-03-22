@@ -186,10 +186,7 @@ skipToStartUVTimer:
 			}
 
 			// if paused then
-			if temp, ok := paused.Load(d.name); !ok {
-				err = fmt.Errorf("paused isn't loaded!")
-				return
-			} else if temp.(bool) {
+			if d.IsMachineInPausedState() {
 				//  Switch off UV Light
 				response, err = d.switchOffUVLight()
 				if err != nil {
@@ -214,7 +211,7 @@ skipToStartUVTimer:
 				//
 				// 4.  If Paused then monitor for resumed
 				//
-				response, err = waitUntilResumed(d.name)
+				response, err = d.waitUntilResumed(d.name)
 				if err != nil {
 					return
 				}
@@ -226,21 +223,15 @@ skipToStartUVTimer:
 	return "UV Light Completed Successfully", nil
 }
 
-func waitUntilResumed(deck string) (response string, err error) {
+func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err error) {
 	for {
 		time.Sleep(time.Millisecond * 300)
-		if temp, ok := paused.Load(deck); !ok {
-			err = fmt.Errorf("paused isn't loaded!")
-			return
-		} else if !temp.(bool) {
+		if !d.IsMachineInPausedState() {
 			// when resumed go again to timer start
 			return "Resumed", nil
 		}
-
-		if temp, ok := aborted.Load(deck); !ok {
-			err = fmt.Errorf("aborted isn't loaded!")
-			return
-		} else if temp.(bool) {
+		
+		if d.IsMachineInAbortedState() {
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err
 		}
