@@ -3,18 +3,21 @@ package compact32
 import (
 	"fmt"
 	"math"
+	logger "github.com/sirupsen/logrus"
+
 )
 
-func (d *Compact32Deck) Homing() (response string, err error) {
 
-	aborted.Store(d.name, false)
-
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
-	if err != nil {
-		fmt.Println("Inside Switch off Shaker err : ", err, d.name)
-		return "", err
+func (d *Compact32Deck) MachineIsHomed() bool{
+	if temp, ok := homed.Load(d.name); !ok {
+		logger.Errorln("homed isn't loaded!")
+	} else if temp.(bool) {
+		return true
 	}
-	fmt.Println("Switched off the shaker--> for ", d.name)
+	return false
+}
+
+func (d *Compact32Deck) Homing() (response string, err error) {
 
 	if temp, ok := runInProgress.Load(d.name); !ok {
 		err = fmt.Errorf("runInProgress isn't loaded!")
@@ -26,6 +29,15 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
+
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
+	if err != nil {
+		fmt.Println("Inside Switch off Shaker err : ", err, d.name)
+		return "", err
+	}
+	fmt.Println("Switched off the shaker--> for ", d.name)
+
+	aborted.Store(d.name, false)
 
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.SyringeHoming()
@@ -50,6 +62,8 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	if err != nil {
 		return
 	}
+
+	homed.Store(d.name, true)
 
 	fmt.Println("Homing Completed Successfully")
 

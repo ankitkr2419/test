@@ -64,7 +64,7 @@ const (
 	attached
 )
 
-var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress sync.Map
+var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress, homed sync.Map
 
 func LoadUtils() {
 	wrotePulses.Store("A", 0)
@@ -81,6 +81,8 @@ func LoadUtils() {
 	timerInProgress.Store("B", false)
 	magnetState.Store("A", detached)
 	magnetState.Store("B", detached)
+	homed.Store("A", false)
+	homed.Store("B", false)
 }
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
