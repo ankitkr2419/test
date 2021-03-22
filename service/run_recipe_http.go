@@ -48,10 +48,13 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uuid.UUID) (response string, err error) {
 
-	if !deps.PlcDeck[deck].MachineIsHomed() {
+	if !deps.PlcDeck[deck].IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
 		return
 	}
+
+	//TODO: Check if RunInprogress
+
 
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
