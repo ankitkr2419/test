@@ -207,7 +207,7 @@ func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) SwitchOffHeater() (response string, err error) {
+func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 
 	// Switch off Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], OFF)
