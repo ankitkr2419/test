@@ -176,10 +176,7 @@ skipToStartUVTimer:
 		default:
 			// delay of 300 ms to reduce CPU usage
 			time.Sleep(time.Millisecond * 300)
-			if temp, ok := aborted.Load(d.name); !ok {
-				err = fmt.Errorf("aborted isn't loaded!")
-				return
-			} else if temp.(bool) {
+			if d.isMachineInAbortedState() {
 				t.Stop()
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
