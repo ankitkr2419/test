@@ -63,6 +63,8 @@ type DeckDriver interface {
 	IsMachineHomed() bool
 	IsRunInProgress() bool
 	IsTimerInProgress() bool
+	IsMachineInAbortedState() bool
+	IsMachineInPausedState() bool
 	ResetRunInProgress()
 	SetRunInProgress()
 	SetTimerInProgress()

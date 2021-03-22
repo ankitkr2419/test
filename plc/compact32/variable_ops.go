@@ -52,3 +52,21 @@ func (d *Compact32Deck) IsTimerInProgress() bool{
 	}
 	return false
 }
+
+func (d *Compact32Deck) IsMachineInAbortedState() bool{
+	if temp, ok := aborted.Load(d.name); !ok {
+		logger.Errorln("aborted isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) IsMachineInPausedState() bool{
+	if temp, ok := paused.Load(d.name); !ok {
+		logger.Errorln("paused isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
