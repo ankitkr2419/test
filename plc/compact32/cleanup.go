@@ -12,7 +12,7 @@ import (
 
 func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 
-	if !d.MachineIsHomed() {
+	if !d.IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
 		return
 	}
@@ -60,11 +60,11 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 
 func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 
-	if !d.MachineIsHomed() {
+	if !d.IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
 		return
 	}
-	
+
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
@@ -117,7 +117,7 @@ ALGORITHM
 
 func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
-	if !d.MachineIsHomed() {
+	if !d.IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
 		return
 	}
