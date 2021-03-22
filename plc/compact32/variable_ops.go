@@ -42,7 +42,6 @@ func (d *Compact32Deck) IsRunInProgress() bool{
 	return false
 }
 
-
 func (d *Compact32Deck) isTimerInProgress() bool{
 	if temp, ok := timerInProgress.Load(d.name); !ok {
 		logger.Errorln("timerInProgress isn't loaded!")
@@ -70,10 +69,27 @@ func (d *Compact32Deck) isMachineInPausedState() bool{
 	return false
 }
 
-
 func (d *Compact32Deck) getMagnetState() int{
 	if temp, ok := magnetState.Load(d.name); !ok {
 		logger.Errorln("magnet State isn't loaded!")
+		return -1
+	} else {
+		return temp.(int)
+	}
+}
+
+func (d *Compact32Deck) getExecutedPulses() int{
+	if temp, ok :=  executedPulses.Load(d.name); !ok {
+		logger.Errorln("executed Pulses isn't loaded!")
+		return -1
+	} else {
+		return temp.(int)
+	}
+}
+
+func (d *Compact32Deck) getWrotePulses() int{
+	if temp, ok :=  wrotePulses.Load(d.name); !ok {
+		logger.Errorln("wrote Pulses isn't loaded!")
 		return -1
 	} else {
 		return temp.(int)
