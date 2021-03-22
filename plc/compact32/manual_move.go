@@ -26,10 +26,6 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 	return
 }
 
-func (d *Compact32Deck) NameOfDeck() string {
-	return d.name
-}
-
 func (d *Compact32Deck) Pause() (response string, err error) {
 
 	// If machine is already PAUSED OR

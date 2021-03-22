@@ -4,6 +4,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+func (d *Compact32Deck) NameOfDeck() string {
+	return d.name
+}
+
 func (d *Compact32Deck) SetRunInProgress() {
 	runInProgress.Store(d.name, true)
 }
