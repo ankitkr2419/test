@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
+	"github.com/google/uuid"
+
 
 	"github.com/gorilla/mux"
 )
@@ -25,21 +27,14 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		// Get the recipe
-		recipe, err := deps.Store.ShowRecipe(req.Context(), recipeID)
-		if err != nil {
-			fmt.Fprintf(rw, err.Error())
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
 		switch deck {
 		case "A", "B":
-			response, err = runRecipe(req.Context(), deps, deck, recipe)
+			response, err = runRecipe(req.Context(), deps, deck, recipeID)
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}
 
+		// TODO: Handle error types
 		if err != nil {
 			fmt.Fprintf(rw, err.Error())
 			fmt.Println(err.Error())
@@ -51,10 +46,16 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Recipe) (response string, err error) {
+func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uuid.UUID) (response string, err error) {
 
 	if !deps.PlcDeck[deck].MachineIsHomed() {
 		err = fmt.Errorf("Please home the machine first!")
+		return
+	}
+
+	// Get the recipe
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
+	if err != nil {
 		return
 	}
 
