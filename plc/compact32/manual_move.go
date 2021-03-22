@@ -16,7 +16,7 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
-	response, err = d.SetupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
+	response, err = d.setupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
 	if err != nil {
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
@@ -27,7 +27,7 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 func (d *Compact32Deck) Pause() (response string, err error) {
 
 	// If machine is already PAUSED OR
-	if d.IsMachineInPausedState() {
+	if d.isMachineInPausedState() {
 		err = fmt.Errorf("Machine is already in PAUSED state")
 		return "", err
 	}
@@ -38,8 +38,8 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		return "", err
 	}
 
-	if !d.IsTimerInProgress() {
-		response, err = d.SwitchOffMotor()
+	if !d.isTimerInProgress() {
+		response, err = d.switchOffMotor()
 		if err != nil {
 			return "", err
 		}
@@ -53,13 +53,13 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 func (d *Compact32Deck) Resume() (response string, err error) {
 
 	// if paused only then resume
-	if !d.IsMachineInPausedState() {
+	if !d.isMachineInPausedState() {
 		err = fmt.Errorf("System is already running, or done with the run")
 		return "", err
 	}
 
-	if !d.IsTimerInProgress() {
-		response, err = d.ReadExecutedPulses()
+	if !d.isTimerInProgress() {
+		response, err = d.readExecutedPulses()
 		if err != nil {
 			fmt.Println("err : ", err)
 			return "", err
@@ -93,7 +93,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	fmt.Println("aborting the operation....")
 
 	fmt.Println("switching motor off....")
-	response, err = d.SwitchOffMotor()
+	response, err = d.switchOffMotor()
 	if err != nil {
 		fmt.Println("From deck ", d.name, err)
 		return "", err
@@ -117,8 +117,8 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	homed.Store(d.name, false)
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
-	if d.IsRunInProgress() && !d.IsTimerInProgress() {
-		response, err = d.ReadExecutedPulses()
+	if d.IsRunInProgress() && !d.isTimerInProgress() {
+		response, err = d.readExecutedPulses()
 		if err != nil {
 			fmt.Println("err : ", err)
 			return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")

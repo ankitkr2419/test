@@ -50,32 +50,17 @@ type Driver interface {
 type DeckDriver interface {
 	NameOfDeck() string
 	Homing() (string, error)
-	DeckHoming() (string, error)
-	SyringeHoming() (string, error)
-	SyringeModuleHoming() (string, error)
-	MagnetHoming() (string, error)
-	MagnetUpDownHoming() (string, error)
-	MagnetFwdRevHoming() (string, error)
-	SwitchOffMotor() (string, error)
-	ReadExecutedPulses() (string, error)
-	SetupMotor(uint16, uint16, uint16, uint16, uint16) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
 	IsMachineHomed() bool
 	IsRunInProgress() bool
-	IsTimerInProgress() bool
-	IsMachineInAbortedState() bool
-	IsMachineInPausedState() bool
-	ResetRunInProgress()
 	SetRunInProgress()
-	SetTimerInProgress()
-	ResetTimerInProgress()
+	ResetRunInProgress()
 	Pause() (string, error)
 	Resume() (string, error)
 	Abort() (string, error)
 	DiscardBoxCleanup() (string, error)
 	RestoreDeck() (string, error)
 	UVLight(string) (string, error)
-	ResumeMotorWithPulses(uint16) (string, error)
 	Heating(uint16, bool, time.Duration) (string, error)
 	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)

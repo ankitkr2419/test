@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
+func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
 
-	if d.IsMachineInAbortedState() {
+	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v. Please home the machine first.", d.name)
 		return "", err
 	}
@@ -29,10 +29,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
 	//
 
-	if temp, ok := magnetState.Load(d.name); !ok {
-		err = fmt.Errorf("magnet State isn't loaded!")
-		return
-	} else if temp.(int) != detached && motorNum == K5_Deck {
+	if d.getMagnetState() != detached && motorNum == K5_Deck {
 		response, err = d.fullDetach()
 		if err != nil {
 			fmt.Println(err)
@@ -93,7 +90,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Println("Wrote motorNum. res : ", results)
 	// Check if User has paused the run/operation
 	for {
-		if d.IsMachineInPausedState() {
+		if d.isMachineInPausedState() {
 			fmt.Println("Machine in PAUSED state for deck: %v", d.name)
 			time.Sleep(400 * time.Millisecond)
 		} else {
@@ -117,7 +114,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
 			// Write executed pulses to Position
-		} else if d.IsMachineInAbortedState() {
+		} else if d.isMachineInAbortedState() {
 			positions[deckAndNumber] += float64(temp.(int)) / float64(motors[deckAndNumber]["steps"])
 			fmt.Println("pos", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
@@ -134,7 +131,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
 				fmt.Println("Completion returned ---> ", results, d.name)
-				response, err = d.SwitchOffMotor()
+				response, err = d.switchOffMotor()
 				if err != nil {
 					fmt.Println("err: from setUp--> ", err, d.name)
 					return
@@ -173,7 +170,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 		if len(results) > 0 {
 			if int(results[0]) == sensorCut {
 				fmt.Println("Sensor returned ---> ", results[0], d.name)
-				response, err = d.SwitchOffMotor()
+				response, err = d.switchOffMotor()
 				if err != nil {
 					fmt.Println("Sensor err : ", err, d.name)
 					return "", err
@@ -199,7 +196,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	return "RUN Completed", nil
 }
 
-func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
+func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
 	if err != nil {
@@ -247,7 +244,7 @@ func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) ReadExecutedPulses() (response string, err error) {
+func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 
 	results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][212], uint16(1))
 	if err != nil {

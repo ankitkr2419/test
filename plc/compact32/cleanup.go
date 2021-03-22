@@ -44,7 +44,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// We know concrete direction here, its REV
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], REV, deckAndMotor.Number)
+	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], REV, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was an issue moving deck REV to discard_box_open_position. Error: %v", err)
@@ -89,7 +89,7 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// We know concrete direction here, its FWD
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
+	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was an issue moving deck FWD to deck_start. Error: %v", err)
@@ -186,7 +186,7 @@ skipToStartUVTimer:
 			}
 
 			// if paused then
-			if d.IsMachineInPausedState() {
+			if d.isMachineInPausedState() {
 				//  Switch off UV Light
 				response, err = d.switchOffUVLight()
 				if err != nil {
@@ -226,12 +226,12 @@ skipToStartUVTimer:
 func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err error) {
 	for {
 		time.Sleep(time.Millisecond * 300)
-		if !d.IsMachineInPausedState() {
+		if !d.isMachineInPausedState() {
 			// when resumed go again to timer start
 			return "Resumed", nil
 		}
 		
-		if d.IsMachineInAbortedState() {
+		if d.isMachineInAbortedState() {
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err
 		}
