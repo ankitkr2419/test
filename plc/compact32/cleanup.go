@@ -17,18 +17,15 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 		return
 	}
 
+	if d.IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return
+	}
+
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
-
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return
-	}
 
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
@@ -65,18 +62,15 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 		return
 	}
 
+	if d.IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return
+	}
+
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
-
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return "", err
-	}
 
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
@@ -122,19 +116,16 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 		return
 	}
 
+	if d.IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return
+	}
+
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
 
 	var totalTime, timeElapsed, remainingTime int64
 	var t *time.Timer
-
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return "", err
-	}
 
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
