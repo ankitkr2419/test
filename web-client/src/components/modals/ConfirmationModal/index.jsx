@@ -20,7 +20,7 @@ const ConfirmationModal = (props) => {
         </Text>
 
         <Center className="text-center p-0 m-0 pt-5">
-          <ButtonGroup>
+          <ButtonGroup className="text-center mt-5">
             {successBtn && (
               <Button
                 onClick={() => {
