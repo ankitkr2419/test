@@ -53,6 +53,11 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func runRecipe(ctx context.Context, deps Dependencies, deck string, recipe db.Recipe) (response string, err error) {
 
+	if !deps.PlcDeck[deck].MachineIsHomed() {
+		err = fmt.Errorf("Please home the machine first!")
+		return
+	}
+
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
