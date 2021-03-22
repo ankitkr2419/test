@@ -19,25 +19,40 @@ const ReusableModal = (props) => {
 
   return (
     <Modal isOpen={modalOpen} toggle={toggleModal} centered size="md">
-        <ModalHeader>
-            <Text tag="h4" className="text-center text-truncate font-weight-bold">
-                {textHead}
-            </Text>
-        </ModalHeader>
-      <ModalBody>
-            <ButtonIcon
-                position="absolute"
-                placement="right"
-                top={16}
-                right={16}
-                size={36}
-                name="cross"
-                onClick={() => {setModalOpen(!modalOpen)}}
-                className="border-0"
-            />
-            <Text tag="h4" className="text-center text-truncate font-weight-bold">
-            {textHead}
-            </Text>
+      <ModalBody className="p-0">
+        {(textHead) &&
+            <div className="d-flex justify-content-center align-items-center modal-heading">
+                    <Text className="mb-0 title font-weight-bold">{textHead}</Text>
+                
+                    <ButtonIcon
+                        position="absolute"
+                        placement="right"
+                        top={0}
+                        right={16}
+                        size={36}
+                        name="cross"
+                        onClick={() => {setModalOpen(!modalOpen)}}
+                        className="border-0"
+                    />
+            </div>
+        }
+            <div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
+                {(!textHead) &&
+                    <ButtonIcon
+                        position="absolute"
+                        placement="right"
+                        top={5}
+                        right={16}
+                        size={36}
+                        name="cross"
+                        onClick={() => {setModalOpen(!modalOpen)}}
+                        className="border-0"
+                    />
+                }
+                <Text Tag="h5" size="20" className="text-center font-weight-bold mt-3 mb-4">
+                    <Text Tag="span" className="mb-1">{textBody}</Text>
+                </Text>
+            </div>
 
         <Center className="text-center p-0 m-0 pt-5">
           <ButtonGroup className="text-center mt-5">
@@ -45,7 +60,7 @@ const ReusableModal = (props) => {
               <Button
                 onClick={() => {setModalOpen(!modalOpen)}}
                 color="transparent"
-                className="mr-4"
+                className="mr-4 border-primary"
               >
                 {secondaryBtn}
               </Button>
@@ -76,7 +91,6 @@ ReusableModal.propTypes = {
 };
 
 ReusableModal.defaultProps = {
-  textBody: "Are you sure you want to Exit?",
   isOpen: false,
 };
 

@@ -43,7 +43,7 @@ const TimeModal = (props) => {
 
 	// const toggleModal = () => {};
 	// Operator Login Modal
-	const [timeModal, setTimeModal] = useState(false);
+	const [timeModal, setTimeModal] = useState(true);
 	const toggleTimeModal = () => setTimeModal(!timeModal);
 	return (
 		<>

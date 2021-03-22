@@ -55,10 +55,11 @@ const LandingScreenComponent = (props) => {
         <ReusableModal
           isOpen={homingStatus}
           toggleModal={homingConfirmation}
-          textHead={MODAL_MESSAGE.homingConfirmation}
+          textBody={MODAL_MESSAGE.homingConfirmation}
           clickHandler={homingConfirmation}
           primaryBtn={MODAL_BTN.okay}
         />
+
       </div>
       <AppFooter />
     </div>
