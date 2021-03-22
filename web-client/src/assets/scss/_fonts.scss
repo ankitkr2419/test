@@ -57,7 +57,11 @@ $icon-tip-position: "\e931";
 $icon-up: "\e932";
 $icon-user-medium: "\e933";
 $icon-tick: "\e934";
-$icon-upload: "\e935";
+$icon-publish: "\e935";
+$icon-download-1: "\e936";
+$icon-published: "\e937";
+$icon-timer: "\e938";
+$icon-process: "\e939";
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -410,8 +414,32 @@ $icon-upload: "\e935";
 	}
 }
 
-.icon-upload {
+.icon-publish {
 	&:before {
-		content: $icon-upload;
+		content: $icon-publish;
+	}
+}
+
+.icon-download-1 {
+	&:before {
+		content: $icon-download-1;
+	}
+}
+
+.icon-published {
+	&:before {
+		content: $icon-published;
+	}
+}
+
+.icon-timer {
+	&:before {
+		content: $icon-timer;
+	}
+}
+
+.icon-process {
+	&:before {
+		content: $icon-process;
 	}
 }

@@ -19,20 +19,19 @@ import { Center, Text, ButtonIcon } from 'shared-components';
 //For Enter Time Form
 const EnterTimeForm = styled.div`
 .row-small-gutter {
-    margin-left: -10px !important;
-    margin-right: -10px !important;
+    margin-left: -0.625rem !important;
+    margin-right: -0.625rem !important;
 }
 
 .row-small-gutter > * {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+    padding-left: 0.625rem !important;
+    padding-right: 0.625rem !important;
 }
 label{
 	font-size:0.813rem;
 	line-height:0.938rem;
 }
 `;
-
 
 const TimeModal = (props) => {
 	const { 
@@ -51,32 +50,37 @@ const TimeModal = (props) => {
 		{/* Operator Login Modal */}
 		  <Button color="primary" onClick={toggleTimeModal}>{buttonText}</Button>
 				<Modal isOpen={timeModal} toggle={toggleTimeModal} centered size="sm">
-				<ModalBody>
+				<ModalBody className="p-0">
+					<div className="d-flex justify-content-center align-items-center modal-heading">
+						<Text className="mb-0 title font-weight-bold">Deck B</Text>
+						<ButtonIcon
+							position="absolute"
+							placement="right"
+							top={0}
+							right={16}
+							size={36}
+							name="cross"
+							onClick={toggleTimeModal}
+							className="border-0"
+						/>
+					</div>
 					<div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
-					<Text Tag="h5" size="20" className="text-center font-weight-bold mb-4">
-					Enter Time Here
+					
+					<Text Tag="h5" size="20" className="text-center font-weight-bold mt-3 mb-4">
+						<Text Tag="span" className="mb-1">Enter Time Here</Text>
 					</Text>
-					<ButtonIcon
-						position="absolute"
-						placement="right"
-						top={16}
-						right={16}
-						size={36}
-						name="cross"
-						onClick={toggleTimeModal}
-						className="border-0"
-					/>
+					
 					<Form>
 					<EnterTimeForm className="col-11 mx-auto">
 						<Row>
-							<Col>
+							<Col md={7} className="mx-auto">
 								<FormGroup row className="d-flex align-items-center justify-content-center row-small-gutter" >
 									<Col sm={4}>
 										<Input
 											type='text'
 											name='hours'
 											id='hours'
-											placeholder='Type here'
+											placeholder=''
 											value=""
 										/>
 										<Label for='hours' className="font-weight-bold">Hours</Label>
@@ -87,10 +91,10 @@ const TimeModal = (props) => {
 											type='text'
 											name='minutes'
 											id='minutes'
-											placeholder='Type here'
+											placeholder=''
 											value=""
 										/>
-										<Label for='minutes' className="font-weight-bold">Minutes</Label>
+										<Label for='minutes' className="font-weight-bold px-2">Minutes</Label>
 										<FormError>Incorrect Minutes</FormError>
 									</Col>
 									<Col sm={4}>
@@ -98,7 +102,7 @@ const TimeModal = (props) => {
 											type='text'
 											name='seconds'
 											id='seconds'
-											placeholder='Type here'
+											placeholder=''
 											value=""
 										/>
 										<Label for='minutes' className="font-weight-bold">Seconds</Label>
@@ -106,8 +110,8 @@ const TimeModal = (props) => {
 									</Col>
 								</FormGroup>
 							</Col>
-						</Row>
-						<Center className='my-3'>
+							</Row>
+							<Center className='mt-3 mb-4'>
 							<Button color='primary'>
 							 Next
 							</Button>
