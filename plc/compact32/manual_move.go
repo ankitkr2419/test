@@ -151,6 +151,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	aborted.Store(d.name, true)
 	wrotePulses.Store(d.name, 0)
 	paused.Store(d.name, false)
+	homed.Store(d.name, false)
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
 
