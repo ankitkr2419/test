@@ -12,7 +12,7 @@ import (
 
 func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 
-	var position, distToTravel float64
+	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
@@ -37,9 +37,9 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 		return "", err
 	}
 
-	distToTravel = position - positions[deckAndMotor]
+	distanceToTravel = position - positions[deckAndMotor]
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// We know concrete direction here, its REV
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], REV, deckAndMotor.Number)
@@ -55,7 +55,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 
 func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 
-	var position, distToTravel float64
+	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
@@ -80,9 +80,9 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 		return "", err
 	}
 
-	distToTravel = positions[deckAndMotor] - position
+	distanceToTravel = positions[deckAndMotor] - position
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// We know concrete direction here, its FWD
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
