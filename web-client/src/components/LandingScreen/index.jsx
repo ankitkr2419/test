@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { ImageIcon, Center, Icon } from "shared-components";
-import ConfirmationModal from "components/modals/ConfirmationModal";
+import ReusableModal from "shared-components/ReusableModal";
+// import ConfirmationModal from "components/modals/ConfirmationModal";
 
 // import SearchBox from 'shared-components/SearchBox';
 // import ButtonBar from 'shared-components/ButtonBar';
@@ -11,6 +12,7 @@ import AppFooter from "components/AppFooter";
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import { CardBody, Card } from "core-components";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
+import TimeModal from "components/modals/TimeModal";
 
 const VideoPlayButton = styled.button`
   color: #7c7976;
@@ -50,13 +52,12 @@ const LandingScreenComponent = (props) => {
             </Center>
           </CardBody>
         </Card>
-        <ConfirmationModal
+        <ReusableModal
           isOpen={homingStatus}
           toggleModal={homingConfirmation}
-          confirmationText={MODAL_MESSAGE.homingConfirmation}
-          confirmationClickHandler={homingConfirmation}
-          successBtn={MODAL_BTN.okay}
-          cancelBtn={MODAL_BTN.cancel}
+          textHead={MODAL_MESSAGE.homingConfirmation}
+          clickHandler={homingConfirmation}
+          primaryBtn={MODAL_BTN.okay}
         />
       </div>
       <AppFooter />

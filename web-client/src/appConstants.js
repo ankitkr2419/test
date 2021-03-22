@@ -62,10 +62,17 @@ export const API_ENDPOINTS = {
 
 export const MODAL_MESSAGE = {
 	setPosition : "Please check the position of tip and magnet!",
-	homingConfirmation: "Homing Confirmation"
+	homingConfirmation: "Homing Confirmation",
+	experimentSuccess: "Experiment was successful",
+	abortConfirmation: "Are you sure you want to abort now?",
+	abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
+	uvSuccess: "UV Clean Up was successful"
 };
 
 export const MODAL_BTN = {
 	okay: "Okay",
-	cancel: "Cancel"
+	cancel: "Cancel",
+	next: "Next",
+	yes: "Yes",
+	no: "No",
 };
