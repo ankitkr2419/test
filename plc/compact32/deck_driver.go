@@ -8,6 +8,14 @@ import (
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
+	if temp, ok := aborted.Load(d.name); !ok {
+		err = fmt.Errorf("aborted isn't loaded!")
+		return
+	} else if temp.(bool) {
+		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v. Please home the machine first.", d.name)
+		return "", err
+	}
+
 	if pulse < minimumPulsesThreshold {
 		fmt.Println("Current pulse: ", pulse, " is less than minimumPulsesThreshold. Avoiding Motor Movements for motor:", motorNum, ", deck: ", d.name)
 		return "SUCCESS", nil
@@ -18,14 +26,6 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
 
 	var results []byte
-
-	if temp, ok := aborted.Load(d.name); !ok {
-		err = fmt.Errorf("aborted isn't loaded!")
-		return
-	} else if temp.(bool) {
-		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v", d.name)
-		return "", err
-	}
 
 	//
 	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
