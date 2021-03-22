@@ -33,7 +33,6 @@ func (d *Compact32Deck) IsMachineHomed() bool{
 	return false
 }
 
-
 func (d *Compact32Deck) IsRunInProgress() bool{
 	if temp, ok := runInProgress.Load(d.name); !ok {
 		logger.Errorln("runInProgress isn't loaded!")
@@ -69,4 +68,14 @@ func (d *Compact32Deck) IsMachineInPausedState() bool{
 		return true
 	}
 	return false
+}
+
+
+func (d *Compact32Deck) GetMagnetState() int{
+	if temp, ok := magnetState.Load(d.name); !ok {
+		logger.Errorln("magnet State isn't loaded!")
+		return -1
+	} else {
+		return temp.(int)
+	}
 }
