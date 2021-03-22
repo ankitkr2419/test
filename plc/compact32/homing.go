@@ -44,7 +44,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	}
 
 	fmt.Println("Moving deck forward till sensor cuts it")
-	response, err = d.DeckHoming()
+	response, err = d.deckHoming()
 	if err != nil {
 		return
 	}
@@ -112,7 +112,7 @@ func (d *Compact32Deck) syringeModuleHoming() (response string, err error) {
 	return "SYRINGE HOMING SUCCESS", nil
 }
 
-func (d *Compact32Deck) DeckHoming() (response string, err error) {
+func (d *Compact32Deck) deckHoming() (response string, err error) {
 
 	deckAndNumber := DeckNumber{Deck: d.name, Number: K5_Deck}
 
