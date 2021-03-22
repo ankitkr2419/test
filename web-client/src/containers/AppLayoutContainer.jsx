@@ -51,7 +51,7 @@ const AppLayoutContainer = (props) => {
 			<ModalContainer />
 			<section className="ml-content">
 				<Switch>
-					<Redirect exact from="/" to="/login" />
+					<Redirect exact from="/" to="/splashscreen" />
 					{routes.map(route => (
 						<RouteWithSubRoutes key={route.key} {...route} />
 					))}
