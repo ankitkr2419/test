@@ -30,22 +30,6 @@ func (d *Compact32Deck) NameOfDeck() string {
 	return d.name
 }
 
-func (d *Compact32Deck) SetRunInProgress() {
-	runInProgress.Store(d.name, true)
-}
-
-func (d *Compact32Deck) ResetRunInProgress() {
-	runInProgress.Store(d.name, false)
-}
-
-func (d *Compact32Deck) SetTimerInProgress() {
-	timerInProgress.Store(d.name, true)
-}
-
-func (d *Compact32Deck) ResetTimerInProgress() {
-	timerInProgress.Store(d.name, false)
-}
-
 func (d *Compact32Deck) Pause() (response string, err error) {
 
 	// If machine is already PAUSED OR
