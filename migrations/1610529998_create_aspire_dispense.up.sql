@@ -4,7 +4,7 @@ CREATE TYPE aspire_dispense_cartridge_type AS ENUM('cartridge_1', 'cartridge_2')
 CREATE TABLE IF NOT EXISTS aspire_dispense(
  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
  category aspire_dispense_type,
- cartridge_type aspire_dispense_cartridge_type,
+ cartridge_type aspire_dispense_cartridge_type DEFAULT 'cartridge_1',
  source_position int,
  aspire_height float,
  aspire_mixing_volume float,
@@ -20,5 +20,6 @@ CREATE TABLE IF NOT EXISTS aspire_dispense(
  process_id uuid UNIQUE NOT NULL,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- FOREIGN KEY (process_id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE);
+ FOREIGN KEY (process_id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE,
+ CHECK( (dispense_volume + dispense_blow_volume) >= (aspire_air_volume + aspire_volume) ) );
  

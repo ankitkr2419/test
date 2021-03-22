@@ -18,7 +18,12 @@ type AttachDetach struct {
 }
 
 const (
-	getAttachDetachQuery = `SELECT id, operation, operation_type, process_id, created_at, updated_at FROM attach_detach where process_id = $1`
+	getAttachDetachQuery = `SELECT * FROM attach_detach where process_id = $1`
+	createAttachDetachQuery = `INSERT INTO attach_detach (
+		operation,
+		operation_type,
+		process_id)
+		VALUES ($1, $2, $3) RETURNING id`
 )
 
 func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad AttachDetach, err error) {
@@ -26,6 +31,29 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 	err = s.db.Get(&ad, getAttachDetachQuery, processID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching attach/detach operation")
+		return
+	}
+	return
+}
+
+
+func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (createdAttachDetach AttachDetach, err error) {
+	var lastInsertID uuid.UUID
+	err = s.db.QueryRow(
+		createAttachDetachQuery,
+		a.Operation,
+		a.OperationType,
+		a.ProcessID,
+	).Scan(&lastInsertID)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error creating AttachDetach")
+		return
+	}
+
+	err = s.db.Get(&createdAttachDetach, getAttachDetachQuery, a.ProcessID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in getting AttachDetach")
 		return
 	}
 	return

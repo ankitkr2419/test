@@ -11,35 +11,18 @@ import (
 type Category string
 
 const (
-	well_to_shaker Category = "well_to_shaker"
-	shaker_to_well Category = "shaker_to_well"
-	well_to_well   Category = "well_to_well"
-	well_to_deck   Category = "well_to_deck"
-	deck_to_well   Category = "deck_to_well"
-	deck_to_deck   Category = "deck_to_deck"
-	shaker_to_deck Category = "shaker_to_deck"
-	deck_to_shaker Category = "deck_to_shaker"
+	WS Category = "well_to_shaker"
+	SW Category = "shaker_to_well"
+	WW Category = "well_to_well"
+	WD Category = "well_to_deck"
+	DW Category = "deck_to_well"
+	DD Category = "deck_to_deck"
+	SD Category = "shaker_to_deck"
+	DS Category = "deck_to_shaker"
 )
 
 const (
-	getAspireDispenseQuery = `SELECT id,
-						category,
-						cartridge_type,
-						source_position,
-						aspire_height,
-						aspire_mixing_volume,
-						aspire_no_of_cycles,
-						aspire_volume,
-						aspire_air_volume,
-						dispense_height,
-						dispense_mixing_volume,
-						dispense_no_of_cycles,
-						dispense_volume,
-						dispense_blow_volume,
-						destination_position,
-						process_id,
-						created_at,
-						updated_at
+	getAspireDispenseQuery = `SELECT *
 						FROM aspire_dispense
 						WHERE process_id = $1`
 	selectAspireDispenseQuery = `SELECT *
@@ -147,7 +130,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		return
 	}
 
-	err = s.db.Get(&createdAspireDispense, getAspireDispenseQuery, lastInsertID)
+	err = s.db.Get(&createdAspireDispense, getAspireDispenseQuery, ad.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting aspire dispense")
 		return

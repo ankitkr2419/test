@@ -19,14 +19,43 @@ type TipDock struct {
 }
 
 const (
-	getTipDockQuery = `SELECT * FROM tip_dock where process_id = $1`
+	getTipDockQuery    = `SELECT * FROM tip_dock where process_id = $1`
+	createTipDockQuery = `INSERT INTO tip_dock (
+		type,
+		position,
+		height,
+		process_id)
+		VALUES ($1, $2, $3, $4) RETURNING id`
 )
 
 func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock, err error) {
 
 	err = s.db.Get(&td, getTipDockQuery, pid)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing tip docking details")
+		logger.WithField("err", err.Error()).Error("Error getting tip docking details")
+		return
+	}
+	return
+}
+
+func (s *pgStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDocking TipDock, err error) {
+	var lastInsertID uuid.UUID
+	err = s.db.QueryRow(
+		createTipDockQuery,
+		t.Type,
+		t.Position,
+		t.Height,
+		t.ProcessID,
+	).Scan(&lastInsertID)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error creating Tip Docking")
+		return
+	}
+
+	err = s.db.Get(&createdTipDocking, getTipDockQuery, t.ProcessID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in getting Tip Docking")
 		return
 	}
 	return

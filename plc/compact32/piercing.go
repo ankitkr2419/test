@@ -19,9 +19,9 @@ import (
 func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
 
 	var deckAndMotor DeckNumber
-	var position, cartridgeStart, piercingHeight, distToTravel float64
+	var position, cartridgeStart, piercingHeight, distanceToTravel float64
 	var ok bool
-	var direction, pulses, piercingPulses uint16
+	var direction, pulses, piercingPulses, afterPiercingRestPulses uint16
 	// []int has direct method to get slice sorted
 	var wellsToBePierced []int
 	deckAndMotor.Deck = d.name
@@ -55,11 +55,13 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 	// Calculation below considers syringe module as glued with tip
 	// And we go to piercingHeight
-	distToTravel = piercingHeight - positions[deckAndMotor]
+	distanceToTravel = piercingHeight - positions[deckAndMotor]
 	// We know concrete direction here
 	// piercingHeight will be less
 
-	piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	// after piercing is completed we need to get the tip to its resting positon
+	afterPiercingRestPulses = piercingPulses
 
 	for _, well := range pi.CartridgeWells {
 		wellsToBePierced = append(wellsToBePierced, int(well))
@@ -68,7 +70,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	// sort wells in Ascending Order
 	sort.Ints(wellsToBePierced)
 
-	for _, wellNumber := range wellsToBePierced {
+	for i, wellNumber := range wellsToBePierced {
 		//
 		// 2.1 Move deck to the well position
 		//
@@ -82,21 +84,11 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		// here disToTravel moves our deck to well position
 		// position + cartridgeStart is the distance of first well on deck for wellNumber = 1
-		distToTravel = positions[deckAndMotor] - (position + cartridgeStart)
+		distanceToTravel = positions[deckAndMotor] - (position + cartridgeStart)
 
-		switch {
-		// distToTravel > 0 means go towards the Sensor or FWD
-		case distToTravel > minimumMoveDistance:
-			direction = 1
-		case distToTravel < (minimumMoveDistance * -1):
-			distToTravel *= -1
-			direction = 0
-		default:
-			// Skip the setUpMotor Step
-			goto skipDeckMovement
-		}
+		modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-		pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+		pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
@@ -104,7 +96,6 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			return "", fmt.Errorf("There was issue moving Deck to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
-	skipDeckMovement:
 		fmt.Println("Completed Move Deck to reach the wellNum ", wellNumber)
 
 		// 2.2 Pierce and come back up
@@ -120,6 +111,25 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		fmt.Println("Pierced WellNumber: ", wellNumber)
 
+		// change piercingPulses just before going up after piercing the first well
+		if i == 0 {
+			// For wells other than first piercing height will be less
+			if piercingHeight, ok = consDistance["piercing_tip_above_well_position"]; !ok {
+				err = fmt.Errorf("piercing_tip_above_well_position doesn't exist for consumable distances")
+				fmt.Println("Error: ", err)
+				return "", err
+			}
+
+			// piercingHeight will be always less than current position
+			distanceToTravel = positions[deckAndMotor] - piercingHeight
+
+			piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+		}
+
+		// if its last well then go to resting position up
+		if i == len(wellsToBePierced)-1 {
+			piercingPulses = afterPiercingRestPulses
+		}
 		// WE know concrete direction here, its UP
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], piercingPulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 		if err != nil {

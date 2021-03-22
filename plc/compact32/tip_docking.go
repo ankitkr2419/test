@@ -9,14 +9,15 @@ import (
 /*TipDocking : to place the tip at rest position.
 ------ALGORITHM
 1. First move the syringe module to the resting position
-2. Check it is not deck position  type so that cartidge_flow can be proceeded.
-3. Cartridge Flow : 1.1 first calculate the accurate position of the well
-                    1.2 Then travel to that position
-					1.3 Then set the syringe height to the specified value for docking
-					1.4 Return Success
+2. Check it is not deck position type so that cartidge_flow can be proceed. Else skip to deck flow
+3. Cartridge Flow :
+	3.1 first calculate the accurate position of the well
+    3.2 Then travel to that position
 4. Deck Flow: If it is some position on the deck
-5. Move to that position on the deck by calculating the deck position
-6. At that position move the syring module to the specified height
+	4.1 first calculate the accurate position on deck
+	4.2 Move to that position on deck
+5. Then set the syringe height to the specified value for docking
+6. At that position move the syringe module to the specified height
 7. Return success
 */
 func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response string, err error) {
@@ -28,8 +29,9 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 	var ok bool
 	var deckAndMotor, syringeModuleDeckAndMotor DeckNumber
 
+	//
 	// Step 1: move the syringe module to resting position
-	// Deck and number for syringe module
+	//
 	syringeModuleDeckAndMotor = DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
 	deckAndMotor = DeckNumber{Deck: d.name, Number: K5_Deck}
 
@@ -39,18 +41,8 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 		return "", err
 	}
 
-	distanceToTravel = positions[syringeModuleDeckAndMotor] - position
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravel > minimumMoveDistance:
-		direction = 1
-	case distanceToTravel < (minimumMoveDistance * -1):
-		distanceToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipToRestPosition
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
 	pulses = uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
@@ -59,16 +51,21 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
 
-skipToRestPosition:
+	//
+	// 2. Check it is not deck position type so that cartidge_flow can be proceed. Else skip to deck flow
+	//
 	if td.Type != "deck" {
+		//
+		// 3. Cartridge Flow :
+		//
 
 		uniqueCartridge := UniqueCartridge{
 			CartridgeID:   cartridgeID,
 			CartridgeType: db.CartridgeType(td.Type),
 		}
 
-		// Step 2 : move the deck to the absolute position of cartridge.
-		// get the cartridge well distance
+		// 3.1 first calculate the accurate position of the well
+
 		// distance to cartridge start + distance to the specified well
 		if cartridgePosition, ok = consDistance[td.Type+"_start"]; !ok {
 			err = fmt.Errorf(td.Type + "_start doesn't exist for consumable distances")
@@ -90,18 +87,12 @@ skipToRestPosition:
 		}
 
 		distanceToTravel = positions[deckAndMotor] - (cartridgePosition + wellPosition)
-		switch {
-		// distToTravel > 0 means go towards the Sensor or FWD
-		case distanceToTravel > minimumMoveDistance:
-			direction = 1
-		case distanceToTravel < (minimumMoveDistance * -1):
-			distanceToTravel *= -1
-			direction = 0
-		default:
-			// Skip the setUpMotor Step
-			goto skipToPositionSyringeHeight
-		}
+
+		modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
 		pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+
+		// 3.2 Then travel to that position
 
 		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
@@ -112,9 +103,11 @@ skipToRestPosition:
 		fmt.Println("deck moved to required position for docking")
 		goto skipToPositionSyringeHeight
 	}
-	// Step 5 : if the tip dock type is deck
+	//
+	// 4. Deck Flow: If it is some position on the deck
+	//
 
-	// calculate the position of the deck where the syringe module needs to dock
+	// 4.1 first calculate the accurate position on deck
 	deckPosition = "pos_" + fmt.Sprintf("%d", td.Position)
 	if position, ok = consDistance[deckPosition]; !ok {
 		err = fmt.Errorf("%s doesn't exist for consumable distances", deckPosition)
@@ -122,19 +115,11 @@ skipToRestPosition:
 		return "", err
 	}
 
-	//move the deck to the specified deck position
+	// 4.2 Move to that position on deck
 	distanceToTravel = positions[deckAndMotor] - position
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravel > minimumMoveDistance:
-		direction = 1
-	case distanceToTravel < (minimumMoveDistance * -1):
-		distanceToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipToPositionSyringeHeight
-	}
+
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
@@ -143,30 +128,27 @@ skipToRestPosition:
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)
 	}
 
+	//
+	// 5. Then set the syringe height to the specified value for docking
+	//
 skipToPositionSyringeHeight:
 
 	distanceToTravel = positions[deckAndMotor] - td.Height
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravel > minimumMoveDistance:
-		direction = 1
-	case distanceToTravel < (minimumMoveDistance * -1):
-		distanceToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipToCompletion
-	}
+
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
 	pulses = uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
 
+	//
+	// 6. At that position move the syringe module to the specified height
+	//
 	response, err = d.SetupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)
 	}
 
-skipToCompletion:
-	// Step 4: completed process
+	// 7. Return success
 	fmt.Println("tip docked successfully")
 	return "Success", nil
 

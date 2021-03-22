@@ -42,11 +42,7 @@ const (
 	reverseAfterNonCutPulses            = uint16(2000)
 	reverseAfterNonCutPulsesMagnet      = uint16(400)
 	finalSensorCutPulses                = uint16(2999)
-)
-
-// minimum Distance for Any motor movement
-const (
-	minimumMoveDistance = 0.3
+	minimumPulsesThreshold              = uint16(50)
 )
 
 // 120 Seconds is the minimum UVLight On Time
@@ -68,6 +64,23 @@ const (
 )
 
 var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress sync.Map
+
+func LoadUtils() {
+	wrotePulses.Store("A", 0)
+	wrotePulses.Store("B", 0)
+	executedPulses.Store("A", 0)
+	executedPulses.Store("B", 0)
+	aborted.Store("A", false)
+	aborted.Store("B", false)
+	paused.Store("A", false)
+	paused.Store("B", false)
+	runInProgress.Store("A", false)
+	runInProgress.Store("B", false)
+	timerInProgress.Store("A", false)
+	timerInProgress.Store("B", false)
+	magnetState.Store("A", detached)
+	magnetState.Store("B", detached)
+}
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
 var positions = map[DeckNumber]float64{
@@ -196,4 +209,15 @@ func SelectAllCartridges(store db.Storer) (err error) {
 		cartridges[uniqueCartridge]["volume"] = well.Volume
 	}
 	return
+}
+
+// modifyDirectionAndDistanceToTravel will make distanceToTravel positive and the direction correct
+func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *uint16) {
+	// distanceToTravel > 0 means go towards the Sensor
+	if *distanceToTravel > 0 {
+		*direction = 1
+	} else {
+		*distanceToTravel *= -1
+		*direction = 0
+	}
 }

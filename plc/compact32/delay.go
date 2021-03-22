@@ -22,7 +22,7 @@ func (d *Compact32Deck) AddDelay(delay db.Delay) (reponse string, err error) {
 		default:
 			if temp, ok := aborted.Load(d.name); !ok {
 				err = fmt.Errorf("aborted isn't loaded!")
-				return 
+				return
 			} else if temp.(bool) {
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err

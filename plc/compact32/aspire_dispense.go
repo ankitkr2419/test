@@ -35,16 +35,17 @@ variables: category, cartridgeType string,
   19. move syringe module down at fast till base
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
-  22. dispense by that dis_vol
+  22. Dispense completely
   23. move syringe module up
-  24. dispense blow out air
+  24. call syringe homing
+
 
 ********/
 
 func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {
 
 	var sourceCartridge, destinationCartridge map[string]float64
-	var sourcePosition, destinationPosition, distToTravel, position, tipHeight float64
+	var sourcePosition, destinationPosition, distanceToTravel, position, tipHeight float64
 	var ok bool
 	var direction, pulses uint16
 	var deckAndMotor DeckNumber
@@ -127,7 +128,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// Get Source Position -
 	//----------------------
 	switch ad.Category {
-	case "well_to_well", "well_to_shaker", "well_to_deck":
+	case db.WW, db.WS, db.WD:
 		uniqueCartridge.WellNum = ad.SourcePosition
 		if sourceCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("sourceCartridge doesn't exist")
@@ -137,9 +138,9 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 		sourcePosition, ok = sourceCartridge["distance"]
 		sourcePosition += position
 		fmt.Println("sourcePosition: ", sourcePosition)
-	case "shaker_to_well", "shaker_to_deck":
+	case db.SW, db.SD:
 		sourcePosition, ok = consDistance["shaker_tube"]
-	case "deck_to_well", "deck_to_deck", "deck_to_shaker":
+	case db.DW, db.DD, db.DS:
 		// TODO: Check source Positions
 		fmt.Println("This is the position---> ", "pos_"+fmt.Sprintf("%d", ad.SourcePosition))
 		sourcePosition, ok = consDistance["pos_"+fmt.Sprintf("%d", ad.SourcePosition)]
@@ -158,7 +159,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// Get Destination Position -
 	//---------------------------
 	switch ad.Category {
-	case "well_to_well", "shaker_to_well", "deck_to_well":
+	case db.WW, db.SW, db.DW:
 		uniqueCartridge.WellNum = ad.DestinationPosition
 		if destinationCartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("destinationCartridge doesn't exist")
@@ -169,9 +170,9 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 		destinationPosition, ok = destinationCartridge["distance"]
 		destinationPosition += position
 		fmt.Println("destinationPosition: ", destinationPosition)
-	case "well_to_shaker", "deck_to_shaker":
+	case db.WS, db.DS:
 		destinationPosition, ok = consDistance["shaker_tube"]
-	case "well_to_deck", "deck_to_deck", "shaker_to_deck":
+	case db.WD, db.DD, db.SD:
 		fmt.Println("This is the position---> ", "pos_"+fmt.Sprintf("%d", ad.DestinationPosition))
 		destinationPosition, ok = consDistance["pos_"+fmt.Sprintf("%d", ad.DestinationPosition)]
 		// default already handled in source Position
@@ -195,29 +196,17 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 		return "", err
 	}
 	// Don't forget to add tipHeight for every tip we have currently attached
-	distToTravel = positions[deckAndMotor] + tipHeight - position
+	distanceToTravel = positions[deckAndMotor] + tipHeight - position
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > minimumMoveDistance:
-		direction = 1
-	case distToTravel < (minimumMoveDistance * -1):
-		distToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipTipUp
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-
-skipTipUp:
 
 	//
 	// 10. calculate the current position difference for deck;
@@ -226,22 +215,11 @@ skipTipUp:
 
 	deckAndMotor.Number = K5_Deck
 
-	distToTravel = positions[deckAndMotor] - sourcePosition
+	distanceToTravel = positions[deckAndMotor] - sourcePosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > minimumMoveDistance:
-		direction = 1
-	case distToTravel < (minimumMoveDistance * -1):
-		distToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipDeckToSourcePosition
-	}
-	fmt.Println(distToTravel)
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	//*************************
 	// REACHING ASPIRE SOURCE *
@@ -256,8 +234,6 @@ skipTipUp:
 		return "", fmt.Errorf("There was issue moving Deck to Aspire Source. Error: %v", err)
 	}
 
-skipDeckToSourcePosition:
-
 	//***********
 	// ASPIRING *
 	//***********
@@ -269,14 +245,14 @@ skipDeckToSourcePosition:
 	// We know the concrete direction here onwards till Deck Movement
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	if position = consDistance["deck_base"]; ok {
-		distToTravel = position - (positions[deckAndMotor] + tipHeight)
+		distanceToTravel = position - (positions[deckAndMotor] + tipHeight)
 	} else {
 		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
@@ -295,7 +271,7 @@ skipDeckToSourcePosition:
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-	
+
 	//
 	//   14. pickup and drop that asp_mix_vol for number of aspire_cycles
 	//       these cycles should be fast
@@ -307,7 +283,7 @@ skipDeckToSourcePosition:
 	oneMicroLitrePulses := 25.0
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireMixingVolume))
 
-	if ad.AspireMixingVolume == 0 {
+	if ad.AspireNoOfCycles == 0 {
 		goto skipAspireCycles
 	}
 	for cycleNumber := int64(1); cycleNumber <= ad.AspireNoOfCycles; cycleNumber++ {
@@ -348,8 +324,8 @@ skipAspireCycles:
 		return "", err
 	}
 	// Don't forget to add tipHeight for every tip we have currently attached
-	distToTravel = positions[deckAndMotor] + tipHeight - position
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	distanceToTravel = positions[deckAndMotor] + tipHeight - position
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 
@@ -364,7 +340,6 @@ skipAspireCycles:
 		return
 	}
 
-
 	//********************************
 	// REACHING DISPENSE DESTINATION *
 	//********************************
@@ -375,29 +350,17 @@ skipAspireCycles:
 
 	deckAndMotor.Number = K5_Deck
 
-	distToTravel = positions[deckAndMotor] - destinationPosition
+	distanceToTravel = positions[deckAndMotor] - destinationPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > minimumMoveDistance:
-		direction = 1
-	case distToTravel < (minimumMoveDistance * -1):
-		distToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipDeckToDestinationPosition
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to Dispense Destination. Error: %v", err)
 	}
-
-skipDeckToDestinationPosition:
 
 	//*************
 	// DISPENCING *
@@ -409,14 +372,14 @@ skipDeckToDestinationPosition:
 	// We know the concrete direction here onwards
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	if position = consDistance["deck_base"]; ok {
-		distToTravel = position - (positions[deckAndMotor] + tipHeight)
+		distanceToTravel = position - (positions[deckAndMotor] + tipHeight)
 	} else {
 		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
@@ -441,7 +404,7 @@ skipDeckToDestinationPosition:
 	deckAndMotor.Number = K10_Syringe_LHRH
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseMixingVolume))
 
-	if ad.DispenseMixingVolume == 0 {
+	if ad.DispenseNoOfCycles == 0 {
 		goto skipDispenseCycles
 	}
 	for cycleNumber := int64(1); cycleNumber <= ad.DispenseNoOfCycles; cycleNumber++ {
@@ -461,9 +424,15 @@ skipDeckToDestinationPosition:
 skipDispenseCycles:
 
 	//
-	//    22. dispense by that dis_vol
+	// 22. Dispense completely
 	//
-	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseVolume))
+	if (ad.DispenseVolume + ad.DispenseBlowVolume) < (ad.AspireAirVolume + ad.AspireVolume) {
+		err = fmt.Errorf("Can't dispense partially!")
+		return
+	}
+
+	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.DispenseVolume + ad.DispenseBlowVolume)))
+	pulses += reverseAfterNonCutPulses
 	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
@@ -480,8 +449,8 @@ skipDispenseCycles:
 		return "", err
 	}
 	// Don't forget to add tipHeight for every tip we have currently attached
-	distToTravel = positions[deckAndMotor] + tipHeight - position
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distToTravel))
+	distanceToTravel = positions[deckAndMotor] + tipHeight - position
+	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
@@ -489,12 +458,10 @@ skipDispenseCycles:
 	}
 
 	//
-	//   24. dispense blow out air
+	//    24.  call syringe homing
 	//
-	deckAndMotor.Number = K10_Syringe_LHRH
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * ad.DispenseBlowVolume))
-	response, err = d.SetupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	response, err = d.SyringeHoming()
 	if err != nil {
 		return
 	}
