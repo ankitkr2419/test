@@ -3,6 +3,7 @@ package compact32
 import (
 	"fmt"
 	"math"
+	"time"
 
 )
 
@@ -13,13 +14,27 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		return "", err
 	}
 
+	defer func() {
+        if r := recover(); r != nil {
+			time.Sleep(2 * time.Second)
+			d.ResetRunInProgress()
+            fmt.Println("Recovering in Homing", r)
+
+			d.ExitCh <- err
+
+			time.Sleep(5 * time.Second)
+			
+			d.Homing()
+		}
+    }()
+// 
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
 		fmt.Println("Inside Switch off Shaker err : ", err, d.name)
-		return "", err
+		panic(err)
 	}
 	fmt.Println("Switched off the shaker--> for ", d.name)
 
@@ -28,25 +43,25 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.syringeHoming()
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	fmt.Println("Moving Syringe Module UP till sensor cuts it")
 	response, err = d.syringeModuleHoming()
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	fmt.Println("Homing Magnet")
 	response, err = d.magnetHoming()
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	fmt.Println("Moving deck forward till sensor cuts it")
 	response, err = d.deckHoming()
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	homed.Store(d.name, true)
