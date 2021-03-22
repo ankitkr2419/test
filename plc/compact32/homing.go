@@ -3,19 +3,8 @@ package compact32
 import (
 	"fmt"
 	"math"
-	logger "github.com/sirupsen/logrus"
 
 )
-
-
-func (d *Compact32Deck) MachineIsHomed() bool{
-	if temp, ok := homed.Load(d.name); !ok {
-		logger.Errorln("homed isn't loaded!")
-	} else if temp.(bool) {
-		return true
-	}
-	return false
-}
 
 func (d *Compact32Deck) Homing() (response string, err error) {
 
