@@ -60,7 +60,9 @@ type DeckDriver interface {
 	ReadExecutedPulses() (string, error)
 	SetupMotor(uint16, uint16, uint16, uint16, uint16) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
-	MachineIsHomed() bool
+	IsMachineHomed() bool
+	IsRunInProgress() bool
+	IsTimerInProgress() bool
 	ResetRunInProgress()
 	SetRunInProgress()
 	SetTimerInProgress()
