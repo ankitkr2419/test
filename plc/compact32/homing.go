@@ -8,10 +8,7 @@ import (
 
 func (d *Compact32Deck) Homing() (response string, err error) {
 
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
+	if d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}

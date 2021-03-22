@@ -8,10 +8,8 @@ import (
 
 func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
-	if temp, ok := aborted.Load(d.name); !ok {
-		err = fmt.Errorf("aborted isn't loaded!")
-		return
-	} else if temp.(bool) {
+
+	if d.IsMachineInAbortedState() {
 		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v. Please home the machine first.", d.name)
 		return "", err
 	}
@@ -32,7 +30,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	//
 
 	if temp, ok := magnetState.Load(d.name); !ok {
-		err = fmt.Errorf("aborted isn't loaded!")
+		err = fmt.Errorf("magnet State isn't loaded!")
 		return
 	} else if temp.(int) != detached && motorNum == K5_Deck {
 		response, err = d.fullDetach()
@@ -95,10 +93,7 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Println("Wrote motorNum. res : ", results)
 	// Check if User has paused the run/operation
 	for {
-		if temp, ok := paused.Load(d.name); !ok {
-			err = fmt.Errorf("paused isn't loaded!")
-			return
-		} else if temp.(bool) {
+		if d.IsMachineInPausedState() {
 			fmt.Println("Machine in PAUSED state for deck: %v", d.name)
 			time.Sleep(400 * time.Millisecond)
 		} else {
@@ -117,15 +112,13 @@ func (d *Compact32Deck) SetupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Println("Movements in Progress for deck: ", d.name)
 
 	for {
-		if temp1, ok := aborted.Load(d.name); !ok {
-			err = fmt.Errorf("aborted isn't loaded!")
-			return
-		} else if temp2, ok := executedPulses.Load(d.name); !ok {
+		
+		if temp, ok := executedPulses.Load(d.name); !ok {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
 			// Write executed pulses to Position
-		} else if temp1.(bool) {
-			positions[deckAndNumber] += float64(temp2.(int)) / float64(motors[deckAndNumber]["steps"])
+		} else if d.IsMachineInAbortedState() {
+			positions[deckAndNumber] += float64(temp.(int)) / float64(motors[deckAndNumber]["steps"])
 			fmt.Println("pos", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err

@@ -32,13 +32,11 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		return "", err
 	}
 
-
 	// run is not in Progress
 	if !d.IsRunInProgress() {
 		err = fmt.Errorf("Machine is already in IDLE state")
 		return "", err
 	}
-
 
 	if !d.IsTimerInProgress() {
 		response, err = d.SwitchOffMotor()
