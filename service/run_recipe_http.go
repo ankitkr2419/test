@@ -53,8 +53,13 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 		return
 	}
 
-	//TODO: Check if RunInprogress
+	if deps.PlcDeck[deck].IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return
+	}
 
+	deps.PlcDeck[deck].SetRunInProgress()
+	defer deps.PlcDeck[deck].ResetRunInProgress()
 
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
