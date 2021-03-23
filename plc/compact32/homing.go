@@ -18,12 +18,17 @@ func (d *Compact32Deck) Homing() (response string, err error) {
         if r := recover(); r != nil {
 			time.Sleep(2 * time.Second)
 			d.ResetRunInProgress()
-            fmt.Println("Recovering in Homing", r)
+            fmt.Printf("\nRecovering in Homing %v for Deck %v", r, d.name)
 
-			d.ExitCh <- err
+			if d.name == "A"{
+				d.ExitCh <- err
+				time.Sleep(5 * time.Second)
+			} else {
+				// Sleep more for deck B
+				time.Sleep(8 * time.Second)
+			}
 
-			time.Sleep(5 * time.Second)
-			
+			// Call Homing of each deck again
 			d.Homing()
 		}
     }()
