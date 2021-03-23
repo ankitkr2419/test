@@ -17,6 +17,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+var conn *websocket.Conn
 // use default options
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -507,4 +508,30 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 		return
 	}
 	return
+}
+
+func openSocketConnection(rw http.ResponseWriter, req *http.Request)(conn *websocket.Conn,err error){
+
+	conn,err=upgrader.Upgrade(rw, req, nil)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
+		return
+	}
+	
+    return
+
+}
+
+func closeSocketConnection(){
+	conn.Close()
+}
+
+func monitorHoming(deps Dependencies, conn *websocket.Conn){
+
+// for resultsOnHoming.InProgress {
+// 	conn.WriteMessage(1,[]byte("homing in progress"))
+// }
+
+// conn.WriteMessage(1,[]byte("homing success"))
+//     return
 }

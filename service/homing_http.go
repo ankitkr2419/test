@@ -27,11 +27,16 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			err = fmt.Errorf("Check your deck name")
 		}
 
+		homingInProgress=true
+		conn,err:=openSocketConnection(rw,req)
+		go monitorHoming(deps,conn)
+
 		if err != nil {
 			fmt.Fprintf(rw, err.Error())
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
+			homingInProgress=false
 			fmt.Fprintf(rw, response)
 			rw.WriteHeader(http.StatusOK)
 		}
