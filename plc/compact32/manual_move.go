@@ -7,7 +7,7 @@ import (
 
 func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
 
-	if !d.IsRunInProgress() {
+	if d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
