@@ -16,6 +16,7 @@ import { StyledUl, StyledLi, CustomButton } from './ListElements';
 import Text from './Text';
 import ImageIcon from './ImageIcon';
 import Loader from './Loader';
+import VideoCard from './VideoCard'
 
 export {
 	ButtonGroup,
@@ -40,4 +41,5 @@ export {
 	CustomButton,
 	ImageIcon,
 	Loader,
+	VideoCard,
 };

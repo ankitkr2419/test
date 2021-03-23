@@ -5,14 +5,15 @@ import operatorLoginModalActions from 'actions/operatorLoginModalActions';
 const operatorLoginModalInitialState = fromJS({
     isOperatorLoggedIn: false,
     error: false,
-    msg: ''
+    msg: '',
+    deckName: ''
 });
 
 export const operatorLoginModalReducer = (state=operatorLoginModalInitialState, action) => {
 
     switch (action.type) {
         case operatorLoginModalActions.loginInitiated: 
-            return state
+            return state.merge({ deckName: action.payload.deckName });
 
         case operatorLoginModalActions.successAction:
             return state.merge({ isOperatorLoggedIn: true, error: false, msg: action.payload.response.msg });

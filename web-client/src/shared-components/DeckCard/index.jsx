@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 
 import styled from 'styled-components';
-// import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Text, Icon } from 'shared-components';
 import {
 	Button, 
 } from 'core-components';
-// import ActionButton from "./ActionButton";
-// import { Progress } from 'reactstrap';
+import ActionButton from "./ActionButton";
+import { DECKCARD_BTN } from "appConstants";
+import { Progress } from 'reactstrap';
 import OperatorLoginModalContainer from 'containers/OperatorLoginModalContainer';
 
 const DeckCardBox = styled.div`
@@ -140,63 +140,108 @@ const CardOverlay= styled.div`
 `;
 const DeckCard = (props) => {
 
-	const { cardName } = props;
+	const { 
+		deckName,
+		recipeName,
+		processNumber,
+		processTotal,
+		loginBtn,
+		showProcess,
+		showCleanUp,
+		handleCancelAction,
+		handleRunAction
+	} = props;
 	
 	const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
-    const toggleOperatorLoginModal = () => setOperatorLoginModalOpen(!operatorLoginModalOpen);
+    const toggleOperatorLoginModal = () => {
+		setOperatorLoginModalOpen(!operatorLoginModalOpen);
+	}
 
 	return (
 		<DeckCardBox className="d-flex justify-content-start align-items-center">
 			<CardOverlay />
 			<div className="d-flex justify-content-center align-items-center deck-title"> 
-				<Text Tag="label" size="20" >{cardName}</Text>
+				<Text Tag="label" size="20" >{deckName}</Text>
 			</div>
 			<div className="p-4 w-100 h-100 deck-content logged-in1">
 			<div className="d-flex justify-content-between align-items-center">
 				<div className="d-none1">
-					{/* <div className="uv-light-button">
-						<ActionButton/>
-					</div>  */}
-					{/* <div className="resume-button">
-						<ActionButton/>
-					</div>
-					<div className="abort-button">
-						<ActionButton/>
-					</div> */}
-					
-					<div className="d-none1">
-							<Text Tag="h5" size="18" className="mb-2 font-weight-bold recipe-name">Recipe Name</Text>
-							{/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text> */}
-							{/* <Text Tag="label" className="mb-1 d-flex align-items-center">
+
+					{(showProcess) &&
+						<>
+							<div className="resume-button" onClick={handleRunAction}>
+								<ActionButton label={DECKCARD_BTN.text.run} icon={DECKCARD_BTN.icon.play} />
+							</div>
+							<div className="abort-button" onClick={handleCancelAction}>
+								<ActionButton label={DECKCARD_BTN.text.cancel} icon={DECKCARD_BTN.icon.cancel} />
+							</div>
+
+							<div className="d-none1">
+								<Text Tag="h5" size="18" className="mb-2 font-weight-bold recipe-name">{recipeName}</Text>
+								
+								{/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
+								<Text Tag="label" className="mb-1 d-flex align-items-center">
+									<Icon name='timer' size={19} className="text-primary"/>
+									<Text Tag="span" className="hour-label font-weight-bold ml-2"> 1 Hr </Text>
+									<Text Tag="span" className="min-label ml-2 font-weight-bold">8 min</Text>
+									<Text Tag="span" className="ml-1">remaining</Text>
+								</Text> */}
+
+								<Text Tag="label" className="mb-1 d-flex align-items-center">
+									<Icon name='process' size={19} className="text-primary"/>
+									<Text Tag="span" className="process-count-label font-weight-bold ml-2"> {processNumber}
+									<Text Tag="span" className="process-total-count font-weight-bold">/{processTotal} </Text> </Text>
+									<Text Tag="span" className="ml-1 process-remaining">Processes remaining</Text>
+								</Text>
+								<Progress value="2" className="custom-progress-bar"/>
+							</div>
+						</>
+					}
+
+					{(showCleanUp) &&
+					<>
+						<div className="resume-button">
+							<ActionButton/>
+						</div>
+						<div className="abort-button">
+							<ActionButton/>
+						</div>
+
+						<div className="d-none1">
+							<Text Tag="h5" size="18" className="mb-2 font-weight-bold recipe-name">Clean Up</Text>
+							<Text Tag="label" className="mb-1 d-flex align-items-center">
 								<Icon name='timer' size={19} className="text-primary"/>
 								<Text Tag="span" className="hour-label font-weight-bold ml-2"> 1 Hr </Text>
 								<Text Tag="span" className="min-label ml-2 font-weight-bold">8 min</Text>
 								<Text Tag="span" className="ml-1">remaining</Text>
-							</Text> */}
-
-							<Text Tag="label" className="mb-1 d-flex align-items-center">
-								<Icon name='process' size={19} className="text-primary"/>
-								<Text Tag="span" className="process-count-label font-weight-bold ml-2"> 4 
-								<Text Tag="span" className="process-total-count font-weight-bold">/10 </Text> </Text>
-								<Text Tag="span" className="ml-1 process-remaining">Processes remaining</Text>
 							</Text>
+							<Progress value="2" className="custom-progress-bar"/>
 						</div>
-				</div>
-				<Button
-					color="primary"
-					className="ml-auto d-flex"
-					size="sm"
-					onClick={toggleOperatorLoginModal}
-				>	Login
-				</Button>
+					</>
+					}
 
-				<OperatorLoginModalContainer 
-					operatorLoginModalOpen={operatorLoginModalOpen}
-					toggleOperatorLoginModal={toggleOperatorLoginModal}
-				/>
-				
+					
 				</div>
-				{/* <Progress value="2" className="custom-progress-bar"/> */}
+
+				{(loginBtn) && 
+					<>
+						<Button
+							color="primary"
+							className="ml-auto d-flex"
+							size="sm"
+							onClick={toggleOperatorLoginModal}
+						>	Login
+						</Button>
+						
+						<OperatorLoginModalContainer 
+							operatorLoginModalOpen={operatorLoginModalOpen}
+							toggleOperatorLoginModal={toggleOperatorLoginModal}
+							deckName={deckName}
+						/>
+					</>
+				}
+
+				</div>
 			</div>
 		</DeckCardBox>
 	);
@@ -204,10 +249,20 @@ const DeckCard = (props) => {
 
 DeckCard.propTypes = {
 	isUserLoggedIn: PropTypes.bool,
+	showProcess: PropTypes.bool,
+	showCleanUp: PropTypes.bool,
+	recipeName: PropTypes.string,
+	processNumber: PropTypes.number,
+	processTotal: PropTypes.number,
 };
 
 DeckCard.defaultProps = {
 	isUserLoggedIn: false,
+	showProcess: false,
+	showCleanUp: false,
+	recipeName: "Recipe Name",
+	processNumber: 0,
+	processTotal: 10,
 };
 
 export default DeckCard;

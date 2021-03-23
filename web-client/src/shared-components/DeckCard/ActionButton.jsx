@@ -54,12 +54,15 @@ const ActionBtn = styled.button`
 `;
  
 const ActionButton = (props) => {
+
+	const { label, icon } = props;
+
 	return (
 		<ActionBtn className="d-flex justify-content-center align-items-center">
             <div className="semi-circle-outter-box">
                 <div className="semi-circular-button">
-                    <Icon name='play' size={18} className="ml-2"/>
-					<div className="btn-label font-weight-bold">RUN</div>
+                    <Icon name={icon} size={18} className="ml-2"/>
+					<div className="btn-label font-weight-bold">{label}</div>
                 </div>
             </div>
         </ActionBtn>

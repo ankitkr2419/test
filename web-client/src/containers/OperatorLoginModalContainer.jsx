@@ -12,7 +12,8 @@ const OperatorLoginModalContainer = (props) => {
 
     const {
         operatorLoginModalOpen,
-        toggleOperatorLoginModal
+        toggleOperatorLoginModal,
+        deckName
     } = props;
 
     const {
@@ -47,7 +48,7 @@ const OperatorLoginModalContainer = (props) => {
         const email = authData.email.value;
         const password = authData.password.value;
         
-        dispatch(operatorLoginInitiated({email:email, password: password, role: "admin"}));
+        dispatch(operatorLoginInitiated({email:email, password: password, deckName: deckName, role: "admin"}));
     }
 
     if (isOperatorLoggedIn && !error) {

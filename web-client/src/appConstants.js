@@ -76,3 +76,27 @@ export const MODAL_BTN = {
 	yes: "Yes",
 	no: "No",
 };
+
+export const DECKCARD_BTN = {
+	text: {
+		run: "RUN",
+		abort: "ABORT",
+		cancel: "CANCEL",
+		pause: "PAUSE",
+		done: "DONE",
+		resume: "RESUME",
+	},
+	icon: {
+		play: "play",
+		abort: "abort",
+		cancel: "cancel",
+		pause: "pause",
+		done: "done",
+		resume: "resume",
+	}
+};
+
+export const DECKNAME = {
+	DeckA : "Deck A",
+	DeckB : "Deck B",
+}

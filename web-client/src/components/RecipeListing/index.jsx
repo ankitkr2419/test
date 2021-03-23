@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon } from "shared-components";
+import { Icon, VideoCard } from "shared-components";
 
 import styled from "styled-components";
 import AppFooter from "components/AppFooter";
 import RecipeFlowModal from "components/modals/RecipeFlowModal";
-import ConfirmationModal from "components/modals/ConfirmationModal";
+// import ConfirmationModal from "components/modals/ConfirmationModal";
 import TrayDiscardModal from "components/modals/TrayDiscardModal";
 import RecipeCard from "components/RecipeListing/RecipeCard";
+import { runRecipeInitiated } from "action-creators/recipeActionCreators";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -20,19 +22,55 @@ const HeadingTitle = styled.label`
 `;
 
 const RecipeListingComponent = (props) => {
-  const { recipeData } = props;
+  const { allRecipeData } = props;
+  const dispatch = useDispatch()
 
-  //sample to generate more rows : will be deleted
-  recipeData.push(recipeData[0]);
-  recipeData.push(recipeData[0]);
-  recipeData.push(recipeData[0]);
-  recipeData.push(recipeData[0]);
+  const operatorLoginModalReducer = useSelector(
+    (state) => state.operatorLoginModalReducer
+  );
+  const { deckName } = operatorLoginModalReducer.toJS();
+
+  // const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  // console.log("RECIPE ACTION REDUCER: ", recipeActionReducer);
+
+  const [recipeData, setRecipeData] = useState({});
+
+  const [isOpen, setIsOpen] = useState(false);
+  const toggle = (recipeId, recipeName, processCount) => {
+    const data = {
+      recipeId: recipeId,
+      recipeName: recipeName,
+      processCount: processCount
+    }
+    setRecipeData(data);
+    setIsOpen(!isOpen);
+  };
+
+  const [showProcess, setShowProcess] = useState(false);
+  const toggleShowProcess = () => {
+    setShowProcess(!showProcess);
+    setIsOpen(!isOpen);
+  };
+
+  const handleCancelAction = () => setShowProcess(!showProcess);
+
+  const handleRunAction = () => {
+    const name = (deckName === "Deck A") ? "A" : "B";
+    const { recipeId } = recipeData;
+    dispatch(runRecipeInitiated({recipeId:recipeId, deckName:name}));
+  };
 
   return (
     <div className="ml-content">
       <div className="landing-content px-2">
-        <ConfirmationModal isOpen={false} />
-        <RecipeFlowModal />
+        {/* <ConfirmationModal isOpen={true} /> */}
+
+        <RecipeFlowModal
+          isOpen={isOpen}
+          toggle={toggle}
+          toggleShowProcess={toggleShowProcess}
+          recipeData={recipeData}
+        />
 
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
           <div className="d-flex align-items-center">
@@ -53,20 +91,37 @@ const RecipeListingComponent = (props) => {
             <TrayDiscardModal />
           </div>
         </TopContent>
-        <Card>
-          <CardBody className="p-5" style={{ columns: "2 auto" }}>
-            {recipeData.map((value, index) => (
-              <Col key={index}>
-                <RecipeCard
-                  recipeName={value.name}
-                  processCount={value.process_count}
-                />
-              </Col>
-            ))}
-          </CardBody>
-        </Card>
+
+        {showProcess ? (
+          <VideoCard />
+        ) : (
+          <Card>
+            <CardBody className="p-5">
+              <Row>
+              {allRecipeData.map((value, index) => (
+                <Col md={6} key={index}>
+                  <RecipeCard
+                    recipeId={value.id}
+                    recipeName={value.name}
+                    processCount={value.process_count}
+                    toggle={toggle}
+                  />
+                </Col>
+              ))}
+              </Row>
+            </CardBody>
+          </Card>
+        )}
       </div>
-      <AppFooter />
+      <AppFooter
+        deckName={deckName}
+        showProcess={showProcess}
+        recipeName={recipeData.recipeName}
+        processNumber={12}
+        processTotal={recipeData.processCount}
+        handleCancelAction={handleCancelAction}
+        handleRunAction={handleRunAction}
+      />
     </div>
   );
 };

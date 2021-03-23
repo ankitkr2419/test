@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, ModalBody } from "core-components";
 import { Center, Text, ButtonGroup, ButtonIcon } from "shared-components";
-import { ModalHeader } from "reactstrap";
 
 const ReusableModal = (props) => {
   const {

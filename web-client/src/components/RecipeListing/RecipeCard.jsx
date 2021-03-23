@@ -46,49 +46,52 @@ const RecipeCard = (props) => {
     // const toggle = () => setFadeIn(!fadeIn);
 
     const {
+        recipeId,
         recipeName,
         processCount,
+        toggle
     } = props;
 
-    const { toggle } = props;
     return(
-        <RecipeCardStyle onClick={toggle}>
-            <div className="font-weight-bold recipe-heading">{recipeName}</div>
-            <div className="recipe-card-body">
-            <Text Tag="span" className="recipe-name">Total Processes -</Text>
-            <Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">{processCount} </Text>
-            {/* <Fade in={fadeIn} tag="h5" className="m-0 d-none">
-                    <div className="recipe-action d-flex justify-content-between align-items-center">
-                        <div className="d-flex justify-content-between align-items-center">
+        <div onClick={() => toggle(recipeId, recipeName, processCount)}>
+            <RecipeCardStyle>
+                <div className="font-weight-bold recipe-heading">{recipeName}</div>
+                <div className="recipe-card-body">
+                <Text Tag="span" className="recipe-name">Total Processes -</Text>
+                <Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">{processCount} </Text>
+                {/* <Fade in={fadeIn} tag="h5" className="m-0 d-none">
+                        <div className="recipe-action d-flex justify-content-between align-items-center">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <ButtonIcon
+                                    size={14}
+                                    name='play'
+                                    className="border-gray text-primary"
+                                    //onClick={toggleExportDataModal}
+                                />
+                                <ButtonIcon
+                                    size={14}
+                                    name='edit-pencil'
+                                    className="border-gray text-primary"
+                                    //onClick={toggleExportDataModal}
+                                />
+                                <ButtonIcon
+                                    size={14}
+                                    name='upload'
+                                    className="border-gray text-primary"
+                                    //onClick={toggleExportDataModal}
+                                />
+                            </div>
                             <ButtonIcon
-                                size={14}
-                                name='play'
-                                className="border-gray text-primary"
-                                //onClick={toggleExportDataModal}
-                            />
-                            <ButtonIcon
-                                size={14}
-                                name='edit-pencil'
-                                className="border-gray text-primary"
-                                //onClick={toggleExportDataModal}
-                            />
-                            <ButtonIcon
-                                size={14}
-                                name='upload'
+                                size={20}
+                                name='minus-1'
                                 className="border-gray text-primary"
                                 //onClick={toggleExportDataModal}
                             />
                         </div>
-                        <ButtonIcon
-                            size={20}
-                            name='minus-1'
-                            className="border-gray text-primary"
-                            //onClick={toggleExportDataModal}
-                        />
-                    </div>
-                </Fade> */}
-            </div> 
-        </RecipeCardStyle>
+                    </Fade> */}
+                </div> 
+            </RecipeCardStyle>
+        </div>
     )
 }
 

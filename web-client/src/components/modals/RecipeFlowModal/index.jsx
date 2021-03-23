@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from "react";
 // import styled from 'styled-components';
-import { ButtonIcon, Center, ImageIcon} from 'shared-components';
-import { Button, Modal, ModalBody} from 'core-components';
-import Slide1 from '../../../assets/images/slide-1.jpg';
-import Slide2 from '../../../assets/images/slide-2.jpg';
-import Slide3 from '../../../assets/images/slide-3.jpg';
-import styled from 'styled-components';
+import { ButtonIcon, Center, ImageIcon } from "shared-components";
+import { Button, Modal, ModalBody } from "core-components";
+import Slide1 from "../../../assets/images/slide-1.jpg";
+import Slide2 from "../../../assets/images/slide-2.jpg";
+import Slide3 from "../../../assets/images/slide-3.jpg";
+import styled from "styled-components";
 import Slider from "react-slick";
 
 // const items = [
@@ -26,31 +26,31 @@ import Slider from "react-slick";
 //     }
 // ];
 const RecipeFlowSlider = styled.div`
-  .slides{
-    .slides-inner-box{
-      width:43.5rem;
-      height:100%;
+  .slides {
+    .slides-inner-box {
+      width: 43.5rem;
+      height: 100%;
       // height:25rem;
-      margin:0 auto;
+      margin: 0 auto;
       overflow: hidden !important;
-      img{
-      border-radius:1.5rem !important;
-      box-shadow:0px 3px 6px rgba(0,0,0,0.16) !important;
+      img {
+        border-radius: 1.5rem !important;
+        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16) !important;
       }
     }
   }
-  .slick-dots{
-    bottom:-2.5rem !important;
-    li button:before{
-      font-size:0.75rem;
+  .slick-dots {
+    bottom: -2.5rem !important;
+    li button:before {
+      font-size: 0.75rem;
     }
-    li.slick-active button:before{
-      transform:scale(1.5);
-      color:#F38220;
+    li.slick-active button:before {
+      transform: scale(1.5);
+      color: #f38220;
     }
   }
   .center {
-    .slick-list{
+    .slick-list {
       padding-top: 30px !important;
       padding-bottom: 30px !important;
     }
@@ -59,7 +59,7 @@ const RecipeFlowSlider = styled.div`
       overflow: hidden;
       border-radius: 1.5rem;
     }
-    .slides{
+    .slides {
       -webkit-transition: all 0.3s ease-out;
       transition: all 0.3s ease-out;
     }
@@ -71,81 +71,90 @@ const NextButton = styled.div`
   right: 6rem;
 `;
 
-
 const RecipeFlowModal = (props) => {
-  const { modal, toggle } = props;
-    // const [modal, setModal] = useState(true);
-    // const toggle = () => setModal(!modal);
+  const [enableNext, setEnableNext] = useState(false);
 
-    const recipeFlowsettings = {
-      className: "center",
-      centerMode: true,
-      centerPadding: "65px",
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      arrows: false,
-    };
-	return (
-		<>
-			{/* <ButtonIcon
+  const { isOpen, toggle, toggleShowProcess, recipeData } = props;
+  const { recipeId, recipeName, processCount } = recipeData;
+  const LAST_SLIDE = 2;
+
+  const recipeFlowsettings = {
+    className: "center",
+    centerMode: true,
+    centerPadding: "65px",
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+    afterChange: (currentSlide) => {
+      if (currentSlide === LAST_SLIDE) {
+        setEnableNext(true);
+      } else {
+        setEnableNext(false);
+      }
+    },
+  };
+
+  return (
+    <>
+      {/* <ButtonIcon
 				size={34}
 				name='external-link'
 				className='mx-2'
 				onClick={toggle}
 			/> */}
-      <Modal
-				isOpen={false}
-				toggle={toggle}
-				centered
-				size='lg'
-        className="recipe-flow-modal"
-			>
-				<ModalBody className="py-5 px-0 recipe-flow-modal-body">
-            <ButtonIcon
-              position="absolute"
-              placement="right"
-              top={16}
-              right={16}
-              size={36}
-              name="cross"
-              onClick={toggle}
-              className="ml-auto border-0"
-            />
-            <Center className="font-weight-bold mb-4">Name Name Name Name Name Name Name</Center>
-            <RecipeFlowSlider className="mb-4">
-              <Slider {...recipeFlowsettings}>
-                  <div className="slides">
-                    <div className="slides-inner-box">
-                      <ImageIcon src={Slide1} alt=""/>
-                    </div>
-                  </div>
-                  <div className="slides">
-                    <div className="slides-inner-box">
-                      <ImageIcon src={Slide2} alt=""/>
-                    </div>
-                  </div>
-                  <div className="slides position-relative">
-                    <div className="slides-inner-box">
-                      <ImageIcon src={Slide3} alt=""/>
-                    </div>
-                  </div>
-                </Slider>  
-            </RecipeFlowSlider>
+      <Modal isOpen={isOpen} centered size="lg" className="recipe-flow-modal">
+        <ModalBody className="py-5 px-0 recipe-flow-modal-body">
+          <ButtonIcon
+            position="absolute"
+            placement="right"
+            top={16}
+            right={16}
+            size={36}
+            name="cross"
+            onClick={() => {toggle(recipeId, recipeName, processCount); setEnableNext(false);}}
+            className="ml-auto border-0"
+          />
+          <Center className="font-weight-bold mb-4">{recipeName}</Center>
+          <RecipeFlowSlider className="mb-4">
+            <Slider {...recipeFlowsettings}>
+              <div className="slides">
+                <div className="slides-inner-box">
+                  <ImageIcon src={Slide1} alt="" />
+                </div>
+              </div>
+              <div className="slides">
+                <div className="slides-inner-box">
+                  <ImageIcon src={Slide2} alt="" />
+                </div>
+              </div>
+              <div className="slides position-relative">
+                <div className="slides-inner-box">
+                  <ImageIcon src={Slide3} alt="" />
+                </div>
+              </div>
+            </Slider>
+          </RecipeFlowSlider>
+
+          {(enableNext) && (
             <NextButton>
               <Button
-              color="outline-secondary"
-              size="sm"
+                className="border-primary"
+                color="outline-secondary"
+                size="sm"
+                onClick={() => {toggleShowProcess(); setEnableNext(false);}}
               >
-							Next
-						</Button>
-					</NextButton>          
-				</ModalBody>
-			</Modal>
-		</>
-	);
+                Next
+              </Button>
+            </NextButton>
+          )}
+
+        </ModalBody>
+      </Modal>
+    </>
+  );
 };
 
 RecipeFlowModal.propTypes = {};
