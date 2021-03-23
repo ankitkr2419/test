@@ -19,8 +19,8 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "SUCCESS", nil
 	}
 
-	wrotePulses.Store(d.name, 0)
-	executedPulses.Store(d.name, 0)
+	wrotePulses.Store(d.name, uint16(0))
+	executedPulses.Store(d.name, uint16(0))
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
 
 	var results []byte
@@ -110,7 +110,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	for {
 		
-		if temp := d.getExecutedPulses(); temp == 0 {
+		if temp := d.getExecutedPulses(); temp == highestUint16 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
 			// Write executed pulses to Position

@@ -65,14 +65,14 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			return "", err
 		}
 
-		if temp1 := d.getWrotePulses(); temp1 == 0 {
+		if temp1 := d.getWrotePulses(); temp1 == highestUint16 {
 			err = fmt.Errorf("wrotePulses isn't loaded!")
-		} else if temp2 := d.getExecutedPulses(); temp2 == 0 {
+		} else if temp2 := d.getExecutedPulses(); temp2 == highestUint16 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 		} else if temp1 <= temp2 {
 			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
-			wrotePulses.Store(d.name, 0)
-			executedPulses.Store(d.name, 0)
+			wrotePulses.Store(d.name, uint16(0))
+			executedPulses.Store(d.name, uint16(0))
 		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
 			response, err = d.ResumeMotorWithPulses(temp1 - temp2)
@@ -91,6 +91,8 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 func (d *Compact32Deck) Abort() (response string, err error) {
 
 	fmt.Println("aborting the operation....")
+
+	homed.Store(d.name, false)
 
 	fmt.Println("switching motor off....")
 	response, err = d.switchOffMotor()
@@ -112,9 +114,8 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	aborted.Store(d.name, true)
-	wrotePulses.Store(d.name, 0)
+	wrotePulses.Store(d.name, uint16(0))
 	paused.Store(d.name, false)
-	homed.Store(d.name, false)
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
 	if d.IsRunInProgress() && !d.isTimerInProgress() {
