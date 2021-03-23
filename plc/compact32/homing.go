@@ -21,16 +21,14 @@ func (d *Compact32Deck) Homing() (response string, err error) {
             fmt.Printf("\nRecovering in Homing %v for Deck %v", r, d.name)
 
             time.Sleep(2 * time.Second)
-// TODO: Handle the scenario when A has completed its homing but B had a serial timeout
 			if !d.IsMachineHomed(){
 				d.ExitCh <- err
 				time.Sleep(5 * time.Second)
 				response, err = d.Homing()
 			}
-			// Call Homing of each deck again
 		}
     }()
-// 
+
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
