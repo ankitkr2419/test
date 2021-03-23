@@ -110,7 +110,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	for {
 		
-		if temp := d.getExecutedPulses(); temp == -1 {
+		if temp := d.getExecutedPulses(); temp == 0 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
 			// Write executed pulses to Position

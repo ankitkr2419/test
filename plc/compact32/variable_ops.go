@@ -78,20 +78,20 @@ func (d *Compact32Deck) getMagnetState() int{
 	}
 }
 
-func (d *Compact32Deck) getExecutedPulses() int{
+func (d *Compact32Deck) getExecutedPulses() uint16{
 	if temp, ok :=  executedPulses.Load(d.name); !ok {
 		logger.Errorln("executed Pulses isn't loaded!")
-		return -1
+		return 0
 	} else {
-		return temp.(int)
+		return temp.(uint16)
 	}
 }
 
-func (d *Compact32Deck) getWrotePulses() int{
+func (d *Compact32Deck) getWrotePulses() uint16{
 	if temp, ok :=  wrotePulses.Load(d.name); !ok {
 		logger.Errorln("wrote Pulses isn't loaded!")
-		return -1
+		return 0
 	} else {
-		return temp.(int)
+		return temp.(uint16)
 	}
 }

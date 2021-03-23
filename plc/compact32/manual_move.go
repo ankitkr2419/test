@@ -65,9 +65,9 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			return "", err
 		}
 
-		if temp1 := d.getWrotePulses(); temp1 == -1 {
+		if temp1 := d.getWrotePulses(); temp1 == 0 {
 			err = fmt.Errorf("wrotePulses isn't loaded!")
-		} else if temp2 := d.getExecutedPulses(); temp2 == -1 {
+		} else if temp2 := d.getExecutedPulses(); temp2 == 0 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 		} else if temp1 <= temp2 {
 			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
@@ -75,7 +75,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			executedPulses.Store(d.name, 0)
 		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
-			response, err = d.ResumeMotorWithPulses(uint16(temp1 - temp2))
+			response, err = d.ResumeMotorWithPulses(temp1 - temp2)
 		}
 		if err != nil {
 			fmt.Println("err:", err)
