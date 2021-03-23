@@ -18,6 +18,7 @@ import (
 )
 
 var conn *websocket.Conn
+
 // use default options
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -510,28 +511,36 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 	return
 }
 
-func openSocketConnection(rw http.ResponseWriter, req *http.Request)(conn *websocket.Conn,err error){
+func openSocketConnection(rw http.ResponseWriter, req *http.Request) (conn *websocket.Conn, err error) {
 
-	conn,err=upgrader.Upgrade(rw, req, nil)
+	conn, err = upgrader.Upgrade(rw, req, nil)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
 		return
 	}
-	
-    return
+
+	return
 
 }
 
-func closeSocketConnection(){
+func closeSocketConnection() {
 	conn.Close()
 }
 
-func monitorHoming(deps Dependencies, conn *websocket.Conn){
+func monitorHoming(deps Dependencies, conn *websocket.Conn) {
 
-// for resultsOnHoming.InProgress {
-// 	conn.WriteMessage(1,[]byte("homing in progress"))
-// }
+	for homing.Progress {
+		conn.WriteMessage(1, []byte("homing in progress"))
+		// adding delay of 0.5s to reduce the cpu usage
+		time.Sleep(500 * time.Millisecond)
+	}
 
-// conn.WriteMessage(1,[]byte("homing success"))
-//     return
+	if homing.Success {
+		conn.WriteMessage(1, []byte("homing success"))
+		return
+	}
+	if homing.Err {
+		conn.WriteMessage(1, []byte("error in homing"))
+
+	}
 }
