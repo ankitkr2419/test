@@ -150,8 +150,8 @@ func startApp(plcName string, test bool) (err error) {
 		driverDeckB = compact32.NewCompact32DeckDriverB(exit, test, handler)	
 	} else {
 		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewUISimulator(exit,"A")
-		driverDeckB = simulator.NewUISimulator(exit,"B")
+		driverDeckA = simulator.NewExtractionSimulator(exit,"A")
+		driverDeckB = simulator.NewExtractionSimulator(exit,"B")
 
 	}
 
