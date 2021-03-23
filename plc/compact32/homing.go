@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"time"
-
 )
 
 func (d *Compact32Deck) Homing() (response string, err error) {
@@ -15,19 +14,19 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	}
 
 	defer func() {
-        if r := recover(); r != nil {
+		if r := recover(); r != nil {
 			time.Sleep(2 * time.Second)
 			d.ResetRunInProgress()
-            fmt.Printf("\nRecovering in Homing %v for Deck %v", r, d.name)
+			fmt.Printf("\nRecovering in Homing %v for Deck %v", r, d.name)
 
-            time.Sleep(2 * time.Second)
-			if !d.IsMachineHomed(){
+			time.Sleep(2 * time.Second)
+			if !d.IsMachineHomed() {
 				d.ExitCh <- err
 				time.Sleep(5 * time.Second)
 				response, err = d.Homing()
 			}
 		}
-    }()
+	}()
 
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()

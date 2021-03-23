@@ -43,7 +43,7 @@ const (
 	reverseAfterNonCutPulsesMagnet      = uint16(400)
 	finalSensorCutPulses                = uint16(2999)
 	minimumPulsesThreshold              = uint16(50)
-	highestUint16 						= uint16(65535)
+	highestUint16                       = uint16(65535)
 )
 
 // 120 Seconds is the minimum UVLight On Time
@@ -53,8 +53,8 @@ const (
 
 // Special Speeds
 const (
-	homingFastSpeed = uint16(2000)
-	homingSlowSpeed = uint16(500)
+	homingFastSpeed     = uint16(2000)
+	homingSlowSpeed     = uint16(500)
 	homingDeckFastSpeed = uint16(3000)
 )
 

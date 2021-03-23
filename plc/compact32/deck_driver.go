@@ -8,7 +8,6 @@ import (
 
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
-
 	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v. Please home the machine first.", d.name)
 		return "", err
@@ -109,7 +108,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	fmt.Println("Movements in Progress for deck: ", d.name)
 
 	for {
-		
+
 		if temp := d.getExecutedPulses(); temp == highestUint16 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
@@ -264,4 +263,3 @@ func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 	return "D212 Reading SUCESS", nil
 
 }
-
