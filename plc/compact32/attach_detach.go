@@ -11,14 +11,14 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 	// Operation attach and detach
 	switch ad.Operation {
 	case "attach":
-		response, err = d.Attach(ad.OperationType)
+		response, err = d.attach(ad.OperationType)
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
 		magnetState.Store(d.name, attached)
 		return
 	case "detach":
-		response, err = d.Detach(ad.OperationType)
+		response, err = d.detach(ad.OperationType)
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
@@ -44,7 +44,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 3. If it is full-detach then move up to 0.5 mm from the 0 position of the magnet.
 4. Then move the magnet 20 mm back to avoid any chances of possible collision with the tips.
 */
-func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
+func (d *Compact32Deck) detach(operationType string) (response string, err error) {
 
 	// TODO: Check if already detached, then avoid all below claculations
 	var magnetBackPosition, magnetUpPosition float64
@@ -70,7 +70,7 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -96,7 +96,7 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -117,7 +117,7 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -134,7 +134,7 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 4. Move the magnet down to 75 mm down behind shaker for attach
 5. At last move 5.5 mm forward for the magnet to attach
 */
-func (d *Compact32Deck) Attach(operationType string) (response string, err error) {
+func (d *Compact32Deck) attach(operationType string) (response string, err error) {
 
 	// TODO: Check if already attached, then avoid all below claculations
 	var deckPosition, magnetDownFirstPosition, magnetFwdFirstPosition, magnetDownSecPosition, magnetFwdSecPosition float64
@@ -164,7 +164,7 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 
 	pulses = uint16(math.Round(float64(motors[deckAndNumber]["steps"]) * distanceToTravel))
 
-	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], pulses, motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
+	response, err = d.setupMotor(motors[deckAndNumber]["fast"], pulses, motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
 	if err != nil {
 		fmt.Printf("error in moving deck to required position")
 		return
@@ -185,7 +185,7 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 1 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -205,7 +205,7 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 1 forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -227,7 +227,7 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -247,7 +247,7 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -259,7 +259,7 @@ func (d *Compact32Deck) fullDetach() (response string, err error) {
 	// Calling AttachDetach below as this handles magnetState implicitly
 	// WARNING: Be careful of below string literals "detach" and "full_detach",
 	// any changes in db schema of magnets should be reflected in these as well.
-	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType: "full_detach"})
+	response, err = d.detach("full_detach")
 	if err != nil {
 		fmt.Printf("error in magnet detach process %v \n", err.Error())
 	}

@@ -20,10 +20,7 @@ func (d *Compact32Deck) AddDelay(delay db.Delay) (reponse string, err error) {
 			fmt.Printf("delay time over %v", n)
 			return "SUCCESS", nil
 		default:
-			if temp, ok := aborted.Load(d.name); !ok {
-				err = fmt.Errorf("aborted isn't loaded!")
-				return
-			} else if temp.(bool) {
+			if d.isMachineInAbortedState() {
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}

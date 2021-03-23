@@ -12,18 +12,20 @@ import (
 
 func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 
+	if !d.IsMachineHomed() {
+		err = fmt.Errorf("Please home the machine first!")
+		return
+	}
+
+	if d.IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return
+	}
+
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
-
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return
-	}
 
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
@@ -42,7 +44,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// We know concrete direction here, its REV
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], REV, deckAndMotor.Number)
+	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], REV, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was an issue moving deck REV to discard_box_open_position. Error: %v", err)
@@ -55,18 +57,20 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 
 func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 
+	if !d.IsMachineHomed() {
+		err = fmt.Errorf("Please home the machine first!")
+		return
+	}
+
+	if d.IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return
+	}
+
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
-
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return "", err
-	}
 
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
@@ -85,7 +89,7 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// We know concrete direction here, its FWD
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
+	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was an issue moving deck FWD to deck_start. Error: %v", err)
@@ -107,19 +111,21 @@ ALGORITHM
 
 func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
+	if !d.IsMachineHomed() {
+		err = fmt.Errorf("Please home the machine first!")
+		return
+	}
+
+	if d.IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		return
+	}
+
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
 
 	var totalTime, timeElapsed, remainingTime int64
 	var t *time.Timer
-
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		return "", err
-	}
 
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
@@ -170,20 +176,14 @@ skipToStartUVTimer:
 		default:
 			// delay of 300 ms to reduce CPU usage
 			time.Sleep(time.Millisecond * 300)
-			if temp, ok := aborted.Load(d.name); !ok {
-				err = fmt.Errorf("aborted isn't loaded!")
-				return
-			} else if temp.(bool) {
+			if d.isMachineInAbortedState() {
 				t.Stop()
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}
 
 			// if paused then
-			if temp, ok := paused.Load(d.name); !ok {
-				err = fmt.Errorf("paused isn't loaded!")
-				return
-			} else if temp.(bool) {
+			if d.isMachineInPausedState() {
 				//  Switch off UV Light
 				response, err = d.switchOffUVLight()
 				if err != nil {
@@ -208,7 +208,7 @@ skipToStartUVTimer:
 				//
 				// 4.  If Paused then monitor for resumed
 				//
-				response, err = waitUntilResumed(d.name)
+				response, err = d.waitUntilResumed(d.name)
 				if err != nil {
 					return
 				}
@@ -220,21 +220,15 @@ skipToStartUVTimer:
 	return "UV Light Completed Successfully", nil
 }
 
-func waitUntilResumed(deck string) (response string, err error) {
+func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err error) {
 	for {
 		time.Sleep(time.Millisecond * 300)
-		if temp, ok := paused.Load(deck); !ok {
-			err = fmt.Errorf("paused isn't loaded!")
-			return
-		} else if !temp.(bool) {
+		if !d.isMachineInPausedState() {
 			// when resumed go again to timer start
 			return "Resumed", nil
 		}
-
-		if temp, ok := aborted.Load(deck); !ok {
-			err = fmt.Errorf("aborted isn't loaded!")
-			return
-		} else if temp.(bool) {
+		
+		if d.isMachineInAbortedState() {
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err
 		}

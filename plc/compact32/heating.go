@@ -71,10 +71,7 @@ func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, hea
 	fmt.Printf("Set Temperature %v", result)
 
 	// first check aborted if yes then exit
-	if temp, ok := aborted.Load(d.name); !ok {
-		err = fmt.Errorf("aborted isn't loaded!")
-		return
-	} else if temp.(bool) {
+	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Operation was ABORTED!")
 		return "", err
 	}
@@ -90,17 +87,14 @@ func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, hea
 	// and start up the heating and when the timer is expired turn off the heater
 	if !follow_temperature {
 		fmt.Printf("inside not follow up")
-		t = time.AfterFunc(heatTime, d.SwitchOffTheHeater)
+		t = time.AfterFunc(heatTime, d.switchOffTheHeater)
 	}
 
 	// loop for continous reading of the shaker temp and check if the temperature has reached specified value.
 shakerSelectionLoop:
 	for {
 
-		if temp, ok := aborted.Load(d.name); !ok {
-			err = fmt.Errorf("aborted isn't loaded!")
-			return
-		} else if temp.(bool) {
+		if d.isMachineInAbortedState() {
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
@@ -157,7 +151,7 @@ shakerSelectionLoop:
 	// specified duration and then turn the heater off
 	if follow_temperature {
 		time.Sleep(heatTime)
-		d.SwitchOffHeater()
+		d.switchOffHeater()
 		return
 
 	}
@@ -166,7 +160,7 @@ shakerSelectionLoop:
 		select {
 		case n := <-t.C:
 			fmt.Printf("time expired %v", n)
-			result, err := d.SwitchOffHeater()
+			result, err := d.switchOffHeater()
 			if err != nil {
 				fmt.Println("err : ", err)
 				return "", err
@@ -176,10 +170,7 @@ shakerSelectionLoop:
 			fmt.Println("Heating Was Successful")
 			return "SUCCESS", nil
 		default:
-			if temp, ok := aborted.Load(d.name); !ok {
-				err = fmt.Errorf("aborted isn't loaded!")
-				return
-			} else if temp.(bool) {
+			if d.isMachineInAbortedState() {
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}
@@ -190,8 +181,8 @@ shakerSelectionLoop:
 
 }
 
-func (d *Compact32Deck) SwitchOffTheHeater() {
-	_, err := d.SwitchOffHeater()
+func (d *Compact32Deck) switchOffTheHeater() {
+	_, err := d.switchOffHeater()
 	if err != nil {
 		fmt.Println("Error failed to switch heater off : ", err)
 		return

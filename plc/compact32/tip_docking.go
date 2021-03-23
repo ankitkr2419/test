@@ -45,7 +45,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 
 	pulses = uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.SetupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
+	response, err = d.setupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -94,7 +94,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 
 		// 3.2 Then travel to that position
 
-		response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+		response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -122,7 +122,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.SetupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)
@@ -142,7 +142,7 @@ skipToPositionSyringeHeight:
 	//
 	// 6. At that position move the syringe module to the specified height
 	//
-	response, err = d.SetupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
+	response, err = d.setupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)

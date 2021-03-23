@@ -7,18 +7,16 @@ import (
 
 func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
 
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp.(bool) {
+	if !d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
+
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
-	response, err = d.SetupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
+	response, err = d.setupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
 	if err != nil {
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
@@ -26,51 +24,22 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 	return
 }
 
-func (d *Compact32Deck) NameOfDeck() string {
-	return d.name
-}
-
-func (d *Compact32Deck) SetRunInProgress() {
-	runInProgress.Store(d.name, true)
-}
-
-func (d *Compact32Deck) ResetRunInProgress() {
-	runInProgress.Store(d.name, false)
-}
-
-func (d *Compact32Deck) SetTimerInProgress() {
-	timerInProgress.Store(d.name, true)
-}
-
-func (d *Compact32Deck) ResetTimerInProgress() {
-	timerInProgress.Store(d.name, false)
-}
-
 func (d *Compact32Deck) Pause() (response string, err error) {
 
 	// If machine is already PAUSED OR
-	if temp, ok := paused.Load(d.name); !ok {
-		err = fmt.Errorf("paused isn't loaded!")
-		return
-	} else if temp.(bool) {
+	if d.isMachineInPausedState() {
 		err = fmt.Errorf("Machine is already in PAUSED state")
 		return "", err
 	}
 
 	// run is not in Progress
-	if temp, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if !temp.(bool) {
+	if !d.IsRunInProgress() {
 		err = fmt.Errorf("Machine is already in IDLE state")
 		return "", err
 	}
 
-	if temp, ok := timerInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("timerInProgress isn't loaded!")
-		return
-	} else if !temp.(bool) {
-		response, err = d.SwitchOffMotor()
+	if !d.isTimerInProgress() {
+		response, err = d.switchOffMotor()
 		if err != nil {
 			return "", err
 		}
@@ -84,35 +53,29 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 func (d *Compact32Deck) Resume() (response string, err error) {
 
 	// if paused only then resume
-	if temp, ok := paused.Load(d.name); !ok {
-		err = fmt.Errorf("paused isn't loaded!")
-		return
-	} else if !temp.(bool) {
+	if !d.isMachineInPausedState() {
 		err = fmt.Errorf("System is already running, or done with the run")
 		return "", err
 	}
 
-	if temp, ok := timerInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("timerInProgress isn't loaded!")
-		return
-	} else if !temp.(bool) {
-		response, err = d.ReadExecutedPulses()
+	if !d.isTimerInProgress() {
+		response, err = d.readExecutedPulses()
 		if err != nil {
 			fmt.Println("err : ", err)
 			return "", err
 		}
 
-		if temp1, ok := wrotePulses.Load(d.name); !ok {
+		if temp1 := d.getWrotePulses(); temp1 == -1 {
 			err = fmt.Errorf("wrotePulses isn't loaded!")
-		} else if temp2, ok := executedPulses.Load(d.name); !ok {
+		} else if temp2 := d.getExecutedPulses(); temp2 == -1 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
-		} else if temp1.(int) <= temp2.(int) {
+		} else if temp1 <= temp2 {
 			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
 			wrotePulses.Store(d.name, 0)
 			executedPulses.Store(d.name, 0)
 		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
-			response, err = d.ResumeMotorWithPulses(uint16(temp1.(int) - temp2.(int)))
+			response, err = d.ResumeMotorWithPulses(uint16(temp1 - temp2))
 		}
 		if err != nil {
 			fmt.Println("err:", err)
@@ -130,13 +93,13 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	fmt.Println("aborting the operation....")
 
 	fmt.Println("switching motor off....")
-	response, err = d.SwitchOffMotor()
+	response, err = d.switchOffMotor()
 	if err != nil {
 		fmt.Println("From deck ", d.name, err)
 		return "", err
 	}
 
-	response, err = d.SwitchOffHeater()
+	response, err = d.switchOffHeater()
 	if err != nil {
 		fmt.Println("From deck ", d.name, err)
 		return "", err
@@ -151,17 +114,11 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	aborted.Store(d.name, true)
 	wrotePulses.Store(d.name, 0)
 	paused.Store(d.name, false)
+	homed.Store(d.name, false)
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
-
-	if temp1, ok := runInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("runInProgress isn't loaded!")
-		return
-	} else if temp2, ok := timerInProgress.Load(d.name); !ok {
-		err = fmt.Errorf("timerInProgress isn't loaded!")
-		return
-	} else if temp1.(bool) && !temp2.(bool) {
-		response, err = d.ReadExecutedPulses()
+	if d.IsRunInProgress() && !d.isTimerInProgress() {
+		response, err = d.readExecutedPulses()
 		if err != nil {
 			fmt.Println("err : ", err)
 			return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")
