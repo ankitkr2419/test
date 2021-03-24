@@ -1,0 +1,306 @@
+ConsumableDistance:
+  - id: 1
+    name: "deck_start"
+    distance: 13.52
+    description: "desk start point"
+  - id: 2
+    name: "deck_end"
+    distance: 370.00
+    description: "desk end point"
+  - id: 3
+    name: "shaker_start"
+    distance: 63.90
+    description: "shakers area start point"
+  - id: 4
+    name: "shaker_end"
+    distance: 113.90
+    description: "shakers area end point"
+  - id: 5
+    name: "cartridge_1_start"
+    distance: 127.66
+    description: "extraction cartridge area start point"
+  - id: 6
+    name: "cartridge_1_end"
+    distance: 211.97
+    description: "extraction cartridge area end point"
+  - id: 7
+    name: "cartridge_2_start"
+    distance: 255.19
+    description: "pcr cartridge area start point"
+  - id: 8
+    name: "cartridge_2_end"
+    distance: 295.66
+    description: "pcr cartridge area end point"
+  - id: 9
+    name: "pcr_collection_start"
+    distance: 297.60
+    description: "pcr collection area start point"
+  - id: 10
+    name: "pcr_collection_end"
+    distance: 329.60
+    description: "pcr collection area end point"
+  - id: 11
+    name: "discard_small_hole"
+    distance: 349.60
+    description: "syringe module will get rid of the tip from this hole"
+  - id: 12
+    name: "discard_big_hole"
+    distance: 354.60
+    description: "syringe module will get tip into this hole"
+  - id: 40
+    name: "discard_box_open_position"
+    distance: 200
+    description: "deck will go to this position on discard box open position"
+  - id: 51
+    name: "pos_1"
+    distance: 13.52
+    description: "position 1 on deck, here pcr tip may reside"
+  - id: 52
+    name: "pos_2"
+    distance: 26.27
+    description: "position 2 on deck, here extraction tip may reside"
+  - id: 53
+    name: "pos_3"
+    distance: 39.02
+    description: "position 3 on deck, here piercing tip may reside"
+  - id: 54
+    name: "pos_4"
+    distance: 54.65
+    description: "position 4 on deck, here sample tube may reside"
+  - id: 55
+    name: "pos_5"
+    distance: 97.76
+    description: "position 5 on deck, here lysis tube (swap or blood or other sample holding tube) may reside. This tip is also known as reaction tube."
+  - id: 56
+    name: "pos_6"
+    distance: 127.66
+    description: "position 6 on deck, here cartridge 1 starts"
+  - id: 57
+    name: "pos_7"
+    distance: 233.50
+    description: "position 7 on deck, here elusion tube may reside"
+  - id: 58
+    name: "pos_8"
+    distance: 255.19
+    description: "position 8 on deck, here cartridge 2 may reside"
+  - id: 59
+    name: "pos_9"
+    distance: 313.6
+    description: "position 9 on deck, here pcr tube may reside"
+  - id: 101
+    name: "pcr_tip"
+    distance: 13.52
+    description: "pcr tip at the 1st position"
+  - id: 102
+    name: "extraction_tip"
+    distance: 26.27
+    description: "extraction tip at the 2nd position"
+  - id: 103
+    name: "piercing_tip"
+    distance: 39.02
+    description: "piercing tip at the 3rd position"
+  - id: 151
+    name: "sample_tube"
+    distance: 54.65
+    description: "swap or blood or other sample holding tube"
+  - id: 152
+    name: "shaker_tube"
+    distance: 97.76
+    description: "tube for performing shaking and also heating, also known as reaction tube."
+  - id: 153
+    name: "extraction_collection_tube"
+    distance: 233.50
+    description: "output from extraction process kept here"
+  - id: 154
+    name: "pcr_collection_tube"
+    distance: 316.75
+    description: "output from pcr process kept here"
+  - id: 201
+    name: "syringe_start"
+    distance: 0.00
+    description: "syring start point"
+  - id: 202
+    name: "syring_end_max"
+    distance: 133.00
+    description: "syringe max down limit"
+  - id: 301
+    name: "syringe_module_fast_down_1000_tip"
+    distance: 101.00
+    description: "syringe module goes this much down at fast for picking up the 1000ul tip ( before turning slow) from the homing position"
+  - id: 302
+    name: "syringe_module_slow_down_1000_tip"
+    distance: 106.00
+    description: "syringe module goes this much down at slow for picking up the 1000ul tip after coming fast down"
+  - id: 303
+    name: "pickup_piercing_tip_up"
+    distance: 59.00
+    description: "syringe module goes this much up at fast after picking up the piercing tip"
+  - id: 304
+    name: "piercing_height_cartridge_1"
+    distance: 90.00
+    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_1"
+  - id: 305
+    name: "piercing_tip_discard_height"
+    distance: 83.9
+    description: "syringe module goes this much down fast with the piercing tip, to enter inside the discard_hole_big for the start of the discarding tip"
+  - id: 306
+    name: "discard_tip_and_slow_up"
+    distance: 7.5
+    description: "syringe module goes this much up slow with the piercing tip, to discard the piercing  tip inside the discard_hole_small"
+  - id: 307
+    name: "discard_tip_and_fast_up"
+    distance: 137.5
+    description: "syringe module goes this much up fast after the piercing tip has been removed"
+  - id: 308
+    name: "resting_position"
+    distance: 5
+    description: "syringe module goes here for resting by default"
+  - id: 310
+    name: "deck_base"
+    distance: 117
+    description: "syringe module is this much distance from its zero homing position to deck"
+  - id: 311
+    name: "syringe_module_slow_down_for_discard"
+    distance: 127
+    description: "syringe module goes here at slow for discarding tip"
+  - id: 320
+    name: "piercing_height_cartridge_2"
+    distance: 88.00
+    description: "syringe module goes 
+    here fast with piercing tip for actual piercing of silver foil for cartridge_2"
+  - id: 321
+    name: "syringe_module_fast_down_piercing_tip"
+    distance: 111.00
+    description: "syringe module goes here at fast for picking up the piercing tip ( before turning slow) from the homing position"
+  - id: 322
+    name: "syringe_module_slow_down_piercing_tip"
+    distance: 114.00
+    description: "syringe module goes here at slow for picking up the piercing tip after coming fast down"
+  - id: 323
+    name: "piercing_tip_rest_position"
+    distance: 65
+    description: "syringe module goes here at fast with piercing tip"
+  - id: 324
+    name: "piercing_tip_above_well_position"
+    distance: 75
+    description: "syringe module goes here at fast with piercing tip"
+  - id: 401
+    name: "pickup_tip_up"
+    distance: 59
+    description: "syringe module goes to this position at fast after picking up any tip, or as per requirement"
+  - id: 601
+    name: "magnet_reverse_after_homing"
+    distance: 50
+    description: "magnet goes here after completing homing everytime homing is called"
+  - id: 602
+    name: "magnet_detach_for_homing"
+    distance: 5.0
+    description: "magnet goes this distance for homing"
+  - id: 603
+    name: "magnet_down_step_1"
+    distance: 0.5
+    description: "This field sets the down height for the magnet first step attach"
+  - id: 604
+    name: "magnet_forward_step_1"
+    distance: 10.5
+    description: "This field sets the forward distance for the magnet attach"
+  - id: 605
+    name: "magnet_down_step_2"
+    distance: 75
+    description: "This field sets the down height for the magnet second step attach"
+  - id: 606
+    name: "magnet_forward_step_2"
+    distance: 3.5
+    description: "This field sets the forward distance for the magnet second step attach"
+  - id: 607
+    name: "magnet_backward_step_1"
+    distance: 10.5
+    description: "This field sets the backward distance for the magnet first step Detach"
+  - id: 608
+    name: "magnet_up_step_1"
+    distance: 0.5
+    description: "This field sets the upward distance for the magnet first step Detach"
+  - id: 609
+    name: "magnet_back_step_2"
+    distance: 40
+    description: "This field sets the backward distance for the magnet second step Detach"
+  - id: 1001
+    name: "syringe_module_a_lh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
+  - id: 1002
+    name: "syringe_module_a_rh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
+  - id: 1003
+    name: "syringe_a_lh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
+  - id: 1004
+    name: "syringe_a_rh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
+  - id: 1005
+    name: "deck_a_zero"
+    distance: 12.2
+    description: "All distances on deck as well as tips and tubes distances will be adjusted according to this variable"
+  - id: 1006
+    name: "magnet_up_down_a_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All magnet horizontal distances will be fixed here"
+  - id: 1007
+    name: "magnet_rev_fwd_a_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All magnet vertical distances will be fixed here"
+  - id: 1008
+    name: "shaker_a_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All shaker horizontal distances will be fixed here"
+  - id: 1009
+    name: "syringe_module_a_lh_rh_zero"
+    distance: 3.2
+    description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
+  - id: 1010
+    name: "syringe_a_lh_rh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
+  - id: 1051
+    name: "syringe_module_b_lh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
+  - id: 1052
+    name: "syringe_module_b_rh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
+  - id: 1053
+    name: "syringe_b_lh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
+  - id: 1054
+    name: "syringe_b_rh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
+  - id: 1055
+    name: "deck_b_zero"
+    distance: 13.5
+    description: "All distances on deck as well as tips and tubes distances will be adjusted according to this variable"
+  - id: 1056
+    name: "magnet_up_down_b_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All magnet horizontal distances will be fixed here"
+  - id: 1057
+    name: "magnet_rev_fwd_b_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All magnet vertical distances will be fixed here"
+  - id: 1058
+    name: "shaker_b_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All shaker horizontal distances will be fixed here"
+  - id: 1059
+    name: "syringe_module_b_lh_rh_zero"
+    distance: 5.5
+    description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
+  - id: 1060
+    name: "syringe_b_lh_rh_zero"
+    distance: 0
+    description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"

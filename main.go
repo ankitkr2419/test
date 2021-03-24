@@ -41,8 +41,8 @@ func main() {
 	// config file to configure motors
 	config.Load("motor_config")
 
-	// config file to configure consumable distance
-	config.Load("consumable_config")
+	// config file to configure consumable distance for version v1.3
+	config.Load("consumable_config_v1_3")
 
 	// config file to configure labware
 	config.Load("labware_config")
