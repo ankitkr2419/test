@@ -113,19 +113,10 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	// Switch off shaker
-	response, err = d.SwitchOffShaker()
+	response, err = d.switchOffShaker()
 	if err != nil {
 		fmt.Println("From deck ", d.name, err)
 		return "", err
-	}
-
-	aborted[d.name] = true
-	wrotePulses[d.name] = 0
-	paused[d.name] = false
-	runInProgress[d.name] = false
-	response, err = d.ReadExecutedPulses()
-	if err != nil {
-		return
 	}
 
 	aborted.Store(d.name, true)
@@ -176,6 +167,6 @@ func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, e
 }
 
 func (d *Compact32Deck) Reset() (ack bool) {
-	aborted[d.name] = false
+	aborted.Store(d.name, false)
 	return true
 }

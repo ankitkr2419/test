@@ -1,7 +1,6 @@
 package compact32
 
 import (
-	"encoding/binary"
 	"fmt"
 	"time"
 )
@@ -29,10 +28,8 @@ func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, hea
 	shaker := uint16(3)
 
 	heatTime = heatTime * time.Second
-	var setTemp, setTemp1, setTemp2 uint16 = 0, 0, 0
+
 	var t *time.Timer
-	var done = false
-	var registerAddress uint16 = 0
 
 	// validation for temperature
 	if temperature > uint16(1200) || temperature <= uint16(200) {
@@ -91,61 +88,7 @@ func (d *Compact32Deck) Heating(temperature uint16, follow_temperature bool, hea
 	}
 
 	// loop for continous reading of the shaker temp and check if the temperature has reached specified value.
-shakerSelectionLoop:
-	for {
-
-		if d.isMachineInAbortedState() {
-			err = fmt.Errorf("Operation was ABORTED!")
-			return "", err
-		}
-
-		if done {
-			return "Operation was successful \n", nil
-		}
-
-		time.Sleep(time.Millisecond * 300)
-		switch shaker {
-		case 1, 2:
-			if setTemp >= temperature {
-				break shakerSelectionLoop
-			}
-			// here we set the register address according to the shaker
-			if shaker == 1 {
-				registerAddress = MODBUS_EXTRACTION[d.name]["D"][210]
-			} else {
-				registerAddress = MODBUS_EXTRACTION[d.name]["D"][224]
-			}
-			results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
-			if err != nil {
-				fmt.Printf("Error failed to read shaker %v temperature ---%v \n", shaker, err)
-				return "", err
-			}
-			setTemp = binary.BigEndian.Uint16(results)
-			fmt.Println(setTemp)
-
-		case 3:
-			if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
-				break shakerSelectionLoop
-			}
-			results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
-			if err != nil {
-				fmt.Printf("Error failed to read shaker 1 temperature ----%v \n", err)
-				return "", err
-			}
-			setTemp1 = binary.BigEndian.Uint16(results)
-			fmt.Println(setTemp1)
-
-			results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
-			if err != nil {
-				fmt.Printf("Error failed to read shaker 2 temperature ----%v \n", err)
-				return "", err
-			}
-			setTemp2 = binary.BigEndian.Uint16(results)
-			fmt.Println(setTemp2)
-
-		}
-
-	}
+	response, err = d.MonitorTemperature(shaker, temperature)
 
 	// if follow up is true then first let it reach the temperature then wait for
 	// specified duration and then turn the heater off
@@ -166,7 +109,6 @@ shakerSelectionLoop:
 				return "", err
 			}
 			fmt.Printf("result %v", result)
-			done = true
 			fmt.Println("Heating Was Successful")
 			return "SUCCESS", nil
 		default:

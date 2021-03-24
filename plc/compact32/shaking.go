@@ -30,23 +30,23 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 	var shakerNo = 3
 
 	//check if aborted
-	if aborted[d.name] {
+	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Operation was ABORTED!")
 		return "", err
 	}
 
 	//validate that rpm 1 is definately set and futher
-	if shakerData.Rpm1 == 0 || shakerData.Time1 == 0 {
-		if shakerData.Rpm2 != 0 || shakerData.Time2 != 0 {
+	if shakerData.RPM1 == 0 || shakerData.Time1 == 0 {
+		if shakerData.RPM2 != 0 || shakerData.Time2 != 0 {
 			err = errors.New("please check value for rpm 1 data")
 			return
 		}
 	} else {
-		if shakerData.Rpm2 == 0 && shakerData.Time2 != 0 {
+		if shakerData.RPM2 == 0 && shakerData.Time2 != 0 {
 			err = errors.New("please check rpm 2 value")
 			return
 		}
-		if shakerData.Rpm2 != 0 && shakerData.Time2 == 0 {
+		if shakerData.RPM2 != 0 && shakerData.Time2 == 0 {
 			err = errors.New("please check rpm  2 time value")
 			return
 		}
@@ -82,7 +82,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (result string, err error)
 	logger.Infof("selected shaker %v", results)
 
 	//set shaker register with rpm 1
-	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.Rpm1))
+	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM1))
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
@@ -155,12 +155,12 @@ skipToShakerRpm2:
 		case n := <-t.C:
 			fmt.Printf("time expired %v", n)
 			//switch off shaker
-			d.SwitchOffShaker()
+			d.switchOffShaker()
 			//switch off heater
-			d.SwitchOffHeater()
+			d.switchOffHeater()
 			break skipToShakerRpm2
 		default:
-			if aborted[d.name] {
+			if d.isMachineInAbortedState() {
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}
@@ -170,10 +170,10 @@ skipToShakerRpm2:
 	}
 
 	//set shaker value with rpm 2 if it exists
-	if shakerData.Rpm2 != 0 {
+	if shakerData.RPM2 != 0 {
 
 		//set shaker register with rpm 2
-		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.Rpm2))
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM2))
 		if err != nil {
 			fmt.Println("err : ", err)
 			return "", err
@@ -193,12 +193,12 @@ skipToShakerRpm2:
 			case n := <-t.C:
 				fmt.Printf("time expired %v", n)
 				//switch off shaker
-				d.SwitchOffShaker()
+				d.switchOffShaker()
 				//switch off heater
-				d.SwitchOffHeater()
+				d.switchOffHeater()
 				break skipToShakerOff
 			default:
-				if aborted[d.name] {
+				if d.isMachineInAbortedState() {
 					err = fmt.Errorf("Operation was ABORTED!")
 					return "", err
 				}
@@ -210,12 +210,12 @@ skipToShakerRpm2:
 	}
 
 	//switch off both shaker and heater
-	_, err = d.SwitchOffHeater()
+	_, err = d.switchOffHeater()
 	if err != nil {
 		fmt.Printf("err in switching off heater---> error: %v\n ", err)
 		return "", err
 	}
-	_, err = d.SwitchOffShaker()
+	_, err = d.switchOffShaker()
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
@@ -224,7 +224,7 @@ skipToShakerRpm2:
 	return "Suceess", nil
 }
 
-func (d *Compact32Deck) SwitchOffShaker() (response string, err error) {
+func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 
 	// Switch off shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
@@ -244,7 +244,7 @@ func (d *Compact32Deck) MonitorTemperature(shakerNo, temperature uint16) (result
 	var registerAddress uint16 = 0
 
 	for {
-		if aborted[d.name] {
+		if d.isMachineInAbortedState() {
 			err = fmt.Errorf("operation was ABORTED \n")
 			return "aborted", err
 		}
