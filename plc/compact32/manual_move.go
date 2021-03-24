@@ -3,6 +3,8 @@ package compact32
 import (
 	"encoding/binary"
 	"fmt"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
@@ -70,12 +72,12 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		} else if temp2 := d.getExecutedPulses(); temp2 == highestUint16 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 		} else if temp1 <= temp2 {
-			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
+			logger.Info("executedPulses is greater than wrote Pulses that means nothing to resume for current motor.")
 			wrotePulses.Store(d.name, uint16(0))
 			executedPulses.Store(d.name, uint16(0))
 		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
-			response, err = d.ResumeMotorWithPulses(temp1 - temp2)
+			response, err = d.resumeMotorWithPulses(temp1 - temp2)
 		}
 		if err != nil {
 			fmt.Println("err:", err)
@@ -132,7 +134,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	return "ABORT SUCCESS", nil
 }
 
-func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
+func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, err error) {
 
 	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulses)
 	if err != nil {
