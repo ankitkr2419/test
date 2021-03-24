@@ -11,8 +11,7 @@ const RecipeListingContainer = (props) => {
 	const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
 	const { recipeData } = recipeActionReducer
 
-	// eslint-disable-next-line
-	useEffect(() => dispatch(recipeListingInitiated()), []);
+	useEffect(() => dispatch(recipeListingInitiated()), [dispatch]);
 
 	return  (
 		<>
