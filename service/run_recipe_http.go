@@ -212,6 +212,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	}
 
 	// Home the machine
+	deps.PlcDeck[deck].ResetRunInProgress()
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
 		return
