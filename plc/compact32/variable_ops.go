@@ -24,7 +24,7 @@ func (d *Compact32Deck) ResetTimerInProgress() {
 	timerInProgress.Store(d.name, false)
 }
 
-func (d *Compact32Deck) IsMachineHomed() bool{
+func (d *Compact32Deck) IsMachineHomed() bool {
 	if temp, ok := homed.Load(d.name); !ok {
 		logger.Errorln("homed isn't loaded!")
 	} else if temp.(bool) {
@@ -33,7 +33,7 @@ func (d *Compact32Deck) IsMachineHomed() bool{
 	return false
 }
 
-func (d *Compact32Deck) IsRunInProgress() bool{
+func (d *Compact32Deck) IsRunInProgress() bool {
 	if temp, ok := runInProgress.Load(d.name); !ok {
 		logger.Errorln("runInProgress isn't loaded!")
 	} else if temp.(bool) {
@@ -42,7 +42,7 @@ func (d *Compact32Deck) IsRunInProgress() bool{
 	return false
 }
 
-func (d *Compact32Deck) isTimerInProgress() bool{
+func (d *Compact32Deck) isTimerInProgress() bool {
 	if temp, ok := timerInProgress.Load(d.name); !ok {
 		logger.Errorln("timerInProgress isn't loaded!")
 	} else if temp.(bool) {
@@ -51,7 +51,7 @@ func (d *Compact32Deck) isTimerInProgress() bool{
 	return false
 }
 
-func (d *Compact32Deck) isMachineInAbortedState() bool{
+func (d *Compact32Deck) isMachineInAbortedState() bool {
 	if temp, ok := aborted.Load(d.name); !ok {
 		logger.Errorln("aborted isn't loaded!")
 	} else if temp.(bool) {
@@ -60,7 +60,7 @@ func (d *Compact32Deck) isMachineInAbortedState() bool{
 	return false
 }
 
-func (d *Compact32Deck) isMachineInPausedState() bool{
+func (d *Compact32Deck) isMachineInPausedState() bool {
 	if temp, ok := paused.Load(d.name); !ok {
 		logger.Errorln("paused isn't loaded!")
 	} else if temp.(bool) {
@@ -69,7 +69,7 @@ func (d *Compact32Deck) isMachineInPausedState() bool{
 	return false
 }
 
-func (d *Compact32Deck) getMagnetState() int{
+func (d *Compact32Deck) getMagnetState() int {
 	if temp, ok := magnetState.Load(d.name); !ok {
 		logger.Errorln("magnet State isn't loaded!")
 		return -1
@@ -78,20 +78,20 @@ func (d *Compact32Deck) getMagnetState() int{
 	}
 }
 
-func (d *Compact32Deck) getExecutedPulses() int{
-	if temp, ok :=  executedPulses.Load(d.name); !ok {
+func (d *Compact32Deck) getExecutedPulses() uint16 {
+	if temp, ok := executedPulses.Load(d.name); !ok {
 		logger.Errorln("executed Pulses isn't loaded!")
-		return -1
+		return highestUint16
 	} else {
-		return temp.(int)
+		return temp.(uint16)
 	}
 }
 
-func (d *Compact32Deck) getWrotePulses() int{
-	if temp, ok :=  wrotePulses.Load(d.name); !ok {
+func (d *Compact32Deck) getWrotePulses() uint16 {
+	if temp, ok := wrotePulses.Load(d.name); !ok {
 		logger.Errorln("wrote Pulses isn't loaded!")
-		return -1
+		return highestUint16
 	} else {
-		return temp.(int)
+		return temp.(uint16)
 	}
 }

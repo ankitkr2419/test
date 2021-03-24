@@ -43,6 +43,7 @@ const (
 	reverseAfterNonCutPulsesMagnet      = uint16(400)
 	finalSensorCutPulses                = uint16(2999)
 	minimumPulsesThreshold              = uint16(50)
+	highestUint16                       = uint16(65535)
 )
 
 // 120 Seconds is the minimum UVLight On Time
@@ -52,8 +53,8 @@ const (
 
 // Special Speeds
 const (
-	homingFastSpeed = uint16(2000)
-	homingSlowSpeed = uint16(500)
+	homingFastSpeed     = uint16(2000)
+	homingSlowSpeed     = uint16(500)
 	homingDeckFastSpeed = uint16(3000)
 )
 
@@ -67,10 +68,10 @@ const (
 var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress, homed sync.Map
 
 func LoadUtils() {
-	wrotePulses.Store("A", 0)
-	wrotePulses.Store("B", 0)
-	executedPulses.Store("A", 0)
-	executedPulses.Store("B", 0)
+	wrotePulses.Store("A", uint16(0))
+	wrotePulses.Store("B", uint16(0))
+	executedPulses.Store("A", uint16(0))
+	executedPulses.Store("B", uint16(0))
 	aborted.Store("A", false)
 	aborted.Store("B", false)
 	paused.Store("A", false)
