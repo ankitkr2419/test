@@ -20,8 +20,8 @@ export function* runRecipe(actions){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: `${API_ENDPOINTS.run}/${recipeId}/${deckName}`,
-        runRecipeSuccess,
-        runRecipeFailed
+        successAction: runRecipeSuccess,
+        failureAction: runRecipeFailed
       },
     });
   } catch (error) {

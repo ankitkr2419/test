@@ -75,6 +75,7 @@ export function* callApi(actions) {
 			params = null,
 		},
 	} = actions;
+
 	// request url formation
 	const fetchUrl = getRequestUrl(reqPath, params);
 	try {
@@ -85,7 +86,13 @@ export function* callApi(actions) {
 		};
 
 		const response = yield fetch(fetchUrl, fetchOptions);
-		const parsedResponse = yield response.json();
+
+		let parsedResponse;
+		try {
+			parsedResponse = yield response.json();
+		} catch (e) {
+			parsedResponse = null;
+		}
 
 		if (response.ok) {
 			yield put(dispatcherHelper(successAction, parsedResponse));

@@ -9,7 +9,7 @@ const RecipeListingContainer = (props) => {
 
 	const dispatch = useDispatch();
 	const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
-	const { response } = recipeActionReducer
+	const { recipeData } = recipeActionReducer
 
 	// eslint-disable-next-line
 	useEffect(() => dispatch(recipeListingInitiated()), []);
@@ -17,7 +17,7 @@ const RecipeListingContainer = (props) => {
 	return  (
 		<>
 			{/* {(!isLoading) && <Loader/>} */}
-			{(response) && <RecipeListingComponent allRecipeData={response}/>}
+			{(recipeData.length) && <RecipeListingComponent allRecipeData={recipeData}/>}
 		</>
 	);
 };

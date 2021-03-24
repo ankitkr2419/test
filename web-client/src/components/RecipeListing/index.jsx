@@ -23,6 +23,7 @@ const HeadingTitle = styled.label`
 
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
+
   const dispatch = useDispatch()
 
   const operatorLoginModalReducer = useSelector(
@@ -30,15 +31,17 @@ const RecipeListingComponent = (props) => {
   );
   const { deckName } = operatorLoginModalReducer.toJS();
 
-  // const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
-  // console.log("RECIPE ACTION REDUCER: ", recipeActionReducer);
+  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  console.log(recipeActionReducer);
 
   const [recipeData, setRecipeData] = useState({});
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = (recipeId, recipeName, processCount) => {
+    //will be deleted
+    const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
     const data = {
-      recipeId: recipeId,
+      recipeId: tempRecipeId,
       recipeName: recipeName,
       processCount: processCount
     }
