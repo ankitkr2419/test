@@ -55,7 +55,8 @@ func NewCompact32Driver(exit chan error, test bool) plc.Driver {
 	C32.ExitCh = exit
 
 	// Start the Heartbeat
-	go C32.HeartBeat()
+	// TODO: Uncomment this after RT-PCR m/c is ready
+	// go C32.HeartBeat()
 
 	// Specifically for testing!
 	if test {

@@ -11,14 +11,14 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 	// Operation attach and detach
 	switch ad.Operation {
 	case "attach":
-		response, err = d.Attach(ad.OperationType)
+		response, err = d.attach(ad.OperationType)
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
 		magnetState.Store(d.name, attached)
 		return
 	case "detach":
-		response, err = d.Detach(ad.OperationType)
+		response, err = d.detach(ad.OperationType)
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
@@ -44,7 +44,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 3. If it is full-detach then move up to 0.5 mm from the 0 position of the magnet.
 4. Then move the magnet 20 mm back to avoid any chances of possible collision with the tips.
 */
-func (d *Compact32Deck) Detach(operationType string) (response string, err error) {
+func (d *Compact32Deck) detach(operationType string) (response string, err error) {
 
 	// TODO: Check if already detached, then avoid all below claculations
 	var magnetBackPosition, magnetUpPosition float64
@@ -63,29 +63,17 @@ func (d *Compact32Deck) Detach(operationType string) (response string, err error
 	}
 
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravelBack := positions[deckMagnetFwdRev] - magnetBackPosition
+	distanceToTravel := positions[deckMagnetFwdRev] - magnetBackPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelBack > minimumMoveDistance:
-		direction = 1
-	case distanceToTravelBack < (minimumMoveDistance * -1):
-		distanceToTravelBack *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipMagnetBackToSourcePosition
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelBack))
+	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
-
-skipMagnetBackToSourcePosition:
 
 	// if operation type is semi detach then return after doing the first backward step.
 	if operationType == "semi_detach" {
@@ -101,29 +89,18 @@ skipMagnetBackToSourcePosition:
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravelUp := positions[deckMagnetUpDown] - magnetUpPosition
+	distanceToTravel = positions[deckMagnetUpDown] - magnetUpPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelUp > minimumMoveDistance:
-		direction = 1
-	case distanceToTravelUp < (minimumMoveDistance * -1):
-		distanceToTravelUp *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipMagnetbackSecPosition
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelUp))
+	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
 
-skipMagnetbackSecPosition:
 	// step 3 to go with the normal flow of full detach.
 	// to calculate the relative position of the magnet from its current
 	// position to move the magnet backward for step 2.
@@ -133,29 +110,18 @@ skipMagnetbackSecPosition:
 		return "", err
 	}
 	// distance and direction setup for magnet for backward step 2
-	distanceToTravelBack = positions[deckMagnetFwdRev] - magnetBackPosition
+	distanceToTravel = positions[deckMagnetFwdRev] - magnetBackPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelBack > minimumMoveDistance:
-		direction = 1
-	case distanceToTravelBack < (minimumMoveDistance * -1):
-		distanceToTravelBack *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipMagnetToSuccessPosition
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelBack))
+	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
 
-skipMagnetToSuccessPosition:
 	return "Success", nil
 
 }
@@ -168,7 +134,7 @@ skipMagnetToSuccessPosition:
 4. Move the magnet down to 75 mm down behind shaker for attach
 5. At last move 5.5 mm forward for the magnet to attach
 */
-func (d *Compact32Deck) Attach(operationType string) (response string, err error) {
+func (d *Compact32Deck) attach(operationType string) (response string, err error) {
 
 	// TODO: Check if already attached, then avoid all below claculations
 	var deckPosition, magnetDownFirstPosition, magnetFwdFirstPosition, magnetDownSecPosition, magnetFwdSecPosition float64
@@ -192,28 +158,17 @@ func (d *Compact32Deck) Attach(operationType string) (response string, err error
 		return "", err
 	}
 
-	distToTravel := positions[deckAndNumber] - deckPosition
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distToTravel > minimumMoveDistance:
-		direction = 1
-	case distToTravel < (minimumMoveDistance * -1):
-		distToTravel *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipDeckToSourcePosition
-	}
+	distanceToTravel := positions[deckAndNumber] - deckPosition
 
-	pulses = uint16(math.Round(float64(motors[deckAndNumber]["steps"]) * distToTravel))
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	response, err = d.SetupMotor(motors[deckAndNumber]["fast"], pulses, motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
+	pulses = uint16(math.Round(float64(motors[deckAndNumber]["steps"]) * distanceToTravel))
+
+	response, err = d.setupMotor(motors[deckAndNumber]["fast"], pulses, motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
 	if err != nil {
 		fmt.Printf("error in moving deck to required position")
 		return
 	}
-
-skipDeckToSourcePosition:
 
 	// step 1 to calculate the relative position of the magnet from its current
 	// position to move the magnet downward for step 1.
@@ -223,29 +178,17 @@ skipDeckToSourcePosition:
 		return "", err
 	}
 	// distance and direction setup for magnet down step 1
-	distanceToTravelDown := positions[deckMagnetUpDown] - magnetDownFirstPosition
+	distanceToTravel = positions[deckMagnetUpDown] - magnetDownFirstPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelDown > minimumMoveDistance:
-		direction = 1
-	case distanceToTravelDown < (minimumMoveDistance * -1):
-		distanceToTravelDown *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipMagnetDownToSourcePosition
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelDown))
+	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 1 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
-
-skipMagnetDownToSourcePosition:
 
 	// step 2 to calculate the relative position of the magnet from its current
 	// position to move the magnet forward for step 1.
@@ -255,28 +198,18 @@ skipMagnetDownToSourcePosition:
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravelFwd := positions[deckMagnetFwdRev] - magnetFwdFirstPosition
+	distanceToTravel = positions[deckMagnetFwdRev] - magnetFwdFirstPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelFwd > minimumMoveDistance:
-		direction = 1
-	case distanceToTravelFwd < (minimumMoveDistance * -1):
-		distanceToTravelFwd *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipMagnetFwdToSourcePosition
-	}
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelFwd))
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
+	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 1 forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
 
-skipMagnetFwdToSourcePosition:
 	// TODO: Set the height according to the operation type (wash,lysis,illusion)
 	// For now it has to be kept same for all.
 	// step 3 to calculate the relative position of the magnet from its current
@@ -287,28 +220,17 @@ skipMagnetFwdToSourcePosition:
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravelDown = positions[deckMagnetUpDown] - magnetDownSecPosition
+	distanceToTravel = positions[deckMagnetUpDown] - magnetDownSecPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelDown > minimumMoveDistance:
-		direction = 1
-	case distanceToTravelDown < (minimumMoveDistance * -1):
-		distanceToTravelDown *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipMagnetDownSecToSourcePosition
-	}
-	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravelDown))
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
+	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.SetupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
-
-skipMagnetDownSecToSourcePosition:
 
 	// step 4 to calculate the relative position of the magnet from its current
 	// position to move the magnet Downward for step 2.
@@ -318,38 +240,26 @@ skipMagnetDownSecToSourcePosition:
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravelFwd = positions[deckMagnetFwdRev] - magnetFwdSecPosition
+	distanceToTravel = positions[deckMagnetFwdRev] - magnetFwdSecPosition
 
-	switch {
-	// distToTravel > 0 means go towards the Sensor or FWD
-	case distanceToTravelFwd > minimumMoveDistance:
-		direction = 1
-	case distanceToTravelFwd < (minimumMoveDistance * -1):
-		distanceToTravelFwd *= -1
-		direction = 0
-	default:
-		// Skip the setUpMotor Step
-		goto skipMagnetFwdSecToSourcePosition
-	}
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravelFwd))
+	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.SetupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
 
-skipMagnetFwdSecToSourcePosition:
 	return "Success", nil
-
 }
 
 func (d *Compact32Deck) fullDetach() (response string, err error) {
 	// Calling AttachDetach below as this handles magnetState implicitly
 	// WARNING: Be careful of below string literals "detach" and "full_detach",
 	// any changes in db schema of magnets should be reflected in these as well.
-	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType: "full_detach"})
+	response, err = d.detach("full_detach")
 	if err != nil {
 		fmt.Printf("error in magnet detach process %v \n", err.Error())
 	}
