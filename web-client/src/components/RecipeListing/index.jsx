@@ -31,9 +31,6 @@ const RecipeListingComponent = (props) => {
   );
   const { deckName } = operatorLoginModalReducer.toJS();
 
-  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
-  console.log(recipeActionReducer);
-
   const [recipeData, setRecipeData] = useState({});
 
   const [isOpen, setIsOpen] = useState(false);
