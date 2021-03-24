@@ -260,7 +260,7 @@ func (d *Compact32Deck) fullDetach() (response string, err error) {
 	// Calling AttachDetach below as this handles magnetState implicitly
 	// WARNING: Be careful of below string literals "detach" and "full_detach",
 	// any changes in db schema of magnets should be reflected in these as well.
-	response, err = d.AttachDetach(db.AttachDetach{Operation: "attach", OperationType: "full_detach"})
+	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType: "full_detach"})
 	if err != nil {
 		fmt.Printf("error in magnet detach process %v \n", err.Error())
 	}
