@@ -39,9 +39,9 @@ const RecipeListingComponent = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = (recipeId, recipeName, processCount) => {
     //will be deleted
-    const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
+    // const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
     const data = {
-      recipeId: tempRecipeId,
+      recipeId: recipeId,
       recipeName: recipeName,
       processCount: processCount
     }
@@ -62,6 +62,11 @@ const RecipeListingComponent = (props) => {
     const { recipeId } = recipeData;
     dispatch(runRecipeInitiated({recipeId:recipeId, deckName:name}));
   };
+
+  // const handlePauseAction = () => {
+  //   const name = (deckName === "Deck A") ? "A" : "B";
+  //   // dispatch(runRecipeInitiated({recipeId:recipeId, deckName:name}));
+  // };
 
   return (
     <div className="ml-content">

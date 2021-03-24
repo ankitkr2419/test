@@ -20,7 +20,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
     case runRecipeAction.runRecipeSuccess:
       return { ...state, runRecipeResponse: action.payload.response, isLoading: false };
     case runRecipeAction.runRecipeFailed:
-      return { ...state, ...action.payload, isLoading: false, error: true };
+      return { ...state, serverErrors: action.payload.serverErrors, error: true, isLoading: false };
 
     case pauseRecipeAction.pauseRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
