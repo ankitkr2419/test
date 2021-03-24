@@ -95,3 +95,57 @@ func (d *Compact32Deck) getWrotePulses() uint16 {
 		return temp.(uint16)
 	}
 }
+
+func (d *Compact32Deck) getMotorNumReg() uint16 {
+	if temp, ok := motorNumReg.Load(d.name); !ok {
+		logger.Errorln("motorNumReg isn't loaded!")
+		return highestUint16
+	} else {
+		return temp.(uint16)
+	}
+}
+
+func (d *Compact32Deck) getSpeedReg() uint16 {
+	if temp, ok := speedReg.Load(d.name); !ok {
+		logger.Errorln("speedReg isn't loaded!")
+		return highestUint16
+	} else {
+		return temp.(uint16)
+	}
+}
+
+func (d *Compact32Deck) getDirectionReg() uint16 {
+	if temp, ok := directionReg.Load(d.name); !ok {
+		logger.Errorln("directionReg isn't loaded!")
+		return highestUint16
+	} else {
+		return temp.(uint16)
+	}
+}
+
+func (d *Compact32Deck) getRampReg() uint16 {
+	if temp, ok := rampReg.Load(d.name); !ok {
+		logger.Errorln("rampReg isn't loaded!")
+		return highestUint16
+	} else {
+		return temp.(uint16)
+	}
+}
+
+func (d *Compact32Deck) getPulseReg() uint16 {
+	if temp, ok := pulseReg.Load(d.name); !ok {
+		logger.Errorln("pulseReg isn't loaded!")
+		return highestUint16
+	} else {
+		return temp.(uint16)
+	}
+}
+
+func (d *Compact32Deck) getOnReg() uint16 {
+	if temp, ok := onReg.Load(d.name); !ok {
+		logger.Errorln("onReg isn't loaded!")
+		return highestUint16
+	} else {
+		return temp.(uint16)
+	}
+}
