@@ -3,8 +3,9 @@ import { Spinner } from "reactstrap";
 
 const Loader = () => {
   return (
-    <div className="position-absolute w-100 h-100 py-5 d-flex justify-content-center overlay">
-      <Spinner color="info" size="md" />
+    <div className="position-absolute py-5 d-flex flex-column align-items-center justify-content-center overlay">
+      <Spinner color="primary" style={{ width: "5rem", height: "5rem" }} />
+      <div>Loading....</div>
     </div>
   );
 };

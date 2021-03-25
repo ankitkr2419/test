@@ -4,99 +4,101 @@ export const API_HOST_VERSION = process.env.REACT_APP_API_HOST_VERSION;
 // Target capacity is used to restrict selection of targets
 export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 
-export const ROOT_URL_PATH = '/';
+export const ROOT_URL_PATH = "/";
 
 export const HTTP_METHODS = {
-	GET: 'GET',
-	POST: 'POST',
-	PUT: 'PUT',
-	DELETE: 'DELETE',
+  GET: "GET",
+  POST: "POST",
+  PUT: "PUT",
+  DELETE: "DELETE",
 };
 
 export const TARGET_LINE_COLORS = [
-	'#F590B2',
-	'#7986CB',
-	'#4FC4F7',
-	'#9D27B0',
-	'#F3811F',
-	'#EFD600',
+  "#F590B2",
+  "#7986CB",
+  "#4FC4F7",
+  "#9D27B0",
+  "#F3811F",
+  "#EFD600",
 ];
 
 export const SOCKET_MESSAGE_TYPE = {
-	wellsData : 'Wells',
-	graphData: 'Graph',
-	success: 'Success',
-	failure: 'Fail',
-	ErrorPCRAborted: 'ErrorPCRAborted',
-	ErrorPCRStopped: 'ErrorPCRStopped',
-	ErrorPCRMonitor: 'ErrorPCRMonitor',
-	ErrorPCRDead: 'ErrorPCRDead',
-	temperatureData: 'Temperature',
+  wellsData: "Wells",
+  graphData: "Graph",
+  success: "Success",
+  failure: "Fail",
+  ErrorPCRAborted: "ErrorPCRAborted",
+  ErrorPCRStopped: "ErrorPCRStopped",
+  ErrorPCRMonitor: "ErrorPCRMonitor",
+  ErrorPCRDead: "ErrorPCRDead",
+  temperatureData: "Temperature",
+  homingProgress: "PROGRESS_HOMING",
+  homingSuccess: "SUCCESS_HOMING",
 };
 
 export const EXPERIMENT_STATUS = {
-	running: 'running',
-	runFailed: 'run-failed',
-	stopped: 'stopped',
+  running: "running",
+  runFailed: "run-failed",
+  stopped: "stopped",
 
-	// socket
-	success: 'success',
-	failed: 'failed',
+  // socket
+  success: "success",
+  failed: "failed",
 };
 
 export const ROUTES = {
-	landing: "landing",
-	splashScreen: "splashscreen"
+  landing: "landing",
+  splashScreen: "splashscreen",
 };
 
 export const API_ENDPOINTS = {
-	homing: "homing/",
-	run: "run",
-	pause: "pause",
-	resume: "resume",
-	abort: "abort",
-	discardDeck: "discard-box/cleanup",
-	restoreDeck: "restore-deck",
-	recipeListing: "recipes"
+  homing: "homing/",
+  run: "run",
+  pause: "pause",
+  resume: "resume",
+  abort: "abort",
+  discardDeck: "discard-box/cleanup",
+  restoreDeck: "restore-deck",
+  recipeListing: "recipes",
 };
 
 export const MODAL_MESSAGE = {
-	setPosition : "Please check the position of tip and magnet!",
-	homingConfirmation: "Homing Confirmation",
-	experimentSuccess: "Experiment was successful",
-	abortConfirmation: "Are you sure you want to abort now?",
-	abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
-	uvSuccess: "UV Clean Up was successful"
+  setPosition: "Please check the position of tip and magnet!",
+  homingConfirmation: "Homing Confirmation",
+  experimentSuccess: "Experiment was successful",
+  abortConfirmation: "Are you sure you want to abort now?",
+  abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
+  uvSuccess: "UV Clean Up was successful",
 };
 
 export const MODAL_BTN = {
-	okay: "Okay",
-	cancel: "Cancel",
-	next: "Next",
-	yes: "Yes",
-	no: "No",
+  okay: "Okay",
+  cancel: "Cancel",
+  next: "Next",
+  yes: "Yes",
+  no: "No",
 };
 
 export const DECKCARD_BTN = {
-	text: {
-		run: "RUN",
-		abort: "ABORT",
-		cancel: "CANCEL",
-		pause: "PAUSE",
-		done: "DONE",
-		resume: "RESUME",
-	},
-	icon: {
-		play: "play",
-		abort: "abort",
-		cancel: "cancel",
-		pause: "pause",
-		done: "done",
-		resume: "resume",
-	}
+  text: {
+    run: "RUN",
+    abort: "ABORT",
+    cancel: "CANCEL",
+    pause: "PAUSE",
+    done: "DONE",
+    resume: "RESUME",
+  },
+  icon: {
+    play: "play",
+    abort: "abort",
+    cancel: "cancel",
+    pause: "pause",
+    done: "done",
+    resume: "resume",
+  },
 };
 
 export const DECKNAME = {
-	DeckA : "Deck A",
-	DeckB : "Deck B",
-}
+  DeckA: "Deck A",
+  DeckB: "Deck B",
+};

@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	logger "github.com/sirupsen/logrus"
+	
 )
 
 func homingHandler(deps Dependencies) http.HandlerFunc {
@@ -23,22 +25,22 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		switch deck {
 		case "":
 			fmt.Println("At both deck!!!")
+			rw.WriteHeader(http.StatusOK)
 			response, err = bothDeckOperation(deps, "Homing")
 		case "A", "B":
+			rw.WriteHeader(http.StatusOK)
 			response, err = singleDeckOperation(deps, deck, "Homing")
 		default:
+			rw.WriteHeader(http.StatusBadRequest)
 			err = fmt.Errorf("Check your deck name")
 		}
 
 		if err != nil {
+			logger.Errorln(err)
 			deps.WsErrCh <- err
-			fmt.Fprintf(rw, err.Error())
-			fmt.Println(err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
+			logger.Infoln(response)
 			deps.WsMsgCh <- "success_homing_successfully homed"
-			fmt.Fprintf(rw, response)
-			rw.WriteHeader(http.StatusOK)
 		}
 	})
 }
