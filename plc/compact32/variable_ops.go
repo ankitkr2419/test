@@ -16,11 +16,11 @@ func (d *Compact32Deck) ResetRunInProgress() {
 	runInProgress.Store(d.name, false)
 }
 
-func (d *Compact32Deck) SetTimerInProgress() {
+func (d *Compact32Deck) setTimerInProgress() {
 	timerInProgress.Store(d.name, true)
 }
 
-func (d *Compact32Deck) ResetTimerInProgress() {
+func (d *Compact32Deck) resetTimerInProgress() {
 	timerInProgress.Store(d.name, false)
 }
 

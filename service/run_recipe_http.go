@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
-	"github.com/google/uuid"
 
+	"github.com/google/uuid"
 
 	"github.com/gorilla/mux"
 )
@@ -109,7 +109,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			// fmt.Printf("heat object %v", heat)
 			// ht, err := deps.PlcDeck[deck].Heating(uint16(heat.Temperature), heat.FollowTemp, heat.Duration)
 			// if err != nil {
-				// return "", err
+			// return "", err
 			// }
 			// fmt.Println(ht)
 
@@ -200,10 +200,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 				return "", err
 			}
 			fmt.Print(delay)
-			// response, err = deps.PlcDeck[deck].AddDelay(delay)
-			// if err != nil {
-			// return "", err
-			// }
+			response, err = deps.PlcDeck[deck].AddDelay(delay)
+			if err != nil {
+				return "", err
+			}
 
 		}
 		// TODO: Instead of switch case, try using reflect
