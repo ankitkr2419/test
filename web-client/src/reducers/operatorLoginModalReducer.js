@@ -19,7 +19,7 @@ export const operatorLoginModalReducer = (state=operatorLoginModalInitialState, 
             return state.merge({ isOperatorLoggedIn: true, error: false, msg: action.payload.response.msg });
 
         case operatorLoginModalActions.failureAction:
-            return state.merge({ isOperatorLoggedIn: false, error: true, msg: action.payload.response.msg });
+            return state.merge({ isOperatorLoggedIn: false, error: true, msg: action.payload.serverErrors });
             
         default: return state;
     }
