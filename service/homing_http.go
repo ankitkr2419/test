@@ -25,14 +25,17 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		switch deck {
 		case "":
 			fmt.Println("At both deck!!!")
+			rw.Write([]byte(`Operation in progress for both decks`))
 			rw.WriteHeader(http.StatusOK)
 			response, err = bothDeckOperation(deps, "Homing")
 		case "A", "B":
+			rw.Write([]byte(`Operation in progress for single deck`))
 			rw.WriteHeader(http.StatusOK)
 			response, err = singleDeckOperation(deps, deck, "Homing")
 		default:
-			rw.WriteHeader(http.StatusBadRequest)
 			err = fmt.Errorf("Check your deck name")
+			rw.Write([]byte(err.Error()))
+			rw.WriteHeader(http.StatusBadRequest)
 		}
 
 		if err != nil {
