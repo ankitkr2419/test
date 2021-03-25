@@ -74,8 +74,3 @@ type oprProgress struct {
 	Type string `json:"type"`
 	Data string `json:"data"`
 }
-
-type oprError struct {
-	Type string `json:"type"`
-	Data string `json:"data"`
-}

@@ -17,7 +17,9 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		deps.WsMsgCh <- "progress_homing"
+		// the format for message in every operation must be in the format:
+		// progress/success_OPERATION NAME_OPERATION MESSAGE
+		deps.WsMsgCh <- "progress_homing_homing in progress"
 		switch deck {
 		case "":
 			fmt.Println("At both deck!!!")
@@ -34,7 +36,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			deps.WsMsgCh <- "success_homing"
+			deps.WsMsgCh <- "success_homing_successfully homed"
 			fmt.Fprintf(rw, response)
 			rw.WriteHeader(http.StatusOK)
 		}
