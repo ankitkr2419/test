@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/rs/cors"
 	logger "github.com/sirupsen/logrus"
@@ -175,6 +176,9 @@ func startApp(plcName string, test bool) (err error) {
 		WsMsgCh: websocketMsg,
 	}
 
+
+	go monitorForPLCTimeout(&deps, exit)
+
 	// setup Db with dyes & targets
 	err = db.Setup(store)
 	if err != nil {
@@ -271,3 +275,23 @@ func startApp(plcName string, test bool) (err error) {
 	server.Run(*addr)
 	return
 }
+
+
+func monitorForPLCTimeout(deps *service.Dependencies, exit chan error){
+	for {
+		select {
+		case err := <- deps.ExitCh:
+			logger.Errorln(err)
+			driverDeckA, handler := compact32.NewCompact32DeckDriverA(exit, false)
+			driverDeckB := compact32.NewCompact32DeckDriverB(exit, false, handler)
+			plcDeckMap := map[string]plc.DeckDriver{
+				"A": driverDeckA,
+				"B": driverDeckB,
+			}
+			deps.PlcDeck = plcDeckMap
+		default:
+			time.Sleep(5 * time.Second)
+		}
+	}
+}
+

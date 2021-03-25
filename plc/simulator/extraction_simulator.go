@@ -29,37 +29,25 @@ func (us *ExtractionSimulator) NameOfDeck() string {
 }
 
 // Homing returns success if the machine is  successfully homed
+
 func (us *ExtractionSimulator) Homing() (string, error) {
 	time.Sleep(time.Second * 10)
 	return "SUCCESS", nil
 }
 
-// DeckHoming
-func (us *ExtractionSimulator) DeckHoming() (string, error)          { return "SUCCESS", nil }
-func (us *ExtractionSimulator) SyringeHoming() (string, error)       { return "SUCCESS", nil }
-func (us *ExtractionSimulator) SyringeModuleHoming() (string, error) { return "SUCCESS", nil }
-func (us *ExtractionSimulator) MagnetHoming() (string, error)        { return "SUCCESS", nil }
-func (us *ExtractionSimulator) MagnetUpDownHoming() (string, error)  { return "SUCCESS", nil }
-func (us *ExtractionSimulator) MagnetFwdRevHoming() (string, error)  { return "SUCCESS", nil }
-func (us *ExtractionSimulator) SwitchOffMotor() (string, error)      { return "SUCCESS", nil }
-func (us *ExtractionSimulator) ReadExecutedPulses() (string, error)  { return "SUCCESS", nil }
-func (us *ExtractionSimulator) SetupMotor(uint16, uint16, uint16, uint16, uint16) (string, error) {
-	return "SUCCESS", nil
-}
 func (us *ExtractionSimulator) ManualMovement(uint16, uint16, uint16) (string, error) {
 	return "SUCCESS", nil
 }
-func (us *ExtractionSimulator) ResetRunInProgress()                          { return }
-func (us *ExtractionSimulator) SetRunInProgress()                            { return }
-func (us *ExtractionSimulator) SetTimerInProgress()                          { return }
-func (us *ExtractionSimulator) ResetTimerInProgress()                        { return }
-func (us *ExtractionSimulator) Pause() (string, error)                       { return "SUCCESS", nil }
-func (us *ExtractionSimulator) Resume() (string, error)                      { return "SUCCESS", nil }
-func (us *ExtractionSimulator) Abort() (string, error)                       { return "SUCCESS", nil }
-func (us *ExtractionSimulator) DiscardBoxCleanup() (string, error)           { return "SUCCESS", nil }
-func (us *ExtractionSimulator) RestoreDeck() (string, error)                 { return "SUCCESS", nil }
-func (us *ExtractionSimulator) UVLight(string) (string, error)               { return "SUCCESS", nil }
-func (us *ExtractionSimulator) ResumeMotorWithPulses(uint16) (string, error) { return "SUCCESS", nil }
+func (us *ExtractionSimulator) IsMachineHomed() bool               { return true }
+func (us *ExtractionSimulator) IsRunInProgress() bool              { return false }
+func (us *ExtractionSimulator) ResetRunInProgress()                { return }
+func (us *ExtractionSimulator) SetRunInProgress()                  { return }
+func (us *ExtractionSimulator) Pause() (string, error)             { return "SUCCESS", nil }
+func (us *ExtractionSimulator) Resume() (string, error)            { return "SUCCESS", nil }
+func (us *ExtractionSimulator) Abort() (string, error)             { return "SUCCESS", nil }
+func (us *ExtractionSimulator) DiscardBoxCleanup() (string, error) { return "SUCCESS", nil }
+func (us *ExtractionSimulator) RestoreDeck() (string, error)       { return "SUCCESS", nil }
+func (us *ExtractionSimulator) UVLight(string) (string, error)     { return "SUCCESS", nil }
 func (us *ExtractionSimulator) Heating(uint16, bool, time.Duration) (string, error) {
 	return "SUCCESS", nil
 }
