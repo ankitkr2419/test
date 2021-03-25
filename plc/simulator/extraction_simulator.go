@@ -29,7 +29,12 @@ func (us *ExtractionSimulator) NameOfDeck() string {
 }
 
 // Homing returns success if the machine is  successfully homed
-func (us *ExtractionSimulator) Homing() (string, error) { return "SUCCESS", nil }
+
+func (us *ExtractionSimulator) Homing() (string, error) {
+	time.Sleep(time.Second * 10)
+	return "SUCCESS", nil
+}
+
 func (us *ExtractionSimulator) ManualMovement(uint16, uint16, uint16) (string, error) {
 	return "SUCCESS", nil
 }

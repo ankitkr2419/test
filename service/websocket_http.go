@@ -8,6 +8,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
+	"strings"
 	"time"
 
 	"strconv"
@@ -43,6 +44,8 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 			select {
 			case msg := <-deps.WsMsgCh:
 
+				msgs := msgDivision(msg)
+
 				if msg == "read" {
 
 					sendGraph(deps, rw, c)
@@ -56,6 +59,13 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 					sendTemperature(deps, rw, c)
 
+				} else if msgs[0] == "progress" {
+
+					monitorOperation(deps, rw, c, msgs)
+
+				} else if msgs[0] == "success" {
+
+					successOperation(deps, rw, c, msgs)
 				}
 
 			case err = <-deps.ExitCh:
@@ -506,5 +516,57 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 		deps.WsErrCh <- err
 		return
 	}
+	return
+}
+
+func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn, msg []string) (err error) {
+
+	monitorOpr := oprProgress{
+		Type: fmt.Sprintf("PROGRESS_%s", strings.ToUpper(msg[1])),
+		Data: fmt.Sprintf("%s", strings.ToLower(msg[2])),
+	}
+
+	respBytes, err := json.Marshal(monitorOpr)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling result temp data")
+		return
+	}
+
+	err = c.WriteMessage(1, respBytes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", msg).Info("Websocket send Data")
+	return
+}
+
+func successOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn, msg []string) (err error) {
+	successOpr := oprSuccess{
+		Type: fmt.Sprintf("SUCCESS_%s", strings.ToUpper(msg[1])),
+		Data: fmt.Sprintf("%s", msg[2]),
+	}
+
+	respBytes, err := json.Marshal(successOpr)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling result temp data")
+		return
+	}
+
+	err = c.WriteMessage(1, respBytes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", msg).Info("Websocket send Data")
+	return
+}
+
+func msgDivision(msg string) (msgs []string) {
+	msgs = strings.Split(msg, "_")
 	return
 }
