@@ -230,13 +230,10 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	skipSensor:
 		switch pulse {
-		// Avoiding initialSensorCutMagnetPulses as its duplicate
-		case initialSensorCutSyringeModulePulses, initialSensorCutDeckPulses, initialSensorCutSyringePulses:
-			time.Sleep(400 * time.Millisecond)
 		case finalSensorCutPulses:
 			time.Sleep(50 * time.Millisecond)
 		default:
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(150 * time.Millisecond)
 		}
 	}
 
