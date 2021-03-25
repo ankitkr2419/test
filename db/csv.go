@@ -495,7 +495,7 @@ func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (e
 		logger.Errorln(err, record[4])
 		return err
 	} else {
-		h.Duration = time.Duration(time1)
+		h.Duration = time1
 	}
 
 	createdProcess, err := store.CreateHeating(context.Background(), h)

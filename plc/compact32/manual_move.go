@@ -47,6 +47,13 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
+	if d.isHeaterInProgress() {
+		response, err = d.switchOffHeater()
+		if err != nil {
+			return
+		}
+	}
+
 	paused.Store(d.name, true)
 
 	return "Operation PAUSED Successfully", nil
@@ -81,6 +88,13 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		}
 		if err != nil {
 			fmt.Println("err:", err)
+			return
+		}
+	}
+
+	if d.isHeaterInProgress() {
+		response, err = d.switchOnHeater()
+		if err != nil {
 			return
 		}
 	}
