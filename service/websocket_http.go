@@ -517,18 +517,6 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 	return
 }
 
-func openSocketConnection(rw http.ResponseWriter, req *http.Request) (conn *websocket.Conn, err error) {
-
-	conn, err = upgrader.Upgrade(rw, req, nil)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Websocket upgrader failed")
-		return
-	}
-
-	return
-
-}
-
 func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn, msg string) (err error) {
 	monitorOpr := oprProgress{
 		Type: fmt.Sprintf("PROGRESS_%s", strings.ToUpper(msg)),
