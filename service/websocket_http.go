@@ -18,8 +18,6 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-var conn *websocket.Conn
-
 // use default options
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
