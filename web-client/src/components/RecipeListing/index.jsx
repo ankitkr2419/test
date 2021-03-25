@@ -24,7 +24,7 @@ const HeadingTitle = styled.label`
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const operatorLoginModalReducer = useSelector(
     (state) => state.operatorLoginModalReducer
@@ -40,8 +40,8 @@ const RecipeListingComponent = (props) => {
     const data = {
       recipeId: recipeId,
       recipeName: recipeName,
-      processCount: processCount
-    }
+      processCount: processCount,
+    };
     setRecipeData(data);
     setIsOpen(!isOpen);
   };
@@ -55,9 +55,9 @@ const RecipeListingComponent = (props) => {
   const handleCancelAction = () => setShowProcess(!showProcess);
 
   const handleRunAction = () => {
-    const name = (deckName === "Deck A") ? "A" : "B";
+    const name = deckName === "Deck A" ? "A" : "B";
     const { recipeId } = recipeData;
-    dispatch(runRecipeInitiated({recipeId:recipeId, deckName:name}));
+    dispatch(runRecipeInitiated({ recipeId: recipeId, deckName: name }));
   };
 
   // const handlePauseAction = () => {
@@ -103,16 +103,20 @@ const RecipeListingComponent = (props) => {
           <Card>
             <CardBody className="p-5">
               <Row>
-              {allRecipeData.map((value, index) => (
-                <Col md={6} key={index}>
-                  <RecipeCard
-                    recipeId={value.id}
-                    recipeName={value.name}
-                    processCount={value.process_count}
-                    toggle={toggle}
-                  />
-                </Col>
-              ))}
+                {allRecipeData.length > 0 ? (
+                  allRecipeData.map((value, index) => (
+                    <Col md={6} key={index}>
+                      <RecipeCard
+                        recipeId={value.id}
+                        recipeName={value.name}
+                        processCount={value.process_count}
+                        toggle={toggle}
+                      />
+                    </Col>
+                  ))
+                ) : (
+                  <h4>No recipes to show!</h4>
+                )}
               </Row>
             </CardBody>
           </Card>

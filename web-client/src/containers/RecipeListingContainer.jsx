@@ -16,7 +16,7 @@ const RecipeListingContainer = (props) => {
 	return  (
 		<>
 			{/* {(!isLoading) && <Loader/>} */}
-			{(recipeData.length) && <RecipeListingComponent allRecipeData={recipeData}/>}
+			{(recipeData) && <RecipeListingComponent allRecipeData={recipeData}/>}
 		</>
 	);
 };

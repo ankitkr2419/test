@@ -8,7 +8,7 @@ export const initialState = {
   abortRecipeResponse: {},
   pauseRecipeResponse: {},
   resumeRecipeResponse: {},
-  recipeData: {},
+  recipeData: [],
 };
 
 export const recipeActionReducer = (state = initialState, action = {}) => {
