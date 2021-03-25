@@ -3,7 +3,7 @@
 In the first phase of development, we are going to analyse 96 samples (6 dyes
 each) and show the results to the end user. This results should be shown in tabular format
 and graphical format. This machine will be industrial machine with Touch screen.
-
+This machine will also consider the Extraction logic.
 
 ## Golang Boilerplate
 We have used Golang boilerplate to kickstart any go api project.
@@ -73,7 +73,7 @@ You need to set username and password
 ### 6. Set config.yml
 Inside conf directory, create a clone file from config.yml.default and name it as config.yml. And let it be. 
 
-## Building Binary without GUI Support
+# Building Binary without GUI Support
 This is only backend binary
 Make sure your PWD is same as this README's.
 ```
@@ -83,7 +83,7 @@ If build fails then make sure you were on 'master' branch.
 If master branch build fails then we must have messed pretty bad, please contact us.
 
 
-## For Building with GUI Support
+# For Building with GUI Support
 Run the below command in the same PWD and a binary should be created
 NOTE: This will create binary for linux platform with amd64 architecture,
 in case your's is different please change build-binary's line number 9 accordingly.
@@ -91,13 +91,43 @@ in case your's is different please change build-binary's line number 9 according
 ```
 sh build-binary.sh
 ```
+or
+```
+sudo ./build-binary.sh
+```
 Run it with sudo if permission denied is displayed for any operation.
 
 Please refer README inside web-client directory if you are facing any issue and then escalate it to us.
 
-### Run
+# Run
 DEPENDENCY: Make sure that cpagent binary is built
-Firstly run the migrations, make sure your PWD is same as this README's.
+
+## 1. If there are changes in Migration/DB schema files 
+
+Please drop the cpagentdb database.
+
+For this open connection to postgresql
+```
+$ psql -U postgres
+```
+Type your password
+
+And then drop your database by typing
+```
+DROP DATABASE cpagentdb;
+```
+
+Recreate the database
+```
+CREATE DATABASE cpagentdb;
+```
+
+You may close the connection to database
+
+## 2. Run the migrations, make sure your PWD is same as this README's.
+
+If you have changed your branch which has differnt DB schema, please goto Step 1
+
 ```
 $ ./cpagent migrate
 ```
