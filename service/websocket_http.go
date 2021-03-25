@@ -8,6 +8,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
+	"strings"
 	"time"
 
 	"strconv"
@@ -58,6 +59,13 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 					sendTemperature(deps, rw, c)
 
+				} else if msg[:8] == "progress" {
+
+					monitorOperation(deps, rw, c, msg[9:])
+
+				} else if msg[:7] == "success" {
+
+					successOperation(deps, rw, c, msg[8:])
 				}
 
 			case err = <-deps.ExitCh:
@@ -523,24 +531,48 @@ func openSocketConnection(rw http.ResponseWriter, req *http.Request) (conn *webs
 
 }
 
-func closeSocketConnection() {
-	conn.Close()
-}
-
-func monitorHoming(deps Dependencies, conn *websocket.Conn) {
-
-	for homing.Progress {
-		conn.WriteMessage(1, []byte("homing in progress"))
-		// adding delay of 0.5s to reduce the cpu usage
-		time.Sleep(500 * time.Millisecond)
+func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn, msg string) (err error) {
+	monitorOpr := oprProgress{
+		Type: fmt.Sprintf("PROGRESS_%s", strings.ToUpper(msg)),
+		Data: fmt.Sprintf("PROGRESS_%s", strings.ToUpper(msg)),
 	}
 
-	if homing.Success {
-		conn.WriteMessage(1, []byte("homing success"))
+	respBytes, err := json.Marshal(monitorOpr)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling result temp data")
 		return
 	}
-	if homing.Err {
-		conn.WriteMessage(1, []byte("error in homing"))
 
+	err = c.WriteMessage(1, respBytes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
+
+	logger.WithField("data", msg).Info("Websocket send Data")
+	return
+}
+
+func successOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn, msg string) (err error) {
+	successOpr := oprSuccess{
+		Type: fmt.Sprintf("SUCCESS_%s", strings.ToUpper(msg)),
+		Data: fmt.Sprintf("SUCCESS_%s", strings.ToUpper(msg)),
+	}
+
+	respBytes, err := json.Marshal(successOpr)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling result temp data")
+		return
+	}
+
+	err = c.WriteMessage(1, respBytes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", msg).Info("Websocket send Data")
+	return
 }

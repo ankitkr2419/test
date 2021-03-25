@@ -17,6 +17,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
+		deps.WsMsgCh <- "progress_homing"
 		switch deck {
 		case "":
 			fmt.Println("At both deck!!!")
@@ -27,19 +28,13 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			err = fmt.Errorf("Check your deck name")
 		}
 
-		homing.Progress = true
-		conn, err := openSocketConnection(rw, req)
-		go monitorHoming(deps, conn)
-
 		if err != nil {
-			homing.Progress = false
-			homing.Err = true
+			deps.WsErrCh <- err
 			fmt.Fprintf(rw, err.Error())
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			homing.Progress = false
-			homing.Success = true
+			deps.WsMsgCh <- "success_homing"
 			fmt.Fprintf(rw, response)
 			rw.WriteHeader(http.StatusOK)
 		}

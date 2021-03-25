@@ -21,7 +21,6 @@ var (
 	graphMin          float32 = 0 // scale for graph
 	graphMax          float32 = 10
 	undetermine               = "UNDETERMINE"
-	homing            resultsOnHoming
 )
 
 type experimentResultValues struct {
@@ -66,8 +65,17 @@ type experimentTemperature struct {
 	Data []db.ExperimentTemperature `json:"data"`
 }
 
-type resultsOnHoming struct {
-	Progress bool
-	Success  bool
-	Err      bool
+type oprSuccess struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
+}
+
+type oprProgress struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
+}
+
+type oprError struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
 }
