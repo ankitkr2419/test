@@ -9,15 +9,15 @@ import (
 )
 
 type Delay struct {
-	ID        uuid.UUID     `db:"id" json:"id"`
-	DelayTime time.Duration `db:"delay_time" json:"delay_time"`
-	ProcessID uuid.UUID     `db:"process_id" json:"process_id"`
-	CreatedAt time.Time     `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time     `db:"updated_at" json:"updated_at"`
+	ID        uuid.UUID `db:"id" json:"id"`
+	DelayTime int64     `db:"delay_time" json:"delay_time"`
+	ProcessID uuid.UUID `db:"process_id" json:"process_id"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 const (
-	getDelayQuery = `SELECT * FROM delay where process_id = $1`
+	getDelayQuery    = `SELECT * FROM delay where process_id = $1`
 	createDelayQuery = `INSERT INTO delay (
 		delay_time,
 		process_id)

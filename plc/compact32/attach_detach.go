@@ -8,6 +8,7 @@ import (
 
 func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err error) {
 
+	// TODO : Remove this State storing to attach/detach individual process
 	// Operation attach and detach
 	switch ad.Operation {
 	case "attach":
@@ -259,7 +260,7 @@ func (d *Compact32Deck) fullDetach() (response string, err error) {
 	// Calling AttachDetach below as this handles magnetState implicitly
 	// WARNING: Be careful of below string literals "detach" and "full_detach",
 	// any changes in db schema of magnets should be reflected in these as well.
-	response, err = d.detach("full_detach")
+	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType: "full_detach"})
 	if err != nil {
 		fmt.Printf("error in magnet detach process %v \n", err.Error())
 	}
