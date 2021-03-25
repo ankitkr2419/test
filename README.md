@@ -155,7 +155,7 @@ After a successfull latest build from master, type the below command in below fo
 ./cpagent import --recipename name_of_the_recipe --csv PATH_TO_CSV
 ```
 
-name_of_the_recipe is name without spaces.
+name_of_the_recipe is name without spaces. These underscores will be replaced by space.
 PATH_TO_CSV contains name of the csv along its extension.
 
 E.g
