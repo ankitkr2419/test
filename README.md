@@ -1,14 +1,17 @@
 ## MyLabDiscoveries Client
+
 # Introduction
 In the first phase of development, we are going to analyse 96 samples (6 dyes
 each) and show the results to the end user. This results should be shown in tabular format
 and graphical format. This machine will be industrial machine with Touch screen.
-This machine will also consider the Extraction logic.
+
+For the Extraction part we have a machine with 2 decks. Deck A and Deck B. These have motors which are controlled by a PLC. Our Industrial PC serves as a master while the PLCs serve as slaves.
 
 ## Golang Boilerplate
 We have used Golang boilerplate to kickstart any go api project.
 
-## SetUp Steps
+# SetUp Steps
+
 ### 1. Install Go Language
 Refer https://golang.org/doc/install, or for linux users 
 ```
@@ -73,6 +76,7 @@ You need to set username and password
 ### 6. Set config.yml
 Inside conf directory, create a clone file from config.yml.default and name it as config.yml. And let it be. 
 
+
 # Building Binary without GUI Support
 This is only backend binary
 Make sure your PWD is same as this README's.
@@ -98,6 +102,7 @@ sudo ./build-binary.sh
 Run it with sudo if permission denied is displayed for any operation.
 
 Please refer README inside web-client directory if you are facing any issue and then escalate it to us.
+
 
 # Run
 DEPENDENCY: Make sure that cpagent binary is built
@@ -141,6 +146,23 @@ If you have followed all steps correctly the setup should start normally.
 
 Congrats if your setup runs, else feel free to contact us.
 
+
+# Import CSV
+
+After a successfull latest build from master, type the below command in below format to import a Recipe from CSV
+
+```
+./cpagent import --recipename name_of_the_recipe --csv PATH_TO_CSV
+```
+
+name_of_the_recipe is name without spaces.
+PATH_TO_CSV contains name of the csv along its extension.
+
+E.g
+```
+./cpagent import --recipename covidExtract --csv /home/josh/Downloads/CER.csv
+```
+
 ### Testing
 
 Run test locally
@@ -151,13 +173,17 @@ $ make test
 ### DB Support
 
 For PostgreSQL use following commands
+```
 ./cpagent start --plc simulator
 ./cpagent migrate
 ./cpagent create_migration filename
+```
 
 ### RICE
 
 For embedding react build with Go binary
 
+```
 $ rice embed
 $ go build
+```
