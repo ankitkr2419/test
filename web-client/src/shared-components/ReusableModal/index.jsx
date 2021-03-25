@@ -17,47 +17,59 @@ const ReusableModal = (props) => {
   const [modalOpen, setModalOpen] = useState(isOpen);
 
   return (
-    <Modal isOpen={modalOpen} toggle={toggleModal} centered size="md">
+    <Modal isOpen={isOpen} toggle={toggleModal} centered size="md">
       <ModalBody className="p-0">
-        {(textHead) &&
-            <div className="d-flex justify-content-center align-items-center modal-heading">
-                    <Text className="mb-0 title font-weight-bold">{textHead}</Text>
-                
-                    <ButtonIcon
-                        position="absolute"
-                        placement="right"
-                        top={0}
-                        right={16}
-                        size={36}
-                        name="cross"
-                        onClick={() => {setModalOpen(!modalOpen)}}
-                        className="border-0"
-                    />
-            </div>
-        }
-            <div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
-                {(!textHead) &&
-                    <ButtonIcon
-                        position="absolute"
-                        placement="right"
-                        top={5}
-                        right={16}
-                        size={36}
-                        name="cross"
-                        onClick={() => {setModalOpen(!modalOpen)}}
-                        className="border-0"
-                    />
-                }
-                <Text Tag="h5" size="20" className="text-center font-weight-bold mt-3 mb-4">
-                    <Text Tag="span" className="mb-1">{textBody}</Text>
-                </Text>
-            </div>
+        {textHead && (
+          <div className="d-flex justify-content-center align-items-center modal-heading">
+            <Text className="mb-0 title font-weight-bold">{textHead}</Text>
+
+            <ButtonIcon
+              position="absolute"
+              placement="right"
+              top={0}
+              right={16}
+              size={36}
+              name="cross"
+              onClick={() => {
+                setModalOpen(!modalOpen);
+              }}
+              className="border-0"
+            />
+          </div>
+        )}
+        <div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
+          {!textHead && (
+            <ButtonIcon
+              position="absolute"
+              placement="right"
+              top={5}
+              right={16}
+              size={36}
+              name="cross"
+              onClick={() => {
+                setModalOpen(!modalOpen);
+              }}
+              className="border-0"
+            />
+          )}
+          <Text
+            Tag="h5"
+            size="20"
+            className="text-center font-weight-bold mt-3 mb-4"
+          >
+            <Text Tag="span" className="mb-1">
+              {textBody}
+            </Text>
+          </Text>
+        </div>
 
         <Center className="text-center p-0 m-0 pt-5">
           <ButtonGroup className="text-center mt-5">
             {secondaryBtn && (
               <Button
-                onClick={() => {setModalOpen(!modalOpen)}}
+                onClick={() => {
+                  setModalOpen(!modalOpen);
+                }}
                 color="transparent"
                 className="mr-4 border-primary"
               >
