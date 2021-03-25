@@ -141,8 +141,8 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	remainingTime = totalTime
 
 	// set the timer in progress variable to specify that it is not a motor operation.
-	d.SetTimerInProgress()
-	defer d.ResetTimerInProgress()
+	d.setTimerInProgress()
+	defer d.resetTimerInProgress()
 
 skipToStartUVTimer:
 	//
