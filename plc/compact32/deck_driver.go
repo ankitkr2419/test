@@ -72,7 +72,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing pulse : ", err, d.name)
 		return "", err
 	}
-	logger.Errorln("Wrote Pulse. res : ", results)
+	logger.Infoln("Wrote Pulse. res : ", results)
 	pulseReg.Store(d.name, pulse)
 	wrotePulses.Store(d.name, pulse)
 
