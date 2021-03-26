@@ -38,7 +38,16 @@ const RecipeListingComponent = (props) => {
   const { deckName } = operatorLoginModalReducer.toJS();
 
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
-  const { error } = recipeActionReducer;
+  const {
+    // runRecipeError,
+    abortRecipeError,
+    // pauseRecipeError,
+    // resumeRecipeError,
+    // recipeListingError,
+    leftActionBtn,
+    rightActionBtn,
+    // isLoading,
+  } = recipeActionReducer;
 
   const [confirmationModal, setConfirmationModal] = useState(false);
   const [recipeData, setRecipeData] = useState({});
@@ -62,44 +71,26 @@ const RecipeListingComponent = (props) => {
     setIsOpen(!isOpen);
   };
 
-  const [leftActionBtn, setLeftActionBtn] = useState(DECKCARD_BTN.text.run);
-  const [rightActionBtn, setRightActionBtn] = useState(
-    DECKCARD_BTN.text.cancel
-  );
-
   const handleRunAction = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     const { recipeId } = recipeData;
     dispatch(runRecipeInitiated({ recipeId: recipeId, deckName: name }));
-
-    if (!error) {
-      setLeftActionBtn(DECKCARD_BTN.text.pause);
-      setRightActionBtn(DECKCARD_BTN.text.abort);
-    }
   };
 
   const handlePauseAction = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     dispatch(pauseRecipeInitiated({ deckName: name }));
-
-    if (!error) {
-      setLeftActionBtn(DECKCARD_BTN.text.resume);
-    }
   };
 
   const handleResumeAction = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     dispatch(resumeRecipeInitiated({ deckName: name }));
-
-    if (!error) {
-      setLeftActionBtn(DECKCARD_BTN.text.pause);
-    }
   };
 
   const handleDoneAction = () => {
     setShowProcess(!showProcess);
-    setLeftActionBtn(DECKCARD_BTN.text.run);
-    setRightActionBtn(DECKCARD_BTN.text.cancel);
+    // setLeftActionBtn(DECKCARD_BTN.text.run);
+    // setRightActionBtn(DECKCARD_BTN.text.cancel);
     setProgressPercentComplete(0);
   };
 
@@ -109,12 +100,11 @@ const RecipeListingComponent = (props) => {
   const toggleConfirmModal = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     dispatch(abortRecipeInitiated({ deckName: name }));
-
-    if (!error) {
-      setConfirmationModal(!confirmationModal);
+    
+    // not working: will be correct in future
+    if (!abortRecipeError){
+      setConfirmationModal(false);
       setShowProcess(!showProcess);
-      setLeftActionBtn(DECKCARD_BTN.text.run);
-      setRightActionBtn(DECKCARD_BTN.text.cancel);
     }
   };
 

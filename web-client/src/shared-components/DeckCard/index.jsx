@@ -250,7 +250,7 @@ const DeckCard = (props) => {
                 <div className="d-none1">
                   <Text
                     Tag="h5"
-                    size="18"
+                    size={18}
                     className="mb-2 font-weight-bold recipe-name"
                   >
                     {recipeName}
