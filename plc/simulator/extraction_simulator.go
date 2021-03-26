@@ -5,6 +5,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"sync"
+	"time"
 )
 
 type ExtractionSimulator struct {
