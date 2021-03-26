@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
@@ -67,6 +68,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 		return
 	}
 
+	if !deps.PlcDeck[deck].Reset() {
+		err = errors.New("failed to reset recipe in aborted state")
+		return
+	}
+
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
@@ -114,13 +120,16 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			fmt.Println(ht)
 
 		case "Shaking":
-			// Get the Shaking process
-			// sh, err := deps.Store.ShowShaking(req.Context(), p.ID)
-			// if err != nil {
-			// return "", err
-			// }
-			// fmt.Println(sh)
-			// sh.run()
+			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
+
+			fmt.Printf("shaker object %v", shaker)
+
+			sha, err := deps.PlcDeck[deck].Shaking(shaker)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(sha)
+
 		case "Piercing":
 			// Get the Piercing process
 			// TODO: Below ID is reference ID, so please conform

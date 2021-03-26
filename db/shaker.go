@@ -2,13 +2,14 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
 
-type Shaking struct {
+type Shaker struct {
 	ID          uuid.UUID     `json:"id" db:"id"`
 	WithTemp    bool          `json:"with_temp" db:"with_temp"`
 	Temperature float64       `json:"temperature" db:"temperature"`
@@ -23,7 +24,7 @@ type Shaking struct {
 }
 
 const (
-	getShakingQuery    = `SELECT * FROM shaking where process_id = $1`
+	getShakerQuery     = `SELECT * FROM shaking where process_id = $1`
 	createShakingQuery = `INSERT INTO shaking (
 		with_temp,
 		temperature,
@@ -36,18 +37,22 @@ const (
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 )
 
-func (s *pgStore) ShowShaking(ctx context.Context, shakingID uuid.UUID) (shaking Shaking, err error) {
+func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker Shaker, err error) {
 
-	err = s.db.Get(&shaking, getShakingQuery, shakingID)
+	err = s.db.Get(&shaker,
+		getShakerQuery,
+		shakerID,
+	)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error getting shaking data")
 		return
 	}
 
+	fmt.Printf("shaker %v", shaker)
 	return
 }
 
-func (s *pgStore) CreateShaking(ctx context.Context, sh Shaking) (createdShaking Shaking, err error) {
+func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking Shaker, err error) {
 	var lastInsertID uuid.UUID
 
 	err = s.db.QueryRow(
@@ -67,7 +72,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaking) (createdShaking
 		return
 	}
 
-	err = s.db.Get(&createdShaking, getShakingQuery, sh.ProcessID)
+	err = s.db.Get(&createdShaking, getShakerQuery, sh.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting Shaking")
 		return

@@ -125,7 +125,15 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	//  Switch off UV Light
 	response, err = d.switchOffUVLight()
 	if err != nil {
-		return
+		fmt.Println("From deck ", d.name, err)
+		return "", err
+	}
+
+	// Switch off shaker
+	response, err = d.switchOffShaker()
+	if err != nil {
+		fmt.Println("From deck ", d.name, err)
+		return "", err
 	}
 
 	aborted.Store(d.name, true)
@@ -190,4 +198,9 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 	onReg.Store(d.name, ON)
 
 	return "RESUMED with pulses.", nil
+}
+
+func (d *Compact32Deck) Reset() (ack bool) {
+	aborted.Store(d.name, false)
+	return true
 }

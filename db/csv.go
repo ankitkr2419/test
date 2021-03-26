@@ -414,7 +414,7 @@ func createTipDockingProcess(record []string, processID uuid.UUID, store Storer)
 func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
 	logger.Info("Inside shaking create Process. Record: ", record, ". ProcessID:", processID)
 
-	s := Shaking{
+	s := Shaker{
 		ProcessID: processID,
 	}
 
