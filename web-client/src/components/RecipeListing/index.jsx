@@ -15,9 +15,12 @@ import {
   pauseRecipeInitiated,
   resumeRecipeInitiated,
   runRecipeInitiated,
+  runRecipeReset,
+  pauseRecipeReset,
+  resumeRecipeReset,
+  abortRecipeReset,
 } from "action-creators/recipeActionCreators";
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
-import { abortRecipeReset } from "action-creators/recipeActionCreators";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -40,10 +43,10 @@ const RecipeListingComponent = (props) => {
 
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const {
-    // runRecipeError,
+    runRecipeError,
     abortRecipeError,
-    // pauseRecipeError,
-    // resumeRecipeError,
+    pauseRecipeError,
+    resumeRecipeError,
     // recipeListingError,
     leftActionBtn,
     rightActionBtn,
@@ -77,9 +80,29 @@ const RecipeListingComponent = (props) => {
     if (abortRecipeError === false && confirmationModal) {
       setConfirmationModal(false);
       setShowProcess(false);
-      dispatch(abortRecipeReset());
     }
-  }, [abortRecipeError, confirmationModal, dispatch]);
+
+    if (
+      runRecipeError ||
+      pauseRecipeError ||
+      resumeRecipeError ||
+      abortRecipeError
+    ) {
+      //show toast with error msg
+    }
+    
+    dispatch(abortRecipeReset());
+    dispatch(runRecipeReset());
+    dispatch(resumeRecipeReset());
+    dispatch(pauseRecipeReset());
+  }, [
+    runRecipeError,
+    pauseRecipeError,
+    resumeRecipeError,
+    abortRecipeError,
+    confirmationModal,
+    dispatch,
+  ]);
 
   const handleRunAction = () => {
     const name = deckName === "Deck A" ? "A" : "B";
