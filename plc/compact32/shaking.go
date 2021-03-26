@@ -27,6 +27,10 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	var shakerNo = 3
 
+	var motorNum = K8_Shaker
+
+	var results []byte
+
 	//check if aborted
 	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Operation was ABORTED!")
@@ -64,6 +68,21 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		return "", err
 	}
 
+	// write motor number for shaker
+	if temp := d.getMotorNumReg(); temp == highestUint16 {
+		err = fmt.Errorf("motor Number Register isn't loaded!")
+		return
+	} else if temp != motorNum {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][226], motorNum)
+	}
+
+	if err != nil {
+		logger.Errorln("error writing motor num: ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote motorNum. res : ", results)
+	motorNumReg.Store(d.name, motorNum)
+
 	//restart process motor
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
 	if err != nil {
@@ -72,7 +91,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	}
 
 	//set shaker selection register
-	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][220], uint16(shakerNo))
+	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][220], uint16(shakerNo))
 	if err != nil {
 		fmt.Println("err : ", err)
 		return "", err
@@ -93,7 +112,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			ht := db.Heating{
 				Temperature: shakerData.Temperature,
 				FollowTemp:  shakerData.FollowTemp,
-				Duration:    1,
+				Duration:    0,
 			}
 			response, err = d.Heating(ht)
 
