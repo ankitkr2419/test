@@ -141,8 +141,8 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	remainingTime = totalTime
 
 	// set the timer in progress variable to specify that it is not a motor operation.
-	d.SetTimerInProgress()
-	defer d.ResetTimerInProgress()
+	d.setTimerInProgress()
+	defer d.resetTimerInProgress()
 
 skipToStartUVTimer:
 	//
@@ -227,7 +227,7 @@ func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err erro
 			// when resumed go again to timer start
 			return "Resumed", nil
 		}
-		
+
 		if d.isMachineInAbortedState() {
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err

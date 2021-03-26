@@ -43,6 +43,7 @@ const (
 	reverseAfterNonCutPulsesMagnet      = uint16(400)
 	finalSensorCutPulses                = uint16(2999)
 	minimumPulsesThreshold              = uint16(50)
+	highestUint16                       = uint16(65535)
 )
 
 // 120 Seconds is the minimum UVLight On Time
@@ -52,8 +53,8 @@ const (
 
 // Special Speeds
 const (
-	homingFastSpeed = uint16(2000)
-	homingSlowSpeed = uint16(500)
+	homingFastSpeed     = uint16(2000)
+	homingSlowSpeed     = uint16(500)
 	homingDeckFastSpeed = uint16(3000)
 )
 
@@ -66,11 +67,14 @@ const (
 
 var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress, homed sync.Map
 
+// variable map Registers to keep track of machine related variables.
+var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
+
 func LoadUtils() {
-	wrotePulses.Store("A", 0)
-	wrotePulses.Store("B", 0)
-	executedPulses.Store("A", 0)
-	executedPulses.Store("B", 0)
+	wrotePulses.Store("A", uint16(0))
+	wrotePulses.Store("B", uint16(0))
+	executedPulses.Store("A", uint16(0))
+	executedPulses.Store("B", uint16(0))
 	aborted.Store("A", false)
 	aborted.Store("B", false)
 	paused.Store("A", false)
@@ -83,6 +87,19 @@ func LoadUtils() {
 	magnetState.Store("B", detached)
 	homed.Store("A", false)
 	homed.Store("B", false)
+
+	motorNumReg.Store("A", uint16(0))
+	motorNumReg.Store("B", uint16(0))
+	speedReg.Store("A", uint16(0))
+	speedReg.Store("B", uint16(0))
+	directionReg.Store("A", uint16(0))
+	directionReg.Store("B", uint16(0))
+	rampReg.Store("A", uint16(0))
+	rampReg.Store("B", uint16(0))
+	pulseReg.Store("A", uint16(0))
+	pulseReg.Store("B", uint16(0))
+	onReg.Store("A", OFF)
+	onReg.Store("B", OFF)
 }
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)

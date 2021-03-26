@@ -209,10 +209,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 				return "", err
 			}
 			fmt.Print(delay)
-			// response, err = deps.PlcDeck[deck].AddDelay(delay)
-			// if err != nil {
-			// return "", err
-			// }
+			response, err = deps.PlcDeck[deck].AddDelay(delay)
+			if err != nil {
+				return "", err
+			}
 
 		}
 		// TODO: Instead of switch case, try using reflect
@@ -221,6 +221,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	}
 
 	// Home the machine
+	deps.PlcDeck[deck].ResetRunInProgress()
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
 		return

@@ -1,13 +1,14 @@
 package compact32
 
 import (
-	"encoding/binary"
 	"fmt"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
 
-	if !d.IsRunInProgress() {
+	if d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
 		return "", err
 	}
@@ -61,24 +62,24 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 	if !d.isTimerInProgress() {
 		response, err = d.readExecutedPulses()
 		if err != nil {
-			fmt.Println("err : ", err)
+			logger.Errorln("err : ", err)
 			return "", err
 		}
 
-		if temp1 := d.getWrotePulses(); temp1 == -1 {
+		if temp1 := d.getWrotePulses(); temp1 == highestUint16 {
 			err = fmt.Errorf("wrotePulses isn't loaded!")
-		} else if temp2 := d.getExecutedPulses(); temp2 == -1 {
+		} else if temp2 := d.getExecutedPulses(); temp2 == highestUint16 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 		} else if temp1 <= temp2 {
-			err = fmt.Errorf("executedPulses is greater than wrote Pulses that means nothing to resume.")
-			wrotePulses.Store(d.name, 0)
-			executedPulses.Store(d.name, 0)
+			logger.Info("executedPulses is greater than wrote Pulses that means nothing to resume for current motor.")
+			wrotePulses.Store(d.name, uint16(0))
+			executedPulses.Store(d.name, uint16(0))
 		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
-			response, err = d.ResumeMotorWithPulses(uint16(temp1 - temp2))
+			response, err = d.resumeMotorWithPulses(temp1 - temp2)
 		}
 		if err != nil {
-			fmt.Println("err:", err)
+			logger.Errorln("err:", err)
 			return
 		}
 	}
@@ -90,18 +91,20 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 
 func (d *Compact32Deck) Abort() (response string, err error) {
 
-	fmt.Println("aborting the operation....")
+	logger.Infoln("aborting the operation....")
 
-	fmt.Println("switching motor off....")
+	homed.Store(d.name, false)
+
+	logger.Infoln("switching motor off....")
 	response, err = d.switchOffMotor()
 	if err != nil {
-		fmt.Println("From deck ", d.name, err)
+		logger.Errorln("From deck ", d.name, err)
 		return "", err
 	}
 
 	response, err = d.switchOffHeater()
 	if err != nil {
-		fmt.Println("From deck ", d.name, err)
+		logger.Errorln("From deck ", d.name, err)
 		return "", err
 	}
 
@@ -120,15 +123,14 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	aborted.Store(d.name, true)
-	wrotePulses.Store(d.name, 0)
+	wrotePulses.Store(d.name, uint16(0))
 	paused.Store(d.name, false)
-	homed.Store(d.name, false)
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
 	if d.IsRunInProgress() && !d.isTimerInProgress() {
 		response, err = d.readExecutedPulses()
 		if err != nil {
-			fmt.Println("err : ", err)
+			logger.Errorln("err : ", err)
 			return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")
 		}
 	}
@@ -139,29 +141,47 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	return "ABORT SUCCESS", nil
 }
 
-func (d *Compact32Deck) ResumeMotorWithPulses(pulses uint16) (response string, err error) {
+func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, err error) {
 
-	results, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulses)
+	var results []byte
+
+	if temp := d.getOnReg(); temp == highestUint16 {
+		err = fmt.Errorf("on/off Register  isn't loaded!")
+		return
+	} else if temp != OFF {
+		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
+	}
 	if err != nil {
-		fmt.Println("err : ", err)
+		logger.Errorln("err Switching motor off: ", err)
 		return "", err
 	}
-	fmt.Println("Wrote Pulse. res : ", binary.BigEndian.Uint16(results))
+	logger.Infoln("Wrote Switch OFF motor")
+	onReg.Store(d.name, OFF)
+
+
+	if temp := d.getPulseReg(); temp == highestUint16 {
+		err = fmt.Errorf("pulsesReg isn't loaded!")
+		return
+	} else if temp != pulses {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulses)
+	}
+
+	if err != nil {
+		logger.Errorln("err writing pulses: ", err)
+		return "", err
+	}
+	logger.Infoln("Wrote pulses: ", results)
+	pulseReg.Store(d.name, pulses)
 	wrotePulses.Store(d.name, pulses)
-	fmt.Println("Wrote Pulses ---> ", pulses)
-
-	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][202], uint16(1))
-	if err != nil {
-		fmt.Println("err : ", err)
-		return "", err
-	}
-	fmt.Printf("read ReadHoldingRegisters_Pulse : %+v \n", binary.BigEndian.Uint16(results))
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
 	if err != nil {
-		fmt.Println("err : ", err)
+		logger.Errorln("err : ", err)
 		return "", err
 	}
+
+	logger.Infoln("Wrote Switch ON motor")
+	onReg.Store(d.name, ON)
 
 	return "RESUMED with pulses.", nil
 }

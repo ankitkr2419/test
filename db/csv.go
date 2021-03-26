@@ -304,7 +304,7 @@ func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err
 		logger.Errorln(err, record[0])
 		return err
 	} else {
-		d.DelayTime = time.Duration(delay)
+		d.DelayTime = delay
 	}
 
 	createdProcess, err := store.CreateDelay(context.Background(), d)
