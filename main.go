@@ -146,13 +146,13 @@ func startApp(plcName string, test bool) (err error) {
 
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
-		driver = compact32.NewCompact32Driver(exit, test)
-		driverDeckA, handler = compact32.NewCompact32DeckDriverA(exit, test)
-		driverDeckB = compact32.NewCompact32DeckDriverB(exit, test, handler)	
+		driver = compact32.NewCompact32Driver(websocketMsg, exit, test)
+		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, exit, test)
+		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
 	} else {
 		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(exit,"A")
-		driverDeckB = simulator.NewExtractionSimulator(exit,"B")
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, exit, "A")
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, exit, "B")
 
 	}
 
@@ -175,7 +175,6 @@ func startApp(plcName string, test bool) (err error) {
 		WsErrCh: websocketErr,
 		WsMsgCh: websocketMsg,
 	}
-
 
 	go monitorForPLCTimeout(&deps, exit)
 
@@ -276,14 +275,13 @@ func startApp(plcName string, test bool) (err error) {
 	return
 }
 
-
-func monitorForPLCTimeout(deps *service.Dependencies, exit chan error){
+func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 	for {
 		select {
-		case err := <- deps.ExitCh:
+		case err := <-deps.ExitCh:
 			logger.Errorln(err)
-			driverDeckA, handler := compact32.NewCompact32DeckDriverA(exit, false)
-			driverDeckB := compact32.NewCompact32DeckDriverB(exit, false, handler)
+			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, exit, false)
+			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
 			plcDeckMap := map[string]plc.DeckDriver{
 				"A": driverDeckA,
 				"B": driverDeckB,
@@ -294,4 +292,3 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error){
 		}
 	}
 }
-
