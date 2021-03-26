@@ -10,17 +10,17 @@ import (
 )
 
 type Shaker struct {
-	ID          uuid.UUID     `json:"id" db:"id"`
-	WithTemp    bool          `json:"with_temp" db:"with_temp"`
-	Temperature float64       `json:"temperature" db:"temperature"`
-	FollowTemp  bool          `json:"follow_temp" db:"follow_temp"`
-	ProcessID   uuid.UUID     `json:"process_id" db:"process_id"`
-	RPM1        int64         `json:"rpm_1" db:"rpm_1"`
-	RPM2        int64         `json:"rpm_2" db:"rpm_2"`
-	Time1       time.Duration `json:"time_1" db:"time_1"`
-	Time2       time.Duration `json:"time_2" db:"time_2"`
-	CreatedAt   time.Time     `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at" db:"updated_at"`
+	ID          uuid.UUID `json:"id" db:"id"`
+	WithTemp    bool      `json:"with_temp" db:"with_temp"`
+	Temperature float64   `json:"temperature" db:"temperature"`
+	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
+	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
+	RPM1        int64     `json:"rpm_1" db:"rpm_1"`
+	RPM2        int64     `json:"rpm_2" db:"rpm_2"`
+	Time1       int64     `json:"time_1" db:"time_1"`
+	Time2       int64     `json:"time_2" db:"time_2"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }
 
 const (

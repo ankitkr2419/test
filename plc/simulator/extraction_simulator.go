@@ -5,6 +5,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"sync"
+	"time"
 )
 
 type ExtractionSimulator struct {
@@ -79,4 +80,8 @@ func (us *ExtractionSimulator) AttachDetach(db.AttachDetach) (response string, e
 func (us *ExtractionSimulator) AddDelay(db.Delay) (string, error) { return "SUCCESS", nil }
 func (us *ExtractionSimulator) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
 	return "SUCCESS", nil
+}
+func (us *ExtractionSimulator) Shaking(db.Shaker) (string, error) {
+	return "SUCCESS", nil
+
 }
