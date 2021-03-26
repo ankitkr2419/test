@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 // import ConfirmationModal from "components/modals/ConfirmationModal";
 
-// import SearchBox from 'shared-components/SearchBox';
-// import ButtonBar from 'shared-components/ButtonBar';
 import AppFooter from "components/AppFooter";
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
@@ -31,7 +29,6 @@ const LandingScreenComponent = (props) => {
           successBtn={MODAL_BTN.okay}
           showCrossBtn={false}
         />
-
       </div>
       <AppFooter
         loginBtn={true}
