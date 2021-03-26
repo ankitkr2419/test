@@ -67,6 +67,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	homed.Store(d.name, true)
 
 	fmt.Println("Homing Completed Successfully")
+	d.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", d.name)
 
 	return "HOMING SUCCESS", nil
 }
@@ -94,6 +95,7 @@ func (d *Compact32Deck) syringeHoming() (response string, err error) {
 	}
 
 	fmt.Println("Syringe homing is completed")
+	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed syringe for deck %v", d.name)
 
 	return "SYRINGE HOMING COMPLETED", nil
 }
@@ -124,6 +126,8 @@ func (d *Compact32Deck) syringeModuleHoming() (response string, err error) {
 
 	fmt.Println("After Final Slow Moving Up and getting Cut")
 
+	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed syringe for deck %v", d.name)
+
 	return "SYRINGE HOMING SUCCESS", nil
 }
 
@@ -150,6 +154,7 @@ func (d *Compact32Deck) deckHoming() (response string, err error) {
 	}
 
 	fmt.Println("Deck homing is completed.")
+	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed deck %v", d.name)
 
 	return "DECK HOMING SUCCESS", nil
 }
@@ -183,6 +188,7 @@ func (d *Compact32Deck) magnetHoming() (response string, err error) {
 	if err != nil {
 		return
 	}
+	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed magnet for deck %v", d.name)
 
 	return "MAGNET HOMING SUCCESS", nil
 }

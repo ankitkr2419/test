@@ -64,3 +64,13 @@ type experimentTemperature struct {
 	Type string                     `json:"type"`
 	Data []db.ExperimentTemperature `json:"data"`
 }
+
+type oprSuccess struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
+}
+
+type oprProgress struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
+}

@@ -68,6 +68,9 @@ const (
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 
+// variable map Registers to keep track of machine related variables.
+var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
+
 func LoadUtils() {
 	wrotePulses.Store("A", uint16(0))
 	wrotePulses.Store("B", uint16(0))
@@ -87,6 +90,19 @@ func LoadUtils() {
 	magnetState.Store("B", detached)
 	homed.Store("A", false)
 	homed.Store("B", false)
+
+	motorNumReg.Store("A", uint16(0))
+	motorNumReg.Store("B", uint16(0))
+	speedReg.Store("A", uint16(0))
+	speedReg.Store("B", uint16(0))
+	directionReg.Store("A", uint16(0))
+	directionReg.Store("B", uint16(0))
+	rampReg.Store("A", uint16(0))
+	rampReg.Store("B", uint16(0))
+	pulseReg.Store("A", uint16(0))
+	pulseReg.Store("B", uint16(0))
+	onReg.Store("A", OFF)
+	onReg.Store("B", OFF)
 }
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
