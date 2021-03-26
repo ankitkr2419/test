@@ -90,6 +90,8 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		logger.Errorln("error in switching heater on ", err)
 		return "", err
 	}
+	d.setHeaterInProgress()
+	defer d.resetHeaterInProgress()
 
 	// Step 8:
 	// first check if not follow up then call delay function.
@@ -99,8 +101,6 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	// as we do not need to monitor the temperature here.
 	if !ht.FollowTemp {
 		fmt.Printf("inside not follow up")
-		d.setHeaterInProgress()
-		defer d.resetHeaterInProgress()
 		response, err = d.AddDelay(delay)
 		if err != nil {
 			return
