@@ -107,7 +107,7 @@ func (d *Compact32Deck) getMotorNumReg() uint16 {
 
 func (d *Compact32Deck) getSpeedReg() uint16 {
 	if temp, ok := speedReg.Load(d.name); !ok {
-		logger.Errorln("speedReg isn't loaded!")
+		logger.Errorln("speed Register isn't loaded!")
 		return highestUint16
 	} else {
 		return temp.(uint16)
@@ -116,7 +116,7 @@ func (d *Compact32Deck) getSpeedReg() uint16 {
 
 func (d *Compact32Deck) getDirectionReg() uint16 {
 	if temp, ok := directionReg.Load(d.name); !ok {
-		logger.Errorln("directionReg isn't loaded!")
+		logger.Errorln("direction Register isn't loaded!")
 		return highestUint16
 	} else {
 		return temp.(uint16)
@@ -125,7 +125,7 @@ func (d *Compact32Deck) getDirectionReg() uint16 {
 
 func (d *Compact32Deck) getRampReg() uint16 {
 	if temp, ok := rampReg.Load(d.name); !ok {
-		logger.Errorln("rampReg isn't loaded!")
+		logger.Errorln("ramp Register isn't loaded!")
 		return highestUint16
 	} else {
 		return temp.(uint16)
@@ -134,7 +134,7 @@ func (d *Compact32Deck) getRampReg() uint16 {
 
 func (d *Compact32Deck) getPulseReg() uint16 {
 	if temp, ok := pulseReg.Load(d.name); !ok {
-		logger.Errorln("pulseReg isn't loaded!")
+		logger.Errorln("pulse Register isn't loaded!")
 		return highestUint16
 	} else {
 		return temp.(uint16)

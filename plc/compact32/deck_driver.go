@@ -62,7 +62,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	}
 
 	if temp := d.getPulseReg(); temp == highestUint16 {
-		err = fmt.Errorf("pulseReg isn't loaded!")
+		err = fmt.Errorf("pulse Register isn't loaded!")
 		return
 	} else if temp != pulse {
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulse)
@@ -77,7 +77,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	wrotePulses.Store(d.name, pulse)
 
 	if temp := d.getSpeedReg(); temp == highestUint16 {
-		err = fmt.Errorf("speedReg isn't loaded!")
+		err = fmt.Errorf("speed Register isn't loaded!")
 		return
 	} else if temp != speed {
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][200], speed)
@@ -91,7 +91,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	speedReg.Store(d.name, speed)
 
 	if temp := d.getRampReg(); temp == highestUint16 {
-		err = fmt.Errorf("rampReg isn't loaded!")
+		err = fmt.Errorf("ramp Register isn't loaded!")
 		return
 	} else if temp != ramp {
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][204], ramp)
@@ -106,7 +106,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	rampReg.Store(d.name, ramp)
 
 	if temp := d.getDirectionReg(); temp == highestUint16 {
-		err = fmt.Errorf("directionReg isn't loaded!")
+		err = fmt.Errorf("direction Register isn't loaded!")
 		return
 	} else if temp != direction {
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][206], direction)
