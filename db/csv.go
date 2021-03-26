@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 
 	_ "github.com/lib/pq"
 	logger "github.com/sirupsen/logrus"
@@ -77,7 +78,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 	}
 
 	// Current Version supported is only 1.2
-	if strings.TrimSpace(record[1]) !=  "1.2" {
+	if strings.TrimSpace(record[1]) != "1.2" {
 		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version 1.2")
 		logger.Errorln(err)
 		return err
@@ -303,7 +304,7 @@ func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err
 		logger.Errorln(err, record[0])
 		return err
 	} else {
-		d.DelayTime = time.Duration(delay)
+		d.DelayTime = delay
 	}
 
 	createdProcess, err := store.CreateDelay(context.Background(), d)
@@ -476,7 +477,7 @@ func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (e
 	h := Heating{
 		ProcessID: processID,
 	}
-	
+
 	// Current Temperature is accurate only to 1 decimal point
 	// While sending it to PLC  we need to multiply by 10
 	// As PLC can't handle decimals
