@@ -231,7 +231,7 @@ const DeckCard = (props) => {
     <DeckCardBox className="d-flex justify-content-start align-items-center">
       <CardOverlay />
       <div className="d-flex justify-content-center align-items-center deck-title">
-        <Text Tag="label" size="20">
+        <Text Tag="label" size={20}>
           {deckName}
         </Text>
       </div>

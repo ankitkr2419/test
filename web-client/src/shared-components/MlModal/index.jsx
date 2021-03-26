@@ -51,7 +51,7 @@ const MlModal = (props) => {
           )}
           <Text
             Tag="h5"
-            size="20"
+            size={20}
             className="text-center font-weight-bold mt-3 mb-4"
           >
             <Text Tag="span" className="mb-1">

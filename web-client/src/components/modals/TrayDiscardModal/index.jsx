@@ -53,10 +53,10 @@ const TrayDiscardModal = (props) => {
 					<TrayDiscardSection className="gray-scale-box d-flex justify-content-center align-items-center">
 					<Center className="mt-4">
 						<ImageIcon src={alertIcon} alt="alert icon not available" className='mb-4' />
-						<Text Tag="h5" size="18" className="text-center mx-5 mb-0">
+						<Text Tag="h5" size={18} className="text-center mx-5 mb-0">
 							Tray will be discarded from Machine!
 						</Text>
-						<Text Tag="h5" size="18" className="text-center mx-5 mb-4">
+						<Text Tag="h5" size={18} className="text-center mx-5 mb-4">
 							You can collect and empty the tray.
 						</Text>
 						<ImageIcon src={collectAndEmptyTrayImage} alt="" className='mb-4 mx-auto d-block' />
