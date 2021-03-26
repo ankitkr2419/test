@@ -17,6 +17,7 @@ import {
   runRecipeInitiated,
 } from "action-creators/recipeActionCreators";
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import { abortRecipeReset } from "action-creators/recipeActionCreators";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -72,11 +73,13 @@ const RecipeListingComponent = (props) => {
   };
 
   useEffect(() => {
-    if ((abortRecipeError === false) && (confirmationModal === true)) {
+    //Do not change '===';
+    if (abortRecipeError === false && confirmationModal) {
       setConfirmationModal(false);
-      setShowProcess(!showProcess);
+      setShowProcess(false);
+      dispatch(abortRecipeReset());
     }
-  }, [abortRecipeError, confirmationModal, showProcess]);
+  }, [abortRecipeError, confirmationModal, dispatch]);
 
   const handleRunAction = () => {
     const name = deckName === "Deck A" ? "A" : "B";

@@ -44,6 +44,11 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         isLoading: false,
         runRecipeError: true,
       };
+    case runRecipeAction.runRecipeReset:
+      return {
+        ...state,
+        runRecipeError: null,
+      };
 
     case pauseRecipeAction.pauseRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
@@ -61,6 +66,11 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...action.payload,
         isLoading: false,
         pauseRecipeError: true,
+      };
+    case pauseRecipeAction.pauseRecipeReset:
+      return {
+        ...state,
+        pauseRecipeError: null,
       };
 
     case abortRecipeAction.abortRecipeInitiated:
@@ -86,6 +96,11 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         isLoading: false,
         abortRecipeError: true,
       };
+    case abortRecipeAction.abortRecipeReset:
+      return {
+        ...state,
+        abortRecipeError: null,
+      };
 
     case resumeRecipeAction.resumeRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
@@ -105,6 +120,12 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         resumeRecipeError: true,
       };
 
+    case resumeRecipeAction.resumeRecipeReset:
+      return {
+        ...state,
+        resumeRecipeError: null,
+      };
+
     case recipeListingAction.recipeListingInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case recipeListingAction.recipeListingSuccess:
@@ -120,6 +141,11 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         serverErrors: action.payload.serverErrors,
         recipeListingError: true,
         isLoading: false,
+      };
+    case recipeListingAction.recipeListingReset:
+      return {
+        ...state,
+        recipeListingError: null,
       };
 
     default:

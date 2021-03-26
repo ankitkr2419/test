@@ -3,108 +3,133 @@ import {
   pauseRecipeAction,
   resumeRecipeAction,
   abortRecipeAction,
-  recipeListingAction
+  recipeListingAction,
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
   type: runRecipeAction.runRecipeInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
 export const runRecipeSuccess = (runRecipeResponse) => ({
   type: runRecipeAction.runRecipeSuccess,
   payload: {
-    runRecipeResponse
-  }
+    runRecipeResponse,
+  },
 });
 
 export const runRecipeFailed = (serverErrors) => ({
   type: runRecipeAction.runRecipeFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
+});
+
+export const runRecipeReset = () => ({
+  type: runRecipeAction.runRecipeReset,
+  payload: {},
 });
 
 export const pauseRecipeInitiated = (params) => ({
   type: pauseRecipeAction.pauseRecipeInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
 export const pauseRecipeSuccess = (pauseRecipeResponse) => ({
   type: pauseRecipeAction.pauseRecipeSuccess,
   payload: {
-    pauseRecipeResponse
-  }
+    pauseRecipeResponse,
+  },
 });
 
 export const pauseRecipeFailed = (serverErrors) => ({
   type: pauseRecipeAction.pauseRecipeFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
+});
+
+export const pauseRecipeReset = () => ({
+  type: pauseRecipeAction.pauseRecipeReset,
+  payload: {},
 });
 
 export const resumeRecipeInitiated = (params) => ({
   type: resumeRecipeAction.resumeRecipeInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
 export const resumeRecipeSuccess = (resumeRecipeResponse) => ({
   type: resumeRecipeAction.resumeRecipeSuccess,
   payload: {
-    resumeRecipeResponse
-  }
+    resumeRecipeResponse,
+  },
 });
 
 export const resumeRecipeFailed = (serverErrors) => ({
   type: resumeRecipeAction.resumeRecipeFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
+});
+
+export const resumeRecipeReset = () => ({
+  type: resumeRecipeAction.resumeRecipeReset,
+  payload: {},
 });
 
 export const abortRecipeInitiated = (params) => ({
   type: abortRecipeAction.abortRecipeInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
 export const abortRecipeSuccess = (abortRecipeResponse) => ({
   type: abortRecipeAction.abortRecipeSuccess,
   payload: {
-    abortRecipeResponse
-  }
+    abortRecipeResponse,
+  },
 });
 
 export const abortRecipeFailed = (serverErrors) => ({
   type: abortRecipeAction.abortRecipeFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
+});
+
+export const abortRecipeReset = () => ({
+  type: abortRecipeAction.abortRecipeReset,
+  payload: {},
 });
 
 export const recipeListingInitiated = () => ({
   type: recipeListingAction.recipeListingInitiated,
-  payload: { }
+  payload: {},
 });
 
 export const recipeListingSuccess = (recipeData) => ({
   type: recipeListingAction.recipeListingSuccess,
   payload: {
-    recipeData
-  }
+    recipeData,
+  },
 });
 
 export const recipeListingFailed = (serverErrors) => ({
   type: recipeListingAction.recipeListingFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
+});
+
+export const recipeListingReset = () => ({
+  type: recipeListingAction.recipeListingReset,
+  payload: {},
 });

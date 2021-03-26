@@ -283,10 +283,6 @@ const DeckCard = (props) => {
                       Processes remaining
                     </Text>
                   </Text>
-                  <Progress
-                    value={progressPercentComplete}
-                    className="custom-progress-bar"
-                  />
                 </div>
               </>
             )}
@@ -327,7 +323,7 @@ const DeckCard = (props) => {
                       remaining
                     </Text>
                   </Text>
-                  <Progress value="2" className="custom-progress-bar" />
+                  {/* <Progress value="2" className="custom-progress-bar" /> */}
                 </div>
               </>
             )}
@@ -353,6 +349,8 @@ const DeckCard = (props) => {
             </>
           )}
         </div>
+        
+        {(showProcess || showCleanUp) && <Progress value={progressPercentComplete} className="custom-progress-bar" />}
       </div>
     </DeckCardBox>
   );
