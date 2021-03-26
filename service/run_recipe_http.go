@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
@@ -83,13 +84,29 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	//  This field will be set when a tip is picked up
 	//  We will get its id from recipe and its details from tipsTubes
 
-	for _, p := range processes {
+	for i, p := range processes {
+
+		wsData := recipeProgress{
+			Deck:              deck,
+			RecipeID:          recipeID,
+			TotalStepInRecipe: len(processes),
+			CurrentStep:       i + 1,
+		}
+		wsDataJSON, err := json.Marshal(wsData)
+		if err != nil {
+			return "", err
+		}
+		wsMsg := fmt.Sprintf("progress_recipe_%v", string(wsDataJSON))
+
+		deps.WsMsgCh <- wsMsg
+
 		switch p.Type {
 		case "AspireDispense":
 			// Get the AspireDispense process
 			// TODO: Below ID is reference ID, so please change code accordingly
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(ad)
@@ -104,6 +121,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			if err != nil {
 				return "", err
 			}
+
 		case "Heating":
 			// heat, err := deps.Store.ShowHeating(ctx, p.ID)
 			// fmt.Printf("heat object %v", heat)
@@ -206,10 +224,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			}
 
 		}
+
+		deps.WsMsgCh <- fmt.Sprintf("progress_recipe_completed process %d", i)
 		// TODO: Instead of switch case, try using reflect
 		// Pass context and ID here
 		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
+
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_ recipeid %v", recipeID)
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()

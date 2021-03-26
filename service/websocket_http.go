@@ -523,7 +523,7 @@ func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 
 	monitorOpr := oprProgress{
 		Type: fmt.Sprintf("PROGRESS_%s", strings.ToUpper(msg[1])),
-		Data: fmt.Sprintf("%s", strings.ToLower(msg[2])),
+		Data: fmt.Sprintf("%s", msg[2]),
 	}
 
 	respBytes, err := json.Marshal(monitorOpr)
@@ -539,11 +539,12 @@ func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 		return
 	}
 
-	logger.WithField("data", msg).Info("Websocket send Data")
+	logger.WithField("data", monitorOpr).Info("Websocket send Data")
 	return
 }
 
 func successOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn, msg []string) (err error) {
+
 	successOpr := oprSuccess{
 		Type: fmt.Sprintf("SUCCESS_%s", strings.ToUpper(msg[1])),
 		Data: fmt.Sprintf("%s", msg[2]),
@@ -562,11 +563,11 @@ func successOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 		return
 	}
 
-	logger.WithField("data", msg).Info("Websocket send Data")
+	logger.WithField("data", successOpr).Info("Websocket send Data")
 	return
 }
 
 func msgDivision(msg string) (msgs []string) {
-	msgs = strings.Split(msg, "_")
+	msgs = strings.SplitN(msg, "_", 3)
 	return
 }
