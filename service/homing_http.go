@@ -12,34 +12,24 @@ import (
 func homingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var response string
-		var err error
-
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		// the format for message in every operation must be in the format:
-		// progress/success_OPERATION NAME_OPERATION MESSAGE
-		deps.WsMsgCh <- "progress_homing_homing in progress"
+
 		switch deck {
 		case "":
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`both decks operation in progress`))
 			fmt.Println("At both deck!!!")
-			response, err = bothDeckOperation(deps, "Homing")
+			go bothDeckOperation(deps, "Homing")
 		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "Homing")
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`single deck operation in progress`))
+			go singleDeckOperation(deps, deck, "Homing")
 		default:
-			err = fmt.Errorf("Check your deck name")
+			err := fmt.Errorf("Check your deck name")
+			deps.WsErrCh <- err
 		}
 
-		if err != nil {
-			deps.WsErrCh <- err
-			fmt.Fprintf(rw, err.Error())
-			fmt.Println(err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			deps.WsMsgCh <- "success_homing_successfully homed"
-			fmt.Fprintf(rw, response)
-			rw.WriteHeader(http.StatusOK)
-		}
 	})
 }
 
@@ -62,6 +52,7 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			// abort Deck B Operation as Well
 			response, err = deps.PlcDeck["B"].Abort()
 			if err != nil {
+				deps.WsErrCh <- err
 				return
 			}
 			return "", deckAErr
@@ -70,10 +61,12 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			// Abort Deck A Operation as well
 			response, err = deps.PlcDeck["A"].Abort()
 			if err != nil {
+				deps.WsErrCh <- err
 				return
 			}
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
+
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
 			fmt.Println(operationSuccessMsg)
 			return operationSuccessMsg, nil
@@ -82,6 +75,7 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			time.Sleep(400 * time.Millisecond)
 		}
 	}
+
 }
 
 func singleDeckOperation(deps Dependencies, deck, operation string) (response string, err error) {
@@ -94,7 +88,9 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 
 	if len(result) != 2 {
 		fmt.Println("result is different in this reflect Call !", result)
-		return "", fmt.Errorf("unexpected length result")
+		err := fmt.Errorf("unexpected length result")
+		deps.WsErrCh <- err
+		return "", err
 	}
 
 	fmt.Println("Correct Result: ", result)
@@ -105,7 +101,9 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	errRes := result[1].Interface()
 	if errRes != nil {
 		fmt.Println(errRes)
-		return "", fmt.Errorf("%v", errRes)
+		err := fmt.Errorf("%v", errRes)
+		deps.WsErrCh <- err
+		return "", err
 	}
 
 	return

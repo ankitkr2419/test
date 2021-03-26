@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"sync"
@@ -9,14 +10,17 @@ import (
 
 type ExtractionSimulator struct {
 	sync.RWMutex
-	name   string // Deck Name
-	ExitCh chan string
-	ErrCh  chan error
+	name    string // Deck Name
+	WsMsgCh chan string
+	ExitCh  chan string
+	ErrCh   chan error
 }
 
-func NewExtractionSimulator(exit chan error, deck string) plc.DeckDriver {
+func NewExtractionSimulator(wsMsgch chan string, exit chan error, deck string) plc.DeckDriver {
 	ex := make(chan string)
 	s := ExtractionSimulator{}
+	s.WsMsgCh = wsMsgch
+
 	s.ExitCh = ex
 	s.ErrCh = exit
 	s.name = deck
@@ -31,7 +35,13 @@ func (us *ExtractionSimulator) NameOfDeck() string {
 // Homing returns success if the machine is  successfully homed
 
 func (us *ExtractionSimulator) Homing() (string, error) {
-	time.Sleep(time.Second * 10)
+	for i := 0; i < 10; i++ {
+		time.Sleep(time.Second * 1)
+		// the format for message in every operation must be in the format:
+		// progress/success_OPERATION NAME_OPERATION MESSAGE
+		us.WsMsgCh <- fmt.Sprintf("progress_homing_homing in progress for deck %v", us.name)
+	}
+	us.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", us.name)
 	return "SUCCESS", nil
 }
 
