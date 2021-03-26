@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon, VideoCard } from "shared-components";
+import { Icon, MlModal, VideoCard } from "shared-components";
 
 import styled from "styled-components";
 import AppFooter from "components/AppFooter";
@@ -10,7 +10,13 @@ import RecipeFlowModal from "components/modals/RecipeFlowModal";
 // import ConfirmationModal from "components/modals/ConfirmationModal";
 import TrayDiscardModal from "components/modals/TrayDiscardModal";
 import RecipeCard from "components/RecipeListing/RecipeCard";
-import { runRecipeInitiated } from "action-creators/recipeActionCreators";
+import {
+  abortRecipeInitiated,
+  pauseRecipeInitiated,
+  resumeRecipeInitiated,
+  runRecipeInitiated,
+} from "action-creators/recipeActionCreators";
+import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -31,11 +37,15 @@ const RecipeListingComponent = (props) => {
   );
   const { deckName } = operatorLoginModalReducer.toJS();
 
+  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  const { error } = recipeActionReducer;
+
+  const [confirmationModal, setConfirmationModal] = useState(false);
   const [recipeData, setRecipeData] = useState({});
+  const [progressPercentComplete, setProgressPercentComplete] = useState(0);
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = (recipeId, recipeName, processCount) => {
-    //will be deleted
     // const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
     const data = {
       recipeId: recipeId,
@@ -52,29 +62,106 @@ const RecipeListingComponent = (props) => {
     setIsOpen(!isOpen);
   };
 
-  const handleCancelAction = () => setShowProcess(!showProcess);
+  const [leftActionBtn, setLeftActionBtn] = useState(DECKCARD_BTN.text.run);
+  const [rightActionBtn, setRightActionBtn] = useState(
+    DECKCARD_BTN.text.cancel
+  );
 
   const handleRunAction = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     const { recipeId } = recipeData;
     dispatch(runRecipeInitiated({ recipeId: recipeId, deckName: name }));
+
+    if (!error) {
+      setLeftActionBtn(DECKCARD_BTN.text.pause);
+      setRightActionBtn(DECKCARD_BTN.text.abort);
+    }
   };
 
-  // const handlePauseAction = () => {
-  //   const name = (deckName === "Deck A") ? "A" : "B";
-  //   // dispatch(runRecipeInitiated({recipeId:recipeId, deckName:name}));
-  // };
+  const handlePauseAction = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(pauseRecipeInitiated({ deckName: name }));
+
+    if (!error) {
+      setLeftActionBtn(DECKCARD_BTN.text.resume);
+    }
+  };
+
+  const handleResumeAction = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(resumeRecipeInitiated({ deckName: name }));
+
+    if (!error) {
+      setLeftActionBtn(DECKCARD_BTN.text.pause);
+    }
+  };
+
+  const handleDoneAction = () => {
+    setShowProcess(!showProcess);
+    setLeftActionBtn(DECKCARD_BTN.text.run);
+    setRightActionBtn(DECKCARD_BTN.text.cancel);
+    setProgressPercentComplete(0);
+  };
+
+  const handleCancelAction = () => setShowProcess(!showProcess);
+  const handleAbortAction = () => setConfirmationModal(true);
+
+  const toggleConfirmModal = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(abortRecipeInitiated({ deckName: name }));
+
+    if (!error) {
+      setConfirmationModal(!confirmationModal);
+      setShowProcess(!showProcess);
+      setLeftActionBtn(DECKCARD_BTN.text.run);
+      setRightActionBtn(DECKCARD_BTN.text.cancel);
+    }
+  };
+
+  const getLeftActionBtnHandler = () => {
+    switch (leftActionBtn) {
+      case DECKCARD_BTN.text.run:
+        return handleRunAction;
+      case DECKCARD_BTN.text.pause:
+        return handlePauseAction;
+      case DECKCARD_BTN.text.resume:
+        return handleResumeAction;
+      case DECKCARD_BTN.text.done:
+        return handleDoneAction;
+      default:
+        break;
+    }
+  };
+
+  const getRightActionBtnHandler = () => {
+    switch (rightActionBtn) {
+      case DECKCARD_BTN.text.abort:
+        return handleAbortAction;
+      case DECKCARD_BTN.text.cancel:
+        return handleCancelAction;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="ml-content">
       <div className="landing-content px-2">
-        {/* <ConfirmationModal isOpen={true} /> */}
-
         <RecipeFlowModal
           isOpen={isOpen}
           toggle={toggle}
           toggleShowProcess={toggleShowProcess}
           recipeData={recipeData}
+        />
+
+        <MlModal
+          isOpen={confirmationModal}
+          textHead={deckName}
+          textBody={MODAL_MESSAGE.abortConfirmation}
+          handleSuccessBtn={toggleConfirmModal}
+          handleCrossBtn={() => setConfirmationModal(!confirmationModal)}
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
         />
 
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
@@ -128,8 +215,11 @@ const RecipeListingComponent = (props) => {
         recipeName={recipeData.recipeName}
         processNumber={12}
         processTotal={recipeData.processCount}
-        handleCancelAction={handleCancelAction}
-        handleRunAction={handleRunAction}
+        progressPercentComplete={progressPercentComplete}
+        handleLeftAction={getLeftActionBtnHandler()}
+        handleRightAction={getRightActionBtnHandler()}
+        leftActionBtn={leftActionBtn}
+        rightActionBtn={rightActionBtn}
       />
     </div>
   );

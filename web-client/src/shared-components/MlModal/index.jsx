@@ -94,8 +94,8 @@ MlModal.propTypes = {
   isOpen: PropTypes.bool,
   clickHandler: PropTypes.func,
   showCrossBtn: PropTypes.bool,
-  successBtn: PropTypes.bool,
-  failureBtn: PropTypes.bool,
+  successBtn: PropTypes.string,
+  failureBtn: PropTypes.string,
   toggleModal: PropTypes.func,
 };
 

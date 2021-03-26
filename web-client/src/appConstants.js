@@ -87,7 +87,7 @@ export const DECKCARD_BTN = {
 		resume: "RESUME",
 	},
 	icon: {
-		play: "play",
+		run: "play",
 		abort: "abort",
 		cancel: "cancel",
 		pause: "pause",
