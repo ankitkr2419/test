@@ -138,7 +138,7 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 	var results []byte
 
 	if temp := d.getOnReg(); temp == highestUint16 {
-		err = fmt.Errorf("OnReg isn't loaded!")
+		err = fmt.Errorf("on/off Register  isn't loaded!")
 		return
 	} else if temp != OFF {
 		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)

@@ -42,7 +42,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// Switch OFF The motor
 
 	if temp := d.getOnReg(); temp == highestUint16 {
-		err = fmt.Errorf("onReg isn't loaded!")
+		err = fmt.Errorf("on/off Register  isn't loaded!")
 		return
 	} else if temp != OFF {
 		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
@@ -119,8 +119,8 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Wrote direction. res : ", results)
 	directionReg.Store(d.name, direction)
 
-	if temp := d.getDirectionReg(); temp == highestUint16 {
-		err = fmt.Errorf("directionReg isn't loaded!")
+	if temp := d.getMotorNumReg(); temp == highestUint16 {
+		err = fmt.Errorf("motor Number Register isn't loaded!")
 		return
 	} else if temp != motorNum {
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][226], motorNum)
@@ -243,7 +243,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 
 	if temp := d.getOnReg(); temp == highestUint16 {
-		err = fmt.Errorf("OnReg isn't loaded!")
+		err = fmt.Errorf("on/off Register  isn't loaded!")
 		return
 	} else if temp != OFF {
 		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
