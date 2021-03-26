@@ -10,11 +10,11 @@ import { DECKCARD_BTN } from "appConstants";
 export const initialState = {
   isLoading: false,
   serverErrors: {},
-  runRecipeError: false,
-  abortRecipeError: false,
-  pauseRecipeError: false,
-  resumeRecipeError: false,
-  recipeListingError: false,
+  runRecipeError: null,
+  abortRecipeError: null,
+  pauseRecipeError: null,
+  resumeRecipeError: null,
+  recipeListingError: null,
   runRecipeResponse: {},
   abortRecipeResponse: {},
   pauseRecipeResponse: {},
@@ -33,6 +33,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         runRecipeResponse: action.payload.response,
         isLoading: false,
+        runRecipeError: false,
         leftActionBtn: DECKCARD_BTN.text.pause,
         rightActionBtn: DECKCARD_BTN.text.abort,
       };
@@ -51,6 +52,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         ...action.payload,
         isLoading: false,
+        pauseRecipeError: false,
         leftActionBtn: DECKCARD_BTN.text.resume,
       };
     case pauseRecipeAction.pauseRecipeFailed:
@@ -58,16 +60,22 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         ...action.payload,
         isLoading: false,
-        pauseRecipeAction: true,
+        pauseRecipeError: true,
       };
 
     case abortRecipeAction.abortRecipeInitiated:
-      return { ...state, ...action.payload, isLoading: true };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: true,
+        abortRecipeError: null,
+      };
     case abortRecipeAction.abortRecipeSuccess:
       return {
         ...state,
         ...action.payload,
         isLoading: false,
+        abortRecipeError: false,
         leftActionBtn: DECKCARD_BTN.text.run,
         rightActionBtn: DECKCARD_BTN.text.cancel,
       };
@@ -86,6 +94,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         ...action.payload,
         isLoading: false,
+        resumeRecipeError: false,
         leftActionBtn: DECKCARD_BTN.text.pause,
       };
     case resumeRecipeAction.resumeRecipeFailed:
@@ -103,14 +112,14 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         recipeData: action.payload.response,
         isLoading: false,
+        recipeListingError: false,
       };
     case recipeListingAction.recipeListingFailed:
       return {
         ...state,
         serverErrors: action.payload.serverErrors,
-        error: true,
-        isLoading: false,
         recipeListingError: true,
+        isLoading: false,
       };
 
     default:

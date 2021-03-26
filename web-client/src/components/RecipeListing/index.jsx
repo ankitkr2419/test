@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
@@ -71,6 +71,13 @@ const RecipeListingComponent = (props) => {
     setIsOpen(!isOpen);
   };
 
+  useEffect(() => {
+    if ((abortRecipeError === false) && (confirmationModal === true)) {
+      setConfirmationModal(false);
+      setShowProcess(!showProcess);
+    }
+  }, [abortRecipeError, confirmationModal, showProcess]);
+
   const handleRunAction = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     const { recipeId } = recipeData;
@@ -100,12 +107,6 @@ const RecipeListingComponent = (props) => {
   const toggleConfirmModal = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     dispatch(abortRecipeInitiated({ deckName: name }));
-    
-    // not working: will be correct in future
-    if (!abortRecipeError){
-      setConfirmationModal(false);
-      setShowProcess(!showProcess);
-    }
   };
 
   const getLeftActionBtnHandler = () => {
@@ -133,6 +134,8 @@ const RecipeListingComponent = (props) => {
         break;
     }
   };
+
+  console.log("DECKNAME: ", deckName);
 
   return (
     <div className="ml-content">
