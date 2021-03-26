@@ -62,9 +62,6 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 func uvLightHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var response string
-		var err error
-
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
@@ -72,18 +69,13 @@ func uvLightHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "A", "B":
-			response, err = deps.PlcDeck[deck].UVLight(uvTime)
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`uv light clean up in progress`))
+			go deps.PlcDeck[deck].UVLight(uvTime)
 		default:
-			err = fmt.Errorf("Check your deck name")
+			err := fmt.Errorf("Check your deck name")
+			deps.WsErrCh <- err
 		}
 
-		if err != nil {
-			fmt.Fprintf(rw, err.Error())
-			fmt.Println(err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			fmt.Fprintf(rw, response)
-			rw.WriteHeader(http.StatusOK)
-		}
 	})
 }

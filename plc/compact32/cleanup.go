@@ -113,14 +113,18 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
 	if !d.IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
+		d.WsErrCh <- err
+
 		return
 	}
 
 	if d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		d.WsErrCh <- err
+
 		return
 	}
-
+	d.WsMsgCh <- fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name)
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
 
@@ -136,6 +140,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	//
 	totalTime, err = calculateUVTimeInSeconds(uvTime)
 	if err != nil {
+
 		return "", err
 	}
 	remainingTime = totalTime
@@ -150,6 +155,7 @@ skipToStartUVTimer:
 	//
 	response, err = d.switchOnUVLight()
 	if err != nil {
+		d.WsErrCh <- err
 		return
 	}
 
@@ -179,7 +185,9 @@ skipToStartUVTimer:
 			if d.isMachineInAbortedState() {
 				t.Stop()
 				err = fmt.Errorf("Operation was ABORTED!")
+				d.WsErrCh <- err
 				return "", err
+
 			}
 
 			// if paused then
@@ -187,6 +195,8 @@ skipToStartUVTimer:
 				//  Switch off UV Light
 				response, err = d.switchOffUVLight()
 				if err != nil {
+					d.WsErrCh <- err
+
 					return
 				}
 				// stop the timer
@@ -217,6 +227,7 @@ skipToStartUVTimer:
 		}
 	}
 
+	d.WsMsgCh <- fmt.Sprintf("success_uvlight_UV Light Completed Successfully %v", d.name)
 	return "UV Light Completed Successfully", nil
 }
 
