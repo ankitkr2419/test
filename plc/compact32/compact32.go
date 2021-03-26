@@ -26,17 +26,19 @@ type Compact32Driver interface {
 }
 
 type Compact32 struct {
-	ExitCh chan error
-	Driver Compact32Driver
+	ExitCh  chan error
+	WsMsgCh chan string
+	Driver  Compact32Driver
 }
 
 type Compact32Deck struct {
 	name       string
 	ExitCh     chan error
+	WsMsgCh    chan string
 	DeckDriver Compact32Driver
 }
 
-func NewCompact32Driver(exit chan error, test bool) plc.Driver {
+func NewCompact32Driver(wsMsgCh chan string, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler.BaudRate = 9600
@@ -53,6 +55,7 @@ func NewCompact32Driver(exit chan error, test bool) plc.Driver {
 	C32 := Compact32{}
 	C32.Driver = &driver
 	C32.ExitCh = exit
+	C32.WsMsgCh = wsMsgCh
 
 	// Start the Heartbeat
 	// TODO: Uncomment this after RT-PCR m/c is ready
@@ -108,7 +111,7 @@ func NewCompact32Driver(exit chan error, test bool) plc.Driver {
 
 // Compact32 Driver for Deck A and B
 // TODO: Use test to Configure the Deck Operations
-func NewCompact32DeckDriverA(exit chan error, test bool) (plc.DeckDriver, *modbus.RTUClientHandler) {
+func NewCompact32DeckDriverA(wsMsgCh chan string, exit chan error, test bool) (plc.DeckDriver, *modbus.RTUClientHandler) {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler.BaudRate = 9600
@@ -126,12 +129,14 @@ func NewCompact32DeckDriverA(exit chan error, test bool) (plc.DeckDriver, *modbu
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
+	C32.WsMsgCh = wsMsgCh
+
 	C32.name = "A"
 
 	return &C32, handler // plc Driver
 }
 
-func NewCompact32DeckDriverB(exit chan error, test bool, handler *modbus.RTUClientHandler) plc.DeckDriver {
+func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) plc.DeckDriver {
 	/* Modbus RTU/ASCII */
 	handler2 := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler2.BaudRate = 9600
@@ -148,6 +153,7 @@ func NewCompact32DeckDriverB(exit chan error, test bool, handler *modbus.RTUClie
 	C32 := Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
+	C32.WsMsgCh = wsMsgCh
 	C32.name = "B"
 
 	return &C32 // plc Driver
