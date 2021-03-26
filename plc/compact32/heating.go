@@ -29,10 +29,6 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	// 3 is the value that needs to be passed for heating both the shakers.
 	shaker := uint16(3)
 
-	delay := db.Delay{
-		DelayTime: ht.Duration,
-	}
-
 	// Step 1 : Validation for temperature
 	// validation for temperature
 	if (ht.Temperature*10) > 1200 || (ht.Temperature*10) <= 200 {
@@ -43,10 +39,15 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	// Step 2 : Validation for Duration
 	//validation for heating duration
-	if ht.Duration > 3660 || ht.Duration < 10 {
+	// zero value for duration signifies that the shaker has initiated followTemp.
+	if ht.Duration > 3660 || ht.Duration < 10 && ht.Duration != 0 {
 		err = fmt.Errorf("%v not in valid range of 10sec to 1hr 60sec", ht.Duration)
 		logger.Errorln("Error Duration for heating not in valid range: ", err)
 		return "", err
+	}
+
+	delay := db.Delay{
+		DelayTime: ht.Duration,
 	}
 
 	// Step 3 : Validation for shaker
@@ -117,6 +118,11 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	// Step 10 : monitor the temperature if not follow temp.
 	// loop for continous reading of the shaker temp and check if the temperature has reached specified value.
 	d.monitorTemperature(shaker, ht.Temperature)
+
+	// for shaker when the heater is needed with follow temp
+	if delay.DelayTime == 0 {
+		return "SUCCESS", nil
+	}
 
 	// After monitoring add delay of specified time period.
 	response, err = d.AddDelay(delay)
