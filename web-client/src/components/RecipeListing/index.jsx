@@ -135,8 +135,6 @@ const RecipeListingComponent = (props) => {
     }
   };
 
-  console.log("DECKNAME: ", deckName);
-
   return (
     <div className="ml-content">
       <div className="landing-content px-2">
