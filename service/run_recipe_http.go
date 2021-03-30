@@ -115,7 +115,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 		case "Shaking":
 			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
-
+			if err != nil {
+				return "", err
+			}
 			fmt.Printf("shaker object %v", shaker)
 
 			sha, err := deps.PlcDeck[deck].Shaking(shaker)
