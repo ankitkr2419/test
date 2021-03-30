@@ -7,10 +7,10 @@ export const operatorLoginInitiated = (authData) => ({
 
 export const operatorLoginSuccess = (successMsg) => ({
     type: operatorLoginModalActions.successAction,
-    payload: { msg: successMsg }
+    payload: { response: successMsg }
 });
 
 export const operatorLoginFailed = (errorMsg) => ({
-    type: operatorLoginModalActions.successAction,
-    payload: { msg: errorMsg }
+    type: operatorLoginModalActions.failureAction,
+    payload: { serverErrors: errorMsg }
 });

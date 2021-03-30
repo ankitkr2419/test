@@ -1,17 +1,27 @@
-import { takeEvery, put, call } from 'redux-saga/effects';
-import { callApi } from 'apis/apiHelper';
-import { runRecipeAction, pauseRecipeAction, resumeRecipeAction, abortRecipeAction, recipeListingAction } from "actions/recipeActions";
+import { takeEvery, put, call } from "redux-saga/effects";
+import { callApi } from "apis/apiHelper";
+import {
+  runRecipeAction,
+  pauseRecipeAction,
+  resumeRecipeAction,
+  abortRecipeAction,
+  recipeListingAction,
+} from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import {
   runRecipeFailed as runrecipeFailure,
   resumeRecipeFailed as resumeRecipeFailure,
   pauseRecipeFailed as pauseRecipeFailure,
   abortRecipeFailed as abortRecipeFailure,
-  recipeListingFailed as recipeListingFailure
+  recipeListingFailed as recipeListingFailure,
 } from "action-creators/recipeActionCreators";
 
-export function* runRecipe(actions){
-  const { payload: { params : { recipeId, deckName } }} = actions;
+export function* runRecipe(actions) {
+  const {
+    payload: {
+      params: { recipeId, deckName },
+    },
+  } = actions;
   const { runRecipeSuccess, runRecipeFailed } = runRecipeAction;
 
   try {
@@ -20,8 +30,8 @@ export function* runRecipe(actions){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: `${API_ENDPOINTS.run}/${recipeId}/${deckName}`,
-        runRecipeSuccess,
-        runRecipeFailed
+        successAction: runRecipeSuccess,
+        failureAction: runRecipeFailed,
       },
     });
   } catch (error) {
@@ -30,8 +40,12 @@ export function* runRecipe(actions){
   }
 }
 
-export function* resumeRecipe(actions){
-  const { payload: { params : { deckName } }} = actions;
+export function* resumeRecipe(actions) {
+  const {
+    payload: {
+      params: { deckName },
+    },
+  } = actions;
   const { resumeRecipeSuccess, resumeRecipeFailed } = resumeRecipeAction;
 
   try {
@@ -40,9 +54,9 @@ export function* resumeRecipe(actions){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: `${API_ENDPOINTS.resume}/${deckName}`,
-        resumeRecipeSuccess,
-        resumeRecipeFailed
-      }
+        successAction: resumeRecipeSuccess,
+        failureAction: resumeRecipeFailed,
+      },
     });
   } catch (error) {
     console.error(" Error in resuming a recipe", error);
@@ -51,7 +65,11 @@ export function* resumeRecipe(actions){
 }
 
 export function* abortRecipe(actions) {
-  const { payload: { params : { deckName } }} = actions;
+  const {
+    payload: {
+      params: { deckName },
+    },
+  } = actions;
   const { abortRecipeSuccess, abortRecipeFailed } = abortRecipeAction;
 
   try {
@@ -60,18 +78,22 @@ export function* abortRecipe(actions) {
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: `${API_ENDPOINTS.abort}/${deckName}`,
-        abortRecipeSuccess,
-        abortRecipeFailed
-      }
+        successAction: abortRecipeSuccess,
+        failureAction: abortRecipeFailed,
+      },
     });
-  } catch(error) {
+  } catch (error) {
     console.error(" Error in aborting a recipe", error);
     yield put(abortRecipeFailure(error));
   }
 }
 
-export function* pauseRecipe(actions){
-  const { payload: { params : { deckName } }} = actions;
+export function* pauseRecipe(actions) {
+  const {
+    payload: {
+      params: { deckName },
+    },
+  } = actions;
   const { pauseRecipeSuccess, pauseRecipeFailed } = pauseRecipeAction;
 
   try {
@@ -80,9 +102,9 @@ export function* pauseRecipe(actions){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: `${API_ENDPOINTS.pause}/${deckName}`,
-        pauseRecipeSuccess,
-        pauseRecipeFailed
-      }
+        successAction: pauseRecipeSuccess,
+        failureAction: pauseRecipeFailed,
+      },
     });
   } catch (error) {
     console.error("Error in pausing a recipe", error);
@@ -90,7 +112,7 @@ export function* pauseRecipe(actions){
   }
 }
 
-export function* recipeListing(){
+export function* recipeListing() {
   const { recipeListingSuccess, recipeListingFailed } = recipeListingAction;
 
   try {
@@ -99,13 +121,13 @@ export function* recipeListing(){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: API_ENDPOINTS.recipeListing,
-        recipeListingSuccess,
-        recipeListingFailed
-      }
-    })
-  } catch(error) {
+        successAction: recipeListingSuccess,
+        failureAction: recipeListingFailed,
+      },
+    });
+  } catch (error) {
     console.error("Error in fetching the recipes", error);
-    yield put(recipeListingFailure(error))
+    yield put(recipeListingFailure(error));
   }
 }
 

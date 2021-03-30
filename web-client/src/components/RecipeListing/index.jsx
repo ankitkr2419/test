@@ -1,154 +1,245 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
-import { Card, CardBody, Button, Row, Col } from 'core-components';
+import { Card, CardBody, Button, Row, Col } from "core-components";
+import { Icon, MlModal, VideoCard } from "shared-components";
+
+import styled from "styled-components";
+import AppFooter from "components/AppFooter";
+import RecipeFlowModal from "components/modals/RecipeFlowModal";
+// import ConfirmationModal from "components/modals/ConfirmationModal";
+import TrayDiscardModal from "components/modals/TrayDiscardModal";
+import RecipeCard from "components/RecipeListing/RecipeCard";
 import {
-	Icon,
-    Text,
-    ButtonIcon
-} from 'shared-components';
-
-
-import styled from 'styled-components';
-import AppFooter from 'components/AppFooter';
-import RecipeFlowModal from 'components/modals/RecipeFlowModal';
-import ConfirmationModal from 'components/modals/ConfirmationModal';
-import { Fade } from 'reactstrap';
-import TrayDiscardModal from 'components/modals/TrayDiscardModal';
+  abortRecipeInitiated,
+  pauseRecipeInitiated,
+  resumeRecipeInitiated,
+  runRecipeInitiated,
+  runRecipeReset,
+  pauseRecipeReset,
+  resumeRecipeReset,
+  abortRecipeReset,
+} from "action-creators/recipeActionCreators";
+import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 
 const TopContent = styled.div`
-	margin-bottom:2.25rem;
+  margin-bottom: 2.25rem;
 `;
 
 const HeadingTitle = styled.label`
-    font-size: 1.25rem;
-    line-height: 1.438rem;
+  font-size: 1.25rem;
+  line-height: 1.438rem;
 `;
-const RecipeCard = styled.div`
-    padding: 0.8rem 0.5rem;
-    border: 1px solid #E3E3E3;
-    border-radius: 0.5rem;
-    margin-bottom:0.688rem;
-    box-shadow: 0px 3px 16px rgba(0,0,0,0.04);
-    // width:27.5rem;
-    // height: 5.563rem;
-    .recipe-heading{
-        padding-bottom:0.5rem;
-    }
-    .recipe-card-body{
-        padding-top:0.25rem;
-        border-top: 1px solid #d9d9d9;
-        
-        .recipe-name{
-            font-size:0.875rem;
-            line-height:1rem;
-        }
-        .recipe-value{
-            font-size:1.125rem;
-            line-height:1.313rem;
-        }
-        .recipe-action{
-            button {
-                width:33px !important;
-                height:33px !important;
-                border:1px solid #696969 !important;
-                &:not(:first-child){
-                    margin-left:12px;
-                }
-            }
-        }
-    }
-    &:focus{
-        background-color:rgba(243, 130, 32, 0.30);
-    }
-`;
-
 
 const RecipeListingComponent = (props) => {
-    const [fadeIn, setFadeIn] = useState(true);
-    const toggle = () => setFadeIn(!fadeIn);
+  const { allRecipeData } = props;
 
-	return (
-		<div className="ml-content">
-			<div className='landing-content px-2'>
-				<ConfirmationModal
-						isOpen={false}
-				/>
-				<RecipeFlowModal/>
-			
+  const dispatch = useDispatch();
 
-				<TopContent className="d-flex justify-content-between align-items-center mx-5">
-						<div className="d-flex align-items-center">
-								<Icon name="angle-left" size={32} className="text-white"/>
-								<HeadingTitle Tag="h5" className="text-white font-weight-bold ml-3 mb-0">Select a Recipe for Deck B</HeadingTitle>
-						</div>
-						<div className="">
-							<Icon name="download" size={19} className="text-white mr-3"/>
-							<Button
-								color="secondary"
-								className="ml-auto"
-						>	Clean Up       
-						</Button>
-						<TrayDiscardModal />
-					</div>
-				</TopContent>
-				<Card>
-						<CardBody className="p-5">
-								<Row>
-										<Col>
-												<RecipeCard onClick={toggle}>
-														<div className="font-weight-bold recipe-heading">Name Name Name Name Name Name Name</div>
-														<div className="recipe-card-body">
-																<Text Tag="span" className="recipe-name">Total Processes -</Text>
-																<Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">347 </Text>
-																<Fade in={fadeIn} tag="h5" className="m-0 d-none">
-																<div className="recipe-action d-flex justify-content-between align-items-center">
-																		<div className="d-flex justify-content-between align-items-center">
-																				<ButtonIcon
-																						size={14}
-																						name='play'
-																						className="border-gray text-primary"
-																						//onClick={toggleExportDataModal}
-																				/>
-																				<ButtonIcon
-																						size={14}
-																						name='edit-pencil'
-																						className="border-gray text-primary"
-																						//onClick={toggleExportDataModal}
-																				/>
-																				<ButtonIcon
-																						size={14}
-																						name='upload'
-																						className="border-gray text-primary"
-																						//onClick={toggleExportDataModal}
-																				/>
-																		</div>
-																		<ButtonIcon
-																				size={20}
-																				name='minus-1'
-																				className="border-gray text-primary"
-																				//onClick={toggleExportDataModal}
-																		/>
-																</div>
-														</Fade>
-														</div> 
-												</RecipeCard>
-										</Col>
-										<Col>
-												<RecipeCard>
-														<div className="font-weight-bold recipe-heading">Name Name Name Name Name Name Name</div>
-														<div className="recipe-card-body">
-																<Text Tag="span" className="recipe-name">Total Processes -</Text>
-																<Text Tag="span" className="text-primary font-weight-bold recipe-value ml-2">347 </Text>
-														</div>
-												</RecipeCard>
-										</Col>
-								</Row>
-						</CardBody>
-				</Card>
-			</div>
-      <AppFooter />
-		</div>
-	);
+  const operatorLoginModalReducer = useSelector(
+    (state) => state.operatorLoginModalReducer
+  );
+  const { deckName } = operatorLoginModalReducer.toJS();
+
+  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  const {
+    runRecipeError,
+    abortRecipeError,
+    pauseRecipeError,
+    resumeRecipeError,
+    // recipeListingError,
+    leftActionBtn,
+    rightActionBtn,
+    // isLoading,
+  } = recipeActionReducer;
+
+  const [confirmationModal, setConfirmationModal] = useState(false);
+  const [recipeData, setRecipeData] = useState({});
+  const [progressPercentComplete, setProgressPercentComplete] = useState(0);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const toggle = (recipeId, recipeName, processCount) => {
+    // const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
+    const data = {
+      recipeId: recipeId,
+      recipeName: recipeName,
+      processCount: processCount,
+    };
+    setRecipeData(data);
+    setIsOpen(!isOpen);
+  };
+
+  const [showProcess, setShowProcess] = useState(false);
+  const toggleShowProcess = () => {
+    setShowProcess(!showProcess);
+    setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    //Do not change '===';
+    if (abortRecipeError === false && confirmationModal) {
+      setConfirmationModal(false);
+      setShowProcess(false);
+    }
+
+    if (
+      runRecipeError ||
+      pauseRecipeError ||
+      resumeRecipeError ||
+      abortRecipeError
+    ) {
+      //show toast with error msg
+    }
+
+    dispatch(abortRecipeReset());
+    dispatch(runRecipeReset());
+    dispatch(resumeRecipeReset());
+    dispatch(pauseRecipeReset());
+  }, [
+    runRecipeError,
+    pauseRecipeError,
+    resumeRecipeError,
+    abortRecipeError,
+    confirmationModal,
+    dispatch,
+  ]);
+
+  const handleRunAction = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    const { recipeId } = recipeData;
+    dispatch(runRecipeInitiated({ recipeId: recipeId, deckName: name }));
+  };
+
+  const handlePauseAction = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(pauseRecipeInitiated({ deckName: name }));
+  };
+
+  const handleResumeAction = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(resumeRecipeInitiated({ deckName: name }));
+  };
+
+  const handleDoneAction = () => {
+    setShowProcess(!showProcess);
+    // setLeftActionBtn(DECKCARD_BTN.text.run);
+    // setRightActionBtn(DECKCARD_BTN.text.cancel);
+    setProgressPercentComplete(0);
+  };
+
+  const handleCancelAction = () => setShowProcess(!showProcess);
+  const handleAbortAction = () => setConfirmationModal(true);
+
+  const toggleConfirmModal = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(abortRecipeInitiated({ deckName: name }));
+  };
+
+  const getLeftActionBtnHandler = () => {
+    switch (leftActionBtn) {
+      case DECKCARD_BTN.text.run:
+        return handleRunAction;
+      case DECKCARD_BTN.text.pause:
+        return handlePauseAction;
+      case DECKCARD_BTN.text.resume:
+        return handleResumeAction;
+      case DECKCARD_BTN.text.done:
+        return handleDoneAction;
+      default:
+        break;
+    }
+  };
+
+  const getRightActionBtnHandler = () => {
+    switch (rightActionBtn) {
+      case DECKCARD_BTN.text.abort:
+        return handleAbortAction;
+      case DECKCARD_BTN.text.cancel:
+        return handleCancelAction;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <div className="ml-content">
+      <div className="landing-content px-2">
+        <RecipeFlowModal
+          isOpen={isOpen}
+          toggle={toggle}
+          toggleShowProcess={toggleShowProcess}
+          recipeData={recipeData}
+        />
+
+        <MlModal
+          isOpen={confirmationModal}
+          textHead={deckName}
+          textBody={MODAL_MESSAGE.abortConfirmation}
+          handleSuccessBtn={toggleConfirmModal}
+          handleCrossBtn={() => setConfirmationModal(!confirmationModal)}
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
+        />
+
+        <TopContent className="d-flex justify-content-between align-items-center mx-5">
+          <div className="d-flex align-items-center">
+            <Icon name="angle-left" size={32} className="text-white" />
+            <HeadingTitle
+              Tag="h5"
+              className="text-white font-weight-bold ml-3 mb-0"
+            >
+              Select a Recipe for Deck B
+            </HeadingTitle>
+          </div>
+          <div className="">
+            <Icon name="download" size={19} className="text-white mr-3" />
+            <Button color="secondary" className="ml-auto">
+              {" "}
+              Clean Up
+            </Button>
+            <TrayDiscardModal />
+          </div>
+        </TopContent>
+
+        {showProcess ? (
+          <VideoCard />
+        ) : (
+          <Card>
+            <CardBody className="p-5">
+              <Row>
+                {allRecipeData.length > 0 ? (
+                  allRecipeData.map((value, index) => (
+                    <Col md={6} key={index}>
+                      <RecipeCard
+                        recipeId={value.id}
+                        recipeName={value.name}
+                        processCount={value.process_count}
+                        toggle={toggle}
+                      />
+                    </Col>
+                  ))
+                ) : (
+                  <h4>No recipes to show!</h4>
+                )}
+              </Row>
+            </CardBody>
+          </Card>
+        )}
+      </div>
+      <AppFooter
+        deckName={deckName}
+        showProcess={showProcess}
+        recipeName={recipeData.recipeName}
+        processNumber={12}
+        processTotal={recipeData.processCount}
+        progressPercentComplete={progressPercentComplete}
+        handleLeftAction={getLeftActionBtnHandler()}
+        handleRightAction={getRightActionBtnHandler()}
+        leftActionBtn={leftActionBtn}
+        rightActionBtn={rightActionBtn}
+      />
+    </div>
+  );
 };
 
 RecipeListingComponent.propTypes = {};

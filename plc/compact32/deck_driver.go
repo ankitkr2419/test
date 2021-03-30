@@ -271,6 +271,19 @@ func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 	return "SUCCESS", nil
 }
 
+func (d *Compact32Deck) switchOnHeater() (response string, err error) {
+
+	// Switch off Heater
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], ON)
+	if err != nil {
+		fmt.Println("err Switching on the heater: ", err)
+		return "", err
+	}
+	fmt.Println("Switched on the heater--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
 func (d *Compact32Deck) switchOnUVLight() (response string, err error) {
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][6], ON)

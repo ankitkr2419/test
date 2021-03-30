@@ -2,7 +2,6 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 
 import styled from "styled-components";
-
 import { ImageIcon } from "shared-components";
 
 import CirclelogoIcon from "assets/images/mylab-logo-with-circle.png";
@@ -23,8 +22,9 @@ const SplashScreen = styled.div`
   cursor: pointer;
 `;
 
-const SplashScreenComponent = (props) => {
+const SplashScreenComponent = () => {
   const history = useHistory();
+
   const redirectToLandingPage = () => {
     return history.push(ROUTES.landing);
   };
@@ -42,20 +42,22 @@ const SplashScreenComponent = (props) => {
       {/* <Button color="danger" onClick={toggle}>Alert pop up2</Button> */}
       {/* <Modal isOpen={true} toggle={toggle} centered size="sm">
 					<ModalBody className="p-0">
-						<OptionBox className="p-5">
-							<ButtonIcon
-									position="absolute"
-									placement="right"
-									top={16}
-									right={16}
-									size={36}
-									name="cross"
-									onClick={toggle}
-									className="ml-auto border-0"
-							/>
-							
-							<div className="d-flex justify-content-center align-items-center flex-column mt-5">
-								<Text Tag="label" size="20" className="mb-4 title-heading">Homing Confirmation</Text>
+					<div className="d-flex justify-content-center align-items-center modal-heading">
+						<Text className="mb-0 title font-weight-bold">Deck B</Text>
+						<ButtonIcon
+							position="absolute"
+							placement="right"
+							top={0}
+							right={16}
+							size={36}
+							name="cross"
+							onClick={toggle}
+							className="border-0"
+						/>
+					</div>
+						<OptionBox className="p-4">
+							<div className="d-flex justify-content-center align-items-center flex-column mb-3">
+								<Text Tag="label" size="20" className="mb-4 title-heading font-weight-bold">Homing Confirmation</Text>
 									<div
 										className="d-flex justify-content-center align-items-center font-weight-light border-1 border-gray shadow-none bg-gray large-btn">
 											<div className="d-flex justify-content-center align-items-center flex-column">
@@ -89,7 +91,7 @@ const SplashScreenComponent = (props) => {
 									<Button
 										color="primary"
 									>
-										Yes
+										Okay
 									</Button>
 							</div>
 						</OptionBox>
@@ -104,7 +106,5 @@ const SplashScreenComponent = (props) => {
     </SplashScreen>
   );
 };
-
-SplashScreenComponent.propTypes = {};
 
 export default SplashScreenComponent;

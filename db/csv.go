@@ -40,7 +40,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 
 	// Add the recipe entry into the database for the given recipe name here
 	r := Recipe{
-		Name:               recipeName,
+		Name:               strings.ReplaceAll(recipeName, "_", " "),
 		Description:        "Covid Recipe",
 		Position1:          1,
 		Position2:          2,
@@ -495,7 +495,7 @@ func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (e
 		logger.Errorln(err, record[4])
 		return err
 	} else {
-		h.Duration = time.Duration(time1)
+		h.Duration = time1
 	}
 
 	createdProcess, err := store.CreateHeating(context.Background(), h)

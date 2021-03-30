@@ -1,13 +1,27 @@
-import { runRecipeAction, pauseRecipeAction, resumeRecipeAction, abortRecipeAction, recipeListingAction } from "actions/recipeActions";
+import {
+  runRecipeAction,
+  pauseRecipeAction,
+  resumeRecipeAction,
+  abortRecipeAction,
+  recipeListingAction,
+} from "actions/recipeActions";
+import { DECKCARD_BTN } from "appConstants";
 
 export const initialState = {
   isLoading: false,
   serverErrors: {},
+  runRecipeError: null,
+  abortRecipeError: null,
+  pauseRecipeError: null,
+  resumeRecipeError: null,
+  recipeListingError: null,
   runRecipeResponse: {},
   abortRecipeResponse: {},
   pauseRecipeResponse: {},
   resumeRecipeResponse: {},
-  recipeData: {}
+  recipeData: [],
+  leftActionBtn: DECKCARD_BTN.text.run,
+  rightActionBtn: DECKCARD_BTN.text.cancel,
 };
 
 export const recipeActionReducer = (state = initialState, action = {}) => {
@@ -15,34 +29,126 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
     case runRecipeAction.runRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case runRecipeAction.runRecipeSuccess:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        runRecipeResponse: action.payload.response,
+        isLoading: false,
+        runRecipeError: false,
+        leftActionBtn: DECKCARD_BTN.text.pause,
+        rightActionBtn: DECKCARD_BTN.text.abort,
+      };
     case runRecipeAction.runRecipeFailed:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        serverErrors: action.payload.serverErrors,
+        isLoading: false,
+        runRecipeError: true,
+      };
+    case runRecipeAction.runRecipeReset:
+      return {
+        ...state,
+        runRecipeError: null,
+      };
+
     case pauseRecipeAction.pauseRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case pauseRecipeAction.pauseRecipeSuccess:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        pauseRecipeError: false,
+        leftActionBtn: DECKCARD_BTN.text.resume,
+      };
     case pauseRecipeAction.pauseRecipeFailed:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        pauseRecipeError: true,
+      };
+    case pauseRecipeAction.pauseRecipeReset:
+      return {
+        ...state,
+        pauseRecipeError: null,
+      };
+
     case abortRecipeAction.abortRecipeInitiated:
-      return { ...state, ...action.payload, isLoading: true };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: true,
+        abortRecipeError: null,
+      };
     case abortRecipeAction.abortRecipeSuccess:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        abortRecipeError: false,
+        leftActionBtn: DECKCARD_BTN.text.run,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+      };
     case abortRecipeAction.abortRecipeFailed:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        abortRecipeError: true,
+      };
+    case abortRecipeAction.abortRecipeReset:
+      return {
+        ...state,
+        abortRecipeError: null,
+      };
+
     case resumeRecipeAction.resumeRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case resumeRecipeAction.resumeRecipeSuccess:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        resumeRecipeError: false,
+        leftActionBtn: DECKCARD_BTN.text.pause,
+      };
     case resumeRecipeAction.resumeRecipeFailed:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        resumeRecipeError: true,
+      };
+
+    case resumeRecipeAction.resumeRecipeReset:
+      return {
+        ...state,
+        resumeRecipeError: null,
+      };
+
     case recipeListingAction.recipeListingInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case recipeListingAction.recipeListingSuccess:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        recipeData: action.payload.response,
+        isLoading: false,
+        recipeListingError: false,
+      };
     case recipeListingAction.recipeListingFailed:
-      return { ...state, ...action.payload, isLoading: false };
+      return {
+        ...state,
+        serverErrors: action.payload.serverErrors,
+        recipeListingError: true,
+        isLoading: false,
+      };
+    case recipeListingAction.recipeListingReset:
+      return {
+        ...state,
+        recipeListingError: null,
+      };
+
     default:
       return state;
   }
-}
+};

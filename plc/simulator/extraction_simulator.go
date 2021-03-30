@@ -70,7 +70,7 @@ func (us *ExtractionSimulator) UVLight(string) (string, error) {
 
 	return "SUCCESS", nil
 }
-func (us *ExtractionSimulator) Heating(uint16, bool, time.Duration) (string, error) {
+func (us *ExtractionSimulator) Heating(db.Heating) (string, error) {
 	return "SUCCESS", nil
 }
 func (us *ExtractionSimulator) AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {

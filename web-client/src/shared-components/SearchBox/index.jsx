@@ -2,59 +2,81 @@ import React from 'react';
 
 import styled from 'styled-components';
 // import { Link } from 'react-router-dom';
+import { FormGroup, Input } from 'core-components';
+import { Icon } from 'shared-components';
 import PropTypes from 'prop-types';
 
 const StyledSearchBox = styled.div`
-input {
-    outline: none;
-
-    &:-moz-placeholder {
-        color: rgba(102, 102, 102, 0.26);
-    }
-
-    &::-webkit-input-placeholder {
-        color: rgba(102, 102, 102, 0.26);
-    }
-}
-
-input[type=search] {
-    //-webkit-appearance: textfield;
-    //-webkit-box-sizing: content-box;
-    font-family: inherit;
-    font-size: 100%;
-    background: #fafafa url('images/search-icon.png') no-repeat center right 12px;
+.search-box {
+    margin-bottom: auto;
+    margin-top: auto;
+    height: 42px;
+    background-color: #fff;
+    border-radius: 30px;
+    padding: 1px;
     border: 1px solid #717171;
-    padding: 0.5rem 0.563rem 0.5rem 1.938rem;
-    width: 0px;
-    color: transparent;
-    cursor: pointer;
-    border-radius:10rem;
-    -webkit-transition: all .5s;
-    -moz-transition: all .5s;
-    transition: all .5s;
+    .search-input {
+        color: white;
+        border: 0;
+        outline: 0;
+        background: none;
+        width: 0;
+        caret-color: transparent;
+        line-height: 42px;
+        transition: width 0.2s linear;
+        padding: 0px 1px;
+        &:focus{
+            box-shadow:none;
+        }
+    }
     &:hover{
-        background-color: #fff;
+        .search-input {
+            padding: 0 10px;
+            width: 596px;
+            caret-color: #000;
+            transition: width 0.4s linear;
+        }
+        .search-icon {
+            background: rgb(131, 180, 172);
+            background: linear-gradient(-90deg, rgba(131, 180, 172, 1) 0%, rgba(178, 218, 209, 1) 100%);
+            border-radius: 0 30px 30px 0;
+            > i{
+                color: #fff;
+            }
+        }
     }
-
-    &:focus {
-        width: 37.25rem;
-        padding-right: 2.5rem;
-        color: #000;
-        background-color: #fff;
-        cursor: auto;
+    &:focus{
+        box-shadow:none;
     }
-}
-
-input::-webkit-search-decoration,
-input::-webkit-search-cancel-button {
-    display: none;
+    .search-icon {
+        height: 38px;
+        width: 38px;
+        float: right;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        color: #ABD5CE;
+        text-decoration: none;
+        &:hover{
+            text-decoration: none;
+        }
+        > i{
+            color: #ABD5CE;
+        }
+    }
 }
 `;
 
 const SearchBox = (props) => {
 	return (
-		<StyledSearchBox className="d-flex justify-content-start align-items-center m-3">
-			<input type="search" placeholder="Search"/>
+		<StyledSearchBox className="mb-3">
+			<div className="d-flex h-100">
+                <div className="d-flex search-box">
+                    <Input className="search-input" type="text" name="" placeholder="Search..."/>
+                    <a href="#" className="search-icon"><Icon name='search' size={32} /></a>
+                </div>
+            </div>
 		</StyledSearchBox>
 	);
 };

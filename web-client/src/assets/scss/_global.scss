@@ -26,6 +26,7 @@ body {
 // Page Header CSS
 .experiment-info {
 	position: relative;
+
 	.text-default {
 		width: rem(192px);
 		position: absolute;
@@ -74,22 +75,16 @@ body {
 		right: 0;
 		left: 0;
 		height: rem(225px);
-		background: transparent -moz-linear-gradient(
-				110deg,
+		background: transparent -moz-linear-gradient(110deg,
 				$pale 0%,
 				$tacao 58%,
-				$tango 100%
-			) 0% 0% no-repeat padding-box;
-		background: transparent -webkit-linear-gradient(
-				110deg,
+				$tango 100%) 0% 0% no-repeat padding-box;
+		background: transparent -webkit-linear-gradient(110deg,
 				$pale 0%,
 				$tacao 58%,
-				$tango 100%
-			) 0% 0% no-repeat padding-box;
-		background: transparent
-			linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat
-			padding-box;
-		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="$pale",endColorstr="$tango",GradientType=1);
+				$tango 100%) 0% 0% no-repeat padding-box;
+		background: transparent linear-gradient(110deg, $pale 0%, $tacao 58%, $tango 100%) 0% 0% no-repeat padding-box;
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="$pale", endColorstr="$tango", GradientType=1);
 		z-index: -1;
 	}
 }
@@ -112,8 +107,8 @@ body {
 	margin-right: rem(-8px);
 	margin-left: rem(-8px);
 
-	> .col,
-	> [class*='col-'] {
+	>.col,
+	>[class*='col-'] {
 		padding-right: rem(8px);
 		padding-left: rem(8px);
 	}
@@ -173,6 +168,7 @@ button:focus {
 // Select
 .css-2b097c-container {
 	&.lg {
+
 		.css-yk16xz-control,
 		.css-1pahdxg-control {
 			min-height: rem(50px);
@@ -180,6 +176,7 @@ button:focus {
 	}
 
 	&.md {
+
 		.css-yk16xz-control,
 		.css-1pahdxg-control {
 			min-height: rem(42px);
@@ -232,21 +229,21 @@ button:focus {
 		}
 	}
 
-	.custom-control-input:checked ~ .custom-control-label::after {
+	.custom-control-input:checked~.custom-control-label::after {
 		background-image: none;
 		background-color: $pale;
 	}
 
 	.custom-control-input:focus,
 	.custom-control-input:focus:not(:checked) {
-		~ .custom-control-label::before {
+		~.custom-control-label::before {
 			box-shadow: none;
 			border-color: $gray-60;
 		}
 	}
 
-	.custom-control-input:checked ~ .custom-control-label::before,
-	.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+	.custom-control-input:checked~.custom-control-label::before,
+	.custom-control-input:not(:disabled):active~.custom-control-label::before {
 		background-color: $white;
 		border-color: $gray-60;
 	}
@@ -257,15 +254,15 @@ button:focus {
 	min-height: rem(32px);
 	padding-left: rem(88px);
 
-	.custom-control-input:focus ~ .custom-control-label::before {
+	.custom-control-input:focus~.custom-control-label::before {
 		box-shadow: rem(0 3px 6px) #00000029;
 	}
 
-	.custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
+	.custom-control-input:focus:not(:checked)~.custom-control-label::before {
 		border-color: $gray-80;
 	}
 
-	.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+	.custom-control-input:not(:disabled):active~.custom-control-label::before {
 		background-color: transparent;
 	}
 
@@ -305,7 +302,7 @@ button:focus {
 		}
 	}
 
-	.custom-control-input:checked ~ .custom-control-label::before {
+	.custom-control-input:checked~.custom-control-label::before {
 		content: 'On';
 		background: $white 0% 0% no-repeat padding-box;
 		color: $gray-40;
@@ -314,7 +311,7 @@ button:focus {
 		transition: all 0.15s ease-in-out;
 	}
 
-	.custom-control-input:checked ~ .custom-control-label::after {
+	.custom-control-input:checked~.custom-control-label::after {
 		background-color: $tango;
 		transform: translateX(rem(40px));
 	}
@@ -431,13 +428,14 @@ button:focus {
 			box-shadow: none;
 			color: $white;
 
-			+ button {
+			+button {
 				margin-left: rem(24px);
 			}
 		}
 	}
 
 	&.table-sm {
+
 		th,
 		td {
 			&:first-child {
@@ -458,7 +456,7 @@ button:focus {
 
 			&.td-actions {
 				button {
-					+ button {
+					+button {
 						margin-left: rem(16px);
 					}
 				}
@@ -497,7 +495,7 @@ button:focus {
 		width: rem(248px);
 	}
 
-	> p {
+	>p {
 		color: $gray-40;
 		margin: rem(-64px 0 0 -40px);
 	}
@@ -553,27 +551,29 @@ button:focus {
 // Popover Counter
 .popover-counter {
 	border: 1px solid $gray-80;
+
 	.btn {
 		width: rem(40px);
 	}
 
-	&.bs-popover-top > .arrow::before,
-	&.bs-popover-auto[x-placement^='top'] > .arrow::before {
+	&.bs-popover-top>.arrow::before,
+	&.bs-popover-auto[x-placement^='top']>.arrow::before {
 		border-top-color: $gray-80;
 	}
 }
 
-.video-thumbnail-wrapper{
-	.img-video-thumbnail{
-		width:100%;
+.video-thumbnail-wrapper {
+	.img-video-thumbnail {
+		width: 100%;
 		// width: rem(937px);
 		height: rem(549px);
-		box-shadow: 0px 3px 16px rgba(0,0,0,0.6%);
-		border-radius:rem(36px)	;
+		box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.6%);
+		border-radius: rem(36px);
 	}
 }
+
 // Overlay CSS
-.overlay{
+.overlay {
 	position: fixed;
 	display: none;
 	width: 100%;
@@ -582,7 +582,19 @@ button:focus {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: rgba(0,0,0,0.28);
+	background-color: rgba(0, 0, 0, 0.28);
 	z-index: 3;
 	cursor: pointer;
+}
+
+// Modal Heading
+.modal-heading {
+	background-color: rgba(178, 218, 209, 0.22);
+	border-radius: 2.25rem 2.25rem 0 0;
+	height: 3rem;
+
+	.title {
+		font-size: 15px;
+		line-height: 20px;
+	}
 }
