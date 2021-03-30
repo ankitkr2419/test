@@ -65,7 +65,8 @@ const (
 	attached
 )
 
-var wrotePulses, executedPulses, aborted, paused, runInProgress, magnetState, timerInProgress, homed sync.Map
+var wrotePulses, executedPulses, aborted, paused, homed sync.Map
+var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 
 // variable map Registers to keep track of machine related variables.
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
@@ -83,6 +84,8 @@ func LoadUtils() {
 	runInProgress.Store("B", false)
 	timerInProgress.Store("A", false)
 	timerInProgress.Store("B", false)
+	heaterInProgress.Store("A", false)
+	heaterInProgress.Store("B", false)
 	magnetState.Store("A", detached)
 	magnetState.Store("B", detached)
 	homed.Store("A", false)

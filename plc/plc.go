@@ -2,7 +2,6 @@ package plc
 
 import (
 	"mylab/cpagent/db"
-	"time"
 )
 
 type Status int32
@@ -61,7 +60,7 @@ type DeckDriver interface {
 	DiscardBoxCleanup() (string, error)
 	RestoreDeck() (string, error)
 	UVLight(string) (string, error)
-	Heating(uint16, bool, time.Duration) (string, error)
+	Heating(heating db.Heating) (string, error)
 	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 	TipOperation(to db.TipOperation) (response string, err error)

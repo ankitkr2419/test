@@ -9,17 +9,17 @@ import (
 )
 
 type Heating struct {
-	ID          uuid.UUID     `json:"id" db:"id"`
-	Temperature float64       `json:"temperature" db:"temperature"`
-	FollowTemp  bool          `json:"follow_temp" db:"follow_temp"`
-	Duration    time.Duration `json:"duration" db:"duration"`
-	ProcessID   uuid.UUID     `json:"process_id" db:"process_id"`
-	CreatedAt   time.Time     `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at" db:"updated_at"`
+	ID          uuid.UUID `json:"id" db:"id"`
+	Temperature float64   `json:"temperature" db:"temperature"`
+	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
+	Duration    int64     `json:"duration" db:"duration"`
+	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }
 
 const (
-	getHeatingQuery = `SELECT * FROM heating where process_id = $1`
+	getHeatingQuery    = `SELECT * FROM heating where process_id = $1`
 	createHeatingQuery = `INSERT INTO heating (
 		temperature,
 		follow_temp,
