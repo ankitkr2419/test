@@ -40,7 +40,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 
 	// Add the recipe entry into the database for the given recipe name here
 	r := Recipe{
-		Name:               recipeName,
+		Name:               strings.ReplaceAll(recipeName, "_", " "),
 		Description:        "Covid Recipe",
 		Position1:          1,
 		Position2:          2,
