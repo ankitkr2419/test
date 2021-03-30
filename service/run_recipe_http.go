@@ -34,7 +34,6 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 			response, err = runRecipe(req.Context(), deps, deck, recipeID)
 			if err != nil {
 				deps.WsErrCh <- err
-				return "", err
 			}
 		default:
 			err = fmt.Errorf("Check your deck name")
