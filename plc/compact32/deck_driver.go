@@ -3,8 +3,9 @@ package compact32
 import (
 	"encoding/binary"
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"time"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
@@ -38,6 +39,19 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	}
 
 	logger.Infoln("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
+
+	//
+	// move the syringe module to rest position if the Motor Num is of deck
+	// and syringe tips are inside of deck positions.
+	//
+
+	if d.getSyringeModuleState() == InDeck && motorNum == K5_Deck {
+		response, err = d.SyringeRestPosition()
+		if err != nil {
+			logger.Errorln(err)
+			return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck. Error: %v", err)
+		}
+	}
 
 	// Switch OFF The motor
 
@@ -96,7 +110,6 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	} else if temp != ramp {
 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][204], ramp)
 	}
-
 
 	if err != nil {
 		logger.Errorln("error writing RAMP : ", err, d.name)

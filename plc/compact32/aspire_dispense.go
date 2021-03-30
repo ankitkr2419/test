@@ -36,6 +36,7 @@ variables: category, cartridgeType string,
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
   22. Dispense completely
+-----
   23. move syringe module up
   24. call syringe homing
 
@@ -437,34 +438,39 @@ skipDispenseCycles:
 	if err != nil {
 		return
 	}
-
 	//
-	//   23. move syringe module up
+	//   23. update syringe module state to in deck
 	//
-	deckAndMotor.Number = K9_Syringe_Module_LHRH
+	syringeModuleState.Store(d.name, InDeck)
 
-	if position, ok = consDistance["pickup_tip_up"]; !ok {
-		err = fmt.Errorf("pickup_tip_up doesn't exist for consumable distances")
+	return "ASPIRE and DISPENSE was successful", nil
+}
+
+func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
+	var distanceToTravel, position float64
+	var direction uint16
+	var ok bool
+
+	syringeModuleDeckAndMotor := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
+
+	if position, ok = consDistance["resting_position"]; !ok {
+		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	// Don't forget to add tipHeight for every tip we have currently attached
-	distanceToTravel = positions[deckAndMotor] + tipHeight - position
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	distanceToTravel = positions[syringeModuleDeckAndMotor] - position
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
+	pulses := uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
+
+	response, err = d.setupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
-		return
+		fmt.Println(err)
+		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
+	syringeModuleState.Store(d.name, OutDeck)
 
-	//
-	//    24.  call syringe homing
-	//
+	return
 
-	response, err = d.syringeHoming()
-	if err != nil {
-		return
-	}
-
-	return "ASPIRE and DISPENSE was successful", nil
 }
