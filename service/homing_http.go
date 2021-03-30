@@ -13,7 +13,8 @@ import (
 
 func homingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-
+		var response string
+		var err error
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
