@@ -7,22 +7,17 @@ import { operatorLoginFailed } from 'action-creators/operatorLoginModalActionCre
 
 export function* operatorLogin(actions){
 
-    // const { email, password, role } = actions.payload;
+    const { email, password, role } = actions.payload;
     const { successAction, failureAction } = operatorLoginModalActions;
+    
     try {
         yield call(callApi, {
             payload: {
-                //will be removed in future
                 body: {
-                    "username": "admin",
-                    "password": "admin",
-                    "role": "admin"
+                    "username": email,
+                    "password": password,
+                    "role": role
                 },
-                // body: {
-                //     "username": email,
-                //     "password": password,
-                //     "role": role
-                // },
                 reqPath: 'users/admin/validate',
                 method: HTTP_METHODS.POST,
                 successAction,

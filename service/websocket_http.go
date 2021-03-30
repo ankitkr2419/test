@@ -539,7 +539,7 @@ func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 		return
 	}
 
-	logger.WithField("data", msg).Info("Websocket send Data")
+	logger.WithField("data", monitorOpr).Info("Websocket send Data")
 	return
 }
 
@@ -562,7 +562,7 @@ func successOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 		return
 	}
 
-	logger.WithField("data", msg).Info("Websocket send Data")
+	logger.WithField("data", successOpr).Info("Websocket send Data")
 	return
 }
 

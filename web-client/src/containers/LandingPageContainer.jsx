@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import LandingScreenComponent from 'components/LandingScreen';
+import LandingScreenComponent from "components/LandingScreen";
 
 const LandingPageContainer = (props) => {
-	return <LandingScreenComponent/>;
+  return <LandingScreenComponent />;
 };
 
 LandingPageContainer.propTypes = {};

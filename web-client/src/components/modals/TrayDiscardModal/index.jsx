@@ -36,24 +36,27 @@ const TrayDiscardModal = (props) => {
 		{/* Tray Discard Modal */}
 		<Button color="secondary" onClick={toggleTrayDiscardModal} className="ml-2">Discard Tray</Button>
 				<Modal isOpen={trayDiscardModal} toggle={toggleTrayDiscardModal} centered size="md">
-				<ModalBody className="py-5 px-4">
-					<TrayDiscardSection className="gray-scale-box d-flex justify-content-center align-items-center">
-					<ButtonIcon
-						position="absolute"
-						placement="right"
-						top={16}
-						right={16}
-						size={36}
-						name="cross"
-						onClick={toggleTrayDiscardModal}
-						className="border-0"
+				<ModalBody className="p-0">
+				<div className="d-flex justify-content-center align-items-center modal-heading">
+						<Text className="mb-0 title font-weight-bold">Deck B</Text>
+						<ButtonIcon
+							position="absolute"
+							placement="right"
+							top={0}
+							right={16}
+							size={36}
+							name="cross"
+							onClick={toggleTrayDiscardModal}
+							className="border-0"
 						/>
-					<Center>
+					</div>
+					<TrayDiscardSection className="gray-scale-box d-flex justify-content-center align-items-center">
+					<Center className="mt-4">
 						<ImageIcon src={alertIcon} alt="alert icon not available" className='mb-4' />
-						<Text Tag="h5" size="18" className="text-center mx-5 mb-0">
+						<Text Tag="h5" size={18} className="text-center mx-5 mb-0">
 							Tray will be discarded from Machine!
 						</Text>
-						<Text Tag="h5" size="18" className="text-center mx-5 mb-4">
+						<Text Tag="h5" size={18} className="text-center mx-5 mb-4">
 							You can collect and empty the tray.
 						</Text>
 						<ImageIcon src={collectAndEmptyTrayImage} alt="" className='mb-4 mx-auto d-block' />

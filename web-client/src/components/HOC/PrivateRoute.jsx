@@ -11,7 +11,7 @@ const privateRoute = Component => (props) => {
 	} = loginReducer.toJS();
 
 	if (isUserLoggedIn === false) {
-		return <Redirect to="/login" />;
+		return <Redirect to="/splashscreen" />;
 	}
 
 	return (
