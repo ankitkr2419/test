@@ -30,19 +30,23 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "A", "B":
+			rw.WriteHeader(http.StatusOK)
 			response, err = runRecipe(req.Context(), deps, deck, recipeID)
+			if err != nil {
+				deps.WsErrCh <- err
+				return "", err
+			}
 		default:
 			err = fmt.Errorf("Check your deck name")
+			deps.WsErrCh <- err
 		}
 
 		// TODO: Handle error types
 		if err != nil {
-			fmt.Fprintf(rw, err.Error())
+			deps.WsErrCh <- err
 			fmt.Println(err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
-			rw.WriteHeader(http.StatusOK)
+			fmt.Println(response)
 		}
 	})
 }
@@ -106,7 +110,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			// TODO: Below ID is reference ID, so please change code accordingly
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(ad)
