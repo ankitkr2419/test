@@ -31,12 +31,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	var results []byte
 
-	//check if aborted
-	if d.isMachineInAbortedState() {
-		err = fmt.Errorf("Operation was ABORTED!")
-		return "", err
-	}
-
 	//validate that rpm 1 is definately set and futher
 	if shakerData.RPM1 == 0 || shakerData.Time1 == 0 {
 		if shakerData.RPM2 != 0 || shakerData.Time2 != 0 {
@@ -125,6 +119,12 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		}
 		d.setHeaterInProgress()
 
+	}
+
+	//check if aborted
+	if d.isMachineInAbortedState() {
+		err = fmt.Errorf("Operation was ABORTED!")
+		return "", err
 	}
 
 	//start shaker
