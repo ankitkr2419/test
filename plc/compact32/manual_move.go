@@ -53,6 +53,13 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
+	if d.isShakerInProgress() {
+		response, err = d.switchOffShaker()
+		if err != nil {
+			return
+		}
+	}
+
 	paused.Store(d.name, true)
 
 	return "Operation PAUSED Successfully", nil
@@ -93,6 +100,12 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 
 	if d.isHeaterInProgress() {
 		response, err = d.switchOnHeater()
+		if err != nil {
+			return
+		}
+	}
+	if d.isShakerInProgress() {
+		response, err = d.switchOnShaker()
 		if err != nil {
 			return
 		}
@@ -171,7 +184,6 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 	}
 	logger.Infoln("Wrote Switch OFF motor")
 	onReg.Store(d.name, OFF)
-
 
 	if temp := d.getPulseReg(); temp == highestUint16 {
 		err = fmt.Errorf("pulsesReg isn't loaded!")

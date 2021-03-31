@@ -101,19 +101,14 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	if shakerData.WithTemp {
 
-		switch {
-		case shakerData.FollowTemp:
-			ht := db.Heating{
-				Temperature: shakerData.Temperature,
-				FollowTemp:  shakerData.FollowTemp,
-				Duration:    0,
-			}
-			response, err = d.Heating(ht)
-
-		default:
-			response, err = d.switchOnHeater()
-
+		ht := db.Heating{
+			Temperature: shakerData.Temperature,
+			FollowTemp:  shakerData.FollowTemp,
+			Duration:    0,
 		}
+		response, err = d.Heating(ht)
+		d.switchOnHeater()
+
 		if err != nil {
 			return "", err
 		}
@@ -134,6 +129,9 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		return "", err
 	}
 
+	d.setShakerInProgress()
+	defer d.resetShakerInProgress()
+
 	// add delay of time1 duration
 	delay := db.Delay{
 		DelayTime: shakerData.Time1,
@@ -143,6 +141,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		fmt.Println("err adding delay: ", err)
 		return "", err
 	}
+
+	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "completed")
 
 	//set shaker value with rpm 2 if it exists
 	if shakerData.RPM2 != 0 {
