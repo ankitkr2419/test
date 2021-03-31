@@ -20,7 +20,7 @@ variables: category, cartridgeType string,
   6. store the destination_well position into destinationPosition variable; goto 9
   7. store the source_well position into sourcePosition variable
   8. store the shaker position into destinationPosition variable
-  9. setup the motor of syringe module to go up atleast 30mm above deck
+  9. setup the motor of syringe module to go up atleast 30mm above deck(not required)
   10. calculate the current position difference for deck;
    		if its positive then direction is 1(towards sensor) else 0(oppose sensor)
   11. move deck to match the sourcePosition with help of difference calculated
@@ -36,11 +36,6 @@ variables: category, cartridgeType string,
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
   22. Dispense completely
------
-  23. move syringe module up
-  24. call syringe homing
-
-
 ********/
 
 func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {
