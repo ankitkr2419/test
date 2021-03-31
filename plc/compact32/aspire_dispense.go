@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 /****ALGORITHM******
@@ -426,14 +428,10 @@ skipDispenseCycles:
 	//
 	// 22. Dispense completely
 	//
-	if (ad.DispenseVolume + ad.DispenseBlowVolume) < (ad.AspireAirVolume + ad.AspireVolume) {
-		err = fmt.Errorf("Can't dispense partially!")
-		return
-	}
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.DispenseVolume + ad.DispenseBlowVolume)))
-	pulses += reverseAfterNonCutPulses
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	logger.Infoln("Syringe is moving down until sensor not cut")
+	// TODO:  Note down Bio team's required speed
+	response, err = d.setupMotor(homingFastSpeed, initialSensorCutSyringePulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
