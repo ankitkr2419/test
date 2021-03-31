@@ -89,19 +89,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 	for i, p := range processes {
 
-		wsData := recipeProgress{
-			Deck:              deck,
-			RecipeID:          recipeID,
-			TotalStepInRecipe: len(processes),
-			CurrentStep:       i + 1,
-		}
-		wsDataJSON, err := json.Marshal(wsData)
-		if err != nil {
-			return "", err
-		}
-		wsMsg := fmt.Sprintf("progress_recipe_%v", string(wsDataJSON))
-
-		deps.WsMsgCh <- wsMsg
+		sendWSData(deps, deck, recipeID, len(processes), i)
 
 		switch p.Type {
 		case "AspireDispense":
@@ -258,4 +246,24 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	}
 	err = fmt.Errorf("position is invalid to pickup the tip")
 	return 0, err
+}
+
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
+
+	// percentage calculation for each process
+	percentage := float64((currentStep * 100) / processLength)
+
+	wsData := recipeProgress{
+		Deck:       deck,
+		RecipeID:   recipeID,
+		Percentage: percentage,
+	}
+	wsDataJSON, err := json.Marshal(wsData)
+	if err != nil {
+		return "", err
+	}
+	wsMsg := fmt.Sprintf("progress_recipe_%v", string(wsDataJSON))
+
+	deps.WsMsgCh <- wsMsg
+	return
 }
