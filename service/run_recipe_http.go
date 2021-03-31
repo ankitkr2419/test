@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
@@ -29,19 +30,22 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "A", "B":
+			rw.WriteHeader(http.StatusOK)
 			response, err = runRecipe(req.Context(), deps, deck, recipeID)
+			if err != nil {
+				deps.WsErrCh <- err
+			}
 		default:
 			err = fmt.Errorf("Check your deck name")
+			deps.WsErrCh <- err
 		}
 
 		// TODO: Handle error types
 		if err != nil {
-			fmt.Fprintf(rw, err.Error())
+			deps.WsErrCh <- err
 			fmt.Println(err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
-			rw.WriteHeader(http.StatusOK)
+			fmt.Println(response)
 		}
 	})
 }
@@ -83,7 +87,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	//  This field will be set when a tip is picked up
 	//  We will get its id from recipe and its details from tipsTubes
 
-	for _, p := range processes {
+	for i, p := range processes {
+
+		// TODO : percentage calculation from inside the process.
+		sendWSData(deps, deck, recipeID, len(processes), i)
+
 		switch p.Type {
 		case "AspireDispense":
 			// Get the AspireDispense process
@@ -104,6 +112,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			if err != nil {
 				return "", err
 			}
+
 		case "Heating":
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
 			fmt.Printf("heat object %v", heat)
@@ -206,10 +215,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			}
 
 		}
+
+		deps.WsMsgCh <- fmt.Sprintf("progress_recipe_completed process %d", i)
 		// TODO: Instead of switch case, try using reflect
 		// Pass context and ID here
 		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
+
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_ recipeid %v", recipeID)
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()
@@ -234,4 +247,24 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	}
 	err = fmt.Errorf("position is invalid to pickup the tip")
 	return 0, err
+}
+
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
+
+	// percentage calculation for each process
+	percentage := float64((currentStep * 100) / processLength)
+
+	wsData := recipeProgress{
+		Deck:       deck,
+		RecipeID:   recipeID,
+		Percentage: percentage,
+	}
+	wsDataJSON, err := json.Marshal(wsData)
+	if err != nil {
+		return "", err
+	}
+	wsMsg := fmt.Sprintf("progress_recipe_%v", string(wsDataJSON))
+
+	deps.WsMsgCh <- wsMsg
+	return
 }

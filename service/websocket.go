@@ -71,6 +71,12 @@ type oprSuccess struct {
 }
 
 type oprProgress struct {
-	Type string `json:"type"`
-	Data string `json:"data"`
+	Type string      `json:"type"`
+	Data interface{} `json:"data"`
+}
+
+type recipeProgress struct {
+	Deck       string    `json:"deck"`
+	RecipeID   uuid.UUID `json:"recipe_id"`
+	Percentage float64   `json:"percentage"`
 }
