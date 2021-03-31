@@ -187,7 +187,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	//
 	// 9. setup the motor of syringe module to go up atleast 30mm above deck
 	//
-	// this step is not required because if the dispencing and aspiring wells are same then it does not
+	// this step is not required because if the dispencing and aspiring wells are same
 	// the syringe does not need to come above the deck.
 	// and if it is aspiring from some other well then it is handled in the below code.
 
