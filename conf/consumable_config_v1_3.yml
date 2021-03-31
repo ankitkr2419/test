@@ -175,6 +175,10 @@ ConsumableDistance:
     name: "resting_position"
     distance: 5
     description: "syringe module goes here for resting by default"
+  - id: 309
+    name: "syringe_parking"
+    distance: 90
+    description: "syringe module parks here after tip discard"
   - id: 310
     name: "deck_base"
     distance: 117
