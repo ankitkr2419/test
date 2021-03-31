@@ -57,7 +57,19 @@ func (us *ExtractionSimulator) Resume() (string, error)            { return "SUC
 func (us *ExtractionSimulator) Abort() (string, error)             { return "SUCCESS", nil }
 func (us *ExtractionSimulator) DiscardBoxCleanup() (string, error) { return "SUCCESS", nil }
 func (us *ExtractionSimulator) RestoreDeck() (string, error)       { return "SUCCESS", nil }
-func (us *ExtractionSimulator) UVLight(string) (string, error)     { return "SUCCESS", nil }
+func (us *ExtractionSimulator) UVLight(string) (string, error) {
+
+	for i := 0; i < 10; i++ {
+		time.Sleep(time.Second * 1)
+		// the format for message in every operation must be in the format:
+		// progress/success_OPERATION NAME_OPERATION MESSAGE
+		us.WsMsgCh <- fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", us.name)
+	}
+	us.WsMsgCh <- fmt.Sprintf("success_uvLight_uv Light Completed Successfully %v", us.name)
+	return "SUCCESS", nil
+
+	return "SUCCESS", nil
+}
 func (us *ExtractionSimulator) Heating(db.Heating) (string, error) {
 	return "SUCCESS", nil
 }
