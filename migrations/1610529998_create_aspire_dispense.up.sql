@@ -20,6 +20,5 @@ CREATE TABLE IF NOT EXISTS aspire_dispense(
  process_id uuid UNIQUE NOT NULL,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- FOREIGN KEY (process_id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE,
- CHECK( (dispense_volume + dispense_blow_volume) >= (aspire_air_volume + aspire_volume) ) );
+ FOREIGN KEY (process_id) REFERENCES processes(id) ON UPDATE CASCADE ON DELETE CASCADE);
  
