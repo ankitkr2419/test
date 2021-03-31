@@ -89,7 +89,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 	for i, p := range processes {
 
-		// TODO : add percentage calculation from inside the process.
+		// TODO : percentage calculation from inside the process.
 		sendWSData(deps, deck, recipeID, len(processes), i)
 
 		switch p.Type {
