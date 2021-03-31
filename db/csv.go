@@ -250,14 +250,6 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 		logger.Errorln(err, record[10])
 		return
 	}
-	if a.DispenseVolume, err = strconv.ParseFloat(record[11], 64); err != nil {
-		logger.Errorln(err, record[11])
-		return
-	}
-	if a.DispenseBlowVolume, err = strconv.ParseFloat(record[12], 64); err != nil {
-		logger.Errorln(err, record[12])
-		return
-	}
 	if a.DestinationPosition, err = strconv.ParseInt(record[13], 10, 64); err != nil {
 		logger.Errorln(err, record[13])
 		return
