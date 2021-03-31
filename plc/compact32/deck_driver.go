@@ -49,8 +49,9 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		response, err = d.SyringeRestPosition()
 		if err != nil {
 			logger.Errorln(err)
-			return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck. Error: %v", err)
+			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
 		}
+
 	}
 
 	// Switch OFF The motor

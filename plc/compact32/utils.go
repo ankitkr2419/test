@@ -95,7 +95,7 @@ func LoadUtils() {
 	magnetState.Store("A", detached)
 	magnetState.Store("B", detached)
 	syringeModuleState.Store("A", OutDeck)
-	syringeModuleState.Store("B", InDeck)
+	syringeModuleState.Store("B", OutDeck)
 
 	homed.Store("A", false)
 	homed.Store("B", false)
