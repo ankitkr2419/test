@@ -255,7 +255,7 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 	// NOTE: Since version 1.2.1 we have deprecated CSV support for 
 	// dispense volume and dispense air volume
 	if a.DestinationPosition, err = strconv.ParseInt(record[11], 10, 64); err != nil {
-		logger.Errorln(err, record[13])
+		logger.Errorln(err, record[11])
 		return
 	}
 
