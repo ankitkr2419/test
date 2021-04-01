@@ -46,6 +46,13 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
+	if d.isUVLightInProgress() {
+		response, err = d.switchOffUVLight()
+		if err != nil {
+			return "", err
+		}
+	}
+
 	if d.isHeaterInProgress() {
 		response, err = d.switchOffHeater()
 		if err != nil {
@@ -91,13 +98,19 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		}
 	}
 
-	if d.isHeaterInProgress() {
+	if !d.isHeaterInProgress() {
 		response, err = d.switchOnHeater()
 		if err != nil {
 			return
 		}
 	}
 
+	if !d.isUVLightInProgress() {
+		response, err = d.switchOnUVLight()
+		if err != nil {
+			return "", err
+		}
+	}
 	paused.Store(d.name, false)
 
 	return "Operation RESUMED Successfully.", nil
@@ -163,7 +176,6 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 	}
 	logger.Infoln("Wrote Switch OFF motor")
 	onReg.Store(d.name, OFF)
-
 
 	if temp := d.getPulseReg(); temp == highestUint16 {
 		err = fmt.Errorf("pulsesReg isn't loaded!")

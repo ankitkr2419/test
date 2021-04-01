@@ -86,6 +86,15 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 	return false
 }
 
+func (d *Compact32Deck) isUVLightInProgress() bool {
+	if temp, ok := uvLightInProgress.Load(d.name); !ok {
+		logger.Errorln("heaterInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
 func (d *Compact32Deck) getMagnetState() int {
 	if temp, ok := magnetState.Load(d.name); !ok {
 		logger.Errorln("magnet State isn't loaded!")
