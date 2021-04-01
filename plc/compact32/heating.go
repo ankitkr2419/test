@@ -181,7 +181,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64)
 			}
 			results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
 			if err != nil {
-				logger.Errorfmt.Printf("inside not follow up")ln("Error failed to read shaker ", shakerNo, "temperature", err)
+				logger.Errorln("Error failed to read shaker ", shakerNo, "temperature", err)
 				return "", err
 			}
 			setTemp = float64(binary.BigEndian.Uint16(results)) / 10
