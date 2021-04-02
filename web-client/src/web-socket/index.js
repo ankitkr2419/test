@@ -15,6 +15,11 @@ import {
   homingActionInCompleted,
 } from "action-creators/homingActionCreators";
 
+import {
+  runRecipeInProgress,
+  runRecipeInCompleted
+} from "action-creators/recipeActionCreators";
+
 let webSocket = null;
 export const connectSocket = (dispatch) => {
   webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`);
@@ -43,6 +48,12 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
           dispatch(homingActionInCompleted(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.runRecipeProgress:
+          dispatch(runRecipeInProgress(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.runRecipeSuccess:
+          dispatch(runRecipeInCompleted(data));
           break;
         // case SOCKET_MESSAGE_TYPE.failure:
         // 	dispatch(experimentedFailed(data));

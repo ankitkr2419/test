@@ -34,6 +34,8 @@ export const SOCKET_MESSAGE_TYPE = {
   temperatureData: "Temperature",
   homingProgress: "PROGRESS_HOMING",
   homingSuccess: "SUCCESS_HOMING",
+  runRecipeProgress: "RUN_RECIPE_PROGRESS",
+  runRecipeSuccess: "RUN_RECIPE_SUCCESS"
 };
 
 export const EXPERIMENT_STATUS = {
