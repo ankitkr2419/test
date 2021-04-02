@@ -14,8 +14,6 @@ CREATE TABLE IF NOT EXISTS aspire_dispense(
  dispense_height float,
  dispense_mixing_volume float,
  dispense_no_of_cycles int,
- dispense_volume float,
- dispense_blow_volume float,
  destination_position int,
  process_id uuid UNIQUE NOT NULL,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
