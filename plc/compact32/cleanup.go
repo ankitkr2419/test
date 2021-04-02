@@ -150,6 +150,8 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 		d.WsErrCh <- err
 		return
 	}
+	d.setUVLightInProgress()
+	defer d.resetUVLightInProgress()
 
 	//
 	// 3. Add delay
