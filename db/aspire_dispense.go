@@ -41,11 +41,9 @@ const (
 						dispense_height,
 						dispense_mixing_volume,
 						dispense_no_of_cycles,
-						dispense_volume,
-						dispense_blow_volume,
 						destination_position,
 						process_id)
-						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`
+						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`
 	updateAspireDispenseQuery = `UPDATE aspire_dispense SET (
 						category,
 						cartridge_type,
@@ -58,11 +56,9 @@ const (
 						dispense_height,
 						dispense_mixing_volume,
 						dispense_no_of_cycles,
-						dispense_volume,
-						dispense_blow_volume,
 						destination_position,
 						updated_at) = 
-						($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) WHERE process_id = $16`
+						($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE process_id = $14`
 )
 
 type AspireDispense struct {
@@ -78,8 +74,6 @@ type AspireDispense struct {
 	DispenseHeight       float64       `db:"dispense_height" json:"dispense_height"`
 	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
 	DispenseNoOfCycles   int64         `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
-	DispenseVolume       float64       `db:"dispense_volume" json:"dispense_volume"`
-	DispenseBlowVolume   float64       `db:"dispense_blow_volume" json:"dispense_blow_volume"`
 	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
 	ProcessID            uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
@@ -119,8 +113,6 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		ad.DispenseHeight,
 		ad.DispenseMixingVolume,
 		ad.DispenseNoOfCycles,
-		ad.DispenseVolume,
-		ad.DispenseBlowVolume,
 		ad.DestinationPosition,
 		ad.ProcessID,
 	).Scan(&lastInsertID)
@@ -161,8 +153,6 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 		ad.DispenseHeight,
 		ad.DispenseMixingVolume,
 		ad.DispenseNoOfCycles,
-		ad.DispenseVolume,
-		ad.DispenseBlowVolume,
 		ad.DestinationPosition,
 		time.Now(),
 		ad.ID,
