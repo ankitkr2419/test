@@ -12,7 +12,7 @@ import (
 // TODO: check for height and volumes constraint at insertion process itself
 variables: category, cartridgeType string,
 			cartridgeID, type, source_well, destination_well, aspire_cycles, dispense_cycles int64,
-			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64
+			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol float64
 
   1. Check the category of operation
   2. if category is well_to_well then goto 3 else if category is shaker_to_well then goto 5  else 7
