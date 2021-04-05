@@ -98,14 +98,14 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		}
 	}
 
-	if !d.isHeaterInProgress() {
+	if d.isHeaterInProgress() {
 		response, err = d.switchOnHeater()
 		if err != nil {
 			return
 		}
 	}
 
-	if !d.isUVLightInProgress() {
+	if d.isUVLightInProgress() {
 		response, err = d.switchOnUVLight()
 		if err != nil {
 			return "", err
