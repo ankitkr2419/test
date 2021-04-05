@@ -22,6 +22,17 @@ import {
 } from "action-creators/recipeActionCreators";
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 
+const RecipeListing = styled.div`
+  .landing-content{
+    padding: 1.25rem 4.5rem 0.875rem 4.5rem;
+    &::after{
+      height:9.125rem;
+    }
+    .recipe-listing-cards{
+      height:30.75rem;
+    }
+  }
+`;
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
 `;
@@ -30,7 +41,6 @@ const HeadingTitle = styled.label`
   font-size: 1.25rem;
   line-height: 1.438rem;
 `;
-
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
 
@@ -162,7 +172,7 @@ const RecipeListingComponent = (props) => {
   };
 
   return (
-    <div className="ml-content">
+    <RecipeListing>
       <div className="landing-content px-2">
         <RecipeFlowModal
           isOpen={isOpen}
@@ -204,7 +214,7 @@ const RecipeListingComponent = (props) => {
         {showProcess ? (
           <VideoCard />
         ) : (
-          <Card>
+          <Card className="recipe-listing-cards">
             <CardBody className="p-5">
               <Row>
                 {allRecipeData.length > 0 ? (
@@ -238,7 +248,7 @@ const RecipeListingComponent = (props) => {
         leftActionBtn={leftActionBtn}
         rightActionBtn={rightActionBtn}
       />
-    </div>
+    </RecipeListing>
   );
 };
 
