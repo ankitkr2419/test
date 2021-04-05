@@ -146,8 +146,8 @@ func startApp(plcName string, test bool) (err error) {
 
 	// PLC work in a completely separate go-routine!
 	if plcName == "compact32" {
-		driver = compact32.NewCompact32Driver(websocketMsg, exit, test)
-		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, exit, test)
+		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
+		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
 	} else {
 		driver = simulator.NewSimulator(exit)
@@ -280,7 +280,7 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 		select {
 		case err := <-deps.ExitCh:
 			logger.Errorln(err)
-			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, exit, false)
+			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
 			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
 			plcDeckMap := map[string]plc.DeckDriver{
 				"A": driverDeckA,
