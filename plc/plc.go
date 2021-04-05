@@ -49,6 +49,7 @@ type Driver interface {
 type DeckDriver interface {
 	NameOfDeck() string
 	Homing() (string, error)
+	DiscardTipAndHome(bool) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
 	IsMachineHomed() bool
 	IsRunInProgress() bool
