@@ -18,7 +18,7 @@ func discardAndHomeHandler(deps Dependencies) http.HandlerFunc {
 
 		discardTip := vars["discard"]
 
-		if discard, err = strconv.ParseBool(discardTip) ; err != nil {
+		if discard, err = strconv.ParseBool(discardTip); err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			rw.Write([]byte(`Invalid boolean value for tip discard option`))
 			err := fmt.Errorf("Discard option Should be boolean only")

@@ -222,7 +222,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
 
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_ recipeid %v", recipeID)
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeid %v", recipeID)
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()

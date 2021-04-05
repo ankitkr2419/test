@@ -67,7 +67,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	homed.Store(d.name, true)
 
 	fmt.Println("Homing Completed Successfully")
-	d.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", d.name)
+	//d.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", d.name)
 
 	return "HOMING SUCCESS", nil
 }

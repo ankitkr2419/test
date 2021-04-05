@@ -16,9 +16,9 @@ func (d *Compact32Deck) TipOperation(to db.TipOperation) (response string, err e
 
 	switch to.Type {
 	case db.PickupTip:
-		response, err = d.TipPickup(to.Position)
+		response, err = d.tipPickup(to.Position)
 	case db.DiscardTip:
-		response, err = d.TipDiscard()
+		response, err = d.tipDiscard()
 	}
 	if err != nil {
 		fmt.Println(err)
@@ -38,7 +38,7 @@ func (d *Compact32Deck) TipOperation(to db.TipOperation) (response string, err e
 
 ********/
 
-func (d *Compact32Deck) TipPickup(pos int64) (response string, err error) {
+func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	// **************
 	// Tip PickUp	*
@@ -204,7 +204,7 @@ func (d *Compact32Deck) TipPickup(pos int64) (response string, err error) {
 */
 
 // TODO: Currently only discarding at Discard box so avoiding at_pickup_passing condition
-func (d *Compact32Deck) TipDiscard() (response string, err error) {
+func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	/*
 	 ************* *
