@@ -22,23 +22,24 @@ import {
 } from "action-creators/recipeActionCreators";
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 import PaginationBox from "shared-components/PaginationBox";
+import TipDiscardModal from "components/modals/TipDiscardModal";
 
 const RecipeListing = styled.div`
-  .landing-content{
+  .landing-content {
     padding: 1.25rem 4.5rem 0.875rem 4.5rem;
-    &::after{
-      height:9.125rem;
+    &::after {
+      height: 9.125rem;
     }
-    .recipe-listing-cards{
-      height:30.75rem;
+    .recipe-listing-cards {
+      height: 30.75rem;
     }
   }
 `;
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
-  .icon-download-1{
-    font-size:18px;
-    color:#3C3C3C;
+  .icon-download-1 {
+    font-size: 18px;
+    color: #3c3c3c;
   }
 `;
 
@@ -69,14 +70,15 @@ const RecipeListingComponent = (props) => {
   } = recipeActionReducer;
 
   const [confirmationModal, setConfirmationModal] = useState(false);
+  const [tipDiscardModal, setTipDiscardModal] = useState(false);
   const [recipeData, setRecipeData] = useState({});
   const [progressPercentComplete, setProgressPercentComplete] = useState(0);
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = (recipeId, recipeName, processCount) => {
-    // const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
+    const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
     const data = {
-      recipeId: recipeId,
+      recipeId: tempRecipeId, //recipeId,
       recipeName: recipeName,
       processCount: processCount,
     };
@@ -94,7 +96,8 @@ const RecipeListingComponent = (props) => {
     //Do not change '===';
     if (abortRecipeError === false && confirmationModal) {
       setConfirmationModal(false);
-      setShowProcess(false);
+      setTipDiscardModal(true);
+      // setShowProcess(false);
     }
 
     if (
@@ -150,6 +153,11 @@ const RecipeListingComponent = (props) => {
     dispatch(abortRecipeInitiated({ deckName: name }));
   };
 
+  const toggleTipDiscardModal = (tipDiscard) => {
+    console.log(`tipDiscard: ${tipDiscard}`);
+    setTipDiscardModal(!tipDiscardModal);
+  };
+
   const getLeftActionBtnHandler = () => {
     switch (leftActionBtn) {
       case DECKCARD_BTN.text.run:
@@ -186,6 +194,12 @@ const RecipeListingComponent = (props) => {
           recipeData={recipeData}
         />
 
+        <TipDiscardModal
+          isOpen={tipDiscardModal}
+          handleSuccessBtn={toggleTipDiscardModal}
+          deckName={deckName}
+        />
+
         <MlModal
           isOpen={confirmationModal}
           textHead={deckName}
@@ -207,7 +221,11 @@ const RecipeListingComponent = (props) => {
             </HeadingTitle>
           </div>
           <div className="d-flex ml-auto">
-            <ButtonIcon name="download-1" size={28} className="bg-white border-primary" />
+            <ButtonIcon
+              name="download-1"
+              size={28}
+              className="bg-white border-primary"
+            />
             <Button color="secondary" className="ml-2 border-primary">
               {" "}
               Clean Up
