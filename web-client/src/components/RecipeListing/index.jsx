@@ -113,8 +113,6 @@ const RecipeListingComponent = (props) => {
     } else if (tipDiscardHomingError === true) {
       //show toast error msg for tip discard and homing error
       console.log("Error in tip discard and homing: ", tipDiscardServerErrors);
-      setTipDiscardModal(false);
-      setRedirect(true);
     }
 
     if (abortRecipeError === false) {
