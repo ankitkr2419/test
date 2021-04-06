@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Redirect } from "react-router-dom";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
 import { Icon, MlModal, VideoCard, ButtonIcon } from "shared-components";
@@ -20,6 +21,10 @@ import {
   resumeRecipeReset,
   abortRecipeReset,
 } from "action-creators/recipeActionCreators";
+import {
+  discardTipAndHomingActionInitiated,
+  discardTipAndHomingActionReset,
+} from "action-creators/homingActionCreators";
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 import PaginationBox from "shared-components/PaginationBox";
 import TipDiscardModal from "components/modals/TipDiscardModal";
@@ -52,6 +57,13 @@ const RecipeListingComponent = (props) => {
 
   const dispatch = useDispatch();
 
+  const discardTipAndHomingReducer = useSelector(
+    (state) => state.discardTipAndHomingReducer
+  );
+  const { error, serverErrors } = discardTipAndHomingReducer;
+  const tipDiscardHomingError = error;
+  const tipDiscardServerErrors = serverErrors;
+
   const operatorLoginModalReducer = useSelector(
     (state) => state.operatorLoginModalReducer
   );
@@ -69,6 +81,7 @@ const RecipeListingComponent = (props) => {
     // isLoading,
   } = recipeActionReducer;
 
+  const [redirect, setRedirect] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState(false);
   const [tipDiscardModal, setTipDiscardModal] = useState(false);
   const [recipeData, setRecipeData] = useState({});
@@ -92,12 +105,19 @@ const RecipeListingComponent = (props) => {
     setIsOpen(!isOpen);
   };
 
+  //Do not change '===';
   useEffect(() => {
-    //Do not change '===';
-    if (abortRecipeError === false && confirmationModal) {
+    if (tipDiscardHomingError === false) {
+      setTipDiscardModal(false);
+      setRedirect(true);
+    } else if (tipDiscardHomingError === true) {
+      //show toast error msg for tip discard and homing error
+      console.log("Error in tip discard and homing: ", tipDiscardServerErrors);
+    }
+
+    if (abortRecipeError === false) {
       setConfirmationModal(false);
       setTipDiscardModal(true);
-      // setShowProcess(false);
     }
 
     if (
@@ -109,11 +129,14 @@ const RecipeListingComponent = (props) => {
       //show toast with error msg
     }
 
+    dispatch(discardTipAndHomingActionReset());
     dispatch(abortRecipeReset());
     dispatch(runRecipeReset());
     dispatch(resumeRecipeReset());
     dispatch(pauseRecipeReset());
   }, [
+    tipDiscardServerErrors,
+    tipDiscardHomingError,
     runRecipeError,
     pauseRecipeError,
     resumeRecipeError,
@@ -153,9 +176,14 @@ const RecipeListingComponent = (props) => {
     dispatch(abortRecipeInitiated({ deckName: name }));
   };
 
-  const toggleTipDiscardModal = (tipDiscard) => {
-    console.log(`tipDiscard: ${tipDiscard}`);
-    setTipDiscardModal(!tipDiscardModal);
+  const toggleTipDiscardModal = (discardTip) => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(
+      discardTipAndHomingActionInitiated({
+        deckName: name,
+        discardTip: discardTip,
+      })
+    );
   };
 
   const getLeftActionBtnHandler = () => {
@@ -184,7 +212,9 @@ const RecipeListingComponent = (props) => {
     }
   };
 
-  return (
+  return redirect ? (
+    <Redirect to="/landing" />
+  ) : (
     <RecipeListing>
       <div className="landing-content px-2">
         <RecipeFlowModal

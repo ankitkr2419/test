@@ -60,6 +60,7 @@ export const API_ENDPOINTS = {
   discardDeck: "discard-box/cleanup",
   restoreDeck: "restore-deck",
   recipeListing: "recipes",
+  discardTipAndHoming: "discard-tip-and-home",
 };
 
 export const MODAL_MESSAGE = {
@@ -80,22 +81,22 @@ export const MODAL_BTN = {
 };
 
 export const DECKCARD_BTN = {
-	text: {
-		run: "RUN",
-		abort: "ABORT",
-		cancel: "CANCEL",
-		pause: "PAUSE",
-		done: "DONE",
-		resume: "RESUME",
-	},
-	icon: {
-		run: "play",
-		abort: "abort",
-		cancel: "cancel",
-		pause: "pause",
-		done: "done",
-		resume: "resume",
-	}
+  text: {
+    run: "RUN",
+    abort: "ABORT",
+    cancel: "CANCEL",
+    pause: "PAUSE",
+    done: "DONE",
+    resume: "RESUME",
+  },
+  icon: {
+    run: "play",
+    abort: "abort",
+    cancel: "cancel",
+    pause: "pause",
+    done: "done",
+    resume: "resume",
+  },
 };
 
 export const DECKNAME = {

@@ -36,7 +36,7 @@ import { socketReducer } from 'reducers/socketReducer';
 import { modalReducer } from 'reducers/modalReducer';
 import { temperatureGraphReducer } from 'reducers/temperatureGraphReducer';
 import { operatorLoginModalReducer } from 'reducers/operatorLoginModalReducer';
-import { homingReducer } from "reducers/homingReducer";
+import { homingReducer, discardTipAndHomingReducer } from "reducers/homingReducer";
 import { recipeActionReducer } from "reducers/recipeActionReducer";
 import { restoreDeckReducer } from "reducers/restoreDeckReducer";
 import { discardDeckReducer } from "reducers/discardDeckReducer";
@@ -75,6 +75,7 @@ const rootReducer = combineReducers({
 	recipeActionReducer,
 	restoreDeckReducer,
 	discardDeckReducer,
+	discardTipAndHomingReducer,
 });
 
 export default rootReducer;
