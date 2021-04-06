@@ -16,7 +16,7 @@ const LandingScreenComponent = () => {
   const { isHomingActionCompleted } = homingReducer;
 
   const homingConfirmation = () => {
-    // dispatch(homingActionInitiated());
+    dispatch(homingActionInitiated());
     setHomingStatus(!homingStatus);
   };
 

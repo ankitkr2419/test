@@ -20,6 +20,13 @@ import {
   runRecipeInCompleted
 } from "action-creators/recipeActionCreators";
 
+import {
+  cleanUpActionInProgress,
+  cleanUpActionInCompleted
+} from "action-creators/cleanUpActionCreators";
+
+import { discardTipInProgress, discardTipInCompleted } from "action-creators/discardDeckActionCreators";
+
 let webSocket = null;
 export const connectSocket = (dispatch) => {
   webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`);
@@ -54,6 +61,18 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeSuccess:
           dispatch(runRecipeInCompleted(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.uvLightProgress:
+          dispatch(cleanUpActionInProgress(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.uvLightSuccess:
+          dispatch(cleanUpActionInCompleted(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.discardTipProgress:
+          dispatch(discardTipInProgress(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.discardTipSuccess:
+          dispatch(discardTipInCompleted(data));
           break;
         // case SOCKET_MESSAGE_TYPE.failure:
         // 	dispatch(experimentedFailed(data));

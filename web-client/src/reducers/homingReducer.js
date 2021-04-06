@@ -5,6 +5,8 @@ export const initialState = {
   homingData: {},
   serverErrors: {},
   isHomingActionCompleted: false,
+  homingActionInProgress: {},
+  homingActionInCompleted: {}
 };
 
 export const homingReducer = (state = initialState, action = {}) => {

@@ -23,7 +23,9 @@ export const initialState = {
   leftActionBtn: DECKCARD_BTN.text.run,
   rightActionBtn: DECKCARD_BTN.text.cancel,
   isRunRecipeCompleted: false,
-  isResumeRecipeCompleted: false
+  isResumeRecipeCompleted: false,
+  runRecipeInCompleted: {},
+  runRecipeInProgress: {}
 };
 
 export const recipeActionReducer = (state = initialState, action = {}) => {

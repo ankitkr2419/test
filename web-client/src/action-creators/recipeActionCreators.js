@@ -34,12 +34,16 @@ export const runRecipeReset = () => ({
 
 export const runRecipeInProgress = (runRecipeInProgress) => ({
   type: runRecipeAction.runRecipeInProgress,
-  payload: runRecipeInProgress,
+  payload: {
+    runRecipeInProgress
+  }
 });
 
 export const runRecipeInCompleted = (runRecipeInCompleted) => ({
   type: runRecipeAction.runRecipeInCompleted,
-  payload: runRecipeInCompleted
+  payload: {
+    runRecipeInCompleted
+  }
 });
 
 export const pauseRecipeInitiated = (params) => ({

@@ -34,8 +34,12 @@ export const SOCKET_MESSAGE_TYPE = {
   temperatureData: "Temperature",
   homingProgress: "PROGRESS_HOMING",
   homingSuccess: "SUCCESS_HOMING",
-  runRecipeProgress: "RUN_RECIPE_PROGRESS",
-  runRecipeSuccess: "RUN_RECIPE_SUCCESS"
+  runRecipeProgress: "PROGRESS_RECIPE",
+  runRecipeSuccess: "SUCCESS_RECIPE",
+  uvLightProgress: "PROGRESS_UVLIGHT",
+  uvLightSuccess: "SUCCESS_UVLIGHT",
+  discardTipProgress: "DISCARD_TIP_PROGRESS",
+  discardTipSuccess: "DISCARD_TIP_SUCCESS"
 };
 
 export const EXPERIMENT_STATUS = {
@@ -62,6 +66,7 @@ export const API_ENDPOINTS = {
   discardDeck: "discard-box/cleanup",
   restoreDeck: "restore-deck",
   recipeListing: "recipes",
+  cleanUp: "uv"
 };
 
 export const MODAL_MESSAGE = {
