@@ -84,23 +84,37 @@ func (us *ExtractionSimulator) UVLight(string) (string, error) {
 	return "SUCCESS", nil
 }
 func (us *ExtractionSimulator) Heating(db.Heating) (string, error) {
+	time.Sleep(time.Second * 1)
+
 	return "SUCCESS", nil
 }
 func (us *ExtractionSimulator) AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {
+	time.Sleep(time.Second * 1)
+
 	return "SUCCESS", nil
 }
 func (us *ExtractionSimulator) TipDocking(td db.TipDock, cartridgeID int64) (response string, err error) {
 	return "SUCCESS", nil
 }
 func (us *ExtractionSimulator) TipOperation(to db.TipOperation) (response string, err error) {
+	time.Sleep(time.Second * 1)
+
 	return "SUCCESS", nil
 }
 
 func (us *ExtractionSimulator) AttachDetach(db.AttachDetach) (response string, err error) {
+	time.Sleep(time.Second * 1)
+
 	return "SUCCESS", nil
 }
-func (us *ExtractionSimulator) AddDelay(db.Delay) (string, error) { return "SUCCESS", nil }
+func (us *ExtractionSimulator) AddDelay(db.Delay) (string, error) {
+	time.Sleep(time.Second * 1)
+
+	return "SUCCESS", nil
+}
 func (us *ExtractionSimulator) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
+	time.Sleep(time.Second * 1)
+
 	return "SUCCESS", nil
 }
 func (us *ExtractionSimulator) DiscardTipAndHome(discard bool) (response string, err error) {
