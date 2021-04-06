@@ -163,7 +163,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			// Write executed pulses to Position
 		} else if d.isMachineInAbortedState() {
 			positions[deckAndNumber] += float64(temp) / float64(motors[deckAndNumber]["steps"])
-			logger.Infoln("pos", positions[deckAndNumber])
+			logger.Infoln("position after abortion: ", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
