@@ -32,6 +32,14 @@ func (d *Compact32Deck) resetHeaterInProgress() {
 	heaterInProgress.Store(d.name, false)
 }
 
+func (d *Compact32Deck) setUVLightInProgress() {
+	uvLightInProgress.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetUVLightInProgress() {
+	uvLightInProgress.Store(d.name, false)
+}
+
 func (d *Compact32Deck) IsMachineHomed() bool {
 	if temp, ok := homed.Load(d.name); !ok {
 		logger.Errorln("homed isn't loaded!")
@@ -79,6 +87,15 @@ func (d *Compact32Deck) isMachineInPausedState() bool {
 
 func (d *Compact32Deck) isHeaterInProgress() bool {
 	if temp, ok := heaterInProgress.Load(d.name); !ok {
+		logger.Errorln("heaterInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) isUVLightInProgress() bool {
+	if temp, ok := uvLightInProgress.Load(d.name); !ok {
 		logger.Errorln("heaterInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
