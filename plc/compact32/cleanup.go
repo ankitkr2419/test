@@ -3,11 +3,10 @@ package compact32
 import (
 	"fmt"
 	"math"
+	"mylab/cpagent/db"
 	"strconv"
 	"strings"
 	"time"
-
-	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
@@ -104,7 +103,7 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 ALGORITHM
 	1. 	Calculate UV Time in Seconds
 	1.  Start UV Light
-	2.  Start Timer
+	2.  Add delay
 	3.  Monitor for PAUSE and abort or completion
 	4.  If Paused then monitor for resumed
 */
@@ -128,8 +127,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
 
-	var totalTime, timeElapsed, remainingTime int64
-	var t *time.Timer
+	var totalTime int64
 
 	aborted.Store(d.name, false)
 	runInProgress.Store(d.name, true)
@@ -143,13 +141,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
 		return "", err
 	}
-	remainingTime = totalTime
 
-	// set the timer in progress variable to specify that it is not a motor operation.
-	d.setTimerInProgress()
-	defer d.resetTimerInProgress()
-
-skipToStartUVTimer:
 	//
 	// 2. Start UV Light
 	//
@@ -158,73 +150,21 @@ skipToStartUVTimer:
 		d.WsErrCh <- err
 		return
 	}
+	d.setUVLightInProgress()
+	defer d.resetUVLightInProgress()
 
 	//
-	// 3. start the timer
+	// 3. Add delay
 	//
-	t = time.NewTimer(time.Duration(remainingTime) * time.Second)
-	time1 := time.Now()
-	for {
-		//
-		//   Monitor for PAUSE and abort or completion
-		//
-		select {
-		// wait for the timer to finish
-		case n := <-t.C:
-			fmt.Printf("delay time over %v", n)
-			//  Switch off UV Light
-			response, err = d.switchOffUVLight()
-			if err != nil {
-				return
-			}
-			return "SUCCESS", nil
-		// or check for its pause/abort
-		default:
-			// delay of 300 ms to reduce CPU usage
-			time.Sleep(time.Millisecond * 300)
-			if d.isMachineInAbortedState() {
-				t.Stop()
-				err = fmt.Errorf("Operation was ABORTED!")
-				d.WsErrCh <- err
-				return "", err
 
-			}
+	delay := db.Delay{
+		DelayTime: totalTime,
+	}
 
-			// if paused then
-			if d.isMachineInPausedState() {
-				//  Switch off UV Light
-				response, err = d.switchOffUVLight()
-				if err != nil {
-					d.WsErrCh <- err
-
-					return
-				}
-				// stop the timer
-				t.Stop()
-				//note the time when paused was hit
-				time2 := time.Now()
-				// calculate the time elapsed in Seconds
-				timeElapsed += int64(time2.Sub(time1) / time.Second)
-				// calculate the remaining time
-				remainingTime = totalTime - timeElapsed
-
-				logger.Infof("remaining time %v and elapsed time %v", remainingTime, timeElapsed)
-				// if the remaining time is less than a sec then time is over
-				if remainingTime < 2 {
-					return "SUCCESS", nil
-				}
-				// else wait for the process to be resumed
-
-				//
-				// 4.  If Paused then monitor for resumed
-				//
-				response, err = d.waitUntilResumed(d.name)
-				if err != nil {
-					return
-				}
-				goto skipToStartUVTimer
-			}
-		}
+	response, err = d.AddDelay(delay)
+	if err != nil {
+		d.WsErrCh <- err
+		return
 	}
 
 	d.WsMsgCh <- fmt.Sprintf("success_uvlight_UV Light Completed Successfully %v", d.name)
