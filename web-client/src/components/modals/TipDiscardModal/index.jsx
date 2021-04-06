@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Icon } from "shared-components";
+import { Icon, Text } from "shared-components";
 import { Button, CheckBox, Modal, ModalBody } from "core-components";
-import { ButtonIcon, Text } from "shared-components";
 
 const TipDiscardModal = (props) => {
   const { isOpen, handleSuccessBtn, deckName } = props;
