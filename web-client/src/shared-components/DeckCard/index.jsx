@@ -86,11 +86,25 @@ const DeckCardBox = styled.div`
       position: absolute;
       right: 123px;
       top: 0;
+      .icon-pause{
+        font-size:0.938rem;
+      }
+      .icon-resume{
+        font-size:1.25rem;
+      }
     }
     .abort-button {
       position: absolute;
       right: 21px;
       top: 0;
+      .semi-circular-button{
+        border: 1px solid transparent;
+        background-color: #ffffff;
+        color:#3C3C3C;
+      }
+      .icon-cancel{
+        font-size:0.875rem;
+      }
     }
     .hour-label {
       background-color: #f5e3d3;

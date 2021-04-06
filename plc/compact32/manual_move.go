@@ -46,6 +46,13 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
+	if d.isUVLightInProgress() {
+		response, err = d.switchOffUVLight()
+		if err != nil {
+			return "", err
+		}
+	}
+
 	if d.isHeaterInProgress() {
 		response, err = d.switchOffHeater()
 		if err != nil {
@@ -111,6 +118,12 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		}
 	}
 
+	if d.isUVLightInProgress() {
+		response, err = d.switchOnUVLight()
+		if err != nil {
+			return "", err
+		}
+	}
 	paused.Store(d.name, false)
 
 	return "Operation RESUMED Successfully.", nil
