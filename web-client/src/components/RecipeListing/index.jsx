@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon, MlModal, VideoCard } from "shared-components";
+import { Icon, MlModal, VideoCard, ButtonIcon } from "shared-components";
 
 import styled from "styled-components";
 import AppFooter from "components/AppFooter";
@@ -21,16 +21,31 @@ import {
   abortRecipeReset,
 } from "action-creators/recipeActionCreators";
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import PaginationBox from "shared-components/PaginationBox";
 
+const RecipeListing = styled.div`
+  .landing-content{
+    padding: 1.25rem 4.5rem 0.875rem 4.5rem;
+    &::after{
+      height:9.125rem;
+    }
+    .recipe-listing-cards{
+      height:30.75rem;
+    }
+  }
+`;
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
+  .icon-download-1{
+    font-size:18px;
+    color:#3C3C3C;
+  }
 `;
 
 const HeadingTitle = styled.label`
   font-size: 1.25rem;
   line-height: 1.438rem;
 `;
-
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
 
@@ -162,7 +177,7 @@ const RecipeListingComponent = (props) => {
   };
 
   return (
-    <div className="ml-content">
+    <RecipeListing>
       <div className="landing-content px-2">
         <RecipeFlowModal
           isOpen={isOpen}
@@ -191,9 +206,9 @@ const RecipeListingComponent = (props) => {
               Select a Recipe for Deck B
             </HeadingTitle>
           </div>
-          <div className="">
-            <Icon name="download" size={19} className="text-white mr-3" />
-            <Button color="secondary" className="ml-auto">
+          <div className="d-flex ml-auto">
+            <ButtonIcon name="download-1" size={28} className="bg-white border-primary" />
+            <Button color="secondary" className="ml-2 border-primary">
               {" "}
               Clean Up
             </Button>
@@ -204,8 +219,11 @@ const RecipeListingComponent = (props) => {
         {showProcess ? (
           <VideoCard />
         ) : (
-          <Card>
+          <Card className="recipe-listing-cards">
             <CardBody className="p-5">
+              <div className="d-flex justify-content-end">
+                <PaginationBox />
+              </div>
               <Row>
                 {allRecipeData.length > 0 ? (
                   allRecipeData.map((value, index) => (
@@ -238,7 +256,7 @@ const RecipeListingComponent = (props) => {
         leftActionBtn={leftActionBtn}
         rightActionBtn={rightActionBtn}
       />
-    </div>
+    </RecipeListing>
   );
 };
 

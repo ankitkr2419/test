@@ -34,7 +34,7 @@ const TrayDiscardModal = (props) => {
 	return (
 		<>
 		{/* Tray Discard Modal */}
-		<Button color="secondary" onClick={toggleTrayDiscardModal} className="ml-2">Discard Tray</Button>
+		<Button color="secondary" onClick={toggleTrayDiscardModal} className="ml-2 border-primary">Discard Tray</Button>
 				<Modal isOpen={trayDiscardModal} toggle={toggleTrayDiscardModal} centered size="md">
 				<ModalBody className="p-0">
 				<div className="d-flex justify-content-center align-items-center modal-heading">
