@@ -14,13 +14,14 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 		return "", err
 	}
 
+	d.resetAborted()
+
 	if discard {
 		response, err = d.tipDiscard()
 		if err != nil {
 			logger.Errorln("error in discarding tip for deck --->", d.name)
 			return
 		}
-
 	}
 
 	//home
@@ -28,7 +29,6 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 	if err != nil {
 		logger.Errorln("error in homing for deck --->", d.name)
 		return
-
 	}
 
 	d.WsMsgCh <- "success_discardAndHomed_tips discarded successfully and machine homed"

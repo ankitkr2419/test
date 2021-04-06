@@ -32,6 +32,30 @@ func (d *Compact32Deck) resetHeaterInProgress() {
 	heaterInProgress.Store(d.name, false)
 }
 
+func (d *Compact32Deck) setAborted() {
+	aborted.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetAborted() {
+	aborted.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setPaused() {
+	paused.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetPaused() {
+	paused.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setHomed() {
+	homed.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetHomed() {
+	homed.Store(d.name, false)
+}
+
 func (d *Compact32Deck) IsMachineHomed() bool {
 	if temp, ok := homed.Load(d.name); !ok {
 		logger.Errorln("homed isn't loaded!")

@@ -13,8 +13,8 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 		return "", err
 	}
 
-	aborted.Store(d.name, false)
-	runInProgress.Store(d.name, true)
+	d.resetAborted()
+	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
 	response, err = d.setupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
@@ -53,7 +53,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
-	paused.Store(d.name, true)
+	d.setPaused()
 
 	return "Operation PAUSED Successfully", nil
 }
@@ -98,7 +98,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		}
 	}
 
-	paused.Store(d.name, false)
+	d.resetPaused()
 
 	return "Operation RESUMED Successfully.", nil
 }
@@ -128,9 +128,9 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return
 	}
 
-	aborted.Store(d.name, true)
+	d.setAborted()
 	wrotePulses.Store(d.name, uint16(0))
-	paused.Store(d.name, false)
+	d.resetPaused()
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
 	if d.IsRunInProgress() && !d.isTimerInProgress() {
@@ -141,8 +141,8 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		}
 	}
 
-	runInProgress.Store(d.name, false)
-	timerInProgress.Store(d.name, false)
+	d.ResetRunInProgress()
+	d.resetTimerInProgress()
 
 	return "ABORT SUCCESS", nil
 }
