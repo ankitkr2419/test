@@ -220,13 +220,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 		}
 
-		deps.WsMsgCh <- fmt.Sprintf("progress_recipe_completed process %d", i)
 		// TODO: Instead of switch case, try using reflect
 		// Pass context and ID here
 		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
 
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeid %v", recipeID)
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeId %v", recipeID)
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()
@@ -262,7 +261,10 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 		Deck:     deck,
 		Status:   "PROGRESS_RECIPE",
 		OperationDetails: plc.OperationDetails{
-			Message: fmt.Sprintf("successfully completed process %v for deck %v", currentStep, deck),
+			Message:        fmt.Sprintf("process %v for deck %v in progress", currentStep, deck),
+			CurrentStep:    currentStep,
+			RecipeID:       recipeID,
+			TotalProcesses: processLength,
 		},
 	}
 
