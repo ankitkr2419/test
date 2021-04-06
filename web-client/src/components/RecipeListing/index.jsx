@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
 import { Icon, MlModal, VideoCard, ButtonIcon } from "shared-components";
@@ -25,7 +25,7 @@ import {
   discardTipAndHomingActionInitiated,
   discardTipAndHomingActionReset,
 } from "action-creators/homingActionCreators";
-import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PaginationBox from "shared-components/PaginationBox";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 
@@ -105,6 +105,9 @@ const RecipeListingComponent = (props) => {
     setIsOpen(!isOpen);
   };
 
+
+  const history = useHistory();
+
   //Do not change '===';
   useEffect(() => {
     if (tipDiscardHomingError === false) {
@@ -113,6 +116,8 @@ const RecipeListingComponent = (props) => {
     } else if (tipDiscardHomingError === true) {
       //show toast error msg for tip discard and homing error
       console.log("Error in tip discard and homing: ", tipDiscardServerErrors);
+      setTipDiscardModal(false);
+      setRedirect(true);
     }
 
     if (abortRecipeError === false) {
@@ -212,9 +217,10 @@ const RecipeListingComponent = (props) => {
     }
   };
 
-  return redirect ? (
-    <Redirect to="/landing" />
-  ) : (
+  if (redirect) {
+    return <Redirect to="/landing" />;
+  }
+  return (
     <RecipeListing>
       <div className="landing-content px-2">
         <RecipeFlowModal
