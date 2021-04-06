@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"net/http"
 
 	"github.com/google/uuid"
+	logger "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
 )
@@ -250,23 +252,26 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	err = fmt.Errorf("position is invalid to pickup the tip")
 	return 0, err
 }
-
 func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
-
 	// percentage calculation for each process
-	percentage := float64((currentStep * 100) / processLength)
 
-	wsData := recipeProgress{
-		Deck:       deck,
-		RecipeID:   recipeID,
-		Percentage: percentage,
+	progress := float64((currentStep * 100) / processLength)
+
+	wsProgressOperation := plc.WSData{
+		Progress: progress,
+		Deck:     deck,
+		Status:   "PROGRESS_RECIPE",
+		OperationDetails: plc.OperationDetails{
+			Message: fmt.Sprintf("successfully completed process %v for deck %v", currentStep, deck),
+		},
 	}
-	wsDataJSON, err := json.Marshal(wsData)
+
+	wsData, err := json.Marshal(wsProgressOperation)
 	if err != nil {
-		return "", err
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		deps.WsErrCh <- err
 	}
-	wsMsg := fmt.Sprintf("progress_recipe_%v", string(wsDataJSON))
+	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
-	deps.WsMsgCh <- wsMsg
 	return
 }

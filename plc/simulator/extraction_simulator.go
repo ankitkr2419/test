@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -37,9 +38,21 @@ func (us *ExtractionSimulator) NameOfDeck() string {
 func (us *ExtractionSimulator) Homing() (string, error) {
 	for i := 0; i < 10; i++ {
 		time.Sleep(time.Second * 1)
-		// the format for message in every operation must be in the format:
-		// progress/success_OPERATION NAME_OPERATION MESSAGE
-		us.WsMsgCh <- fmt.Sprintf("progress_homing_homing in progress for deck %v", us.name)
+
+		wsProgressOperation := plc.WSData{
+			Progress: float64(10 * i),
+			Deck:     us.name,
+			Status:   "PROGRESS_HOMING",
+			OperationDetails: plc.OperationDetails{
+				Message: fmt.Sprintf("successfully homed %v for deck %v", i, us.name),
+			},
+		}
+
+		wsData, err := json.Marshal(wsProgressOperation)
+		if err != nil {
+			us.ErrCh <- err
+		}
+		us.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
 	}
 	us.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", us.name)
 	return "SUCCESS", nil

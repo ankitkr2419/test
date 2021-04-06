@@ -1,9 +1,13 @@
 package compact32
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
+	"mylab/cpagent/plc"
 	"time"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) Homing() (response string, err error) {
@@ -52,17 +56,56 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		panic(err)
 	}
 
+	//web socket response for syringe homing
+
+	wsProgressOperation := plc.WSData{
+		Progress: 25,
+		Deck:     d.name,
+		Status:   "PROGRESS_HOMING",
+		OperationDetails: plc.OperationDetails{
+			Message: fmt.Sprintf("successfully homed syringe for deck %v", d.name),
+		},
+	}
+
+	wsData, err := json.Marshal(wsProgressOperation)
+	if err != nil {
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		d.WsErrCh <- err
+	}
+	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
+
 	fmt.Println("Homing Magnet")
 	response, err = d.magnetHoming()
 	if err != nil {
 		panic(err)
 	}
 
+	//web socket response for magnet homing
+
+	wsProgressOperation.Progress = 75
+	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed magnet for deck %v", d.name)
+	wsData, err = json.Marshal(wsProgressOperation)
+	if err != nil {
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		d.WsErrCh <- err
+	}
+	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
+
+	// Started Homing
 	fmt.Println("Moving deck forward till sensor cuts it")
 	response, err = d.deckHoming()
 	if err != nil {
 		panic(err)
 	}
+
+	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed deck %v", d.name)
+	wsProgressOperation.Progress = 100
+	wsData, err = json.Marshal(wsProgressOperation)
+	if err != nil {
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		d.WsErrCh <- err
+	}
+	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
 
 	d.setHomed()
 
@@ -126,8 +169,6 @@ func (d *Compact32Deck) syringeModuleHoming() (response string, err error) {
 
 	fmt.Println("After Final Slow Moving Up and getting Cut")
 
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed syringe for deck %v", d.name)
-
 	return "SYRINGE HOMING SUCCESS", nil
 }
 
@@ -188,7 +229,6 @@ func (d *Compact32Deck) magnetHoming() (response string, err error) {
 	if err != nil {
 		return
 	}
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed magnet for deck %v", d.name)
 
 	return "MAGNET HOMING SUCCESS", nil
 }
