@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { 
-	Modal, 
-	ModalBody, 
+import {
+	Modal,
+	ModalBody,
 	Button,
 	Form,
 	FormGroup,
@@ -34,17 +34,24 @@ label{
 `;
 
 const TimeModal = (props) => {
-	const { 
-		// confirmationText, 
-		// isOpen, 
+	const {
+		// confirmationText,
+		// isOpen,
 		// confirmationClickHandler,
 		buttonText,
+		timeModal,
+		toggleTimeModal,
+		hours,
+		mins,
+		secs,
+		handleChangeTime,
+		submitTime
 	 } = props;
 
 	// const toggleModal = () => {};
 	// Operator Login Modal
-	const [timeModal, setTimeModal] = useState(true);
-	const toggleTimeModal = () => setTimeModal(!timeModal);
+	// const [timeModal, setTimeModal] = useState(true);
+	// const toggleTimeModal = () => setTimeModal(!timeModal);
 	return (
 		<>
 		{/* Operator Login Modal */}
@@ -65,11 +72,11 @@ const TimeModal = (props) => {
 						/>
 					</div>
 					<div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
-					
+
 					<Text Tag="h5" size="20" className="text-center font-weight-bold mt-3 mb-4">
 						<Text Tag="span" className="mb-1">Enter Time Here</Text>
 					</Text>
-					
+
 					<Form>
 					<EnterTimeForm className="col-11 mx-auto">
 						<Row>
@@ -77,33 +84,36 @@ const TimeModal = (props) => {
 								<FormGroup row className="d-flex align-items-center justify-content-center row-small-gutter" >
 									<Col sm={4}>
 										<Input
-											type='text'
+											type='number'
 											name='hours'
 											id='hours'
 											placeholder=''
-											value=""
+											value={hours}
+											onChange={handleChangeTime}
 										/>
 										<Label for='hours' className="font-weight-bold">Hours</Label>
 										<FormError>Incorrect Hours</FormError>
 									</Col>
 									<Col sm={4}>
 										<Input
-											type='text'
+											type='number'
 											name='minutes'
 											id='minutes'
 											placeholder=''
-											value=""
+											value={mins}
+											onChange={handleChangeTime}
 										/>
 										<Label for='minutes' className="font-weight-bold px-2">Minutes</Label>
 										<FormError>Incorrect Minutes</FormError>
 									</Col>
 									<Col sm={4}>
 										<Input
-											type='text'
+											type='number'
 											name='seconds'
 											id='seconds'
 											placeholder=''
-											value=""
+											value={secs}
+											onChange={handleChangeTime}
 										/>
 										<Label for='minutes' className="font-weight-bold">Seconds</Label>
 										<FormError>Incorrect Seconds</FormError>
@@ -112,7 +122,7 @@ const TimeModal = (props) => {
 							</Col>
 							</Row>
 							<Center className='mt-3 mb-4'>
-							<Button color='primary'>
+							<Button color='primary' onClick={submitTime}>
 							 Next
 							</Button>
 						</Center>
