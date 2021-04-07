@@ -8,6 +8,7 @@ import (
 
 func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err error) {
 
+	var messageWithTipDiscard string
 	// Machine Should be in aborted state
 	if !d.isMachineInAbortedState() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
@@ -22,6 +23,7 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 			logger.Errorln("error in discarding tip for deck --->", d.name)
 			return
 		}
+		messageWithTipDiscard = "tip discarded and "
 	}
 
 	//home
@@ -31,7 +33,7 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 		return
 	}
 
-	d.WsMsgCh <- "success_discardAndHomed_tips discarded successfully and machine homed"
+	d.WsMsgCh <- fmt.Sprintf("success_discardAndHomed_%vmachine homed successfully", messageWithTipDiscard)
 
 	return "SUCCESS", nil
 }
