@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon, MlModal, VideoCard, ButtonIcon } from "shared-components";
+import { Icon, MlModal, VideoCard } from "shared-components";
 
 import styled from "styled-components";
 import AppFooter from "components/AppFooter";
