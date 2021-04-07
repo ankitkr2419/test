@@ -49,6 +49,7 @@ type Driver interface {
 type DeckDriver interface {
 	NameOfDeck() string
 	Homing() (string, error)
+	DiscardTipAndHome(bool) (string, error)
 	ManualMovement(uint16, uint16, uint16) (string, error)
 	IsMachineHomed() bool
 	IsRunInProgress() bool
@@ -64,8 +65,6 @@ type DeckDriver interface {
 	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 	TipOperation(to db.TipOperation) (response string, err error)
-	TipPickup(pos int64) (response string, err error)
-	TipDiscard() (response string, err error)
 	AttachDetach(db.AttachDetach) (response string, err error)
 	AddDelay(db.Delay) (string, error)
 	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)

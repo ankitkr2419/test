@@ -262,14 +262,15 @@ const DeckCard = (props) => {
                 </div>
 
                 <div className="d-none1">
-                  <Text
+                  <marquee width="90%" direction="left" behavior=""
                     Tag="h5"
                     size={18}
                     className="mb-2 font-weight-bold recipe-name"
+                    scrolldelay="100"
                   >
                     {recipeName}
-                  </Text>
-
+                  </marquee>
+                  {/* TODO : Remove this commented code after clean up process developement done */}
                   {/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
 								<Text Tag="label" className="mb-1 d-flex align-items-center">
 									<Icon name='timer' size={19} className="text-primary"/>
@@ -337,7 +338,6 @@ const DeckCard = (props) => {
                       remaining
                     </Text>
                   </Text>
-                  {/* <Progress value="2" className="custom-progress-bar" /> */}
                 </div>
               </>
             )}

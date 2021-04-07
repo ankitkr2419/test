@@ -6,16 +6,16 @@ import { Progress } from "reactstrap";
 import styled from "styled-components";
 
 const CustomProgressBar = styled.div`
-.custom-progress-bar{
-  border-radius:7px;
-  background-color:#B2DAD131;
-  border: 1px solid #B2DAD131;
-  .progress-bar{
-    height:0.875rem;
-    background-color:#92C4BC;
-    border-radius:7px 0px 0px 7px;
+  .custom-progress-bar {
+    border-radius: 7px;
+    background-color: #b2dad131;
+    border: 1px solid #b2dad131;
+    .progress-bar {
+      height: 0.875rem;
+      background-color: #92c4bc;
+      border-radius: 7px 0px 0px 7px;
+    }
   }
-}
 `;
 const MlModal = (props) => {
   const {
@@ -52,7 +52,7 @@ const MlModal = (props) => {
             )}
           </div>
         )}
-        <div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
+        <div className="d-flex justify-content-center align-items-center flex-column h-100 py-5">
           {!textHead && showCrossBtn && (
             <ButtonIcon
               position="absolute"
@@ -65,8 +65,8 @@ const MlModal = (props) => {
               className="border-0"
             />
           )}
-          <Text Tag="h5" size={20} className="text-center my-4">
-            <Text Tag="span" className="font-weight-normal" size={18}>
+          <Text Tag="h5" size={20} className="text-center my-3">
+            <Text Tag="span" className="font-weight-normal" size={20}>
               {textBody}
             </Text>
           </Text>
@@ -74,16 +74,16 @@ const MlModal = (props) => {
 
         {/* Conditional rendering for progress bar */}
         {isProgressBarVisible && (
-         <CustomProgressBar className="mx-5">
+          <CustomProgressBar className="mx-5">
             <Progress
               value={progressPercentage}
               className="custom-progress-bar"
             />
-           </CustomProgressBar>
+          </CustomProgressBar>
         )}
-       
+
         <Center className="text-center p-0 m-0 pt-5">
-          <ButtonGroup className="text-center mt-5">
+          <ButtonGroup className="text-center my-5">
             {failureBtn && (
               <Button
                 onClick={handleCrossBtn}

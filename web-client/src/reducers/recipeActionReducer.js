@@ -22,6 +22,10 @@ export const initialState = {
   recipeData: [],
   leftActionBtn: DECKCARD_BTN.text.run,
   rightActionBtn: DECKCARD_BTN.text.cancel,
+  isRunRecipeCompleted: false,
+  isResumeRecipeCompleted: false,
+  runRecipeInCompleted: {},
+  runRecipeInProgress: {}
 };
 
 export const recipeActionReducer = (state = initialState, action = {}) => {
@@ -49,7 +53,19 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         runRecipeError: null,
       };
-
+    case runRecipeAction.runRecipeInProgress:
+      return {
+        ...state,
+        ...action.payload,
+        isLoading : false,
+        isRunRecipeCompleted: true,
+      };
+    case runRecipeAction.runRecipeInCompleted:
+      return {
+        ...state,
+        ...action.payload,
+        isRunRecipeCompleted: false
+      };
     case pauseRecipeAction.pauseRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case pauseRecipeAction.pauseRecipeSuccess:
@@ -126,6 +142,20 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         resumeRecipeError: null,
       };
 
+    case resumeRecipeAction.resumeRecipeInProgress:
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        isResumeRecipeCompleted: true
+      };
+    case resumeRecipeAction.resumeRecipeInCompleted:
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        isResumeRecipeCompleted: false
+      }
     case recipeListingAction.recipeListingInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case recipeListingAction.recipeListingSuccess:

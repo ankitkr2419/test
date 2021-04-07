@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AppFooter from "components/AppFooter";
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
+import { operatorLoginReset } from "action-creators/operatorLoginModalActionCreators";
 import { VideoCard, MlModal } from "shared-components";
 import styled from "styled-components";
 
@@ -19,6 +20,8 @@ const LandingScreen = styled.div`
 const LandingScreenComponent = () => {
   const dispatch = useDispatch();
   const homingReducer = useSelector((state) => state.homingReducer);
+
+  // dispatch(operatorLoginReset());
 
   const {
     isHomingActionCompleted,

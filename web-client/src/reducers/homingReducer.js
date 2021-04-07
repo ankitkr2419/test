@@ -1,4 +1,7 @@
-import { homingActions } from "actions/homingActions";
+import {
+  homingActions,
+  discardTipAndHomingActions,
+} from "actions/homingActions";
 
 export const initialState = {
   isLoading: false,
@@ -6,6 +9,8 @@ export const initialState = {
   serverErrors: {},
   homingAllDeckCompletionPercentage: 50,
   isHomingActionCompleted: false,
+  homingActionInProgress: {},
+  homingActionInCompleted: {}
 };
 
 export const homingReducer = (state = initialState, action = {}) => {
@@ -41,6 +46,36 @@ export const homingReducer = (state = initialState, action = {}) => {
         isLoading: false,
         isHomingActionCompleted: true,
       };
+    default:
+      return state;
+  }
+};
+
+const discardTipHomingInitialState = {
+  isLoading: false,
+  homingData: {},
+  serverErrors: {},
+  error: null,
+};
+
+export const discardTipAndHomingReducer = (
+  state = discardTipHomingInitialState,
+  action
+) => {
+  switch (action.type) {
+    case discardTipAndHomingActions.discardTipAndHomingActionInitiated:
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: true,
+      };
+    case discardTipAndHomingActions.discardTipAndHomingActionSuccess:
+      return { ...state, ...action.payload, isLoading: false, error: false };
+    case discardTipAndHomingActions.discardTipAndHomingActionFailed:
+      return { ...state, ...action.payload, isLoading: false, error: true };
+    case discardTipAndHomingActions.discardTipAndHomingActionReset:
+      return { ...state, error: null };
+
     default:
       return state;
   }
