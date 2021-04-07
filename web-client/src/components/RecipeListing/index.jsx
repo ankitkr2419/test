@@ -25,7 +25,7 @@ import {
   discardTipAndHomingActionInitiated,
   discardTipAndHomingActionReset,
 } from "action-creators/homingActionCreators";
-import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PaginationBox from "shared-components/PaginationBox";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 import { operatorLoginReset } from "action-creators/operatorLoginModalActionCreators";
