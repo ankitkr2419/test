@@ -25,6 +25,7 @@ import (
 */
 func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
+	var stopMonitor chan bool
 	// here we are hardcoding the shaker no in future this is to be fetched dynamically.
 	// 3 is the value that needs to be passed for heating both the shakers.
 	shaker := uint16(3)
@@ -102,6 +103,8 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	// as we do not need to monitor the temperature here.
 	if !ht.FollowTemp {
 		logger.Infoln("not follow temperature")
+		go d.monitorTemperature(shaker, ht.Temperature, false, stopMonitor)
+		defer d.stopMonitorTemperature(stopMonitor)
 		response, err = d.AddDelay(delay)
 		if err != nil {
 			return
@@ -117,7 +120,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	// Step 10 : monitor the temperature if not follow temp.
 	// loop for continous reading of the shaker temp and check if the temperature has reached specified value.
-	response, err = d.monitorTemperature(shaker, ht.Temperature)
+	response, err = d.monitorTemperature(shaker, ht.Temperature, true, stopMonitor)
 	if err != nil {
 		logger.Errorln("Error in monitor temperature \n", err)
 		return "", err
@@ -145,7 +148,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	return
 }
 
-func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64) (response string, err error) {
+func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64, tempCheck bool, stopMonitor chan bool) (response string, err error) {
 	var setTemp, setTemp1, setTemp2, prevTemp1, prevTemp2 float64
 	var heatingFailCounter1, heatingFailCounter2 int
 
@@ -187,24 +190,27 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64)
 			setTemp = float64(binary.BigEndian.Uint16(results)) / 10
 
 		case 3:
+			if !tempCheck {
+				goto skipToMonitor
+			}
 			if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
 				return "SUCCESS", nil
 			}
 
+		skipToMonitor:
 			prevTemp1 = setTemp1
 			prevTemp2 = setTemp2
 
 			if (setTemp1 - prevTemp1) < 1 {
 				heatingFailCounter1 += 1
 			} else {
-				heatingFailCounter1 -= 1
+				heatingFailCounter1 = 0
 			}
 
 			if (setTemp2 - prevTemp2) < 1 {
 				heatingFailCounter2 += 1
 			} else {
-				heatingFailCounter2 -= 1
-
+				heatingFailCounter2 = 0
 			}
 
 			if heatingFailCounter1 >= 5 || heatingFailCounter2 >= 5 {
@@ -238,4 +244,8 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64)
 
 	}
 
+}
+
+func (d *Compact32Deck) stopMonitorTemperature(stop chan bool) {
+	stop <- true
 }
