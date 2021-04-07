@@ -36,7 +36,7 @@ const RecipeCardStyle = styled.div`
             }
         }
     }
-    &:focus{
+    &:focus, &:hover{
         background-color:rgba(243, 130, 32, 0.30);
     }
 `;

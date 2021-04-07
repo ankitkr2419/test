@@ -7,7 +7,15 @@ import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
 // import TimeModal from "components/modals/TimeModal";
 import { VideoCard, MlModal, Loader } from "shared-components";
-
+import styled from "styled-components";
+const LandingScreen = styled.div`
+  .landing-content{
+    padding: 2.313rem 4.5rem;
+    &::after{
+      height:9.125rem;
+    }
+  }
+`;
 const LandingScreenComponent = () => {
   const [homingStatus, setHomingStatus] = useState(true);
   const dispatch = useDispatch();
@@ -21,7 +29,7 @@ const LandingScreenComponent = () => {
   };
 
   return (
-    <div className="ml-content">
+    <LandingScreen>
       <div className="landing-content">
         {isHomingActionCompleted && <Loader />}
         <VideoCard />
@@ -34,7 +42,7 @@ const LandingScreenComponent = () => {
         />
       </div>
       <AppFooter loginBtn={true} />
-    </div>
+    </LandingScreen>
   );
 };
 
