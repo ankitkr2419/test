@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"reflect"
 	"time"
-
+	"mylab/cpagent/plc/compact32"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -19,11 +19,11 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "":
-			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(`both decks operation in progress`))
 			fmt.Println("At both deck!!!")
 			rw.Write([]byte(`Operation in progress for both decks`))
 			rw.WriteHeader(http.StatusOK)
+			compact32.SetBothDeckHomingInProgress()
+			defer compact32.ResetBothDeckHomingInProgress()
 			response, err = bothDeckOperation(deps, "Homing")
 		case "A", "B":
 			rw.Write([]byte(`Operation in progress for single deck`))
@@ -40,7 +40,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			deps.WsErrCh <- err
 		} else {
 			logger.Infoln(response)
-			deps.WsMsgCh <- "success_homing_successfully homed " + deck
+			deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
 		}
 
 	})
