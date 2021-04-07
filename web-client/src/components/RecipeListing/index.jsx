@@ -22,6 +22,7 @@ import {
   resumeRecipeReset,
   abortRecipeReset,
 } from "action-creators/recipeActionCreators";
+import { operatorLoginReset } from "action-creators/operatorLoginModalActionCreators";
 import {
   discardTipAndHomingActionInitiated,
   discardTipAndHomingActionReset,
@@ -125,6 +126,7 @@ const RecipeListingComponent = (props) => {
   //Do not change '===';
   useEffect(() => {
     if (tipDiscardHomingError === false) {
+      dispatch(operatorLoginReset());
       setTipDiscardModal(false);
       setRedirect(true);
     } else if (tipDiscardHomingError === true) {
