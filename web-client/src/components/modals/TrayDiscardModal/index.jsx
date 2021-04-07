@@ -21,8 +21,11 @@ const TrayDiscardSection = styled.div`
 	}
 }
 `;
-
-
+const DiscardTrayBox = styled.div`
+.btn-discard-tray{
+	width:10rem;
+}
+`;
 const TrayDiscardModal = (props) => {
 	//const { confirmationText, isOpen, confirmationClickHandler } = props;
 
@@ -34,7 +37,8 @@ const TrayDiscardModal = (props) => {
 	return (
 		<>
 		{/* Tray Discard Modal */}
-		<Button color="secondary" onClick={toggleTrayDiscardModal} className="ml-2 border-primary">Discard Tray</Button>
+		<DiscardTrayBox>
+		<Button color="secondary" onClick={toggleTrayDiscardModal} className="ml-2 border-primary btn-discard-tray">Discard Tray</Button>
 				<Modal isOpen={trayDiscardModal} toggle={toggleTrayDiscardModal} centered size="md">
 				<ModalBody className="p-0">
 				<div className="d-flex justify-content-center align-items-center modal-heading">
@@ -76,6 +80,7 @@ const TrayDiscardModal = (props) => {
 					</TrayDiscardSection>
 			</ModalBody>
 		</Modal>
+		</DiscardTrayBox>
 		</>
 	);
 };

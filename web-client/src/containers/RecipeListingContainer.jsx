@@ -10,7 +10,12 @@ const RecipeListingContainer = (props) => {
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const { recipeData } = recipeActionReducer;
 
-  useEffect(() => dispatch(recipeListingInitiated()), [dispatch]);
+  useEffect(() => {
+    const fetchData = async () => {
+      dispatch(recipeListingInitiated());
+    };
+    fetchData();
+  }, [dispatch]);
 
   return (
     <>

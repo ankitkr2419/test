@@ -36,7 +36,7 @@ const MlModal = (props) => {
             )}
           </div>
         )}
-        <div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
+        <div className="d-flex justify-content-center align-items-center flex-column h-100 py-5">
           {!textHead && showCrossBtn && (
             <ButtonIcon
               position="absolute"
@@ -52,16 +52,16 @@ const MlModal = (props) => {
           <Text
             Tag="h5"
             size={20}
-            className="text-center my-4"
+            className="text-center my-3"
           >
-            <Text Tag="span" className="font-weight-normal" size={18}>
+            <Text Tag="span" className="font-weight-normal" size={20}>
               {textBody}
             </Text>
           </Text>
         </div>
 
         <Center className="text-center p-0 m-0 pt-5">
-          <ButtonGroup className="text-center mt-5">
+          <ButtonGroup className="text-center my-5">
             {failureBtn && (
               <Button
                 onClick={handleCrossBtn}
