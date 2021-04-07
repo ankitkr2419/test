@@ -65,8 +65,14 @@ const (
 	attached
 )
 
+// Syringe module States
+const (
+	InDeck = iota
+	OutDeck
+)
+
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
-var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress, shakerInProgress sync.Map
+var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress, syringeModuleState, shakerInProgress sync.Map
 
 // variable map Registers to keep track of machine related variables.
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
@@ -92,6 +98,9 @@ func LoadUtils() {
 	uvLightInProgress.Store("B", false)
 	magnetState.Store("A", detached)
 	magnetState.Store("B", detached)
+	syringeModuleState.Store("A", OutDeck)
+	syringeModuleState.Store("B", OutDeck)
+
 	homed.Store("A", false)
 	homed.Store("B", false)
 

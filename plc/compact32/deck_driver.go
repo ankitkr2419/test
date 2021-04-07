@@ -40,6 +40,20 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	logger.Infoln("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
 
+	//
+	// move the syringe module to rest position if the Motor Num is of deck
+	// and syringe tips are inside of deck positions.
+	//
+
+	if d.getSyringeModuleState() == InDeck && motorNum == K5_Deck {
+		response, err = d.SyringeRestPosition()
+		if err != nil {
+			logger.Errorln(err)
+			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
+		}
+
+	}
+
 	// Switch OFF The motor
 
 	if temp := d.getOnReg(); temp == highestUint16 {

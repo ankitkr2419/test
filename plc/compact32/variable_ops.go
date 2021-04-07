@@ -128,6 +128,15 @@ func (d *Compact32Deck) getMagnetState() int {
 	}
 }
 
+func (d *Compact32Deck) getSyringeModuleState() int {
+	if temp, ok := syringeModuleState.Load(d.name); !ok {
+		logger.Errorln("Syringe Module State isn't loaded!")
+		return -1
+	} else {
+		return temp.(int)
+	}
+}
+
 func (d *Compact32Deck) getExecutedPulses() uint16 {
 	if temp, ok := executedPulses.Load(d.name); !ok {
 		logger.Errorln("executed Pulses isn't loaded!")
