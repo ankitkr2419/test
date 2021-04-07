@@ -89,9 +89,8 @@ const RecipeListingComponent = (props) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = (recipeId, recipeName, processCount) => {
-    const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
     const data = {
-      recipeId: tempRecipeId, //recipeId,
+      recipeId: recipeId,
       recipeName: recipeName,
       processCount: processCount,
     };
