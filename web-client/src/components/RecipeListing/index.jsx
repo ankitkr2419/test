@@ -40,6 +40,9 @@ const TopContent = styled.div`
     font-size:18px;
     color:#3C3C3C;
   }
+  .btn-clean-up{
+    width:7.063rem;
+  }
 `;
 
 const HeadingTitle = styled.label`
@@ -206,9 +209,9 @@ const RecipeListingComponent = (props) => {
               Select a Recipe for Deck B
             </HeadingTitle>
           </div>
-          <div className="d-flex ml-auto">
+          <div className="d-flex align-items-center ml-auto">
             <ButtonIcon name="download-1" size={28} className="bg-white border-primary" />
-            <Button color="secondary" className="ml-2 border-primary">
+            <Button color="secondary" className="ml-2 border-primary btn-clean-up">
               {" "}
               Clean Up
             </Button>
