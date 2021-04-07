@@ -158,90 +158,96 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 	}
 
 	for {
-		if d.isMachineInPausedState() {
-			response, err = d.waitUntilResumed(d.name)
-			if err != nil {
-				return
+		select {
+		case n := <-stopMonitor:
+			fmt.Printf("stop the montoring %v", n)
+			return "SUCCESS", nil
+
+		default:
+			if d.isMachineInPausedState() {
+				response, err = d.waitUntilResumed(d.name)
+				if err != nil {
+					return
+				}
+			}
+
+			if d.isMachineInAbortedState() {
+				err = fmt.Errorf("operation was ABORTED \n")
+				return "ABORTED", err
+			}
+
+			time.Sleep(time.Second * 2)
+			switch shakerNo {
+			case 1, 2:
+				if setTemp >= temperature {
+					return "SUCCESS", nil
+				}
+				// here we set the register address according to the shaker
+				if shakerNo == 1 {
+					registerAddress = MODBUS_EXTRACTION[d.name]["D"][210]
+				} else {
+					registerAddress = MODBUS_EXTRACTION[d.name]["D"][224]
+				}
+				results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
+				if err != nil {
+					logger.Errorln("Error failed to read shaker ", shakerNo, "temperature", err)
+					return "", err
+				}
+				setTemp = float64(binary.BigEndian.Uint16(results)) / 10
+
+			case 3:
+				if !tempCheck {
+					goto skipToMonitor
+				}
+				if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
+					return "SUCCESS", nil
+				}
+
+			skipToMonitor:
+				prevTemp1 = setTemp1
+				prevTemp2 = setTemp2
+
+				if (setTemp1 - prevTemp1) < 1 {
+					heatingFailCounter1 += 1
+				} else {
+					heatingFailCounter1 = 0
+				}
+
+				if (setTemp2 - prevTemp2) < 1 {
+					heatingFailCounter2 += 1
+				} else {
+					heatingFailCounter2 = 0
+				}
+
+				if heatingFailCounter1 >= 5 || heatingFailCounter2 >= 5 {
+					err = fmt.Errorf("temperature not upgrading")
+					return "", err
+				}
+
+				results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
+				if err != nil {
+					logger.Errorln("Error failed to read shaker 1 temperature \n", err)
+					return "", err
+				}
+				setTemp1 = float64(binary.BigEndian.Uint16(results)) / 10
+
+				logger.Infoln("temp 1 reading", setTemp1)
+
+				results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
+				if err != nil {
+					logger.Errorln("Error failed to read shaker 2 temperature \n", err)
+					return "", err
+				}
+				setTemp2 = float64(binary.BigEndian.Uint16(results)) / 10
+				logger.Infoln("temp 2 reading", setTemp2)
+				response, err = d.AddDelay(delay)
+				if err != nil {
+					logger.Errorln("Error failed to add delay in monitor temperature \n", err)
+					return "", err
+				}
+
 			}
 		}
-
-		if d.isMachineInAbortedState() {
-			err = fmt.Errorf("operation was ABORTED \n")
-			return "ABORTED", err
-		}
-
-		time.Sleep(time.Second * 2)
-		switch shakerNo {
-		case 1, 2:
-			if setTemp >= temperature {
-				return "SUCCESS", nil
-			}
-			// here we set the register address according to the shaker
-			if shakerNo == 1 {
-				registerAddress = MODBUS_EXTRACTION[d.name]["D"][210]
-			} else {
-				registerAddress = MODBUS_EXTRACTION[d.name]["D"][224]
-			}
-			results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
-			if err != nil {
-				logger.Errorln("Error failed to read shaker ", shakerNo, "temperature", err)
-				return "", err
-			}
-			setTemp = float64(binary.BigEndian.Uint16(results)) / 10
-
-		case 3:
-			if !tempCheck {
-				goto skipToMonitor
-			}
-			if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
-				return "SUCCESS", nil
-			}
-
-		skipToMonitor:
-			prevTemp1 = setTemp1
-			prevTemp2 = setTemp2
-
-			if (setTemp1 - prevTemp1) < 1 {
-				heatingFailCounter1 += 1
-			} else {
-				heatingFailCounter1 = 0
-			}
-
-			if (setTemp2 - prevTemp2) < 1 {
-				heatingFailCounter2 += 1
-			} else {
-				heatingFailCounter2 = 0
-			}
-
-			if heatingFailCounter1 >= 5 || heatingFailCounter2 >= 5 {
-				err = fmt.Errorf("temperature not upgrading")
-				return "", err
-			}
-
-			results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
-			if err != nil {
-				logger.Errorln("Error failed to read shaker 1 temperature \n", err)
-				return "", err
-			}
-			setTemp1 = float64(binary.BigEndian.Uint16(results)) / 10
-
-			logger.Infoln("temp 1 reading", setTemp1)
-
-			results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
-			if err != nil {
-				logger.Errorln("Error failed to read shaker 2 temperature \n", err)
-				return "", err
-			}
-			setTemp2 = float64(binary.BigEndian.Uint16(results)) / 10
-			logger.Infoln("temp 2 reading", setTemp2)
-			response, err = d.AddDelay(delay)
-			if err != nil {
-				logger.Errorln("Error failed to add delay in monitor temperature \n", err)
-				return "", err
-			}
-
-		}
-
 	}
 
 }
