@@ -28,7 +28,6 @@ import {
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PaginationBox from "shared-components/PaginationBox";
 import TipDiscardModal from "components/modals/TipDiscardModal";
-import { operatorLoginReset } from "action-creators/operatorLoginModalActionCreators";
 
 const RecipeListing = styled.div`
   .landing-content {
@@ -108,7 +107,6 @@ const RecipeListingComponent = (props) => {
   //Do not change '===';
   useEffect(() => {
     if (tipDiscardHomingError === false) {
-      dispatch(operatorLoginReset());
       setTipDiscardModal(false);
       setRedirect(true);
     } else if (tipDiscardHomingError === true) {
