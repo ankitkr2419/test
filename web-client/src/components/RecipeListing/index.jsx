@@ -339,7 +339,7 @@ const RecipeListingComponent = (props) => {
                 <PaginationBox />
               </div>
               <Row>
-                {allRecipeData.length > 0 ? (
+                {allRecipeData && allRecipeData.length > 0 ? (
                   allRecipeData.map((value, index) => (
                     <Col md={6} key={index}>
                       <RecipeCard

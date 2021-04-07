@@ -20,7 +20,7 @@ const RecipeListingContainer = (props) => {
   return (
     <>
       {/* {(!isLoading) && <Loader/>} */}
-      {recipeData && <RecipeListingComponent allRecipeData={recipeData} />}
+      <RecipeListingComponent allRecipeData={recipeData} />
     </>
   );
 };
