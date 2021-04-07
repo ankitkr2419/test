@@ -28,7 +28,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		}
 	}()
 
-	runInProgress.Store(d.name, true)
+	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
@@ -38,7 +38,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	}
 	fmt.Println("Switched off the shaker--> for ", d.name)
 
-	aborted.Store(d.name, false)
+	d.resetAborted()
 
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.syringeHoming()
@@ -64,10 +64,10 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		panic(err)
 	}
 
-	homed.Store(d.name, true)
+	d.setHomed()
 
 	fmt.Println("Homing Completed Successfully")
-	d.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", d.name)
+	//d.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", d.name)
 
 	return "HOMING SUCCESS", nil
 }
