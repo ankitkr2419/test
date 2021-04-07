@@ -14,3 +14,8 @@ export const operatorLoginFailed = (errorMsg) => ({
     type: operatorLoginModalActions.failureAction,
     payload: { serverErrors: errorMsg }
 });
+
+export const operatorLoginReset = () => ({
+    type: operatorLoginModalActions.resetAction,
+    payload: { }
+});
