@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"net/http"
 
 	"github.com/google/uuid"
+	logger "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
 )
@@ -92,7 +94,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	for i, p := range processes {
 
 		// TODO : percentage calculation from inside the process.
-		sendWSData(deps, deck, recipeID, len(processes), i)
+		sendWSData(deps, deck, recipeID, len(processes), i+1)
 
 		switch p.Type {
 		case "AspireDispense":
@@ -218,13 +220,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 		}
 
-		deps.WsMsgCh <- fmt.Sprintf("progress_recipe_completed process %d", i)
 		// TODO: Instead of switch case, try using reflect
 		// Pass context and ID here
 		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
 
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeid %v", recipeID)
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeId %v", recipeID)
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()
@@ -250,23 +251,29 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	err = fmt.Errorf("position is invalid to pickup the tip")
 	return 0, err
 }
-
 func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
-
 	// percentage calculation for each process
-	percentage := float64((currentStep * 100) / processLength)
 
-	wsData := recipeProgress{
-		Deck:       deck,
-		RecipeID:   recipeID,
-		Percentage: percentage,
+	progress := float64((currentStep * 100) / processLength)
+
+	wsProgressOperation := plc.WSData{
+		Progress: progress,
+		Deck:     deck,
+		Status:   "PROGRESS_RECIPE",
+		OperationDetails: plc.OperationDetails{
+			Message:        fmt.Sprintf("process %v for deck %v in progress", currentStep, deck),
+			CurrentStep:    currentStep,
+			RecipeID:       recipeID,
+			TotalProcesses: processLength,
+		},
 	}
-	wsDataJSON, err := json.Marshal(wsData)
+
+	wsData, err := json.Marshal(wsProgressOperation)
 	if err != nil {
-		return "", err
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		deps.WsErrCh <- err
 	}
-	wsMsg := fmt.Sprintf("progress_recipe_%v", string(wsDataJSON))
+	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
-	deps.WsMsgCh <- wsMsg
 	return
 }

@@ -121,7 +121,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
 		return
 	}
-	d.WsMsgCh <- fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name)
+
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
 
