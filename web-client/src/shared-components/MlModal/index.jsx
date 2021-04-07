@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, ModalBody } from "core-components";
 import { Center, Text, ButtonGroup, ButtonIcon } from "shared-components";
+import { Progress } from "reactstrap";
 
 const MlModal = (props) => {
   const {
@@ -13,6 +14,8 @@ const MlModal = (props) => {
     failureBtn,
     handleCrossBtn,
     handleSuccessBtn,
+    progressPercentage,
+    isProgressBarVisible,
   } = props;
 
   return (
@@ -49,16 +52,22 @@ const MlModal = (props) => {
               className="border-0"
             />
           )}
-          <Text
-            Tag="h5"
-            size={20}
-            className="text-center my-4"
-          >
+          <Text Tag="h5" size={20} className="text-center my-4">
             <Text Tag="span" className="font-weight-normal" size={18}>
               {textBody}
             </Text>
           </Text>
         </div>
+
+        {/* Conditional rendering for progress bar */}
+        {isProgressBarVisible && (
+          <div mt-2>
+            <Progress
+              value={progressPercentage}
+              className="custom-progress-bar"
+            />
+          </div>
+        )}
 
         <Center className="text-center p-0 m-0 pt-5">
           <ButtonGroup className="text-center mt-5">
@@ -97,11 +106,14 @@ MlModal.propTypes = {
   successBtn: PropTypes.string,
   failureBtn: PropTypes.string,
   toggleModal: PropTypes.func,
+  progressPercentage: PropTypes.number,
+  isProgressBarVisible: PropTypes.bool,
 };
 
 MlModal.defaultProps = {
   isOpen: false,
   showCrossBtn: true,
+  isProgressBarVisible: false,
 };
 
 export default MlModal;
