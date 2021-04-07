@@ -101,9 +101,6 @@ func (us *ExtractionSimulator) TipOperation(to db.TipOperation) (response string
 
 	return "SUCCESS", nil
 }
-<<<<<<< HEAD
-
-=======
 func (us *ExtractionSimulator) TipPickup(pos int64) (response string, err error) {
 	time.Sleep(time.Second * 1)
 
@@ -114,7 +111,6 @@ func (us *ExtractionSimulator) TipDiscard() (response string, err error) {
 
 	return "SUCCESS", nil
 }
->>>>>>> da0bcca1a1ca3a19155b6832f06fa88f85cdd932
 func (us *ExtractionSimulator) AttachDetach(db.AttachDetach) (response string, err error) {
 	time.Sleep(time.Second * 1)
 
