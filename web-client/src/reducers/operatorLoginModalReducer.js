@@ -1,28 +1,45 @@
-import { fromJS } from 'immutable';
+import { fromJS } from "immutable";
 
-import operatorLoginModalActions from 'actions/operatorLoginModalActions';
+import operatorLoginModalActions from "actions/operatorLoginModalActions";
 
 const operatorLoginModalInitialState = fromJS({
-    isOperatorLoggedIn: false,
-    error: false,
-    msg: '',
-    deckName: ''
+  isOperatorLoggedIn: false,
+  error: false,
+  msg: "",
+  deckName: "",
 });
 
-export const operatorLoginModalReducer = (state=operatorLoginModalInitialState, action) => {
+export const operatorLoginModalReducer = (
+  state = operatorLoginModalInitialState,
+  action
+) => {
+  switch (action.type) {
+    case operatorLoginModalActions.loginInitiated:
+      return state.merge({ deckName: action.payload.deckName });
 
-    switch (action.type) {
-        case operatorLoginModalActions.loginInitiated: 
-            return state.merge({ deckName: action.payload.deckName });
+    case operatorLoginModalActions.successAction:
+      return state.merge({
+        isOperatorLoggedIn: true,
+        error: false,
+        msg: action.payload.response.msg,
+      });
 
-        case operatorLoginModalActions.successAction:
-            return state.merge({ isOperatorLoggedIn: true, error: false, msg: action.payload.response.msg });
+    case operatorLoginModalActions.failureAction:
+      return state.merge({
+        isOperatorLoggedIn: false,
+        error: true,
+        msg: action.payload.serverErrors,
+      });
 
-        case operatorLoginModalActions.failureAction:
-            return state.merge({ isOperatorLoggedIn: false, error: true, msg: action.payload.serverErrors });
-            
-        default: return state;
-    }
-}
+    case operatorLoginModalActions.resetAction:
+      return state.merge({
+        isOperatorLoggedIn: false,
+        error: false,
+        msg: "",
+        deckName: "",
+      });
 
-
+    default:
+      return state;
+  }
+};
