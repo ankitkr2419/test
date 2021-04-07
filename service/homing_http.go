@@ -8,7 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
-	
 )
 
 func homingHandler(deps Dependencies) http.HandlerFunc {
@@ -41,7 +40,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			deps.WsErrCh <- err
 		} else {
 			logger.Infoln(response)
-			deps.WsMsgCh <- "success_homing_successfully homed"
+			deps.WsMsgCh <- "success_homing_successfully homed " + deck
 		}
 
 	})

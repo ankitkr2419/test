@@ -22,6 +22,7 @@ import {
   resumeRecipeReset,
   abortRecipeReset,
 } from "action-creators/recipeActionCreators";
+import { operatorLoginReset } from "action-creators/operatorLoginModalActionCreators";
 import {
   discardTipAndHomingActionInitiated,
   discardTipAndHomingActionReset,
@@ -48,8 +49,8 @@ const TopContent = styled.div`
     font-size: 18px;
     color: #3c3c3c;
   }
-  .btn-clean-up{
-    width:7.063rem;
+  .btn-clean-up {
+    width: 7.063rem;
   }
 `;
 
@@ -60,6 +61,7 @@ const HeadingTitle = styled.label`
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
   const [timeModal, setTimeModal] = useState(false);
+  const [trayDiscardModal, setTrayDiscardModal] = useState(false);
   const [hours, setHours] = useState(0);
   const [mins, setMins] = useState(0);
   const [secs, setSecs] = useState(0);
@@ -77,8 +79,13 @@ const RecipeListingComponent = (props) => {
     (state) => state.operatorLoginModalReducer
   );
   const { deckName } = operatorLoginModalReducer.toJS();
+
   const handleTimeModal = () => {
     setTimeModal(!timeModal);
+  };
+
+  const handleTrayDiscardModal = () => {
+    setTrayDiscardModal(!trayDiscardModal);
   };
 
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
@@ -119,6 +126,7 @@ const RecipeListingComponent = (props) => {
   //Do not change '===';
   useEffect(() => {
     if (tipDiscardHomingError === false) {
+      dispatch(operatorLoginReset());
       setTipDiscardModal(false);
       setRedirect(true);
     } else if (tipDiscardHomingError === true) {
@@ -281,6 +289,15 @@ const RecipeListingComponent = (props) => {
             secs={secs}
             handleChangeTime={handleChangeTime}
             submitTime={submitTime}
+            deckName={deckName}
+          />
+        )}
+
+        {trayDiscardModal && (
+          <TrayDiscardModal
+            trayDiscardModal={trayDiscardModal}
+            toggleTrayDiscardModal={handleTrayDiscardModal}
+            deckName={deckName}
           />
         )}
 
@@ -302,12 +319,19 @@ const RecipeListingComponent = (props) => {
               <Button
                 color="secondary"
                 className="ml-auto"
-                onClick={() => handleTimeModal()}
+                onClick={handleTimeModal}
               >
                 {" "}
               Clean Up
             </Button>
-              <TrayDiscardModal />
+
+              <Button
+                color="secondary"
+                className="ml-2 border-primary btn-discard-tray"
+                onClick={handleTrayDiscardModal}
+              >
+                Discard Tray
+            </Button>
             </div>
           }
         </TopContent>
