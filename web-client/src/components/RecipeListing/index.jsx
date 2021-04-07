@@ -48,8 +48,8 @@ const TopContent = styled.div`
     font-size: 18px;
     color: #3c3c3c;
   }
-  .btn-clean-up{
-    width:7.063rem;
+  .btn-clean-up {
+    width: 7.063rem;
   }
 `;
 
@@ -60,6 +60,7 @@ const HeadingTitle = styled.label`
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
   const [timeModal, setTimeModal] = useState(false);
+  const [trayDiscardModal, setTrayDiscardModal] = useState(false);
   const [hours, setHours] = useState(0);
   const [mins, setMins] = useState(0);
   const [secs, setSecs] = useState(0);
@@ -79,6 +80,14 @@ const RecipeListingComponent = (props) => {
   const { deckName } = operatorLoginModalReducer.toJS();
   const handleTimeModal = () => {
     setTimeModal(!timeModal);
+  };
+
+  const handleTimeModal = () => {
+    setTimeModal(!timeModal);
+  };
+
+  const handleTrayDiscardModal = () => {
+    setTrayDiscardModal(!trayDiscardModal);
   };
 
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
@@ -281,6 +290,15 @@ const RecipeListingComponent = (props) => {
             secs={secs}
             handleChangeTime={handleChangeTime}
             submitTime={submitTime}
+            deckName={deckName}
+          />
+        )}
+
+        {trayDiscardModal && (
+          <TrayDiscardModal
+            trayDiscardModal={trayDiscardModal}
+            toggleTrayDiscardModal={handleTrayDiscardModal}
+            deckName={deckName}
           />
         )}
 
@@ -304,7 +322,14 @@ const RecipeListingComponent = (props) => {
               {" "}
               Clean Up
             </Button>
-            <TrayDiscardModal />
+
+            <Button
+              color="secondary"
+              className="ml-2 border-primary btn-discard-tray"
+              onClick={() => handleTrayDiscardModal()}
+            >
+              Discard Tray
+            </Button>
           </div>
         </TopContent>
 

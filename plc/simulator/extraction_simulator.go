@@ -82,14 +82,14 @@ func (us *ExtractionSimulator) TipDocking(td db.TipDock, cartridgeID int64) (res
 func (us *ExtractionSimulator) TipOperation(to db.TipOperation) (response string, err error) {
 	return "SUCCESS", nil
 }
-func (us *ExtractionSimulator) TipPickup(pos int64) (response string, err error) {
-	return "SUCCESS", nil
-}
-func (us *ExtractionSimulator) TipDiscard() (response string, err error) { return "SUCCESS", nil }
+
 func (us *ExtractionSimulator) AttachDetach(db.AttachDetach) (response string, err error) {
 	return "SUCCESS", nil
 }
 func (us *ExtractionSimulator) AddDelay(db.Delay) (string, error) { return "SUCCESS", nil }
 func (us *ExtractionSimulator) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
+	return "SUCCESS", nil
+}
+func (us *ExtractionSimulator) DiscardTipAndHome(discard bool) (response string, err error) {
 	return "SUCCESS", nil
 }
