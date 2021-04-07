@@ -78,9 +78,6 @@ const RecipeListingComponent = (props) => {
     (state) => state.operatorLoginModalReducer
   );
   const { deckName } = operatorLoginModalReducer.toJS();
-  const handleTimeModal = () => {
-    setTimeModal(!timeModal);
-  };
 
   const handleTimeModal = () => {
     setTimeModal(!timeModal);
