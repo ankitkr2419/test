@@ -11,6 +11,7 @@ import RecipeFlowModal from "components/modals/RecipeFlowModal";
 // import ConfirmationModal from "components/modals/ConfirmationModal";
 import TrayDiscardModal from "components/modals/TrayDiscardModal";
 import RecipeCard from "components/RecipeListing/RecipeCard";
+import TimeModal from "components/modals/TimeModal";
 import {
   abortRecipeInitiated,
   pauseRecipeInitiated,
@@ -28,6 +29,7 @@ import {
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PaginationBox from "shared-components/PaginationBox";
 import TipDiscardModal from "components/modals/TipDiscardModal";
+import { cleanUpActionInitiated } from "action-creators/cleanUpActionCreators";
 
 const RecipeListing = styled.div`
   .landing-content {
@@ -54,6 +56,10 @@ const HeadingTitle = styled.label`
 `;
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
+  const [timeModal, setTimeModal] = useState(false);
+  const [hours, setHours] = useState(0);
+  const [mins, setMins] = useState(0);
+  const [secs, setSecs] = useState(0);
 
   const dispatch = useDispatch();
 
@@ -68,6 +74,9 @@ const RecipeListingComponent = (props) => {
     (state) => state.operatorLoginModalReducer
   );
   const { deckName } = operatorLoginModalReducer.toJS();
+  const handleTimeModal = () => {
+    setTimeModal(!timeModal);
+  };
 
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const {
@@ -167,6 +176,27 @@ const RecipeListingComponent = (props) => {
     setProgressPercentComplete(0);
   };
 
+  const handleChangeTime = (event) => {
+    let name = event.target.name;
+    if (name === "hours") {
+      setHours(event.target.value);
+    } else if (name === "minutes") {
+      setMins(event.target.value);
+    } else {
+      setSecs(event.target.value);
+    }
+  };
+
+  const submitTime = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(
+      cleanUpActionInitiated({
+        time: `${hours}:${mins}:${secs}`,
+        deckName: name,
+      })
+    );
+  };
+
   const handleCancelAction = () => setShowProcess(!showProcess);
   const handleAbortAction = () => setConfirmationModal(true);
 
@@ -239,6 +269,17 @@ const RecipeListingComponent = (props) => {
           successBtn={MODAL_BTN.yes}
           failureBtn={MODAL_BTN.no}
         />
+        {timeModal && (
+          <TimeModal
+            timeModal={timeModal}
+            toggleTimeModal={handleTimeModal}
+            hours={hours}
+            mins={mins}
+            secs={secs}
+            handleChangeTime={handleChangeTime}
+            submitTime={submitTime}
+          />
+        )}
 
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
           <div className="d-flex align-items-center">
@@ -250,13 +291,13 @@ const RecipeListingComponent = (props) => {
               Select a Recipe for Deck B
             </HeadingTitle>
           </div>
-          <div className="d-flex ml-auto">
-            <ButtonIcon
-              name="download-1"
-              size={28}
-              className="bg-white border-primary"
-            />
-            <Button color="secondary" className="ml-2 border-primary">
+          <div className="">
+            <Icon name="download" size={19} className="text-white mr-3" />
+            <Button
+              color="secondary"
+              className="ml-auto"
+              onClick={() => handleTimeModal()}
+            >
               {" "}
               Clean Up
             </Button>

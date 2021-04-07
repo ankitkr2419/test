@@ -40,6 +40,7 @@ import { homingReducer, discardTipAndHomingReducer } from "reducers/homingReduce
 import { recipeActionReducer } from "reducers/recipeActionReducer";
 import { restoreDeckReducer } from "reducers/restoreDeckReducer";
 import { discardDeckReducer } from "reducers/discardDeckReducer";
+import { cleanUpReducer } from "reducers/cleanUpReducer";
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -76,6 +77,7 @@ const rootReducer = combineReducers({
 	restoreDeckReducer,
 	discardDeckReducer,
 	discardTipAndHomingReducer,
+	cleanUpReducer
 });
 
 export default rootReducer;
