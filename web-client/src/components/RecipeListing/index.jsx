@@ -302,34 +302,38 @@ const RecipeListingComponent = (props) => {
         )}
 
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
-          <div className="d-flex align-items-center">
-            <Icon name="angle-left" size={32} className="text-white" />
-            <HeadingTitle
-              Tag="h5"
-              className="text-white font-weight-bold ml-3 mb-0"
-            >
-              Select a Recipe for Deck B
+          {showProcess ? null :
+            <div className="d-flex align-items-center">
+              <Icon name="angle-left" size={32} className="text-white" />
+              <HeadingTitle
+                Tag="h5"
+                className="text-white font-weight-bold ml-3 mb-0"
+              >
+                Select a Recipe for Deck B
             </HeadingTitle>
-          </div>
-          <div className="">
-            <Icon name="download" size={19} className="text-white mr-3" />
-            <Button
-              color="secondary"
-              className="ml-auto"
-              onClick={handleTimeModal}
-            >
-              {" "}
+            </div>
+          }
+          {showProcess ? null :
+            <div className="">
+              <Icon name="download" size={19} className="text-white mr-3" />
+              <Button
+                color="secondary"
+                className="ml-auto"
+                onClick={handleTimeModal}
+              >
+                {" "}
               Clean Up
             </Button>
 
-            <Button
-              color="secondary"
-              className="ml-2 border-primary btn-discard-tray"
-              onClick={handleTrayDiscardModal}
-            >
-              Discard Tray
+              <Button
+                color="secondary"
+                className="ml-2 border-primary btn-discard-tray"
+                onClick={handleTrayDiscardModal}
+              >
+                Discard Tray
             </Button>
-          </div>
+            </div>
+          }
         </TopContent>
 
         {showProcess ? (
