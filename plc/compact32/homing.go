@@ -35,6 +35,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	runInProgress.Store(d.name, true)
 	defer d.ResetRunInProgress()
 
+	
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
 		fmt.Println("Inside Switch off Shaker err : ", err, d.name)
@@ -50,17 +51,14 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		panic(err)
 	}
 
-	fmt.Println("Moving Syringe Module UP till sensor cuts it")
-	response, err = d.syringeModuleHoming()
-	if err != nil {
-		panic(err)
-	}
-
 	//web socket response for syringe homing
+	d.setHomingPercent(25.0)
 
+	// NOTE: getHomingPercent will handle both Deck homing percent
+	// Similarly getHomingDeckName will handle both Deck Name convention 
 	wsProgressOperation := plc.WSData{
-		Progress: 25,
-		Deck:     d.name,
+		Progress: d.getHomingPercent(),
+		Deck:     d.getHomingDeckName(),
 		Status:   "PROGRESS_HOMING",
 		OperationDetails: plc.OperationDetails{
 			Message: fmt.Sprintf("successfully homed syringe for deck %v", d.name),
@@ -72,7 +70,27 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		d.WsErrCh <- err
 	}
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
+	d.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", d.getHomingDeckName(), string(wsData))
+
+	fmt.Println("Moving Syringe Module UP till sensor cuts it")
+	response, err = d.syringeModuleHoming()
+	if err != nil {
+		panic(err)
+	}
+
+	//web socket response for syringe homing
+	d.setHomingPercent(50.0)
+
+	wsProgressOperation.Progress = d.getHomingPercent()
+	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed syringe for deck %v", d.name)
+
+	wsData, err = json.Marshal(wsProgressOperation)
+	if err != nil {
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		d.WsErrCh <- err
+	}
+	
+	d.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", d.getHomingDeckName(), string(wsData))
 
 	fmt.Println("Homing Magnet")
 	response, err = d.magnetHoming()
@@ -82,30 +100,36 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 	//web socket response for magnet homing
 
-	wsProgressOperation.Progress = 75
+	d.setHomingPercent(75.0)
+
+	wsProgressOperation.Progress = d.getHomingPercent()
 	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed magnet for deck %v", d.name)
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		d.WsErrCh <- err
 	}
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
+	
+	d.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", d.getHomingDeckName(), string(wsData))
 
-	// Started Homing
+	// Started Deck Homing
 	fmt.Println("Moving deck forward till sensor cuts it")
 	response, err = d.deckHoming()
 	if err != nil {
 		panic(err)
 	}
-
+	
+	d.setHomingPercent(100.0)
+	
+	wsProgressOperation.Progress = d.getHomingPercent()
 	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed deck %v", d.name)
-	wsProgressOperation.Progress = 100
+	
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		d.WsErrCh <- err
 	}
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
+	d.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", d.getHomingDeckName(), string(wsData))
 
 	homed.Store(d.name, true)
 
