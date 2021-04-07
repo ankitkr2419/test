@@ -48,6 +48,9 @@ const TopContent = styled.div`
     font-size: 18px;
     color: #3c3c3c;
   }
+  .btn-clean-up{
+    width:7.063rem;
+  }
 `;
 
 const HeadingTitle = styled.label`
