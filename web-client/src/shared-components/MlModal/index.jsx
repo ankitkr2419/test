@@ -3,7 +3,20 @@ import PropTypes from "prop-types";
 import { Button, Modal, ModalBody } from "core-components";
 import { Center, Text, ButtonGroup, ButtonIcon } from "shared-components";
 import { Progress } from "reactstrap";
+import styled from "styled-components";
 
+const CustomProgressBar = styled.div`
+.custom-progress-bar{
+  border-radius:7px;
+  background-color:#B2DAD131;
+  border: 1px solid #B2DAD131;
+  .progress-bar{
+    height:0.875rem;
+    background-color:#92C4BC;
+    border-radius:7px 0px 0px 7px;
+  }
+}
+`;
 const MlModal = (props) => {
   const {
     textHead,
@@ -61,14 +74,14 @@ const MlModal = (props) => {
 
         {/* Conditional rendering for progress bar */}
         {isProgressBarVisible && (
-          <div mt-2>
+         <CustomProgressBar className="mx-5">
             <Progress
               value={progressPercentage}
               className="custom-progress-bar"
             />
-          </div>
+           </CustomProgressBar>
         )}
-
+       
         <Center className="text-center p-0 m-0 pt-5">
           <ButtonGroup className="text-center mt-5">
             {failureBtn && (
