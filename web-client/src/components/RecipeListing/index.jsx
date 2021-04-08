@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Redirect } from "react-router-dom";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon, MlModal, VideoCard, ButtonIcon } from "shared-components";
+import { Icon, MlModal, VideoCard } from "shared-components";
 
 import styled from "styled-components";
 import AppFooter from "components/AppFooter";
@@ -10,6 +11,7 @@ import RecipeFlowModal from "components/modals/RecipeFlowModal";
 // import ConfirmationModal from "components/modals/ConfirmationModal";
 import TrayDiscardModal from "components/modals/TrayDiscardModal";
 import RecipeCard from "components/RecipeListing/RecipeCard";
+import TimeModal from "components/modals/TimeModal";
 import {
   abortRecipeInitiated,
   pauseRecipeInitiated,
@@ -20,25 +22,35 @@ import {
   resumeRecipeReset,
   abortRecipeReset,
 } from "action-creators/recipeActionCreators";
-import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import { operatorLoginReset } from "action-creators/operatorLoginModalActionCreators";
+import {
+  discardTipAndHomingActionInitiated,
+  discardTipAndHomingActionReset,
+} from "action-creators/homingActionCreators";
+import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PaginationBox from "shared-components/PaginationBox";
+import TipDiscardModal from "components/modals/TipDiscardModal";
+import { cleanUpActionInitiated } from "action-creators/cleanUpActionCreators";
 
 const RecipeListing = styled.div`
-  .landing-content{
+  .landing-content {
     padding: 1.25rem 4.5rem 0.875rem 4.5rem;
-    &::after{
-      height:9.125rem;
+    &::after {
+      height: 9.125rem;
     }
-    .recipe-listing-cards{
-      height:30.75rem;
+    .recipe-listing-cards {
+      height: 30.75rem;
     }
   }
 `;
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
-  .icon-download-1{
-    font-size:18px;
-    color:#3C3C3C;
+  .icon-download-1 {
+    font-size: 18px;
+    color: #3c3c3c;
+  }
+  .btn-clean-up {
+    width: 7.063rem;
   }
 `;
 
@@ -48,13 +60,33 @@ const HeadingTitle = styled.label`
 `;
 const RecipeListingComponent = (props) => {
   const { allRecipeData } = props;
+  const [timeModal, setTimeModal] = useState(false);
+  const [trayDiscardModal, setTrayDiscardModal] = useState(false);
+  const [hours, setHours] = useState(0);
+  const [mins, setMins] = useState(0);
+  const [secs, setSecs] = useState(0);
 
   const dispatch = useDispatch();
+
+  const discardTipAndHomingReducer = useSelector(
+    (state) => state.discardTipAndHomingReducer
+  );
+  const { error, serverErrors } = discardTipAndHomingReducer;
+  const tipDiscardHomingError = error;
+  const tipDiscardServerErrors = serverErrors;
 
   const operatorLoginModalReducer = useSelector(
     (state) => state.operatorLoginModalReducer
   );
   const { deckName } = operatorLoginModalReducer.toJS();
+
+  const handleTimeModal = () => {
+    setTimeModal(!timeModal);
+  };
+
+  const handleTrayDiscardModal = () => {
+    setTrayDiscardModal(!trayDiscardModal);
+  };
 
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const {
@@ -68,13 +100,14 @@ const RecipeListingComponent = (props) => {
     // isLoading,
   } = recipeActionReducer;
 
+  const [redirect, setRedirect] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState(false);
+  const [tipDiscardModal, setTipDiscardModal] = useState(false);
   const [recipeData, setRecipeData] = useState({});
   const [progressPercentComplete, setProgressPercentComplete] = useState(0);
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = (recipeId, recipeName, processCount) => {
-    // const tempRecipeId = "bb7fcfa2-8337-4d79-829a-e9bd486add14";
     const data = {
       recipeId: recipeId,
       recipeName: recipeName,
@@ -90,11 +123,20 @@ const RecipeListingComponent = (props) => {
     setIsOpen(!isOpen);
   };
 
+  //Do not change '===';
   useEffect(() => {
-    //Do not change '===';
-    if (abortRecipeError === false && confirmationModal) {
+    if (tipDiscardHomingError === false) {
+      dispatch(operatorLoginReset());
+      setTipDiscardModal(false);
+      setRedirect(true);
+    } else if (tipDiscardHomingError === true) {
+      //show toast error msg for tip discard and homing error
+      console.log("Error in tip discard and homing: ", tipDiscardServerErrors);
+    }
+
+    if (abortRecipeError === false) {
       setConfirmationModal(false);
-      setShowProcess(false);
+      setTipDiscardModal(true);
     }
 
     if (
@@ -106,11 +148,14 @@ const RecipeListingComponent = (props) => {
       //show toast with error msg
     }
 
+    dispatch(discardTipAndHomingActionReset());
     dispatch(abortRecipeReset());
     dispatch(runRecipeReset());
     dispatch(resumeRecipeReset());
     dispatch(pauseRecipeReset());
   }, [
+    tipDiscardServerErrors,
+    tipDiscardHomingError,
     runRecipeError,
     pauseRecipeError,
     resumeRecipeError,
@@ -142,12 +187,43 @@ const RecipeListingComponent = (props) => {
     setProgressPercentComplete(0);
   };
 
+  const handleChangeTime = (event) => {
+    let name = event.target.name;
+    if (name === "hours") {
+      setHours(event.target.value);
+    } else if (name === "minutes") {
+      setMins(event.target.value);
+    } else {
+      setSecs(event.target.value);
+    }
+  };
+
+  const submitTime = () => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(
+      cleanUpActionInitiated({
+        time: `${hours}:${mins}:${secs}`,
+        deckName: name,
+      })
+    );
+  };
+
   const handleCancelAction = () => setShowProcess(!showProcess);
   const handleAbortAction = () => setConfirmationModal(true);
 
   const toggleConfirmModal = () => {
     const name = deckName === "Deck A" ? "A" : "B";
     dispatch(abortRecipeInitiated({ deckName: name }));
+  };
+
+  const toggleTipDiscardModal = (discardTip) => {
+    const name = deckName === "Deck A" ? "A" : "B";
+    dispatch(
+      discardTipAndHomingActionInitiated({
+        deckName: name,
+        discardTip: discardTip,
+      })
+    );
   };
 
   const getLeftActionBtnHandler = () => {
@@ -176,6 +252,9 @@ const RecipeListingComponent = (props) => {
     }
   };
 
+  if (redirect) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
   return (
     <RecipeListing>
       <div className="landing-content px-2">
@@ -184,6 +263,12 @@ const RecipeListingComponent = (props) => {
           toggle={toggle}
           toggleShowProcess={toggleShowProcess}
           recipeData={recipeData}
+        />
+
+        <TipDiscardModal
+          isOpen={tipDiscardModal}
+          handleSuccessBtn={toggleTipDiscardModal}
+          deckName={deckName}
         />
 
         <MlModal
@@ -195,25 +280,60 @@ const RecipeListingComponent = (props) => {
           successBtn={MODAL_BTN.yes}
           failureBtn={MODAL_BTN.no}
         />
+        {timeModal && (
+          <TimeModal
+            timeModal={timeModal}
+            toggleTimeModal={handleTimeModal}
+            hours={hours}
+            mins={mins}
+            secs={secs}
+            handleChangeTime={handleChangeTime}
+            submitTime={submitTime}
+            deckName={deckName}
+          />
+        )}
+
+        {trayDiscardModal && (
+          <TrayDiscardModal
+            trayDiscardModal={trayDiscardModal}
+            toggleTrayDiscardModal={handleTrayDiscardModal}
+            deckName={deckName}
+          />
+        )}
 
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
-          <div className="d-flex align-items-center">
-            <Icon name="angle-left" size={32} className="text-white" />
-            <HeadingTitle
-              Tag="h5"
-              className="text-white font-weight-bold ml-3 mb-0"
-            >
-              Select a Recipe for Deck B
+          {showProcess ? null :
+            <div className="d-flex align-items-center">
+              <Icon name="angle-left" size={32} className="text-white" />
+              <HeadingTitle
+                Tag="h5"
+                className="text-white font-weight-bold ml-3 mb-0"
+              >
+                Select a Recipe for Deck B
             </HeadingTitle>
-          </div>
-          <div className="d-flex ml-auto">
-            <ButtonIcon name="download-1" size={28} className="bg-white border-primary" />
-            <Button color="secondary" className="ml-2 border-primary">
-              {" "}
+            </div>
+          }
+          {showProcess ? null :
+            <div className="">
+              <Icon name="download" size={19} className="text-white mr-3" />
+              <Button
+                color="secondary"
+                className="ml-auto"
+                onClick={handleTimeModal}
+              >
+                {" "}
               Clean Up
             </Button>
-            <TrayDiscardModal />
-          </div>
+
+              <Button
+                color="secondary"
+                className="ml-2 border-primary btn-discard-tray"
+                onClick={handleTrayDiscardModal}
+              >
+                Discard Tray
+            </Button>
+            </div>
+          }
         </TopContent>
 
         {showProcess ? (
@@ -225,7 +345,7 @@ const RecipeListingComponent = (props) => {
                 <PaginationBox />
               </div>
               <Row>
-                {allRecipeData.length > 0 ? (
+                {allRecipeData && allRecipeData.length > 0 ? (
                   allRecipeData.map((value, index) => (
                     <Col md={6} key={index}>
                       <RecipeCard

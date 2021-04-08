@@ -32,6 +32,30 @@ func (d *Compact32Deck) resetHeaterInProgress() {
 	heaterInProgress.Store(d.name, false)
 }
 
+func (d *Compact32Deck) setAborted() {
+	aborted.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetAborted() {
+	aborted.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setPaused() {
+	paused.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetPaused() {
+	paused.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setHomed() {
+	homed.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetHomed() {
+	homed.Store(d.name, false)
+}
+
 func (d *Compact32Deck) setUVLightInProgress() {
 	uvLightInProgress.Store(d.name, true)
 }
@@ -110,6 +134,15 @@ func (d *Compact32Deck) isUVLightInProgress() bool {
 func (d *Compact32Deck) getMagnetState() int {
 	if temp, ok := magnetState.Load(d.name); !ok {
 		logger.Errorln("magnet State isn't loaded!")
+		return -1
+	} else {
+		return temp.(int)
+	}
+}
+
+func (d *Compact32Deck) getSyringeModuleState() int {
+	if temp, ok := syringeModuleState.Load(d.name); !ok {
+		logger.Errorln("Syringe Module State isn't loaded!")
 		return -1
 	} else {
 		return temp.(int)

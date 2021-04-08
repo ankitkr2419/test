@@ -34,6 +34,12 @@ export const SOCKET_MESSAGE_TYPE = {
   temperatureData: "Temperature",
   homingProgress: "PROGRESS_HOMING",
   homingSuccess: "SUCCESS_HOMING",
+  runRecipeProgress: "PROGRESS_RECIPE",
+  runRecipeSuccess: "SUCCESS_RECIPE",
+  uvLightProgress: "PROGRESS_UVLIGHT",
+  uvLightSuccess: "SUCCESS_UVLIGHT",
+  discardTipProgress: "DISCARD_TIP_PROGRESS",
+  discardTipSuccess: "DISCARD_TIP_SUCCESS"
 };
 
 export const EXPERIMENT_STATUS = {
@@ -60,6 +66,8 @@ export const API_ENDPOINTS = {
   discardDeck: "discard-box/cleanup",
   restoreDeck: "restore-deck",
   recipeListing: "recipes",
+  discardTipAndHoming: "discard-tip-and-home",
+  cleanUp: "uv"
 };
 
 export const MODAL_MESSAGE = {
@@ -80,22 +88,22 @@ export const MODAL_BTN = {
 };
 
 export const DECKCARD_BTN = {
-	text: {
-		run: "RUN",
-		abort: "ABORT",
-		cancel: "CANCEL",
-		pause: "PAUSE",
-		done: "DONE",
-		resume: "RESUME",
-	},
-	icon: {
-		run: "play",
-		abort: "abort",
-		cancel: "cancel",
-		pause: "pause",
-		done: "done",
-		resume: "resume",
-	}
+  text: {
+    run: "RUN",
+    abort: "ABORT",
+    cancel: "CANCEL",
+    pause: "PAUSE",
+    done: "DONE",
+    resume: "RESUME",
+  },
+  icon: {
+    run: "play",
+    abort: "abort",
+    cancel: "cancel",
+    pause: "pause",
+    done: "done",
+    resume: "resume",
+  },
 };
 
 export const DECKNAME = {

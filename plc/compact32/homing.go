@@ -32,7 +32,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		}
 	}()
 
-	runInProgress.Store(d.name, true)
+	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
 	
@@ -43,7 +43,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	}
 	fmt.Println("Switched off the shaker--> for ", d.name)
 
-	aborted.Store(d.name, false)
+	d.resetAborted()
 
 	fmt.Println("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.syringeHoming()
@@ -131,7 +131,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	}
 	d.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", d.getHomingDeckName(), string(wsData))
 
-	homed.Store(d.name, true)
+	d.setHomed()
 
 	fmt.Println("Homing Completed Successfully")
 
@@ -161,7 +161,6 @@ func (d *Compact32Deck) syringeHoming() (response string, err error) {
 	}
 
 	fmt.Println("Syringe homing is completed")
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed syringe for deck %v", d.name)
 
 	return "SYRINGE HOMING COMPLETED", nil
 }
@@ -218,7 +217,6 @@ func (d *Compact32Deck) deckHoming() (response string, err error) {
 	}
 
 	fmt.Println("Deck homing is completed.")
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed deck %v", d.name)
 
 	return "DECK HOMING SUCCESS", nil
 }

@@ -40,6 +40,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 		fmt.Println("Error: ", err)
 		return "", err
 	}
+	distanceToTravel = positions[syringeModuleDeckAndMotor] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 

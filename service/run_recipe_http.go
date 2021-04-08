@@ -33,6 +33,8 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 		switch deck {
 		case "A", "B":
 			rw.WriteHeader(http.StatusOK)
+			rw.Header().Add("Content-Type", "application/json")
+			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
 			response, err = runRecipe(req.Context(), deps, deck, recipeID)
 			if err != nil {
 				deps.WsErrCh <- err

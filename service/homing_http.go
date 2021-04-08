@@ -8,7 +8,6 @@ import (
 	"mylab/cpagent/plc/compact32"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
-	
 )
 
 func homingHandler(deps Dependencies) http.HandlerFunc {

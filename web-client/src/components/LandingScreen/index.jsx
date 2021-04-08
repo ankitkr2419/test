@@ -9,10 +9,10 @@ import { homingActionInitiated } from "action-creators/homingActionCreators";
 import { VideoCard, MlModal, Loader } from "shared-components";
 import styled from "styled-components";
 const LandingScreen = styled.div`
-  .landing-content{
+  .landing-content {
     padding: 2.313rem 4.5rem;
-    &::after{
-      height:9.125rem;
+    &::after {
+      height: 9.125rem;
     }
   }
 `;

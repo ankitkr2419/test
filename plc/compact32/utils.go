@@ -65,8 +65,18 @@ const (
 	attached
 )
 
+// Syringe module States
+const (
+	InDeck = iota
+	OutDeck
+)
+
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
-var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress sync.Map
+var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress, syringeModuleState sync.Map
+
+// Special variables for both deck operation
+var BothDeckHomingInProgress bool
+var homingPercent sync.Map
 
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
@@ -94,6 +104,9 @@ func LoadUtils() {
 	uvLightInProgress.Store("B", false)
 	magnetState.Store("A", detached)
 	magnetState.Store("B", detached)
+	syringeModuleState.Store("A", OutDeck)
+	syringeModuleState.Store("B", OutDeck)
+
 	homed.Store("A", false)
 	homed.Store("B", false)
 
