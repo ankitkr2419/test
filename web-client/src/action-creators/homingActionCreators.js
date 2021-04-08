@@ -3,7 +3,6 @@ import {
   deckHomingActions,
   discardTipAndHomingActions,
 } from "actions/homingActions";
-import { toast } from "react-toastify";
 
 export const homingActionInitiated = () => ({
   type: homingActions.homingActionInitiated,
