@@ -35,13 +35,12 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
-	if err != nil {
-		fmt.Println("Inside Switch off Shaker err : ", err, d.name)
-		panic(err)
-	}
-	fmt.Println("Switched off the shaker--> for ", d.name)
+	// err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
+	// if err != nil {
+	// 	fmt.Println("Inside Switch off Shaker err : ", err, d.name)
+	// 	panic(err)
+	// }
+	// fmt.Println("Switched off the shaker--> for ", d.name)
 
 	d.resetAborted()
 
@@ -55,7 +54,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.setHomingPercent(25.0)
 
 	// NOTE: getHomingPercent will handle both Deck homing percent
-	// Similarly getHomingDeckName will handle both Deck Name convention 
+	// Similarly getHomingDeckName will handle both Deck Name convention
 	wsProgressOperation := plc.WSData{
 		Progress: d.getHomingPercent(),
 		Deck:     d.getHomingDeckName(),
@@ -89,7 +88,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		d.WsErrCh <- err
 	}
-	
+
 	d.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", d.getHomingDeckName(), string(wsData))
 
 	fmt.Println("Homing Magnet")
@@ -109,7 +108,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		d.WsErrCh <- err
 	}
-	
+
 	d.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", d.getHomingDeckName(), string(wsData))
 
 	// Started Deck Homing
@@ -118,12 +117,12 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	d.setHomingPercent(100.0)
-	
+
 	wsProgressOperation.Progress = d.getHomingPercent()
 	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed deck %v", d.name)
-	
+
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
