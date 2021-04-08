@@ -7,10 +7,10 @@ export const initialState = {
   isLoading: false,
   homingData: {},
   serverErrors: {},
-  homingAllDeckCompletionPercentage: 50,
+  homingAllDeckCompletionPercentage: 0,
   isHomingActionCompleted: false,
   homingActionInProgress: {},
-  homingActionInCompleted: {}
+  homingActionInCompleted: {},
 };
 
 export const homingReducer = (state = initialState, action = {}) => {
@@ -30,7 +30,6 @@ export const homingReducer = (state = initialState, action = {}) => {
     //   return { ...state, ...action.payload, isLoading: false };
 
     case homingActions.homingActionInProgress:
-      console.log("PROGRESS----------->", action.payload);
       return {
         ...state,
         ...action.payload,
