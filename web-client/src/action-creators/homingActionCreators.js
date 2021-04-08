@@ -24,13 +24,10 @@ export const homingActionFailed = (serverErrors) => ({
   },
 });
 
-export const homingActionInProgress = (homingActionInProgress) => (
-  {
-    type: homingActions.homingActionInProgress,
-    payload: homingActionInProgress,
-  },
-  toast.success("MY SUCCESS")
-);
+export const homingActionInProgress = (homingActionInProgress) => ({
+  type: homingActions.homingActionInProgress,
+  payload: homingActionInProgress,
+});
 
 export const homingActionInCompleted = (homingActionInCompleted) => ({
   type: homingActions.homingActionInCompleted,

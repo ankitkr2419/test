@@ -17,15 +17,18 @@ import {
 
 import {
   runRecipeInProgress,
-  runRecipeInCompleted
+  runRecipeInCompleted,
 } from "action-creators/recipeActionCreators";
 
 import {
   cleanUpActionInProgress,
-  cleanUpActionInCompleted
+  cleanUpActionInCompleted,
 } from "action-creators/cleanUpActionCreators";
 
-import { discardTipInProgress, discardTipInCompleted } from "action-creators/discardDeckActionCreators";
+import {
+  discardTipInProgress,
+  discardTipInCompleted,
+} from "action-creators/discardDeckActionCreators";
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
