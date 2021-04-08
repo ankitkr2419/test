@@ -150,6 +150,7 @@ const DeckCardBox = styled.div`
     }
   }
   .marquee{
+    width: 80%;
     white-space: nowrap;
     overflow: hidden;
     box-sizing: border-box;

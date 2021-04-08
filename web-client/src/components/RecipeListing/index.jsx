@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon, MlModal, VideoCard } from "shared-components";
+import { Icon, MlModal, VideoCard, ButtonIcon } from "shared-components";
 
 import styled from "styled-components";
 import AppFooter from "components/AppFooter";
@@ -46,11 +46,17 @@ const RecipeListing = styled.div`
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
   .icon-download-1 {
-    font-size: 18px;
+    font-size: 1.125rem;
     color: #3c3c3c;
   }
   .btn-clean-up {
     width: 7.063rem;
+  }
+  .btn-discard-tray{
+    width:10rem;
+  }
+  .icon-logout{
+    font-size:1rem;
   }
 `;
 
@@ -314,11 +320,11 @@ const RecipeListingComponent = (props) => {
             </div>
           }
           {showProcess ? null :
-            <div className="">
-              <ButtonIcon name="download-1" size={19} className="mr-3" />
+            <div className="d-flex align-items-center ml-auto">
+              <ButtonIcon name="download-1" size={28} className="bg-white border-primary" />
               <Button
                 color="secondary"
-                className="ml-auto border-primary bg-white"
+                className="ml-2 border-primary btn-clean-up bg-white"
                 onClick={handleTimeModal}
               >
                 {" "}
@@ -332,6 +338,8 @@ const RecipeListingComponent = (props) => {
               >
                 Discard Tray
             </Button>
+
+            <ButtonIcon name="logout" size={28} className="ml-2 bg-white border-primary" />
             </div>
           }
         </TopContent>
