@@ -14,10 +14,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 ReactDOM.render(
   <Provider store={store}>
+    <ToastContainer />
     <Router>
       <Switch>
         <Route path="/" component={Routes} />
-        <ToastContainer position="top-right" autoClose={5000} />
       </Switch>
     </Router>
   </Provider>,

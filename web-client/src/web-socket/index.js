@@ -30,6 +30,8 @@ import {
   discardTipInCompleted,
 } from "action-creators/discardDeckActionCreators";
 
+import { toast } from "react-toastify";
+
 let webSocket = null;
 export const connectSocket = (dispatch) => {
   webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`);
@@ -57,6 +59,7 @@ export const connectSocket = (dispatch) => {
           dispatch(homingActionInProgress(data));
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
+          toast.success("Homing Successfull");
           dispatch(homingActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
