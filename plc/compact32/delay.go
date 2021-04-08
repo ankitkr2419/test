@@ -69,7 +69,7 @@ skipToStartTimer:
 					logger.Errorf("error in marshalling web socket data %v", err.Error())
 					d.WsErrCh <- err
 				}
-				d.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
+				d.WsMsgCh <- fmt.Sprintf("progress_uvLight_%v", string(wsData))
 			}
 			// if paused then
 			// when timer was paused go again to timer start

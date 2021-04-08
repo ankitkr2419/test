@@ -126,6 +126,9 @@ func (us *ExtractionSimulator) Piercing(pi db.Piercing, cartridgeID int64) (resp
 
 	return "SUCCESS", nil
 }
-func (us *ExtractionSimulator) DiscardTipAndHome(discard bool) (response string, err error) {
+
+func (us *ExtractionSimulator) DiscardTipAndHome(bool) (response string, err error) {
+	time.Sleep(time.Second * 1)
+
 	return "SUCCESS", nil
 }

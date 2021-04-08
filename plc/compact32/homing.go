@@ -161,7 +161,6 @@ func (d *Compact32Deck) syringeHoming() (response string, err error) {
 	}
 
 	fmt.Println("Syringe homing is completed")
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed syringe for deck %v", d.name)
 
 	return "SYRINGE HOMING COMPLETED", nil
 }
@@ -218,7 +217,6 @@ func (d *Compact32Deck) deckHoming() (response string, err error) {
 	}
 
 	fmt.Println("Deck homing is completed.")
-	d.WsMsgCh <- fmt.Sprintf("progress_homing_successfully homed deck %v", d.name)
 
 	return "DECK HOMING SUCCESS", nil
 }
