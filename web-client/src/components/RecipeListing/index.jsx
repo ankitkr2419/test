@@ -315,10 +315,10 @@ const RecipeListingComponent = (props) => {
           }
           {showProcess ? null :
             <div className="">
-              <Icon name="download" size={19} className="text-white mr-3" />
+              <ButtonIcon name="download-1" size={19} className="mr-3" />
               <Button
                 color="secondary"
-                className="ml-auto"
+                className="ml-auto border-primary bg-white"
                 onClick={handleTimeModal}
               >
                 {" "}
@@ -327,7 +327,7 @@ const RecipeListingComponent = (props) => {
 
               <Button
                 color="secondary"
-                className="ml-2 border-primary btn-discard-tray"
+                className="ml-2 border-primary btn-discard-tray bg-white"
                 onClick={handleTrayDiscardModal}
               >
                 Discard Tray
