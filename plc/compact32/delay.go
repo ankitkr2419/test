@@ -58,7 +58,7 @@ skipToStartTimer:
 				wsProgressOperation := plc.WSData{
 					Progress: float64(progress),
 					Deck:     d.name,
-					Status:   "PROGRESS_RECIPE",
+					Status:   "PROGRESS_UVLIGHT",
 					OperationDetails: plc.OperationDetails{
 						Message: fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
 					},
