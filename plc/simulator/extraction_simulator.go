@@ -52,9 +52,8 @@ func (us *ExtractionSimulator) Homing() (string, error) {
 		if err != nil {
 			us.ErrCh <- err
 		}
-		us.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
+		us.WsMsgCh <- fmt.Sprintf("progress_homing%v_%v", us.NameOfDeck(), string(wsData))
 	}
-	us.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed for deck %v", us.name)
 	return "SUCCESS", nil
 }
 
