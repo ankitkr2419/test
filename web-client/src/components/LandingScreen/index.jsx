@@ -5,23 +5,20 @@ import { useDispatch, useSelector } from "react-redux";
 import AppFooter from "components/AppFooter";
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
-import { operatorLoginReset } from "action-creators/operatorLoginModalActionCreators";
 // import TimeModal from "components/modals/TimeModal";
 import { VideoCard, MlModal, Loader } from "shared-components";
 import styled from "styled-components";
 const LandingScreen = styled.div`
-  .landing-content{
+  .landing-content {
     padding: 2.313rem 4.5rem;
-    &::after{
-      height:9.125rem;
+    &::after {
+      height: 9.125rem;
     }
   }
 `;
 const LandingScreenComponent = () => {
   const [homingStatus, setHomingStatus] = useState(true);
   const dispatch = useDispatch();
-
-  dispatch(operatorLoginReset());
 
   const homingReducer = useSelector((state) => state.homingReducer);
   const { isHomingActionCompleted } = homingReducer;
