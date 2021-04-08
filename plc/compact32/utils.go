@@ -78,10 +78,6 @@ var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProg
 var BothDeckHomingInProgress bool
 var homingPercent sync.Map
 
-// Special variables for both deck operation
-var BothDeckHomingInProgress bool
-var homingPercent sync.Map
-
 // variable map Registers to keep track of machine related variables.
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 

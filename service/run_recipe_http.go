@@ -35,10 +35,8 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
 			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
-			response, err = runRecipe(req.Context(), deps, deck, recipeID)
-			if err != nil {
-				deps.WsErrCh <- err
-			}
+			go runRecipe(req.Context(), deps, deck, recipeID)
+
 		default:
 			err = fmt.Errorf("Check your deck name")
 			deps.WsErrCh <- err
@@ -58,11 +56,13 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
+		deps.WsErrCh <- err
 		return
 	}
 
 	if deps.PlcDeck[deck].IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		deps.WsErrCh <- err
 		return
 	}
 
@@ -72,12 +72,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
+		deps.WsErrCh <- err
 		return
 	}
 
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
+		deps.WsErrCh <- err
 		return "", err
 	}
 
@@ -102,6 +104,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			// TODO: Below ID is reference ID, so please change code accordingly
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(ad)
@@ -114,6 +117,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -122,6 +126,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			fmt.Printf("heat object %v", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(ht)
@@ -151,6 +156,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -158,22 +164,26 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
 			fmt.Printf("attach detach record %v \n", ad)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			response, err = deps.PlcDeck[deck].AttachDetach(ad)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
 		case "TipOperation":
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(to)
 
 			response, err = deps.PlcDeck[deck].TipOperation(to)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -182,10 +192,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 				// Store Current Tip here
 				tipID, err := getTipIDFromRecipePosition(recipe, to.Position)
 				if err != nil {
+					deps.WsErrCh <- err
 					return "", err
 				}
 				currentTip, err = deps.Store.ShowTip(tipID)
 				if err != nil {
+					deps.WsErrCh <- err
 					return "", err
 				}
 			case db.DiscardTip:
@@ -195,6 +207,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 		case "TipDocking":
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(td)
@@ -205,16 +218,19 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 		case "Delay":
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Print(delay)
 			response, err = deps.PlcDeck[deck].AddDelay(delay)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -231,6 +247,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	deps.PlcDeck[deck].ResetRunInProgress()
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
+		deps.WsErrCh <- err
 		return
 	}
 
