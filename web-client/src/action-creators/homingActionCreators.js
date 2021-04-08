@@ -3,6 +3,7 @@ import {
   deckHomingActions,
   discardTipAndHomingActions,
 } from "actions/homingActions";
+import { toast } from "react-toastify";
 
 export const homingActionInitiated = () => ({
   type: homingActions.homingActionInitiated,
@@ -23,10 +24,13 @@ export const homingActionFailed = (serverErrors) => ({
   },
 });
 
-export const homingActionInProgress = (homingActionInProgress) => ({
-  type: homingActions.homingActionInProgress,
-  payload: homingActionInProgress,
-});
+export const homingActionInProgress = (homingActionInProgress) => (
+  {
+    type: homingActions.homingActionInProgress,
+    payload: homingActionInProgress,
+  },
+  toast.success("MY SUCCESS")
+);
 
 export const homingActionInCompleted = (homingActionInCompleted) => ({
   type: homingActions.homingActionInCompleted,
