@@ -132,3 +132,7 @@ func (us *ExtractionSimulator) DiscardTipAndHome(bool) (response string, err err
 
 	return "SUCCESS", nil
 }
+func (us *ExtractionSimulator) Shaking(db.Shaker) (string, error) {
+	return "SUCCESS", nil
+
+}
