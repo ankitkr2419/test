@@ -149,6 +149,21 @@ const DeckCardBox = styled.div`
       background-color: #9d9d9d;
     }
   }
+  .marquee{
+    width: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    .recipe-name{
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 10s linear infinite;
+    }
+    @keyframes marquee {
+      0%   { transform: translate(0, 0); }
+      100% { transform: translate(-100%, 0); }
+    }
+  }
 `;
 
 const CardOverlay = styled.div`
@@ -164,6 +179,7 @@ const CardOverlay = styled.div`
   z-index: 3;
   cursor: pointer;
 `;
+
 const DeckCard = (props) => {
   const {
     deckName,
@@ -261,15 +277,15 @@ const DeckCard = (props) => {
                   {getRightActionBtn(rightActionBtn)}
                 </div>
 
-                <div className="d-none1">
-                  <marquee width="90%" direction="left" behavior=""
+                <div className="marquee">
+                  <Text
                     Tag="h5"
                     size={18}
                     className="mb-2 font-weight-bold recipe-name"
-                    scrolldelay="100"
+                    
                   >
                     {recipeName}
-                  </marquee>
+                  </Text>
                   {/* TODO : Remove this commented code after clean up process developement done */}
                   {/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
 								<Text Tag="label" className="mb-1 d-flex align-items-center">
