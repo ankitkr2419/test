@@ -74,6 +74,10 @@ const (
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress, syringeModuleState, shakerInProgress sync.Map
 
+// Special variables for both deck operation
+var BothDeckHomingInProgress bool
+var homingPercent sync.Map
+
 // variable map Registers to keep track of machine related variables.
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
@@ -103,6 +107,10 @@ func LoadUtils() {
 
 	homed.Store("A", false)
 	homed.Store("B", false)
+
+	BothDeckHomingInProgress = false
+	homingPercent.Store("A", float64(0))
+	homingPercent.Store("B", float64(0))
 
 	motorNumReg.Store("A", uint16(0))
 	motorNumReg.Store("B", uint16(0))

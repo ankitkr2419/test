@@ -1,9 +1,10 @@
 import { takeEvery, put, call } from 'redux-saga/effects';
 import { callApi } from 'apis/apiHelper';
-import { discardDeckActions } from "actions/discardDeckActions";
+import { discardDeckActions, discardTipActions } from "actions/discardDeckActions";
 import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import {
-  discardDeckFailed as discardDeckFailure
+  discardDeckFailed as discardDeckFailure,
+  discardTipFailed as discardTipFailure
 } from "action-creators/discardDeckActionCreators";
 
 export function* discardDeck(actions){
@@ -23,6 +24,26 @@ export function* discardDeck(actions){
   } catch (error) {
     console.error("Error in discarding a deck", error);
     yield put(discardDeckFailure(error));
+  }
+}
+
+export function* discardTip(actions){
+  const { payload: { params : { deckName } }} = actions;
+  const { discardTipSuccess, discardTipFailed } = discardTipActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `/discard-tip-and-home/true/${deckName}`, /**static api route**/
+        discardTipSuccess,
+        discardTipFailed
+      },
+    });
+  } catch (error) {
+    console.error("Error in discarding a tip", error);
+    yield put(discardTipFailure(error));
   }
 }
 
