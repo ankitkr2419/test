@@ -22,8 +22,6 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusOK)
 			rw.Write([]byte(`both decks operation in progress`))
 			fmt.Println("At both deck!!!")
-			rw.Write([]byte(`Operation in progress for both decks`))
-			rw.WriteHeader(http.StatusOK)
 			response, err = bothDeckOperation(deps, "Homing")
 		case "A", "B":
 			rw.Write([]byte(`Operation in progress for single deck`))
