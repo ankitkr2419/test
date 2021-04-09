@@ -1,8 +1,10 @@
 package compact32
 
 import (
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 
 	logger "github.com/sirupsen/logrus"
 
@@ -26,6 +28,7 @@ func (d *Compact32Deck) AddDelay(delay db.Delay) (response string, err error) {
 	var t *time.Timer
 
 	var timeElapsedVar int64 = 0
+	var progress int64 = 0
 	timeElapsed := &timeElapsedVar
 
 	// set the timer in progress variable to specify that it is not a motor operation.
@@ -49,6 +52,24 @@ skipToStartTimer:
 				t.Stop()
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
+			}
+			if d.isUVLightInProgress() {
+				progress = (*timeElapsed * 100) / delay.DelayTime
+				wsProgressOperation := plc.WSData{
+					Progress: float64(progress),
+					Deck:     d.name,
+					Status:   "PROGRESS_RECIPE",
+					OperationDetails: plc.OperationDetails{
+						Message: fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
+					},
+				}
+
+				wsData, err := json.Marshal(wsProgressOperation)
+				if err != nil {
+					logger.Errorf("error in marshalling web socket data %v", err.Error())
+					d.WsErrCh <- err
+				}
+				d.WsMsgCh <- fmt.Sprintf("progress_uvLight_%v", string(wsData))
 			}
 			// if paused then
 			// when timer was paused go again to timer start

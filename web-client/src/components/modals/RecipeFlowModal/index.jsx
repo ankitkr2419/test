@@ -8,23 +8,6 @@ import Slide3 from "../../../assets/images/slide-3.jpg";
 import styled from "styled-components";
 import Slider from "react-slick";
 
-// const items = [
-//     {
-//       src: Slide1,
-//       altText: '',
-//       caption: ''
-//     },
-//     {
-//       src: Slide2,
-//       altText: '',
-//       caption: ''
-//     },
-//     {
-//       src: Slide3,
-//       altText: '',
-//       caption: ''
-//     }
-// ];
 const RecipeFlowSlider = styled.div`
   .slides {
     .slides-inner-box {
@@ -46,13 +29,13 @@ const RecipeFlowSlider = styled.div`
     }
     li.slick-active button:before {
       transform: scale(1.5);
-      color: #f38220;
+      color: #9AD0C8;
     }
   }
   .center {
     .slick-list {
-      padding-top: 30px !important;
-      padding-bottom: 30px !important;
+      padding-top: 1.875rem !important;
+      padding-bottom: 1.875rem !important;
     }
     .slick-center .slides-inner-box {
       transform: scale(1.12);
@@ -62,6 +45,38 @@ const RecipeFlowSlider = styled.div`
     .slides {
       -webkit-transition: all 0.3s ease-out;
       transition: all 0.3s ease-out;
+    }
+    .slick-next, .slick-prev{
+      background-color:#9AD0C8;
+      z-index:1;
+      width:3rem;
+      height:6.063rem;
+      box-shadow:0px 3px 6px rgba(0,0,0,0.16);
+    }
+    .slick-next{
+      right:-1px;
+      border-radius:3.125rem 0 0 3.125rem;
+      &::before{
+        background: url("/images/next-arrow.svg") no-repeat;
+        background-position:top center;
+        position: relative;
+        left: 5px;
+        background-size:contain;
+        color:transparent;
+      }
+    }
+    .slick-prev{
+      left:-1px;
+      border-radius:0 3.125rem 3.125rem 0;
+      &::before{
+        background: url("/images/prev-arrow.svg") no-repeat;
+        background-position:top center;
+        position: relative;
+        right: 5px;
+        background-size:contain;
+        color:transparent;
+      
+      }
     }
   }
 `;
@@ -83,11 +98,11 @@ const RecipeFlowModal = (props) => {
     centerMode: true,
     centerPadding: "65px",
     dots: true,
-    infinite: true,
+    infinite: false,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: false,
+    arrows: true,
     afterChange: (currentSlide) => {
       if (currentSlide === LAST_SLIDE) {
         setEnableNext(true);

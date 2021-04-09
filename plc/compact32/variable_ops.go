@@ -32,6 +32,42 @@ func (d *Compact32Deck) resetHeaterInProgress() {
 	heaterInProgress.Store(d.name, false)
 }
 
+func (d *Compact32Deck) setAborted() {
+	aborted.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetAborted() {
+	aborted.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setPaused() {
+	paused.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetPaused() {
+	paused.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setHomed() {
+	homed.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetHomed() {
+	homed.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setUVLightInProgress() {
+	uvLightInProgress.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetUVLightInProgress() {
+	uvLightInProgress.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setHomingPercent(percent float64) {
+	homingPercent.Store(d.name, percent)
+}
+
 func (d *Compact32Deck) IsMachineHomed() bool {
 	if temp, ok := homed.Load(d.name); !ok {
 		logger.Errorln("homed isn't loaded!")
@@ -86,9 +122,27 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 	return false
 }
 
+func (d *Compact32Deck) isUVLightInProgress() bool {
+	if temp, ok := uvLightInProgress.Load(d.name); !ok {
+		logger.Errorln("heaterInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
 func (d *Compact32Deck) getMagnetState() int {
 	if temp, ok := magnetState.Load(d.name); !ok {
 		logger.Errorln("magnet State isn't loaded!")
+		return -1
+	} else {
+		return temp.(int)
+	}
+}
+
+func (d *Compact32Deck) getSyringeModuleState() int {
+	if temp, ok := syringeModuleState.Load(d.name); !ok {
+		logger.Errorln("Syringe Module State isn't loaded!")
 		return -1
 	} else {
 		return temp.(int)
@@ -166,3 +220,47 @@ func (d *Compact32Deck) getOnReg() uint16 {
 		return temp.(uint16)
 	}
 }
+
+func (d *Compact32Deck) getHomingDeckName() string {
+	if BothDeckHomingInProgress {
+		return ""
+	}
+	return d.name
+}
+
+func (d *Compact32Deck) getHomingPercent() float64{
+	if BothDeckHomingInProgress {
+		if tempA, ok := homingPercent.Load("A"); !ok {
+			logger.Errorln("homingPercent isn't loaded!")
+			return -1
+		} else if tempB, ok := homingPercent.Load("B"); !ok {
+			logger.Errorln("homingPercent isn't loaded!")
+			return -1	
+		} else {
+			return (tempA.(float64) + tempB.(float64))/ 2
+		}
+	}
+	if temp, ok := homingPercent.Load(d.name); !ok {
+		logger.Errorln("homingPercent isn't loaded!")
+		return -1
+	} else {
+		return temp.(float64)
+	}
+}
+
+
+func SetBothDeckHomingInProgress() {
+	BothDeckHomingInProgress = true
+}
+
+func ResetBothDeckHomingInProgress() {
+	BothDeckHomingInProgress = false
+}
+
+func IsBothDeckHomingInProgress() bool {	
+	return BothDeckHomingInProgress
+}
+
+
+
+

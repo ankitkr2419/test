@@ -3,6 +3,8 @@ export const runRecipeAction = {
   runRecipeSuccess: "RUN_RECIPE_SUCCESS",
   runRecipeFailed: "RUN_RECIPE_FAILED",
   runRecipeReset: "RUN_RECIPE_RESET",
+  runRecipeInProgress: "PROGRESS_RUN_RECIPE",
+  runRecipeInCompleted: "SUCCESS_RUN_RECIPE"
 };
 
 export const pauseRecipeAction = {
@@ -17,6 +19,8 @@ export const resumeRecipeAction = {
   resumeRecipeSuccess: "RESUME_RECIPE_SUCCESS",
   resumeRecipeFailed: "RESUME_RECIPE_FAILED",
   resumeRecipeReset: "RESUME_RECIPE_RESET",
+  resumeRecipeInProgress: "PROGRESS_RESUME_RECIPE",
+  resumeRecipeInCompleted: "SUCCESS_RESUME_RECIPE"
 };
 
 export const abortRecipeAction = {

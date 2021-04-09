@@ -86,11 +86,25 @@ const DeckCardBox = styled.div`
       position: absolute;
       right: 123px;
       top: 0;
+      .icon-pause{
+        font-size:0.938rem;
+      }
+      .icon-resume{
+        font-size:1.25rem;
+      }
     }
     .abort-button {
       position: absolute;
       right: 21px;
       top: 0;
+      .semi-circular-button{
+        border: 1px solid transparent;
+        background-color: #ffffff;
+        color:#3C3C3C;
+      }
+      .icon-cancel{
+        font-size:0.875rem;
+      }
     }
     .hour-label {
       background-color: #f5e3d3;
@@ -135,6 +149,21 @@ const DeckCardBox = styled.div`
       background-color: #9d9d9d;
     }
   }
+  .marquee{
+    width: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    .recipe-name{
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 10s linear infinite;
+    }
+    @keyframes marquee {
+      0%   { transform: translate(0, 0); }
+      100% { transform: translate(-100%, 0); }
+    }
+  }
 `;
 
 const CardOverlay = styled.div`
@@ -150,6 +179,7 @@ const CardOverlay = styled.div`
   z-index: 3;
   cursor: pointer;
 `;
+
 const DeckCard = (props) => {
   const {
     deckName,
@@ -247,15 +277,16 @@ const DeckCard = (props) => {
                   {getRightActionBtn(rightActionBtn)}
                 </div>
 
-                <div className="d-none1">
+                <div className="marquee">
                   <Text
                     Tag="h5"
                     size={18}
                     className="mb-2 font-weight-bold recipe-name"
+                    
                   >
                     {recipeName}
                   </Text>
-
+                  {/* TODO : Remove this commented code after clean up process developement done */}
                   {/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
 								<Text Tag="label" className="mb-1 d-flex align-items-center">
 									<Icon name='timer' size={19} className="text-primary"/>
@@ -323,7 +354,6 @@ const DeckCard = (props) => {
                       remaining
                     </Text>
                   </Text>
-                  {/* <Progress value="2" className="custom-progress-bar" /> */}
                 </div>
               </>
             )}

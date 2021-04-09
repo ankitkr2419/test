@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"net/http"
 
 	"github.com/google/uuid"
+	logger "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
 )
@@ -31,10 +33,10 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 		switch deck {
 		case "A", "B":
 			rw.WriteHeader(http.StatusOK)
-			response, err = runRecipe(req.Context(), deps, deck, recipeID)
-			if err != nil {
-				deps.WsErrCh <- err
-			}
+			rw.Header().Add("Content-Type", "application/json")
+			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
+			go runRecipe(req.Context(), deps, deck, recipeID)
+
 		default:
 			err = fmt.Errorf("Check your deck name")
 			deps.WsErrCh <- err
@@ -54,11 +56,13 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
+		deps.WsErrCh <- err
 		return
 	}
 
 	if deps.PlcDeck[deck].IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		deps.WsErrCh <- err
 		return
 	}
 
@@ -68,12 +72,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
+		deps.WsErrCh <- err
 		return
 	}
 
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
+		deps.WsErrCh <- err
 		return "", err
 	}
 
@@ -90,7 +96,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 	for i, p := range processes {
 
 		// TODO : percentage calculation from inside the process.
-		sendWSData(deps, deck, recipeID, len(processes), i)
+		sendWSData(deps, deck, recipeID, len(processes), i+1)
 
 		switch p.Type {
 		case "AspireDispense":
@@ -98,6 +104,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			// TODO: Below ID is reference ID, so please change code accordingly
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(ad)
@@ -110,6 +117,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -118,6 +126,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			fmt.Printf("heat object %v", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(ht)
@@ -147,6 +156,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 
 			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -154,22 +164,26 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
 			fmt.Printf("attach detach record %v \n", ad)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			response, err = deps.PlcDeck[deck].AttachDetach(ad)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
 		case "TipOperation":
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(to)
 
 			response, err = deps.PlcDeck[deck].TipOperation(to)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -178,10 +192,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 				// Store Current Tip here
 				tipID, err := getTipIDFromRecipePosition(recipe, to.Position)
 				if err != nil {
+					deps.WsErrCh <- err
 					return "", err
 				}
 				currentTip, err = deps.Store.ShowTip(tipID)
 				if err != nil {
+					deps.WsErrCh <- err
 					return "", err
 				}
 			case db.DiscardTip:
@@ -191,6 +207,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 		case "TipDocking":
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(td)
@@ -201,33 +218,36 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 		case "Delay":
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Print(delay)
 			response, err = deps.PlcDeck[deck].AddDelay(delay)
 			if err != nil {
+				deps.WsErrCh <- err
 				return "", err
 			}
 
 		}
 
-		deps.WsMsgCh <- fmt.Sprintf("progress_recipe_completed process %d", i)
 		// TODO: Instead of switch case, try using reflect
 		// Pass context and ID here
 		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
 
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_ recipeid %v", recipeID)
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeId %v", recipeID)
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
+		deps.WsErrCh <- err
 		return
 	}
 
@@ -248,23 +268,29 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	err = fmt.Errorf("position is invalid to pickup the tip")
 	return 0, err
 }
-
 func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
-
 	// percentage calculation for each process
-	percentage := float64((currentStep * 100) / processLength)
 
-	wsData := recipeProgress{
-		Deck:       deck,
-		RecipeID:   recipeID,
-		Percentage: percentage,
+	progress := float64((currentStep * 100) / processLength)
+
+	wsProgressOperation := plc.WSData{
+		Progress: progress,
+		Deck:     deck,
+		Status:   "PROGRESS_RECIPE",
+		OperationDetails: plc.OperationDetails{
+			Message:        fmt.Sprintf("process %v for deck %v in progress", currentStep, deck),
+			CurrentStep:    currentStep,
+			RecipeID:       recipeID,
+			TotalProcesses: processLength,
+		},
 	}
-	wsDataJSON, err := json.Marshal(wsData)
+
+	wsData, err := json.Marshal(wsProgressOperation)
 	if err != nil {
-		return "", err
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		deps.WsErrCh <- err
 	}
-	wsMsg := fmt.Sprintf("progress_recipe_%v", string(wsDataJSON))
+	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
-	deps.WsMsgCh <- wsMsg
 	return
 }

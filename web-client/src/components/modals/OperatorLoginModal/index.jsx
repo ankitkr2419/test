@@ -42,31 +42,32 @@ const OperatorLoginModal = (props) => {
 
 	//const { confirmationText, isOpen, confirmationClickHandler } = props;
 
-	// const toggleModal = () => {};
 	// Operator Login Modal
-	// const [operatorLoginModal, setOperatorLoginModal] = useState(false);
-	// const toggleOperatorLoginModal = () => setOperatorLoginModal(!operatorLoginModal);
 	return (
 		<>
 		{/* Operator Login Modal */}
-		{/* <Button color="primary" onClick={toggleOperatorLoginModal}>Operator Login</Button> */}
-		<Modal isOpen={operatorLoginModalOpen} toggle={toggleOperatorLoginModal} centered size="sm">
+		<Modal 
+			isOpen={operatorLoginModalOpen} 
+			toggle={toggleOperatorLoginModal} 
+			centered 
+			size="md"
+			>
 			<ModalBody>
-				<Text Tag="h4" size={24} className="text-center text-primary mb-4">
+				<Text Tag="h4" size={24} className="text-center text-primary mt-3 mb-4">
 					Welcome
 				</Text>
 				<ButtonIcon
 					position="absolute"
 					placement="right"
-					top={16}
-					right={16}
+					top={4}
+					right={8}
 					size={36}
 					name="cross"
 					onClick={toggleOperatorLoginModal}
 					className="border-0"
 				/>
 				<Form>
-					<OperatorLoginForm className="col-10 mx-auto">
+					<OperatorLoginForm className="col-11 mx-auto">
 						<Row>
 							<Col>
 								<FormGroup row className="has-border-left d-flex align-items-center" >
