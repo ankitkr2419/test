@@ -41,7 +41,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
 
 	//
-	// move the syringe module to rest position if the Motor Num is of deck 
+	// move the syringe module to rest position if the Motor Num is of deck
 	// or Magnet Rev Fwd motor as suggested by @Sanket
 	// and syringe tips are inside of deck positions.
 	//

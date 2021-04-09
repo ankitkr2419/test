@@ -369,7 +369,7 @@ skipAspireCycles:
 	//   19. move syringe module down at fast till base
 	//
 
-	// We know the concrete direction here downwards
+	// We know the concrete direction here onwards
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	distanceToTravel = deckBase - (positions[deckAndMotor] + tipHeight)
 
@@ -464,10 +464,10 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 
 }
 
-func(d * Compact32Deck) setIndeck(deckBase, tipHeight float64){
-	deckAndMotor := DeckNumber{Deck: d.name, Number:K9_Syringe_Module_LHRH}
+func (d *Compact32Deck) setIndeck(deckBase, tipHeight float64) {
+	deckAndMotor := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
 	// In case the operation was aborted after syringe module went inside the deck!
-	if (positions[deckAndMotor] + tipHeight) > deckBase  {
+	if (positions[deckAndMotor] + tipHeight) > deckBase {
 		syringeModuleState.Store(d.name, InDeck)
 	}
 }
