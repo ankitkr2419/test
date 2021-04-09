@@ -72,7 +72,7 @@ const (
 )
 
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
-var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress, syringeModuleState sync.Map
+var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress, syringeModuleState, shakerInProgress sync.Map
 
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
@@ -96,6 +96,8 @@ func LoadUtils() {
 	timerInProgress.Store("B", false)
 	heaterInProgress.Store("A", false)
 	heaterInProgress.Store("B", false)
+	shakerInProgress.Store("A", false)
+	shakerInProgress.Store("B", false)
 	uvLightInProgress.Store("A", false)
 	uvLightInProgress.Store("B", false)
 	magnetState.Store("A", detached)
