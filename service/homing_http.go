@@ -24,7 +24,6 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			rw.Write([]byte(`Operation in progress for both decks`))
 			rw.WriteHeader(http.StatusOK)
 			compact32.SetBothDeckHomingInProgress()
-			defer compact32.ResetBothDeckHomingInProgress()
 			go bothDeckOperation(deps, "Homing")
 		case "A", "B":
 			rw.Write([]byte(`Operation in progress for single deck`))
@@ -41,13 +40,13 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			deps.WsErrCh <- err
 		} else {
 			logger.Infoln(response)
-			deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
 		}
 
 	})
 }
 
 func bothDeckOperation(deps Dependencies, operation string) (response string, err error) {
+	defer compact32.ResetBothDeckHomingInProgress()
 
 	var deckAResponse, deckBResponse string
 	var deckAErr, deckBErr error
@@ -80,8 +79,8 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			}
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
-
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
+			deps.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed")
 			fmt.Println(operationSuccessMsg)
 			return operationSuccessMsg, nil
 		default:
@@ -110,6 +109,7 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	fmt.Println("Correct Result: ", result)
 	response = result[0].String()
 	if len(response) > 0 {
+		deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
 		return
 	}
 	errRes := result[1].Interface()
