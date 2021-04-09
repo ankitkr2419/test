@@ -107,11 +107,11 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			Duration:    0,
 		}
 		response, err = d.Heating(ht)
-		d.switchOnHeater()
-
 		if err != nil {
 			return "", err
 		}
+		d.switchOnHeater()
+		logger.Infoln("switched on heater")
 		d.setHeaterInProgress()
 
 	}
