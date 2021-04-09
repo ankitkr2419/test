@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
 
 import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon, MlModal, VideoCard } from "shared-components";
+import { Icon, MlModal, VideoCard, ButtonIcon } from "shared-components";
 
 import styled from "styled-components";
 import AppFooter from "components/AppFooter";
@@ -46,11 +46,17 @@ const RecipeListing = styled.div`
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
   .icon-download-1 {
-    font-size: 18px;
+    font-size: 1.125rem;
     color: #3c3c3c;
   }
   .btn-clean-up {
     width: 7.063rem;
+  }
+  .btn-discard-tray {
+    width: 10rem;
+  }
+  .icon-logout {
+    font-size: 1rem;
   }
 `;
 
@@ -302,7 +308,7 @@ const RecipeListingComponent = (props) => {
         )}
 
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
-          {showProcess ? null :
+          {showProcess ? null : (
             <div className="d-flex align-items-center">
               <Icon name="angle-left" size={32} className="text-white" />
               <HeadingTitle
@@ -310,30 +316,40 @@ const RecipeListingComponent = (props) => {
                 className="text-white font-weight-bold ml-3 mb-0"
               >
                 Select a Recipe for Deck B
-            </HeadingTitle>
+              </HeadingTitle>
             </div>
-          }
-          {showProcess ? null :
-            <div className="">
-              <Icon name="download" size={19} className="text-white mr-3" />
+          )}
+          {showProcess ? null : (
+            <div className="d-flex align-items-center ml-auto">
+              <ButtonIcon
+                name="download-1"
+                size={28}
+                className="bg-white border-primary"
+              />
               <Button
                 color="secondary"
-                className="ml-auto"
+                className="ml-2 border-primary btn-clean-up bg-white"
                 onClick={handleTimeModal}
               >
                 {" "}
-              Clean Up
-            </Button>
+                Clean Up
+              </Button>
 
               <Button
                 color="secondary"
-                className="ml-2 border-primary btn-discard-tray"
+                className="ml-2 border-primary btn-discard-tray bg-white"
                 onClick={handleTrayDiscardModal}
               >
                 Discard Tray
-            </Button>
+              </Button>
+
+              <ButtonIcon
+                name="logout"
+                size={28}
+                className="ml-2 bg-white border-primary"
+              />
             </div>
-          }
+          )}
         </TopContent>
 
         {showProcess ? (

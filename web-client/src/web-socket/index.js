@@ -17,15 +17,20 @@ import {
 
 import {
   runRecipeInProgress,
-  runRecipeInCompleted
+  runRecipeInCompleted,
 } from "action-creators/recipeActionCreators";
 
 import {
   cleanUpActionInProgress,
-  cleanUpActionInCompleted
+  cleanUpActionInCompleted,
 } from "action-creators/cleanUpActionCreators";
 
-import { discardTipInProgress, discardTipInCompleted } from "action-creators/discardDeckActionCreators";
+import {
+  discardTipInProgress,
+  discardTipInCompleted,
+} from "action-creators/discardDeckActionCreators";
+
+import { toast } from "react-toastify";
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
@@ -54,6 +59,7 @@ export const connectSocket = (dispatch) => {
           dispatch(homingActionInProgress(data));
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
+          toast.success("Homing Successfull");
           dispatch(homingActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:

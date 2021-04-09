@@ -2,6 +2,8 @@ package plc
 
 import (
 	"mylab/cpagent/db"
+
+	"github.com/google/uuid"
 )
 
 type Status int32
@@ -68,4 +70,18 @@ type DeckDriver interface {
 	AttachDetach(db.AttachDetach) (response string, err error)
 	AddDelay(db.Delay) (string, error)
 	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
+}
+
+type WSData struct {
+	Progress         float64          `json:"progress"`
+	Deck             string           `json:"deck"`
+	Status           string           `json:"status"`
+	OperationDetails OperationDetails `json:"operation_details"`
+}
+
+type OperationDetails struct {
+	Message        string    `json:"message"`
+	CurrentStep    int       `json:"current_step,omitempty"`
+	TotalProcesses int       `json:"total_processes,omitempty"`
+	RecipeID       uuid.UUID `json:"recipe_id,omitempty"`
 }
