@@ -25,6 +25,7 @@ import (
 */
 func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
+	stopMonitor := make(chan bool, 1)
 	// here we are hardcoding the shaker no in future this is to be fetched dynamically.
 	// 3 is the value that needs to be passed for heating both the shakers.
 	shaker := uint16(3)
@@ -101,7 +102,9 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	//if no then then start heating  after specified time turn off heater and return
 	// as we do not need to monitor the temperature here.
 	if !ht.FollowTemp {
-		fmt.Printf("inside not follow up")
+		logger.Infoln("not follow temperature")
+		go d.monitorTemperature(shaker, ht.Temperature, false, stopMonitor)
+		defer d.stopMonitorTemperature(stopMonitor)
 		response, err = d.AddDelay(delay)
 		if err != nil {
 			return
@@ -115,9 +118,13 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		return
 	}
 
-	// Step 10 : monitor the temperature if not follow temp.
+	// Step 10 : monitor the temperature if follow temp.
 	// loop for continous reading of the shaker temp and check if the temperature has reached specified value.
-	d.monitorTemperature(shaker, ht.Temperature)
+	response, err = d.monitorTemperature(shaker, ht.Temperature, true, stopMonitor)
+	if err != nil {
+		logger.Errorln("Error in monitor temperature \n", err)
+		return "", err
+	}
 
 	// for shaker when the heater is needed with follow temp
 	if delay.DelayTime == 0 {
@@ -141,64 +148,112 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	return
 }
 
-func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64) (response string, err error) {
-	var setTemp, setTemp1, setTemp2 float64
+func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64, tempCheck bool, stopMonitor chan bool) (response string, err error) {
+	var setTemp, setTemp1, setTemp2, prevTemp1, prevTemp2 float64
+	var heatingFailCounter1, heatingFailCounter2 int
 
 	var registerAddress uint16 = 0
-
-	for {
-		if d.isMachineInPausedState() {
-			response, err = d.waitUntilResumed(d.name)
-			if err != nil {
-				return
-			}
-		}
-
-		if d.isMachineInAbortedState() {
-			err = fmt.Errorf("operation was ABORTED \n")
-			return "ABORTED", err
-		}
-
-		time.Sleep(time.Second * 2)
-		switch shakerNo {
-		case 1, 2:
-			if setTemp >= temperature {
-				return "SUCCESS", nil
-			}
-			// here we set the register address according to the shaker
-			if shakerNo == 1 {
-				registerAddress = MODBUS_EXTRACTION[d.name]["D"][210]
-			} else {
-				registerAddress = MODBUS_EXTRACTION[d.name]["D"][224]
-			}
-			results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
-			if err != nil {
-				logger.Errorln("Error failed to read shaker ", shakerNo, "temperature", err)
-				return "", err
-			}
-			setTemp = float64(binary.BigEndian.Uint16(results)) / 10
-
-		case 3:
-			if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
-				return "SUCCESS", nil
-			}
-			time.Sleep(time.Second * 5)
-			results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
-			if err != nil {
-				logger.Errorln("Error failed to read shaker 1 temperature \n", err)
-				return "", err
-			}
-			setTemp1 = float64(binary.BigEndian.Uint16(results)) / 10
-
-			time.Sleep(time.Second * 5)
-			results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
-			if err != nil {
-				logger.Errorln("Error failed to read shaker 2 temperature \n", err)
-				return "", err
-			}
-			setTemp2 = float64(binary.BigEndian.Uint16(results)) / 10
-		}
-
+	delay := db.Delay{
+		DelayTime: 30,
 	}
 
+	for {
+		select {
+		case n := <-stopMonitor:
+			fmt.Printf("stop the montoring %v", n)
+			return "SUCCESS", nil
+
+		default:
+			if d.isMachineInPausedState() {
+				response, err = d.waitUntilResumed(d.name)
+				if err != nil {
+					return
+				}
+			}
+
+			if d.isMachineInAbortedState() {
+				err = fmt.Errorf("operation was ABORTED \n")
+				return "ABORTED", err
+			}
+
+			time.Sleep(time.Second * 2)
+			switch shakerNo {
+			case 1, 2:
+				if setTemp >= temperature {
+					return "SUCCESS", nil
+				}
+				// here we set the register address according to the shaker
+				if shakerNo == 1 {
+					registerAddress = MODBUS_EXTRACTION[d.name]["D"][210]
+				} else {
+					registerAddress = MODBUS_EXTRACTION[d.name]["D"][224]
+				}
+				results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
+				if err != nil {
+					logger.Errorln("Error failed to read shaker ", shakerNo, "temperature", err)
+					return "", err
+				}
+				setTemp = float64(binary.BigEndian.Uint16(results)) / 10
+
+			case 3:
+				if !tempCheck {
+					goto skipToMonitor
+				}
+				if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
+					return "SUCCESS", nil
+				}
+
+			skipToMonitor:
+
+				if (setTemp1 - prevTemp1) < 1 {
+					heatingFailCounter1 += 1
+				} else {
+					heatingFailCounter1 = 0
+				}
+
+				if (setTemp2 - prevTemp2) < 1 {
+					heatingFailCounter2 += 1
+				} else {
+					heatingFailCounter2 = 0
+				}
+
+				prevTemp1 = setTemp1
+				prevTemp2 = setTemp2
+
+				if heatingFailCounter1 >= 5 || heatingFailCounter2 >= 5 {
+					err = fmt.Errorf("temperature not upgrading")
+					return "", err
+				}
+
+				results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
+				if err != nil {
+					logger.Errorln("Error failed to read shaker 1 temperature \n", err)
+					return "", err
+				}
+				setTemp1 = float64(binary.BigEndian.Uint16(results)) / 10
+
+				logger.Infoln("temp 1 reading", setTemp1)
+
+				results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
+				if err != nil {
+					logger.Errorln("Error failed to read shaker 2 temperature \n", err)
+					return "", err
+				}
+				setTemp2 = float64(binary.BigEndian.Uint16(results)) / 10
+				logger.Infoln("temp 2 reading", setTemp2)
+				response, err = d.AddDelay(delay)
+				if err != nil {
+					logger.Errorln("Error failed to add delay in monitor temperature \n", err)
+					return "", err
+				}
+
+			}
+		}
+	}
+
+}
+
+func (d *Compact32Deck) stopMonitorTemperature(stop chan bool) {
+	logger.Infoln("stop monitor temperature")
+	stop <- true
 }

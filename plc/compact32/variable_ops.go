@@ -32,6 +32,14 @@ func (d *Compact32Deck) resetHeaterInProgress() {
 	heaterInProgress.Store(d.name, false)
 }
 
+func (d *Compact32Deck) setShakerInProgress() {
+	shakerInProgress.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetShakerInProgress() {
+	shakerInProgress.Store(d.name, false)
+}
+
 func (d *Compact32Deck) setAborted() {
 	aborted.Store(d.name, true)
 }
@@ -122,9 +130,17 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 	return false
 }
 
+func (d *Compact32Deck) isShakerInProgress() bool {
+	if temp, ok := heaterInProgress.Load(d.name); !ok {
+		logger.Errorln("shakerInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
 func (d *Compact32Deck) isUVLightInProgress() bool {
 	if temp, ok := uvLightInProgress.Load(d.name); !ok {
-		logger.Errorln("heaterInProgress isn't loaded!")
+		logger.Errorln("uvLightInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}
@@ -228,16 +244,16 @@ func (d *Compact32Deck) getHomingDeckName() string {
 	return d.name
 }
 
-func (d *Compact32Deck) getHomingPercent() float64{
+func (d *Compact32Deck) getHomingPercent() float64 {
 	if BothDeckHomingInProgress {
 		if tempA, ok := homingPercent.Load("A"); !ok {
 			logger.Errorln("homingPercent isn't loaded!")
 			return -1
 		} else if tempB, ok := homingPercent.Load("B"); !ok {
 			logger.Errorln("homingPercent isn't loaded!")
-			return -1	
+			return -1
 		} else {
-			return (tempA.(float64) + tempB.(float64))/ 2
+			return (tempA.(float64) + tempB.(float64)) / 2
 		}
 	}
 	if temp, ok := homingPercent.Load(d.name); !ok {
@@ -248,7 +264,6 @@ func (d *Compact32Deck) getHomingPercent() float64{
 	}
 }
 
-
 func SetBothDeckHomingInProgress() {
 	BothDeckHomingInProgress = true
 }
@@ -257,10 +272,6 @@ func ResetBothDeckHomingInProgress() {
 	BothDeckHomingInProgress = false
 }
 
-func IsBothDeckHomingInProgress() bool {	
+func IsBothDeckHomingInProgress() bool {
 	return BothDeckHomingInProgress
 }
-
-
-
-

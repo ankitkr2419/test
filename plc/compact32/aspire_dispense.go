@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 /****ALGORITHM******
 // TODO: check for height and volumes constraint at insertion process itself
 variables: category, cartridgeType string,
 			cartridgeID, type, source_well, destination_well, aspire_cycles, dispense_cycles int64,
-			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64
+			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol float64
 
   1. Check the category of operation
   2. if category is well_to_well then goto 3 else if category is shaker_to_well then goto 5  else 7
@@ -418,15 +420,10 @@ skipDispenseCycles:
 	//
 	// 22. Dispense completely
 	//
-	if (ad.DispenseVolume + ad.DispenseBlowVolume) < (ad.AspireAirVolume + ad.AspireVolume) {
-		err = fmt.Errorf("Can't dispense partially!")
-		return
-	}
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.DispenseVolume + ad.DispenseBlowVolume)))
-	pulses += reverseAfterNonCutPulses
-
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	logger.Infoln("Syringe is moving down until sensor not cut")
+	// TODO:  Note down Bio team's required speed
+	response, err = d.setupMotor(homingFastSpeed, initialSensorCutSyringePulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}

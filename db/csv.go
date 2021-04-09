@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 
@@ -16,6 +15,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+const version = "1.2.1"
 var sequenceNumber int64 = 0
 var createdRecipe Recipe
 
@@ -77,9 +77,9 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 		return err
 	}
 
-	// Current Version supported is only 1.2
-	if strings.TrimSpace(record[1]) != "1.2" {
-		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version 1.2")
+	// 1.2.1 is the currently supported version 
+	if strings.TrimSpace(record[1]) != version {
+		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v", version)
 		logger.Errorln(err)
 		return err
 	}
@@ -250,16 +250,11 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 		logger.Errorln(err, record[10])
 		return
 	}
-	if a.DispenseVolume, err = strconv.ParseFloat(record[11], 64); err != nil {
+
+	// NOTE: Since version 1.2.1 we have deprecated CSV support for 
+	// dispense volume and dispense air volume
+	if a.DestinationPosition, err = strconv.ParseInt(record[11], 10, 64); err != nil {
 		logger.Errorln(err, record[11])
-		return
-	}
-	if a.DispenseBlowVolume, err = strconv.ParseFloat(record[12], 64); err != nil {
-		logger.Errorln(err, record[12])
-		return
-	}
-	if a.DestinationPosition, err = strconv.ParseInt(record[13], 10, 64); err != nil {
-		logger.Errorln(err, record[13])
 		return
 	}
 
@@ -414,7 +409,7 @@ func createTipDockingProcess(record []string, processID uuid.UUID, store Storer)
 func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
 	logger.Info("Inside shaking create Process. Record: ", record, ". ProcessID:", processID)
 
-	s := Shaking{
+	s := Shaker{
 		ProcessID: processID,
 	}
 
@@ -445,7 +440,7 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 		logger.Errorln(err, record[4])
 		return err
 	} else {
-		s.Time1 = time.Duration(time1)
+		s.Time1 = time1
 	}
 
 	if s.RPM2, err = strconv.ParseInt(record[5], 10, 64); err != nil {
@@ -457,7 +452,7 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 		logger.Errorln(err, record[6])
 		return err
 	} else {
-		s.Time2 = time.Duration(time2)
+		s.Time2 = time2
 	}
 
 	createdProcess, err := store.CreateShaking(context.Background(), s)

@@ -132,13 +132,18 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			fmt.Println(ht)
 
 		case "Shaking":
-			// Get the Shaking process
-			// sh, err := deps.Store.ShowShaking(req.Context(), p.ID)
-			// if err != nil {
-			// return "", err
-			// }
-			// fmt.Println(sh)
-			// sh.run()
+			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
+			if err != nil {
+				return "", err
+			}
+			fmt.Printf("shaker object %v", shaker)
+
+			sha, err := deps.PlcDeck[deck].Shaking(shaker)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(sha)
+
 		case "Piercing":
 			// Get the Piercing process
 			// TODO: Below ID is reference ID, so please conform
