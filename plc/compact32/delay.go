@@ -54,7 +54,9 @@ skipToStartTimer:
 				return "", err
 			}
 			if d.isUVLightInProgress() {
-				progress = (*timeElapsed * 100) / delay.DelayTime
+				uvtime := time.Now()
+				uvTimePassed := uvtime.Sub(time1).Seconds()
+				progress = (int64(uvTimePassed) * 100) / delay.DelayTime
 				wsProgressOperation := plc.WSData{
 					Progress: float64(progress),
 					Deck:     d.name,
