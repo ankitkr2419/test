@@ -184,7 +184,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	//
 	// this step is not required because if the dispencing and aspiring wells are same
 	// the syringe does not need to come above the deck.
-	// and if it is aspiring from some other well then it is handled in the below code.
+	// and if it is aspiring from some other well then it is handled in the below code from step 10.
 
 	//
 	// 10. calculate the current position difference for deck;
@@ -231,6 +231,10 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 		fmt.Println("Error: ", err)
 		return "", err
 	}
+
+	// The last step
+	// If operation was aborted and syringe Module is stuck with tip
+	defer d.setIndeck(deckBase, tipHeight)
 
 	if val, ok := syringeModuleState.Load(d.name); !ok {
 		panic(ok)
@@ -363,15 +367,9 @@ skipAspireCycles:
 	//   19. move syringe module down at fast till base
 	//
 
-	// We know the concrete direction here onwards
+	// We know the concrete direction here downwards
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
-	if position = consDistance["deck_base"]; ok {
-		distanceToTravel = position - (positions[deckAndMotor] + tipHeight)
-	} else {
-		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
+	distanceToTravel = deckBase - (positions[deckAndMotor] + tipHeight)
 
 	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
 
@@ -427,6 +425,7 @@ skipDispenseCycles:
 
 	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.DispenseVolume + ad.DispenseBlowVolume)))
 	pulses += reverseAfterNonCutPulses
+
 	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
@@ -466,4 +465,12 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 
 	return
 
+}
+
+func(d * Compact32Deck) setIndeck(deckBase, tipHeight float64){
+	deckAndMotor := DeckNumber{Deck: d.name, Number:K9_Syringe_Module_LHRH}
+	// In case the operation was aborted after syringe module went inside the deck!
+	if (positions[deckAndMotor] + tipHeight) > deckBase  {
+		syringeModuleState.Store(d.name, InDeck)
+	}
 }
