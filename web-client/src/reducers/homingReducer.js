@@ -7,9 +7,10 @@ export const initialState = {
   isLoading: false,
   homingData: {},
   serverErrors: {},
+  homingAllDeckCompletionPercentage: 0,
   isHomingActionCompleted: false,
   homingActionInProgress: {},
-  homingActionInCompleted: {}
+  homingActionInCompleted: {},
 };
 
 export const homingReducer = (state = initialState, action = {}) => {
@@ -19,25 +20,30 @@ export const homingReducer = (state = initialState, action = {}) => {
         ...state,
         ...action.payload,
         isLoading: true,
-        isHomingActionCompleted: true,
+        isHomingActionCompleted: false,
       };
-    case homingActions.homingActionSuccess:
-      return { ...state, ...action.payload, isLoading: false };
-    case homingActions.homingActionFailed:
-      return { ...state, ...action.payload, isLoading: false };
+
+    // case homingActions.homingActionSuccess:
+    //   return { ...state, ...action.payload, isLoading: false };
+
+    // case homingActions.homingActionFailed:
+    //   return { ...state, ...action.payload, isLoading: false };
+
     case homingActions.homingActionInProgress:
       return {
         ...state,
         ...action.payload,
         isLoading: false,
-        isHomingActionCompleted: true,
+        homingAllDeckCompletionPercentage: action.payload.progress,
+        isHomingActionCompleted: false,
       };
+
     case homingActions.homingActionInCompleted:
       return {
         ...state,
         ...action.payload,
         isLoading: false,
-        isHomingActionCompleted: false,
+        isHomingActionCompleted: true,
       };
     default:
       return state;
