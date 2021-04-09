@@ -244,16 +244,16 @@ func (d *Compact32Deck) getHomingDeckName() string {
 	return d.name
 }
 
-func (d *Compact32Deck) getHomingPercent() float64{
+func (d *Compact32Deck) getHomingPercent() float64 {
 	if BothDeckHomingInProgress {
 		if tempA, ok := homingPercent.Load("A"); !ok {
 			logger.Errorln("homingPercent isn't loaded!")
 			return -1
 		} else if tempB, ok := homingPercent.Load("B"); !ok {
 			logger.Errorln("homingPercent isn't loaded!")
-			return -1	
+			return -1
 		} else {
-			return (tempA.(float64) + tempB.(float64))/ 2
+			return (tempA.(float64) + tempB.(float64)) / 2
 		}
 	}
 	if temp, ok := homingPercent.Load(d.name); !ok {
@@ -264,7 +264,6 @@ func (d *Compact32Deck) getHomingPercent() float64{
 	}
 }
 
-
 func SetBothDeckHomingInProgress() {
 	BothDeckHomingInProgress = true
 }
@@ -273,10 +272,6 @@ func ResetBothDeckHomingInProgress() {
 	BothDeckHomingInProgress = false
 }
 
-func IsBothDeckHomingInProgress() bool {	
+func IsBothDeckHomingInProgress() bool {
 	return BothDeckHomingInProgress
 }
-
-
-
-

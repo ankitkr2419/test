@@ -54,17 +54,17 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uuid.UUID) (response string, err error) {
 
-	// if !deps.PlcDeck[deck].IsMachineHomed() {
-	// 	err = fmt.Errorf("Please home the machine first!")
-	// 	deps.WsErrCh <- err
-	// 	return
-	// }
+	if !deps.PlcDeck[deck].IsMachineHomed() {
+		err = fmt.Errorf("Please home the machine first!")
+		deps.WsErrCh <- err
+		return
+	}
 
-	// if deps.PlcDeck[deck].IsRunInProgress() {
-	// 	err = fmt.Errorf("previous run already in progress... wait or abort it")
-	// 	deps.WsErrCh <- err
-	// 	return
-	// }
+	if deps.PlcDeck[deck].IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		deps.WsErrCh <- err
+		return
+	}
 
 	deps.PlcDeck[deck].SetRunInProgress()
 	defer deps.PlcDeck[deck].ResetRunInProgress()

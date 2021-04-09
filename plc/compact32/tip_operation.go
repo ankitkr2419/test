@@ -49,7 +49,6 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	var ok bool
 	deckAndMotor.Deck = d.name
 
-
 	//
 	// 1. Move Deck to the tip's position
 	//
@@ -86,8 +85,8 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	switch pos {
 	// extraction tip
 	case 1, 2:
-	tipFast = "syringe_module_fast_down_1000_tip"
-	tipSlow = "syringe_module_slow_down_1000_tip"
+		tipFast = "syringe_module_fast_down_1000_tip"
+		tipSlow = "syringe_module_slow_down_1000_tip"
 	// piercing tip
 	case 3:
 		tipFast = "syringe_module_fast_down_piercing_tip"

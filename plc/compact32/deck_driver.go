@@ -10,247 +10,246 @@ import (
 
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
-	time.Sleep(time.Second * 2)
-	// 	if d.isMachineInAbortedState() {
-	// 		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v. Please home the machine first.", d.name)
-	// 		return "", err
-	// 	}
+	if d.isMachineInAbortedState() {
+		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v. Please home the machine first.", d.name)
+		return "", err
+	}
 
-	// 	if pulse < minimumPulsesThreshold {
-	// 		logger.Infoln("Current pulse: ", pulse, " is less than minimumPulsesThreshold. Avoiding Motor Movements for motor:", motorNum, ", deck: ", d.name)
-	// 		return "SUCCESS", nil
-	// 	}
+	if pulse < minimumPulsesThreshold {
+		logger.Infoln("Current pulse: ", pulse, " is less than minimumPulsesThreshold. Avoiding Motor Movements for motor:", motorNum, ", deck: ", d.name)
+		return "SUCCESS", nil
+	}
 
-	// 	wrotePulses.Store(d.name, uint16(0))
-	// 	executedPulses.Store(d.name, uint16(0))
-	// 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
+	wrotePulses.Store(d.name, uint16(0))
+	executedPulses.Store(d.name, uint16(0))
+	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
 
-	// 	var results []byte
+	var results []byte
 
-	// 	//
-	// 	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
-	// 	//
+	//
+	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
+	//
 
-	// 	if d.getMagnetState() != detached && motorNum == K5_Deck {
-	// 		response, err = d.fullDetach()
-	// 		if err != nil {
-	// 			logger.Errorln(err)
-	// 			return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck. Error: %v", err)
-	// 		}
-	// 	}
+	if d.getMagnetState() != detached && motorNum == K5_Deck {
+		response, err = d.fullDetach()
+		if err != nil {
+			logger.Errorln(err)
+			return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck. Error: %v", err)
+		}
+	}
 
-	// 	logger.Infoln("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
+	logger.Infoln("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
 
-	// 	//
-	// 	// move the syringe module to rest position if the Motor Num is of deck
-	// 	// and syringe tips are inside of deck positions.
-	// 	//
+	//
+	// move the syringe module to rest position if the Motor Num is of deck
+	// and syringe tips are inside of deck positions.
+	//
 
-	// 	if d.getSyringeModuleState() == InDeck && motorNum == K5_Deck {
-	// 		response, err = d.SyringeRestPosition()
-	// 		if err != nil {
-	// 			logger.Errorln(err)
-	// 			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
-	// 		}
+	if d.getSyringeModuleState() == InDeck && motorNum == K5_Deck {
+		response, err = d.SyringeRestPosition()
+		if err != nil {
+			logger.Errorln(err)
+			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
+		}
 
-	// 	}
+	}
 
-	// 	// Switch OFF The motor
+	// Switch OFF The motor
 
-	// 	if temp := d.getOnReg(); temp == highestUint16 {
-	// 		err = fmt.Errorf("on/off Register  isn't loaded!")
-	// 		return
-	// 	} else if temp != OFF {
-	// 		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
-	// 	}
+	if temp := d.getOnReg(); temp == highestUint16 {
+		err = fmt.Errorf("on/off Register  isn't loaded!")
+		return
+	} else if temp != OFF {
+		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
+	}
 
-	// 	if err != nil {
-	// 		logger.Errorln("error writing Switch Off : ", err, d.name)
-	// 		return
-	// 	}
-	// 	logger.Infoln("Wrote Switch Off motor")
-	// 	onReg.Store(d.name, OFF)
+	if err != nil {
+		logger.Errorln("error writing Switch Off : ", err, d.name)
+		return
+	}
+	logger.Infoln("Wrote Switch Off motor")
+	onReg.Store(d.name, OFF)
 
-	// 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
-	// 	if err != nil {
-	// 		logger.Errorln("error writing Completion Off : ", err, d.name)
-	// 		return "", err
-	// 	}
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
+	if err != nil {
+		logger.Errorln("error writing Completion Off : ", err, d.name)
+		return "", err
+	}
 
-	// 	if temp := d.getPulseReg(); temp == highestUint16 {
-	// 		err = fmt.Errorf("pulse Register isn't loaded!")
-	// 		return
-	// 	} else if temp != pulse {
-	// 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulse)
-	// 	}
+	if temp := d.getPulseReg(); temp == highestUint16 {
+		err = fmt.Errorf("pulse Register isn't loaded!")
+		return
+	} else if temp != pulse {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulse)
+	}
 
-	// 	if err != nil {
-	// 		logger.Errorln("error writing pulse : ", err, d.name)
-	// 		return "", err
-	// 	}
-	// 	logger.Infoln("Wrote Pulse. res : ", results)
-	// 	pulseReg.Store(d.name, pulse)
-	// 	wrotePulses.Store(d.name, pulse)
+	if err != nil {
+		logger.Errorln("error writing pulse : ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote Pulse. res : ", results)
+	pulseReg.Store(d.name, pulse)
+	wrotePulses.Store(d.name, pulse)
 
-	// 	if temp := d.getSpeedReg(); temp == highestUint16 {
-	// 		err = fmt.Errorf("speed Register isn't loaded!")
-	// 		return
-	// 	} else if temp != speed {
-	// 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][200], speed)
-	// 	}
+	if temp := d.getSpeedReg(); temp == highestUint16 {
+		err = fmt.Errorf("speed Register isn't loaded!")
+		return
+	} else if temp != speed {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][200], speed)
+	}
 
-	// 	if err != nil {
-	// 		logger.Errorln("error writing speed : ", err, d.name)
-	// 		return "", err
-	// 	}
-	// 	logger.Infoln("Wrote Speed. res : ", results)
-	// 	speedReg.Store(d.name, speed)
+	if err != nil {
+		logger.Errorln("error writing speed : ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote Speed. res : ", results)
+	speedReg.Store(d.name, speed)
 
-	// 	if temp := d.getRampReg(); temp == highestUint16 {
-	// 		err = fmt.Errorf("ramp Register isn't loaded!")
-	// 		return
-	// 	} else if temp != ramp {
-	// 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][204], ramp)
-	// 	}
+	if temp := d.getRampReg(); temp == highestUint16 {
+		err = fmt.Errorf("ramp Register isn't loaded!")
+		return
+	} else if temp != ramp {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][204], ramp)
+	}
 
-	// 	if err != nil {
-	// 		logger.Errorln("error writing RAMP : ", err, d.name)
-	// 		return "", err
-	// 	}
-	// 	logger.Infoln("Wrote Ramp. res : ", results)
-	// 	rampReg.Store(d.name, ramp)
+	if err != nil {
+		logger.Errorln("error writing RAMP : ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote Ramp. res : ", results)
+	rampReg.Store(d.name, ramp)
 
-	// 	if temp := d.getDirectionReg(); temp == highestUint16 {
-	// 		err = fmt.Errorf("direction Register isn't loaded!")
-	// 		return
-	// 	} else if temp != direction {
-	// 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][206], direction)
-	// 	}
+	if temp := d.getDirectionReg(); temp == highestUint16 {
+		err = fmt.Errorf("direction Register isn't loaded!")
+		return
+	} else if temp != direction {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][206], direction)
+	}
 
-	// 	if err != nil {
-	// 		logger.Errorln("error writing direction : ", err, d.name)
-	// 		return "", err
-	// 	}
-	// 	logger.Infoln("Wrote direction. res : ", results)
-	// 	directionReg.Store(d.name, direction)
+	if err != nil {
+		logger.Errorln("error writing direction : ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote direction. res : ", results)
+	directionReg.Store(d.name, direction)
 
-	// 	if temp := d.getMotorNumReg(); temp == highestUint16 {
-	// 		err = fmt.Errorf("motor Number Register isn't loaded!")
-	// 		return
-	// 	} else if temp != motorNum {
-	// 		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][226], motorNum)
-	// 	}
+	if temp := d.getMotorNumReg(); temp == highestUint16 {
+		err = fmt.Errorf("motor Number Register isn't loaded!")
+		return
+	} else if temp != motorNum {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][226], motorNum)
+	}
 
-	// 	if err != nil {
-	// 		logger.Errorln("error writing motor num: ", err, d.name)
-	// 		return "", err
-	// 	}
-	// 	logger.Infoln("Wrote motorNum. res : ", results)
-	// 	motorNumReg.Store(d.name, motorNum)
+	if err != nil {
+		logger.Errorln("error writing motor num: ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote motorNum. res : ", results)
+	motorNumReg.Store(d.name, motorNum)
 
-	// 	// Check if User has paused the run/operation
-	// 	for {
-	// 		if d.isMachineInPausedState() {
-	// 			logger.Infoln("Machine in PAUSED state for deck: %v", d.name)
-	// 			time.Sleep(400 * time.Millisecond)
-	// 		} else {
-	// 			break
-	// 		}
-	// 	}
+	// Check if User has paused the run/operation
+	for {
+		if d.isMachineInPausedState() {
+			logger.Infoln("Machine in PAUSED state for deck: %v", d.name)
+			time.Sleep(400 * time.Millisecond)
+		} else {
+			break
+		}
+	}
 
-	// 	// Switching Motor ON
-	// 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
-	// 	if err != nil {
-	// 		logger.Errorln("error Writing On/Off : ", err, d.name)
-	// 		return "", err
-	// 	}
-	// 	logger.Infoln("Wrote Switch On motor")
-	// 	onReg.Store(d.name, ON)
+	// Switching Motor ON
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	if err != nil {
+		logger.Errorln("error Writing On/Off : ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote Switch On motor")
+	onReg.Store(d.name, ON)
 
-	// 	// Our Run is in Progress
-	// 	logger.Infoln("Movements in Progress for deck: ", d.name)
+	// Our Run is in Progress
+	logger.Infoln("Movements in Progress for deck: ", d.name)
 
-	// 	for {
+	for {
 
-	// 		if temp := d.getExecutedPulses(); temp == highestUint16 {
-	// 			err = fmt.Errorf("executedPulses isn't loaded!")
-	// 			return
-	// 			// Write executed pulses to Position
-	// 		} else if d.isMachineInAbortedState() {
-	// 			positions[deckAndNumber] += float64(temp) / float64(motors[deckAndNumber]["steps"])
-	// 			logger.Infoln("position after abortion: ", positions[deckAndNumber])
-	// 			err = fmt.Errorf("Operation was ABORTED!")
-	// 			return "", err
-	// 		}
+		if temp := d.getExecutedPulses(); temp == highestUint16 {
+			err = fmt.Errorf("executedPulses isn't loaded!")
+			return
+			// Write executed pulses to Position
+		} else if d.isMachineInAbortedState() {
+			positions[deckAndNumber] += float64(temp) / float64(motors[deckAndNumber]["steps"])
+			logger.Infoln("position after abortion: ", positions[deckAndNumber])
+			err = fmt.Errorf("Operation was ABORTED!")
+			return "", err
+		}
 
-	// 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
-	// 		if err != nil {
-	// 			logger.Errorln("error while reading completion  : ", err, d.name)
-	// 			// Let this reading failure be intolerant
-	// 			return
-	// 		}
+		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))
+		if err != nil {
+			logger.Errorln("error while reading completion  : ", err, d.name)
+			// Let this reading failure be intolerant
+			return
+		}
 
-	// 		if len(results) > 0 {
-	// 			if int(results[0]) == 1 {
-	// 				logger.Infoln("Completion returned ---> ", results, d.name)
-	// 				response, err = d.switchOffMotor()
-	// 				if err != nil {
-	// 					logger.Errorln("err: from setUp--> ", err, d.name)
-	// 					return
-	// 				}
-	// 				distanceMoved := float64(pulse) / float64(motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
-	// 				switch direction {
-	// 				// Away from Sensor
-	// 				case REV:
-	// 					positions[deckAndNumber] += distanceMoved
-	// 				// Towards Sensor
-	// 				case FWD:
-	// 					if (positions[deckAndNumber] - distanceMoved) < 0 {
-	// 						positions[deckAndNumber] = 0
-	// 						logger.Errorln("Motor Just moved to negative distance for deck: ", d.name)
-	// 					}
-	// 					positions[deckAndNumber] -= distanceMoved
-	// 				default:
-	// 					logger.Errorln("Unknown Direction was found")
-	// 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
-	// 				}
-	// 				logger.Infoln("pos", positions[deckAndNumber], d.name)
-	// 				return "RUN Completed", nil
-	// 			}
-	// 		}
+		if len(results) > 0 {
+			if int(results[0]) == 1 {
+				logger.Infoln("Completion returned ---> ", results, d.name)
+				response, err = d.switchOffMotor()
+				if err != nil {
+					logger.Errorln("err: from setUp--> ", err, d.name)
+					return
+				}
+				distanceMoved := float64(pulse) / float64(motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
+				switch direction {
+				// Away from Sensor
+				case REV:
+					positions[deckAndNumber] += distanceMoved
+				// Towards Sensor
+				case FWD:
+					if (positions[deckAndNumber] - distanceMoved) < 0 {
+						positions[deckAndNumber] = 0
+						logger.Errorln("Motor Just moved to negative distance for deck: ", d.name)
+					}
+					positions[deckAndNumber] -= distanceMoved
+				default:
+					logger.Errorln("Unknown Direction was found")
+					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
+				}
+				logger.Infoln("pos", positions[deckAndNumber], d.name)
+				return "RUN Completed", nil
+			}
+		}
 
-	// 		if direction == REV {
-	// 			goto skipSensor
-	// 		}
-	// 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][2], uint16(1))
-	// 		if err != nil {
-	// 			logger.Errorln("error reading Sensor : ", err, d.name)
-	// 			return "", err
-	// 		}
+		if direction == REV {
+			goto skipSensor
+		}
+		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][2], uint16(1))
+		if err != nil {
+			logger.Errorln("error reading Sensor : ", err, d.name)
+			return "", err
+		}
 
-	// 		logger.Infoln("Sensor returned ---> ", results, d.name)
-	// 		if len(results) > 0 {
-	// 			if int(results[0]) == sensorCut {
-	// 				logger.Infoln("Sensor returned ---> ", results[0], d.name)
-	// 				response, err = d.switchOffMotor()
-	// 				if err != nil {
-	// 					logger.Errorln("Sensor err : ", err, d.name)
-	// 					return "", err
-	// 				}
-	// 				positions[deckAndNumber] = calibs[deckAndNumber]
-	// 				logger.Infoln("pos", positions[deckAndNumber], d.name)
-	// 				return
-	// 			}
-	// 		}
+		logger.Infoln("Sensor returned ---> ", results, d.name)
+		if len(results) > 0 {
+			if int(results[0]) == sensorCut {
+				logger.Infoln("Sensor returned ---> ", results[0], d.name)
+				response, err = d.switchOffMotor()
+				if err != nil {
+					logger.Errorln("Sensor err : ", err, d.name)
+					return "", err
+				}
+				positions[deckAndNumber] = calibs[deckAndNumber]
+				logger.Infoln("pos", positions[deckAndNumber], d.name)
+				return
+			}
+		}
 
-	// 	skipSensor:
-	// 		switch pulse {
-	// 		case finalSensorCutPulses:
-	// 			time.Sleep(50 * time.Millisecond)
-	// 		default:
-	// 			time.Sleep(150 * time.Millisecond)
-	// 		}
-	// 	}
+	skipSensor:
+		switch pulse {
+		case finalSensorCutPulses:
+			time.Sleep(50 * time.Millisecond)
+		default:
+			time.Sleep(150 * time.Millisecond)
+		}
+	}
 
 	return "RUN Completed", nil
 }
