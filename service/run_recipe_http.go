@@ -54,17 +54,17 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uuid.UUID) (response string, err error) {
 
-	if !deps.PlcDeck[deck].IsMachineHomed() {
-		err = fmt.Errorf("Please home the machine first!")
-		deps.WsErrCh <- err
-		return
-	}
+	// if !deps.PlcDeck[deck].IsMachineHomed() {
+	// 	err = fmt.Errorf("Please home the machine first!")
+	// 	deps.WsErrCh <- err
+	// 	return
+	// }
 
-	if deps.PlcDeck[deck].IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		deps.WsErrCh <- err
-		return
-	}
+	// if deps.PlcDeck[deck].IsRunInProgress() {
+	// 	err = fmt.Errorf("previous run already in progress... wait or abort it")
+	// 	deps.WsErrCh <- err
+	// 	return
+	// }
 
 	deps.PlcDeck[deck].SetRunInProgress()
 	defer deps.PlcDeck[deck].ResetRunInProgress()
@@ -132,13 +132,18 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			fmt.Println(ht)
 
 		case "Shaking":
-			// Get the Shaking process
-			// sh, err := deps.Store.ShowShaking(req.Context(), p.ID)
-			// if err != nil {
-			// return "", err
-			// }
-			// fmt.Println(sh)
-			// sh.run()
+			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
+			if err != nil {
+				return "", err
+			}
+			fmt.Printf("shaker object %v", shaker)
+
+			sha, err := deps.PlcDeck[deck].Shaking(shaker)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println(sha)
+
 		case "Piercing":
 			// Get the Piercing process
 			// TODO: Below ID is reference ID, so please conform

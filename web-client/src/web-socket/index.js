@@ -56,11 +56,11 @@ export const connectSocket = (dispatch) => {
           dispatch(experimentedCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.homingProgress:
-          dispatch(homingActionInProgress(data));
+          dispatch(homingActionInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
           toast.success("Homing Successfull");
-          dispatch(homingActionInCompleted(data));
+          dispatch(homingActionInCompleted(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
           dispatch(runRecipeInProgress(data));

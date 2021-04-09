@@ -101,6 +101,6 @@ type Storer interface {
 	ShowAttachDetach(ctx context.Context, processID uuid.UUID) (AttachDetach, error)
 	CreateDelay(context.Context, Delay) (Delay, error)
 	ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error)
-	CreateShaking(context.Context, Shaking) (Shaking, error)
-	ShowShaking(ctx context.Context, id uuid.UUID) (shaking Shaking, err error)
+	CreateShaking(context.Context, Shaker) (Shaker, error)
+	ShowShaking(ctx context.Context, id uuid.UUID) (shaking Shaker, err error)
 }

@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 
@@ -410,7 +409,7 @@ func createTipDockingProcess(record []string, processID uuid.UUID, store Storer)
 func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
 	logger.Info("Inside shaking create Process. Record: ", record, ". ProcessID:", processID)
 
-	s := Shaking{
+	s := Shaker{
 		ProcessID: processID,
 	}
 
@@ -441,7 +440,7 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 		logger.Errorln(err, record[4])
 		return err
 	} else {
-		s.Time1 = time.Duration(time1)
+		s.Time1 = time1
 	}
 
 	if s.RPM2, err = strconv.ParseInt(record[5], 10, 64); err != nil {
@@ -453,7 +452,7 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 		logger.Errorln(err, record[6])
 		return err
 	} else {
-		s.Time2 = time.Duration(time2)
+		s.Time2 = time2
 	}
 
 	createdProcess, err := store.CreateShaking(context.Background(), s)
