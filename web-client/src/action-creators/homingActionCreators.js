@@ -1,4 +1,8 @@
-import { homingActions, deckHomingActions } from "actions/homingActions";
+import {
+  homingActions,
+  deckHomingActions,
+  discardTipAndHomingActions,
+} from "actions/homingActions";
 
 export const homingActionInitiated = () => ({
   type: homingActions.homingActionInitiated,
@@ -46,4 +50,30 @@ export const deckHomingActionFailed = (serverErrors) => ({
   payload: {
     serverErrors,
   },
+});
+
+export const discardTipAndHomingActionInitiated = (params) => ({
+  type: discardTipAndHomingActions.discardTipAndHomingActionInitiated,
+  payload: {
+    params,
+  },
+});
+
+export const discardTipAndHomingActionSuccess = (homingData) => ({
+  type: discardTipAndHomingActions.discardTipAndHomingActionSuccess,
+  payload: {
+    homingData,
+  },
+});
+
+export const discardTipAndHomingActionFailed = (serverErrors) => ({
+  type: discardTipAndHomingActions.discardTipAndHomingActionFailed,
+  payload: {
+    serverErrors,
+  },
+});
+
+export const discardTipAndHomingActionReset = () => ({
+  type: discardTipAndHomingActions.discardTipAndHomingActionReset,
+  payload: {},
 });

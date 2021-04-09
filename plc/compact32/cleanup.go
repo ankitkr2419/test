@@ -26,8 +26,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
 
-	aborted.Store(d.name, false)
-	runInProgress.Store(d.name, true)
+	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
 	fmt.Println("Deck is moving to discard_box_open_position")
@@ -71,8 +70,7 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	var pulses uint16
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
 
-	aborted.Store(d.name, false)
-	runInProgress.Store(d.name, true)
+	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
 	fmt.Println("Deck is moving to deck_start")
@@ -123,14 +121,13 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
 		return
 	}
-	d.WsMsgCh <- fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name)
+
 	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
 
 	var totalTime int64
 
-	aborted.Store(d.name, false)
-	runInProgress.Store(d.name, true)
+	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
 	//
