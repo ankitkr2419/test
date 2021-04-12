@@ -162,7 +162,6 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return "", err
 	}
 
-	d.setAborted()
 	wrotePulses.Store(d.name, uint16(0))
 	d.resetPaused()
 
@@ -175,6 +174,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		}
 	}
 
+	d.setAborted()
 	d.ResetRunInProgress()
 	d.resetTimerInProgress()
 

@@ -104,6 +104,9 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		deckAndMotor.Number = K9_Syringe_Module_LHRH
 
 		response, err = d.setupMotor(motors[deckAndMotor]["fast"], piercingPulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+		// TODO: Use defer d.setIndeck as in aspire_dispense
+		// Even if err has occured let's store syringeModuleState as inDeck
+		syringeModuleState.Store(d.name, InDeck)
 		if err != nil {
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module DOWN to Cartridge WellNum %d. Error: %v", wellNumber, err)
@@ -136,6 +139,9 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module UP to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
+		// TODO: Use defer d.setIndeck as in aspire_dispense
+		// Only after successful coming out do we say its OutDeck completely
+		syringeModuleState.Store(d.name, OutDeck)
 
 		fmt.Println("Got Up from WellNumber: ", wellNumber)
 

@@ -42,10 +42,11 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	//
 	// move the syringe module to rest position if the Motor Num is of deck
+	// or Magnet Rev Fwd motor as suggested by @Sanket
 	// and syringe tips are inside of deck positions.
 	//
 
-	if d.getSyringeModuleState() == InDeck && motorNum == K5_Deck {
+	if d.getSyringeModuleState() == InDeck && (motorNum == K5_Deck || motorNum == K7_Magnet_Rev_Fwd) {
 		response, err = d.SyringeRestPosition()
 		if err != nil {
 			logger.Errorln(err)
@@ -176,6 +177,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return
 			// Write executed pulses to Position
 		} else if d.isMachineInAbortedState() {
+			logger.Infoln("position before abortion: ", positions[deckAndNumber])
 			positions[deckAndNumber] += float64(temp) / float64(motors[deckAndNumber]["steps"])
 			logger.Infoln("position after abortion: ", positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
