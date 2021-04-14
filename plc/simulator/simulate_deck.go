@@ -145,7 +145,10 @@ var sensorDone = map[string](chan bool){
 func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
 	// Reset D212
+	logger.Debugln("Reset D212")
 	REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]] = 0
+
+	REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][2]] = plc.SensorUncut
 
 	// Pulses Register
 	// If Pulses greater than 0 && Direction is towards Sensor
@@ -189,6 +192,8 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 
 			// We are updating D212 after every 0.1 second
 			REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]] += uint16(float64(speed) * 0.1)
+			logger.Debugln("D212 for deck", d.DeckName, " value is: ", REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]])
+
 			currentPulses = REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]]
 			if currentPulses > pulses {
 				// D212 updated
@@ -196,6 +201,7 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 				// Completion Done
 				REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][1]] = uint16(1)
 				// Completion is monitored here itself
+				logger.Debugln("Completion is Done for deck", d.DeckName)
 				motorDone[d.DeckName] <- true
 			}
 		}
@@ -227,6 +233,7 @@ func (d *SimulatorDriver) monitorSensorCut() (err error) {
 		shift := float64(REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]]) / float64(plc.Motors[deckAndMotor]["steps"])
 		if plc.Positions[deckAndMotor]-shift <= plc.Calibs[deckAndMotor] {
 			REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][2]] = plc.SensorCut
+			logger.Debugln("Sensor Cut is Done for deck", d.DeckName)
 			sensorDone[d.DeckName] <- true
 			return
 		}
