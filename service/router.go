@@ -89,5 +89,10 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/restore-deck/{deck:[A-B]}", restoreDeckHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/uv/{time}/{deck:[A-B]}", uvLightHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/discard-tip-and-home/{discard}/{deck:[A-B]}", discardAndHomeHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/heating", createHeatingHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/heating/{id}", showHeatingHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/heating/{id}", updateHeatingHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/heating/{id}", deleteHeatingHandler(deps)).Methods(http.MethodDelete)
+
 	return
 }
