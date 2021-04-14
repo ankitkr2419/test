@@ -38,7 +38,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 	}
 
-	logger.Infoln("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
+	logger.Infoln("Moving: ", motorNum, pulse/Motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
 
 	//
 	// move the syringe module to rest position if the Motor Num is of deck
@@ -177,9 +177,9 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return
 			// Write executed pulses to Position
 		} else if d.isMachineInAbortedState() {
-			logger.Infoln("position before abortion: ", positions[deckAndNumber])
-			positions[deckAndNumber] += float64(temp) / float64(motors[deckAndNumber]["steps"])
-			logger.Infoln("position after abortion: ", positions[deckAndNumber])
+			logger.Infoln("position before abortion: ", Positions[deckAndNumber])
+			Positions[deckAndNumber] += float64(temp) / float64(Motors[deckAndNumber]["steps"])
+			logger.Infoln("position after abortion: ", Positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
@@ -199,23 +199,23 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 					logger.Errorln("err: from setUp--> ", err, d.name)
 					return
 				}
-				distanceMoved := float64(pulse) / float64(motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
+				distanceMoved := float64(pulse) / float64(Motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
 				switch direction {
 				// Away from Sensor
 				case REV:
-					positions[deckAndNumber] += distanceMoved
+					Positions[deckAndNumber] += distanceMoved
 				// Towards Sensor
 				case FWD:
-					if (positions[deckAndNumber] - distanceMoved) < 0 {
-						positions[deckAndNumber] = 0
+					if (Positions[deckAndNumber] - distanceMoved) < 0 {
+						Positions[deckAndNumber] = 0
 						logger.Errorln("Motor Just moved to negative distance for deck: ", d.name)
 					}
-					positions[deckAndNumber] -= distanceMoved
+					Positions[deckAndNumber] -= distanceMoved
 				default:
 					logger.Errorln("Unknown Direction was found")
 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
 				}
-				logger.Infoln("pos", positions[deckAndNumber], d.name)
+				logger.Infoln("pos", Positions[deckAndNumber], d.name)
 				return "RUN Completed", nil
 			}
 		}
@@ -231,15 +231,15 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 		logger.Infoln("Sensor returned for deck ", d.name, "---> ", results, d.name)
 		if len(results) > 0 {
-			if int(results[0]) == sensorCut {
+			if int(results[0]) == SensorCut {
 				logger.Infoln("Sensor returned ---> ", results[0], d.name)
 				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("Sensor err : ", err, d.name)
 					return "", err
 				}
-				positions[deckAndNumber] = calibs[deckAndNumber]
-				logger.Infoln("pos", positions[deckAndNumber], d.name)
+				Positions[deckAndNumber] = Calibs[deckAndNumber]
+				logger.Infoln("pos", Positions[deckAndNumber], d.name)
 				return
 			}
 		}

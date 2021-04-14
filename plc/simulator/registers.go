@@ -29,6 +29,7 @@ import (
    And REGISTERS_EXTRACTION["B"]["M"][ MODBUS_EXTRACTION["B"]["M"][0] ] will give us register value at M 0 for deck B
 */
 
+// TODO: Use sync.Map
 var REGISTERS_EXTRACTION map[string]map[string]map[uint16]uint16 = map[string]map[string]map[uint16]uint16{
 	// Registers of Deck A
 	"A": map[string]map[uint16]uint16{

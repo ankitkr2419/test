@@ -64,14 +64,14 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 	}
 
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravel := positions[deckMagnetFwdRev] - magnetBackPosition
+	distanceToTravel := Positions[deckMagnetFwdRev] - magnetBackPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -90,14 +90,14 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravel = positions[deckMagnetUpDown] - magnetUpPosition
+	distanceToTravel = Positions[deckMagnetUpDown] - magnetUpPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(Motors[deckMagnetUpDown]["fast"], pulses, Motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -111,14 +111,14 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 		return "", err
 	}
 	// distance and direction setup for magnet for backward step 2
-	distanceToTravel = positions[deckMagnetFwdRev] - magnetBackPosition
+	distanceToTravel = Positions[deckMagnetFwdRev] - magnetBackPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -159,13 +159,13 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 		return "", err
 	}
 
-	distanceToTravel := positions[deckAndNumber] - deckPosition
+	distanceToTravel := Positions[deckAndNumber] - deckPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndNumber]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndNumber]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndNumber]["fast"], pulses, motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
+	response, err = d.setupMotor(Motors[deckAndNumber]["fast"], pulses, Motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
 	if err != nil {
 		fmt.Printf("error in moving deck to required position")
 		return
@@ -179,14 +179,14 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 		return "", err
 	}
 	// distance and direction setup for magnet down step 1
-	distanceToTravel = positions[deckMagnetUpDown] - magnetDownFirstPosition
+	distanceToTravel = Positions[deckMagnetUpDown] - magnetDownFirstPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 1 Downward Motion
-	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(Motors[deckMagnetUpDown]["fast"], pulses, Motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -199,14 +199,14 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravel = positions[deckMagnetFwdRev] - magnetFwdFirstPosition
+	distanceToTravel = Positions[deckMagnetFwdRev] - magnetFwdFirstPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 1 forward Motion
-	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}
@@ -221,14 +221,14 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravel = positions[deckMagnetUpDown] - magnetDownSecPosition
+	distanceToTravel = Positions[deckMagnetUpDown] - magnetDownSecPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Downward Motion
-	response, err = d.setupMotor(motors[deckMagnetUpDown]["fast"], pulses, motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
+	response, err = d.setupMotor(Motors[deckMagnetUpDown]["fast"], pulses, Motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
 	}
@@ -241,14 +241,14 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
-	distanceToTravel = positions[deckMagnetFwdRev] - magnetFwdSecPosition
+	distanceToTravel = Positions[deckMagnetFwdRev] - magnetFwdSecPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.setupMotor(motors[deckMagnetFwdRev]["fast"], pulses, motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
 	}

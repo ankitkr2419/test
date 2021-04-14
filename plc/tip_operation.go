@@ -61,13 +61,13 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	distanceToTravel = positions[deckAndMotor] - position
+	distanceToTravel = Positions[deckAndMotor] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to tip source. Error: %v", err)
@@ -100,13 +100,13 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	}
 	// Here tipFast will always be greater
 	// than resting_position
-	distanceToTravel = position - positions[deckAndMotor]
+	distanceToTravel = position - Positions[deckAndMotor]
 
 	// We know Concrete Direction here, its DOWN
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to tip's base. Error: %v", err)
@@ -124,14 +124,14 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	}
 	// Here tipSlow will always be greater
 	// than tipFast
-	distanceToTravel = position - positions[deckAndMotor]
+	distanceToTravel = position - Positions[deckAndMotor]
 
 	// We know Concrete Direction here, its DOWN
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// Giving it real slow speed
-	response, err = d.setupMotor(homingSlowSpeed, pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	// TODO: Use defer d.setIndeck as in aspire_dispense
 	// Even if err has occured let's store syringeModuleState as inDeck
 	syringeModuleState.Store(d.name, InDeck)
@@ -148,13 +148,13 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	// Here resting_position will always be lesser
 	// than whatever position earlier
-	distanceToTravel = positions[deckAndMotor] - restingPos
+	distanceToTravel = Positions[deckAndMotor] - restingPos
 
 	// We know Concrete Direction here, its UP
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", restingPositionString, err)
@@ -207,13 +207,13 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	distanceToTravel = positions[deckAndMotor] - position
+	distanceToTravel = Positions[deckAndMotor] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to discard_big_hole source. Error: %v", err)
@@ -233,13 +233,13 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	}
 	// Here deck_base will always be greater
 	// than syringe_parking
-	distanceToTravel = position - positions[deckAndMotor]
+	distanceToTravel = position - Positions[deckAndMotor]
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	// TODO: Use defer d.setIndeck as in aspire_dispense
 	// Even if err has occured let's store syringeModuleState as inDeck
 	syringeModuleState.Store(d.name, InDeck)
@@ -260,14 +260,14 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	}
 	// Here syringe_module_slow_down_for_discard will always be greater
 	// than tipFast
-	distanceToTravel = position - positions[deckAndMotor]
+	distanceToTravel = position - Positions[deckAndMotor]
 
 	// We know Concrete Direction here, its DOWN
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// Giving it real slow speed
-	response, err = d.setupMotor(homingSlowSpeed, pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to discard_big_hole's inside. Error: %v", err)
@@ -285,12 +285,12 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	distanceToTravel = positions[deckAndMotor] - position
+	distanceToTravel = Positions[deckAndMotor] - position
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// We know concrete direction, here its towards sensor/ FWD
-	response, err = d.setupMotor(homingSlowSpeed, pulses, motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
+	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to discard_big_hole source. Error: %v", err)
@@ -310,13 +310,13 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	}
 	// Here deck_base will always be lesser
 	// than syringe_module_slow_down_for_discard
-	distanceToTravel = positions[deckAndMotor] - position
+	distanceToTravel = Positions[deckAndMotor] - position
 
 	// We know Concrete Direction here, its UP
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	// Giving it real slow speed
-	response, err = d.setupMotor(homingSlowSpeed, pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to deck base. Error: %v", err)
@@ -330,13 +330,13 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	// Here syringe_parking will always be lesser
 	// than deck_base
-	distanceToTravel = positions[deckAndMotor] - parkingPos
+	distanceToTravel = Positions[deckAndMotor] - parkingPos
 
 	// We know Concrete Direction here, its UP
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to resting position. Error: %v", err)
