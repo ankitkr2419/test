@@ -32,8 +32,8 @@ const (
 		duration,
 		updated_at) = 
 		($1, $2, $3, $4) WHERE process_id = $5`
-	deleteHeatingQuery = `DELETE FROM heating
-	WHERE process_id = $1`
+	deleteHeatingQuery = `DELETE FROM processes
+	WHERE id = $1`
 )
 
 func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
