@@ -4,11 +4,12 @@ import (
 	"encoding/binary"
 	"sync"
 	"time"
-
-	// "github.com/goburrow/modbus"
 )
 
-type SimulatorDriver struct {}
+type SimulatorDriver struct {
+	// DeckName will be used for differentiating simulator registors 
+	DeckName string
+}
 
 const delay = 50
 
@@ -24,7 +25,7 @@ func (d *SimulatorDriver) WriteMultipleRegisters(address, quantity uint16, value
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	// results, err = simulateWriteMultipleRegisters(address, quantity, value)
+	results, err = simulateWriteMultipleRegisters(address, quantity, value)
 	return
 }
 
@@ -32,7 +33,7 @@ func (d *SimulatorDriver) WriteSingleRegister(address, value uint16) (results []
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	// results, err = simulateWriteSingleRegister(address, value)
+	results, err = simulateWriteSingleRegister(address, value)
 	return
 }
 
@@ -40,7 +41,7 @@ func (d *SimulatorDriver) ReadHoldingRegisters(address, quantity uint16) (result
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	// results, err = simualateReadHoldingRegisters(address, quantity)
+	results, err = simualateReadHoldingRegisters(address, quantity)
 	return
 }
 
@@ -59,7 +60,7 @@ func (d *SimulatorDriver) ReadCoils(address, quantity uint16) (results []byte, e
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	// results, err = simulateReadCoils(address, quantity)
+	results, err = simulateReadCoils(address, quantity)
 	return
 }
 
@@ -79,6 +80,6 @@ func (d *SimulatorDriver) WriteSingleCoil(address, value uint16) (err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	// _, err = simualateWriteSingleCoil(address, value)
+	err = simulateWriteSingleCoil(address, value)
 	return
 }

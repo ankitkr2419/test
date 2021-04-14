@@ -8,7 +8,7 @@ func NewExtractionSimulator(wsMsgch chan string, wsErrch chan error, exit chan e
 	s := plc.Compact32Deck{}
 	s.WsMsgCh = wsMsgch
 
-	driver := SimulatorDriver{}
+	driver := SimulatorDriver{DeckName:deck}
 
 	s.DeckDriver = &driver
 	s.ExitCh = exit
