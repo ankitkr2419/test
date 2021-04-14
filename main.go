@@ -151,8 +151,8 @@ func startApp(plcName string, test bool) (err error) {
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
 	} else {
 		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg,websocketErr, exit, "A")
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg,websocketErr, exit, "B")
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, "A")
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, "B")
 
 	}
 

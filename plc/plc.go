@@ -87,7 +87,6 @@ type OperationDetails struct {
 	RecipeID       uuid.UUID `json:"recipe_id,omitempty"`
 }
 
-
 type Compact32Deck struct {
 	name       string
 	ExitCh     chan error
@@ -107,6 +106,6 @@ type Compact32Driver interface {
 	WriteSingleCoil(address, value uint16) (err error)
 }
 
-func SetDeckName(C32 *Compact32Deck, deck string){
+func SetDeckName(C32 *Compact32Deck, deck string) {
 	C32.name = deck
 }

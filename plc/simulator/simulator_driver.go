@@ -7,7 +7,7 @@ import (
 )
 
 type SimulatorDriver struct {
-	// DeckName will be used for differentiating simulator registors 
+	// DeckName will be used for differentiating simulator registors
 	DeckName string
 }
 

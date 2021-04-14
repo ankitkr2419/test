@@ -88,7 +88,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing pulse : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote Pulse for deck", d.name,". res : ", results)
+	logger.Infoln("Wrote Pulse for deck", d.name, ". res : ", results)
 	pulseReg.Store(d.name, pulse)
 	wrotePulses.Store(d.name, pulse)
 
@@ -117,7 +117,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing RAMP : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote Ramp for deck", d.name,". res : ", results)
+	logger.Infoln("Wrote Ramp for deck", d.name, ". res : ", results)
 	rampReg.Store(d.name, ramp)
 
 	if temp := d.getDirectionReg(); temp == highestUint16 {
@@ -131,7 +131,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing direction : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote direction for deck ", d.name,". res : ", results)
+	logger.Infoln("Wrote direction for deck ", d.name, ". res : ", results)
 	directionReg.Store(d.name, direction)
 
 	if temp := d.getMotorNumReg(); temp == highestUint16 {
@@ -145,7 +145,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing motor num: ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote motorNum", d.name ,". res : ", results)
+	logger.Infoln("Wrote motorNum", d.name, ". res : ", results)
 	motorNumReg.Store(d.name, motorNum)
 
 	// Check if User has paused the run/operation
@@ -193,7 +193,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
-				logger.Infoln("Completion for deck",d.name,"returned ---> ", results, d.name)
+				logger.Infoln("Completion for deck", d.name, "returned ---> ", results, d.name)
 				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("err: from setUp--> ", err, d.name)
@@ -229,7 +229,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return "", err
 		}
 
-		logger.Infoln("Sensor returned for deck ", d.name,"---> ", results, d.name)
+		logger.Infoln("Sensor returned for deck ", d.name, "---> ", results, d.name)
 		if len(results) > 0 {
 			if int(results[0]) == sensorCut {
 				logger.Infoln("Sensor returned ---> ", results[0], d.name)

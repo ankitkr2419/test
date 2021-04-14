@@ -209,7 +209,7 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 		logger.Errorln("err writing pulses: ", err)
 		return "", err
 	}
-	logger.Infoln("Wrote pulses for deck", d.name,". res : ", results)
+	logger.Infoln("Wrote pulses for deck", d.name, ". res : ", results)
 	pulseReg.Store(d.name, pulses)
 	wrotePulses.Store(d.name, pulses)
 
