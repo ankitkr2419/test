@@ -207,8 +207,9 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 				// Towards Sensor
 				case FWD:
 					if (Positions[deckAndNumber] - distanceMoved) < 0 {
+						logger.Errorln("Motor Just moved to negative distance", Positions[deckAndNumber] - distanceMoved ,"for deck: ", d.name)
 						Positions[deckAndNumber] = 0
-						logger.Errorln("Motor Just moved to negative distance for deck: ", d.name)
+						break
 					}
 					Positions[deckAndNumber] -= distanceMoved
 				default:

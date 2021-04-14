@@ -22,7 +22,7 @@ func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (re
 
 	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateWriteSingleRegister for deck ", d.DeckName, " result: ", results)
+	logger.Infoln("Inside simulateWriteSingleRegister for deck ", d.DeckName, " result: ", results ,". address: ",address)
 	return
 }
 
@@ -39,7 +39,7 @@ func (d *SimulatorDriver) simulateReadHoldingRegisters(address, quantity uint16)
 	value := REGISTERS_EXTRACTION[d.DeckName]["D"][address]
 	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateReadHoldingRegisters for deck ", d.DeckName, " result: ", results)
+	logger.Infoln("Inside simulateReadHoldingRegisters for deck ", d.DeckName, " result: ", results ,". address: ", address)
 	return
 }
 
@@ -57,7 +57,7 @@ func (d *SimulatorDriver) simulateReadCoils(address, quantity uint16) (results [
 	value := REGISTERS_EXTRACTION[d.DeckName]["M"][address]
 	results = []byte{uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateReadCoils for deck ", d.DeckName, " result: ", results)
+	logger.Infoln("Inside simulateReadCoils for deck ", d.DeckName, " result: ", results ,". address: ",address)
 	return
 }
 
@@ -70,7 +70,7 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 
 	results := []byte{uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateWriteSingleCoil for deck ", d.DeckName, " result: ", results)
+	logger.Infoln("Inside simulateWriteSingleCoil for deck ", d.DeckName, " result: ", results ,". address: ",address)
 
 	switch address {
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]:
@@ -78,7 +78,6 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]:
 		err = d.simulateHeater(value)
-
 	}
 
 	return
@@ -132,14 +131,15 @@ func (d *SimulatorDriver) simulateMotor(value uint16) (err error) {
 	return
 }
 
+// Having more capacity just in case 100ms isn't enough
 var motorDone = map[string](chan bool){
-	"A": make(chan bool, 1),
-	"B": make(chan bool, 1),
+	"A": make(chan bool, 2),
+	"B": make(chan bool, 2),
 }
 
 var sensorDone = map[string](chan bool){
-	"A": make(chan bool, 1),
-	"B": make(chan bool, 1),
+	"A": make(chan bool, 2),
+	"B": make(chan bool, 2),
 }
 
 func (d *SimulatorDriver) simulateOnMotor() (err error) {
@@ -204,14 +204,22 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 
 func (d *SimulatorDriver) monitorSensorCut() (err error) {
 
-	// Add position shift coz of D212 as well
-	// shift = D212 Pulses   /    Motor steps
+
+	deckAndMotor := plc.DeckNumber{Deck: d.DeckName, Number: REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]]}
+	// shift = D212 Pulses / Motor steps
 	for {
 		// putting declaration inside the loop cause what if motor change happens within 100 ms!!
-		deckAndMotor := plc.DeckNumber{Deck: d.DeckName, Number: REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]]}
-
+		
 		// if motor is OFF then return
 		if plc.OFF == REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]] {
+			return
+		}
+		// if motor is changed then return
+		if deckAndMotor.Number != REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]] {
+			return
+		}
+		// if direction is changed then return		
+		if plc.TowardsSensor != REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][206]]  {
 			return
 		}
 
