@@ -73,27 +73,10 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 
 	switch address {
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]:
-		// TODO: Handle Motor Movements
-	/*
-	    When Switch On Motor
-	   - Monitor Sensor Has Cut
-	   - Write Pulses to D212
-	   - Monitor D212 Pulses
+		err = d.simulateMotor(value)
 
-	   When Switch Off Motor
-	    - Close Monitoring Sensor and writing to D212
-	*/
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]:
-		// TODO: Handle Heater M 3
-		/*
-		   When Heater On
-		   - Monitor Heater
-		   - Set Present Value
-		   - Calibrate Temperature
-
-		   When Heater Off
-		   - Close Heater Monitoring
-		*/
+		err = d.simulateHeater(value)
 
 	}
 
@@ -126,5 +109,46 @@ func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint
 	}
 
 	err = fmt.Errorf("Invalid register address")
+	return
+}
+
+// TODO: Handle Motor Movements
+/*
+    When Switch On Motor
+   - Monitor Sensor Has Cut
+   - Write Pulses to D212
+   - Monitor D212 Pulses
+   When Switch Off Motor
+    - Close Monitoring Sensor and writing to D212
+*/
+func (d *SimulatorDriver) simulateMotor(value uint16) (err error) {
+	switch value {
+	case plc.ON:
+		err = d.simulateOnMotor()
+	case plc.OFF:
+		err = d.simulateOffMotor()
+	}
+	return
+}
+
+func (d *SimulatorDriver) simulateOnMotor() (err error) {
+	return
+}
+
+func (d *SimulatorDriver) simulateOffMotor() (err error) {
+	return
+}
+
+// TODO: Handle Heater M 3
+/*
+   When Heater On
+   - Monitor Heater
+   - Set Present Value
+   - Calibrate Temperature
+   When Heater Off
+   - Close Heater Monitoring
+*/
+func (d *SimulatorDriver) simulateHeater(value uint16) (err error) {
+	// TODO: Implement this with help from @GautamRege
 	return
 }
