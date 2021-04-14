@@ -25,7 +25,7 @@ func (d *SimulatorDriver) WriteMultipleRegisters(address, quantity uint16, value
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	results, err = simulateWriteMultipleRegisters(address, quantity, value)
+	results, err = d.simulateWriteMultipleRegisters(address, quantity, value)
 	return
 }
 
@@ -33,7 +33,7 @@ func (d *SimulatorDriver) WriteSingleRegister(address, value uint16) (results []
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	results, err = simulateWriteSingleRegister(address, value)
+	results, err = d.simulateWriteSingleRegister(address, value)
 	return
 }
 
@@ -41,7 +41,7 @@ func (d *SimulatorDriver) ReadHoldingRegisters(address, quantity uint16) (result
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	results, err = simualateReadHoldingRegisters(address, quantity)
+	results, err = d.simualateReadHoldingRegisters(address, quantity)
 	return
 }
 
@@ -60,7 +60,7 @@ func (d *SimulatorDriver) ReadCoils(address, quantity uint16) (results []byte, e
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	results, err = simulateReadCoils(address, quantity)
+	results, err = d.simulateReadCoils(address, quantity)
 	return
 }
 
@@ -80,6 +80,6 @@ func (d *SimulatorDriver) WriteSingleCoil(address, value uint16) (err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	err = simulateWriteSingleCoil(address, value)
+	err = d.simulateWriteSingleCoil(address, value)
 	return
 }
