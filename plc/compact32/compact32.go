@@ -119,7 +119,9 @@ func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan 
 	C32.WsMsgCh = wsMsgCh
 	C32.WsErrCh = wsErrch
 
-	C32.Name = "A"
+	// C32.Name = "A"
+	plc.SetDeckName(&C32, "A")
+
 
 	return &C32, handler // plc Driver
 }
@@ -142,7 +144,10 @@ func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, ha
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
 	C32.WsMsgCh = wsMsgCh
-	C32.Name = "B"
+
+	plc.SetDeckName(&C32, "B")
+
+	// C32.Name = "B"
 
 	return &C32 // plc Driver
 }

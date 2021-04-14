@@ -24,7 +24,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	var direction, pulses, piercingPulses, afterPiercingRestPulses uint16
 	// []int has direct method to get slice sorted
 	var wellsToBePierced []int
-	deckAndMotor.Deck = d.Name
+	deckAndMotor.Deck = d.name
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	uniqueCartridge := UniqueCartridge{
 		CartridgeID:   cartridgeID,
@@ -106,7 +106,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		response, err = d.setupMotor(motors[deckAndMotor]["fast"], piercingPulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 		// TODO: Use defer d.setIndeck as in aspire_dispense
 		// Even if err has occured let's store syringeModuleState as inDeck
-		syringeModuleState.Store(d.Name, InDeck)
+		syringeModuleState.Store(d.name, InDeck)
 		if err != nil {
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module DOWN to Cartridge WellNum %d. Error: %v", wellNumber, err)
@@ -141,7 +141,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		}
 		// TODO: Use defer d.setIndeck as in aspire_dispense
 		// Only after successful coming out do we say its OutDeck completely
-		syringeModuleState.Store(d.Name, OutDeck)
+		syringeModuleState.Store(d.name, OutDeck)
 
 		fmt.Println("Got Up from WellNumber: ", wellNumber)
 

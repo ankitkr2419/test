@@ -61,7 +61,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	// Step 4: Select shaker
 	//select shaker for heating
-	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.Name]["D"][222], shaker)
+	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][222], shaker)
 	if err != nil {
 		logger.Errorln("Error failed to write temperature: ", err)
 		return "", err
@@ -71,7 +71,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	//Step 5: Set Temperature
 	//Set Temperature for heater
-	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.Name]["D"][208], uint16(ht.Temperature*10))
+	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(ht.Temperature*10))
 	if err != nil {
 		logger.Errorln("Error failed to write temperature: ", err)
 		return "", err
@@ -165,7 +165,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 
 		default:
 			if d.isMachineInPausedState() {
-				response, err = d.waitUntilResumed(d.Name)
+				response, err = d.waitUntilResumed(d.name)
 				if err != nil {
 					return
 				}
@@ -184,9 +184,9 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 				}
 				// here we set the register address according to the shaker
 				if shakerNo == 1 {
-					registerAddress = MODBUS_EXTRACTION[d.Name]["D"][210]
+					registerAddress = MODBUS_EXTRACTION[d.name]["D"][210]
 				} else {
-					registerAddress = MODBUS_EXTRACTION[d.Name]["D"][224]
+					registerAddress = MODBUS_EXTRACTION[d.name]["D"][224]
 				}
 				results, err := d.DeckDriver.ReadHoldingRegisters(registerAddress, 1)
 				if err != nil {
@@ -225,7 +225,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 					return "", err
 				}
 
-				results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.Name]["D"][210], 1)
+				results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
 				if err != nil {
 					logger.Errorln("Error failed to read shaker 1 temperature \n", err)
 					return "", err
@@ -234,7 +234,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 
 				logger.Infoln("temp 1 reading", setTemp1)
 
-				results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.Name]["D"][224], 1)
+				results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
 				if err != nil {
 					logger.Errorln("Error failed to read shaker 2 temperature \n", err)
 					return "", err

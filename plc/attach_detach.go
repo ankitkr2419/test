@@ -16,7 +16,7 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		if err != nil {
 			fmt.Printf("error in attach process %v \n", err.Error())
 		}
-		magnetState.Store(d.Name, attached)
+		magnetState.Store(d.name, attached)
 		return
 	case "detach":
 		response, err = d.detach(ad.OperationType)
@@ -28,9 +28,9 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 		// operation_type is its'd db variable
 		// Make sure that db changes are reflected at here as well
 		if ad.OperationType == "semi_detach" {
-			magnetState.Store(d.Name, semiDetached)
+			magnetState.Store(d.name, semiDetached)
 		} else {
-			magnetState.Store(d.Name, detached)
+			magnetState.Store(d.name, detached)
 		}
 		return
 	}
@@ -52,9 +52,9 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 	var ok bool
 	var direction, pulses uint16
 
-	deckMagnetUpDown := DeckNumber{Deck: d.Name, Number: K6_Magnet_Up_Down}
+	deckMagnetUpDown := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
 	// motor desc for magnet fwd/rev motion
-	deckMagnetFwdRev := DeckNumber{Deck: d.Name, Number: K7_Magnet_Rev_Fwd}
+	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 	// step 1 to calculate the relative position of the magnet from its current
 	// position to move the magnet backward for step 1.
 	if magnetBackPosition, ok = consDistance["magnet_backward_step_1"]; !ok {
@@ -144,11 +144,11 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 
 	//-----------deck
 	// move the deck to the position where the magnet position is appropriate to shaker
-	deckAndNumber := DeckNumber{Deck: d.Name, Number: K5_Deck}
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K5_Deck}
 	// motor desc for magnet up/down motion
-	deckMagnetUpDown := DeckNumber{Deck: d.Name, Number: K6_Magnet_Up_Down}
+	deckMagnetUpDown := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
 	// motor desc for magnet fwd/rev motion
-	deckMagnetFwdRev := DeckNumber{Deck: d.Name, Number: K7_Magnet_Rev_Fwd}
+	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 	// get the consumable deck position
 
 	// deck will be at this position from homing for attach or detach operation

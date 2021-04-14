@@ -20,7 +20,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		if r := recover(); r != nil {
 			time.Sleep(2 * time.Second)
 			d.ResetRunInProgress()
-			fmt.Printf("\nRecovering in Homing %v for Deck %v", r, d.Name)
+			fmt.Printf("\nRecovering in Homing %v for Deck %v", r, d.name)
 
 			time.Sleep(2 * time.Second)
 			if !d.IsMachineHomed() {
@@ -34,12 +34,12 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	// err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.Name]["M"][5], OFF)
+	// err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	// if err != nil {
-	// 	fmt.Println("Inside Switch off Shaker err : ", err, d.Name)
+	// 	fmt.Println("Inside Switch off Shaker err : ", err, d.name)
 	// 	panic(err)
 	// }
-	// fmt.Println("Switched off the shaker--> for ", d.Name)
+	// fmt.Println("Switched off the shaker--> for ", d.name)
 
 	d.resetAborted()
 
@@ -59,7 +59,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		Deck:     d.getHomingDeckName(),
 		Status:   "PROGRESS_HOMING",
 		OperationDetails: OperationDetails{
-			Message: fmt.Sprintf("successfully homed syringe for deck %v", d.Name),
+			Message: fmt.Sprintf("successfully homed syringe for deck %v", d.name),
 		},
 	}
 
@@ -80,7 +80,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.setHomingPercent(50.0)
 
 	wsProgressOperation.Progress = d.getHomingPercent()
-	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed syringe for deck %v", d.Name)
+	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed syringe for deck %v", d.name)
 
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
@@ -101,7 +101,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.setHomingPercent(75.0)
 
 	wsProgressOperation.Progress = d.getHomingPercent()
-	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed magnet for deck %v", d.Name)
+	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed magnet for deck %v", d.name)
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
@@ -120,7 +120,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.setHomingPercent(100.0)
 
 	wsProgressOperation.Progress = d.getHomingPercent()
-	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed deck %v", d.Name)
+	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed deck %v", d.name)
 
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
@@ -143,7 +143,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 func (d *Compact32Deck) syringeHoming() (response string, err error) {
 
-	deckAndNumber := DeckNumber{Deck: d.Name, Number: K10_Syringe_LHRH}
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K10_Syringe_LHRH}
 
 	fmt.Println("Syringe is moving down until sensor not cut")
 
@@ -165,7 +165,7 @@ func (d *Compact32Deck) syringeHoming() (response string, err error) {
 
 func (d *Compact32Deck) syringeModuleHoming() (response string, err error) {
 
-	deckAndNumber := DeckNumber{Deck: d.Name, Number: K9_Syringe_Module_LHRH}
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
 
 	fmt.Println("Syringe Module moving Up")
 	response, err = d.setupMotor(homingFastSpeed, initialSensorCutSyringeModulePulses, motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
@@ -194,7 +194,7 @@ func (d *Compact32Deck) syringeModuleHoming() (response string, err error) {
 
 func (d *Compact32Deck) deckHoming() (response string, err error) {
 
-	deckAndNumber := DeckNumber{Deck: d.Name, Number: K5_Deck}
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K5_Deck}
 
 	fmt.Println("Deck is moving forward")
 	response, err = d.setupMotor(homingDeckFastSpeed, initialSensorCutDeckPulses, motors[deckAndNumber]["ramp"], FWD, deckAndNumber.Number)
@@ -223,12 +223,12 @@ func (d *Compact32Deck) magnetHoming() (response string, err error) {
 	var magnetDetach float64
 	var ok bool
 	var pulses uint16
-	deckAndNumber := DeckNumber{Deck: d.Name, Number: K7_Magnet_Rev_Fwd}
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 
 	// Detaching magnet, doesn't matter even if its already detached
 	if magnetDetach, ok = consDistance["magnet_detach_for_homing"]; !ok {
 		err = fmt.Errorf("magnet_detach_for_homing doesn't exist")
-		fmt.Println("Error: ", err, d.Name)
+		fmt.Println("Error: ", err, d.name)
 		return "", err
 	}
 	fmt.Println("Magnet is moving backward by 5 mm for detachment")
@@ -254,7 +254,7 @@ func (d *Compact32Deck) magnetHoming() (response string, err error) {
 
 func (d *Compact32Deck) magnetUpDownHoming() (response string, err error) {
 
-	deckAndNumber := DeckNumber{Deck: d.Name, Number: K6_Magnet_Up_Down}
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
 
 	fmt.Println("Magnet is moving up")
 	response, err = d.setupMotor(homingFastSpeed, initialSensorCutMagnetPulses, motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
@@ -279,7 +279,7 @@ func (d *Compact32Deck) magnetUpDownHoming() (response string, err error) {
 
 func (d *Compact32Deck) magnetFwdRevHoming() (response string, err error) {
 
-	deckAndNumber := DeckNumber{Deck: d.Name, Number: K7_Magnet_Rev_Fwd}
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 	var magnetReverseAfterHoming, distanceToTravel float64
 	var pulses uint16
 	var ok bool
@@ -303,7 +303,7 @@ func (d *Compact32Deck) magnetFwdRevHoming() (response string, err error) {
 
 	if magnetReverseAfterHoming, ok = consDistance["magnet_reverse_after_homing"]; !ok {
 		err = fmt.Errorf("magnet_reverse_after_homing doesn't exist")
-		fmt.Println("Error: ", err, d.Name)
+		fmt.Println("Error: ", err, d.name)
 		return "", err
 	}
 

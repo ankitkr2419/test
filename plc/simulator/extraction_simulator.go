@@ -15,7 +15,7 @@ func NewExtractionSimulator(wsMsgch chan string, wsErrch chan error, exit chan e
 	s.WsMsgCh = wsMsgch
 	s.WsErrCh = wsErrch
 
-	s.Name = deck
+	plc.SetDeckName(&s, deck)
 
 	return &s
 }

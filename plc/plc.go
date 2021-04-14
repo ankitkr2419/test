@@ -89,7 +89,7 @@ type OperationDetails struct {
 
 
 type Compact32Deck struct {
-	Name       string
+	name       string
 	ExitCh     chan error
 	WsErrCh    chan error
 	WsMsgCh    chan string
@@ -105,4 +105,8 @@ type Compact32Driver interface {
 	ReadHoldingRegisters(address, quantity uint16) (results []byte, err error)
 	ReadSingleRegister(address uint16) (value uint16, err error)
 	WriteSingleCoil(address, value uint16) (err error)
+}
+
+func SetDeckName(C32 *Compact32Deck, deck string){
+	C32.name = deck
 }

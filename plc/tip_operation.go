@@ -47,7 +47,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	var direction, pulses uint16
 	var tipFast, tipSlow, restingPositionString string
 	var ok bool
-	deckAndMotor.Deck = d.Name
+	deckAndMotor.Deck = d.name
 
 	//
 	// 1. Move Deck to the tip's position
@@ -134,7 +134,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	response, err = d.setupMotor(homingSlowSpeed, pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	// TODO: Use defer d.setIndeck as in aspire_dispense
 	// Even if err has occured let's store syringeModuleState as inDeck
-	syringeModuleState.Store(d.Name, InDeck)
+	syringeModuleState.Store(d.name, InDeck)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to tip's inside. Error: %v", err)
@@ -159,7 +159,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", restingPositionString, err)
 	}
-	syringeModuleState.Store(d.Name, OutDeck)
+	syringeModuleState.Store(d.name, OutDeck)
 
 	return "Tip PickUp was successfull", nil
 
@@ -187,7 +187,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	var position, distanceToTravel, parkingPos float64
 	var direction, pulses uint16
 	var ok bool
-	deckAndMotor.Deck = d.Name
+	deckAndMotor.Deck = d.name
 
 	if parkingPos, ok = consDistance["syringe_parking"]; !ok {
 		err = fmt.Errorf("syringe_parking doesn't exist for consumable distances")
@@ -242,7 +242,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	// TODO: Use defer d.setIndeck as in aspire_dispense
 	// Even if err has occured let's store syringeModuleState as inDeck
-	syringeModuleState.Store(d.Name, InDeck)
+	syringeModuleState.Store(d.name, InDeck)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to deck's base. Error: %v", err)
@@ -342,7 +342,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 		return "", fmt.Errorf("There was issue moving Syinge Module to resting position. Error: %v", err)
 	}
 	// Use defer d.setIndeck() instead
-	syringeModuleState.Store(d.Name, OutDeck)
+	syringeModuleState.Store(d.name, OutDeck)
 
 	return "Tip Discard was successful", nil
 }
