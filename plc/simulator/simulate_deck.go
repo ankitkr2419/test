@@ -25,7 +25,7 @@ func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (re
 	return
 }
 
-func (d *SimulatorDriver) simualateReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
+func (d *SimulatorDriver) simulateReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
 	err = d.checkForValidAddress("D", address)
 	if err != nil {
 		return
@@ -38,7 +38,7 @@ func (d *SimulatorDriver) simualateReadHoldingRegisters(address, quantity uint16
 	value := REGISTERS_EXTRACTION[d.DeckName]["D"][address]
 	results = []byte{uint8(value>>8), uint8(value&0xff) }
 
-	logger.Infoln("Inside simualateReadHoldingRegisters for deck ", d.DeckName ," result: ", results)
+	logger.Infoln("Inside simulateReadHoldingRegisters for deck ", d.DeckName ," result: ", results)
 	return
 }
 

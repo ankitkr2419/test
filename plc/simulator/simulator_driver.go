@@ -41,7 +41,7 @@ func (d *SimulatorDriver) ReadHoldingRegisters(address, quantity uint16) (result
 	masterLock.Lock()
 	defer masterLock.Unlock()
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	results, err = d.simualateReadHoldingRegisters(address, quantity)
+	results, err = d.simulateReadHoldingRegisters(address, quantity)
 	return
 }
 
