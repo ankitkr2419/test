@@ -195,7 +195,7 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 		logger.Errorln("err Switching motor off: ", err)
 		return "", err
 	}
-	logger.Infoln("Wrote Switch OFF motor")
+	logger.Infoln("Wrote Switch OFF motor for deck", d.Name)
 	onReg.Store(d.Name, OFF)
 
 	if temp := d.getPulseReg(); temp == highestUint16 {
@@ -209,7 +209,7 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 		logger.Errorln("err writing pulses: ", err)
 		return "", err
 	}
-	logger.Infoln("Wrote pulses: ", results)
+	logger.Infoln("Wrote pulses for deck", d.Name,". res : ", results)
 	pulseReg.Store(d.Name, pulses)
 	wrotePulses.Store(d.Name, pulses)
 

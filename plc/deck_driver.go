@@ -68,7 +68,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing Switch Off : ", err, d.Name)
 		return
 	}
-	logger.Infoln("Wrote Switch Off motor")
+	logger.Infoln("Wrote Switch Off motor for deck", d.Name)
 	onReg.Store(d.Name, OFF)
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.Name]["M"][1], OFF)
@@ -88,7 +88,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing pulse : ", err, d.Name)
 		return "", err
 	}
-	logger.Infoln("Wrote Pulse. res : ", results)
+	logger.Infoln("Wrote Pulse for deck", d.Name,". res : ", results)
 	pulseReg.Store(d.Name, pulse)
 	wrotePulses.Store(d.Name, pulse)
 
@@ -103,7 +103,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing speed : ", err, d.Name)
 		return "", err
 	}
-	logger.Infoln("Wrote Speed. res : ", results)
+	logger.Infoln("Wrote Speed for deck", d.Name, ". res : ", results)
 	speedReg.Store(d.Name, speed)
 
 	if temp := d.getRampReg(); temp == highestUint16 {
@@ -117,7 +117,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing RAMP : ", err, d.Name)
 		return "", err
 	}
-	logger.Infoln("Wrote Ramp. res : ", results)
+	logger.Infoln("Wrote Ramp for deck", d.Name,". res : ", results)
 	rampReg.Store(d.Name, ramp)
 
 	if temp := d.getDirectionReg(); temp == highestUint16 {
@@ -131,7 +131,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing direction : ", err, d.Name)
 		return "", err
 	}
-	logger.Infoln("Wrote direction. res : ", results)
+	logger.Infoln("Wrote direction for deck ", d.Name,". res : ", results)
 	directionReg.Store(d.Name, direction)
 
 	if temp := d.getMotorNumReg(); temp == highestUint16 {
@@ -145,7 +145,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing motor num: ", err, d.Name)
 		return "", err
 	}
-	logger.Infoln("Wrote motorNum. res : ", results)
+	logger.Infoln("Wrote motorNum", d.Name ,". res : ", results)
 	motorNumReg.Store(d.Name, motorNum)
 
 	// Check if User has paused the run/operation
@@ -164,7 +164,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error Writing On/Off : ", err, d.Name)
 		return "", err
 	}
-	logger.Infoln("Wrote Switch On motor")
+	logger.Infoln("Wrote Switch On motor for deck", d.Name)
 	onReg.Store(d.Name, ON)
 
 	// Our Run is in Progress
@@ -193,7 +193,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
-				logger.Infoln("Completion returned ---> ", results, d.Name)
+				logger.Infoln("Completion for deck",d.Name,"returned ---> ", results, d.Name)
 				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("err: from setUp--> ", err, d.Name)
@@ -229,7 +229,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return "", err
 		}
 
-		logger.Infoln("Sensor returned ---> ", results, d.Name)
+		logger.Infoln("Sensor returned for deck ", d.Name,"---> ", results, d.Name)
 		if len(results) > 0 {
 			if int(results[0]) == sensorCut {
 				logger.Infoln("Sensor returned ---> ", results[0], d.Name)
@@ -268,7 +268,7 @@ func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 		logger.Errorln("err Switching motor off: ", err)
 		return "", err
 	}
-	logger.Infoln("Wrote Switch OFF motor")
+	logger.Infoln("Wrote Switch OFF motor for deck", d.Name)
 	onReg.Store(d.Name, OFF)
 
 	return "SUCCESS", nil
@@ -279,7 +279,7 @@ func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 	// Switch off Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.Name]["M"][3], OFF)
 	if err != nil {
-		logger.Errorln("err Switching off the heater: ", err)
+		logger.Errorln("err Switching off the heater for deck: ", d.Name, err)
 		return "", err
 	}
 	logger.Infoln("Switched off the heater--> for deck ", d.Name)

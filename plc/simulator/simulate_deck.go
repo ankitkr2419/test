@@ -21,7 +21,7 @@ func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (re
 
 	results = []byte{uint8(value>>8), uint8(value&0xff) }
 	
-	logger.Infoln("Inside simulateWriteSingleRegister result: ", results)
+	logger.Infoln("Inside simulateWriteSingleRegister for deck ", d.DeckName ," result: ", results)
 	return
 }
 
@@ -38,7 +38,7 @@ func (d *SimulatorDriver) simualateReadHoldingRegisters(address, quantity uint16
 	value := REGISTERS_EXTRACTION[d.DeckName]["D"][address]
 	results = []byte{uint8(value>>8), uint8(value&0xff) }
 
-	logger.Infoln("Inside simualateReadHoldingRegisters result: ", results)
+	logger.Infoln("Inside simualateReadHoldingRegisters for deck ", d.DeckName ," result: ", results)
 	return
 }
 
@@ -56,7 +56,7 @@ func (d *SimulatorDriver) simulateReadCoils(address, quantity uint16) (results [
 	value := REGISTERS_EXTRACTION[d.DeckName]["M"][address]
 	results = []byte{uint8(value&0xff) }
 
-	logger.Infoln("Inside simulateReadCoils result: ", results)
+	logger.Infoln("Inside simulateReadCoils for deck ", d.DeckName ," result: ", results)
 	return
 }
 
@@ -69,7 +69,7 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 
 	results := []byte{uint8(value&0xff) }
 	
-	logger.Infoln("Inside simulateWriteSingleCoil result: ", results)
+	logger.Infoln("Inside simulateWriteSingleCoil for deck ", d.DeckName ," result: ", results)
 	return
 }
 
