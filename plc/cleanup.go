@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
-	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
+	deckAndMotor := DeckNumber{Deck: d.Name, Number: K5_Deck}
 
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
@@ -68,7 +68,7 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16
-	deckAndMotor := DeckNumber{Deck: d.name, Number: K5_Deck}
+	deckAndMotor := DeckNumber{Deck: d.Name, Number: K5_Deck}
 
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
@@ -164,7 +164,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 		return
 	}
 
-	d.WsMsgCh <- fmt.Sprintf("success_uvlight_UV Light Completed Successfully %v", d.name)
+	d.WsMsgCh <- fmt.Sprintf("success_uvlight_UV Light Completed Successfully %v", d.Name)
 	return "UV Light Completed Successfully", nil
 }
 

@@ -14,31 +14,16 @@ const (
 	CYCLE_STAGE   = "cycle"
 )
 
-// Internal Interface to ensure sync'ing and testing modbus interfaces
-type Compact32Driver interface {
-	WriteSingleRegister(address, value uint16) (results []byte, err error)
-	WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error)
-	ReadCoils(address, quantity uint16) (results []byte, err error)
-	ReadSingleCoil(address uint16) (value uint16, err error)
-	ReadHoldingRegisters(address, quantity uint16) (results []byte, err error)
-	ReadSingleRegister(address uint16) (value uint16, err error)
-	WriteSingleCoil(address, value uint16) (err error)
-}
+
 
 type Compact32 struct {
 	ExitCh  chan error
 	WsMsgCh chan string
 	wsErrch chan error
-	Driver  Compact32Driver
+	Driver  plc.Compact32Driver
 }
 
-type Compact32Deck struct {
-	name       string
-	ExitCh     chan error
-	WsErrCh    chan error
-	WsMsgCh    chan string
-	DeckDriver Compact32Driver
-}
+
 
 func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */
@@ -113,7 +98,7 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 
 // Compact32 Driver for Deck A and B
 // TODO: Use test to Configure the Deck Operations
-func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) (plc.DeckDriver, *modbus.RTUClientHandler) {
+func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) (plc.Common, *modbus.RTUClientHandler) {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler.BaudRate = 9600
@@ -128,18 +113,18 @@ func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan 
 
 	driver.Client = modbus.NewClient(handler)
 
-	C32 := Compact32Deck{}
+	C32 := plc.Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
 	C32.WsMsgCh = wsMsgCh
 	C32.WsErrCh = wsErrch
 
-	C32.name = "A"
+	C32.Name = "A"
 
 	return &C32, handler // plc Driver
 }
 
-func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) plc.DeckDriver {
+func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) plc.Common {
 	/* Modbus RTU/ASCII */
 	handler2 := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler2.BaudRate = 9600
@@ -153,11 +138,11 @@ func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, ha
 	driver := Compact32ModbusDriver{}
 	driver.Client = modbus.NewClient2(handler2, handler)
 
-	C32 := Compact32Deck{}
+	C32 := plc.Compact32Deck{}
 	C32.DeckDriver = &driver
 	C32.ExitCh = exit
 	C32.WsMsgCh = wsMsgCh
-	C32.name = "B"
+	C32.Name = "B"
 
 	return &C32 // plc Driver
 }

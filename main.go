@@ -130,8 +130,8 @@ func startApp(plcName string, test bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
 	var handler *modbus.RTUClientHandler
-	var driverDeckA plc.DeckDriver
-	var driverDeckB plc.DeckDriver
+	var driverDeckA plc.Common
+	var driverDeckB plc.Common
 
 	if plcName != "simulator" && plcName != "compact32" {
 		logger.Error("Unsupported PLC. Valid PLC: 'simulator' or 'compact32'")
@@ -151,8 +151,8 @@ func startApp(plcName string, test bool) (err error) {
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
 	} else {
 		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, exit, "A")
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, exit, "B")
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg,websocketErr, exit, "A")
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg,websocketErr, exit, "B")
 
 	}
 
@@ -162,7 +162,7 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	plcDeckMap := map[string]plc.DeckDriver{
+	plcDeckMap := map[string]plc.Common{
 		"A": driverDeckA,
 		"B": driverDeckB,
 	}
@@ -192,7 +192,7 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	err = compact32.SelectAllMotors(store)
+	err = plc.SelectAllMotors(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Select All Motors failed")
 		return
@@ -204,7 +204,7 @@ func startApp(plcName string, test bool) (err error) {
 		logger.WithField("err", err.Error()).Error("Setup Cosumable Distance failed")
 		return
 	}
-	err = compact32.SelectAllConsDistances(store)
+	err = plc.SelectAllConsDistances(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Select All Cosumable Distances failed")
 		return
@@ -216,7 +216,7 @@ func startApp(plcName string, test bool) (err error) {
 		logger.WithField("err", err.Error()).Error("Setup TipsTubes failed")
 		return
 	}
-	err = compact32.SelectAllTipsTubes(store)
+	err = plc.SelectAllTipsTubes(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Select All Tips and Tubes failed")
 		return
@@ -228,13 +228,13 @@ func startApp(plcName string, test bool) (err error) {
 		logger.WithField("err", err.Error()).Error("Setup Cartridge failed")
 		return
 	}
-	err = compact32.SelectAllCartridges(store)
+	err = plc.SelectAllCartridges(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
 		return
 	}
 
-	compact32.LoadUtils()
+	plc.LoadUtils()
 
 	// add default User
 	u := db.User{
@@ -282,7 +282,7 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			logger.Errorln(err)
 			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
 			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
-			plcDeckMap := map[string]plc.DeckDriver{
+			plcDeckMap := map[string]plc.Common{
 				"A": driverDeckA,
 				"B": driverDeckB,
 			}

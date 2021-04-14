@@ -1,10 +1,9 @@
-package compact32
+package plc
 
 import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
-	"mylab/cpagent/plc"
 
 	logger "github.com/sirupsen/logrus"
 
@@ -57,12 +56,12 @@ skipToStartTimer:
 				uvtime := time.Now()
 				uvTimePassed := uvtime.Sub(time1).Seconds()
 				progress = (int64(uvTimePassed) * 100) / delay.DelayTime
-				wsProgressOperation := plc.WSData{
+				wsProgressOperation := WSData{
 					Progress: float64(progress),
-					Deck:     d.name,
+					Deck:     d.Name,
 					Status:   "PROGRESS_UVLIGHT",
-					OperationDetails: plc.OperationDetails{
-						Message: fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
+					OperationDetails: OperationDetails{
+						Message: fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.Name),
 					},
 				}
 
@@ -106,7 +105,7 @@ func (d *Compact32Deck) checkPausedState(t *time.Timer, time1 time.Time, delay i
 		logger.Infof("time : %v %v %v", remainingTime, *timeElapsed, delay)
 
 		// else wait for the process to be resumed
-		response, err = d.waitUntilResumed(d.name)
+		response, err = d.waitUntilResumed(d.Name)
 		if err != nil {
 			return
 		}

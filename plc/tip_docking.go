@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -32,8 +32,8 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 	//
 	// Step 1: move the syringe module to resting position
 	//
-	syringeModuleDeckAndMotor = DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
-	deckAndMotor = DeckNumber{Deck: d.name, Number: K5_Deck}
+	syringeModuleDeckAndMotor = DeckNumber{Deck: d.Name, Number: K9_Syringe_Module_LHRH}
+	deckAndMotor = DeckNumber{Deck: d.Name, Number: K5_Deck}
 
 	if position, ok = consDistance["resting_position"]; !ok {
 		err = fmt.Errorf("resting_position doesn't exist for consumable distances")

@@ -48,7 +48,7 @@ type Driver interface {
 	Calibrate() error             // TBD
 }
 
-type DeckDriver interface {
+type Common interface {
 	NameOfDeck() string
 	Homing() (string, error)
 	DiscardTipAndHome(bool) (string, error)
@@ -85,4 +85,24 @@ type OperationDetails struct {
 	CurrentStep    int       `json:"current_step,omitempty"`
 	TotalProcesses int       `json:"total_processes,omitempty"`
 	RecipeID       uuid.UUID `json:"recipe_id,omitempty"`
+}
+
+
+type Compact32Deck struct {
+	Name       string
+	ExitCh     chan error
+	WsErrCh    chan error
+	WsMsgCh    chan string
+	DeckDriver Compact32Driver
+}
+
+// Internal Interface to ensure sync'ing and testing modbus interfaces
+type Compact32Driver interface {
+	WriteSingleRegister(address, value uint16) (results []byte, err error)
+	WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error)
+	ReadCoils(address, quantity uint16) (results []byte, err error)
+	ReadSingleCoil(address uint16) (value uint16, err error)
+	ReadHoldingRegisters(address, quantity uint16) (results []byte, err error)
+	ReadSingleRegister(address uint16) (value uint16, err error)
+	WriteSingleCoil(address, value uint16) (err error)
 }

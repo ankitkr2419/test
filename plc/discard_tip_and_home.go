@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 	if discard {
 		response, err = d.tipDiscard()
 		if err != nil {
-			logger.Errorln("error in discarding tip for deck --->", d.name)
+			logger.Errorln("error in discarding tip for deck --->", d.Name)
 			return
 		}
 		messageWithTipDiscard = "tip discarded and "
@@ -29,7 +29,7 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 	//home
 	response, err = d.Homing()
 	if err != nil {
-		logger.Errorln("error in homing for deck --->", d.name)
+		logger.Errorln("error in homing for deck --->", d.Name)
 		return
 	}
 

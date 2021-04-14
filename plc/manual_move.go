@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -93,10 +93,10 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 		} else if temp1 <= temp2 {
 			logger.Info("executedPulses is greater than wrote Pulses that means nothing to resume for current motor.")
-			wrotePulses.Store(d.name, uint16(0))
-			executedPulses.Store(d.name, uint16(0))
+			wrotePulses.Store(d.Name, uint16(0))
+			executedPulses.Store(d.Name, uint16(0))
 		} else {
-			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
+			// calculating wrotePulses.[d.Name] - executedPulses.[d.Name]
 			response, err = d.resumeMotorWithPulses(temp1 - temp2)
 		}
 		if err != nil {
@@ -133,36 +133,36 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 	logger.Infoln("aborting the operation....")
 
-	homed.Store(d.name, false)
+	homed.Store(d.Name, false)
 
 	logger.Infoln("switching motor off....")
 	response, err = d.switchOffMotor()
 	if err != nil {
-		logger.Errorln("From deck ", d.name, err)
+		logger.Errorln("From deck ", d.Name, err)
 		return "", err
 	}
 
 	response, err = d.switchOffHeater()
 	if err != nil {
-		logger.Errorln("From deck ", d.name, err)
+		logger.Errorln("From deck ", d.Name, err)
 		return "", err
 	}
 
 	//  Switch off UV Light
 	response, err = d.switchOffUVLight()
 	if err != nil {
-		fmt.Println("From deck ", d.name, err)
+		fmt.Println("From deck ", d.Name, err)
 		return "", err
 	}
 
 	// Switch off shaker
 	response, err = d.switchOffShaker()
 	if err != nil {
-		fmt.Println("From deck ", d.name, err)
+		fmt.Println("From deck ", d.Name, err)
 		return "", err
 	}
 
-	wrotePulses.Store(d.name, uint16(0))
+	wrotePulses.Store(d.Name, uint16(0))
 	d.resetPaused()
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
@@ -189,20 +189,20 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 		err = fmt.Errorf("on/off Register  isn't loaded!")
 		return
 	} else if temp != OFF {
-		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
+		err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.Name]["M"][0], OFF)
 	}
 	if err != nil {
 		logger.Errorln("err Switching motor off: ", err)
 		return "", err
 	}
 	logger.Infoln("Wrote Switch OFF motor")
-	onReg.Store(d.name, OFF)
+	onReg.Store(d.Name, OFF)
 
 	if temp := d.getPulseReg(); temp == highestUint16 {
 		err = fmt.Errorf("pulsesReg isn't loaded!")
 		return
 	} else if temp != pulses {
-		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][202], pulses)
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.Name]["D"][202], pulses)
 	}
 
 	if err != nil {
@@ -210,22 +210,22 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 		return "", err
 	}
 	logger.Infoln("Wrote pulses: ", results)
-	pulseReg.Store(d.name, pulses)
-	wrotePulses.Store(d.name, pulses)
+	pulseReg.Store(d.Name, pulses)
+	wrotePulses.Store(d.Name, pulses)
 
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.Name]["M"][0], ON)
 	if err != nil {
 		logger.Errorln("err : ", err)
 		return "", err
 	}
 
 	logger.Infoln("Wrote Switch ON motor")
-	onReg.Store(d.name, ON)
+	onReg.Store(d.Name, ON)
 
 	return "RESUMED with pulses.", nil
 }
 
 func (d *Compact32Deck) Reset() (ack bool) {
-	aborted.Store(d.name, false)
+	aborted.Store(d.Name, false)
 	return true
 }

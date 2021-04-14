@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -47,7 +47,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	var ok bool
 	var direction, pulses uint16
 	var deckAndMotor DeckNumber
-	deckAndMotor.Deck = d.name
+	deckAndMotor.Deck = d.Name
 
 	//-----------------
 	// Get Tip Height -
@@ -238,7 +238,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// If operation was aborted and syringe Module is stuck with tip
 	defer d.setIndeck(deckBase, tipHeight)
 
-	if val, ok := syringeModuleState.Load(d.name); !ok {
+	if val, ok := syringeModuleState.Load(d.Name); !ok {
 		panic(ok)
 	} else {
 		if val == InDeck {
@@ -430,7 +430,7 @@ skipDispenseCycles:
 	//
 	//   23. update syringe module state to in deck
 	//
-	syringeModuleState.Store(d.name, InDeck)
+	syringeModuleState.Store(d.Name, InDeck)
 
 	return "ASPIRE and DISPENSE was successful", nil
 }
@@ -440,7 +440,7 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 	var direction uint16
 	var ok bool
 
-	syringeModuleDeckAndMotor := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
+	syringeModuleDeckAndMotor := DeckNumber{Deck: d.Name, Number: K9_Syringe_Module_LHRH}
 
 	if position, ok = consDistance["resting_position"]; !ok {
 		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
@@ -458,16 +458,16 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-	syringeModuleState.Store(d.name, OutDeck)
+	syringeModuleState.Store(d.Name, OutDeck)
 
 	return
 
 }
 
 func (d *Compact32Deck) setIndeck(deckBase, tipHeight float64) {
-	deckAndMotor := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
+	deckAndMotor := DeckNumber{Deck: d.Name, Number: K9_Syringe_Module_LHRH}
 	// In case the operation was aborted after syringe module went inside the deck!
 	if (positions[deckAndMotor] + tipHeight) > deckBase {
-		syringeModuleState.Store(d.name, InDeck)
+		syringeModuleState.Store(d.Name, InDeck)
 	}
 }
