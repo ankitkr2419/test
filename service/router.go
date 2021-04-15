@@ -92,7 +92,6 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/heating", createHeatingHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/heating/{id}", showHeatingHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/heating/{id}", updateHeatingHandler(deps)).Methods(http.MethodPut)
-	router.HandleFunc("/heating/{id}", deleteHeatingHandler(deps)).Methods(http.MethodDelete)
 
 	return
 }

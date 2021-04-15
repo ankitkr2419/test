@@ -115,26 +115,3 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write([]byte(`{"msg":"heating record updated successfully"}`))
 	})
 }
-
-func deleteHeatingHandler(deps Dependencies) http.HandlerFunc {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
-
-		processID, err := parseUUID(vars["id"])
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		err = deps.Store.DeleteHeating(req.Context(), processID)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error deleting heating")
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(`{"msg":"heating record deleted successfully"}`))
-	})
-}

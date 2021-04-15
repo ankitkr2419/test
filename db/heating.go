@@ -32,8 +32,6 @@ const (
 		duration,
 		updated_at) = 
 		($1, $2, $3, $4) WHERE process_id = $5`
-	deleteHeatingQuery = `DELETE FROM processes
-	WHERE id = $1`
 )
 
 func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
@@ -86,15 +84,6 @@ func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating heating")
-		return
-	}
-	return
-}
-
-func (s *pgStore) DeleteHeating(ctx context.Context, id uuid.UUID) (err error) {
-	_, err = s.db.Exec(deleteHeatingQuery, id)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error deleting heating")
 		return
 	}
 	return
