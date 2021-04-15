@@ -35,6 +35,17 @@ const (
 		time_2,
 		process_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
+
+	updateShakingQuery = `UPDATE shaking SET (
+		with_temp,
+		temperature,
+		follow_temp,
+		rpm_1,
+		rpm_2,
+		time_1,
+		time_2,
+		updated_at) = 
+		($1, $2, $3, $4, $5, $6, $7, $8) WHERE process_id = $9`
 )
 
 func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker Shaker, err error) {
@@ -75,6 +86,26 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking 
 	err = s.db.Get(&createdShaking, getShakerQuery, sh.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting Shaking")
+		return
+	}
+	return
+}
+
+func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
+	_, err = s.db.Exec(
+		updateShakingQuery,
+		sh.WithTemp,
+		sh.Temperature,
+		sh.FollowTemp,
+		sh.RPM1,
+		sh.RPM2,
+		sh.Time1,
+		sh.Time2,
+		time.Now(),
+		sh.ProcessID,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating shaking")
 		return
 	}
 	return

@@ -26,6 +26,12 @@ const (
 		height,
 		process_id)
 		VALUES ($1, $2, $3, $4) RETURNING id`
+	updateTipDockQuery = `UPDATE tip_dock SET (
+			type,
+			position,
+			height,
+			updated_at) = 
+			($1, $2, $3,$4) WHERE process_id = $5`
 )
 
 func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock, err error) {
@@ -56,6 +62,22 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDo
 	err = s.db.Get(&createdTipDocking, getTipDockQuery, t.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting Tip Docking")
+		return
+	}
+	return
+}
+
+func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
+	_, err = s.db.Exec(
+		updateTipDockQuery,
+		t.Type,
+		t.Position,
+		t.Height,
+		time.Now(),
+		t.ProcessID,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating TipDocking")
 		return
 	}
 	return
