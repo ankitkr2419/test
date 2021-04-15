@@ -1,8 +1,6 @@
 package plc
 
 import (
-	"mylab/cpagent/db"
-
 	"github.com/google/uuid"
 )
 
@@ -46,31 +44,6 @@ type Driver interface {
 	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
-}
-
-type Common interface {
-	NameOfDeck() string
-	Homing() (string, error)
-	DiscardTipAndHome(bool) (string, error)
-	ManualMovement(uint16, uint16, uint16) (string, error)
-	IsMachineHomed() bool
-	IsRunInProgress() bool
-	SetRunInProgress()
-	ResetRunInProgress()
-	Pause() (string, error)
-	Resume() (string, error)
-	Abort() (string, error)
-	DiscardBoxCleanup() (string, error)
-	RestoreDeck() (string, error)
-	UVLight(string) (string, error)
-	Heating(heating db.Heating) (string, error)
-	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
-	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
-	TipOperation(to db.TipOperation) (response string, err error)
-	AttachDetach(db.AttachDetach) (response string, err error)
-	AddDelay(db.Delay) (string, error)
-	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
-	Shaking(db.Shaker) (string, error)
 }
 
 type WSData struct {

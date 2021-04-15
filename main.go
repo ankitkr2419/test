@@ -130,8 +130,8 @@ func startApp(plcName string, test bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
 	var handler *modbus.RTUClientHandler
-	var driverDeckA plc.Common
-	var driverDeckB plc.Common
+	var driverDeckA *plc.Compact32Deck
+	var driverDeckB *plc.Compact32Deck
 
 	if plcName != "simulator" && plcName != "compact32" {
 		logger.Error("Unsupported PLC. Valid PLC: 'simulator' or 'compact32'")
@@ -162,7 +162,7 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	plcDeckMap := map[string]plc.Common{
+	plcDeckMap := map[string]*plc.Compact32Deck{
 		"A": driverDeckA,
 		"B": driverDeckB,
 	}
@@ -282,7 +282,7 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			logger.Errorln(err)
 			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
 			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
-			plcDeckMap := map[string]plc.Common{
+			plcDeckMap := map[string]*plc.Compact32Deck{
 				"A": driverDeckA,
 				"B": driverDeckB,
 			}
