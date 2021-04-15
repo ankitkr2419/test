@@ -131,24 +131,44 @@ func (d *SimulatorDriver) simulateMotor(value uint16) (err error) {
 	return
 }
 
-// Having more capacity just in case 100ms isn't enough
-var motorDone = map[string](chan bool){
-	"A": make(chan bool, 2),
-	"B": make(chan bool, 2),
+var motorDone = map[string]bool{
+	"A": false,
+	"B": false,
 }
 
-var sensorDone = map[string](chan bool){
-	"A": make(chan bool, 2),
-	"B": make(chan bool, 2),
+var sensorDone = map[string]bool{
+	"A": false,
+	"B": false,
+}
+
+var motorInProgress = map[string]bool{
+	"A": false,
+	"B": false,
+}
+
+func (d *SimulatorDriver) resetMotorInProgress() {
+	motorInProgress[d.DeckName] = false
 }
 
 func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
+	for{
+		if !motorInProgress[d.DeckName] {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	motorInProgress[d.DeckName] = true
+	defer d.resetMotorInProgress()
+	
 	// Reset D212
 	logger.Infoln("Reset D212")
 	REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]] = 0
-
+	// Reset Sensor Cut
 	REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][2]] = plc.SensorUncut
+	// Reset map vars
+	sensorDone[d.DeckName] = false
+	motorDone[d.DeckName] = false
 
 	// Pulses Register
 	// If Pulses greater than 0 && Direction is towards Sensor
@@ -167,17 +187,17 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
 func (d *SimulatorDriver) updatePulses() (err error) {
 	motorNum := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]]
-	pulses := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][200]]
-	speed := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][202]]
+	speed := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][200]]
+	pulses := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][202]]
 	currentPulses := uint16(0)
 
 	for {
-		select {
-		case done := <-motorDone[d.DeckName]:
-			logger.Infoln("completion was done ", done, " for deck ", d.DeckName)
+		switch {
+		case motorDone[d.DeckName]:
+			logger.Infoln("completion was done for deck ", d.DeckName)
 			return
-		case done := <-sensorDone[d.DeckName]:
-			logger.Infoln("sensor has cut", done, " for deck ", d.DeckName)
+		case sensorDone[d.DeckName]:
+			logger.Infoln("sensor has cut for deck ", d.DeckName)
 			return
 		default:
 			time.Sleep(100 * time.Millisecond)
@@ -202,7 +222,7 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 				REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][1]] = uint16(1)
 				// Completion is monitored here itself
 				logger.Infoln("Completion is Done for deck", d.DeckName)
-				motorDone[d.DeckName] <- true
+				motorDone[d.DeckName] = true
 			}
 		}
 	}
@@ -234,7 +254,7 @@ func (d *SimulatorDriver) monitorSensorCut() (err error) {
 		if plc.Positions[deckAndMotor]-shift <= plc.Calibs[deckAndMotor] {
 			REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][2]] = plc.SensorCut
 			logger.Infoln("Sensor Cut is Done for deck", d.DeckName)
-			sensorDone[d.DeckName] <- true
+			sensorDone[d.DeckName] = true
 			return
 		}
 		time.Sleep(100 * time.Millisecond)
