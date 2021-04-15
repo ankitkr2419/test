@@ -23,15 +23,24 @@ func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (re
 		return
 	}
 
-	simulatorLock.Lock()
-	REGISTERS_EXTRACTION[d.DeckName]["D"][address] = value
-	simulatorLock.Unlock()
-
+	d.setRegister("D", address, value)
 
 	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
 
 	logger.Infoln("Inside simulateWriteSingleRegister for deck ", d.DeckName, " result: ", results, ". address: ", address)
 	return
+}
+
+func (d *SimulatorDriver) setRegister(regType string, address, value uint16)  {
+	simulatorLock.Lock()
+	defer simulatorLock.Unlock()
+	REGISTERS_EXTRACTION[d.DeckName][regType][address] = value
+}
+
+func (d *SimulatorDriver) readRegister(regType string, address uint16) (value uint16)  {
+	simulatorLock.Lock()
+	defer simulatorLock.Unlock()
+	return REGISTERS_EXTRACTION[d.DeckName][regType][address]
 }
 
 func (d *SimulatorDriver) simulateReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
@@ -44,9 +53,7 @@ func (d *SimulatorDriver) simulateReadHoldingRegisters(address, quantity uint16)
 		return
 	}
 
-	simulatorLock.Lock()
-	value := REGISTERS_EXTRACTION[d.DeckName]["D"][address]
-	simulatorLock.Unlock()
+	value := d.readRegister("D", address)
 
 	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
 
@@ -65,9 +72,7 @@ func (d *SimulatorDriver) simulateReadCoils(address, quantity uint16) (results [
 		return
 	}
 
-	simulatorLock.Lock()
-	value := REGISTERS_EXTRACTION[d.DeckName]["M"][address]
-	simulatorLock.Unlock()
+	value := d.readRegister("M", address)
 	
 	results = []byte{uint8(value & 0xff)}
 
@@ -81,9 +86,7 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 		return
 	}
 
-	simulatorLock.Lock()
-	REGISTERS_EXTRACTION[d.DeckName]["M"][address] = value
-	simulatorLock.Unlock()
+	d.setRegister("M", address, value)
 
 	results := []byte{uint8(value & 0xff)}
 
@@ -162,11 +165,9 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
 	// Reset D212
 	logger.Infoln("Reset D212")
-	simulatorLock.Lock()
-	REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]] = 0
+	d.setRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][212] ,0 )
 	// Reset Sensor Cut
-	REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][2]] = plc.SensorUncut
-	simulatorLock.Unlock()
+	d.setRegister("M",plc.MODBUS_EXTRACTION[d.DeckName]["M"][2] ,plc.SensorUncut )
 	
 	// Reset map vars
 	d.resetSensorDone()
@@ -174,15 +175,12 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
 	// Pulses Register
 	// If Pulses greater than 0 && Direction is towards Sensor
-	simulatorLock.Lock()
-	if REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][202]] > 0 &&
-		REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][206]] == plc.TowardsSensor {
+	if d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][202]) > 0 &&
+		d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][206]) == plc.TowardsSensor {
 		// Call MonitorSensorCut in a go routine
 		// Only makes sense when we are going towards Sensor
 		go d.monitorSensorCut()
 	}
-	simulatorLock.Unlock()
-
 
 	// Update Pulses every 100 Millisecond
 	err = d.updatePulses()
@@ -191,11 +189,9 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 }
 
 func (d *SimulatorDriver) updatePulses() (err error) {
-	simulatorLock.Lock()
-	motorNum := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]]
-	speed := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][200]]
-	pulses := REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][202]]
-	simulatorLock.Unlock()
+	motorNum := d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][226])
+	speed := d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][200])
+	pulses := d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][202])
 
 	currentPulses := uint16(0)
 
@@ -210,72 +206,61 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 		default:
 			time.Sleep(100 * time.Millisecond)
 			// if motor is OFF then return
-			simulatorLock.Lock()
-			if plc.OFF == REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]] {
-				simulatorLock.Unlock()
+			if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]) {
 				return
 			}
 			// if motor is changed then return
-			if motorNum != REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]] {
-				simulatorLock.Unlock()
+			if motorNum != d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]) {
 				return
 			}
 
 			// We are updating D212 after every 0.1 second
-			REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]] += uint16(float64(speed) * 0.1)
-			logger.Infoln("D212 for deck", d.DeckName, " value is: ", REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]])
+			d212Val := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]) 
+			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212] , d212Val + uint16(float64(speed) * 0.1) )
+			currentPulses = d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])
+			logger.Infoln("D212 for deck", d.DeckName, " value is: ", currentPulses )
 
-			currentPulses = REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]]
 			if currentPulses > pulses {
 				// D212 updated
-				REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]] = pulses
+				d.setRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], pulses)
 				// Completion Done
-				REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][1]] = uint16(1)
+				d.setRegister("M",plc.MODBUS_EXTRACTION[d.DeckName]["M"][1], uint16(1))
 				// Completion is monitored here itself
 				logger.Infoln("Completion is Done for deck", d.DeckName)
 				d.setMotorDone()
 			}
-			simulatorLock.Unlock()
 		}
 	}
 }
 
 func (d *SimulatorDriver) monitorSensorCut() (err error) {
 
-	simulatorLock.Lock()
-	deckAndMotor := plc.DeckNumber{Deck: d.DeckName, Number: REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]]}
-	simulatorLock.Unlock()
+	deckAndMotor := plc.DeckNumber{Deck: d.DeckName, Number: d.readRegister("D" ,plc.MODBUS_EXTRACTION[d.DeckName]["D"][226])}
 	
 	// shift = D212 Pulses / Motor steps
 	for {
 		// putting declaration inside the loop cause what if motor change happens within 100 ms!!
-		simulatorLock.Lock()
 		// if motor is OFF then return
-		if plc.OFF == REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]] {
-			simulatorLock.Unlock()
+		if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]){
 			return
 		}
 		// if motor is changed then return
-		if deckAndMotor.Number != REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]] {
-			simulatorLock.Unlock()
+		if deckAndMotor.Number != d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]) {
 			return
 		}
 		// if direction is changed then return
-		if plc.TowardsSensor != REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][206]] {
-			simulatorLock.Unlock()
+		if plc.TowardsSensor != d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][206]) {
 			return
 		}
 
 		// Check For Sensor Cut
-		shift := float64(REGISTERS_EXTRACTION[d.DeckName]["D"][plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]]) / float64(plc.Motors[deckAndMotor]["steps"])
+		shift := float64(d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])) / float64(plc.Motors[deckAndMotor]["steps"])
 		if plc.Positions[deckAndMotor]-shift <= plc.Calibs[deckAndMotor] {
-			REGISTERS_EXTRACTION[d.DeckName]["M"][plc.MODBUS_EXTRACTION[d.DeckName]["M"][2]] = plc.SensorCut
+			d.setRegister("M",plc.MODBUS_EXTRACTION[d.DeckName]["M"][2] ,plc.SensorCut )
 			logger.Infoln("Sensor Cut is Done for deck", d.DeckName)
 			d.setSensorDone()
-			simulatorLock.Unlock()
 			return
 		}
-		simulatorLock.Unlock()
 
 		time.Sleep(100 * time.Millisecond)
 	}
