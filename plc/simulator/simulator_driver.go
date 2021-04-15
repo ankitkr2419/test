@@ -3,6 +3,7 @@ package simulator
 import (
 	"encoding/binary"
 	"sync"
+	"time"
 )
 
 type SimulatorDriver struct {
@@ -10,12 +11,15 @@ type SimulatorDriver struct {
 	DeckName string
 }
 
+const delay = 150
+
 // simulating masterLock like in compact but no need for delay
 var masterLock sync.Mutex
 
 func (d *SimulatorDriver) WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
+	time.Sleep(delay * time.Millisecond)
 	results, err = d.simulateWriteMultipleRegisters(address, quantity, value)
 	return
 }
@@ -23,6 +27,7 @@ func (d *SimulatorDriver) WriteMultipleRegisters(address, quantity uint16, value
 func (d *SimulatorDriver) WriteSingleRegister(address, value uint16) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
+	time.Sleep(delay * time.Millisecond)
 	results, err = d.simulateWriteSingleRegister(address, value)
 	return
 }
@@ -30,6 +35,7 @@ func (d *SimulatorDriver) WriteSingleRegister(address, value uint16) (results []
 func (d *SimulatorDriver) ReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
+	time.Sleep(delay * time.Millisecond)
 	results, err = d.simulateReadHoldingRegisters(address, quantity)
 	return
 }
@@ -48,6 +54,7 @@ func (d *SimulatorDriver) ReadSingleRegister(address uint16) (value uint16, err 
 func (d *SimulatorDriver) ReadCoils(address, quantity uint16) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
+	time.Sleep(delay * time.Millisecond)
 	results, err = d.simulateReadCoils(address, quantity)
 	return
 }
@@ -67,6 +74,7 @@ func (d *SimulatorDriver) ReadSingleCoil(address uint16) (value uint16, err erro
 func (d *SimulatorDriver) WriteSingleCoil(address, value uint16) (err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
+	time.Sleep(delay * time.Millisecond)
 	err = d.simulateWriteSingleCoil(address, value)
 	return
 }
