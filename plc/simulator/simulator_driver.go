@@ -3,7 +3,6 @@ package simulator
 import (
 	"encoding/binary"
 	"sync"
-	"time"
 )
 
 type SimulatorDriver struct {
@@ -11,20 +10,13 @@ type SimulatorDriver struct {
 	DeckName string
 }
 
-const delay = 50
 
-// We have 2 masters, only 1 should be allowed and that too with
-// 200ms delay for 9600 baud rate
-// 100ms delay for 19600 baud rate
-// 50ms delay for 37000 baud rate
-// 40ms delay for 57000 baud rate
-// NOTE: Only 9600 works!!!
+// simulating masterLock like in compact but no need for delay
 var masterLock sync.Mutex
 
 func (d *SimulatorDriver) WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
-	time.Sleep(time.Duration(delay) * time.Millisecond)
 	results, err = d.simulateWriteMultipleRegisters(address, quantity, value)
 	return
 }
@@ -32,7 +24,6 @@ func (d *SimulatorDriver) WriteMultipleRegisters(address, quantity uint16, value
 func (d *SimulatorDriver) WriteSingleRegister(address, value uint16) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
-	time.Sleep(time.Duration(delay) * time.Millisecond)
 	results, err = d.simulateWriteSingleRegister(address, value)
 	return
 }
@@ -40,7 +31,6 @@ func (d *SimulatorDriver) WriteSingleRegister(address, value uint16) (results []
 func (d *SimulatorDriver) ReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
-	time.Sleep(time.Duration(delay) * time.Millisecond)
 	results, err = d.simulateReadHoldingRegisters(address, quantity)
 	return
 }
@@ -59,7 +49,6 @@ func (d *SimulatorDriver) ReadSingleRegister(address uint16) (value uint16, err 
 func (d *SimulatorDriver) ReadCoils(address, quantity uint16) (results []byte, err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
-	time.Sleep(time.Duration(delay) * time.Millisecond)
 	results, err = d.simulateReadCoils(address, quantity)
 	return
 }
@@ -79,7 +68,6 @@ func (d *SimulatorDriver) ReadSingleCoil(address uint16) (value uint16, err erro
 func (d *SimulatorDriver) WriteSingleCoil(address, value uint16) (err error) {
 	masterLock.Lock()
 	defer masterLock.Unlock()
-	time.Sleep(time.Duration(delay) * time.Millisecond)
 	err = d.simulateWriteSingleCoil(address, value)
 	return
 }
