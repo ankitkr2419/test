@@ -2,7 +2,10 @@ package simulator
 
 import (
 	logger "github.com/sirupsen/logrus"
+	"sync"
 )
+
+var simulatorLock sync.Mutex
 
 func (d *SimulatorDriver) setMotorInProgress() {
 	motorInProgress.Store(d.DeckName, true)
@@ -53,4 +56,17 @@ func (d *SimulatorDriver) isSensorDone() bool {
 		return temp.(bool)
 	}
 	return false
+}
+
+// Always take Lock on REGSITERS_EXTRACTION while writing/reading
+func (d *SimulatorDriver) setRegister(regType string, address, value uint16) {
+	simulatorLock.Lock()
+	defer simulatorLock.Unlock()
+	REGISTERS_EXTRACTION[d.DeckName][regType][address] = value
+}
+
+func (d *SimulatorDriver) readRegister(regType string, address uint16) (value uint16) {
+	simulatorLock.Lock()
+	defer simulatorLock.Unlock()
+	return REGISTERS_EXTRACTION[d.DeckName][regType][address]
 }

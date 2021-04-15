@@ -10,7 +10,6 @@ type SimulatorDriver struct {
 	DeckName string
 }
 
-
 // simulating masterLock like in compact but no need for delay
 var masterLock sync.Mutex
 

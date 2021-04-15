@@ -5,17 +5,12 @@ import (
 	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/plc"
 	"time"
-	"sync"
 )
-
-var simulatorLock sync.Mutex
 
 func (d *SimulatorDriver) simulateWriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
 	// TODO: Implement this only when related method arrive
 	return
 }
-
-// Take Lock on REGSITERS_EXTRACTION while writing/reading
 
 func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (results []byte, err error) {
 	err = d.checkForValidAddress("D", address)
@@ -29,18 +24,6 @@ func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (re
 
 	logger.Infoln("Inside simulateWriteSingleRegister for deck ", d.DeckName, " result: ", results, ". address: ", address)
 	return
-}
-
-func (d *SimulatorDriver) setRegister(regType string, address, value uint16)  {
-	simulatorLock.Lock()
-	defer simulatorLock.Unlock()
-	REGISTERS_EXTRACTION[d.DeckName][regType][address] = value
-}
-
-func (d *SimulatorDriver) readRegister(regType string, address uint16) (value uint16)  {
-	simulatorLock.Lock()
-	defer simulatorLock.Unlock()
-	return REGISTERS_EXTRACTION[d.DeckName][regType][address]
 }
 
 func (d *SimulatorDriver) simulateReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
@@ -73,7 +56,7 @@ func (d *SimulatorDriver) simulateReadCoils(address, quantity uint16) (results [
 	}
 
 	value := d.readRegister("M", address)
-	
+
 	results = []byte{uint8(value & 0xff)}
 
 	logger.Infoln("Inside simulateReadCoils for deck ", d.DeckName, " result: ", results, ". address: ", address)
@@ -95,7 +78,9 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 	// Calling in go routine so that masterLock is free
 	switch address {
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]:
-		go d.simulateMotor(value)
+		if value == plc.ON {
+			go d.simulateOnMotor()
+		}
 
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]:
 		go d.simulateHeater(value)
@@ -139,18 +124,8 @@ func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint
    - Monitor Sensor Has Cut
    - Write Pulses to D212
    - Monitor D212 Pulses
-   When Switch Off Motor
-    - Close Monitoring Sensor and writing to D212
+
 */
-func (d *SimulatorDriver) simulateMotor(value uint16) (err error) {
-	switch value {
-	case plc.ON:
-		err = d.simulateOnMotor()
-	case plc.OFF:
-		err = d.simulateOffMotor()
-	}
-	return
-}
 
 func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
@@ -165,18 +140,18 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
 	// Reset D212
 	logger.Infoln("Reset D212")
-	d.setRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][212] ,0 )
+	d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], 0)
 	// Reset Sensor Cut
-	d.setRegister("M",plc.MODBUS_EXTRACTION[d.DeckName]["M"][2] ,plc.SensorUncut )
-	
+	d.setRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][2], plc.SensorUncut)
+
 	// Reset map vars
 	d.resetSensorDone()
 	d.resetMotorDone()
 
 	// Pulses Register
 	// If Pulses greater than 0 && Direction is towards Sensor
-	if d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][202]) > 0 &&
-		d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][206]) == plc.TowardsSensor {
+	if d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][202]) > 0 &&
+		d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][206]) == plc.TowardsSensor {
 		// Call MonitorSensorCut in a go routine
 		// Only makes sense when we are going towards Sensor
 		go d.monitorSensorCut()
@@ -189,9 +164,9 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 }
 
 func (d *SimulatorDriver) updatePulses() (err error) {
-	motorNum := d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][226])
-	speed := d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][200])
-	pulses := d.readRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][202])
+	motorNum := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][226])
+	speed := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][200])
+	pulses := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][202])
 
 	currentPulses := uint16(0)
 
@@ -215,16 +190,16 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 			}
 
 			// We are updating D212 after every 0.1 second
-			d212Val := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212]) 
-			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212] , d212Val + uint16(float64(speed) * 0.1) )
+			d212Val := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])
+			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], d212Val+uint16(float64(speed)*0.1))
 			currentPulses = d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])
-			logger.Infoln("D212 for deck", d.DeckName, " value is: ", currentPulses )
+			logger.Infoln("D212 for deck", d.DeckName, " value is: ", currentPulses)
 
 			if currentPulses > pulses {
 				// D212 updated
-				d.setRegister("D",plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], pulses)
+				d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], pulses)
 				// Completion Done
-				d.setRegister("M",plc.MODBUS_EXTRACTION[d.DeckName]["M"][1], uint16(1))
+				d.setRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][1], uint16(1))
 				// Completion is monitored here itself
 				logger.Infoln("Completion is Done for deck", d.DeckName)
 				d.setMotorDone()
@@ -235,13 +210,13 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 
 func (d *SimulatorDriver) monitorSensorCut() (err error) {
 
-	deckAndMotor := plc.DeckNumber{Deck: d.DeckName, Number: d.readRegister("D" ,plc.MODBUS_EXTRACTION[d.DeckName]["D"][226])}
-	
+	deckAndMotor := plc.DeckNumber{Deck: d.DeckName, Number: d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][226])}
+
 	// shift = D212 Pulses / Motor steps
 	for {
 		// putting declaration inside the loop cause what if motor change happens within 100 ms!!
 		// if motor is OFF then return
-		if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]){
+		if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]) {
 			return
 		}
 		// if motor is changed then return
@@ -256,7 +231,7 @@ func (d *SimulatorDriver) monitorSensorCut() (err error) {
 		// Check For Sensor Cut
 		shift := float64(d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])) / float64(plc.Motors[deckAndMotor]["steps"])
 		if plc.Positions[deckAndMotor]-shift <= plc.Calibs[deckAndMotor] {
-			d.setRegister("M",plc.MODBUS_EXTRACTION[d.DeckName]["M"][2] ,plc.SensorCut )
+			d.setRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][2], plc.SensorCut)
 			logger.Infoln("Sensor Cut is Done for deck", d.DeckName)
 			d.setSensorDone()
 			return
@@ -264,11 +239,6 @@ func (d *SimulatorDriver) monitorSensorCut() (err error) {
 
 		time.Sleep(100 * time.Millisecond)
 	}
-}
-
-func (d *SimulatorDriver) simulateOffMotor() (err error) {
-	// No need, its already handled
-	return
 }
 
 // TODO: Handle Heater M 3
