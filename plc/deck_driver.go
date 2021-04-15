@@ -151,7 +151,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// Check if User has paused the run/operation
 	for {
 		if d.isMachineInPausedState() {
-			logger.Infoln("Machine in PAUSED state for deck: %v", d.name)
+			logger.Infoln("Machine in PAUSED state for deck:", d.name)
 			time.Sleep(400 * time.Millisecond)
 		} else {
 			break

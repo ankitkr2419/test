@@ -17,5 +17,6 @@ func NewExtractionSimulator(wsMsgch chan string, wsErrch chan error, exit chan e
 
 	plc.SetDeckName(&s, deck)
 
+	go LoadUtils()
 	return &s
 }
