@@ -4,7 +4,6 @@ import (
 	"sync"
 )
 
-
 var motorDone, sensorDone, motorInProgress sync.Map
 
 func LoadUtils() {
