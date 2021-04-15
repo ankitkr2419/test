@@ -17,8 +17,8 @@ export function* discardDeck(actions){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: `${API_ENDPOINTS.discardDeck}/${deckName}`,
-        discardDeckSuccess,
-        discardDeckFailed
+        successAction: discardDeckSuccess,
+        failureAction: discardDeckFailed
       },
     });
   } catch (error) {
@@ -37,8 +37,8 @@ export function* discardTip(actions){
         method: HTTP_METHODS.GET,
         body: null,
         reqPath: `/discard-tip-and-home/true/${deckName}`, /**static api route**/
-        discardTipSuccess,
-        discardTipFailed
+        successAction: discardTipSuccess,
+        failureAction: discardTipFailed
       },
     });
   } catch (error) {

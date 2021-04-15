@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -22,7 +22,20 @@ const DiscardTrayBox = styled.div`
   }
 `;
 const TrayDiscardModal = (props) => {
-  const { trayDiscardModal, toggleTrayDiscardModal, deckName } = props;
+  const {
+    trayDiscardModal,
+    toggleTrayDiscardModal,
+    deckName,
+    handleSuccessBtn,
+    switchModalContent,
+  } = props;
+
+  const [enableContent, setEnableContent] = useState(false);
+
+  const toggleContents = () => {
+    setEnableContent(!enableContent);
+  };
+
   return (
     <>
       <DiscardTrayBox>
@@ -41,38 +54,68 @@ const TrayDiscardModal = (props) => {
                 className="border-0"
               />
             </div>
+
             <TrayDiscardSection className="gray-scale-box d-flex justify-content-center align-items-center">
               <Center className="mt-4">
-                <ImageIcon
-                  src={alertIcon}
-                  alt="alert icon not available"
-                  className="mb-4"
-                />
-                <Text Tag="h5" size={18} className="text-center mx-5 mb-0">
-                  Tray will be discarded from Machine!
-                </Text>
-                <Text Tag="h5" size={18} className="text-center mx-5 mb-4">
-                  You can collect and empty the tray.
-                </Text>
-                <ImageIcon
-                  src={collectAndEmptyTrayImage}
-                  alt=""
-                  className="mb-4 mx-auto d-block"
-                />
+                {switchModalContent ? (
+                  <>
+                    <ImageIcon
+                      src={alertIcon}
+                      alt="alert icon not available"
+                      className="mb-4"
+                    />
+                    <Text Tag="h5" size={18} className="text-center mx-5 mb-0">
+                      Tray will be discarded from Machine!
+                    </Text>
+                    <Text Tag="h5" size={18} className="text-center mx-5 mb-4">
+                      You can collect and empty the tray.
+                    </Text>
+                    <ImageIcon
+                      src={collectAndEmptyTrayImage}
+                      alt=""
+                      className="mb-4 mx-auto d-block"
+                    />
 
-                <Button color="primary" size="sm">
-                  Continue to Discard
-                </Button>
-                <div className="status-box my-5">
-                  <ImageIcon src={doneThumbsUpImage} alt="" className="mb-4" />
-                  <CheckBox
-                    id="done"
-                    name="done"
-                    label="Successfully emptied the discarded tray & inserted back."
-                    className="mb-5"
-                  />
-                  <Button color="primary">Yes</Button>
-                </div>
+                    <Button
+                      className="mb-4 "
+                      color="primary"
+                      size="sm"
+                      onClick={handleSuccessBtn}
+                    >
+                      Continue to Discard
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div
+                      className={
+                        enableContent
+                          ? "status-box my-5"
+                          : "gray-scale-box status-box my-5"
+                      }
+                    >
+                      <ImageIcon
+                        className="mb-4"
+                        src={doneThumbsUpImage}
+                        alt=""
+                      />
+                      <CheckBox
+                        id="done"
+                        name="done"
+                        label="Successfully emptied the discarded tray & inserted back."
+                        className="mb-5"
+                        onClick={toggleContents}
+                      />
+                      <Button
+                        color="primary"
+                        disabled={!enableContent}
+                        onClick={handleSuccessBtn}
+                      >
+                        Yes
+                      </Button>
+                    </div>
+                  </>
+                )}
               </Center>
             </TrayDiscardSection>
           </ModalBody>
@@ -85,11 +128,13 @@ const TrayDiscardModal = (props) => {
 TrayDiscardModal.propTypes = {
   //confirmationText: PropTypes.string,
   isOpen: PropTypes.bool,
+  switchModalContent: PropTypes.bool,
   confirmationClickHandler: PropTypes.func,
 };
 
 TrayDiscardModal.defaultProps = {
   //confirmationText: 'Are you sure you want to Exit?',
+  switchModalContent: true,
   isOpen: false,
 };
 

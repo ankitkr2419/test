@@ -57,7 +57,7 @@ const SplashScreenComponent = () => {
 					</div>
 						<OptionBox className="p-4">
 							<div className="d-flex justify-content-center align-items-center flex-column mb-3">
-								<Text Tag="label" size="20" className="mb-4 title-heading font-weight-bold">Homing Confirmation</Text>
+								<Text Tag="label" size={20} className="mb-4 title-heading font-weight-bold">Homing Confirmation</Text>
 									<div
 										className="d-flex justify-content-center align-items-center font-weight-light border-1 border-gray shadow-none bg-gray large-btn">
 											<div className="d-flex justify-content-center align-items-center flex-column">
