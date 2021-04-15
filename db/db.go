@@ -104,5 +104,4 @@ type Storer interface {
 	CreateShaking(context.Context, Shaker) (Shaker, error)
 	ShowShaking(ctx context.Context, id uuid.UUID) (shaking Shaker, err error)
 	UpdateHeating(ctx context.Context, ht Heating) (err error)
-	DeleteHeating(ctx context.Context, id uuid.UUID) (err error)
 }
