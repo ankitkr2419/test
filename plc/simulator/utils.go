@@ -2,8 +2,8 @@ package simulator
 
 import (
 	"fmt"
-	"sync"
 	"mylab/cpagent/plc"
+	"sync"
 )
 
 var motorDone, sensorDone, motorInProgress sync.Map
