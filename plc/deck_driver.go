@@ -193,7 +193,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
-				logger.Infoln("Completion for deck", d.name, "returned ---> ", results, d.name)
+				logger.Infoln("Completion for deck", d.name, "returned ---> ", results)
 				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("err: from setUp--> ", err, d.name)
@@ -230,7 +230,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return "", err
 		}
 
-		logger.Infoln("Sensor returned for deck ", d.name, "---> ", results, d.name)
+		logger.Infoln("Sensor returned for deck ", d.name, "---> ", results)
 		if len(results) > 0 {
 			if int(results[0]) == SensorCut {
 				logger.Infoln("Sensor returned ---> ", results[0], d.name)
