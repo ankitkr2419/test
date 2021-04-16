@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-// TODO: Handle Heater M 3
+// INFO: Change Log Level to Info if debugging
+
 /*
    When Heater On
    - Monitor Heater
@@ -19,7 +20,6 @@ import (
 
 type Celsius float64
 
-// TODO: Use different ramp rate for first 80 % ramping and other for 20%
 const (
 	// roomTemp already declared in pcr.go
 	// for first 80% of heating up
@@ -52,7 +52,7 @@ func (d *SimulatorDriver) simulateOnHeater() (err error) {
 	d.setHeaterInProgress()
 	defer d.resetHeaterInProgress()
 
-	logger.Infoln("Heater has started!!")
+	logger.Debugln("Heater has started!!")
 
 	// Update Temperature every sec
 	d.updateTemperature()
@@ -76,7 +76,7 @@ func (d *SimulatorDriver) updateTemperature() {
 		currentTempRH := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224])
 
 		// 1 degree extra
-		logger.Infoln("Heating Up -> targetTemp :", targetTemp, ", currentTempLH :", currentTempLH, ", currentTempRH", currentTempRH)
+		logger.Debugln("Heating Up -> targetTemp :", targetTemp, ", currentTempLH :", currentTempLH, ", currentTempRH", currentTempRH)
 
 		if currentTempLH < targetTemp+10 {
 			if (float64(currentTempLH) / float64(targetTemp)) < 0.8 {
@@ -113,7 +113,7 @@ func (d *SimulatorDriver) coolDown() {
 		currentTempLH := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][210])
 		currentTempRH := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224])
 
-		logger.Infoln("Cooling Down -> currentTempLH :", currentTempLH, ", currentTempRH", currentTempRH)
+		logger.Debugln("Cooling Down -> currentTempLH :", currentTempLH, ", currentTempRH", currentTempRH)
 		// 1 degree extra
 		if currentTempLH > uint16(roomTemp*10+10) {
 			if (float64(currentTempLH) / float64(roomTemp)) < 0.8 {
