@@ -19,9 +19,13 @@ import (
 
 type Celsius float64
 
+// TODO: Use different ramp rate for first 80 % ramping and other for 20%
 const (
 	// roomTemp already declared in pcr.go
+   // for first 80% of heating up
+	rampUpFastRate Celsius = 1 // increase temp by 1 degree celsius per second when heater is ON
 	// rampUpTemp is temperature increase with heater ON
+   // for last 20% of heating up
 	rampUpRate Celsius = 0.2 // increase temp by 0.2 degree celsius per second when heater is ON
 	// rampDownTemp is temperature decrease with heater OFF
 	rampDownRate Celsius = 0.05 // decrease temp by 0.05 degree celsius per second when heater is OFF
