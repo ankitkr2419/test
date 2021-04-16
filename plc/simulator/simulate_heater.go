@@ -86,9 +86,10 @@ func (d *SimulatorDriver) updateTemperature() {
 
 // cool Down to room Temperature if heater isn't in progress, update every 2 sec
 func (d *SimulatorDriver) coolDown() {
+	heater1Cooled, heater2Cooled := false, false
 	for {
 		time.Sleep(2 * time.Second)
-		if d.isHeaterInProgress() {
+		if d.isHeaterInProgress() || (heater1Cooled && heater2Cooled) {
 			return
 		}
 
@@ -99,9 +100,13 @@ func (d *SimulatorDriver) coolDown() {
 		// 1 degree extra
 		if currentTempLH > uint16(roomTemp*10+10) {
 			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][210], currentTempLH-uint16(rampDownRate*20))
+		} else {
+			heater1Cooled = true
 		}
 		if currentTempRH > uint16(roomTemp*10+10) {
 			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224], currentTempRH-uint16(rampDownRate*20))
+		} else {
+			heater2Cooled = true
 		}
 	}
 }
