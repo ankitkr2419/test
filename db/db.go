@@ -103,4 +103,6 @@ type Storer interface {
 	ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error)
 	CreateShaking(context.Context, Shaker) (Shaker, error)
 	ShowShaking(ctx context.Context, id uuid.UUID) (shaking Shaker, err error)
+	UpdateTipOperation(ctx context.Context, t TipOperation) (err error)
+	UpdateDelay(ctx context.Context, d Delay) (err error)
 }
