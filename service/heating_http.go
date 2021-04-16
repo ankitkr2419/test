@@ -60,7 +60,7 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 		heating, err = deps.Store.ShowHeating(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
+			rw.WriteHeader(http.StatusNotFound)
 			logger.WithField("err", err.Error()).Error("Error show heating")
 			return
 		}
