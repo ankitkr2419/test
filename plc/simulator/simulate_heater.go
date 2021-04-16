@@ -22,13 +22,14 @@ type Celsius float64
 // TODO: Use different ramp rate for first 80 % ramping and other for 20%
 const (
 	// roomTemp already declared in pcr.go
-   // for first 80% of heating up
+	// for first 80% of heating up
 	rampUpFastRate Celsius = 1 // increase temp by 1 degree celsius per second when heater is ON
 	// rampUpTemp is temperature increase with heater ON
-   // for last 20% of heating up
-	rampUpRate Celsius = 0.2 // increase temp by 0.2 degree celsius per second when heater is ON
+	// for last 20% of heating up
+	rampUpSlowRate Celsius = 0.2 // increase temp by 0.2 degree celsius per second when heater is ON
 	// rampDownTemp is temperature decrease with heater OFF
-	rampDownRate Celsius = 0.05 // decrease temp by 0.05 degree celsius per second when heater is OFF
+	rampDownFastRate Celsius = 0.2  // decrease temp by 0.2 degree celsius per second when heater is OFF
+	rampDownSlowRate Celsius = 0.05 // decrease temp by 0.05 degree celsius per second when heater is OFF
 )
 
 // Currently we only handle if both shaker's start together and not separate
@@ -61,6 +62,8 @@ func (d *SimulatorDriver) simulateOnHeater() (err error) {
 
 func (d *SimulatorDriver) updateTemperature() {
 
+	var temp uint16 = 0
+
 	for {
 		time.Sleep(time.Second)
 		if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]) {
@@ -76,10 +79,22 @@ func (d *SimulatorDriver) updateTemperature() {
 		logger.Infoln("Heating Up -> targetTemp :", targetTemp, ", currentTempLH :", currentTempLH, ", currentTempRH", currentTempRH)
 
 		if currentTempLH < targetTemp+10 {
-			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][210], currentTempLH+uint16(rampUpRate*10))
+			if (float64(currentTempLH) / float64(targetTemp)) < 0.8 {
+				temp = currentTempLH + uint16(rampUpFastRate*10)
+			} else {
+				temp = currentTempLH + uint16(rampUpSlowRate*10)
+			}
+
+			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][210], temp)
+
 		}
 		if currentTempRH < targetTemp+10 {
-			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224], currentTempRH+uint16(rampUpRate*10))
+			if (float64(currentTempRH) / float64(targetTemp)) < 0.8 {
+				temp = currentTempRH + uint16(rampUpFastRate*10)
+			} else {
+				temp = currentTempRH + uint16(rampUpSlowRate*10)
+			}
+			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224], temp)
 		}
 	}
 }
@@ -87,6 +102,8 @@ func (d *SimulatorDriver) updateTemperature() {
 // cool Down to room Temperature if heater isn't in progress, update every 2 sec
 func (d *SimulatorDriver) coolDown() {
 	heater1Cooled, heater2Cooled := false, false
+	var temp uint16 = 0
+
 	for {
 		time.Sleep(2 * time.Second)
 		if d.isHeaterInProgress() || (heater1Cooled && heater2Cooled) {
@@ -99,12 +116,22 @@ func (d *SimulatorDriver) coolDown() {
 		logger.Infoln("Cooling Down -> currentTempLH :", currentTempLH, ", currentTempRH", currentTempRH)
 		// 1 degree extra
 		if currentTempLH > uint16(roomTemp*10+10) {
-			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][210], currentTempLH-uint16(rampDownRate*20))
+			if (float64(currentTempLH) / float64(roomTemp)) < 0.8 {
+				temp = currentTempLH - uint16(rampDownFastRate*20)
+			} else {
+				temp = currentTempLH - uint16(rampDownSlowRate*20)
+			}
+			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][210], temp)
 		} else {
 			heater1Cooled = true
 		}
 		if currentTempRH > uint16(roomTemp*10+10) {
-			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224], currentTempRH-uint16(rampDownRate*20))
+			if (float64(currentTempRH) / float64(roomTemp)) < 0.8 {
+				temp = currentTempRH - uint16(rampDownFastRate*20)
+			} else {
+				temp = currentTempRH - uint16(rampDownSlowRate*20)
+			}
+			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224], temp)
 		} else {
 			heater2Cooled = true
 		}
