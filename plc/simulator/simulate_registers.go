@@ -6,6 +6,8 @@ import (
 	"mylab/cpagent/plc"
 )
 
+// INFO: Change Log Level to Info if debugging
+
 func (d *SimulatorDriver) simulateWriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
 	// TODO: Implement this only when related method arrive
 	return
@@ -21,7 +23,7 @@ func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (re
 
 	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateWriteSingleRegister for deck ", d.DeckName, " result: ", results, ". address: ", address)
+	logger.Debugln("Inside simulateWriteSingleRegister for deck ", d.DeckName, " result: ", results, ". address: ", address)
 	return
 }
 
@@ -39,7 +41,7 @@ func (d *SimulatorDriver) simulateReadHoldingRegisters(address, quantity uint16)
 
 	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateReadHoldingRegisters for deck ", d.DeckName, " result: ", results, ". address: ", address)
+	logger.Debugln("Inside simulateReadHoldingRegisters for deck ", d.DeckName, " result: ", results, ". address: ", address)
 	return
 }
 
@@ -58,7 +60,7 @@ func (d *SimulatorDriver) simulateReadCoils(address, quantity uint16) (results [
 
 	results = []byte{uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateReadCoils for deck ", d.DeckName, " result: ", results, ". address: ", address)
+	logger.Debugln("Inside simulateReadCoils for deck ", d.DeckName, " result: ", results, ". address: ", address)
 	return
 }
 
@@ -72,7 +74,7 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 
 	results := []byte{uint8(value & 0xff)}
 
-	logger.Infoln("Inside simulateWriteSingleCoil for deck ", d.DeckName, " result: ", results, ". address: ", address)
+	logger.Debugln("Inside simulateWriteSingleCoil for deck ", d.DeckName, " result: ", results, ". address: ", address)
 
 	// Calling in go routine so that masterLock is free
 	switch address {

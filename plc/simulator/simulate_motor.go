@@ -14,6 +14,8 @@ import (
 
 */
 
+// INFO: Change Log Level to Info if debugging
+
 func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
 	for {
@@ -26,7 +28,7 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 	defer d.resetMotorInProgress()
 
 	// Reset D212
-	logger.Infoln("Reset D212")
+	logger.Debugln("Reset D212")
 	d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], 0)
 	// Reset Sensor Cut
 	d.setRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][2], plc.SensorUncut)
@@ -60,10 +62,10 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 	for {
 		switch {
 		case d.isMotorDone():
-			logger.Infoln("completion was done for deck ", d.DeckName)
+			logger.Debugln("completion was done for deck ", d.DeckName)
 			return
 		case d.isSensorDone():
-			logger.Infoln("sensor has cut for deck ", d.DeckName)
+			logger.Debugln("sensor has cut for deck ", d.DeckName)
 			return
 		default:
 			time.Sleep(200 * time.Millisecond)
@@ -80,7 +82,7 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 			d212Val := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])
 			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], d212Val+uint16(float64(speed)*0.1))
 			currentPulses = d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])
-			logger.Infoln("D212 for deck", d.DeckName, " value is: ", currentPulses)
+			logger.Debugln("D212 for deck", d.DeckName, " value is: ", currentPulses)
 
 			if currentPulses > pulses {
 				// D212 updated
@@ -88,7 +90,7 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 				// Completion Done
 				d.setRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][1], uint16(1))
 				// Completion is monitored here itself
-				logger.Infoln("Completion is Done for deck", d.DeckName)
+				logger.Debugln("Completion is Done for deck", d.DeckName)
 				d.setMotorDone()
 			}
 		}
@@ -119,7 +121,7 @@ func (d *SimulatorDriver) monitorSensorCut() (err error) {
 		shift := float64(d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212])) / float64(plc.Motors[deckAndMotor]["steps"])
 		if plc.Positions[deckAndMotor]-shift <= plc.Calibs[deckAndMotor] {
 			d.setRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][2], plc.SensorCut)
-			logger.Infoln("Sensor Cut is Done for deck", d.DeckName)
+			logger.Debugln("Sensor Cut is Done for deck", d.DeckName)
 			d.setSensorDone()
 			return
 		}

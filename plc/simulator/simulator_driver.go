@@ -13,7 +13,7 @@ type SimulatorDriver struct {
 
 const delay = 50
 
-// simulating masterLock like in compact but no need for delay
+// simulating masterLock like in compact32
 var masterLock sync.Mutex
 
 func (d *SimulatorDriver) WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
