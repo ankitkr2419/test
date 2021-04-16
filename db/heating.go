@@ -10,9 +10,9 @@ import (
 
 type Heating struct {
 	ID          uuid.UUID `json:"id" db:"id"`
-	Temperature float64   `json:"temperature" db:"temperature"`
+	Temperature float64   `json:"temperature" db:"temperature" validate:"gte=20,lte=120"`
 	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
-	Duration    int64     `json:"duration" db:"duration"`
+	Duration    int64     `json:"duration" db:"duration" validate:"gte=10,lte=3660"`
 	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
