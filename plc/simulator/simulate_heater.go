@@ -97,7 +97,7 @@ func (d *SimulatorDriver) coolDown() {
 			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][210], currentTempLH-uint16(rampDownRate*20))
 		}
 		if currentTempRH > uint16(roomTemp*10+10) {
-			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224], currentTempRH+uint16(rampDownRate*20))
+			d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][224], currentTempRH-uint16(rampDownRate*20))
 		}
 	}
 }
