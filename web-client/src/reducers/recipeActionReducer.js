@@ -22,10 +22,10 @@ export const initialState = {
   recipeData: [],
   leftActionBtn: DECKCARD_BTN.text.run,
   rightActionBtn: DECKCARD_BTN.text.cancel,
-  isRunRecipeCompleted: false,
-  isResumeRecipeCompleted: false,
+  isRunRecipeCompleted: null,
+  isResumeRecipeCompleted: null,
   runRecipeInCompleted: {},
-  runRecipeInProgress: {}
+  runRecipeInProgress: null,
 };
 
 export const recipeActionReducer = (state = initialState, action = {}) => {
@@ -38,8 +38,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         runRecipeResponse: action.payload.response,
         isLoading: false,
         runRecipeError: false,
-        leftActionBtn: DECKCARD_BTN.text.pause,
-        rightActionBtn: DECKCARD_BTN.text.abort,
       };
     case runRecipeAction.runRecipeFailed:
       return {
@@ -57,15 +55,20 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
       return {
         ...state,
         ...action.payload,
-        isLoading : false,
-        isRunRecipeCompleted: true,
+        isLoading: false,
+        isRunRecipeCompleted: false,
+        leftActionBtn: DECKCARD_BTN.text.pause,
+        rightActionBtn: DECKCARD_BTN.text.abort,
       };
     case runRecipeAction.runRecipeInCompleted:
       return {
         ...state,
         ...action.payload,
-        isRunRecipeCompleted: false
+        isRunRecipeCompleted: true,
+        leftActionBtn: DECKCARD_BTN.text.done,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
       };
+
     case pauseRecipeAction.pauseRecipeInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case pauseRecipeAction.pauseRecipeSuccess:
@@ -147,15 +150,16 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         ...action.payload,
         isLoading: false,
-        isResumeRecipeCompleted: true
+        isResumeRecipeCompleted: false,
       };
     case resumeRecipeAction.resumeRecipeInCompleted:
       return {
         ...state,
         ...action.payload,
         isLoading: false,
-        isResumeRecipeCompleted: false
-      }
+        isResumeRecipeCompleted: false,
+      };
+
     case recipeListingAction.recipeListingInitiated:
       return { ...state, ...action.payload, isLoading: true };
     case recipeListingAction.recipeListingSuccess:
