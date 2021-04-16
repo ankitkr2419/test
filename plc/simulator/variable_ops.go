@@ -15,6 +15,14 @@ func (d *SimulatorDriver) resetMotorInProgress() {
 	motorInProgress.Store(d.DeckName, false)
 }
 
+func (d *SimulatorDriver) setHeaterInProgress() {
+	heaterInProgress.Store(d.DeckName, true)
+}
+
+func (d *SimulatorDriver) resetHeaterInProgress() {
+	heaterInProgress.Store(d.DeckName, false)
+}
+
 func (d *SimulatorDriver) setMotorDone() {
 	motorDone.Store(d.DeckName, true)
 }
@@ -34,6 +42,15 @@ func (d *SimulatorDriver) resetSensorDone() {
 func (d *SimulatorDriver) isMotorInProgress() bool {
 	if temp, ok := motorInProgress.Load(d.DeckName); !ok {
 		logger.Errorln("motorInProgress isn't loaded!")
+	} else {
+		return temp.(bool)
+	}
+	return false
+}
+
+func (d *SimulatorDriver) isHeaterInProgress() bool {
+	if temp, ok := heaterInProgress.Load(d.DeckName); !ok {
+		logger.Errorln("heaterInProgress isn't loaded!")
 	} else {
 		return temp.(bool)
 	}
