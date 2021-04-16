@@ -19,14 +19,14 @@ type TipDock struct {
 }
 
 const (
-	getTipDockQuery    = `SELECT * FROM tip_dock where process_id = $1`
-	createTipDockQuery = `INSERT INTO tip_dock (
+	getTipDockQuery    = `SELECT * FROM tip_docking where process_id = $1`
+	createTipDockQuery = `INSERT INTO tip_docking (
 		type,
 		position,
 		height,
 		process_id)
 		VALUES ($1, $2, $3, $4) RETURNING id`
-	updateTipDockQuery = `UPDATE tip_dock SET (
+	updateTipDockQuery = `UPDATE tip_docking SET (
 			type,
 			position,
 			height,
