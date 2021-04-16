@@ -16,6 +16,7 @@ import (
 
 // INFO: Change Log Level to Info if debugging
 
+// TODO: Handle Shaker Motor
 func (d *SimulatorDriver) simulateOnMotor() (err error) {
 
 	for {
