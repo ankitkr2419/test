@@ -29,7 +29,7 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 	d.setMotorInProgress()
 	defer d.resetMotorInProgress()
 
-	if  d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][5]) == plc.ON{
+	if d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][5]) == plc.ON {
 		err = d.simulateShakerMotor()
 		return
 	}
@@ -59,11 +59,11 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 	return
 }
 
-func (d *SimulatorDriver) simulateShakerMotor() (err error){
+func (d *SimulatorDriver) simulateShakerMotor() (err error) {
 	logger.Infoln("Shaker motor simulation started")
 	for {
-		time.Sleep( 200 * time.Millisecond)
-		
+		time.Sleep(200 * time.Millisecond)
+
 		if d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][5]) == plc.OFF {
 			logger.Infoln("Shaker motor simulation stopped")
 			return
