@@ -1,124 +1,11 @@
 package simulator
 
 import (
-	"fmt"
 	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/plc"
 	"time"
 )
 
-func (d *SimulatorDriver) simulateWriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
-	// TODO: Implement this only when related method arrive
-	return
-}
-
-func (d *SimulatorDriver) simulateWriteSingleRegister(address, value uint16) (results []byte, err error) {
-	err = d.checkForValidAddress("D", address)
-	if err != nil {
-		return
-	}
-
-	d.setRegister("D", address, value)
-
-	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
-
-	logger.Infoln("Inside simulateWriteSingleRegister for deck ", d.DeckName, " result: ", results, ". address: ", address)
-	return
-}
-
-func (d *SimulatorDriver) simulateReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
-	err = d.checkForValidAddress("D", address)
-	if err != nil {
-		return
-	}
-	if quantity != 1 {
-		err = fmt.Errorf("invalid register reading quantity")
-		return
-	}
-
-	value := d.readRegister("D", address)
-
-	results = []byte{uint8(value >> 8), uint8(value & 0xff)}
-
-	logger.Infoln("Inside simulateReadHoldingRegisters for deck ", d.DeckName, " result: ", results, ". address: ", address)
-	return
-}
-
-func (d *SimulatorDriver) simulateReadCoils(address, quantity uint16) (results []byte, err error) {
-	err = d.checkForValidAddress("M", address)
-	if err != nil {
-		return
-	}
-
-	if quantity != 1 {
-		err = fmt.Errorf("invalid coil reading quantity")
-		return
-	}
-
-	value := d.readRegister("M", address)
-
-	results = []byte{uint8(value & 0xff)}
-
-	logger.Infoln("Inside simulateReadCoils for deck ", d.DeckName, " result: ", results, ". address: ", address)
-	return
-}
-
-func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err error) {
-	err = d.checkForValidAddress("M", address)
-	if err != nil {
-		return
-	}
-
-	d.setRegister("M", address, value)
-
-	results := []byte{uint8(value & 0xff)}
-
-	logger.Infoln("Inside simulateWriteSingleCoil for deck ", d.DeckName, " result: ", results, ". address: ", address)
-
-	// Calling in go routine so that masterLock is free
-	switch address {
-	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]:
-		if value == plc.ON {
-			go d.simulateOnMotor()
-		}
-
-	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]:
-		go d.simulateHeater(value)
-	}
-
-	return
-}
-
-func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint16) (err error) {
-	switch registerType {
-	case "M":
-		// valid range 0-8
-		lowestMAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][0]
-		highestMAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][8]
-
-		if address >= lowestMAddress && address <= highestMAddress {
-			return
-		}
-
-	case "D":
-		// valid range 200-226
-		lowestDAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][200]
-		highestDAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][226]
-
-		// check for divisibility by 2 as well
-		if address >= lowestDAddress && address <= highestDAddress && address%2 != 1 {
-			return
-		}
-
-	default:
-		err = fmt.Errorf("Invalid register Type")
-	}
-
-	err = fmt.Errorf("Invalid register address")
-	return
-}
-
-// TODO: Handle Motor Movements
 /*
     When Switch On Motor
    - Monitor Sensor Has Cut
@@ -239,18 +126,4 @@ func (d *SimulatorDriver) monitorSensorCut() (err error) {
 
 		time.Sleep(200 * time.Millisecond)
 	}
-}
-
-// TODO: Handle Heater M 3
-/*
-   When Heater On
-   - Monitor Heater
-   - Set Present Value
-   - Calibrate Temperature
-   When Heater Off
-   - Close Heater Monitoring
-*/
-func (d *SimulatorDriver) simulateHeater(value uint16) (err error) {
-	// TODO: Implement this with help from @GautamRege
-	return
 }
