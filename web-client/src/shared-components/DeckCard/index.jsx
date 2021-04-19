@@ -86,24 +86,24 @@ const DeckCardBox = styled.div`
       position: absolute;
       right: 123px;
       top: 0;
-      .icon-pause{
-        font-size:0.938rem;
+      .icon-pause {
+        font-size: 0.938rem;
       }
-      .icon-resume{
-        font-size:1.25rem;
+      .icon-resume {
+        font-size: 1.25rem;
       }
     }
     .abort-button {
       position: absolute;
       right: 21px;
       top: 0;
-      .semi-circular-button{
+      .semi-circular-button {
         border: 1px solid transparent;
         background-color: #ffffff;
-        color:#3C3C3C;
+        color: #3c3c3c;
       }
-      .icon-cancel{
-        font-size:0.875rem;
+      .icon-cancel {
+        font-size: 0.875rem;
       }
     }
     .hour-label {
@@ -186,6 +186,9 @@ const DeckCard = (props) => {
     recipeName,
     processNumber,
     processTotal,
+    hours,
+    mins,
+    secs,
     loginBtn,
     showProcess,
     showCleanUp,
@@ -193,6 +196,8 @@ const DeckCard = (props) => {
     handleLeftAction,
     leftActionBtn,
     rightActionBtn,
+    leftActionBtnDisabled,
+    rightActionBtnDisabled,
     progressPercentComplete,
   } = props;
 
@@ -208,6 +213,7 @@ const DeckCard = (props) => {
           <ActionButton
             label={DECKCARD_BTN.text.run}
             icon={DECKCARD_BTN.icon.run}
+            disabled={leftActionBtnDisabled}
           />
         );
       case DECKCARD_BTN.text.pause:
@@ -215,6 +221,7 @@ const DeckCard = (props) => {
           <ActionButton
             label={DECKCARD_BTN.text.pause}
             icon={DECKCARD_BTN.icon.pause}
+            disabled={leftActionBtnDisabled}
           />
         );
       case DECKCARD_BTN.text.resume:
@@ -222,6 +229,7 @@ const DeckCard = (props) => {
           <ActionButton
             label={DECKCARD_BTN.text.resume}
             icon={DECKCARD_BTN.icon.resume}
+            disabled={leftActionBtnDisabled}
           />
         );
       case DECKCARD_BTN.text.done:
@@ -229,6 +237,31 @@ const DeckCard = (props) => {
           <ActionButton
             label={DECKCARD_BTN.text.done}
             icon={DECKCARD_BTN.icon.done}
+            disabled={leftActionBtnDisabled}
+          />
+        );
+      case DECKCARD_BTN.text.startUv:
+        return (
+          <ActionButton
+            label={DECKCARD_BTN.text.startUv}
+            icon={DECKCARD_BTN.icon.run}
+            disabled={leftActionBtnDisabled}
+          />
+        );
+      case DECKCARD_BTN.text.pauseUv:
+        return (
+          <ActionButton
+            label={DECKCARD_BTN.text.pauseUv}
+            icon={DECKCARD_BTN.icon.pause}
+            disabled={leftActionBtnDisabled}
+          />
+        );
+      case DECKCARD_BTN.text.resumeUv:
+        return (
+          <ActionButton
+            label={DECKCARD_BTN.text.resumeUv}
+            icon={DECKCARD_BTN.icon.resume}
+            disabled={leftActionBtnDisabled}
           />
         );
       default:
@@ -243,6 +276,7 @@ const DeckCard = (props) => {
           <ActionButton
             label={DECKCARD_BTN.text.cancel}
             icon={DECKCARD_BTN.icon.cancel}
+            disabled={rightActionBtnDisabled}
           />
         );
       case DECKCARD_BTN.text.abort:
@@ -250,6 +284,7 @@ const DeckCard = (props) => {
           <ActionButton
             label={DECKCARD_BTN.text.abort}
             icon={DECKCARD_BTN.icon.abort}
+            disabled={rightActionBtnDisabled}
           />
         );
       default:
@@ -320,20 +355,20 @@ const DeckCard = (props) => {
 
             {showCleanUp && (
               <>
-                <div className="resume-button">
-                  <ActionButton />
+                <div className="resume-button" onClick={handleLeftAction}>
+                  {getLeftActionBtn(leftActionBtn)}
                 </div>
-                <div className="abort-button">
-                  <ActionButton />
+                <div className="abort-button" onClick={handleRightAction}>
+                  {getRightActionBtn(rightActionBtn)}
                 </div>
 
                 <div className="d-none1">
                   <Text
                     Tag="h5"
-                    size="18"
+                    size={18}
                     className="mb-2 font-weight-bold recipe-name"
                   >
-                    Clean Up
+                    {recipeName}
                   </Text>
                   <Text Tag="label" className="mb-1 d-flex align-items-center">
                     <Icon name="timer" size={19} className="text-primary" />
@@ -342,15 +377,15 @@ const DeckCard = (props) => {
                       className="hour-label font-weight-bold ml-2"
                     >
                       {" "}
-                      1 Hr{" "}
+                      {hours} Hr{" "}
                     </Text>
                     <Text
                       Tag="span"
                       className="min-label ml-2 font-weight-bold"
                     >
-                      8 min
+                      {mins} min {secs} sec
                     </Text>
-                    <Text Tag="span" className="ml-1">
+                    <Text Tag="span" className="ml-1 mt-1 process-remaining">
                       remaining
                     </Text>
                   </Text>
@@ -379,8 +414,13 @@ const DeckCard = (props) => {
             </>
           )}
         </div>
-        
-        {(showProcess || showCleanUp) && <Progress value={progressPercentComplete} className="custom-progress-bar" />}
+
+        {(showProcess || showCleanUp) && (
+          <Progress
+            value={progressPercentComplete}
+            className="custom-progress-bar"
+          />
+        )}
       </div>
     </DeckCardBox>
   );
@@ -392,8 +432,13 @@ DeckCard.propTypes = {
   showCleanUp: PropTypes.bool,
   recipeName: PropTypes.string,
   processNumber: PropTypes.number,
+  hours: PropTypes.number,
+  mins: PropTypes.number,
+  secs: PropTypes.number,
   processTotal: PropTypes.number,
   progressPercentComplete: PropTypes.number,
+  leftActionBtnDisabled: PropTypes.bool,
+  rightActionBtnDisabled: PropTypes.bool,
 };
 
 DeckCard.defaultProps = {
@@ -403,7 +448,12 @@ DeckCard.defaultProps = {
   recipeName: "Recipe Name",
   processNumber: 0,
   processTotal: 10,
+  hours: 0,
+  mins: 0,
+  secs: 0,
   progressPercentComplete: 0,
+  leftActionBtnDisabled: false,
+  rightActionBtnDisabled: false,
 };
 
 export default DeckCard;

@@ -3,12 +3,13 @@ import loginActions from "actions/loginActions";
 import { DECKNAME, USER_ROLES } from "../appConstants";
 
 // const loginInitialState = fromJS({
-// 	isLoading: true,
-// 	isUserLoggedIn: true,
-// 	isLoginTypeAdmin: false,
-// 	isLoginTypeOperator: true,
-// 	isError: false,
-// 	isPlateRoute: true,
+//   isLoading: true,
+//   isUserLoggedIn: false,
+//   isLoginTypeAdmin: false,
+//   isLoginTypeOperator: false,
+//   isError: false,
+//   isPlateRoute: false,
+//   isTemplateRoute: false,
 // });
 
 // const loginInitialState = fromJS({
@@ -25,8 +26,7 @@ const initialStateOfDecks = () => {
         {
             name: DECKNAME.DeckA,
             isLoggedIn: false,
-            isError: false,
-            error: "",
+            error: false,
             msg: "",
             isAdmin: false,
             isActive: false,
@@ -35,7 +35,7 @@ const initialStateOfDecks = () => {
             name: DECKNAME.DeckB,
             isLoggedIn: false,
             isError: false,
-            error: "",
+            error: false,
             msg: "",
             isAdmin: false,
             isActive: false,
@@ -60,7 +60,8 @@ export const loginReducer = (state = loginInitialState, action) => {
             let updatedDecks = state.toJS().decks.map((deckObj) => {
                 return deckObj.name === action.payload.body.deckName ? {
 					...deckObj,
-					error: "",
+					error: false,
+                    msg: "",
 					isError: false,
 					isActive: true
 				} : {
@@ -86,7 +87,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                             ? {
                                   ...deckObj,
                                   isLoggedIn: true,
-                                  error: "",
+                                  error: false,
                                   msg: "",
                                   isAdmin: isAdminTemp,
                                   isActive: true,
@@ -110,7 +111,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                             ? {
                                   ...deckObj,
                                   isLoggedIn: true,
-                                  error: "",
+                                  error: false,
                                   msg: "",
                                   isAdmin: isAdminTemp,
                                   isActive: true,

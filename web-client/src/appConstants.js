@@ -55,6 +55,7 @@ export const EXPERIMENT_STATUS = {
 export const ROUTES = {
   landing: "landing",
   splashScreen: "splashscreen",
+  recipeListing: "recipe-listing"
 };
 
 export const API_ENDPOINTS = {
@@ -95,6 +96,9 @@ export const DECKCARD_BTN = {
     pause: "PAUSE",
     done: "DONE",
     resume: "RESUME",
+    startUv: "START UV",
+    pauseUv: "PAUSE UV",
+    resumeUv: "RESUME UV",
   },
   icon: {
     run: "play",
@@ -103,7 +107,7 @@ export const DECKCARD_BTN = {
     pause: "pause",
     done: "done",
     resume: "resume",
-  },
+  }
 };
 
 export const DECKNAME = {
@@ -114,4 +118,7 @@ export const DECKNAME = {
 export const USER_ROLES = {
   ADMIN: "admin",
   OPERATOR: "operator",
+}
+export const TOAST_MESSAGE = {
+  error: "Something went wrong!",
 }

@@ -4,7 +4,7 @@ export const runRecipeAction = {
   runRecipeFailed: "RUN_RECIPE_FAILED",
   runRecipeReset: "RUN_RECIPE_RESET",
   runRecipeInProgress: "PROGRESS_RUN_RECIPE",
-  runRecipeInCompleted: "SUCCESS_RUN_RECIPE"
+  runRecipeInCompleted: "SUCCESS_RUN_RECIPE",
 };
 
 export const pauseRecipeAction = {
@@ -20,7 +20,7 @@ export const resumeRecipeAction = {
   resumeRecipeFailed: "RESUME_RECIPE_FAILED",
   resumeRecipeReset: "RESUME_RECIPE_RESET",
   resumeRecipeInProgress: "PROGRESS_RESUME_RECIPE",
-  resumeRecipeInCompleted: "SUCCESS_RESUME_RECIPE"
+  resumeRecipeInCompleted: "SUCCESS_RESUME_RECIPE",
 };
 
 export const abortRecipeAction = {
@@ -34,5 +34,4 @@ export const recipeListingAction = {
   recipeListingInitiated: "RECIPE_LISTING_INITIATED",
   recipeListingSuccess: "RECIPE_LISTING_SUCSESSS",
   recipeListingFailed: "RECIPE_LISTING_FAILED",
-  recipeListingReset: "RECIPE_LISTING_RESET",
 };

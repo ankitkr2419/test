@@ -35,15 +35,15 @@ export const runRecipeReset = () => ({
 export const runRecipeInProgress = (runRecipeInProgress) => ({
   type: runRecipeAction.runRecipeInProgress,
   payload: {
-    runRecipeInProgress
-  }
+    runRecipeInProgress,
+  },
 });
 
 export const runRecipeInCompleted = (runRecipeInCompleted) => ({
   type: runRecipeAction.runRecipeInCompleted,
   payload: {
-    runRecipeInCompleted
-  }
+    runRecipeInCompleted,
+  },
 });
 
 export const pauseRecipeInitiated = (params) => ({
@@ -100,12 +100,12 @@ export const resumeRecipeReset = () => ({
 
 export const resumeRecipeInProgress = (resumeRecipeInProgress) => ({
   type: resumeRecipeAction.resumeRecipeInProgress,
-  payload:resumeRecipeInProgress
+  payload: resumeRecipeInProgress,
 });
 
 export const resumeRecipeInCompleted = (resumeRecipeInCompleted) => ({
   type: resumeRecipeAction.resumeRecipeInCompleted,
-  payload: resumeRecipeInCompleted
+  payload: resumeRecipeInCompleted,
 });
 
 export const abortRecipeInitiated = (params) => ({
@@ -151,9 +151,4 @@ export const recipeListingFailed = (serverErrors) => ({
   payload: {
     serverErrors,
   },
-});
-
-export const recipeListingReset = () => ({
-  type: recipeListingAction.recipeListingReset,
-  payload: {},
 });

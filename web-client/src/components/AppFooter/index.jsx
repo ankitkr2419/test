@@ -11,11 +11,16 @@ const AppFooter = (props) => {
     recipeName,
     processNumber,
     processTotal,
+    hours,
+    mins,
+    secs,
     handleLeftAction,
     handleRightAction,
     leftActionBtn,
     rightActionBtn,
     progressPercentComplete,
+    leftActionBtnDisabled,
+    rightActionBtnDisabled,
   } = props;
 
   return deckName === DECKNAME.DeckA ? (
@@ -25,6 +30,9 @@ const AppFooter = (props) => {
         recipeName={recipeName}
         processNumber={processNumber}
         processTotal={processTotal}
+        hours={hours}
+        mins={mins}
+        secs={secs}
         loginBtn={loginBtn}
         showProcess={showProcess}
         showCleanUp={showCleanUp}
@@ -33,6 +41,8 @@ const AppFooter = (props) => {
         leftActionBtn={leftActionBtn}
         rightActionBtn={rightActionBtn}
         progressPercentComplete={progressPercentComplete}
+        leftActionBtnDisabled={leftActionBtnDisabled}
+        rightActionBtnDisabled={rightActionBtnDisabled}
       />
       <DeckCard deckName={DECKNAME.DeckB} loginBtn={true} />
     </div>
@@ -44,6 +54,9 @@ const AppFooter = (props) => {
         recipeName={recipeName}
         processNumber={processNumber}
         processTotal={processTotal}
+        hours={hours}
+        mins={mins}
+        secs={secs}
         loginBtn={loginBtn}
         showProcess={showProcess}
         showCleanUp={showCleanUp}
@@ -52,6 +65,8 @@ const AppFooter = (props) => {
         leftActionBtn={leftActionBtn}
         rightActionBtn={rightActionBtn}
         progressPercentComplete={progressPercentComplete}
+        leftActionBtnDisabled={leftActionBtnDisabled}
+        rightActionBtnDisabled={rightActionBtnDisabled}
       />
     </div>
   );
