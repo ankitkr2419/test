@@ -37,7 +37,7 @@ const LandingScreenComponent = () => {
     <LandingScreen>
       <div className="landing-content">
         <VideoCard />
-        {/*<MlModal
+        <MlModal
           isOpen={!isHomingActionCompleted}
           textBody={MODAL_MESSAGE.homingConfirmation}
           handleSuccessBtn={homingConfirmation}
@@ -45,7 +45,7 @@ const LandingScreenComponent = () => {
           showCrossBtn={false}
           progressPercentage={homingAllDeckCompletionPercentage}
           isProgressBarVisible={isProgressBarVisible}
-        />*/}
+        />
       </div>
       <AppFooter loginBtn={true} />
     </LandingScreen>
