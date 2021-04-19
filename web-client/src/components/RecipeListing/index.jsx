@@ -81,10 +81,18 @@ const RecipeListingComponent = (props) => {
   const tipDiscardHomingError = error;
   const tipDiscardServerErrors = serverErrors;
 
-  const operatorLoginModalReducer = useSelector(
-    (state) => state.operatorLoginModalReducer
+  // const operatorLoginModalReducer = useSelector(
+  //   (state) => state.operatorLoginModalReducer
+  // );
+  // const { deckName } = operatorLoginModalReducer.toJS();
+
+  const loginReducer = useSelector(
+    (state) => state.loginReducer
   );
-  const { deckName } = operatorLoginModalReducer.toJS();
+
+  const loginReducerData = loginReducer.toJS()
+  let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
+  let deckName  = activeDeckObj.name
 
   const handleTimeModal = () => {
     setTimeModal(!timeModal);
@@ -315,7 +323,7 @@ const RecipeListingComponent = (props) => {
                 Tag="h5"
                 className="text-white font-weight-bold ml-3 mb-0"
               >
-                Select a Recipe for Deck B
+                {`Select a Recipe for ${deckName}`}
               </HeadingTitle>
             </div>
           )}

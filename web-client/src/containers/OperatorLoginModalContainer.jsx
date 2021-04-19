@@ -4,10 +4,10 @@ import {reducer, initialState, authDataStateActions} from "components/modals/Ope
 import OperatorLoginModal from 'components/modals/OperatorLoginModal';
 
 import { operatorLoginInitiated } from 'action-creators/operatorLoginModalActionCreators';
-
+import { login } from '../action-creators/loginActionCreators'
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect } from 'react-router';
-
+import { USER_ROLES } from '../appConstants'
 const OperatorLoginModalContainer = (props) => {
 
     const {
@@ -24,8 +24,16 @@ const OperatorLoginModalContainer = (props) => {
     } = authDataStateActions;
 
     const dispatch = useDispatch();
-    const operatorLoginModalReducer = useSelector((state) => state.operatorLoginModalReducer);
-    const { isOperatorLoggedIn, error } = operatorLoginModalReducer.toJS();
+    // const operatorLoginModalReducer = useSelector((state) => state.operatorLoginModalReducer);
+    // const { isOperatorLoggedIn, error } = operatorLoginModalReducer.toJS();
+
+    const loginReducer = useSelector(
+        (state) => state.loginReducer
+    );
+    const loginReducerData = loginReducer.toJS()
+    let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
+    let { isLoggedIn, error }  = activeDeckObj ? activeDeckObj : {}
+
 
     const [authData, setAuthData] = useReducer(reducer, initialState);
 
@@ -45,13 +53,16 @@ const OperatorLoginModalContainer = (props) => {
     
     //email and password validation and setting local state
     const handleLoginButtonClick = () => {
-        const email = authData.email.value;
+        const emailValue = authData.email.value;//emailValue example => username@role.com
         const password = authData.password.value;
+        // dispatch(operatorLoginInitiated({email:email, password: password, deckName: deckName, role: "admin"}));
+        let role = emailValue ? emailValue.split('@').pop().split('.')[0] : undefined 
+        let email = emailValue.split('@')[0]
         
-        dispatch(operatorLoginInitiated({email:email, password: password, deckName: deckName, role: "admin"}));
+        dispatch(login({email, password, deckName, role}))
     }
 
-    if (isOperatorLoggedIn && !error) {
+    if (isLoggedIn && !error) {
         return <Redirect to="/recipe-listing"/>
     }
 

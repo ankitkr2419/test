@@ -21,7 +21,7 @@ const AppFooter = (props) => {
   return deckName === DECKNAME.DeckA ? (
     <div className="d-flex justify-content-center align-items-center">
       <DeckCard
-        deckName={"Deck A"}
+        deckName={DECKNAME.DeckA}
         recipeName={recipeName}
         processNumber={processNumber}
         processTotal={processTotal}
@@ -34,13 +34,13 @@ const AppFooter = (props) => {
         rightActionBtn={rightActionBtn}
         progressPercentComplete={progressPercentComplete}
       />
-      <DeckCard deckName={"Deck B"} loginBtn={true} />
+      <DeckCard deckName={DECKNAME.DeckB} loginBtn={true} />
     </div>
   ) : (
     <div className="d-flex justify-content-center align-items-center">
-      <DeckCard deckName={"Deck A"} loginBtn={true} />
+      <DeckCard deckName={DECKNAME.DeckA} loginBtn={true} />
       <DeckCard
-        deckName={"Deck B"}
+        deckName={DECKNAME.DeckB}
         recipeName={recipeName}
         processNumber={processNumber}
         processTotal={processTotal}

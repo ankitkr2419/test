@@ -110,3 +110,8 @@ export const DECKNAME = {
   DeckA: "Deck A",
   DeckB: "Deck B",
 };
+
+export const USER_ROLES = {
+  ADMIN: "admin",
+  OPERATOR: "operator",
+}
