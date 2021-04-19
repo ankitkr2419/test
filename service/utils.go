@@ -28,6 +28,7 @@ func validate(i interface{}) (valid bool, respBytes []byte) {
 	if err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
 			fieldErrors[e.Namespace()] = e.Tag()
+			fieldErrors["error"] = "invalid value for field " + e.Field()
 
 			logger.WithFields(logger.Fields{
 				"field": e.Namespace(),
