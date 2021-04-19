@@ -1,7 +1,31 @@
-export const cleanUpActions = {
-  cleanUpActionInitiated: "CLEANUP_ACTION_INITIATED",
-  cleanUpActionSuccess: "CLEANUP_ACION_SUCCESS",
-  cleanUpActionFailed: "CLEANUP_ACTION_FAILED",
-  cleanUpActionInProgress: "PROGRESS_CLEANUP",
-  cleanUpActionInCompleted: "SUCCESS_CLEANUP"
+export const runCleanUpAction = {
+  runCleanUpInitiated: "RUN_CLEAN_UP_INITIATED",
+  runCleanUpSuccess: "RUN_CLEAN_UP_SUCCESS",
+  runCleanUpFailed: "RUN_CLEAN_UP_FAILED",
+  runCleanUpReset: "RUN_CLEAN_UP_RESET",
+  runCleanUpInProgress: "PROGRESS_CLEANUP",
+  runCleanUpInCompleted: "SUCCESS_CLEANUP",
+};
+
+export const pauseCleanUpAction = {
+  pauseCleanUpInitiated: "PAUSE_CLEAN_UP_INITIATED",
+  pauseCleanUpSuccess: "PAUSE_CLEAN_UP_SUCCESS",
+  pauseCleanUpFailed: "PAUSE_CLEAN_UP_FAILED",
+  pauseCleanUpReset: "PAUSE_CLEAN_UP_RESET",
+};
+
+export const resumeCleanUpAction = {
+  resumeCleanUpInitiated: "RESUME_CLEAN_UP_INITIATED",
+  resumeCleanUpSuccess: "RESUME_CLEAN_UP_SUCCESS",
+  resumeCleanUpFailed: "RESUME_CLEAN_UP_FAILED",
+  resumeCleanUpReset: "RESUME_CLEAN_UP_RESET",
+  resumeCleanUpInProgress: "PROGRESS_RESUME_CLEAN_UP",
+  resumeCleanUpInCompleted: "SUCCESS_RESUME_CLEAN_UP"
+};
+
+export const abortCleanUpAction = {
+  abortCleanUpInitiated: "ABORT_CLEAN_UP_INITIATED",
+  abortCleanUpSuccess: "ABORT_CLEAN_UP_SUCCESS",
+  abortCleanUpFailed: "ABORT_CLEAN_UP_FAILED",
+  abortCleanUpReset: "ABORT_CLEAN_UP_RESET",
 };

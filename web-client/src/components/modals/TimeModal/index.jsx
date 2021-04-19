@@ -42,7 +42,7 @@ const TimeModal = (props) => {
     secs,
     handleChangeTime,
     submitTime,
-	deckName
+    deckName,
   } = props;
 
   return (
@@ -66,7 +66,7 @@ const TimeModal = (props) => {
           <div className="d-flex justify-content-center align-items-center flex-column h-100 py-4">
             <Text
               Tag="h5"
-              size="20"
+              size={20}
               className="text-center font-weight-bold mt-3 mb-4"
             >
               <Text Tag="span" className="mb-1">
@@ -88,6 +88,7 @@ const TimeModal = (props) => {
                           name="hours"
                           id="hours"
                           placeholder=""
+                          min={0}
                           value={hours}
                           onChange={handleChangeTime}
                         />
@@ -102,6 +103,7 @@ const TimeModal = (props) => {
                           name="minutes"
                           id="minutes"
                           placeholder=""
+                          min={0}
                           value={mins}
                           onChange={handleChangeTime}
                         />
@@ -116,10 +118,11 @@ const TimeModal = (props) => {
                           name="seconds"
                           id="seconds"
                           placeholder=""
+                          min={0}
                           value={secs}
                           onChange={handleChangeTime}
                         />
-                        <Label for="minutes" className="font-weight-bold">
+                        <Label for="seconds" className="font-weight-bold">
                           Seconds
                         </Label>
                         <FormError>Incorrect Seconds</FormError>

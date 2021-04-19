@@ -57,10 +57,10 @@ const ActionBtn = styled.button`
 `;
 
 const ActionButton = (props) => {
-  const { label, icon } = props;
+  const { label, icon, disabled } = props;
 
   return (
-    <ActionBtn className="d-flex justify-content-center align-items-center">
+    <ActionBtn className="d-flex justify-content-center align-items-center" disabled={disabled}>
       <div className="semi-circle-outter-box">
         <div className="semi-circular-button">
           <Icon name={icon} size={18} />
@@ -73,10 +73,12 @@ const ActionButton = (props) => {
 
 ActionButton.propTypes = {
   isUserLoggedIn: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 ActionButton.defaultProps = {
   isUserLoggedIn: false,
+  disabled: false,
 };
 
 export default ActionButton;

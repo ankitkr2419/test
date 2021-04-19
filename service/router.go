@@ -98,5 +98,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tip-docking", createTipDockHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/tip-docking/{id}", showTipDockHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/tip-docking/{id}", updateTipDockHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/heating", createHeatingHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/heating/{id}", showHeatingHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/heating/{id}", updateHeatingHandler(deps)).Methods(http.MethodPut)
+
 	return
 }

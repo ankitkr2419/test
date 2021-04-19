@@ -54,7 +54,7 @@ const discardTipHomingInitialState = {
   isLoading: false,
   homingData: {},
   serverErrors: {},
-  error: null,
+  discardTipAndHomingError: null,
 };
 
 export const discardTipAndHomingReducer = (
@@ -69,11 +69,21 @@ export const discardTipAndHomingReducer = (
         isLoading: true,
       };
     case discardTipAndHomingActions.discardTipAndHomingActionSuccess:
-      return { ...state, ...action.payload, isLoading: false, error: false };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        discardTipAndHomingError: false,
+      };
     case discardTipAndHomingActions.discardTipAndHomingActionFailed:
-      return { ...state, ...action.payload, isLoading: false, error: true };
+      return {
+        ...state,
+        ...action.payload,
+        isLoading: false,
+        discardTipAndHomingError: true,
+      };
     case discardTipAndHomingActions.discardTipAndHomingActionReset:
-      return { ...state, error: null };
+      return { ...state, discardTipAndHomingError: null };
 
     default:
       return state;

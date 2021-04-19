@@ -21,8 +21,8 @@ import {
 } from "action-creators/recipeActionCreators";
 
 import {
-  cleanUpActionInProgress,
-  cleanUpActionInCompleted,
+  runCleanUpActionInProgress,
+  runCleanUpActionInCompleted
 } from "action-creators/cleanUpActionCreators";
 
 import {
@@ -60,7 +60,7 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
           toast.success("Homing Successfull");
-          dispatch(homingActionInCompleted(JSON.parse(data)));
+          dispatch(homingActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
           dispatch(runRecipeInProgress(data));
@@ -69,10 +69,10 @@ export const connectSocket = (dispatch) => {
           dispatch(runRecipeInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.uvLightProgress:
-          dispatch(cleanUpActionInProgress(data));
+          dispatch(runCleanUpActionInProgress(data));
           break;
         case SOCKET_MESSAGE_TYPE.uvLightSuccess:
-          dispatch(cleanUpActionInCompleted(data));
+          dispatch(runCleanUpActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.discardTipProgress:
           dispatch(discardTipInProgress(data));
@@ -88,7 +88,7 @@ export const connectSocket = (dispatch) => {
         // case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
         case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
-          dispatch(showErrorModal(data));
+          // dispatch(showErrorModal(data));
           break;
         default:
           break;

@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -127,7 +127,7 @@ func LoadUtils() {
 }
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
-var positions = map[DeckNumber]float64{
+var Positions = map[DeckNumber]float64{
 	// Deck A and its Motors
 	DeckNumber{Deck: "A", Number: K1_Syringe_Module_LH}:   0,
 	DeckNumber{Deck: "A", Number: K2_Syringe_Module_RH}:   0,
@@ -154,12 +154,12 @@ var positions = map[DeckNumber]float64{
 	//* Careful when dealing with K1, K2, K3 and K4
 }
 
-var motors = make(map[DeckNumber]map[string]uint16)
+var Motors = make(map[DeckNumber]map[string]uint16)
 var consDistance = make(map[string]float64)
 var tipstubes = make(map[string]map[string]interface{})
 var labwares = make(map[int]string)
 var cartridges = make(map[UniqueCartridge]map[string]float64)
-var calibs = make(map[DeckNumber]float64)
+var Calibs = make(map[DeckNumber]float64)
 
 func SelectAllMotors(store db.Storer) (err error) {
 	allMotors, err := store.ListMotors()
@@ -169,11 +169,11 @@ func SelectAllMotors(store db.Storer) (err error) {
 
 	for _, motor := range allMotors {
 		deckNumber := DeckNumber{Deck: motor.Deck, Number: uint16(motor.Number)}
-		motors[deckNumber] = make(map[string]uint16)
-		motors[deckNumber]["ramp"] = uint16(motor.Ramp)
-		motors[deckNumber]["steps"] = uint16(motor.Steps)
-		motors[deckNumber]["slow"] = uint16(motor.Slow)
-		motors[deckNumber]["fast"] = uint16(motor.Fast)
+		Motors[deckNumber] = make(map[string]uint16)
+		Motors[deckNumber]["ramp"] = uint16(motor.Ramp)
+		Motors[deckNumber]["steps"] = uint16(motor.Steps)
+		Motors[deckNumber]["slow"] = uint16(motor.Slow)
+		Motors[deckNumber]["fast"] = uint16(motor.Fast)
 	}
 	return
 }
@@ -191,14 +191,14 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 		case cd.ID > 1000 && cd.ID <= 1010:
 			deckAndNumber.Deck = "A"
 			deckAndNumber.Number = uint16(cd.ID - 1000)
-			calibs[deckAndNumber] = cd.Distance
+			Calibs[deckAndNumber] = cd.Distance
 		case cd.ID > 1050 && cd.ID <= 1060:
 			deckAndNumber.Deck = "B"
 			deckAndNumber.Number = uint16(cd.ID - 1050)
-			calibs[deckAndNumber] = cd.Distance
+			Calibs[deckAndNumber] = cd.Distance
 		}
 	}
-	fmt.Println("Calibs:--->", calibs)
+	fmt.Println("Calibs:--->", Calibs)
 	return
 }
 

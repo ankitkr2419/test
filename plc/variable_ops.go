@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	logger "github.com/sirupsen/logrus"
