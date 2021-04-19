@@ -8,7 +8,7 @@ import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from "appConstants";
 import { updateWellThroughSocket } from "action-creators/wellActionCreators";
 import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 import { experimentedCompleted } from "action-creators/runExperimentActionCreators";
-import { showErrorModal } from "action-creators/modalActionCreators";
+// import { showErrorModal } from "action-creators/modalActionCreators";
 import { temperatureDataSucceeded } from "action-creators/temperatureGraphActionCreators";
 import {
   homingActionInProgress,

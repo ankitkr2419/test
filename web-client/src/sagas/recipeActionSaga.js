@@ -16,6 +16,8 @@ import {
   recipeListingFailed as recipeListingFailure,
 } from "action-creators/recipeActionCreators";
 
+import { toast } from "react-toastify";
+
 export function* runRecipe(actions) {
   const {
     payload: {
@@ -126,7 +128,8 @@ export function* recipeListing() {
       },
     });
   } catch (error) {
-    console.error("Error in fetching the recipes", error);
+    yield put(toast(error));
+    // console.error("Error in fetching the recipes", error);
     yield put(recipeListingFailure(error));
   }
 }
