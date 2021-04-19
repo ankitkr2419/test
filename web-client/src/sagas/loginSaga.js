@@ -4,6 +4,7 @@ import { callApi } from 'apis/apiHelper';
 import loginActions from 'actions/loginActions';
 import { loginFailed } from 'action-creators/loginActionCreators';
 import { HTTP_METHODS } from '../appConstants';
+import { toast } from "react-toastify";
 
 export function* login(actions) {
 	const {
@@ -40,10 +41,12 @@ export function* login(actions) {
                 failureAction,
             },
         });
+		// yield put(toast.success('done!'))
     } catch (error) {
         // yield put(operatorLoginFailed(error));
 		console.log('error while login: ', error);
-		yield put(loginFailed(error))
+		// yield put(loginFailed(error))
+		// yield put(toast.error('failure!'))
     }
 }
 

@@ -52,22 +52,22 @@ const loginInitialState = fromJS({
     decks: initialStateOfDecks(),
 });
 
-
-
 export const loginReducer = (state = loginInitialState, action) => {
     switch (action.type) {
         case loginActions.loginInitiated:
             let updatedDecks = state.toJS().decks.map((deckObj) => {
-                return deckObj.name === action.payload.body.deckName ? {
-					...deckObj,
-					error: false,
-                    msg: "",
-					isError: false,
-					isActive: true
-				} : {
-					...deckObj,
-					isActive: false
-				};
+                return deckObj.name === action.payload.body.deckName
+                    ? {
+                          ...deckObj,
+                          error: false,
+                          msg: "",
+                          isError: false,
+                          isActive: true,
+                      }
+                    : {
+                          ...deckObj,
+                          isActive: false,
+                      };
             });
 
             return state.merge({
@@ -132,21 +132,40 @@ export const loginReducer = (state = loginInitialState, action) => {
                 return state;
             }
         case loginActions.failureAction:
-            console.log("action: ", action);
+            // console.log("action: ", action);
+            let err =
+                action.payload.serverErrors && action.payload.serverErrors.msg
+                    ? action.payload.serverErrors.msg
+                    : "Something went wrong!";
+            let newDecks = state.toJS().decks.map((deckObj) => {
+                return deckObj.name === state.toJS().deckName
+                    ? {
+                          ...deckObj,
+                          error: true,
+                          msg: err,
+                      }
+                    : deckObj;
+            });
+
+            return state.merge({
+                isLoading: false,
+                decks: newDecks,
+            });
+
             return state;
         case loginActions.setActiveDeck:
-            console.log('action: ', action)
+            console.log("action: ", action);
             return state;
-            // let deckName = 
-            // let newDecks = state.toJS().decks.map((deckObj) => {
-            //     return deckObj.name === deckName ? {
-            //         ...deckObj,
-            //         isActive: true
-            //     } : {
-            //         ...deckObj,
-            //         isActive: false
-            //     }
-            // })
+        // let deckName =
+        // let newDecks = state.toJS().decks.map((deckObj) => {
+        //     return deckObj.name === deckName ? {
+        //         ...deckObj,
+        //         isActive: true
+        //     } : {
+        //         ...deckObj,
+        //         isActive: false
+        //     }
+        // })
         case loginActions.setLoginTypeAsOperator:
             return state.merge({
                 isLoginTypeOperator: true,

@@ -111,11 +111,18 @@ const RecipeListingComponent = (props) => {
   const { discardTipAndHomingError } = discardTipAndHomingReducer;
   const discardTipServerErrors = discardTipAndHomingReducer.serverErrors;
 
-  const operatorLoginModalReducer = useSelector(
-    (state) => state.operatorLoginModalReducer
+  // const operatorLoginModalReducer = useSelector(
+  //   (state) => state.operatorLoginModalReducer
+  // );
+  // const { deckName } = operatorLoginModalReducer.toJS();
+  const loginReducer = useSelector(
+    (state) => state.loginReducer
   );
-  const { deckName } = operatorLoginModalReducer.toJS();
 
+  const loginReducerData = loginReducer.toJS()
+  let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
+  let deckName  = activeDeckObj ? activeDeckObj.name : ''
+  
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const {
     runRecipeError,

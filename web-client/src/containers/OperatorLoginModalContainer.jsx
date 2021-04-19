@@ -87,8 +87,6 @@ const OperatorLoginModalContainer = (props) => {
 
     if (isLoggedIn && !error) {
         return <Redirect to={`/${ROUTES.recipeListing}`} />;
-    } else if (error) {
-        toast.error(`${msg}`);
     }
 
     return (

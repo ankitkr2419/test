@@ -17,7 +17,8 @@ const LandingScreen = styled.div`
   }
 `;
 
-const LandingScreenComponent = () => {
+const LandingScreenComponent = (props) => {
+  let { deckName }  = props;
   const dispatch = useDispatch();
   const homingReducer = useSelector((state) => state.homingReducer);
 
@@ -47,7 +48,10 @@ const LandingScreenComponent = () => {
           isProgressBarVisible={isProgressBarVisible}
         />
       </div>
-      <AppFooter loginBtn={true} />
+      <AppFooter 
+        deckName={deckName}
+        loginBtn={true}
+      />
     </LandingScreen>
   );
 };
