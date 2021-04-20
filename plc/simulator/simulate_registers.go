@@ -76,17 +76,19 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 
 	logger.Debugln("Inside simulateWriteSingleCoil for deck ", d.DeckName, " result: ", results, ". address: ", address)
 
+	// If its not ON event then it doesn't need handling
+	if value != plc.ON {
+		return
+	}
+
 	// Calling in go routine so that masterLock is free
+
 	switch address {
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]:
-		if value == plc.ON {
-			go d.simulateOnMotor()
-		}
-
+		go d.simulateOnMotor()
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]:
-		go d.simulateHeater(value)
+		go d.simulateOnHeater()
 	}
 
 	return
 }
-
