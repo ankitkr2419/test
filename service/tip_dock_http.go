@@ -96,7 +96,7 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
-		tdObj.ID = id
+		tdObj.ProcessID = id
 		err = deps.Store.UpdateTipDock(req.Context(), tdObj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)

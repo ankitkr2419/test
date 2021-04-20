@@ -24,7 +24,7 @@ const (
 		VALUES ($1, $2) RETURNING id`
 	updateDelayQuery = `UPDATE delay SET (
 			delay_time,
-			updated_at) = ($1, $2) WHERE WHERE process_id = $3`
+			updated_at) = ($1, $2) WHERE process_id = $3`
 )
 
 func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error) {
@@ -62,10 +62,12 @@ func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay,
 }
 
 func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
+	logger.Infoln(d)
 	_, err = s.db.Exec(
 		updateDelayQuery,
 		d.DelayTime,
 		time.Now(),
+		d.ProcessID,
 	)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating delay")

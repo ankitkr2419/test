@@ -92,7 +92,7 @@ func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 		err = json.NewDecoder(req.Body).Decode(&delay)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
+			logger.WithField("err", err.Error()).Error("Error while decoding delay data")
 			return
 		}
 
@@ -102,11 +102,11 @@ func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		delay.ID = id
+		delay.ProcessID = id
 		err = deps.Store.UpdateDelay(req.Context(), delay)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update piercing")
+			logger.WithField("err", err.Error()).Error("Error update delay")
 			return
 		}
 

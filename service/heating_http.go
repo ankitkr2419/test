@@ -102,7 +102,7 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		htObj.ID = id
+		htObj.ProcessID = id
 		err = deps.Store.UpdateHeating(req.Context(), htObj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)

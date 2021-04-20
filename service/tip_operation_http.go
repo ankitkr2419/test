@@ -102,7 +102,7 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		tipOpr.ID = id
+		tipOpr.ProcessID = id
 		err = deps.Store.UpdateTipOperation(req.Context(), tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
