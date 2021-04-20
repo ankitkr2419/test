@@ -27,8 +27,9 @@ const (
 						pos_cartridge_1,
 						pos_7,
 						pos_cartridge_2,
-						pos_9)
-						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`
+						pos_9,
+						is_published)
+						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,12) RETURNING id`
 	updateRecipeQuery = `UPDATE recipes SET (
 						name,
 						description,
@@ -41,7 +42,8 @@ const (
 						pos_7,
 						pos_cartridge_2,
 						pos_9,
-						updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) WHERE id = $13`
+						is_published,
+						updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE id = $14`
 )
 
 type Recipe struct {
@@ -58,6 +60,7 @@ type Recipe struct {
 	Cartridge2Position int64     `db:"pos_cartridge_2" json:"pos_cartridge_2"`
 	Position9          int64     `db:"pos_9" json:"pos_9"`
 	ProcessCount       int64     `db:"process_count" json:"process_count"`
+	IsPublished        bool      `db:"is_published" json:"is_published"`
 	CreatedAt          time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt          time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -95,6 +98,7 @@ func (s *pgStore) CreateRecipe(ctx context.Context, r Recipe) (createdRecipe Rec
 		r.Position7,
 		r.Cartridge2Position,
 		r.Position9,
+		r.IsPublished,
 	).Scan(&lastInsertID)
 
 	if err != nil {
@@ -133,6 +137,7 @@ func (s *pgStore) UpdateRecipe(ctx context.Context, r Recipe) (err error) {
 		r.Position7,
 		r.Cartridge2Position,
 		r.Position9,
+		r.IsPublished,
 		time.Now(),
 		r.ID,
 	)

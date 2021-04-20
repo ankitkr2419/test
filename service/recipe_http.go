@@ -158,3 +158,38 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write([]byte(`{"msg":"recipe updated successfully"}`))
 	})
 }
+
+func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id, err := parseUUID(vars["id"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		var recipe db.Recipe
+
+		recipe.ID = id
+		recipe, err = deps.Store.ShowRecipe(req.Context(), id)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error show recipe")
+			return
+		}
+
+		recipe.IsPublished = true
+		err = deps.Store.UpdateRecipe(req.Context(), recipe)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error update recipe")
+			return
+		}
+
+		//TODO : publish recipe to the cloud when cloud is available.
+
+		rw.WriteHeader(http.StatusOK)
+		rw.Header().Add("Content-Type", "application/json")
+		rw.Write([]byte(`{"msg":"recipe published successfully"}`))
+	})
+}
