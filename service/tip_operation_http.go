@@ -92,7 +92,7 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		err = json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
+			logger.WithField("err", err.Error()).Error("Error while decoding tip operation data")
 			return
 		}
 
@@ -106,7 +106,7 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		err = deps.Store.UpdateTipOperation(req.Context(), tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update piercing")
+			logger.WithField("err", err.Error()).Error("Error update tip operation")
 			return
 		}
 
