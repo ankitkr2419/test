@@ -1,16 +1,18 @@
-package compact32
+package plc
 
 import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 /****ALGORITHM******
 // TODO: check for height and volumes constraint at insertion process itself
 variables: category, cartridgeType string,
 			cartridgeID, type, source_well, destination_well, aspire_cycles, dispense_cycles int64,
-			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol, dis_vol, dis_blow float64
+			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol float64
 
   1. Check the category of operation
   2. if category is well_to_well then goto 3 else if category is shaker_to_well then goto 5  else 7
@@ -184,7 +186,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	//
 	// this step is not required because if the dispencing and aspiring wells are same
 	// the syringe does not need to come above the deck.
-	// and if it is aspiring from some other well then it is handled in the below code.
+	// and if it is aspiring from some other well then it is handled in the below code from step 10.
 
 	//
 	// 10. calculate the current position difference for deck;
@@ -193,11 +195,11 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 
 	deckAndMotor.Number = K5_Deck
 
-	distanceToTravel = positions[deckAndMotor] - sourcePosition
+	distanceToTravel = Positions[deckAndMotor] - sourcePosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	//*************************
 	// REACHING ASPIRE SOURCE *
@@ -206,7 +208,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	//
 	// 11. move deck to match the sourcePosition with help of difference calculated
 	//
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to Aspire Source. Error: %v", err)
@@ -225,12 +227,16 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 
 	if position = consDistance["deck_base"]; ok {
 		deckBase = position
-		distanceToTravel = (positions[deckAndMotor] + tipHeight) - position
+		distanceToTravel = (Positions[deckAndMotor] + tipHeight) - position
 	} else {
 		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
+
+	// The last step
+	// If operation was aborted and syringe Module is stuck with tip
+	defer d.setIndeck(deckBase, tipHeight)
 
 	if val, ok := syringeModuleState.Load(d.name); !ok {
 		panic(ok)
@@ -242,9 +248,9 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip to deck base. Error: %v", err)
@@ -254,13 +260,13 @@ skipToAspireInside:
 	//
 	//   13. setup the syringe module motor with aspire height
 	//
-	distanceToTravel = (positions[deckAndMotor] + tipHeight) - (ad.AspireHeight + deckBase)
+	distanceToTravel = (Positions[deckAndMotor] + tipHeight) - (ad.AspireHeight + deckBase)
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -282,14 +288,14 @@ skipToAspireInside:
 	}
 	for cycleNumber := int64(1); cycleNumber <= ad.AspireNoOfCycles; cycleNumber++ {
 		// Aspire
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
 
 		// Dispense
 		// TODO: Call a separate function for this kind of setup, as it only DISPENCING
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
@@ -302,7 +308,7 @@ skipAspireCycles:
 
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireVolume))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
@@ -318,10 +324,10 @@ skipAspireCycles:
 		return "", err
 	}
 	// Don't forget to add tipHeight for every tip we have currently attached
-	distanceToTravel = positions[deckAndMotor] + tipHeight - position
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	distanceToTravel = Positions[deckAndMotor] + tipHeight - position
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 
 	deckAndMotor.Number = K10_Syringe_LHRH
 
@@ -329,7 +335,7 @@ skipAspireCycles:
 	//  17. take airVolume in
 	//
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireAirVolume))
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
@@ -344,13 +350,13 @@ skipAspireCycles:
 
 	deckAndMotor.Number = K5_Deck
 
-	distanceToTravel = positions[deckAndMotor] - destinationPosition
+	distanceToTravel = Positions[deckAndMotor] - destinationPosition
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Deck to Dispense Destination. Error: %v", err)
@@ -365,17 +371,11 @@ skipAspireCycles:
 
 	// We know the concrete direction here onwards
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
-	if position = consDistance["deck_base"]; ok {
-		distanceToTravel = position - (positions[deckAndMotor] + tipHeight)
-	} else {
-		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
+	distanceToTravel = deckBase - (Positions[deckAndMotor] + tipHeight)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip to deck base. Error: %v", err)
@@ -384,9 +384,9 @@ skipAspireCycles:
 	//
 	//   20. setup the syringe module motor with dispense height
 	//
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * ad.DispenseHeight))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * ad.DispenseHeight))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -404,13 +404,13 @@ skipAspireCycles:
 	for cycleNumber := int64(1); cycleNumber <= ad.DispenseNoOfCycles; cycleNumber++ {
 		// Dispense
 		// CHECK : should these operations be fast ?
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
 
 		// Aspire
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
@@ -420,14 +420,10 @@ skipDispenseCycles:
 	//
 	// 22. Dispense completely
 	//
-	if (ad.DispenseVolume + ad.DispenseBlowVolume) < (ad.AspireAirVolume + ad.AspireVolume) {
-		err = fmt.Errorf("Can't dispense partially!")
-		return
-	}
 
-	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.DispenseVolume + ad.DispenseBlowVolume)))
-	pulses += reverseAfterNonCutPulses
-	response, err = d.setupMotor(motors[deckAndMotor]["slow"], pulses, motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	logger.Infoln("Syringe is moving down until sensor not cut")
+	// TODO:  Note down Bio team's required speed
+	response, err = d.setupMotor(homingFastSpeed, initialSensorCutSyringePulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
@@ -451,13 +447,13 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	distanceToTravel = positions[syringeModuleDeckAndMotor] - position
+	distanceToTravel = Positions[syringeModuleDeckAndMotor] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses := uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
+	pulses := uint16(math.Round(float64(Motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
+	response, err = d.setupMotor(Motors[syringeModuleDeckAndMotor]["fast"], pulses, Motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -466,4 +462,12 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 
 	return
 
+}
+
+func (d *Compact32Deck) setIndeck(deckBase, tipHeight float64) {
+	deckAndMotor := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
+	// In case the operation was aborted after syringe module went inside the deck!
+	if (Positions[deckAndMotor] + tipHeight) > deckBase {
+		syringeModuleState.Store(d.name, InDeck)
+	}
 }

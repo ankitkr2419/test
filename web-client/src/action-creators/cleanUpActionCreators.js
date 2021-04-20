@@ -1,36 +1,124 @@
-import { cleanUpActions } from "actions/cleanUpActions";
+import {
+  runCleanUpAction,
+  pauseCleanUpAction,
+  resumeCleanUpAction,
+  abortCleanUpAction,
+} from "actions/cleanUpActions";
 
-export const cleanUpActionInitiated = (params) => ({
-  type: cleanUpActions.cleanUpActionInitiated,
+export const runCleanUpActionInitiated = (params) => ({
+  type: runCleanUpAction.runCleanUpInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
-export const cleanUpActionSuccess = (cleanUpData) => ({
-  type: cleanUpActions.cleanUpActionSuccess,
+export const runCleanUpActionSuccess = (cleanUpData) => ({
+  type: runCleanUpAction.runCleanUpSuccess,
   payload: {
-    cleanUpData
-  }
+    cleanUpData,
+  },
 });
 
-export const cleanUpActionFailed = (serverErrors) => ({
-  type: cleanUpActions.cleanUpActionFailed,
+export const runCleanUpActionFailed = (serverErrors) => ({
+  type: runCleanUpAction.runCleanUpFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
 });
 
-export const cleanUpActionInProgress = (cleanUpActionInProgress) => ({
-  type: cleanUpActions.cleanUpActionInProgress,
-  payload: {
-    cleanUpActionInProgress
-  }
+export const runCleanUpActionReset = () => ({
+  type: runCleanUpAction.runCleanUpReset,
+  payload: {},
 });
 
-export const cleanUpActionInCompleted = (cleanUpActionInCompleted) => ({
-  type: cleanUpActions.cleanUpActionInCompleted,
+export const runCleanUpActionInProgress = (cleanUpActionInProgress) => ({
+  type: runCleanUpAction.runCleanUpInProgress,
   payload: {
-    cleanUpActionInCompleted
-  }
+    cleanUpActionInProgress,
+  },
+});
+
+export const runCleanUpActionInCompleted = (cleanUpActionInCompleted) => ({
+  type: runCleanUpAction.runCleanUpInCompleted,
+  payload: {
+    cleanUpActionInCompleted,
+  },
+});
+
+export const pauseCleanUpActionInitiated = (params) => ({
+  type: pauseCleanUpAction.pauseCleanUpInitiated,
+  payload: {
+    params,
+  },
+});
+
+export const pauseCleanUpActionSuccess = (pauseCleanUpResponse) => ({
+  type: pauseCleanUpAction.pauseCleanUpSuccess,
+  payload: {
+    pauseCleanUpResponse,
+  },
+});
+
+export const pauseCleanUpActionFailed = (serverErrors) => ({
+  type: pauseCleanUpAction.pauseCleanUpFailed,
+  payload: {
+    serverErrors,
+  },
+});
+
+export const pauseCleanUpActionReset = () => ({
+  type: pauseCleanUpAction.pauseCleanUpReset,
+  payload: {},
+});
+
+export const resumeCleanUpActionInitiated = (params) => ({
+  type: resumeCleanUpAction.resumeCleanUpInitiated,
+  payload: {
+    params,
+  },
+});
+
+export const resumeCleanUpActionSuccess = (resumeCleanUpResponse) => ({
+  type: resumeCleanUpAction.resumeCleanUpSuccess,
+  payload: {
+    resumeCleanUpResponse,
+  },
+});
+
+export const resumeCleanUpActionFailed = (serverErrors) => ({
+  type: resumeCleanUpAction.resumeCleanUpFailed,
+  payload: {
+    serverErrors,
+  },
+});
+
+export const resumeCleanUpActionReset = () => ({
+  type: resumeCleanUpAction.resumeCleanUpReset,
+  payload: {},
+});
+
+export const abortCleanUpActionInitiated = (params) => ({
+  type: abortCleanUpAction.abortCleanUpInitiated,
+  payload: {
+    params,
+  },
+});
+
+export const abortCleanUpActionSuccess = (abortCleanUpResponse) => ({
+  type: abortCleanUpAction.abortCleanUpSuccess,
+  payload: {
+    abortCleanUpResponse,
+  },
+});
+
+export const abortCleanUpActionFailed = (serverErrors) => ({
+  type: abortCleanUpAction.abortCleanUpFailed,
+  payload: {
+    serverErrors,
+  },
+});
+
+export const abortCleanUpActionReset = () => ({
+  type: abortCleanUpAction.abortCleanUpReset,
+  payload: {},
 });

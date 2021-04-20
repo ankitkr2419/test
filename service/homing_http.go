@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"mylab/cpagent/plc/compact32"
+	"mylab/cpagent/plc"
 	"net/http"
 	"reflect"
 	"time"
@@ -23,13 +23,12 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println("At both deck!!!")
 			rw.Write([]byte(`Operation in progress for both decks`))
 			rw.WriteHeader(http.StatusOK)
-			compact32.SetBothDeckHomingInProgress()
-			defer compact32.ResetBothDeckHomingInProgress()
-			response, err = bothDeckOperation(deps, "Homing")
+			plc.SetBothDeckHomingInProgress()
+			go bothDeckOperation(deps, "Homing")
 		case "A", "B":
 			rw.Write([]byte(`Operation in progress for single deck`))
 			rw.WriteHeader(http.StatusOK)
-			response, err = singleDeckOperation(deps, deck, "Homing")
+			go singleDeckOperation(deps, deck, "Homing")
 		default:
 			err = fmt.Errorf("Check your deck name")
 			rw.Write([]byte(err.Error()))
@@ -41,13 +40,13 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			deps.WsErrCh <- err
 		} else {
 			logger.Infoln(response)
-			deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
 		}
 
 	})
 }
 
 func bothDeckOperation(deps Dependencies, operation string) (response string, err error) {
+	defer plc.ResetBothDeckHomingInProgress()
 
 	var deckAResponse, deckBResponse string
 	var deckAErr, deckBErr error
@@ -80,8 +79,8 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			}
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
-
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
+			deps.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed")
 			fmt.Println(operationSuccessMsg)
 			return operationSuccessMsg, nil
 		default:
@@ -110,6 +109,7 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	fmt.Println("Correct Result: ", result)
 	response = result[0].String()
 	if len(response) > 0 {
+		deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
 		return
 	}
 	errRes := result[1].Interface()

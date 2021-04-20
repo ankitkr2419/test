@@ -1,53 +1,61 @@
-import { discardDeckActions, discardTipActions } from "actions/discardDeckActions";
+import {
+  discardDeckActions,
+  discardTipActions,
+} from "actions/discardDeckActions";
 
 export const discardDeckInitiated = (params) => ({
   type: discardDeckActions.discardDeckInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
 export const discardDeckSuccess = () => ({
   type: discardDeckActions.discardDeckSuccess,
-  payload: {}
+  payload: {},
 });
 
 export const discardDeckFailed = (serverErrors) => ({
   type: discardDeckActions.discardDeckFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
+});
+
+export const discardDeckReset = () => ({
+  type: discardDeckActions.discardDeckReset,
+  payload: {},
 });
 
 export const discardTipInitiated = (params) => ({
   type: discardTipActions.discardTipInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
 export const discardTipSuccess = () => ({
   type: discardTipActions.discardTipInitiated,
-  payload: {}
+  payload: {},
 });
 
 export const discardTipFailed = (serverErrors) => ({
   type: discardTipActions.discardTipFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
 });
 
 export const discardTipInProgress = (discardTipInProgress) => ({
   type: discardTipActions.discardTipInProgress,
   payload: {
-    discardTipInProgress
-  }
+    discardTipInProgress,
+  },
 });
 
 export const discardTipInCompleted = (discardTipInCompleted) => ({
   type: discardTipActions.discardTipInCompleted,
   payload: {
-    discardTipInCompleted
-  }
+    discardTipInCompleted,
+  },
 });

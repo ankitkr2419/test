@@ -1,10 +1,9 @@
-package compact32
+package plc
 
 import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
-	"mylab/cpagent/plc"
 
 	logger "github.com/sirupsen/logrus"
 
@@ -54,12 +53,14 @@ skipToStartTimer:
 				return "", err
 			}
 			if d.isUVLightInProgress() {
-				progress = (*timeElapsed * 100) / delay.DelayTime
-				wsProgressOperation := plc.WSData{
+				uvtime := time.Now()
+				uvTimePassed := uvtime.Sub(time1).Seconds()
+				progress = (int64(uvTimePassed) * 100) / delay.DelayTime
+				wsProgressOperation := WSData{
 					Progress: float64(progress),
 					Deck:     d.name,
-					Status:   "PROGRESS_RECIPE",
-					OperationDetails: plc.OperationDetails{
+					Status:   "PROGRESS_UVLIGHT",
+					OperationDetails: OperationDetails{
 						Message: fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
 					},
 				}

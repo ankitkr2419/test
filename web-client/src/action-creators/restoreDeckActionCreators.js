@@ -3,18 +3,23 @@ import { restoreDeckActions } from "actions/restoreDeckActions";
 export const restoreDeckInitiated = (params) => ({
   type: restoreDeckActions.restoreDeckInitiated,
   payload: {
-    params
-  }
+    params,
+  },
 });
 
 export const restoreDeckSuccess = () => ({
   type: restoreDeckActions.restoreDeckSuccess,
-  payload: {}
+  payload: {},
 });
 
 export const restoreDeckFailed = (serverErrors) => ({
   type: restoreDeckActions.restoreDeckFailed,
   payload: {
-    serverErrors
-  }
+    serverErrors,
+  },
+});
+
+export const restoreDeckReset = () => ({
+  type: restoreDeckActions.restoreDeckReset,
+  payload: {},
 });
