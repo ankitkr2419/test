@@ -29,7 +29,7 @@ const (
 						pos_cartridge_2,
 						pos_9,
 						is_published)
-						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,12) RETURNING id`
+						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,$12) RETURNING id`
 	updateRecipeQuery = `UPDATE recipes SET (
 						name,
 						description,
