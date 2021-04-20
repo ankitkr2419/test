@@ -37,7 +37,7 @@ const (
 // WARN: Be careful with temperature, its multiplied by 10 for machine
 func (d *SimulatorDriver) simulateOnHeater() (err error) {
 
-	// ASK: Do we need to Handle for separate shaker part ?
+	// We don't need separate handle for separate shaker part
 	heaterNum := d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][222])
 	if heaterNum != uint16(3) {
 		err = fmt.Errorf("simulator support is only provided for LH, RH shaker heaters together only")
