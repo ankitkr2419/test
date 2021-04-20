@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -40,13 +40,13 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	distanceToTravel = positions[syringeModuleDeckAndMotor] - position
+	distanceToTravel = Positions[syringeModuleDeckAndMotor] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
+	response, err = d.setupMotor(Motors[syringeModuleDeckAndMotor]["fast"], pulses, Motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -87,15 +87,15 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 			return "", err
 		}
 
-		distanceToTravel = positions[deckAndMotor] - (cartridgePosition + wellPosition)
+		distanceToTravel = Positions[deckAndMotor] - (cartridgePosition + wellPosition)
 
 		modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-		pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+		pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 		// 3.2 Then travel to that position
 
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -117,13 +117,13 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 	}
 
 	// 4.2 Move to that position on deck
-	distanceToTravel = positions[deckAndMotor] - position
+	distanceToTravel = Positions[deckAndMotor] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)
@@ -134,16 +134,16 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 	//
 skipToPositionSyringeHeight:
 
-	distanceToTravel = positions[deckAndMotor] - td.Height
+	distanceToTravel = Positions[deckAndMotor] - td.Height
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-	pulses = uint16(math.Round(float64(motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
+	pulses = uint16(math.Round(float64(Motors[syringeModuleDeckAndMotor]["steps"]) * distanceToTravel))
 
 	//
 	// 6. At that position move the syringe module to the specified height
 	//
-	response, err = d.setupMotor(motors[syringeModuleDeckAndMotor]["fast"], pulses, motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
+	response, err = d.setupMotor(Motors[syringeModuleDeckAndMotor]["fast"], pulses, Motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)

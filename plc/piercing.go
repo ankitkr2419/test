@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"fmt"
@@ -55,11 +55,11 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 	// Calculation below considers syringe module as glued with tip
 	// And we go to piercingHeight
-	distanceToTravel = piercingHeight - positions[deckAndMotor]
+	distanceToTravel = piercingHeight - Positions[deckAndMotor]
 	// We know concrete direction here
 	// piercingHeight will be less
 
-	piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+	piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 	// after piercing is completed we need to get the tip to its resting positon
 	afterPiercingRestPulses = piercingPulses
 
@@ -84,13 +84,13 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		// here disToTravel moves our deck to well position
 		// position + cartridgeStart is the distance of first well on deck for wellNumber = 1
-		distanceToTravel = positions[deckAndMotor] - (position + cartridgeStart)
+		distanceToTravel = Positions[deckAndMotor] - (position + cartridgeStart)
 
 		modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
-		pulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+		pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], pulses, motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Deck to Cartridge WellNum %d. Error: %v", wellNumber, err)
@@ -103,7 +103,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		// WE know concrete direction here, its DOWN
 		deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], piercingPulses, motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 		// TODO: Use defer d.setIndeck as in aspire_dispense
 		// Even if err has occured let's store syringeModuleState as inDeck
 		syringeModuleState.Store(d.name, InDeck)
@@ -124,9 +124,9 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			}
 
 			// piercingHeight will be always less than current position
-			distanceToTravel = positions[deckAndMotor] - piercingHeight
+			distanceToTravel = Positions[deckAndMotor] - piercingHeight
 
-			piercingPulses = uint16(math.Round(float64(motors[deckAndMotor]["steps"]) * distanceToTravel))
+			piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 		}
 
 		// if its last well then go to resting position up
@@ -134,7 +134,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			piercingPulses = afterPiercingRestPulses
 		}
 		// WE know concrete direction here, its UP
-		response, err = d.setupMotor(motors[deckAndMotor]["fast"], piercingPulses, motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 		if err != nil {
 			fmt.Println(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module UP to Cartridge WellNum %d. Error: %v", wellNumber, err)

@@ -27,8 +27,8 @@ const (
 						WHERE process_id = $1`
 	selectAspireDispenseQuery = `SELECT *
 						FROM aspire_dispense`
-	deleteAspireDispenseQuery = `DELETE FROM aspire_dispense
-						WHERE process_id = $1`
+	deleteAspireDispenseQuery = `DELETE FROM processes
+						WHERE id = $1`
 	createAspireDispenseQuery = `INSERT INTO aspire_dispense (
 						category,
 						cartridge_type,
