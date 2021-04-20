@@ -177,6 +177,7 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error show recipe")
 			return
 		}
+		//TODO : publish recipe to the cloud when cloud is available.
 
 		recipe.IsPublished = true
 		err = deps.Store.UpdateRecipe(req.Context(), recipe)
@@ -185,8 +186,6 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error update recipe")
 			return
 		}
-
-		//TODO : publish recipe to the cloud when cloud is available.
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
