@@ -2,11 +2,11 @@ package simulator
 
 import (
 	"fmt"
-	"sync"
 	"mylab/cpagent/plc"
+	"sync"
 )
 
-var motorDone, sensorDone, motorInProgress sync.Map
+var motorDone, sensorDone, motorInProgress, heaterInProgress sync.Map
 
 func LoadUtils() {
 	motorDone.Store("A", false)
@@ -15,6 +15,8 @@ func LoadUtils() {
 	sensorDone.Store("B", false)
 	motorInProgress.Store("A", false)
 	motorInProgress.Store("B", false)
+	heaterInProgress.Store("A", false)
+	heaterInProgress.Store("B", false)
 }
 
 func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint16) (err error) {

@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"fmt"
 	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/plc"
 	"time"
@@ -27,6 +28,11 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 	d.setMotorInProgress()
 	defer d.resetMotorInProgress()
 
+	if d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][5]) == plc.ON {
+		err = d.simulateShakerMotor()
+		return
+	}
+
 	// Reset D212
 	logger.Debugln("Reset D212")
 	d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][212], 0)
@@ -50,6 +56,23 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 	err = d.updatePulses()
 
 	return
+}
+
+func (d *SimulatorDriver) simulateShakerMotor() (err error) {
+	logger.Infoln("Shaker motor simulation started")
+	for {
+		time.Sleep(200 * time.Millisecond)
+
+		if d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][5]) == plc.OFF {
+			logger.Infoln("Shaker motor simulation stopped")
+			return
+		}
+		// if motor is not K8_Shaker then return
+		if plc.K8_Shaker != d.readRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][226]) {
+			err = fmt.Errorf("Motor is different than shaker!")
+			return
+		}
+	}
 }
 
 func (d *SimulatorDriver) updatePulses() (err error) {
