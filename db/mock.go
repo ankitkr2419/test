@@ -344,11 +344,6 @@ func (m *DBMockStore) CreatePiercing(ctx context.Context, p Piercing) (pi Pierci
 	return args.Get(0).(Piercing), args.Error(1)
 }
 
-func (m *DBMockStore) DeletePiercing(ctx context.Context, id uuid.UUID) (err error) {
-	args := m.Called(ctx, id)
-	return args.Error(1)
-}
-
 func (m *DBMockStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	args := m.Called(ctx, p)
 	return args.Error(1)
@@ -424,11 +419,6 @@ func (m *DBMockStore) CreateAspireDispense(ctx context.Context, ad AspireDispens
 	return args.Get(0).(AspireDispense), args.Error(1)
 }
 
-func (m *DBMockStore) DeleteAspireDispense(ctx context.Context, id uuid.UUID) (err error) {
-	args := m.Called(ctx, id)
-	return args.Error(1)
-}
-
 func (m *DBMockStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (err error) {
 	args := m.Called(ctx, ad)
 	return args.Error(1)
@@ -451,11 +441,6 @@ func (m *DBMockStore) UpdateTipDock(ctx context.Context, td TipDock) (err error)
 
 func (m *DBMockStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	args := m.Called(ctx, ht)
-	return args.Error(1)
-}
-
-func (m *DBMockStore) DeleteHeating(ctx context.Context, id uuid.UUID) (err error) {
-	args := m.Called(ctx, id)
 	return args.Error(1)
 }
 
