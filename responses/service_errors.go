@@ -5,10 +5,11 @@ import(
 )
 
 var(
-	PiercingDecodingError = fmt.Errorf("error decoding piercing record")
+	PiercingDecodeError = fmt.Errorf("error decoding piercing record")
 	PiercingValidationError = fmt.Errorf("error validating piercing record")
-	PiercingCreationError = fmt.Errorf("error creating piercing record")
-
+	PiercingCreateError = fmt.Errorf("error creating piercing record")
+	PiercingFetchError = fmt.Errorf("error fetching piercing record")
+	UUIDParseError = fmt.Errorf("error parsing uuid")
 )
 
 // Special errors which are in []byte format

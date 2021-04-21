@@ -76,7 +76,7 @@ func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
 	return
 }
 
-func responseWithCodeAndMsg(rw http.ResponseWriter, statusCode int, msg interface{}) {
+func responseCodeAndMsg(rw http.ResponseWriter, statusCode int, msg interface{}) {
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(statusCode)
 	respBytes, err := json.Marshal(msg)

@@ -4,5 +4,6 @@ import(
 )
 
 var (
-	SuccessPiercingRecord = "piercing record created successfully"
+	PiercingCreateSuccess = "piercing record created successfully"
+	PiercingFetchSuccess = "piercing record fetched successfully"
 )
