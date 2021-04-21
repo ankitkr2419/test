@@ -71,6 +71,7 @@ func isvalidID(id uuid.UUID) bool {
 
 func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
 	rw.Header().Add("Content-Type", "application/json")
+	logger.WithField("err", respBytes)
 	rw.WriteHeader(http.StatusBadRequest)
 	rw.Write(respBytes)
 	return
