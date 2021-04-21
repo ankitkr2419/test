@@ -1,5 +1,5 @@
 package service
-
+/*
 import (
 	"fmt"
 	"mylab/cpagent/db"
@@ -63,3 +63,4 @@ func (suite *ExperimentTemperatureHandlerTestSuite) TestListExperimentTemperatur
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
+*/

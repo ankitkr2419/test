@@ -433,6 +433,22 @@ func (m *DBMockStore) UpdateAspireDispense(ctx context.Context, ad AspireDispens
 	args := m.Called(ctx, ad)
 	return args.Error(1)
 }
+
+func (m *DBMockStore) UpdateAttachDetach(ctx context.Context, ad AttachDetach) (err error) {
+	args := m.Called(ctx, ad)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
+	args := m.Called(ctx, sh)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateTipDock(ctx context.Context, td TipDock) (err error) {
+	args := m.Called(ctx, td)
+	return args.Error(1)
+}
+
 func (m *DBMockStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	args := m.Called(ctx, ht)
 	return args.Error(1)
