@@ -5,7 +5,8 @@ import styled from "styled-components";
 import RecipeListingComponent from "components/RecipeListing";
 
 import { recipeListingInitiated } from "action-creators/recipeActionCreators";
-
+import { ROUTES } from "appConstants";
+import { Redirect } from "react-router-dom";
 // import { Loader } from 'shared-components'
 const RecipeListing = styled.div`
   .landing-content {
@@ -124,6 +125,9 @@ const RecipeListingContainer = (props) => {
 
   const loginReducerData = loginReducer.toJS()
   let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
+  if(!activeDeckObj){//if not found active deck goto landing page for relogin
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
   let deckName  = activeDeckObj.name
   let isAdmin = activeDeckObj.isAdmin
 

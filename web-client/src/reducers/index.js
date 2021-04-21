@@ -41,6 +41,7 @@ import { recipeActionReducer } from "reducers/recipeActionReducer";
 import { restoreDeckReducer } from "reducers/restoreDeckReducer";
 import { discardDeckReducer } from "reducers/discardDeckReducer";
 import { cleanUpReducer } from "reducers/cleanUpReducer";
+import { saveNewRecipeReducer } from 'reducers/saveNewRecipeReducer'
 
 const rootReducer = combineReducers({
 	createTemplateReducer,
@@ -77,7 +78,8 @@ const rootReducer = combineReducers({
 	restoreDeckReducer,
 	discardDeckReducer,
 	discardTipAndHomingReducer,
-	cleanUpReducer
+	cleanUpReducer,
+	saveNewRecipeReducer,
 });
 
 export default rootReducer;
