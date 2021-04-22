@@ -89,7 +89,7 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		pobj.ID = id
+		pobj.ProcessID = id
 		err = deps.Store.UpdatePiercing(req.Context(), pobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.PiercingUpdateError)
