@@ -1,4 +1,4 @@
-CREATE TYPE role_type AS  ENUM('admin', 'operator', 'engineer');
+CREATE TYPE role_type AS  ENUM('admin', 'operator', 'engineer','supervisor');
 
 CREATE TABLE IF NOT EXISTS users(
     username varchar(50) PRIMARY KEY,
