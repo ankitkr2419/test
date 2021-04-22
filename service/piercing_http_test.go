@@ -1,8 +1,10 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
 
@@ -52,19 +54,20 @@ func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
 
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingFailure() {
 	testProcessUUID := uuid.New()
-	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, fmt.Errorf("Error creating piercing"))
+	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, responses.PiercingCreateError)
 
-	body := fmt.Sprintf(`{"type":"cartridge_1","cartridge_wells":[1,2],"discard":"at_pickup_passing","process_id":"%s","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testProcessUUID)
+	body := fmt.Sprintf(`{"type":"cartridge_1","cartridge_wells":[1,2],"discard":"at_pickup_passing","process_id":"%s"}`, testProcessUUID)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/piercing",
 		"/piercing",
 		body,
 		createPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Errorf("Error creating piercing")
+	output := ErrObj {Err: responses.PiercingCreateError.Error()}
+	outputBytes,_ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -91,7 +94,7 @@ func (suite *PiercingHandlerTestSuite) TestShowPiercingSuccess() {
 
 func (suite *PiercingHandlerTestSuite) TestShowPiercingFailure() {
 	testUUID := uuid.New()
-	suite.dbMock.On("ShowPiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, fmt.Errorf("Error listing piercing"))
+	suite.dbMock.On("ShowPiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, responses.PiercingFetchError)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/piercing/{id}",
@@ -99,9 +102,11 @@ func (suite *PiercingHandlerTestSuite) TestShowPiercingFailure() {
 		"",
 		showPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ""
+	output := ErrObj {Err: responses.PiercingFetchError.Error()}
+	outputBytes,_ := json.Marshal(output)
+
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -121,9 +126,11 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingSuccess() {
 		body,
 		updatePiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
+	output := MsgObj {Msg: responses.PiercingUpdateSuccess}
+	outputBytes,_ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"piercing updated successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -131,7 +138,7 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingSuccess() {
 func (suite *PiercingHandlerTestSuite) TestUpdatePiercingFailure() {
 	testUUID := uuid.New()
 	testProcessUUID := uuid.New()
-	suite.dbMock.On("UpdatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, fmt.Errorf("updating piercing failed"))
+	suite.dbMock.On("UpdatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, responses.PiercingUpdateError)
 
 	body := fmt.Sprintf(`{"id":"%s","type":"cartridge_1","cartridge_wells":[1,2],"discard":"at_pickup_passing","process_id":"%s","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testProcessUUID)
 
@@ -142,8 +149,11 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingFailure() {
 		updatePiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
 
+	output := ErrObj {Err: responses.PiercingUpdateError.Error()}
+	outputBytes,_ := json.Marshal(output)
+
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes , recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
