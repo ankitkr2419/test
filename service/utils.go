@@ -19,6 +19,14 @@ const (
 	cycle = "cycle"
 )
 
+type ErrObj struct{
+	Err string `json:"err"`
+}
+
+type MsgObj struct{
+	Msg string `json:"msg"`
+}
+
 func validate(i interface{}) (valid bool, respBytes []byte) {
 
 	fieldErrors := make(map[string]string)
