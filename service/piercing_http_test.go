@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -28,8 +27,6 @@ func (suite *PiercingHandlerTestSuite) SetupTest() {
 func TestPiercingTestSuite(t *testing.T) {
 	suite.Run(t, new(PiercingHandlerTestSuite))
 }
-
-var testProcessUUID = uuid.New()
 
 var testPiercingRecord = db.Piercing{
 	ID:             testUUID,
