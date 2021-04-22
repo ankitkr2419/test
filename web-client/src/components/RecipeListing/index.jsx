@@ -10,6 +10,7 @@ import PaginationBox from "shared-components/PaginationBox";
 
 import RecipeCard from "components/RecipeListing/RecipeCard";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
+import AppFooter from "components/AppFooter";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -148,6 +149,8 @@ const RecipeListingComponent = (props) => {
           )}
         </>
       </div>
+
+      <AppFooter />
     </>
   );
 };

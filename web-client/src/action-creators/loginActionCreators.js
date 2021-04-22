@@ -15,6 +15,13 @@ export const loginFailed = errorResponse => ({
 	},
 });
 
+export const setActiveDeck = deckName => ({
+	type: loginActions.setActiveDeck,
+	payload: {
+		deckName
+	}
+})
+
 export const loginReset = () => ({
 	type: loginActions.loginReset,
 });

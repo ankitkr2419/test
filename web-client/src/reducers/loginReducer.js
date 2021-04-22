@@ -152,20 +152,23 @@ export const loginReducer = (state = loginInitialState, action) => {
                 decks: newDecks,
             });
 
-            return state;
         case loginActions.setActiveDeck:
-            console.log("action: ", action);
-            return state;
-        // let deckName =
-        // let newDecks = state.toJS().decks.map((deckObj) => {
-        //     return deckObj.name === deckName ? {
-        //         ...deckObj,
-        //         isActive: true
-        //     } : {
-        //         ...deckObj,
-        //         isActive: false
-        //     }
-        // })
+            let deckNameToSetActive = action.payload.deckName;
+            let newDecksForActive = state.toJS().decks.map((deckObj) => {
+                return deckObj.name === deckNameToSetActive
+                    ? {
+                          ...deckObj,
+                          isActive: true,
+                      }
+                    : {
+                          ...deckObj,
+                          isActive: false,
+                      };
+            });
+            return state.merge({
+                decks: newDecksForActive,
+            });
+
         case loginActions.setLoginTypeAsOperator:
             return state.merge({
                 isLoginTypeOperator: true,

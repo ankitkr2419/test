@@ -8,6 +8,8 @@ import ActionButton from "./ActionButton";
 import { DECKCARD_BTN } from "appConstants";
 import { Progress } from "reactstrap";
 import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveDeck } from "action-creators/loginActionCreators";
 
 const DeckCardBox = styled.div`
   width: 50%;
@@ -202,7 +204,15 @@ const DeckCard = (props) => {
   } = props;
 
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj = loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  let activeDeckName = activeDeckObj && activeDeckObj.name;
+
   const toggleOperatorLoginModal = () => {
+    setCurrentDeckActive();
     setOperatorLoginModalOpen(!operatorLoginModalOpen);
   };
 
@@ -292,8 +302,17 @@ const DeckCard = (props) => {
     }
   };
 
+  const setCurrentDeckActive = () => {
+    /**
+     *  set active deck to current deck if:
+     *  activeDeckName not found or not equal to current deck
+    */
+    if(!activeDeckName || deckName !== activeDeckName)
+      dispatch(setActiveDeck(deckName))
+  }
+
   return (
-    <DeckCardBox className="d-flex justify-content-start align-items-center">
+    <DeckCardBox className="d-flex justify-content-start align-items-center" onClick={setCurrentDeckActive}>
       <CardOverlay />
       <div className="d-flex justify-content-center align-items-center deck-title">
         <Text Tag="label" size={20}>
@@ -405,14 +424,13 @@ const DeckCard = (props) => {
                 {" "}
                 Login
               </Button>
-
-              <OperatorLoginModalContainer
-                operatorLoginModalOpen={operatorLoginModalOpen}
-                toggleOperatorLoginModal={toggleOperatorLoginModal}
-                deckName={deckName}
-              />
             </>
           )}
+          <OperatorLoginModalContainer
+            operatorLoginModalOpen={operatorLoginModalOpen}
+            toggleOperatorLoginModal={toggleOperatorLoginModal}
+            deckName={deckName}
+          />
         </div>
 
         {(showProcess || showCleanUp) && (
