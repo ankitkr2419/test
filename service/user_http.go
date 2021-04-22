@@ -5,6 +5,8 @@ import (
 	"mylab/cpagent/db"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -16,6 +18,21 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding user data")
+			return
+		}
+
+		vars := mux.Vars(req)
+		deck := vars["deck"]
+		logger.Infoln(deck)
+		value, ok := userLogin.Load(deck)
+		if !ok {
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"error:"invalid deck name"}`))
+			return
+		}
+		if value.(bool) == true {
+			rw.WriteHeader(http.StatusForbidden)
+			rw.Write([]byte(`{"error:"not allowed to login"}`))
 			return
 		}
 
@@ -39,8 +56,21 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		token, err := EncodeToken(u.Username, u.Role, "A", map[string]string{})
+
+		response, err := json.Marshal(map[string]string{
+			"msg":   "user logged in successfully",
+			"token": token,
+		})
+
+		if err != nil {
+			rw.Write([]byte(`{"msg":"user login failed"}`))
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(`{"msg":"Validated User Sucessfully"}`))
+		rw.Write(response)
 	})
 }
