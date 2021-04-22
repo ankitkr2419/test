@@ -153,7 +153,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			}
 			fmt.Println(pi)
 
-			if pi.Type== db.Cartridge1 {
+			if pi.Type == db.Cartridge1 {
 				currentCartridgeID = recipe.Cartridge1Position
 			} else {
 				currentCartridgeID = recipe.Cartridge2Position

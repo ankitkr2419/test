@@ -19,11 +19,11 @@ const (
 	cycle = "cycle"
 )
 
-type ErrObj struct{
+type ErrObj struct {
 	Err string `json:"err"`
 }
 
-type MsgObj struct{
+type MsgObj struct {
 	Msg string `json:"msg"`
 }
 

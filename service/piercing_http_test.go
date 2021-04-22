@@ -32,15 +32,15 @@ func TestPiercingTestSuite(t *testing.T) {
 var testProcessUUID = uuid.New()
 
 var testPiercingRecord = db.Piercing{
-	ID: testUUID,
-	Type: db.Cartridge1, 
-	CartridgeWells: []int64{1, 2}, 
-	Discard: "at_pickup_passing", 
-	ProcessID: testProcessUUID,
+	ID:             testUUID,
+	Type:           db.Cartridge1,
+	CartridgeWells: []int64{1, 2},
+	Discard:        "at_pickup_passing",
+	ProcessID:      testProcessUUID,
 }
 
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
-	
+
 	suite.dbMock.On("CreatePiercing", mock.Anything, testPiercingRecord).Return(testPiercingRecord, nil)
 
 	body, _ := json.Marshal(testPiercingRecord)
@@ -50,7 +50,7 @@ func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
 		string(body),
 		createPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	
+
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
@@ -68,8 +68,8 @@ func (suite *PiercingHandlerTestSuite) TestCreatePiercingFailure() {
 		string(body),
 		createPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ErrObj {Err: responses.PiercingCreateError.Error()}
-	outputBytes,_ := json.Marshal(output)
+	output := ErrObj{Err: responses.PiercingCreateError.Error()}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
@@ -106,8 +106,8 @@ func (suite *PiercingHandlerTestSuite) TestShowPiercingFailure() {
 		"",
 		showPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ErrObj {Err: responses.PiercingFetchError.Error()}
-	outputBytes,_ := json.Marshal(output)
+	output := ErrObj{Err: responses.PiercingFetchError.Error()}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
@@ -127,8 +127,8 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingSuccess() {
 		string(body),
 		updatePiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := MsgObj {Msg: responses.PiercingUpdateSuccess}
-	outputBytes,_ := json.Marshal(output)
+	output := MsgObj{Msg: responses.PiercingUpdateSuccess}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
@@ -149,11 +149,11 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingFailure() {
 		updatePiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := ErrObj {Err: responses.PiercingUpdateError.Error()}
-	outputBytes,_ := json.Marshal(output)
+	output := ErrObj{Err: responses.PiercingUpdateError.Error()}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), outputBytes , recorder.Body.Bytes())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

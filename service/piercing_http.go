@@ -16,7 +16,7 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 		err := json.NewDecoder(req.Body).Decode(&pobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingDecodeError)
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{ Err:responses.PiercingDecodeError.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PiercingDecodeError.Error()})
 			return
 		}
 
@@ -31,7 +31,7 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 		createdTemp, err = deps.Store.CreatePiercing(req.Context(), pobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingCreateError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err:responses.PiercingCreateError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PiercingCreateError.Error()})
 			return
 		}
 		logger.Infoln(responses.PiercingCreateSuccess)
@@ -46,7 +46,7 @@ func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 		id, err := parseUUID(vars["id"])
 		if err != nil {
 			// This error is already logged
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{ Err:responses.UUIDParseError.Error() })
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -54,13 +54,13 @@ func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowPiercing(req.Context(), id)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{ Err:responses.PiercingFetchError.Error() })
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PiercingFetchError.Error()})
 			logger.WithField("err", err.Error()).Error(responses.PiercingFetchError)
 			return
 		}
 
 		logger.Infoln(responses.PiercingFetchSuccess)
-		responseCodeAndMsg(rw,http.StatusOK, latestT)
+		responseCodeAndMsg(rw, http.StatusOK, latestT)
 	})
 }
 
@@ -70,7 +70,7 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 		id, err := parseUUID(vars["id"])
 		if err != nil {
 			// This error is already logged
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{ Err:responses.UUIDParseError.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -79,7 +79,7 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 		err = json.NewDecoder(req.Body).Decode(&pobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingDecodeError)
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{ Err:responses.PiercingDecodeError.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PiercingDecodeError.Error()})
 			return
 		}
 
@@ -93,11 +93,11 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 		err = deps.Store.UpdatePiercing(req.Context(), pobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.PiercingUpdateError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{ Err:responses.PiercingUpdateError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PiercingUpdateError.Error()})
 			return
 		}
 
 		logger.Infoln(responses.PiercingUpdateSuccess)
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{ Msg: responses.PiercingUpdateSuccess} )
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PiercingUpdateSuccess})
 	})
 }
