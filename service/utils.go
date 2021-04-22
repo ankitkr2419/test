@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"mylab/cpagent/db"
 	"net/http"
+	"sync"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -17,6 +18,14 @@ const (
 	hold  = "hold"
 	cycle = "cycle"
 )
+
+var userLogin sync.Map
+
+func LoadUtils() {
+	userLogin.Store("A", false)
+	userLogin.Store("B", false)
+
+}
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
 

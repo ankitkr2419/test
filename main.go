@@ -235,6 +235,7 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	plc.LoadUtils()
+	service.LoadUtils()
 
 	// add default User
 	u := db.User{
