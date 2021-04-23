@@ -48,8 +48,6 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 func createUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		// ASK and VEFRIFY: @Paramita only admin/supervisor are allowed to create roles, 
-		// so this API chould be only called by these 2 roles
 		var u db.User
 		rw.Header().Add("Content-Type", "application/json")
 		err := json.NewDecoder(req.Body).Decode(&u)
