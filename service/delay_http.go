@@ -9,33 +9,33 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func createHeatingHandler(deps Dependencies) http.HandlerFunc {
+func createDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var htObj db.Heating
-		err := json.NewDecoder(req.Body).Decode(&htObj)
+		var delay db.Delay
+		err := json.NewDecoder(req.Body).Decode(&delay)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding heating data")
+			logger.WithField("err", err.Error()).Error("Error while decoding Delay data")
 			return
 		}
 
-		valid, respBytes := validate(htObj)
+		valid, respBytes := validate(delay)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		var createdTemp db.Heating
-		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj)
+		var createdTemp db.Delay
+		createdTemp, err = deps.Store.CreateDelay(req.Context(), delay)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create Heating")
+			logger.WithField("err", err.Error()).Error("Error create Delay")
 			return
 		}
 
 		respBytes, err = json.Marshal(createdTemp)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling heating data")
+			logger.WithField("err", err.Error()).Error("Error marshaling Delay data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -46,7 +46,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func showHeatingHandler(deps Dependencies) http.HandlerFunc {
+func showDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
@@ -56,18 +56,18 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var heating db.Heating
+		var Delay db.Delay
 
-		heating, err = deps.Store.ShowHeating(req.Context(), id)
+		Delay, err = deps.Store.ShowDelay(req.Context(), id)
 		if err != nil {
 			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show heating")
+			logger.WithField("err", err.Error()).Error("Error show Delay")
 			return
 		}
 
-		respBytes, err := json.Marshal(heating)
+		respBytes, err := json.Marshal(Delay)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling heating data")
+			logger.WithField("err", err.Error()).Error("Error marshaling Delay data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -78,7 +78,7 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
+func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -87,31 +87,31 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var htObj db.Heating
+		var delay db.Delay
 
-		err = json.NewDecoder(req.Body).Decode(&htObj)
+		err = json.NewDecoder(req.Body).Decode(&delay)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
+			logger.WithField("err", err.Error()).Error("Error while decoding delay data")
 			return
 		}
 
-		valid, respBytes := validate(htObj)
+		valid, respBytes := validate(delay)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		htObj.ProcessID = id
-		err = deps.Store.UpdateHeating(req.Context(), htObj)
+		delay.ProcessID = id
+		err = deps.Store.UpdateDelay(req.Context(), delay)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update piercing")
+			logger.WithField("err", err.Error()).Error("Error update delay")
 			return
 		}
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"heating record updated successfully"}`))
+		rw.Write([]byte(`{"msg":"Delay record updated successfully"}`))
 	})
 }

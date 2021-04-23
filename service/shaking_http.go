@@ -96,7 +96,7 @@ func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
-		shObj.ID = id
+		shObj.ProcessID = id
 		err = deps.Store.UpdateShaking(req.Context(), shObj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)

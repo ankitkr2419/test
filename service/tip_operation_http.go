@@ -9,33 +9,33 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func createHeatingHandler(deps Dependencies) http.HandlerFunc {
+func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var htObj db.Heating
-		err := json.NewDecoder(req.Body).Decode(&htObj)
+		var tipOpr db.TipOperation
+		err := json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding heating data")
+			logger.WithField("err", err.Error()).Error("Error while decoding TipOperation data")
 			return
 		}
 
-		valid, respBytes := validate(htObj)
+		valid, respBytes := validate(tipOpr)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		var createdTemp db.Heating
-		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj)
+		var createdTemp db.TipOperation
+		createdTemp, err = deps.Store.CreateTipOperation(req.Context(), tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create Heating")
+			logger.WithField("err", err.Error()).Error("Error create TipOperation")
 			return
 		}
 
 		respBytes, err = json.Marshal(createdTemp)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling heating data")
+			logger.WithField("err", err.Error()).Error("Error marshaling TipOperation data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -46,7 +46,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func showHeatingHandler(deps Dependencies) http.HandlerFunc {
+func showTipOperationHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
@@ -56,18 +56,18 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var heating db.Heating
+		var TipOperation db.TipOperation
 
-		heating, err = deps.Store.ShowHeating(req.Context(), id)
+		TipOperation, err = deps.Store.ShowTipOperation(req.Context(), id)
 		if err != nil {
 			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show heating")
+			logger.WithField("err", err.Error()).Error("Error show TipOperation")
 			return
 		}
 
-		respBytes, err := json.Marshal(heating)
+		respBytes, err := json.Marshal(TipOperation)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling heating data")
+			logger.WithField("err", err.Error()).Error("Error marshaling TipOperation data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -78,7 +78,7 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
+func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -87,31 +87,31 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var htObj db.Heating
+		var tipOpr db.TipOperation
 
-		err = json.NewDecoder(req.Body).Decode(&htObj)
+		err = json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
+			logger.WithField("err", err.Error()).Error("Error while decoding tip operation data")
 			return
 		}
 
-		valid, respBytes := validate(htObj)
+		valid, respBytes := validate(tipOpr)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		htObj.ProcessID = id
-		err = deps.Store.UpdateHeating(req.Context(), htObj)
+		tipOpr.ProcessID = id
+		err = deps.Store.UpdateTipOperation(req.Context(), tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update piercing")
+			logger.WithField("err", err.Error()).Error("Error update tip operation")
 			return
 		}
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"heating record updated successfully"}`))
+		rw.Write([]byte(`{"msg":"TipOperation record updated successfully"}`))
 	})
 }
