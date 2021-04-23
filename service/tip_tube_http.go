@@ -43,3 +43,26 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 		rw.Header().Add("Content-Type", "application/json")
 	})
 }
+
+func listTipsTubesHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		var tipsTubes []db.TipsTubes
+		tipsTubes, err := deps.Store.ListTipsTubes()
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error showing Tip tubes")
+			return
+		}
+
+		respBytes, err := json.Marshal(tipsTubes)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling Tip tubes data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(respBytes)
+	})
+}
