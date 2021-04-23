@@ -62,7 +62,6 @@ func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay,
 }
 
 func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
-	logger.Infoln(d)
 	_, err = s.db.Exec(
 		updateDelayQuery,
 		d.DelayTime,
