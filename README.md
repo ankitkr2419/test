@@ -54,6 +54,7 @@ Inside conf directory, create a clone file from application.yml.default and name
 CRITICAL STEPS: 
 Set APP_NAME to MyLabDiscoveries if you want to run GUI application. 
 Set APP_PORT to 33001.
+Set SECRET_KEY to "123456qwerty"
 NOTE: Failing to setup any of the above steps will give a 404 for API responses
 #### 5.2 Setting DB_URI
 (You may skip this step if you have already set correct DB_URI)
