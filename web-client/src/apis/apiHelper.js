@@ -2,6 +2,7 @@ import { takeEvery, put } from "redux-saga/effects";
 
 import fetchAction from "actions/fetchActions";
 import { API_HOST_URL, API_HOST_VERSION } from "appConstants";
+import { toast } from "react-toastify";
 
 /**
  * getQueryString with form query string from given object
@@ -83,6 +84,8 @@ export function* callApi(actions) {
       failureAction,
       method = "GET",
       params = null,
+      showPopupSuccessMessage = false,
+      showPopupFailureMessage = false
     },
   } = actions;
 
@@ -106,8 +109,14 @@ export function* callApi(actions) {
 
     if (response.ok) {
       yield put(dispatcherHelper(successAction, parsedResponse));
+      if(showPopupSuccessMessage && parsedResponse && parsedResponse.msg){
+        toast.success(parsedResponse.msg)
+      }
     } else {
       yield put(dispatcherHelper(failureAction, parsedResponse, true));
+      if(showPopupFailureMessage && parsedResponse && parsedResponse.msg){
+        toast.error(parsedResponse.msg)
+      }
     }
   } catch (error) {
     throw error;

@@ -22,8 +22,11 @@ export const setActiveDeck = deckName => ({
 	}
 })
 
-export const loginReset = () => ({
+export const loginReset = (deckName) => ({
 	type: loginActions.loginReset,
+	payload: {
+		deckName
+	}
 });
 
 export const loginAsOperator = () => ({

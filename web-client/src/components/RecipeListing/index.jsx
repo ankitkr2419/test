@@ -1,5 +1,5 @@
-import React from "react";
-// import { useSelector, useDispatch } from "react-redux";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 import styled from "styled-components";
 import { Card, CardBody, Button, Row, Col } from "core-components";
@@ -7,10 +7,13 @@ import { Icon, VideoCard, ButtonIcon } from "shared-components";
 
 import SearchBox from "shared-components/SearchBox";
 import PaginationBox from "shared-components/PaginationBox";
-
+import MlModal from "shared-components/MlModal"
 import RecipeCard from "components/RecipeListing/RecipeCard";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
 import AppFooter from "components/AppFooter";
+import { useHistory } from "react-router-dom";
+import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
+import { loginReset } from 'action-creators/loginActionCreators';
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -45,6 +48,19 @@ const RecipeListingComponent = (props) => {
     returnRecipeDetails,
   } = props;
 
+  const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  const onLogoutClicked = () => {
+    toggleLogoutModalVisibility();
+    dispatch(loginReset(deckName));
+    history.push(ROUTES.landing);
+  }
+
+  const toggleLogoutModalVisibility = () => {
+    setLogoutModalVisibility(!isLogoutModalVisible);
+  }
   return (
     <>
       <div className="landing-content px-2">
@@ -55,6 +71,15 @@ const RecipeListingComponent = (props) => {
             handleCarousalModal={handleCarousalModal}
           />
         )}
+        <MlModal
+          isOpen={isLogoutModalVisible}
+          textHead={deckName}
+          textBody={`Are you sure you want to sign out of ${isAdmin ? 'Admin':'Operator'} role?`}
+          handleSuccessBtn={onLogoutClicked}
+          handleCrossBtn={toggleLogoutModalVisibility}
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
+        />
 
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
           {isProcessInProgress ? null : (
@@ -107,6 +132,7 @@ const RecipeListingComponent = (props) => {
                 name="logout"
                 size={28}
                 className="ml-2 bg-white border-primary"
+                onClick={toggleLogoutModalVisibility}
               />
             </div>
           )}

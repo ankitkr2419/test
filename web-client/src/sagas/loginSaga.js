@@ -39,9 +39,10 @@ export function* login(actions) {
                 method: HTTP_METHODS.POST,
                 successAction,
                 failureAction,
+				showPopupSuccessMessage: true,
+				showPopupFailureMessage: true
             },
         });
-		// yield put(toast.success('done!'))
     } catch (error) {
         // yield put(operatorLoginFailed(error));
 		console.log('error while login: ', error);

@@ -13,15 +13,35 @@ const AppFooter = (props) => {
         loginReducerData &&
         loginReducerData.decks.find((deck) => deck.name === DECKNAME.DeckA);
     let isDeckALoggedIn = loginDataOfA.isLoggedIn;
+    let isDeckAActive = loginDataOfA.isActive
     let loginDataOfB =
         loginReducerData &&
         loginReducerData.decks.find((deck) => deck.name === DECKNAME.DeckB);
     let isDeckBLoggedIn = loginDataOfB.isLoggedIn;
+    let isDeckBActive = loginDataOfB.isActive
 
+    const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+    let recipeActionReducerForDeckA = recipeActionReducer.decks.find(deckObj => deckObj.name === DECKNAME.DeckA)
+    let recipeActionReducerForDeckB = recipeActionReducer.decks.find(deckObj => deckObj.name === DECKNAME.DeckB)
+    
     return (
         <div className="d-flex justify-content-center align-items-center">
-            <DeckCard deckName={DECKNAME.DeckA} loginBtn={!isDeckALoggedIn} />
-            <DeckCard deckName={DECKNAME.DeckB} loginBtn={!isDeckBLoggedIn} />
+            <DeckCard
+                deckName={DECKNAME.DeckA}
+                isActiveDeck={isDeckAActive}
+                loginBtn={!isDeckALoggedIn}
+                isAnotherDeckLoggedIn={isDeckBLoggedIn}
+                leftActionBtn={isDeckALoggedIn ? recipeActionReducerForDeckA.leftActionBtn : ''}
+                rightActionBtn={isDeckALoggedIn ? recipeActionReducerForDeckA.rightActionBtn: ''}
+            />
+            <DeckCard
+                deckName={DECKNAME.DeckB}
+                isActiveDeck={isDeckBActive}
+                loginBtn={!isDeckBLoggedIn}
+                isAnotherDeckLoggedIn={isDeckALoggedIn}
+                leftActionBtn={recipeActionReducerForDeckB.leftActionBtn}
+                rightActionBtn={recipeActionReducerForDeckB.rightActionBtn}
+            />
         </div>
     );
 };

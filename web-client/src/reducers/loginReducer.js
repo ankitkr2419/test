@@ -29,12 +29,11 @@ const initialStateOfDecks = () => {
             error: false,
             msg: "",
             isAdmin: false,
-            isActive: false,
+            isActive: true,
         },
         {
             name: DECKNAME.DeckB,
             isLoggedIn: false,
-            isError: false,
             error: false,
             msg: "",
             isAdmin: false,
@@ -183,7 +182,20 @@ export const loginReducer = (state = loginInitialState, action) => {
                 action.payload.isTemplateRoute
             );
         case loginActions.loginReset:
-            return loginInitialState;
+            let deckShouldLogout = action.payload.deckName;
+            let newDecksAfterLogout = state.toJS().decks.map((deckObj) => {
+                return deckObj.name === deckShouldLogout
+                    ? {
+                          ...deckObj,
+                          isLoggedIn: false,
+                      }
+                    : {
+                          ...deckObj,
+                      };
+            });
+            return state.merge({
+                decks: newDecksAfterLogout,
+            });
         default:
             return state;
     }

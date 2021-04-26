@@ -48,10 +48,7 @@ const LandingScreenComponent = (props) => {
           isProgressBarVisible={isProgressBarVisible}
         />*/}
       </div>
-      <AppFooter 
-        deckName={deckName}
-        loginBtn={true}
-      />
+      <AppFooter />
     </LandingScreen>
   );
 };

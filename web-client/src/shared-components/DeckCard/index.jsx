@@ -170,8 +170,8 @@ const DeckCardBox = styled.div`
 
 const CardOverlay = styled.div`
   position: absolute;
-  display: none;
-  width: 50%;
+  // display: none;
+  width: 100%;
   height: 6.625rem;
   top: 0;
   left: 0;
@@ -201,6 +201,8 @@ const DeckCard = (props) => {
     leftActionBtnDisabled,
     rightActionBtnDisabled,
     progressPercentComplete,
+    isActiveDeck,
+    isAnotherDeckLoggedIn,
   } = props;
 
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
@@ -313,7 +315,12 @@ const DeckCard = (props) => {
 
   return (
     <DeckCardBox className="d-flex justify-content-start align-items-center" onClick={setCurrentDeckActive}>
-      <CardOverlay />
+      <CardOverlay className={
+        (isAnotherDeckLoggedIn && loginBtn && !isActiveDeck) || 
+        (isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck) 
+          ? ''
+          : 'd-none'
+      } />
       <div className="d-flex justify-content-center align-items-center deck-title">
         <Text Tag="label" size={20}>
           {deckName}

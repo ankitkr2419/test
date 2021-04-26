@@ -5,6 +5,8 @@ import styled from "styled-components";
 import RecipeListingComponent from "components/RecipeListing";
 
 import { recipeListingInitiated } from "action-creators/recipeActionCreators";
+import { ROUTES } from "appConstants";
+import { Redirect } from "react-router-dom";
 
 // import { Loader } from 'shared-components'
 const RecipeListing = styled.div`
@@ -110,10 +112,6 @@ const RecipeListingContainer = (props) => {
     setOperatorRunRecipeCarousalModalVisible(!prevState);
   };
 
-  const returnRecipeDetails = (data) => {
-    console.log("DATA returned--->", data);
-  };
-
   useEffect(() => {
     dispatch(recipeListingInitiated());
   }, [dispatch]);
@@ -124,8 +122,19 @@ const RecipeListingContainer = (props) => {
 
   const loginReducerData = loginReducer.toJS()
   let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
+  if(!activeDeckObj.isLoggedIn){
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
   let deckName  = activeDeckObj.name
   let isAdmin = activeDeckObj.isAdmin
+
+  const returnRecipeDetails = (data) => {
+    let requiredData  =  {
+      data,
+      deckName //active deck
+    }
+    console.log("DATA returned--->", requiredData);
+  };
 
   return (
     <RecipeListing>
