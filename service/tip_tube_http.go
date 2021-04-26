@@ -5,6 +5,7 @@ import (
 	"mylab/cpagent/db"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -46,9 +47,11 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 
 func listTipsTubesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		tipTubeType := vars["tiptube"]
 
 		var tipsTubes []db.TipsTubes
-		tipsTubes, err := deps.Store.ListTipsTubes()
+		tipsTubes, err := deps.Store.ListTipsTubes(tipTubeType)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error showing Tip tubes")
