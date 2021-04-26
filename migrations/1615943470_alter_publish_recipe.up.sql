@@ -1,0 +1,1 @@
+ALTER TABLE recipes ADD COLUMN is_published boolean DEFAULT FALSE;
