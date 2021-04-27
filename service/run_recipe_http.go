@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
@@ -36,6 +37,39 @@ func runRecipeHandler(deps Dependencies, stepRun bool) http.HandlerFunc {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
 			go runRecipe(req.Context(), deps, deck, stepRun, recipeID)
+
+		default:
+			err = fmt.Errorf("Check your deck name")
+			deps.WsErrCh <- err
+		}
+
+		// TODO: Handle error types
+		if err != nil {
+			deps.WsErrCh <- err
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(response)
+		}
+	})
+}
+
+
+
+func runNextStepHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		var response string
+		var err error
+
+		vars := mux.Vars(req)
+		deck := vars["deck"]
+
+		switch deck {
+		case "A", "B":
+			deps.PlcDeck[deck].ResumeStep()
+			rw.WriteHeader(http.StatusOK)
+			rw.Header().Add("Content-Type", "application/json")
+			rw.Write([]byte(`{"msg":"next step run is in progress"}`))
 
 		default:
 			err = fmt.Errorf("Check your deck name")
@@ -98,8 +132,16 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, stepRun bool
 		// TODO : percentage calculation from inside the process.
 		sendWSData(deps, deck, recipeID, len(processes), i+1)
 
-		// To resume the next step admin needs to hits the resume API only
-		deps.PlcDeck[deck].SetPaused()
+		if stepRun{
+			deps.PlcDeck[deck].PauseStep()
+		// To resume the next step admin needs to hits the run-next-step API only
+			for{
+				time.Sleep(time.Second)
+				if deps.PlcDeck[deck].IsNextStepSet(){
+					break
+				}
+			}
+		}
 
 		switch p.Type {
 		case "AspireDispense":
