@@ -22,7 +22,7 @@ func listProcessesHandler(deps Dependencies) http.HandlerFunc {
 		list, err := deps.Store.ListProcesses(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
 		respBytes, err := json.Marshal(list)
