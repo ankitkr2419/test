@@ -18,7 +18,6 @@ import (
 func runRecipeHandler(deps Dependencies, stepRun bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var response string
 		var err error
 
 		vars := mux.Vars(req)
@@ -40,15 +39,14 @@ func runRecipeHandler(deps Dependencies, stepRun bool) http.HandlerFunc {
 
 		default:
 			err = fmt.Errorf("Check your deck name")
-			deps.WsErrCh <- err
 		}
 
-		// TODO: Handle error types
 		if err != nil {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"msg":"check your deck name"}`))
 			deps.WsErrCh <- err
-			fmt.Println(err.Error())
-		} else {
-			fmt.Println(response)
+			logger.Errorln(err.Error())
 		}
 	})
 }
@@ -58,7 +56,6 @@ func runRecipeHandler(deps Dependencies, stepRun bool) http.HandlerFunc {
 func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var response string
 		var err error
 
 		vars := mux.Vars(req)
@@ -66,6 +63,12 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "A", "B":
+			// If next step is already set means this API is called at wrong time
+			if deps.PlcDeck[deck].IsNextStepSet(){
+				rw.WriteHeader(http.StatusBadRequest)
+				rw.Header().Add("Content-Type", "application/json")
+				rw.Write([]byte(`{"msg":"check if the step-run is in progress"}`))
+			}
 			deps.PlcDeck[deck].ResumeStep()
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
@@ -73,15 +76,14 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 
 		default:
 			err = fmt.Errorf("Check your deck name")
-			deps.WsErrCh <- err
 		}
 
-		// TODO: Handle error types
 		if err != nil {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"msg":"check your deck name"}`))
 			deps.WsErrCh <- err
-			fmt.Println(err.Error())
-		} else {
-			fmt.Println(response)
+			logger.Errorln(err.Error())
 		}
 	})
 }
