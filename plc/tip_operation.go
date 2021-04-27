@@ -225,15 +225,14 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	fmt.Println("Moving Syringe to tip's base")
+	fmt.Println("Moving Syringe to deck's base")
 	if position, ok = consDistance["deck_base"]; !ok {
 		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	// Here deck_base will always be greater
-	// than syringe_parking
-	distanceToTravel = position - Positions[deckAndMotor]
+
+	distanceToTravel = Positions[deckAndMotor] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
@@ -289,6 +288,8 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
+	d.setTipDiscardInProgress()
+	defer d.resetTipDiscardInProgress()
 	// We know concrete direction, here its towards sensor/ FWD
 	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
 	if err != nil {
