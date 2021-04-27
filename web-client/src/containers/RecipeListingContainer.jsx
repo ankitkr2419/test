@@ -4,9 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import RecipeListingComponent from "components/RecipeListing";
 
-import { recipeListingInitiated } from "action-creators/recipeActionCreators";
+import { recipeListingInitiated, saveRecipeDataForDeck } from "action-creators/recipeActionCreators";
 import { ROUTES } from "appConstants";
 import { Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 // import { Loader } from 'shared-components'
 const RecipeListing = styled.div`
@@ -23,6 +24,7 @@ const RecipeListing = styled.div`
 
 const RecipeListingContainer = (props) => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   // const { recipeData,isLoading } = recipeActionReducer;
   const recipeData = [
@@ -106,6 +108,8 @@ const RecipeListingContainer = (props) => {
     setOperatorRunRecipeCarousalModalVisible,
   ] = useState(false);
 
+  const [selectedRecipeData, setSelectedRecipeData] = useState({}) 
+
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
   ) => {
@@ -129,12 +133,25 @@ const RecipeListingContainer = (props) => {
   let isAdmin = activeDeckObj.isAdmin
 
   const returnRecipeDetails = (data) => {
-    let requiredData  =  {
-      data,
-      deckName //active deck
-    }
-    console.log("DATA returned--->", requiredData);
+    // let requiredData  =  {
+    //   data,
+    //   deckName //active deck
+    // }
+    // console.log("DATA returned--->", requiredData);
+    // store data in reducer
+    setSelectedRecipeData({data, deckName})
   };
+
+  const onConfirmedRecipeSelection = () => {
+    let { data, deckName } = selectedRecipeData;
+    if(!deckName){
+      console.error('deckName not found!')
+      return;
+    } 
+    dispatch(saveRecipeDataForDeck(data, deckName))
+    // history.push(ROUTES.landing);//go to landing page
+    // return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   return (
     <RecipeListing>
@@ -147,6 +164,7 @@ const RecipeListingContainer = (props) => {
         }
         handleCarousalModal={handleCarousalModal}
         returnRecipeDetails={returnRecipeDetails}
+        onConfirmedRecipeSelection={onConfirmedRecipeSelection}
         deckName={deckName}
         isAdmin={isAdmin}
       />

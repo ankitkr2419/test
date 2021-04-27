@@ -35,3 +35,8 @@ export const recipeListingAction = {
   recipeListingSuccess: "RECIPE_LISTING_SUCSESSS",
   recipeListingFailed: "RECIPE_LISTING_FAILED",
 };
+
+export const saveRecipeDataAction = {
+  saveRecipeDataForDeck: "SAVE_RECIPE_DATA_FOR_DECK",
+  resetRecipeDataForDeck: "RESET_RECIPE_DATA_FOR_DECK"
+}

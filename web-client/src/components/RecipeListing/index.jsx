@@ -46,6 +46,7 @@ const RecipeListingComponent = (props) => {
     isOperatorRunRecipeCarousalModalVisible,
     handleCarousalModal,
     returnRecipeDetails,
+    onConfirmedRecipeSelection,
   } = props;
 
   const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
@@ -69,6 +70,7 @@ const RecipeListingComponent = (props) => {
           <OperatorRunRecipeCarousalModal
             isOpen={isOperatorRunRecipeCarousalModalVisible}
             handleCarousalModal={handleCarousalModal}
+            onConfirmedRecipeSelection={onConfirmedRecipeSelection}
           />
         )}
         <MlModal

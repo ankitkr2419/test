@@ -4,6 +4,7 @@ import {
   resumeRecipeAction,
   abortRecipeAction,
   recipeListingAction,
+  saveRecipeDataAction
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
@@ -150,5 +151,20 @@ export const recipeListingFailed = (serverErrors) => ({
   type: recipeListingAction.recipeListingFailed,
   payload: {
     serverErrors,
+  },
+});
+
+export const saveRecipeDataForDeck = (recipeData, deckName) => ({//deckName should be passed
+  type: saveRecipeDataAction.saveRecipeDataForDeck,
+  payload: {
+    recipeData,
+    deckName
+  },
+});
+
+export const resetRecipeDataForDeck = (deckName) => ({//deckName should be passed
+  type: saveRecipeDataAction.saveRecipeDataForDeck,
+  payload: {
+    deckName
   },
 });

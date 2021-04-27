@@ -4,15 +4,17 @@ import {
     resumeRecipeAction,
     abortRecipeAction,
     recipeListingAction,
+    saveRecipeDataAction,
 } from "actions/recipeActions";
 import { DECKCARD_BTN, DECKNAME } from "appConstants";
 
 export const initialState = {
-    recipeData: [],//all recipe data
+    recipeData: [], //all recipe data
     decks: [
         {
             name: DECKNAME.DeckA,
-            recipeData: null, //current recipe 
+            recipeData: null, //current recipe
+            showProcess: false,
             isLoading: false,
             serverErrors: {},
             runRecipeError: null,
@@ -30,10 +32,17 @@ export const initialState = {
             isResumeRecipeCompleted: null,
             runRecipeInCompleted: {},
             runRecipeInProgress: null,
+            hours: 0,
+            mins: 0,
+            secs: 0,
+            showCleanUp: false,
+            leftActionBtnDisabled: false,
+            rightActionBtnDisabled: false,
         },
         {
             name: DECKNAME.DeckB,
-            recipeData: null,//current recipe
+            recipeData: null, //current recipe
+            showProcess: false,
             isLoading: false,
             serverErrors: {},
             runRecipeError: null,
@@ -51,12 +60,34 @@ export const initialState = {
             isResumeRecipeCompleted: null,
             runRecipeInCompleted: {},
             runRecipeInProgress: null,
+            hours: 0,
+            mins: 0,
+            secs: 0,
+            showCleanUp: false,
+            leftActionBtnDisabled: false,
+            rightActionBtnDisabled: false,
         },
     ],
 };
 
 export const recipeActionReducer = (state = initialState, action = {}) => {
     switch (action.type) {
+        case saveRecipeDataAction.saveRecipeDataForDeck://set and update: depend on deckName
+            // console.log("action: ", action);
+            let deckNameForRecipe = action.payload.deckName;
+            let newDecksAfterRecipeDataAdded = state.decks.map((deckObj) => {
+                return deckObj.name === deckNameForRecipe
+                    ? {
+                          ...deckObj,
+                          recipeData: action.payload.recipeData,
+                          showProcess: true,
+                      }
+                    : deckObj;
+            });
+            return {
+                ...state,
+                decks: newDecksAfterRecipeDataAdded,
+            };
         case runRecipeAction.runRecipeInitiated:
             return { ...state, ...action.payload, isLoading: true };
         case runRecipeAction.runRecipeSuccess:

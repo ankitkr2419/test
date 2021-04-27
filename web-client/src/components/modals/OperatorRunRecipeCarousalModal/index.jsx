@@ -89,7 +89,7 @@ const NextButton = styled.div`
 `;
 
 const OperatorRunRecipeCarousalModal = (props) => {
-  const { isOpen, handleCarousalModal } = props;
+  const { isOpen, handleCarousalModal, onConfirmedRecipeSelection } = props;
 
   const [isNextButtonVisible, setNextButtonVisbile] = useState(false);
 
@@ -162,7 +162,10 @@ const OperatorRunRecipeCarousalModal = (props) => {
               className="border-primary"
               color="outline-secondary"
               size="sm"
-              onClick={handleStartRunRecipe}
+              onClick={() => {
+                handleCarousalModal();//hide/show
+                onConfirmedRecipeSelection();//save data in reducer
+              }}
             >
               Next
             </Button>
