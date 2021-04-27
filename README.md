@@ -77,6 +77,10 @@ You need to set username and password
 ### 6. Set config.yml
 Inside conf directory, create a clone file from config.yml.default and name it as config.yml. And let it be. 
 
+### 7. Accept Header
+Failing to set this header will give 404 Page Not Found Error
+Set this Header for Postman or for Any Other Web client
+Accept:application/vnd.MyLabDiscoveries.v1
 
 # Building Binary without GUI Support
 This is only backend binary

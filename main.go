@@ -237,12 +237,13 @@ func startApp(plcName string, test bool) (err error) {
 	plc.LoadUtils()
 	service.LoadUtils()
 
-	// add default User
+	// Create a default User
 	u := db.User{
-		Username: "admin",
-		Password: service.MD5Hash("admin"),
-		Role:     "admin",
+		Username: "supervisor",
+		Password: service.MD5Hash("supervisor"),
+		Role:     "supervisor",
 	}
+	// Add Default supervisor user to DB
 	db.AddDefaultUser(store, u)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Default User failed")
