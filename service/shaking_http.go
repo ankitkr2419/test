@@ -26,6 +26,13 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = updateProcessName(deps, shaObj.ProcessID, "Shaking", shaObj)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error updating process name")
+			return
+		}
+
 		var createdShaker db.Shaker
 		createdShaker, err = deps.Store.CreateShaking(req.Context(), shaObj)
 		if err != nil {

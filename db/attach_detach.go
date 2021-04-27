@@ -10,7 +10,7 @@ import (
 
 type AttachDetach struct {
 	ID            uuid.UUID `db:"id" json:"id"`
-	Operation     string    `db:"operation" json:"operation"`
+	Operation     string    `db:"operation" json:"operation"  validate:"required"`
 	OperationType string    `db:"operation_type" json:"operation_type"`
 	ProcessID     uuid.UUID `db:"process_id" json:"process_id" validate:"required"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
