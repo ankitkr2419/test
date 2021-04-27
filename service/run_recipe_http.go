@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func runRecipeHandler(deps Dependencies) http.HandlerFunc {
+func runRecipeHandler(deps Dependencies, stepRun bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		var response string
@@ -35,7 +35,7 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
 			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
-			go runRecipe(req.Context(), deps, deck, recipeID)
+			go runRecipe(req.Context(), deps, deck, stepRun, recipeID)
 
 		default:
 			err = fmt.Errorf("Check your deck name")
@@ -52,7 +52,7 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uuid.UUID) (response string, err error) {
+func runRecipe(ctx context.Context, deps Dependencies, deck string, stepRun bool, recipeID uuid.UUID) (response string, err error) {
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
@@ -98,10 +98,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 		// TODO : percentage calculation from inside the process.
 		sendWSData(deps, deck, recipeID, len(processes), i+1)
 
+		// To resume the next step admin needs to hits the resume API only
+		deps.PlcDeck[deck].SetPaused()
+
 		switch p.Type {
 		case "AspireDispense":
-			// Get the AspireDispense process
-			// TODO: Below ID is reference ID, so please change code accordingly
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
 				deps.WsErrCh <- err
@@ -145,8 +146,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			fmt.Println(sha)
 
 		case "Piercing":
-			// Get the Piercing process
-			// TODO: Below ID is reference ID, so please conform
 			pi, err := deps.Store.ShowPiercing(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -240,10 +239,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			}
 
 		}
-
-		// TODO: Instead of switch case, try using reflect
-		// Pass context and ID here
-		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
 
 	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeId %v", recipeID)
@@ -273,6 +268,7 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	err = fmt.Errorf("position is invalid to pickup the tip")
 	return 0, err
 }
+
 func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
 	// percentage calculation for each process
 
