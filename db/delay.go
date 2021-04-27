@@ -10,8 +10,8 @@ import (
 
 type Delay struct {
 	ID        uuid.UUID `db:"id" json:"id"`
-	DelayTime int64     `db:"delay_time" json:"delay_time"`
-	ProcessID uuid.UUID `db:"process_id" json:"process_id"`
+	DelayTime int64     `db:"delay_time" json:"delay_time" validate:"required"`
+	ProcessID uuid.UUID `db:"process_id" json:"process_id" validate:"required"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }

@@ -10,10 +10,10 @@ import (
 
 type TipDock struct {
 	ID        uuid.UUID `json:"id" db:"id"`
-	Type      string    `json:"type" db:"type"`
-	Position  int64     `json:"position" db:"position"`
-	Height    float64   `json:"height" db:"height"`
-	ProcessID uuid.UUID `json:"process_id" db:"process_id"`
+	Type      string    `json:"type" db:"type" validate:"required"s`
+	Position  int64     `json:"position" db:"position" validate:"required"`
+	Height    float64   `json:"height" db:"height" validate:"required"`
+	ProcessID uuid.UUID `json:"process_id" db:"process_id" validate:"required"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }

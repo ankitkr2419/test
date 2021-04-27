@@ -75,7 +75,7 @@ type AspireDispense struct {
 	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
 	DispenseNoOfCycles   int64         `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
 	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
-	ProcessID            uuid.UUID     `db:"process_id" json:"process_id"`
+	ProcessID            uuid.UUID     `db:"process_id" json:"process_id" validate:"required"`
 	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt            time.Time     `db:"updated_at" json:"updated_at"`
 }
