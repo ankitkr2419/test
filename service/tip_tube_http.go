@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"mylab/cpagent/db"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -48,7 +49,13 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 func listTipsTubesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
-		tipTubeType := vars["tiptube"]
+		tipTubeType := strings.ToLower(vars["tiptube"])
+
+		if tipTubeType != "tip" && tipTubeType != "tube" {
+			rw.WriteHeader(http.StatusBadRequest)
+			logger.WithField("err", "invalid argument").Error("Invalid Argument")
+			return
+		}
 
 		var tipsTubes []db.TipsTubes
 		tipsTubes, err := deps.Store.ListTipsTubes(tipTubeType)
