@@ -60,7 +60,7 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowAspireDispense(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
+			rw.WriteHeader(http.StatusNotFound)
 			logger.WithField("err", err.Error()).Error("Error show aspire dispense")
 			return
 		}

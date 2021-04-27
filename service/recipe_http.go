@@ -81,7 +81,7 @@ func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowRecipe(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
+			rw.WriteHeader(http.StatusNotFound)
 			logger.WithField("err", err.Error()).Error("Error show recipe")
 			return
 		}

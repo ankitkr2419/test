@@ -60,7 +60,7 @@ func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowPiercing(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
+			rw.WriteHeader(http.StatusNotFound)
 			logger.WithField("err", err.Error()).Error("Error show piercing")
 			return
 		}
