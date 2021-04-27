@@ -60,6 +60,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments/{id}/emission", getResultHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{id}/temperature", getTemperatureHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/users/{username}/validate", validateUserHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/users", createUserHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/motor", createMotorHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/consumabledistance", createConsumableDistanceHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tiptube", createTipTubeHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
@@ -79,6 +80,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/recipes/{id}", showRecipeHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/recipes/{id}", deleteRecipeHandler(deps)).Methods(http.MethodDelete)
 	router.HandleFunc("/recipes/{id}", updateRecipeHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/recipes/{id}/publish", publishRecipeHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/processes", createProcessHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/processes/{id}", listProcessesHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/processes/{id}", showProcessHandler(deps)).Methods(http.MethodGet)
@@ -101,6 +103,12 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/heating", createHeatingHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/heating/{id}", showHeatingHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/heating/{id}", updateHeatingHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/delay", createDelayHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/delay/{id}", showDelayHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/delay/{id}", updateDelayHandler(deps)).Methods(http.MethodPut)
+	router.HandleFunc("/tip-operation", createTipOperationHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/tip-operation/{id}", showTipOperationHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/tip-operation/{id}", updateTipOperationHandler(deps)).Methods(http.MethodPut)
 
 	return
 }

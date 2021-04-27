@@ -96,7 +96,7 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
-		adObj.ID = id
+		adObj.ProcessID = id
 		err = deps.Store.UpdateAttachDetach(req.Context(), adObj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
