@@ -80,6 +80,9 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		return "", err
 	}
 
+	// TODO: Check if adding && !d.isCompletionBitSet() is suited below
+	// completion bit shouldn't be set or it means run was already completed
+	
 	if !d.isTimerInProgress() {
 		response, err = d.readExecutedPulses()
 		if err != nil {
