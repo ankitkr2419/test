@@ -9,33 +9,33 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
+func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var adobj db.AspireDispense
-		err := json.NewDecoder(req.Body).Decode(&adobj)
+		var tipOpr db.TipOperation
+		err := json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding aspire dispense data")
+			logger.WithField("err", err.Error()).Error("Error while decoding TipOperation data")
 			return
 		}
 
-		valid, respBytes := validate(adobj)
+		valid, respBytes := validate(tipOpr)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		var createdTemp db.AspireDispense
-		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj)
+		var createdTemp db.TipOperation
+		createdTemp, err = deps.Store.CreateTipOperation(req.Context(), tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create aspire dispense")
+			logger.WithField("err", err.Error()).Error("Error create TipOperation")
 			return
 		}
 
 		respBytes, err = json.Marshal(createdTemp)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling aspire dispense data")
+			logger.WithField("err", err.Error()).Error("Error marshaling TipOperation data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -46,7 +46,7 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
+func showTipOperationHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
@@ -56,18 +56,18 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var latestT db.AspireDispense
+		var TipOperation db.TipOperation
 
-		latestT, err = deps.Store.ShowAspireDispense(req.Context(), id)
+		TipOperation, err = deps.Store.ShowTipOperation(req.Context(), id)
 		if err != nil {
 			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show aspire dispense")
+			logger.WithField("err", err.Error()).Error("Error show TipOperation")
 			return
 		}
 
-		respBytes, err := json.Marshal(latestT)
+		respBytes, err := json.Marshal(TipOperation)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling aspire dispense data")
+			logger.WithField("err", err.Error()).Error("Error marshaling TipOperation data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -78,7 +78,7 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
+func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -87,31 +87,31 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var adobj db.AspireDispense
+		var tipOpr db.TipOperation
 
-		err = json.NewDecoder(req.Body).Decode(&adobj)
+		err = json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding aspire dispense data")
+			logger.WithField("err", err.Error()).Error("Error while decoding tip operation data")
 			return
 		}
 
-		valid, respBytes := validate(adobj)
+		valid, respBytes := validate(tipOpr)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		adobj.ID = id
-		err = deps.Store.UpdateAspireDispense(req.Context(), adobj)
+		tipOpr.ProcessID = id
+		err = deps.Store.UpdateTipOperation(req.Context(), tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update aspire dispense")
+			logger.WithField("err", err.Error()).Error("Error update tip operation")
 			return
 		}
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"aspire dispense updated successfully"}`))
+		rw.Write([]byte(`{"msg":"TipOperation record updated successfully"}`))
 	})
 }

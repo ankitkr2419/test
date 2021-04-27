@@ -16,6 +16,7 @@ import (
 )
 
 const version = "1.2.1"
+
 var sequenceNumber int64 = 0
 var createdRecipe Recipe
 
@@ -51,6 +52,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 		Position7:          6,
 		Cartridge2Position: 2,
 		Position9:          7,
+		IsPublished:        false,
 	}
 
 	// Create Recipe
@@ -77,7 +79,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 		return err
 	}
 
-	// 1.2.1 is the currently supported version 
+	// 1.2.1 is the currently supported version
 	if strings.TrimSpace(record[1]) != version {
 		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v", version)
 		logger.Errorln(err)
@@ -251,7 +253,7 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 		return
 	}
 
-	// NOTE: Since version 1.2.1 we have deprecated CSV support for 
+	// NOTE: Since version 1.2.1 we have deprecated CSV support for
 	// dispense volume and dispense air volume
 	if a.DestinationPosition, err = strconv.ParseInt(record[11], 10, 64); err != nil {
 		logger.Errorln(err, record[11])
