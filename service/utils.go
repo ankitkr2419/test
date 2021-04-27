@@ -150,3 +150,19 @@ func getProcessName(processType string, process interface{}) (processName string
 		return "", errors.New("wrong process type")
 	}
 }
+
+func updateProcessName(deps Dependencies, processID uuid.UUID, processType string, process interface{}) (err error) {
+
+	processName, err := getProcessName(processType, process)
+	if err != nil {
+		err = fmt.Errorf("error in creating new process name")
+		return
+	}
+
+	err = deps.Store.UpdateProcessName(context.Background(), processID, processName)
+	if err != nil {
+		err = fmt.Errorf("error in updating process name")
+		return
+	}
+	return
+}
