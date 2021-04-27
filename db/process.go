@@ -33,6 +33,8 @@ const (
 						sequence_num,
 						updated_at)
 						VALUES ($1, $2, $3) WHERE id = $4`
+
+	updateProcessNameQuery = `UPDATE processes SET name = $1 WHERE id = $2`
 )
 
 type Process struct {
@@ -105,6 +107,19 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating process")
+		return
+	}
+	return
+}
+
+func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processName string) (err error) {
+	_, err = s.db.Exec(
+		updateProcessNameQuery,
+		processName,
+		id,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating process name")
 		return
 	}
 	return
