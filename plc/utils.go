@@ -73,6 +73,7 @@ const (
 
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress, uvLightInProgress, syringeModuleState, shakerInProgress sync.Map
+var runNextStep sync.Map
 
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
@@ -107,6 +108,9 @@ func LoadUtils() {
 
 	homed.Store("A", false)
 	homed.Store("B", false)
+
+	runNextStep.Store("A", false)
+	runNextStep.Store("B", false)
 
 	BothDeckHomingInProgress = false
 	homingPercent.Store("A", float64(0))
