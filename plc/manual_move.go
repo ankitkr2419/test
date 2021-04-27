@@ -67,7 +67,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
-	d.setPaused()
+	d.SetPaused()
 
 	return "Operation PAUSED Successfully", nil
 }

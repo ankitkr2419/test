@@ -48,7 +48,7 @@ func (d *Compact32Deck) resetAborted() {
 	aborted.Store(d.name, false)
 }
 
-func (d *Compact32Deck) setPaused() {
+func (d *Compact32Deck) SetPaused() {
 	paused.Store(d.name, true)
 }
 
