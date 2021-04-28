@@ -14,10 +14,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func runRecipeHandler(deps Dependencies) http.HandlerFunc {
+func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var response string
 		var err error
 
 		vars := mux.Vars(req)
@@ -34,25 +33,67 @@ func runRecipeHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
-			go runRecipe(req.Context(), deps, deck, recipeID)
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"recipe run is in progress for deck %v"}`, deck)))
+			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
 
 		default:
 			err = fmt.Errorf("Check your deck name")
-			deps.WsErrCh <- err
 		}
 
-		// TODO: Handle error types
 		if err != nil {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"msg":"check your deck name"}`))
 			deps.WsErrCh <- err
-			fmt.Println(err.Error())
-		} else {
-			fmt.Println(response)
+			logger.Errorln(err.Error())
 		}
 	})
 }
 
-func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uuid.UUID) (response string, err error) {
+
+
+func runNextStepHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		var err error
+
+		vars := mux.Vars(req)
+		deck := vars["deck"]
+
+		switch deck {
+		case "A", "B":
+			// If runNext is set means this API is called at wrong time
+			if runNext[deck] {
+				rw.WriteHeader(http.StatusBadRequest)
+				rw.Header().Add("Content-Type", "application/json")
+				rw.Write([]byte(fmt.Sprintf(`{"msg":"check if the step-run is in progress for deck %v"}`, deck)))
+				return
+			}
+
+			logger.Infoln("Populating the nextStep channel for deck", deck)
+			nextStep[deck] <- struct{}{}
+
+			rw.WriteHeader(http.StatusOK)
+			rw.Header().Add("Content-Type", "application/json")
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"next step run is in progress for deck %v"}`, deck)))
+			return
+
+		default:
+			err = fmt.Errorf("Check your deck name")
+		}
+
+		if err != nil {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"msg":"check your deck name"}`))
+			deps.WsErrCh <- err
+			logger.Errorln(err.Error())
+		}
+		return
+	})
+}
+
+func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise bool, recipeID uuid.UUID) (response string, err error) {
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
@@ -98,10 +139,18 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 		// TODO : percentage calculation from inside the process.
 		sendWSData(deps, deck, recipeID, len(processes), i+1)
 
+		if runStepWise{
+		
+			logger.Infoln("Waiting to run next process")
+			resetRunNext(deck)
+			// To resume the next step admin needs to hits the run-next-step API only
+			<-nextStep[deck]
+			setRunNext(deck)
+			logger.Infoln("Next process is in progress")
+		}
+
 		switch p.Type {
 		case "AspireDispense":
-			// Get the AspireDispense process
-			// TODO: Below ID is reference ID, so please change code accordingly
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
 				deps.WsErrCh <- err
@@ -145,8 +194,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			fmt.Println(sha)
 
 		case "Piercing":
-			// Get the Piercing process
-			// TODO: Below ID is reference ID, so please conform
 			pi, err := deps.Store.ShowPiercing(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -240,10 +287,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, recipeID uui
 			}
 
 		}
-
-		// TODO: Instead of switch case, try using reflect
-		// Pass context and ID here
-		// result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(p.Type).Call([]reflect.Value{})
 	}
 
 	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeId %v", recipeID)
@@ -273,6 +316,7 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	err = fmt.Errorf("position is invalid to pickup the tip")
 	return 0, err
 }
+
 func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
 	// percentage calculation for each process
 
