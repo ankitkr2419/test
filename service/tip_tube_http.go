@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"mylab/cpagent/db"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -49,19 +48,23 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 func listTipsTubesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
-		tipTubeType := strings.ToLower(vars["tiptube"])
-
-		if tipTubeType != "tip" && tipTubeType != "tube" {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", "invalid argument").Error("Invalid Argument")
-			return
-		}
+		tipTubeType := vars["tiptube"]
 
 		var tipsTubes []db.TipsTubes
-		tipsTubes, err := deps.Store.ListTipsTubes(tipTubeType)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error showing Tip tubes")
+		var err error
+
+		switch tipTubeType {
+		case "tip", "tube", "":
+			tipsTubes, err = deps.Store.ListTipsTubes(tipTubeType)
+			if err != nil {
+				rw.WriteHeader(http.StatusInternalServerError)
+				logger.WithField("err", err.Error()).Error("Error showing Tip tubes")
+				return
+			}
+		default:
+			rw.WriteHeader(http.StatusBadRequest)
+			logger.WithField("err", "invalid argument").Error("Invalid Argument")
+			rw.Write([]byte(`{"error":"invalid arguments"}`))
 			return
 		}
 

@@ -104,7 +104,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/heating/{id}", showHeatingHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/heating/{id}", updateHeatingHandler(deps)).Methods(http.MethodPut)
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}", listTipsTubesHandler(deps)).Methods(http.MethodGet)
-	router.HandleFunc("/cartridges/list", listCartridgesHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/cartridges", listCartridgesHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/delay", createDelayHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/delay/{id}", showDelayHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/delay/{id}", updateDelayHandler(deps)).Methods(http.MethodPut)
