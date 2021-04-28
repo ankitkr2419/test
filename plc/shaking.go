@@ -58,7 +58,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	//reset completion bit
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
 	if err != nil {
-		logger.Errorln("err starting shaker: ", err)
+		logger.Errorln("err resetting completion bit: ", err)
 		return "", err
 	}
 
