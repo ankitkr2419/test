@@ -39,9 +39,8 @@ func generateToken(userID, role, deck, accessKey string, payload map[string]stri
 		Deck:    deck,
 		Payload: payload,
 		StandardClaims: jwt.StandardClaims{
-			Subject:   userID,
-			ExpiresAt: time.Now().Unix() + int64((time.Hour * 24).Seconds()),
-			IssuedAt:  time.Now().Unix(),
+			Subject:  userID,
+			IssuedAt: time.Now().Unix(),
 		},
 	}
 
