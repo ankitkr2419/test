@@ -47,8 +47,8 @@ type Piercing struct {
 	UpdatedAt      time.Time     `db:"updated_at" json:"updated_at"`
 }
 
-func (s *pgStore) ShowPiercing(ctx context.Context, id uuid.UUID) (dbPiercing Piercing, err error) {
-	err = s.db.Get(&dbPiercing, getPiercingQuery, id)
+func (s *pgStore) ShowPiercing(ctx context.Context, processID uuid.UUID) (dbPiercing Piercing, err error) {
+	err = s.db.Get(&dbPiercing, getPiercingQuery, processID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching piercing")
 		return
@@ -88,15 +88,6 @@ func (s *pgStore) CreatePiercing(ctx context.Context, p Piercing) (createdPierci
 	return
 }
 
-func (s *pgStore) DeletePiercing(ctx context.Context, id uuid.UUID) (err error) {
-	_, err = s.db.Exec(deletePiercingQuery, id)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error deleting piercing")
-		return
-	}
-	return
-}
-
 func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	_, err = s.db.Exec(
 		updatePiercingQuery,
@@ -104,7 +95,7 @@ func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 		p.CartridgeWells,
 		p.Discard,
 		time.Now(),
-		p.ID,
+		p.ProcessID,
 	)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating piercing")
