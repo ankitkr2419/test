@@ -1,10 +1,22 @@
 import React from "react";
 import DeckCard from "shared-components/DeckCard";
 import { DECKNAME } from "appConstants";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { DECKCARD_BTN } from "appConstants";
+import {
+    abortRecipeInitiated,
+    pauseRecipeInitiated,
+    resumeRecipeInitiated,
+    runRecipeInitiated,
+    runRecipeReset,
+    pauseRecipeReset,
+    resumeRecipeReset,
+    abortRecipeReset,
+} from "action-creators/recipeActionCreators";
 
 const AppFooter = (props) => {
+    const dispatch = useDispatch();
+
     //login reducer
     const loginReducer = useSelector((state) => state.loginReducer);
     const loginReducerData = loginReducer.toJS();
@@ -33,57 +45,92 @@ const AppFooter = (props) => {
         (deckObj) => deckObj.name === DECKNAME.DeckB
     );
 
-    const tempFunction = () => {//remove later//check
+    const tempFunction = () => {
+        //remove later//check
         alert("in dev");
     };
 
     const getLeftActionBtnHandler = (deckName) => {
-        return tempFunction;
-        // switch (
-        //     showProcess
-        //         ? recipeActionReducer.leftActionBtn
-        //         : cleanUpReducer.leftActionBtn
-        // ) {
-        //     case DECKCARD_BTN.text.run:
-        //         return handleRunAction;
-        //     case DECKCARD_BTN.text.pause:
-        //         return handlePauseAction;
-        //     case DECKCARD_BTN.text.resume:
-        //         return handleResumeAction;
+        let recipeReducerData =
+            deckName === DECKNAME.DeckA
+                ? recipeActionReducerForDeckA
+                : recipeActionReducerForDeckB;
+        let showProcess = recipeReducerData.showProcess;
 
-        //     case DECKCARD_BTN.text.startUv:
-        //         return handleRunAction;
-        //     case DECKCARD_BTN.text.pauseUv:
-        //         return handlePauseAction;
-        //     case DECKCARD_BTN.text.resumeUv:
-        //         return handleResumeAction;
+        let cleanUpReducerData = { leftActionBtn: undefined }; //check //change (use cleanUpReducer data here)
 
-        //     case DECKCARD_BTN.text.done:
-        //         return handleDoneAction;
+        switch (
+            showProcess
+                ? recipeReducerData.leftActionBtn
+                : cleanUpReducerData.leftActionBtn
+        ) {
+            case DECKCARD_BTN.text.run:
+                return deckName === DECKNAME.DeckA
+                    ? handleRunActionDeckA
+                    : handleRunActionDeckB;
+            case DECKCARD_BTN.text.pause:
+                return handlePauseAction;
+            case DECKCARD_BTN.text.resume:
+                return handleResumeAction;
 
-        //     default:
-        //         break;
-        // }
+            case DECKCARD_BTN.text.startUv:
+                return deckName === DECKNAME.DeckA
+                    ? handleRunActionDeckA
+                    : handleRunActionDeckB;
+            case DECKCARD_BTN.text.pauseUv:
+                return handlePauseAction;
+            case DECKCARD_BTN.text.resumeUv:
+                return handleResumeAction;
+
+            case DECKCARD_BTN.text.done:
+                return handleDoneAction;
+
+            default:
+                break;
+        }
     };
 
-    const handleRunAction = () => {
-        // const name = deckName === "Deck A" ? "A" : "B";
-        // if (showProcess) {
-        //     const { recipeId } = recipeData;
-        //     dispatch(
-        //         runRecipeInitiated({
-        //             recipeId: recipeId,
-        //             deckName: name,
-        //         })
-        //     );
-        // } else {
-        //     dispatch(
-        //         runCleanUpActionInitiated({
-        //             time: `${hours}:${mins}:${secs}`,
-        //             deckName: name,
-        //         })
-        //     );
-        // }
+    const handleRunActionDeckA = () => {
+        let recipeReducerData = recipeActionReducerForDeckA;
+
+        if (recipeReducerData.showProcess) {
+            const { recipeId } = recipeReducerData.recipeData;
+            dispatch(
+                runRecipeInitiated({
+                    recipeId: recipeId,
+                    deckName: recipeReducerData.name, //deck A
+                })
+            );
+        } else {
+            console.log("cleanUp in development");
+            // dispatch(
+            //     runCleanUpActionInitiated({
+            //         time: `${recipeReducerData.hours}:${recipeReducerData.mins}:${recipeReducerData.secs}`,
+            //         deckName: recipeReducerData.name,
+            //     })
+            // );
+        }
+    };
+    const handleRunActionDeckB = () => {
+        let recipeReducerData = recipeActionReducerForDeckB;
+
+        if (recipeReducerData.showProcess) {
+            const { recipeId } = recipeReducerData.recipeData;
+            dispatch(
+                runRecipeInitiated({
+                    recipeId: recipeId,
+                    deckName: recipeReducerData.name, //deck B
+                })
+            );
+        } else {
+            console.log("cleanUp in development");
+            // dispatch(
+            //     runCleanUpActionInitiated({
+            //         time: `${recipeReducerData.hours}:${recipeReducerData.mins}:${recipeReducerData.secs}`,
+            //         deckName: recipeReducerData.name,
+            //     })
+            // );
+        }
     };
 
     const handlePauseAction = () => {
@@ -188,8 +235,8 @@ const AppFooter = (props) => {
                         : 0
                 }
                 showCleanUp={recipeActionReducerForDeckA.showCleanUp}
-                handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckB)}
-                handleRightAction={getRightActionBtnHandler(DECKNAME.DeckB)}
+                handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckA)}
+                handleRightAction={getRightActionBtnHandler(DECKNAME.DeckA)}
                 leftActionBtnDisabled={
                     recipeActionReducerForDeckA.leftActionBtnDisabled
                 }
@@ -303,8 +350,8 @@ const AppFooter = (props) => {
 //         leftActionBtn={leftActionBtn}//
 //         rightActionBtn={rightActionBtn}//
 //         progressPercentComplete={progressPercentComplete}//
-//         leftActionBtnDisabled={leftActionBtnDisabled}
-//         rightActionBtnDisabled={rightActionBtnDisabled}
+//         leftActionBtnDisabled={leftActionBtnDisabled}//
+//         rightActionBtnDisabled={rightActionBtnDisabled}//
 //       />
 //       <DeckCard deckName={DECKNAME.DeckB} loginBtn={true} />
 //     </div>

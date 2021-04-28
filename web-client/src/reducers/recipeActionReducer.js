@@ -1,3 +1,4 @@
+import loginActions from "actions/loginActions";
 import {
     runRecipeAction,
     pauseRecipeAction,
@@ -72,7 +73,7 @@ export const initialState = {
 
 export const recipeActionReducer = (state = initialState, action = {}) => {
     switch (action.type) {
-        case saveRecipeDataAction.saveRecipeDataForDeck://set and update: depend on deckName
+        case saveRecipeDataAction.saveRecipeDataForDeck: //set and update: depend on deckName
             // console.log("action: ", action);
             let deckNameForRecipe = action.payload.deckName;
             let newDecksAfterRecipeDataAdded = state.decks.map((deckObj) => {
@@ -89,8 +90,10 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 decks: newDecksAfterRecipeDataAdded,
             };
         case runRecipeAction.runRecipeInitiated:
+            console.log("action: ", action); // only change the loading of deck and buttons
             return { ...state, ...action.payload, isLoading: true };
         case runRecipeAction.runRecipeSuccess:
+            console.log("action success: ", action);
             return {
                 ...state,
                 runRecipeResponse: action.payload.response,
@@ -110,6 +113,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 runRecipeError: null,
             };
         case runRecipeAction.runRecipeInProgress:
+            console.log("action inProgress: ", action);
             return {
                 ...state,
                 ...action.payload,
@@ -119,6 +123,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 rightActionBtn: DECKCARD_BTN.text.abort,
             };
         case runRecipeAction.runRecipeInCompleted:
+          console.log('action completed', action);
             return {
                 ...state,
                 ...action.payload,
@@ -239,6 +244,24 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 ...state,
                 recipeListingError: null,
             };
+
+        case loginActions.loginReset:
+            let deckToResetOnLogout = action.payload.deckName;
+            let newDecksAfterLoggedOut = state.decks.map((deckObj) => {
+                return deckObj.name === deckToResetOnLogout
+                    ? {
+                          ...initialState.decks.find(
+                              (initialDeckObj) =>
+                                  initialDeckObj.name === deckToResetOnLogout
+                          ),
+                      }
+                    : deckObj;
+            });
+            return {
+                ...state,
+                decks: newDecksAfterLoggedOut,
+            };
+            return state;
 
         default:
             return state;

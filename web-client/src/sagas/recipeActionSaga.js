@@ -7,7 +7,7 @@ import {
   abortRecipeAction,
   recipeListingAction,
 } from "actions/recipeActions";
-import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
+import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
 import {
   runRecipeFailed as runrecipeFailure,
   resumeRecipeFailed as resumeRecipeFailure,
@@ -31,7 +31,7 @@ export function* runRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.run}/${recipeId}/${deckName}`,
+        reqPath: `${API_ENDPOINTS.run}/${recipeId}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
       },
@@ -55,7 +55,7 @@ export function* resumeRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.resume}/${deckName}`,
+        reqPath: `${API_ENDPOINTS.resume}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
         successAction: resumeRecipeSuccess,
         failureAction: resumeRecipeFailed,
       },
@@ -79,7 +79,7 @@ export function* abortRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.abort}/${deckName}`,
+        reqPath: `${API_ENDPOINTS.abort}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
         successAction: abortRecipeSuccess,
         failureAction: abortRecipeFailed,
       },
@@ -103,7 +103,7 @@ export function* pauseRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.pause}/${deckName}`,
+        reqPath: `${API_ENDPOINTS.pause}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
         successAction: pauseRecipeSuccess,
         failureAction: pauseRecipeFailed,
       },
