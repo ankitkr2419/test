@@ -26,13 +26,6 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = updateProcessName(req.Context(), deps, tdObj.ProcessID, "TipDocking", tdObj)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error updating process name")
-			return
-		}
-
 		var createdAtDt db.TipDock
 		createdAtDt, err = deps.Store.CreateTipDocking(req.Context(), tdObj)
 		if err != nil {

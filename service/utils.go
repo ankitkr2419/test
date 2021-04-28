@@ -5,8 +5,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -123,70 +121,4 @@ func MD5Hash(s string) string {
 	hash := md5.Sum([]byte(s))
 
 	return hex.EncodeToString(hash[:])
-}
-
-func getProcessName(processType string, process interface{}) (processName string, err error) {
-
-	switch processType {
-	case "Piercing":
-		piercing := process.(db.Piercing)
-		processName = fmt.Sprintf("Piercing_%s", piercing.Type)
-		return
-
-	case "TipOperation":
-		tipOpr := process.(db.TipOperation)
-		processName = fmt.Sprintf("Tip_Operation_%s", tipOpr.Type)
-		return
-
-	case "TipDocking":
-		tipDock := process.(db.TipDock)
-		processName = fmt.Sprintf("Tip_Docking_%s", tipDock.Type)
-		return
-
-	case "AspireDispense":
-		aspDis := process.(db.AspireDispense)
-		processName = fmt.Sprintf("Aspire_Dispense_%s", aspDis.Category)
-		return
-
-	case "Heating":
-		processName = fmt.Sprintf("Heating")
-		return
-
-	case "Shaking":
-		shaking := process.(db.Shaker)
-		if shaking.WithTemp {
-			processName = fmt.Sprintf("Shaking_With_temperature")
-			return
-		}
-		processName = fmt.Sprintf("Shaking_Without_temperature")
-		return
-
-	case "AttachDetach":
-		atDet := process.(db.AttachDetach)
-		processName = fmt.Sprintf("Magnet_%s", atDet.Operation)
-		return
-
-	case "Delay":
-		processName = fmt.Sprintf("Delay")
-		return
-
-	default:
-		return "", errors.New("wrong process type")
-	}
-}
-
-func updateProcessName(ctx context.Context, deps Dependencies, processID uuid.UUID, processType string, process interface{}) (err error) {
-
-	processName, err := getProcessName(processType, process)
-	if err != nil {
-		err = fmt.Errorf("error in creating new process name")
-		return
-	}
-
-	err = deps.Store.UpdateProcessName(ctx, processID, processName)
-	if err != nil {
-		err = fmt.Errorf("error in updating process name")
-		return
-	}
-	return
 }

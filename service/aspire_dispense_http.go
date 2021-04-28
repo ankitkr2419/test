@@ -27,13 +27,6 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = updateProcessName(req.Context(), deps, adobj.ProcessID, "AspireDispense", adobj)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error updating process name")
-			return
-		}
-
 		var createdTemp db.AspireDispense
 		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj)
 		if err != nil {

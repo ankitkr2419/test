@@ -27,13 +27,6 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = updateProcessName(req.Context(), deps, pobj.ProcessID, "Piercing", pobj)
-		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error updating process name")
-			return
-		}
-
 		var createdTemp db.Piercing
 		createdTemp, err = deps.Store.CreatePiercing(req.Context(), pobj)
 		if err != nil {
