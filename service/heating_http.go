@@ -25,7 +25,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = updateProcessName(deps, htObj.ProcessID, "Heating", htObj)
+		err = updateProcessName(req.Context(), deps, htObj.ProcessID, "Heating", htObj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error updating process name")

@@ -25,7 +25,7 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = updateProcessName(deps, tipOpr.ProcessID, "TipOperation", tipOpr)
+		err = updateProcessName(req.Context(), deps, tipOpr.ProcessID, "TipOperation", tipOpr)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error updating process name")

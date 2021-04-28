@@ -151,7 +151,7 @@ func getProcessName(processType string, process interface{}) (processName string
 	}
 }
 
-func updateProcessName(deps Dependencies, processID uuid.UUID, processType string, process interface{}) (err error) {
+func updateProcessName(ctx context.Context, deps Dependencies, processID uuid.UUID, processType string, process interface{}) (err error) {
 
 	processName, err := getProcessName(processType, process)
 	if err != nil {
@@ -159,7 +159,7 @@ func updateProcessName(deps Dependencies, processID uuid.UUID, processType strin
 		return
 	}
 
-	err = deps.Store.UpdateProcessName(context.Background(), processID, processName)
+	err = deps.Store.UpdateProcessName(ctx, processID, processName)
 	if err != nil {
 		err = fmt.Errorf("error in updating process name")
 		return

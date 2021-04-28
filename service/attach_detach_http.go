@@ -26,7 +26,7 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = updateProcessName(deps, adObj.ProcessID, "AttachDetach", adObj)
+		err = updateProcessName(req.Context(), deps, adObj.ProcessID, "AttachDetach", adObj)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error updating process name")
