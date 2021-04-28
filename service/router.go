@@ -79,6 +79,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/recipes/{id}", authenticate(showRecipeHandler(deps), deps)).Methods(http.MethodGet)
 	router.HandleFunc("/recipes/{id}", authenticateAdmin(deleteRecipeHandler(deps), deps)).Methods(http.MethodDelete)
 	router.HandleFunc("/recipes/{id}", authenticateAdmin(updateRecipeHandler(deps), deps)).Methods(http.MethodPut)
+	router.HandleFunc("/recipes/{id}/publish", publishRecipeHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/processes", authenticateAdmin(createProcessHandler(deps), deps)).Methods(http.MethodPost)
 	router.HandleFunc("/processes/{id}", authenticate(listProcessesHandler(deps), deps)).Methods(http.MethodGet)
 	router.HandleFunc("/processes/{id}", authenticate(showProcessHandler(deps), deps)).Methods(http.MethodGet)

@@ -1,12 +1,12 @@
 package service
 
 import (
-	"fmt"
+	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -28,118 +28,129 @@ func TestPiercingTestSuite(t *testing.T) {
 	suite.Run(t, new(PiercingHandlerTestSuite))
 }
 
-func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
-	testUUID := uuid.New()
-	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{
-		ID: testUUID, CartridgeIDs: []int64{1, 2}, Discard: "at_pickup_passing",
-	}, nil)
+var testPiercingRecord = db.Piercing{
+	ID:             testUUID,
+	Type:           db.Cartridge1,
+	CartridgeWells: []int64{1, 2},
+	Discard:        "at_pickup_passing",
+	ProcessID:      testProcessUUID,
+}
 
-	body := fmt.Sprintf(`{"id":"%s","cartridge_ids":[1,2],"discard":"at_pickup_passing","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
+
+	suite.dbMock.On("CreatePiercing", mock.Anything, testPiercingRecord).Return(testPiercingRecord, nil)
+
+	body, _ := json.Marshal(testPiercingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/piercing",
 		"/piercing",
-		body,
+		string(body),
 		createPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","cartridge_ids":[1,2],"discard":"at_pickup_passing","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingFailure() {
-	testUUID := uuid.New()
-	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, fmt.Errorf("Error creating piercing"))
 
-	body := fmt.Sprintf(`{"id":"%s","cartridge_ids":[1,2],"discard":"at_pickup_passing","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+	suite.dbMock.On("CreatePiercing", mock.Anything, testPiercingRecord).Return(db.Piercing{}, responses.PiercingCreateError)
+
+	body, _ := json.Marshal(testPiercingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/piercing",
 		"/piercing",
-		body,
+		string(body),
 		createPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Errorf("Error creating piercing")
+	output := ErrObj{Err: responses.PiercingCreateError.Error()}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.NotEqual(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *PiercingHandlerTestSuite) TestShowPiercingSuccess() {
-	testUUID := uuid.New()
-	suite.dbMock.On("ShowPiercing", mock.Anything, mock.Anything).Return(db.Piercing{
-		ID: testUUID, CartridgeIDs: []int64{1, 3}, Discard: "at_pickup_passing",
-	}, nil)
+
+	suite.dbMock.On("ShowPiercing", mock.Anything, testProcessUUID).Return(testPiercingRecord, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/piercing/{id}",
-		"/piercing/"+testUUID.String(),
+		"/piercing/"+testProcessUUID.String(),
 		"",
 		showPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","cartridge_ids":[1,3],"discard":"at_pickup_passing","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+
+	body, _ := json.Marshal(testPiercingRecord)
+
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *PiercingHandlerTestSuite) TestShowPiercingFailure() {
-	testUUID := uuid.New()
-	suite.dbMock.On("ShowPiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, fmt.Errorf("Error listing piercing"))
+
+	suite.dbMock.On("ShowPiercing", mock.Anything, testProcessUUID).Return(db.Piercing{}, responses.PiercingFetchError)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/piercing/{id}",
-		"/piercing/"+testUUID.String(),
+		"/piercing/"+testProcessUUID.String(),
 		"",
 		showPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ""
+	output := ErrObj{Err: responses.PiercingFetchError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *PiercingHandlerTestSuite) TestUpdatePiercingSuccess() {
-	testUUID := uuid.New()
-	suite.dbMock.On("UpdatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{
-		ID: testUUID, CartridgeIDs: []int64{1, 3}, Discard: "at_pickup_passing",
-	}, nil)
 
-	body := fmt.Sprintf(`{"id":"%s","cartridge_ids":[1,2],"discard":"at_discard_box","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+	suite.dbMock.On("UpdatePiercing", mock.Anything, testPiercingRecord).Return(testPiercingRecord, nil)
+
+	body, _ := json.Marshal(testPiercingRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/piercing/{id}",
-		"/piercing/"+testUUID.String(),
-		body,
+		"/piercing/"+testProcessUUID.String(),
+		string(body),
 		updatePiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
+	output := MsgObj{Msg: responses.PiercingUpdateSuccess}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"piercing updated successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *PiercingHandlerTestSuite) TestUpdatePiercingFailure() {
-	testUUID := uuid.New()
-	suite.dbMock.On("UpdatePiercing", mock.Anything, mock.Anything).Return(db.Piercing{}, fmt.Errorf("updating piercing failed"))
 
-	body := fmt.Sprintf(`{"id":"%s","cartridge_ids":[1,2],"discard":"at_discard_box","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+	suite.dbMock.On("UpdatePiercing", mock.Anything, testPiercingRecord).Return(db.Piercing{}, responses.PiercingUpdateError)
+
+	body, _ := json.Marshal(testPiercingRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/piercing/{id}",
-		"/piercing/"+testUUID.String(),
-		body,
+		"/piercing/"+testProcessUUID.String(),
+		string(body),
 		updatePiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
 
+	output := ErrObj{Err: responses.PiercingUpdateError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
