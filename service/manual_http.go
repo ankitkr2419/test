@@ -63,7 +63,7 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			fmt.Fprintf(rw, response+" Manual Movements in Progress/Done")
+			fmt.Fprintf(rw, response+" Manual Movements in Progress/Done for deck " + m.Deck)
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
@@ -89,7 +89,7 @@ func pauseHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			fmt.Fprintf(rw, fmt.Sprintf("%v for deck %v", response, deck))
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
@@ -116,7 +116,7 @@ func resumeHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			fmt.Fprintf(rw, fmt.Sprintf("%v for deck %v", response, deck))
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
@@ -144,7 +144,7 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			fmt.Fprintf(rw, fmt.Sprintf("%v for deck %v", response, deck))
 			rw.WriteHeader(http.StatusOK)
 		}
 	})

@@ -33,7 +33,7 @@ func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 		case "A", "B":
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"recipe run is in progress for deck %v"}`, deck)))
 			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
 
 		default:
@@ -66,7 +66,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 			if runNext[deck] {
 				rw.WriteHeader(http.StatusBadRequest)
 				rw.Header().Add("Content-Type", "application/json")
-				rw.Write([]byte(`{"msg":"check if the step-run is in progress"}`))
+				rw.Write([]byte(fmt.Sprintf(`{"msg":"check if the step-run is in progress for deck %v"}`, deck)))
 				return
 			}
 
@@ -75,7 +75,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(`{"msg":"next step run is in progress"}`))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"next step run is in progress for deck %v"}`, deck)))
 			return
 
 		default:

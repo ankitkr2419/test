@@ -26,7 +26,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			plc.SetBothDeckHomingInProgress()
 			go bothDeckOperation(deps, "Homing")
 		case "A", "B":
-			rw.Write([]byte(`Operation in progress for single deck`))
+			rw.Write([]byte(fmt.Sprintf(`Operation in progress for deck %v`, deck)))
 			rw.WriteHeader(http.StatusOK)
 			go singleDeckOperation(deps, deck, "Homing")
 		default:
