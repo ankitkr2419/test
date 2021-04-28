@@ -43,6 +43,13 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 
 func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (createdAttachDetach AttachDetach, err error) {
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, a.ProcessID, "AttachDetach", a)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating attach detach process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createAttachDetachQuery,
 		a.Operation,
@@ -60,6 +67,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (creat
 		logger.WithField("err", err.Error()).Error("Error in getting AttachDetach")
 		return
 	}
+
 	return
 }
 

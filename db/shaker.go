@@ -66,6 +66,12 @@ func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker S
 func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking Shaker, err error) {
 	var lastInsertID uuid.UUID
 
+	err = s.UpdateProcessName(ctx, sh.ProcessID, "Shaking", sh)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating shakingprocess name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createShakingQuery,
 		sh.WithTemp,

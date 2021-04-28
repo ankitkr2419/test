@@ -46,6 +46,13 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 
 func (s *pgStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDocking TipDock, err error) {
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, t.ProcessID, "TipDocking", t)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createTipDockQuery,
 		t.Type,

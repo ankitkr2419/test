@@ -66,7 +66,15 @@ func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err 
 }
 
 func (s *pgStore) CreatePiercing(ctx context.Context, p Piercing) (createdPiercing Piercing, err error) {
+
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, p.ProcessID, "Piercing", p)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating piercing process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createPiercingQuery,
 		p.Type,

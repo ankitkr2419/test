@@ -52,6 +52,12 @@ func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heatin
 func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdHeating Heating, err error) {
 	var lastInsertID uuid.UUID
 
+	err = s.UpdateProcessName(ctx, h.ProcessID, "Heating", h)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createHeatingQuery,
 		h.Temperature,

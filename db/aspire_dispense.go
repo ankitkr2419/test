@@ -100,6 +100,14 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 
 func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (createdAspireDispense AspireDispense, err error) {
 	var lastInsertID uuid.UUID
+
+	//update the process name before record creation
+	err = s.UpdateProcessName(ctx, ad.ProcessID, "AspireDispense", ad)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createAspireDispenseQuery,
 		ad.Category,
@@ -127,6 +135,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		logger.WithField("err", err.Error()).Error("Error in getting aspire dispense")
 		return
 	}
+
 	return
 }
 

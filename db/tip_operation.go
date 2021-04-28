@@ -63,6 +63,13 @@ func (s *pgStore) ListTipOperation(ctx context.Context) (dbTipOperation []TipOpe
 
 func (s *pgStore) CreateTipOperation(ctx context.Context, t TipOperation) (createdTipOperation TipOperation, err error) {
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, t.ProcessID, "TipOperation", t)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating tip operation process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createTipOperationQuery,
 		t.Type,

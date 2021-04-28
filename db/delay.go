@@ -42,6 +42,13 @@ func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err
 
 func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay, err error) {
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, d.ProcessID, "Delay", d)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating delay process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createDelayQuery,
 		d.DelayTime,
