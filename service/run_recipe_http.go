@@ -62,11 +62,12 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "A", "B":
-			// If step run is not in progress means this API is called at wrong time
-			if !stepRun[deck] {
+			// If runNext is set means this API is called at wrong time
+			if runNext[deck] {
 				rw.WriteHeader(http.StatusBadRequest)
 				rw.Header().Add("Content-Type", "application/json")
 				rw.Write([]byte(`{"msg":"check if the step-run is in progress"}`))
+				return
 			}
 
 			logger.Infoln("Populating the nextStep channel for deck", deck)
@@ -75,6 +76,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
 			rw.Write([]byte(`{"msg":"next step run is in progress"}`))
+			return
 
 		default:
 			err = fmt.Errorf("Check your deck name")
@@ -87,6 +89,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 			deps.WsErrCh <- err
 			logger.Errorln(err.Error())
 		}
+		return
 	})
 }
 
@@ -121,12 +124,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		return "", err
 	}
 
-	// if it is step-run then set the map
-	if runStepWise{
-		setStepRun(deck)
-		defer resetStepRun(deck)
-	}
-
 	var currentCartridgeID int64
 	// No cartridge selected so cartridge_id by default is 0
 	// Depending on cartridge_1 or cartridge_2 type we shall
@@ -145,8 +142,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if runStepWise{
 		
 			logger.Infoln("Waiting to run next process")
+			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
 			<-nextStep[deck]
+			setRunNext(deck)
 			logger.Infoln("Next process is in progress")
 		}
 
