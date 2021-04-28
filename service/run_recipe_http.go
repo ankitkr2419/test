@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
@@ -15,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func runRecipeHandler(deps Dependencies, stepRun bool) http.HandlerFunc {
+func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		var err error
@@ -35,7 +34,7 @@ func runRecipeHandler(deps Dependencies, stepRun bool) http.HandlerFunc {
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
 			rw.Write([]byte(`{"msg":"recipe run is in progress"}`))
-			go runRecipe(req.Context(), deps, deck, stepRun, recipeID)
+			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
 
 		default:
 			err = fmt.Errorf("Check your deck name")
@@ -63,13 +62,16 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "A", "B":
-			// If next step is already set means this API is called at wrong time
-			if deps.PlcDeck[deck].IsNextStepSet(){
+			// If step run is not in progress means this API is called at wrong time
+			if !stepRun[deck] {
 				rw.WriteHeader(http.StatusBadRequest)
 				rw.Header().Add("Content-Type", "application/json")
 				rw.Write([]byte(`{"msg":"check if the step-run is in progress"}`))
 			}
-			deps.PlcDeck[deck].ResumeStep()
+
+			logger.Infoln("Populating the nextStep channel for deck", deck)
+			nextStep[deck] <- struct{}{}
+
 			rw.WriteHeader(http.StatusOK)
 			rw.Header().Add("Content-Type", "application/json")
 			rw.Write([]byte(`{"msg":"next step run is in progress"}`))
@@ -88,7 +90,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func runRecipe(ctx context.Context, deps Dependencies, deck string, stepRun bool, recipeID uuid.UUID) (response string, err error) {
+func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise bool, recipeID uuid.UUID) (response string, err error) {
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
@@ -119,6 +121,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, stepRun bool
 		return "", err
 	}
 
+	// if it is step-run then set the map
+	if runStepWise{
+		setStepRun(deck)
+		defer resetStepRun(deck)
+	}
+
 	var currentCartridgeID int64
 	// No cartridge selected so cartridge_id by default is 0
 	// Depending on cartridge_1 or cartridge_2 type we shall
@@ -134,15 +142,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, stepRun bool
 		// TODO : percentage calculation from inside the process.
 		sendWSData(deps, deck, recipeID, len(processes), i+1)
 
-		if stepRun{
-			deps.PlcDeck[deck].PauseStep()
-		// To resume the next step admin needs to hits the run-next-step API only
-			for{
-				time.Sleep(time.Second)
-				if deps.PlcDeck[deck].IsNextStepSet(){
-					break
-				}
-			}
+		if runStepWise{
+		
+			logger.Infoln("Waiting to run next process")
+			// To resume the next step admin needs to hits the run-next-step API only
+			<-nextStep[deck]
+			logger.Infoln("Next process is in progress")
 		}
 
 		switch p.Type {
