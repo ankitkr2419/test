@@ -201,7 +201,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(pi)
 
-			if string(pi.Type) == db.Cartridge1 {
+			if pi.Type == db.Cartridge1 {
 				currentCartridgeID = recipe.Cartridge1Position
 			} else {
 				currentCartridgeID = recipe.Cartridge2Position
@@ -264,7 +264,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 			fmt.Println(td)
-			if td.Type == db.Cartridge1 {
+			if td.Type == string(db.Cartridge1) {
 				currentCartridgeID = recipe.Cartridge1Position
 			} else {
 				currentCartridgeID = recipe.Cartridge2Position

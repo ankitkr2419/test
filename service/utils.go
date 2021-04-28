@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -43,6 +44,14 @@ func LoadUtils(){
 		"A": chanA,
 		"B": chanB,
 	}
+}
+
+type ErrObj struct {
+	Err string `json:"err"`
+}
+
+type MsgObj struct {
+	Msg string `json:"msg"`
 }
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
@@ -97,7 +106,22 @@ func isvalidID(id uuid.UUID) bool {
 
 func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
 	rw.Header().Add("Content-Type", "application/json")
+	logger.WithField("err", respBytes)
 	rw.WriteHeader(http.StatusBadRequest)
+	rw.Write(respBytes)
+	return
+}
+
+func responseCodeAndMsg(rw http.ResponseWriter, statusCode int, msg interface{}) {
+	rw.Header().Add("Content-Type", "application/json")
+	rw.WriteHeader(statusCode)
+	respBytes, err := json.Marshal(msg)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.DataMarshallingError)
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write(responses.DataMarshallingError)
+		return
+	}
 	rw.Write(respBytes)
 	return
 }
