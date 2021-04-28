@@ -29,6 +29,7 @@ func TestProcessTestSuite(t *testing.T) {
 }
 
 var testUUID = uuid.New()
+var testProcessUUID = uuid.New()
 var testName = "testName"
 var testType = "testType"
 var recipeUUID = uuid.New()
