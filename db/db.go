@@ -86,12 +86,10 @@ type Storer interface {
 	UpdateProcess(context.Context, Process) error
 	ListPiercing(context.Context) ([]Piercing, error)
 	CreatePiercing(context.Context, Piercing) (Piercing, error)
-	DeletePiercing(context.Context, uuid.UUID) error
 	UpdatePiercing(context.Context, Piercing) error
 	ShowAspireDispense(context.Context, uuid.UUID) (AspireDispense, error)
 	ListAspireDispense(context.Context) ([]AspireDispense, error)
 	CreateAspireDispense(context.Context, AspireDispense) (AspireDispense, error)
-	DeleteAspireDispense(context.Context, uuid.UUID) error
 	UpdateAspireDispense(context.Context, AspireDispense) error
 	ShowTipDocking(context.Context, uuid.UUID) (TipDock, error)
 	CreateTipDocking(context.Context, TipDock) (TipDock, error)
@@ -103,4 +101,10 @@ type Storer interface {
 	ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error)
 	CreateShaking(context.Context, Shaker) (Shaker, error)
 	ShowShaking(ctx context.Context, id uuid.UUID) (shaking Shaker, err error)
+	UpdateTipOperation(ctx context.Context, t TipOperation) (err error)
+	UpdateDelay(ctx context.Context, d Delay) (err error)
+	UpdateShaking(ctx context.Context, sh Shaker) (err error)
+	UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error)
+	UpdateTipDock(ctx context.Context, t TipDock) (err error)
+	UpdateHeating(ctx context.Context, ht Heating) (err error)
 }

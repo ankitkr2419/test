@@ -344,11 +344,6 @@ func (m *DBMockStore) CreatePiercing(ctx context.Context, p Piercing) (pi Pierci
 	return args.Get(0).(Piercing), args.Error(1)
 }
 
-func (m *DBMockStore) DeletePiercing(ctx context.Context, id uuid.UUID) (err error) {
-	args := m.Called(ctx, id)
-	return args.Error(1)
-}
-
 func (m *DBMockStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	args := m.Called(ctx, p)
 	return args.Error(1)
@@ -424,12 +419,92 @@ func (m *DBMockStore) CreateAspireDispense(ctx context.Context, ad AspireDispens
 	return args.Get(0).(AspireDispense), args.Error(1)
 }
 
-func (m *DBMockStore) DeleteAspireDispense(ctx context.Context, id uuid.UUID) (err error) {
-	args := m.Called(ctx, id)
-	return args.Error(1)
-}
-
 func (m *DBMockStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (err error) {
 	args := m.Called(ctx, ad)
 	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateAttachDetach(ctx context.Context, ad AttachDetach) (err error) {
+	args := m.Called(ctx, ad)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
+	args := m.Called(ctx, sh)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateTipDock(ctx context.Context, td TipDock) (err error) {
+	args := m.Called(ctx, td)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
+	args := m.Called(ctx, ht)
+	return args.Error(1)
+}
+
+func (m *DBMockStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (createdAttachDetach AttachDetach, err error) {
+	args := m.Called(ctx, ad)
+	return args.Get(0).(AttachDetach), args.Error(1)
+}
+
+func (m *DBMockStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay, err error) {
+	args := m.Called(ctx, d)
+	return args.Get(0).(Delay), args.Error(1)
+}
+
+func (m *DBMockStore) CreateHeating(ctx context.Context, h Heating) (createdHeating Heating, err error) {
+	args := m.Called(ctx, h)
+	return args.Get(0).(Heating), args.Error(1)
+}
+
+func (m *DBMockStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking Shaker, err error) {
+	args := m.Called(ctx, sh)
+	return args.Get(0).(Shaker), args.Error(1)
+}
+
+func (m *DBMockStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDocking TipDock, err error) {
+	args := m.Called(ctx, t)
+	return args.Get(0).(TipDock), args.Error(1)
+}
+
+func (m *DBMockStore) CreateTipOperation(ctx context.Context, t TipOperation) (createdTipOperation TipOperation, err error) {
+	args := m.Called(ctx, t)
+	return args.Get(0).(TipOperation), args.Error(1)
+}
+
+func (m *DBMockStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad AttachDetach, err error) {
+	args := m.Called(ctx, processID)
+	return args.Get(0).(AttachDetach), args.Error(1)
+}
+
+func (m *DBMockStore) ShowDelay(ctx context.Context, processID uuid.UUID) (createdDelay Delay, err error) {
+	args := m.Called(ctx, processID)
+	return args.Get(0).(Delay), args.Error(1)
+}
+
+func (m *DBMockStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Heating), args.Error(1)
+}
+
+func (m *DBMockStore) ShowShaking(ctx context.Context, id uuid.UUID) (shaking Shaker, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Shaker), args.Error(1)
+}
+
+func (m *DBMockStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock, err error) {
+	args := m.Called(ctx, pid)
+	return args.Get(0).(TipDock), args.Error(1)
+}
+
+func (m *DBMockStore) ShowTipOperation(ctx context.Context, id uuid.UUID) (dbTipOperation TipOperation, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(TipOperation), args.Error(1)
+}
+
+func (m *DBMockStore) ShowTip(id int64) (tip TipsTubes, err error) {
+	args := m.Called(id)
+	return args.Get(0).(TipsTubes), args.Error(1)
 }

@@ -18,12 +18,17 @@ type AttachDetach struct {
 }
 
 const (
-	getAttachDetachQuery = `SELECT * FROM attach_detach where process_id = $1`
+	getAttachDetachQuery    = `SELECT * FROM attach_detach where process_id = $1`
 	createAttachDetachQuery = `INSERT INTO attach_detach (
 		operation,
 		operation_type,
 		process_id)
 		VALUES ($1, $2, $3) RETURNING id`
+	updateAttachDetachQuery = `UPDATE attach_detach SET (
+			operation,
+			operation_type,
+			updated_at) = 
+			($1, $2, $3) WHERE process_id = $4`
 )
 
 func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad AttachDetach, err error) {
@@ -35,7 +40,6 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 	}
 	return
 }
-
 
 func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (createdAttachDetach AttachDetach, err error) {
 	var lastInsertID uuid.UUID
@@ -54,6 +58,21 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (creat
 	err = s.db.Get(&createdAttachDetach, getAttachDetachQuery, a.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting AttachDetach")
+		return
+	}
+	return
+}
+
+func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error) {
+	_, err = s.db.Exec(
+		updateAttachDetachQuery,
+		a.Operation,
+		a.OperationType,
+		time.Now(),
+		a.ProcessID,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating attach detach")
 		return
 	}
 	return

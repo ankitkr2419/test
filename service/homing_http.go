@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"mylab/cpagent/plc/compact32"
+	"mylab/cpagent/plc"
 	"net/http"
 	"reflect"
 	"time"
@@ -23,7 +23,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println("At both deck!!!")
 			rw.Write([]byte(`Operation in progress for both decks`))
 			rw.WriteHeader(http.StatusOK)
-			compact32.SetBothDeckHomingInProgress()
+			plc.SetBothDeckHomingInProgress()
 			go bothDeckOperation(deps, "Homing")
 		case "A", "B":
 			rw.Write([]byte(`Operation in progress for single deck`))
@@ -46,7 +46,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 }
 
 func bothDeckOperation(deps Dependencies, operation string) (response string, err error) {
-	defer compact32.ResetBothDeckHomingInProgress()
+	defer plc.ResetBothDeckHomingInProgress()
 
 	var deckAResponse, deckBResponse string
 	var deckAErr, deckBErr error

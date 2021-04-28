@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"encoding/binary"
@@ -38,7 +38,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 	}
 
-	logger.Infoln("Moving: ", motorNum, pulse/motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
+	logger.Infoln("Moving: ", motorNum, pulse/Motors[deckAndNumber]["steps"], "mm in ", direction, "for deck:", d.name)
 
 	//
 	// move the syringe module to rest position if the Motor Num is of deck
@@ -46,13 +46,13 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// and syringe tips are inside of deck positions.
 	//
 
-	if d.getSyringeModuleState() == InDeck && (motorNum == K5_Deck || motorNum == K7_Magnet_Rev_Fwd) {
+	// if tip discard is in progress that means avoid moving module up when motor is K5
+	if d.getSyringeModuleState() == InDeck && ( (motorNum == K5_Deck  && !d.isTipDiscardInProgress() ) || motorNum == K7_Magnet_Rev_Fwd) {
 		response, err = d.SyringeRestPosition()
 		if err != nil {
 			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
 		}
-
 	}
 
 	// Switch OFF The motor
@@ -68,7 +68,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing Switch Off : ", err, d.name)
 		return
 	}
-	logger.Infoln("Wrote Switch Off motor")
+	logger.Infoln("Wrote Switch Off motor for deck", d.name)
 	onReg.Store(d.name, OFF)
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
@@ -88,7 +88,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing pulse : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote Pulse. res : ", results)
+	logger.Infoln("Wrote Pulse for deck", d.name, ". res : ", results)
 	pulseReg.Store(d.name, pulse)
 	wrotePulses.Store(d.name, pulse)
 
@@ -103,7 +103,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing speed : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote Speed. res : ", results)
+	logger.Infoln("Wrote Speed for deck", d.name, ". res : ", results)
 	speedReg.Store(d.name, speed)
 
 	if temp := d.getRampReg(); temp == highestUint16 {
@@ -117,7 +117,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing RAMP : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote Ramp. res : ", results)
+	logger.Infoln("Wrote Ramp for deck", d.name, ". res : ", results)
 	rampReg.Store(d.name, ramp)
 
 	if temp := d.getDirectionReg(); temp == highestUint16 {
@@ -131,7 +131,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing direction : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote direction. res : ", results)
+	logger.Infoln("Wrote direction for deck ", d.name, ". res : ", results)
 	directionReg.Store(d.name, direction)
 
 	if temp := d.getMotorNumReg(); temp == highestUint16 {
@@ -145,13 +145,13 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error writing motor num: ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote motorNum. res : ", results)
+	logger.Infoln("Wrote motorNum", d.name, ". res : ", results)
 	motorNumReg.Store(d.name, motorNum)
 
 	// Check if User has paused the run/operation
 	for {
 		if d.isMachineInPausedState() {
-			logger.Infoln("Machine in PAUSED state for deck: %v", d.name)
+			logger.Infoln("Machine in PAUSED state for deck:", d.name)
 			time.Sleep(400 * time.Millisecond)
 		} else {
 			break
@@ -164,7 +164,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		logger.Errorln("error Writing On/Off : ", err, d.name)
 		return "", err
 	}
-	logger.Infoln("Wrote Switch On motor")
+	logger.Infoln("Wrote Switch On motor for deck", d.name)
 	onReg.Store(d.name, ON)
 
 	// Our Run is in Progress
@@ -177,9 +177,9 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return
 			// Write executed pulses to Position
 		} else if d.isMachineInAbortedState() {
-			logger.Infoln("position before abortion: ", positions[deckAndNumber])
-			positions[deckAndNumber] += float64(temp) / float64(motors[deckAndNumber]["steps"])
-			logger.Infoln("position after abortion: ", positions[deckAndNumber])
+			logger.Infoln("position before abortion: ", Positions[deckAndNumber])
+			Positions[deckAndNumber] += float64(temp) / float64(Motors[deckAndNumber]["steps"])
+			logger.Infoln("position after abortion: ", Positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
 		}
@@ -193,29 +193,30 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
-				logger.Infoln("Completion returned ---> ", results, d.name)
+				logger.Infoln("Completion for deck", d.name, "returned ---> ", results)
 				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("err: from setUp--> ", err, d.name)
 					return
 				}
-				distanceMoved := float64(pulse) / float64(motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
+				distanceMoved := float64(pulse) / float64(Motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
 				switch direction {
 				// Away from Sensor
 				case REV:
-					positions[deckAndNumber] += distanceMoved
+					Positions[deckAndNumber] += distanceMoved
 				// Towards Sensor
 				case FWD:
-					if (positions[deckAndNumber] - distanceMoved) < 0 {
-						positions[deckAndNumber] = 0
-						logger.Errorln("Motor Just moved to negative distance for deck: ", d.name)
+					if (Positions[deckAndNumber] - distanceMoved) < 0 {
+						logger.Errorln("Motor Just moved to negative distance", Positions[deckAndNumber]-distanceMoved, "for deck: ", d.name)
+						Positions[deckAndNumber] = 0
+						break
 					}
-					positions[deckAndNumber] -= distanceMoved
+					Positions[deckAndNumber] -= distanceMoved
 				default:
 					logger.Errorln("Unknown Direction was found")
 					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
 				}
-				logger.Infoln("pos", positions[deckAndNumber], d.name)
+				logger.Infoln("pos", Positions[deckAndNumber], d.name)
 				return "RUN Completed", nil
 			}
 		}
@@ -229,18 +230,18 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return "", err
 		}
 
-		logger.Infoln("Sensor returned ---> ", results, d.name)
+		logger.Infoln("Sensor returned for deck ", d.name, "---> ", results)
 		if len(results) > 0 {
-			if int(results[0]) == sensorCut {
+			if int(results[0]) == SensorCut {
 				logger.Infoln("Sensor returned ---> ", results[0], d.name)
 				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("Sensor err : ", err, d.name)
 					return "", err
 				}
-				positions[deckAndNumber] = calibs[deckAndNumber]
-				logger.Infoln("pos", positions[deckAndNumber], d.name)
-				return
+				Positions[deckAndNumber] = Calibs[deckAndNumber]
+				logger.Infoln("pos", Positions[deckAndNumber], d.name)
+				return "RUN Completed as Sensor cut", nil
 			}
 		}
 
@@ -253,7 +254,6 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 	}
 
-	return "RUN Completed", nil
 }
 
 func (d *Compact32Deck) switchOffMotor() (response string, err error) {
@@ -268,7 +268,7 @@ func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 		logger.Errorln("err Switching motor off: ", err)
 		return "", err
 	}
-	logger.Infoln("Wrote Switch OFF motor")
+	logger.Infoln("Wrote Switch OFF motor for deck", d.name)
 	onReg.Store(d.name, OFF)
 
 	return "SUCCESS", nil
@@ -279,7 +279,7 @@ func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 	// Switch off Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], OFF)
 	if err != nil {
-		logger.Errorln("err Switching off the heater: ", err)
+		logger.Errorln("err Switching off the heater for deck: ", d.name, err)
 		return "", err
 	}
 	logger.Infoln("Switched off the heater--> for deck ", d.name)
@@ -368,5 +368,4 @@ func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 	logger.Infoln("Read D212 Pulses -> ", binary.BigEndian.Uint16(results))
 
 	return "D212 Reading SUCESS", nil
-
 }

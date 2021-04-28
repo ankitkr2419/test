@@ -32,8 +32,8 @@ const (
 type CartridgeType string
 
 const (
-	Cartridge1 = "cartridge_1"
-	Cartridge2 = "cartridge_2"
+	Cartridge1 CartridgeType = "cartridge_1"
+	Cartridge2 CartridgeType = "cartridge_2"
 )
 
 type Cartridge struct {

@@ -10,9 +10,9 @@ import (
 
 type Heating struct {
 	ID          uuid.UUID `json:"id" db:"id"`
-	Temperature float64   `json:"temperature" db:"temperature"`
+	Temperature float64   `json:"temperature" db:"temperature" validate:"gte=20,lte=120"`
 	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
-	Duration    int64     `json:"duration" db:"duration"`
+	Duration    int64     `json:"duration" db:"duration" validate:"gte=10,lte=3660"`
 	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
@@ -26,6 +26,12 @@ const (
 		duration,
 		process_id)
 		VALUES ($1, $2, $3, $4) RETURNING id`
+	updateHeatingQuery = `UPDATE heating SET (
+		temperature,
+		follow_temp,
+		duration,
+		updated_at) = 
+		($1, $2, $3, $4) WHERE process_id = $5`
 )
 
 func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
@@ -62,6 +68,22 @@ func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdHeating 
 	err = s.db.Get(&createdHeating, getHeatingQuery, h.ProcessID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error in getting Heating")
+		return
+	}
+	return
+}
+
+func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
+	_, err = s.db.Exec(
+		updateHeatingQuery,
+		ht.Temperature,
+		ht.FollowTemp,
+		ht.Duration,
+		time.Now(),
+		ht.ProcessID,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating heating")
 		return
 	}
 	return

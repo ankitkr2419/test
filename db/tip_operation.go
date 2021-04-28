@@ -31,7 +31,7 @@ const (
 	updateTipOperationQuery = `UPDATE tip_operation SET (
 						type,
 						position,
-						updated_at) = ($1, $2, $3) WHERE WHERE process_id = $4`
+						updated_at) = ($1, $2, $3) WHERE process_id = $4`
 )
 
 type TipOperation struct {

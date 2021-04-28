@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	"time"
@@ -16,8 +16,10 @@ const (
 	REV         = uint16(0)
 	ASPIRE      = uint16(0)
 	DISPENSE    = uint16(1)
-	sensorUncut = 2
-	sensorCut   = 3
+	TowardsSensor = uint16(1)
+	AgainstSensor = uint16(0)
+	SensorUncut = 2
+	SensorCut   = 3
 )
 
 // *** NOTE ***

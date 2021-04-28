@@ -1,4 +1,4 @@
-package compact32
+package plc
 
 import (
 	logger "github.com/sirupsen/logrus"
@@ -39,6 +39,15 @@ func (d *Compact32Deck) setShakerInProgress() {
 func (d *Compact32Deck) resetShakerInProgress() {
 	shakerInProgress.Store(d.name, false)
 }
+
+func (d *Compact32Deck) setTipDiscardInProgress() {
+	tipDiscardInProgress.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetTipDiscardInProgress() {
+	tipDiscardInProgress.Store(d.name, false)
+}
+
 
 func (d *Compact32Deck) setAborted() {
 	aborted.Store(d.name, true)
@@ -141,6 +150,15 @@ func (d *Compact32Deck) isShakerInProgress() bool {
 func (d *Compact32Deck) isUVLightInProgress() bool {
 	if temp, ok := uvLightInProgress.Load(d.name); !ok {
 		logger.Errorln("uvLightInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) isTipDiscardInProgress() bool {
+	if temp, ok := tipDiscardInProgress.Load(d.name); !ok {
+		logger.Errorln("tipDiscardInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}
