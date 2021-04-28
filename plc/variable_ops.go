@@ -76,14 +76,6 @@ func (d *Compact32Deck) setHomingPercent(percent float64) {
 	homingPercent.Store(d.name, percent)
 }
 
-func (d *Compact32Deck) PauseStep() {
-	runNextStep.Store(d.name, false)
-}
-
-func (d *Compact32Deck) ResumeStep() {
-	runNextStep.Store(d.name, true)
-}
-
 func (d *Compact32Deck) IsMachineHomed() bool {
 	if temp, ok := homed.Load(d.name); !ok {
 		logger.Errorln("homed isn't loaded!")
@@ -96,15 +88,6 @@ func (d *Compact32Deck) IsMachineHomed() bool {
 func (d *Compact32Deck) IsRunInProgress() bool {
 	if temp, ok := runInProgress.Load(d.name); !ok {
 		logger.Errorln("runInProgress isn't loaded!")
-	} else if temp.(bool) {
-		return true
-	}
-	return false
-}
-
-func (d *Compact32Deck) IsNextStepSet() bool {
-	if temp, ok := runNextStep.Load(d.name); !ok {
-		logger.Errorln("runNextStep isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}
