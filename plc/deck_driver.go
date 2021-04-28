@@ -46,13 +46,13 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// and syringe tips are inside of deck positions.
 	//
 
-	if d.getSyringeModuleState() == InDeck && (motorNum == K5_Deck || motorNum == K7_Magnet_Rev_Fwd) {
+	// if tip discard is in progress that means avoid moving module up when motor is K5
+	if d.getSyringeModuleState() == InDeck && ( (motorNum == K5_Deck  && !d.isTipDiscardInProgress() ) || motorNum == K7_Magnet_Rev_Fwd) {
 		response, err = d.SyringeRestPosition()
 		if err != nil {
 			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
 		}
-
 	}
 
 	// Switch OFF The motor
@@ -207,7 +207,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 				// Towards Sensor
 				case FWD:
 					if (Positions[deckAndNumber] - distanceMoved) < 0 {
-						logger.Errorln("Motor Just moved to negative distance", Positions[deckAndNumber] - distanceMoved ,"for deck: ", d.name)
+						logger.Errorln("Motor Just moved to negative distance", Positions[deckAndNumber]-distanceMoved, "for deck: ", d.name)
 						Positions[deckAndNumber] = 0
 						break
 					}
@@ -241,7 +241,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 				}
 				Positions[deckAndNumber] = Calibs[deckAndNumber]
 				logger.Infoln("pos", Positions[deckAndNumber], d.name)
-				return
+				return "RUN Completed as Sensor cut", nil
 			}
 		}
 
@@ -254,7 +254,6 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 	}
 
-	return "RUN Completed", nil
 }
 
 func (d *Compact32Deck) switchOffMotor() (response string, err error) {
@@ -369,5 +368,4 @@ func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 	logger.Infoln("Read D212 Pulses -> ", binary.BigEndian.Uint16(results))
 
 	return "D212 Reading SUCESS", nil
-
 }

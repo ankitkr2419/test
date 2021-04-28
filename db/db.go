@@ -86,12 +86,10 @@ type Storer interface {
 	UpdateProcess(context.Context, Process) error
 	ListPiercing(context.Context) ([]Piercing, error)
 	CreatePiercing(context.Context, Piercing) (Piercing, error)
-	DeletePiercing(context.Context, uuid.UUID) error
 	UpdatePiercing(context.Context, Piercing) error
 	ShowAspireDispense(context.Context, uuid.UUID) (AspireDispense, error)
 	ListAspireDispense(context.Context) ([]AspireDispense, error)
 	CreateAspireDispense(context.Context, AspireDispense) (AspireDispense, error)
-	DeleteAspireDispense(context.Context, uuid.UUID) error
 	UpdateAspireDispense(context.Context, AspireDispense) error
 	ShowTipDocking(context.Context, uuid.UUID) (TipDock, error)
 	CreateTipDocking(context.Context, TipDock) (TipDock, error)

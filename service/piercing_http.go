@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -14,13 +15,14 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 		var pobj db.Piercing
 		err := json.NewDecoder(req.Body).Decode(&pobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
+			logger.WithField("err", err.Error()).Errorln(responses.PiercingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PiercingDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(pobj)
 		if !valid {
+			logger.WithField("err", err.Error()).Errorln(responses.PiercingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -35,21 +37,12 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 		var createdTemp db.Piercing
 		createdTemp, err = deps.Store.CreatePiercing(req.Context(), pobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create piercing")
+			logger.WithField("err", err.Error()).Errorln(responses.PiercingCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PiercingCreateError.Error()})
 			return
 		}
-
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling piercing data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.PiercingCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, createdTemp)
 	})
 }
 
@@ -59,7 +52,8 @@ func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -67,21 +61,13 @@ func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowPiercing(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show piercing")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PiercingFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.PiercingFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(latestT)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling piercing data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.PiercingFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, latestT)
 	})
 }
 
@@ -90,7 +76,8 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -98,8 +85,8 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&pobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
+			logger.WithField("err", err.Error()).Errorln(responses.PiercingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PiercingDecodeError.Error()})
 			return
 		}
 
@@ -109,16 +96,15 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		pobj.ID = id
+		pobj.ProcessID = id
 		err = deps.Store.UpdatePiercing(req.Context(), pobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update piercing")
+			logger.WithField("err", err.Error()).Error(responses.PiercingUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PiercingUpdateError.Error()})
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"piercing updated successfully"}`))
+		logger.Infoln(responses.PiercingUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PiercingUpdateSuccess})
 	})
 }

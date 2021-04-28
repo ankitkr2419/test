@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -14,13 +15,14 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		var adobj db.AspireDispense
 		err := json.NewDecoder(req.Body).Decode(&adobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding aspire dispense data")
+			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.AspireDispenseDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(adobj)
 		if !valid {
+			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -35,21 +37,12 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		var createdTemp db.AspireDispense
 		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create aspire dispense")
+			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.AspireDispenseCreateError.Error()})
 			return
 		}
-
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling aspire dispense data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.AspireDispenseCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, createdTemp)
 	})
 }
 
@@ -59,7 +52,8 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -67,21 +61,13 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowAspireDispense(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show aspire dispense")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.AspireDispenseFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.AspireDispenseFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(latestT)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling aspire dispense data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.AspireDispenseFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, latestT)
 	})
 }
 
@@ -90,7 +76,8 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -98,8 +85,8 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&adobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding aspire dispense data")
+			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.AspireDispenseDecodeError.Error()})
 			return
 		}
 
@@ -109,16 +96,15 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		adobj.ID = id
+		adobj.ProcessID = id
 		err = deps.Store.UpdateAspireDispense(req.Context(), adobj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update aspire dispense")
+			logger.WithField("err", err.Error()).Error(responses.AspireDispenseUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.AspireDispenseUpdateError.Error()})
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"aspire dispense updated successfully"}`))
+		logger.Infoln(responses.AspireDispenseUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.AspireDispenseUpdateSuccess})
 	})
 }
