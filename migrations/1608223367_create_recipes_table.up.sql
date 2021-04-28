@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS recipes(
  pos_cartridge_2 int NOT NULL,
  pos_9 int NOT NULL,
  process_count int NOT NULL DEFAULT 0,
- is_published boolean DEFAULT false,
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY(pos_1) REFERENCES tips_and_tubes(id),
