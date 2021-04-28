@@ -168,3 +168,11 @@ export const resetRecipeDataForDeck = (deckName) => ({//deckName should be passe
     deckName
   },
 });
+
+export const updateRecipeReducerDataForDeck = (deckName, body) => ({//deckName should be passed
+  type: saveRecipeDataAction.updateRecipeReducerDataForDeck,
+  payload: {
+    deckName,
+    body
+  },
+});

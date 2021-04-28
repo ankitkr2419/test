@@ -89,6 +89,20 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 ...state,
                 decks: newDecksAfterRecipeDataAdded,
             };
+        case saveRecipeDataAction.updateRecipeReducerDataForDeck: //update data in a deck
+            let deckNameToUpdate = action.payload.deckName;
+            let newDecksAfterRequiredUpdations = state.decks.map((deckObj) => {
+                return deckObj.name === deckNameToUpdate
+                    ? {
+                          ...deckObj,
+                          ...action.payload.body,
+                      }
+                    : deckObj;
+            });
+            return {
+                ...state,
+                decks: newDecksAfterRequiredUpdations,
+            };
         case runRecipeAction.runRecipeInitiated:
             console.log("action: ", action); // only change the loading of deck and buttons
             return { ...state, ...action.payload, isLoading: true };
@@ -123,7 +137,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 rightActionBtn: DECKCARD_BTN.text.abort,
             };
         case runRecipeAction.runRecipeInCompleted:
-          console.log('action completed', action);
+            console.log("action completed", action);
             return {
                 ...state,
                 ...action.payload,

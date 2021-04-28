@@ -12,6 +12,7 @@ import {
     pauseRecipeReset,
     resumeRecipeReset,
     abortRecipeReset,
+    updateRecipeReducerDataForDeck,
 } from "action-creators/recipeActionCreators";
 
 const AppFooter = (props) => {
@@ -45,11 +46,6 @@ const AppFooter = (props) => {
         (deckObj) => deckObj.name === DECKNAME.DeckB
     );
 
-    const tempFunction = () => {
-        //remove later//check
-        alert("in dev");
-    };
-
     const getLeftActionBtnHandler = (deckName) => {
         let recipeReducerData =
             deckName === DECKNAME.DeckA
@@ -69,21 +65,30 @@ const AppFooter = (props) => {
                     ? handleRunActionDeckA
                     : handleRunActionDeckB;
             case DECKCARD_BTN.text.pause:
-                return handlePauseAction;
+                return deckName === DECKNAME.DeckA
+                    ? handlePauseActionDeckA
+                    : handlePauseActionDeckB;
             case DECKCARD_BTN.text.resume:
-                return handleResumeAction;
+                return deckName === DECKNAME.DeckA
+                    ? handleResumeActionDeckA
+                    : handleResumeActionDeckB;
 
             case DECKCARD_BTN.text.startUv:
                 return deckName === DECKNAME.DeckA
                     ? handleRunActionDeckA
                     : handleRunActionDeckB;
             case DECKCARD_BTN.text.pauseUv:
-                return handlePauseAction;
+                return deckName === DECKNAME.DeckA
+                    ? handlePauseActionDeckA
+                    : handlePauseActionDeckB;
             case DECKCARD_BTN.text.resumeUv:
-                return handleResumeAction;
-
+                return deckName === DECKNAME.DeckA
+                    ? handleResumeActionDeckA
+                    : handleResumeActionDeckB;
             case DECKCARD_BTN.text.done:
-                return handleDoneAction;
+                return deckName === DECKNAME.DeckA
+                    ? handleDoneActionDeckA
+                    : handleDoneActionDeckB;
 
             default:
                 break;
@@ -133,52 +138,122 @@ const AppFooter = (props) => {
         }
     };
 
-    const handlePauseAction = () => {
-        // const name = deckName === "Deck A" ? "A" : "B";
-        // if (showProcess) {
-        //     dispatch(pauseRecipeInitiated({ deckName: name }));
-        // } else {
-        //     dispatch(pauseCleanUpActionInitiated({ deckName: name }));
-        // }
+    const handlePauseActionDeckA = () => {
+        let recipeReducerData = recipeActionReducerForDeckA;
+
+        if (recipeReducerData.showProcess) {
+            dispatch(
+                pauseRecipeInitiated({ deckName: recipeReducerData.name })
+            );
+        } else {
+            //dispatch(pauseCleanUpActionInitiated({ deckName: recipeReducerData.name }));
+        }
+    };
+    const handlePauseActionDeckB = () => {
+        let recipeReducerData = recipeActionReducerForDeckB;
+
+        if (recipeReducerData.showProcess) {
+            dispatch(
+                pauseRecipeInitiated({ deckName: recipeReducerData.name })
+            );
+        } else {
+            //dispatch(pauseCleanUpActionInitiated({ deckName: recipeReducerData.name }));
+        }
     };
 
-    const handleResumeAction = () => {
-        // const name = deckName === "Deck A" ? "A" : "B";
-        // if (showProcess) {
-        //     dispatch(resumeRecipeInitiated({ deckName: name }));
-        // } else {
-        //     dispatch(resumeCleanUpActionInitiated({ deckName: name }));
-        // }
+    const handleResumeActionDeckA = () => {
+        let recipeReducerData = recipeActionReducerForDeckA;
+
+        if (recipeReducerData.showProcess) {
+            dispatch(
+                resumeRecipeInitiated({ deckName: recipeReducerData.name })
+            );
+        } else {
+            //dispatch(resumeCleanUpActionInitiated({ deckName: recipeReducerData.name }));
+        }
     };
 
-    const handleDoneAction = () => {
-        // setShowProcess(!showProcess);
-        // // setLeftActionBtn(DECKCARD_BTN.text.run);
-        // //setRightActionBtn(DECKCARD_BTN.text.cancel);
+    const handleResumeActionDeckB = () => {
+        let recipeReducerData = recipeActionReducerForDeckB;
+
+        if (recipeReducerData.showProcess) {
+            dispatch(
+                resumeRecipeInitiated({ deckName: recipeReducerData.name })
+            );
+        } else {
+            //dispatch(resumeCleanUpActionInitiated({ deckName: recipeReducerData.name }));
+        }
     };
 
-    const getRightActionBtnHandler = () => {
-        return tempFunction;
-        // switch (
-        //     showProcess
-        //         ? recipeActionReducer.rightActionBtn
-        //         : cleanUpReducer.rightActionBtn
-        // ) {
-        //     case DECKCARD_BTN.text.abort:
-        //         return handleAbortAction;
-        //     case DECKCARD_BTN.text.cancel:
-        //         return handleCancelAction;
-        //     default:
-        //         break;
-        // }
+    const handleDoneActionDeckA = () => {
+        let recipeReducerData = recipeActionReducerForDeckA;
+        dispatch(
+            updateRecipeReducerDataForDeck(recipeReducerData.name, {
+                showProcess: !recipeReducerData.showProcess,
+            })
+        );
+    };
+    const handleDoneActionDeckB = () => {
+        let recipeReducerData = recipeActionReducerForDeckB;
+        dispatch(
+            updateRecipeReducerDataForDeck(recipeReducerData.name, {
+                showProcess: !recipeReducerData.showProcess,
+            })
+        );
     };
 
-    const handleCancelAction = () => {
-        // setShowProcess(false);
-        // setShowCleanUp(false);
+    const getRightActionBtnHandler = (deckName) => {
+        let recipeReducerData =
+            deckName === DECKNAME.DeckA
+                ? recipeActionReducerForDeckA
+                : recipeActionReducerForDeckB;
+        let showProcess = recipeReducerData.showProcess;
+
+        let cleanUpReducerData = { leftActionBtn: undefined }; //check //change (use cleanUpReducer data here)
+
+        switch (
+            showProcess
+                ? recipeActionReducer.rightActionBtn
+                : cleanUpReducerData.rightActionBtn
+        ) {
+            case DECKCARD_BTN.text.abort:
+                return deckName === DECKNAME.DeckA
+                    ? handleAbortActionDeckA
+                    : handleAbortActionDeckB;
+            case DECKCARD_BTN.text.cancel:
+                return deckName === DECKNAME.DeckA
+                    ? handleCancelActionDeckA
+                    : handleCancelActionDeckB;
+            default:
+                break;
+        }
+    };
+    const handleCancelActionDeckA = () => {
+        let recipeReducerData = recipeActionReducerForDeckA;
+        dispatch(
+            updateRecipeReducerDataForDeck(recipeReducerData.name, {
+                showProcess: false,
+            })
+        );
+        // setShowCleanUp(false); //check
+    };
+    const handleCancelActionDeckB = () => {
+        let recipeReducerData = recipeActionReducerForDeckB;
+        dispatch(
+            updateRecipeReducerDataForDeck(recipeReducerData.name, {
+                showProcess: false,
+            })
+        );
+        // setShowCleanUp(false);//check
     };
 
-    const handleAbortAction = () => {
+    const handleAbortActionDeckA = () => {
+        //check
+        // setConfirmationModal(true);
+    };
+
+    const handleAbortActionDeckB = () => {
+        //check
         // setConfirmationModal(true);
     };
 

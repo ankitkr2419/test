@@ -38,5 +38,6 @@ export const recipeListingAction = {
 
 export const saveRecipeDataAction = {
   saveRecipeDataForDeck: "SAVE_RECIPE_DATA_FOR_DECK",
-  resetRecipeDataForDeck: "RESET_RECIPE_DATA_FOR_DECK"
+  resetRecipeDataForDeck: "RESET_RECIPE_DATA_FOR_DECK",
+  updateRecipeReducerDataForDeck: "UPDATE_RECIPE_REDUCER_DATA_FOR_DECK"
 }
