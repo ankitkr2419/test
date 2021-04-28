@@ -18,6 +18,33 @@ const (
 	cycle = "cycle"
 )
 
+
+var stepRun  map[string]bool
+var nextStep map[string]chan struct{}
+
+func resetStepRun(deck string){
+	stepRun[deck] = false
+}
+
+func setStepRun(deck string){
+	stepRun[deck] = true
+}
+
+func LoadUtils(){
+	stepRun = map[string]bool{
+		"A": false,
+		"B": false,
+	}
+
+	chanA := make(chan struct{}, 1)
+	chanB := make(chan struct{}, 1)
+
+	nextStep = map[string]chan struct{}{
+		"A": chanA,
+		"B": chanB,
+	}
+}
+
 func validate(i interface{}) (valid bool, respBytes []byte) {
 
 	fieldErrors := make(map[string]string)
