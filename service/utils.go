@@ -22,9 +22,33 @@ const (
 
 var userLogin sync.Map
 
+// runNext will run the next step of process when set
+var runNext map[string]bool
+var nextStep map[string]chan struct{}
+
+func resetRunNext(deck string) {
+	runNext[deck] = false
+}
+
+func setRunNext(deck string) {
+	runNext[deck] = true
+}
+
 func LoadUtils() {
 	userLogin.Store("A", false)
 	userLogin.Store("B", false)
+	runNext = map[string]bool{
+		"A": false,
+		"B": false,
+	}
+
+	chanA := make(chan struct{}, 1)
+	chanB := make(chan struct{}, 1)
+
+	nextStep = map[string]chan struct{}{
+		"A": chanA,
+		"B": chanB,
+	}
 }
 
 type ErrObj struct {
