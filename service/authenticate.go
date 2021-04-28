@@ -14,7 +14,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-type Claims struct {
+type Token struct {
 	jwt.StandardClaims
 	Role    string            `json:"role"`
 	Deck    string            `json:"deck"`
@@ -34,7 +34,7 @@ func EncodeToken(userID string, role string, deck string, payload map[string]str
 }
 
 func generateToken(userID, role, deck, accessKey string, payload map[string]string) (string, error) {
-	tokenClaims := &Claims{
+	tokenClaims := &Token{
 		Role:    role,
 		Deck:    deck,
 		Payload: payload,
