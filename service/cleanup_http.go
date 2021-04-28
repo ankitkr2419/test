@@ -27,7 +27,7 @@ func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			fmt.Fprintf(rw, fmt.Sprintf("%v for deck %v", response, deck))
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
@@ -53,7 +53,7 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			fmt.Fprintf(rw, fmt.Sprintf("%v for deck %v", response, deck))
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
@@ -70,7 +70,7 @@ func uvLightHandler(deps Dependencies) http.HandlerFunc {
 		switch deck {
 		case "A", "B":
 			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(`uv light clean up in progress`))
+			rw.Write([]byte(fmt.Sprintf(`uv light clean up in progress for deck %v`, deck)))
 			go deps.PlcDeck[deck].UVLight(uvTime)
 		default:
 			err := fmt.Errorf("Check your deck name")

@@ -26,7 +26,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			plc.SetBothDeckHomingInProgress()
 			go bothDeckOperation(deps, "Homing")
 		case "A", "B":
-			rw.Write([]byte(`Operation in progress for single deck`))
+			rw.Write([]byte(fmt.Sprintf(`Operation in progress for deck %v`, deck)))
 			rw.WriteHeader(http.StatusOK)
 			go singleDeckOperation(deps, deck, "Homing")
 		default:
@@ -109,15 +109,16 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	fmt.Println("Correct Result: ", result)
 	response = result[0].String()
 	if len(response) > 0 {
-		deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
-		return
-	}
-	errRes := result[1].Interface()
-	if errRes != nil {
-		fmt.Println(errRes)
-		err := fmt.Errorf("%v", errRes)
-		deps.WsErrCh <- err
-		return "", err
+		errRes := result[1].Interface()
+		if errRes != nil {
+			fmt.Println(errRes)
+			err := fmt.Errorf("%v", errRes)
+			deps.WsErrCh <- err
+			return "", err
+		}
+		if operation == "Homing"{
+			deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
+		}
 	}
 
 	return
