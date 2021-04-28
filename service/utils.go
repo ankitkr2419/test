@@ -19,20 +19,20 @@ const (
 	cycle = "cycle"
 )
 
-
-var stepRun  map[string]bool
+// runNext will run the next step of process when set
+var runNext  map[string]bool
 var nextStep map[string]chan struct{}
 
-func resetStepRun(deck string){
-	stepRun[deck] = false
+func resetRunNext(deck string){
+	runNext[deck] = false
 }
 
-func setStepRun(deck string){
-	stepRun[deck] = true
+func setRunNext(deck string){
+	runNext[deck] = true
 }
 
 func LoadUtils(){
-	stepRun = map[string]bool{
+	runNext = map[string]bool{
 		"A": false,
 		"B": false,
 	}
