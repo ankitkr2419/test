@@ -1,1 +1,0 @@
-ALTER TABLE recipes DROP COLUMN IF EXISTS is_published;
