@@ -27,12 +27,19 @@ func discardAndHomeHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "A", "B":
-			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(`discard-tip-and-home in progress`))
 			go deps.PlcDeck[deck].DiscardTipAndHome(discard)
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(fmt.Sprintf(`"msg":"discard-tip-and-home in progress","deck": "%v"`, deck)))
 		default:
 			err := fmt.Errorf("Check your deck name")
 			deps.WsErrCh <- err
+		}
+
+		if err != nil {
+			fmt.Fprintf(rw, err.Error())
+			fmt.Println(err.Error())
+			rw.WriteHeader(http.StatusBadRequest)
 		}
 
 	})

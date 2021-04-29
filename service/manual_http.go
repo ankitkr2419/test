@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	logger "github.com/sirupsen/logrus"
 )
 
 type Manual struct {
@@ -63,8 +64,11 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			fmt.Fprintf(rw, response+" Manual Movements in Progress/Done")
+			response += " Manual Movements in Progress/Done"
+			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, m.Deck)))
+			logger.Infoln(response)
 		}
 	})
 }
@@ -89,8 +93,10 @@ func pauseHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, deck)))
+			logger.Infoln(response)
 		}
 	})
 }
@@ -116,8 +122,10 @@ func resumeHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, deck)))
+			logger.Infoln(response)
 		}
 	})
 }
@@ -144,8 +152,10 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println(err.Error())
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(rw, response)
+			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, deck)))
+			logger.Infoln(response)
 		}
 	})
 }

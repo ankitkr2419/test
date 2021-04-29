@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
-CREATE TABLE notifications
+CREATE TABLE IF NOT EXISTS notifications
 (
     id uuid primary key default uuid_generate_v4(),
     message varchar(250),
