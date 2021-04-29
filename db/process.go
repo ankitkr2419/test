@@ -2,8 +2,9 @@ package db
 
 import (
 	"context"
-	"errors"
+	"database/sql"
 	"fmt"
+	"mylab/cpagent/responses"
 	"time"
 
 	"github.com/google/uuid"
@@ -37,6 +38,8 @@ const (
 						VALUES ($1, $2, $3) WHERE id = $4`
 
 	updateProcessNameQuery = `UPDATE processes SET name = $1 WHERE id = $2`
+
+	getHighestSequenceNumberQuery = `SELECT max(sequence_num) FROM processes; `
 )
 
 type Process struct {
@@ -114,15 +117,46 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	return
 }
 
+func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID, process interface{}) (duplicate Process, err error) {
+
+	var parent Process
+	var highestSeqNum int64
+
+	// if parent process exists only then create duplicate process
+	parent, err = s.ShowProcess(ctx, processID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
+		return
+	}
+
+	// Get highest sequence number
+	// This sequence number is updation, we only need to get something unique
+	err = s.db.QueryRow(
+		getHighestSequenceNumberQuery,
+	).Scan(&highestSeqNum)
+
+	// get the highest sequence number for our process
+	parent.SequenceNumber = highestSeqNum + 1
+
+	createdP, err := s.processOperation(ctx, "duplicate", parent.Type, process, parent)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error creating duplicate process")
+		return
+	}
+
+	logger.Infoln("Duplicate process created in db : ", createdP)
+	return
+}
+
 func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
-	processName, err := getProcessName(processType, process)
+	processWithName, err := s.processOperation(ctx, "name", processType, process, Process{})
 	if err != nil {
 		err = fmt.Errorf("error in updating new process name")
 		return
 	}
 	_, err = s.db.Exec(
 		updateProcessNameQuery,
-		processName,
+		processWithName.Name,
 		id,
 	)
 	if err != nil {
@@ -132,52 +166,270 @@ func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processTy
 	return
 }
 
-func getProcessName(processType string, process interface{}) (processName string, err error) {
+func (s *pgStore) processOperation(ctx context.Context, operation string, processType string, process interface{}, parent Process) (pr Process, err error) {
+
+	// TODO: handle type conversion panic by defer
+
+	var tx *sql.Tx
+	var lastInsertID uuid.UUID
+
+	if operation == "duplicate" {
+		// In a transaction insert entry into Process table
+		// and then into its type table
+		tx, err = s.db.BeginTx(ctx, nil)
+		if err != nil {
+			logger.WithField("err:", err.Error()).Error("Error while initiating transaction")
+			return Process{}, err
+		}
+
+		defer func() {
+			if err != nil {
+				tx.Rollback()
+				return
+			}
+			tx.Commit()
+		}()
+
+		// Insert entry into Process table
+		err = tx.QueryRow(
+			createProcessQuery,
+			parent.Name,
+			parent.Type,
+			parent.RecipeID,
+			parent.SequenceNumber,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate Process")
+			return Process{}, err
+		}
+
+		pr = parent
+		pr.ID = lastInsertID
+	}
 
 	switch processType {
 	case "Piercing":
-		piercing := process.(Piercing)
-		processName = fmt.Sprintf("Piercing_%s", piercing.Type)
+		p := process.(Piercing)
+		if operation == "name" {
+			pr.Name = fmt.Sprintf("Piercing_%s", p.Type)
+			return
+		}
+
+		// Create Piercing process
+		p.ProcessID = pr.ID
+
+		err = tx.QueryRow(
+			createPiercingQuery,
+			p.Type,
+			p.CartridgeWells,
+			p.Discard,
+			p.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate piercing")
+			return
+		}
+
+		p.ID = lastInsertID
+		logger.Infoln("Piercing Process Duplicated => ", p)
 		return
 
 	case "TipOperation":
-		tipOpr := process.(TipOperation)
-		processName = fmt.Sprintf("Tip_Operation_%s", tipOpr.Type)
+		t := process.(TipOperation)
+		if operation == "name" {
+			pr.Name = fmt.Sprintf("Tip_Operation_%s", t.Type)
+			return
+		}
+		// Create TipOperation  process
+		t.ProcessID = pr.ID
+
+		err = tx.QueryRow(
+			createTipOperationQuery,
+			t.Type,
+			t.Position,
+			t.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate tip operation")
+			return
+		}
+
+		t.ID = lastInsertID
+		logger.Infoln("Tip Operation Process Duplicated => ", t)
 		return
 
 	case "TipDocking":
-		tipDock := process.(TipDock)
-		processName = fmt.Sprintf("Tip_Docking_%s", tipDock.Type)
+		t := process.(TipDock)
+		if operation == "name" {
+			pr.Name = fmt.Sprintf("Tip_Docking_%s", t.Type)
+			return
+		}
+		// Create TipDocking process
+		t.ProcessID = pr.ID
+
+		err = tx.QueryRow(
+			createTipDockQuery,
+			t.Type,
+			t.Position,
+			t.Height,
+			t.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate tip docking")
+			return
+		}
+
+		t.ID = lastInsertID
+		logger.Infoln("Tip Docking Process Duplicated => ", t)
 		return
 
 	case "AspireDispense":
-		aspDis := process.(AspireDispense)
-		processName = fmt.Sprintf("Aspire_Dispense_%s", aspDis.Category)
+		ad := process.(AspireDispense)
+		if operation == "name" {
+			pr.Name = fmt.Sprintf("Aspire_Dispense_%s", ad.Category)
+			return
+		}
+		// Create AspireDispense process
+		ad.ProcessID = pr.ID
+
+		err = tx.QueryRow(
+			createAspireDispenseQuery,
+			ad.Category,
+			ad.CartridgeType,
+			ad.SourcePosition,
+			ad.AspireHeight,
+			ad.AspireMixingVolume,
+			ad.AspireNoOfCycles,
+			ad.AspireVolume,
+			ad.AspireAirVolume,
+			ad.DispenseHeight,
+			ad.DispenseMixingVolume,
+			ad.DispenseNoOfCycles,
+			ad.DestinationPosition,
+			ad.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate aspire dispense")
+			return
+		}
+
+		ad.ID = lastInsertID
+		logger.Infoln("Aspire Dispense Process Duplicated => ", ad)
 		return
 
 	case "Heating":
-		processName = fmt.Sprintf("Heating")
+		if operation == "name" {
+			pr.Name = "Heating"
+			return
+		}
+		// Create Heating process
+		h := process.(Heating)
+		h.ProcessID = pr.ID
+
+		err = tx.QueryRow(
+			createHeatingQuery,
+			h.Temperature,
+			h.FollowTemp,
+			h.Duration,
+			h.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate heating")
+			return
+		}
+
+		h.ID = lastInsertID
+		logger.Infoln("Heating Process Duplicated => ", h)
 		return
 
 	case "Shaking":
-		shaking := process.(Shaker)
-		if shaking.WithTemp {
-			processName = fmt.Sprintf("Shaking_With_temperature")
+		sh := process.(Shaker)
+		if operation == "name" {
+			if sh.WithTemp {
+				pr.Name = "Shaking_With_temperature"
+				return
+			}
+			pr.Name = "Shaking_Without_temperature"
 			return
 		}
-		processName = fmt.Sprintf("Shaking_Without_temperature")
+		// Create Shaking process
+		sh.ProcessID = pr.ID
+
+		err = tx.QueryRow(
+			createShakingQuery,
+			sh.WithTemp,
+			sh.Temperature,
+			sh.FollowTemp,
+			sh.RPM1,
+			sh.RPM2,
+			sh.Time1,
+			sh.Time2,
+			sh.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate shaking")
+			return
+		}
+
+		sh.ID = lastInsertID
+		logger.Infoln("Shaking Process Duplicated => ", sh)
 		return
 
 	case "AttachDetach":
-		atDet := process.(AttachDetach)
-		processName = fmt.Sprintf("Magnet_%s", atDet.Operation)
+		ad := process.(AttachDetach)
+		if operation == "name" {
+			pr.Name = fmt.Sprintf("Magnet_%s", ad.Operation)
+			return
+		}
+		// Create AttachDetach process
+		ad.ProcessID = pr.ID
+
+		err = tx.QueryRow(
+			createAttachDetachQuery,
+			ad.Operation,
+			ad.OperationType,
+			ad.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate attach detach")
+			return
+		}
+
+		ad.ID = lastInsertID
+		logger.Infoln("AttachDetach Process Duplicated => ", ad)
 		return
 
 	case "Delay":
-		processName = fmt.Sprintf("Delay")
-		return
+		if operation == "name" {
+			pr.Name = "Delay"
+			return
+		}
+		// Create Delay process
+		d := process.(Delay)
+		d.ProcessID = pr.ID
 
+		err = tx.QueryRow(
+			createDelayQuery,
+			d.DelayTime,
+			d.ProcessID,
+		).Scan(&lastInsertID)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error creating duplicate delay")
+			return
+		}
+		d.ID = lastInsertID
+		logger.Infoln("Delay Process Duplicated => ", d)
+		return
 	default:
-		return "", errors.New("wrong process type")
+		return Process{}, responses.ProcessTypeInvalid
 	}
 }
