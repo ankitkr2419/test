@@ -1,4 +1,4 @@
-CREATE TABLE experiment_temperatures
+CREATE TABLE IF NOT EXISTS experiment_temperatures
 (
     experiment_id uuid,
     temp float,

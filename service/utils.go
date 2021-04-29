@@ -8,6 +8,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
+	"sync"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -19,19 +20,23 @@ const (
 	cycle = "cycle"
 )
 
+var userLogin sync.Map
+
 // runNext will run the next step of process when set
-var runNext  map[string]bool
+var runNext map[string]bool
 var nextStep map[string]chan struct{}
 
-func resetRunNext(deck string){
+func resetRunNext(deck string) {
 	runNext[deck] = false
 }
 
-func setRunNext(deck string){
+func setRunNext(deck string) {
 	runNext[deck] = true
 }
 
-func LoadUtils(){
+func LoadUtils() {
+	userLogin.Store("A", false)
+	userLogin.Store("B", false)
 	runNext = map[string]bool{
 		"A": false,
 		"B": false,
