@@ -10,10 +10,12 @@ import {
 import { DECKCARD_BTN, DECKNAME } from "appConstants";
 
 export const initialState = {
-    recipeData: [], //all recipe data
+    // recipeData: [], //all recipe data
+    tempDeckName: "", //used for fetch recipe list
     decks: [
         {
             name: DECKNAME.DeckA,
+            allRecipeData: [], //all recipe list
             recipeData: null, //current recipe
             showProcess: false,
             isLoading: false,
@@ -42,6 +44,7 @@ export const initialState = {
         },
         {
             name: DECKNAME.DeckB,
+            allRecipeData: [], //all recipe list
             recipeData: null, //current recipe
             showProcess: false,
             isLoading: false,
@@ -238,13 +241,25 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
             };
 
         case recipeListingAction.recipeListingInitiated:
-            return { ...state, ...action.payload, isLoading: true };
-        case recipeListingAction.recipeListingSuccess:
             return {
                 ...state,
-                recipeData: action.payload.response,
-                isLoading: false,
-                recipeListingError: false,
+                // ...action.payload,
+                // isLoading: true,
+                tempDeckName: action.payload.deckName,
+            };
+        case recipeListingAction.recipeListingSuccess:
+            const newDecksAfterRecipeList = state.decks.map((deckObj) => {
+                return deckObj.name === state.tempDeckName
+                    ? {
+                          ...deckObj,
+                          allRecipeData: action.payload.response,
+                      }
+                    : deckObj;
+            });
+            return {
+                ...state,
+                tempDeckName: "",
+                decks: newDecksAfterRecipeList,
             };
         case recipeListingAction.recipeListingFailed:
             return {

@@ -27,7 +27,6 @@ const RecipeListingContainer = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
-  const { recipeData, isLoading } = recipeActionReducer;
   const [recipeFetched, setRecipeFetched] = useState(false)
   // const recipeData = [
   //   {
@@ -124,7 +123,7 @@ const RecipeListingContainer = (props) => {
   //}, [dispatch]);
   useEffect(() => {
     if(token && !recipeFetched){
-      dispatch(recipeListingInitiated(token))
+      dispatch(recipeListingInitiated(token, deckName))
       setRecipeFetched(true)
     }
   }, [token])
@@ -143,6 +142,9 @@ const RecipeListingContainer = (props) => {
   if(!token)
     setToken(activeDeckObj.token);
 
+  const  recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(deck => deck.name === deckName);
+  const recipeData = recipeReducerDataOfActiveDeck.allRecipeData;
+  const isLoading = recipeReducerDataOfActiveDeck.isLoading;
   const returnRecipeDetails = (data) => {
     // let requiredData  =  {
     //   data,

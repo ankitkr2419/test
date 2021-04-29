@@ -135,9 +135,12 @@ export const abortRecipeReset = () => ({
   payload: {},
 });
 
-export const recipeListingInitiated = (token) => ({
+export const recipeListingInitiated = (token, deckName) => ({
   type: recipeListingAction.recipeListingInitiated,
-  payload: {token},
+  payload: {
+    token,
+    deckName
+  },
 });
 
 export const recipeListingSuccess = (recipeData) => ({
