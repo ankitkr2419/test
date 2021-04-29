@@ -1,6 +1,6 @@
 CREATE TYPE tip_operation_type AS ENUM ('pickup', 'discard');
 
-CREATE TABLE  tip_operation(
+CREATE TABLE IF NOT EXISTS tip_operation(
  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
  type tip_operation_type DEFAULT 'discard',
  position int CHECK (position<11),

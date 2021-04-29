@@ -20,10 +20,11 @@ const (
 							volume,
 							height)
 							VALUES %s `
-	insertTipsTubesQuery2 = `ON CONFLICT DO NOTHING;`
-	getTipsTubesQuery     = `SELECT *
-							FROM tips_and_tubes`
-	getTipByIDQuery = `SELECT *
+	insertTipsTubesQuery2   = `ON CONFLICT DO NOTHING;`
+	getTipsTubesBytypeQuery = `SELECT *
+							FROM tips_and_tubes WHERE type = $1`
+	getTipsTubesQuery = `SELECT * FROM tips_and_tubes`
+	getTipByIDQuery   = `SELECT *
 							FROM tips_and_tubes where id=$1`
 )
 
@@ -71,8 +72,12 @@ func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 	return stmt
 }
 
-func (s *pgStore) ListTipsTubes() (tipstubes []TipsTubes, err error) {
-	err = s.db.Select(&tipstubes, getTipsTubesQuery)
+func (s *pgStore) ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error) {
+	if ttype == "" {
+		err = s.db.Select(&tipstubes, getTipsTubesQuery)
+	} else {
+		err = s.db.Select(&tipstubes, getTipsTubesBytypeQuery, ttype)
+	}
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
 		return

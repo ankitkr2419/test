@@ -1,4 +1,4 @@
-CREATE TABLE delay(
+CREATE TABLE IF NOT EXISTS delay(
  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
  delay_time int,
  process_id uuid UNIQUE NOT NULL,

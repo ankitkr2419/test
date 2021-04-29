@@ -13,33 +13,35 @@ import (
 
 func homingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var response string
+
 		var err error
+		var msg string
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
 		switch deck {
 		case "":
 			fmt.Println("At both deck!!!")
-			rw.Write([]byte(`Operation in progress for both decks`))
-			rw.WriteHeader(http.StatusOK)
+			msg = "homing in progress for both decks"
 			plc.SetBothDeckHomingInProgress()
 			go bothDeckOperation(deps, "Homing")
 		case "A", "B":
-			rw.Write([]byte(`Operation in progress for single deck`))
-			rw.WriteHeader(http.StatusOK)
+			msg = "homing in progress for single deck"
 			go singleDeckOperation(deps, deck, "Homing")
 		default:
 			err = fmt.Errorf("Check your deck name")
-			rw.Write([]byte(err.Error()))
-			rw.WriteHeader(http.StatusBadRequest)
 		}
 
 		if err != nil {
+			rw.Write([]byte(err.Error()))
+			rw.WriteHeader(http.StatusBadRequest)
 			logger.Errorln(err)
 			deps.WsErrCh <- err
 		} else {
-			logger.Infoln(response)
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,msg, deck)))
+			logger.Infoln(msg)
 		}
 
 	})
@@ -62,21 +64,9 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 		switch {
 		case deckAErr != nil:
 			fmt.Printf("Error %s deck A", operation)
-			// abort Deck B Operation as Well
-			response, err = deps.PlcDeck["B"].Abort()
-			if err != nil {
-				deps.WsErrCh <- err
-				return
-			}
 			return "", deckAErr
 		case deckBErr != nil:
 			fmt.Printf("Error %s deck B", operation)
-			// Abort Deck A Operation as well
-			response, err = deps.PlcDeck["A"].Abort()
-			if err != nil {
-				deps.WsErrCh <- err
-				return
-			}
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
@@ -109,15 +99,16 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	fmt.Println("Correct Result: ", result)
 	response = result[0].String()
 	if len(response) > 0 {
-		deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
-		return
-	}
-	errRes := result[1].Interface()
-	if errRes != nil {
-		fmt.Println(errRes)
-		err := fmt.Errorf("%v", errRes)
-		deps.WsErrCh <- err
-		return "", err
+		errRes := result[1].Interface()
+		if errRes != nil {
+			fmt.Println(errRes)
+			err := fmt.Errorf("%v", errRes)
+			deps.WsErrCh <- err
+			return "", err
+		}
+		if operation == "Homing"{
+			deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
+		}
 	}
 
 	return

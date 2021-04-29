@@ -211,7 +211,8 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 // 1051- 1100 for deck B
 
 func SelectAllTipsTubes(store db.Storer) (err error) {
-	allTipsTubes, err := store.ListTipsTubes()
+	ttype := ""
+	allTipsTubes, err := store.ListTipsTubes(ttype)
 	if err != nil {
 		return
 	}

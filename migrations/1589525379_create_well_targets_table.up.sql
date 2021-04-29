@@ -1,4 +1,4 @@
-CREATE TABLE well_targets (
+CREATE TABLE IF NOT EXISTS well_targets (
   experiment_id uuid,
   well_position integer,
   target_id uuid,

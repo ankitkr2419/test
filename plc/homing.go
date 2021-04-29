@@ -76,11 +76,11 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 		panic(err)
 	}
 
-	//web socket response for syringe homing
+	//web socket response for syringe module homing
 	d.setHomingPercent(50.0)
 
 	wsProgressOperation.Progress = d.getHomingPercent()
-	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed syringe for deck %v", d.name)
+	wsProgressOperation.OperationDetails.Message = fmt.Sprintf("successfully homed syringe module for deck %v", d.name)
 
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {

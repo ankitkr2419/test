@@ -66,7 +66,7 @@ type Storer interface {
 	InsertCartridge(context.Context, []Cartridge, []CartridgeWells) error
 	ListMotors() ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
-	ListTipsTubes() ([]TipsTubes, error)
+	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
 	ListCartridges() ([]Cartridge, error)
 	ListCartridgeWells() ([]CartridgeWells, error)
@@ -108,4 +108,5 @@ type Storer interface {
 	UpdateTipDock(ctx context.Context, t TipDock) (err error)
 	UpdateHeating(ctx context.Context, ht Heating) (err error)
 	UpdateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error)
+	ShowUser(ctx context.Context, username string) (user User, err error)
 }
