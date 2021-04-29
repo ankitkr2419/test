@@ -66,7 +66,7 @@ type Storer interface {
 	InsertCartridge(context.Context, []Cartridge, []CartridgeWells) error
 	ListMotors() ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
-	ListTipsTubes() ([]TipsTubes, error)
+	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
 	ListCartridges() ([]Cartridge, error)
 	ListCartridgeWells() ([]CartridgeWells, error)
