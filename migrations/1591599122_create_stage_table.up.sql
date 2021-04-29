@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
-CREATE TABLE stages
+CREATE TABLE IF NOT EXISTS stages
 (
     id uuid primary key default uuid_generate_v4(),
     type varchar(50),

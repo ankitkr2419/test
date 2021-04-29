@@ -55,6 +55,12 @@ func GetColorLimits(key string) uint16 {
 	return uint16(viper.GetInt(key))
 }
 
+func GetSecretKey() string {
+	key := "SECRET_KEY"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
 func GetICPosition() int {
 	return ReadEnvInt("ic_position")
 }

@@ -75,7 +75,7 @@ type AspireDispense struct {
 	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
 	DispenseNoOfCycles   int64         `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
 	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
-	ProcessID            uuid.UUID     `db:"process_id" json:"process_id"`
+	ProcessID            uuid.UUID     `db:"process_id" json:"process_id" validate:"required"`
 	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt            time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -100,6 +100,14 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 
 func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (createdAspireDispense AspireDispense, err error) {
 	var lastInsertID uuid.UUID
+
+	//update the process name before record creation
+	err = s.UpdateProcessName(ctx, ad.ProcessID, "AspireDispense", ad)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createAspireDispenseQuery,
 		ad.Category,
@@ -127,6 +135,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		logger.WithField("err", err.Error()).Error("Error in getting aspire dispense")
 		return
 	}
+
 	return
 }
 

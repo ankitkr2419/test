@@ -1,4 +1,4 @@
-CREATE TABLE experiment_template_targets
+CREATE TABLE IF NOT EXISTS experiment_template_targets
 (
     experiment_id uuid,
     template_id uuid,

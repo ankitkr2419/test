@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
-CREATE TABLE wells (
+CREATE TABLE IF NOT EXISTS wells (
   id uuid primary key default uuid_generate_v4(),
   position integer,
   experiment_id uuid,

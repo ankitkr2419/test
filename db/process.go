@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,6 +35,8 @@ const (
 						sequence_num,
 						updated_at)
 						VALUES ($1, $2, $3) WHERE id = $4`
+
+	updateProcessNameQuery = `UPDATE processes SET name = $1 WHERE id = $2`
 )
 
 type Process struct {
@@ -108,4 +112,72 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 		return
 	}
 	return
+}
+
+func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
+	processName, err := getProcessName(processType, process)
+	if err != nil {
+		err = fmt.Errorf("error in updating new process name")
+		return
+	}
+	_, err = s.db.Exec(
+		updateProcessNameQuery,
+		processName,
+		id,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating process name")
+		return
+	}
+	return
+}
+
+func getProcessName(processType string, process interface{}) (processName string, err error) {
+
+	switch processType {
+	case "Piercing":
+		piercing := process.(Piercing)
+		processName = fmt.Sprintf("Piercing_%s", piercing.Type)
+		return
+
+	case "TipOperation":
+		tipOpr := process.(TipOperation)
+		processName = fmt.Sprintf("Tip_Operation_%s", tipOpr.Type)
+		return
+
+	case "TipDocking":
+		tipDock := process.(TipDock)
+		processName = fmt.Sprintf("Tip_Docking_%s", tipDock.Type)
+		return
+
+	case "AspireDispense":
+		aspDis := process.(AspireDispense)
+		processName = fmt.Sprintf("Aspire_Dispense_%s", aspDis.Category)
+		return
+
+	case "Heating":
+		processName = fmt.Sprintf("Heating")
+		return
+
+	case "Shaking":
+		shaking := process.(Shaker)
+		if shaking.WithTemp {
+			processName = fmt.Sprintf("Shaking_With_temperature")
+			return
+		}
+		processName = fmt.Sprintf("Shaking_Without_temperature")
+		return
+
+	case "AttachDetach":
+		atDet := process.(AttachDetach)
+		processName = fmt.Sprintf("Magnet_%s", atDet.Operation)
+		return
+
+	case "Delay":
+		processName = fmt.Sprintf("Delay")
+		return
+
+	default:
+		return "", errors.New("wrong process type")
+	}
 }

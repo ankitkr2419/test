@@ -10,10 +10,10 @@ import (
 
 type Heating struct {
 	ID          uuid.UUID `json:"id" db:"id"`
-	Temperature float64   `json:"temperature" db:"temperature" validate:"gte=20,lte=120"`
+	Temperature float64   `json:"temperature" db:"temperature" validate:"required,gte=20,lte=120"`
 	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
-	Duration    int64     `json:"duration" db:"duration" validate:"gte=10,lte=3660"`
-	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
+	Duration    int64     `json:"duration" db:"duration" validate:"required,gte=10,lte=3660"`
+	ProcessID   uuid.UUID `json:"process_id" db:"process_id" validate:"required"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -51,6 +51,12 @@ func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heatin
 
 func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdHeating Heating, err error) {
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, h.ProcessID, "Heating", h)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		return
+	}
 
 	err = s.db.QueryRow(
 		createHeatingQuery,

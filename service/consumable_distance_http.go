@@ -37,9 +37,8 @@ func createConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
+		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusCreated)
 		rw.Write(respBytes)
-		rw.Header().Add("Content-Type", "application/json")
 	})
 }
