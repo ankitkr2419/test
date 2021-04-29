@@ -54,6 +54,15 @@ var (
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
+
+	ProcessDecodeError            = fmt.Errorf("error decoding process record")
+	ProcessFetchError             = fmt.Errorf("error fetching process record")
+	ProcessCreateError            = fmt.Errorf("error creating process record")
+	ProcessIDInvalidError         = fmt.Errorf("error process id is invalid")
+	DuplicateProcessCreationError = fmt.Errorf("error creating duplicate process record")
+	ProcessTypeInvalid            = fmt.Errorf("error process type is wrong")
+
+	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 )
 
 // Special errors which are in []byte format
