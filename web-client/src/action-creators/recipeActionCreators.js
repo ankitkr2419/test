@@ -135,9 +135,9 @@ export const abortRecipeReset = () => ({
   payload: {},
 });
 
-export const recipeListingInitiated = () => ({
+export const recipeListingInitiated = (token) => ({
   type: recipeListingAction.recipeListingInitiated,
-  payload: {},
+  payload: {token},
 });
 
 export const recipeListingSuccess = (recipeData) => ({

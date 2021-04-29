@@ -114,9 +114,11 @@ export function* pauseRecipe(actions) {
   }
 }
 
-export function* recipeListing() {
+export function* recipeListing(actions) {
   const { recipeListingSuccess, recipeListingFailed } = recipeListingAction;
 
+  const token = actions.payload.token;
+  
   try {
     yield call(callApi, {
       payload: {
@@ -125,6 +127,7 @@ export function* recipeListing() {
         reqPath: API_ENDPOINTS.recipeListing,
         successAction: recipeListingSuccess,
         failureAction: recipeListingFailed,
+        token
       },
     });
   } catch (error) {

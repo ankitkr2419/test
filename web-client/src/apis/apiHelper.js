@@ -36,10 +36,16 @@ const getRequestUrl = (reqPath, params) => {
   return `/${reqPath}${queryParams}`;
 };
 
-const defaultHeaders = () => ({
-  "Content-Type": "application/json",
-  // API_HOST_VERSION is api version is also configured from .env(constants.js)
-  Accept: `application/${API_HOST_VERSION}`,
+const defaultHeaders = (token) => (token ? 
+  {
+    "Content-Type": "application/json",
+    // API_HOST_VERSION is api version is also configured from .env(constants.js)
+    Accept: `application/${API_HOST_VERSION}`,
+    Authorization: `Bearer ${token}`
+  }: {
+    "Content-Type": "application/json",
+    // API_HOST_VERSION is api version is also configured from .env(constants.js)
+    Accept: `application/${API_HOST_VERSION}`,
 });
 
 // Rest success status check
@@ -85,7 +91,8 @@ export function* callApi(actions) {
       method = "GET",
       params = null,
       showPopupSuccessMessage = false,
-      showPopupFailureMessage = false
+      showPopupFailureMessage = false,
+      token
     },
   } = actions;
 
@@ -94,7 +101,7 @@ export function* callApi(actions) {
   try {
     const fetchOptions = {
       method,
-      headers: defaultHeaders(),
+      headers: defaultHeaders(token),
       body: body && JSON.stringify(body),
     };
 

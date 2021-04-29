@@ -30,6 +30,7 @@ const initialStateOfDecks = () => {
             msg: "",
             isAdmin: false,
             isActive: true,
+            token: "",
         },
         {
             name: DECKNAME.DeckB,
@@ -38,6 +39,7 @@ const initialStateOfDecks = () => {
             msg: "",
             isAdmin: false,
             isActive: false,
+            token: "",
         },
     ];
 };
@@ -76,6 +78,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                 decks: updatedDecks,
             });
         case loginActions.successAction:
+            const token = action.payload.response.token;
             let deckName = state.toJS().deckName;
             let isAdminTemp = state.toJS().isAdmin;
             if (deckName && deckName === DECKNAME.DeckA) {
@@ -90,6 +93,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                                   msg: "",
                                   isAdmin: isAdminTemp,
                                   isActive: true,
+                                  token
                               }
                             : {
                                   ...deckObj,
@@ -114,6 +118,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                                   msg: "",
                                   isAdmin: isAdminTemp,
                                   isActive: true,
+                                  token
                               }
                             : {
                                   ...deckObj,
@@ -142,6 +147,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                           ...deckObj,
                           error: true,
                           msg: err,
+                          token: "",
                       }
                     : deckObj;
             });
@@ -188,6 +194,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                     ? {
                           ...deckObj,
                           isLoggedIn: false,
+                          token: "",
                       }
                     : {
                           ...deckObj,

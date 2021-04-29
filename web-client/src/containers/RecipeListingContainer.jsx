@@ -8,6 +8,7 @@ import { recipeListingInitiated, saveRecipeDataForDeck } from "action-creators/r
 import { ROUTES } from "appConstants";
 import { Redirect } from "react-router-dom";
 import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // import { Loader } from 'shared-components'
 const RecipeListing = styled.div`
@@ -27,6 +28,7 @@ const RecipeListingContainer = (props) => {
   const history = useHistory();
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const { recipeData, isLoading } = recipeActionReducer;
+  const [recipeFetched, setRecipeFetched] = useState(false)
   // const recipeData = [
   //   {
   //     id: "28101940-718b-4937-913d-39cb6b9057ba",
@@ -109,6 +111,7 @@ const RecipeListingContainer = (props) => {
   ] = useState(false);
 
   const [selectedRecipeData, setSelectedRecipeData] = useState({}) 
+  const [token, setToken] = useState()
 
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
@@ -116,9 +119,15 @@ const RecipeListingContainer = (props) => {
     setOperatorRunRecipeCarousalModalVisible(!prevState);
   };
 
+  //useEffect(() => {
+    // dispatch(recipeListingInitiated());
+  //}, [dispatch]);
   useEffect(() => {
-    dispatch(recipeListingInitiated());
-  }, [dispatch]);
+    if(token && !recipeFetched){
+      dispatch(recipeListingInitiated(token))
+      setRecipeFetched(true)
+    }
+  }, [token])
 
   const loginReducer = useSelector(
     (state) => state.loginReducer
@@ -131,6 +140,8 @@ const RecipeListingContainer = (props) => {
   }
   let deckName  = activeDeckObj.name
   let isAdmin = activeDeckObj.isAdmin
+  if(!token)
+    setToken(activeDeckObj.token);
 
   const returnRecipeDetails = (data) => {
     // let requiredData  =  {

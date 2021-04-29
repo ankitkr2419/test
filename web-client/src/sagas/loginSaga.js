@@ -3,7 +3,7 @@ import { takeEvery, put, call } from 'redux-saga/effects';
 import { callApi } from 'apis/apiHelper';
 import loginActions from 'actions/loginActions';
 import { loginFailed } from 'action-creators/loginActionCreators';
-import { HTTP_METHODS } from '../appConstants';
+import { DECKNAME, HTTP_METHODS } from '../appConstants';
 import { toast } from "react-toastify";
 
 export function* login(actions) {
@@ -26,6 +26,7 @@ export function* login(actions) {
 	// 	yield put(loginFailed(error));
 	// }
 
+	let deckName = actions.payload.body.deckName === DECKNAME.DeckA ? "A" : "B"
 	const { successAction, failureAction } = loginActions;
 	try {
         yield call(callApi, {
@@ -35,7 +36,8 @@ export function* login(actions) {
                     "password": body.password,
                     "role": body.role
                 },
-                reqPath: 'users/admin/validate',
+                // reqPath: 'users/admin/validate',
+				reqPath: `users/validate/${deckName}`,
                 method: HTTP_METHODS.POST,
                 successAction,
                 failureAction,
