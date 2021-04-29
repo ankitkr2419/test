@@ -107,5 +107,6 @@ type Storer interface {
 	UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error)
 	UpdateTipDock(ctx context.Context, t TipDock) (err error)
 	UpdateHeating(ctx context.Context, ht Heating) (err error)
+	UpdateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error)
 	ShowUser(ctx context.Context, username string) (user User, err error)
 }

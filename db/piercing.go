@@ -39,10 +39,10 @@ const (
 
 type Piercing struct {
 	ID             uuid.UUID     `db:"id" json:"id"`
-	Type           CartridgeType `db:"type" json:"type"`
-	CartridgeWells pq.Int64Array `db:"cartridge_wells" json:"cartridge_wells"`
+	Type           CartridgeType `db:"type" json:"type" validate:"required"`
+	CartridgeWells pq.Int64Array `db:"cartridge_wells" json:"cartridge_wells" validate:"required"`
 	Discard        Discard       `db:"discard" json:"discard"`
-	ProcessID      uuid.UUID     `db:"process_id" json:"process_id"`
+	ProcessID      uuid.UUID     `db:"process_id" json:"process_id" validate:"required"`
 	CreatedAt      time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt      time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -66,7 +66,15 @@ func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err 
 }
 
 func (s *pgStore) CreatePiercing(ctx context.Context, p Piercing) (createdPiercing Piercing, err error) {
+
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, p.ProcessID, "Piercing", p)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating piercing process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createPiercingQuery,
 		p.Type,

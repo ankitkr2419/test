@@ -10,10 +10,10 @@ import (
 
 type TipDock struct {
 	ID        uuid.UUID `json:"id" db:"id"`
-	Type      string    `json:"type" db:"type"`
-	Position  int64     `json:"position" db:"position"`
-	Height    float64   `json:"height" db:"height"`
-	ProcessID uuid.UUID `json:"process_id" db:"process_id"`
+	Type      string    `json:"type" db:"type" validate:"required"`
+	Position  int64     `json:"position" db:"position" validate:"required"`
+	Height    float64   `json:"height" db:"height" validate:"required"`
+	ProcessID uuid.UUID `json:"process_id" db:"process_id" validate:"required"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -46,6 +46,13 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 
 func (s *pgStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDocking TipDock, err error) {
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, t.ProcessID, "TipDocking", t)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createTipDockQuery,
 		t.Type,

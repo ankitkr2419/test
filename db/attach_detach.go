@@ -10,9 +10,9 @@ import (
 
 type AttachDetach struct {
 	ID            uuid.UUID `db:"id" json:"id"`
-	Operation     string    `db:"operation" json:"operation"`
+	Operation     string    `db:"operation" json:"operation"  validate:"required"`
 	OperationType string    `db:"operation_type" json:"operation_type"`
-	ProcessID     uuid.UUID `db:"process_id" json:"process_id"`
+	ProcessID     uuid.UUID `db:"process_id" json:"process_id" validate:"required"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -43,6 +43,13 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 
 func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (createdAttachDetach AttachDetach, err error) {
 	var lastInsertID uuid.UUID
+
+	err = s.UpdateProcessName(ctx, a.ProcessID, "AttachDetach", a)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error in updating attach detach process name")
+		return
+	}
+
 	err = s.db.QueryRow(
 		createAttachDetachQuery,
 		a.Operation,
@@ -60,6 +67,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (creat
 		logger.WithField("err", err.Error()).Error("Error in getting AttachDetach")
 		return
 	}
+
 	return
 }
 
