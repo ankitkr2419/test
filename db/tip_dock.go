@@ -93,7 +93,7 @@ func (s *pgStore) createTipDocking(ctx context.Context, t TipDock, tx *sql.Tx) (
 		return
 	}
 
-	createdTipDocking, err = s.ShowTipDocking(ctx, t.ProcessID)
+	createdTipDocking, err = s.ShowTipDocking(ctx, lastInsertID)
 	// failures are already logged
 	return
 }

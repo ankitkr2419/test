@@ -109,7 +109,7 @@ func (s *pgStore) createTipOperation(ctx context.Context, to TipOperation, tx *s
 		return
 	}
 
-	createdTipOperation, err = s.ShowTipOperation(ctx, to.ProcessID)
+	createdTipOperation, err = s.ShowTipOperation(ctx, lastInsertID)
 	// failures are already logged
 	return
 }

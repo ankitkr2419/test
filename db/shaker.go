@@ -114,7 +114,7 @@ func (s *pgStore) createShaking(ctx context.Context, sh Shaker, tx *sql.Tx) (cre
 		return
 	}
 
-	createdShaking, err = s.ShowShaking(ctx, sh.ProcessID)
+	createdShaking, err = s.ShowShaking(ctx, lastInsertID)
 	// failures are already logged
 	return
 }

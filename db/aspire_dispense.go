@@ -157,7 +157,7 @@ func (s *pgStore) createAspireDispense(ctx context.Context, ad AspireDispense, t
 		return
 	}
 
-	createdAspireDispense, err = s.ShowAspireDispense(ctx, ad.ProcessID)
+	createdAspireDispense, err = s.ShowAspireDispense(ctx, lastInsertID)
 	// failures are already logged
 	return
 }

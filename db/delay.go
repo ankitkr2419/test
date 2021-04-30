@@ -87,7 +87,7 @@ func (s *pgStore) createDelay(ctx context.Context, d Delay, tx *sql.Tx) (created
 		return
 	}
 
-	createdDelay, err = s.ShowDelay(ctx, d.ProcessID)
+	createdDelay, err = s.ShowDelay(ctx, lastInsertID)
 	// failures are already logged
 	return
 }

@@ -114,7 +114,7 @@ func (s *pgStore) createPiercing(ctx context.Context, pi Piercing, tx *sql.Tx) (
 		return
 	}
 
-	createdPiercing, err = s.ShowPiercing(ctx, pi.ProcessID)
+	createdPiercing, err = s.ShowPiercing(ctx, lastInsertID)
 	// failures are already logged
 	return
 }

@@ -98,7 +98,7 @@ func (s *pgStore) createHeating(ctx context.Context, h Heating, tx *sql.Tx) (cre
 		return
 	}
 
-	createdHeating, err = s.ShowHeating(ctx, h.ProcessID)
+	createdHeating, err = s.ShowHeating(ctx, lastInsertID)
 	// failures are already logged
 	return
 }

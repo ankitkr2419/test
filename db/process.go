@@ -104,7 +104,7 @@ func (s *pgStore) createProcess(ctx context.Context, p Process, tx *sql.Tx) (cre
 		return
 	}
 
-	createdProcess, err = s.ShowProcess(ctx, p.ID)
+	createdProcess, err = s.ShowProcess(ctx, lastInsertID)
 	// failures are already logged
 	return
 }
@@ -210,6 +210,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		// Insert parent entry into Process table
 		pr, err = s.createProcess(ctx, parent, tx)
+		fmt.Println("ppp", pr)
 		if err != nil {
 			// failure will be logged in defer before rollback
 			return Process{}, err

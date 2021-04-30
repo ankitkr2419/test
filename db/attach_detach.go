@@ -89,7 +89,7 @@ func (s *pgStore) createAttachDetach(ctx context.Context, ad AttachDetach, tx *s
 		return
 	}
 
-	createdAttachDetach, err = s.ShowAttachDetach(ctx, ad.ProcessID)
+	createdAttachDetach, err = s.ShowAttachDetach(ctx, lastInsertID)
 	// failures are already logged
 	return
 }
