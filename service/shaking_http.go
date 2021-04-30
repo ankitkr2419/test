@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,35 +16,27 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 		var shaObj db.Shaker
 		err := json.NewDecoder(req.Body).Decode(&shaObj)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding shaking data")
+			logger.WithField("err", err.Error()).Errorln(responses.ShakingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ShakingDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(shaObj)
 		if !valid {
+			logger.WithField("err", err.Error()).Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		var createdShaker db.Shaker
-		createdShaker, err = deps.Store.CreateShaking(req.Context(), shaObj)
+		var shaker db.Shaker
+		shaker, err = deps.Store.CreateShaking(req.Context(), shaObj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create shaking")
+			logger.WithField("err", err.Error()).Errorln(responses.ShakingCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ShakingCreateError.Error()})
 			return
 		}
-
-		respBytes, err = json.Marshal(createdShaker)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling shaking data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.ShakingCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, shaker)
 	})
 }
 
@@ -52,27 +45,20 @@ func showShakingHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
 		var shaking db.Shaker
 		shaking, err = deps.Store.ShowShaking(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error show shaking")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ShakingFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.ShakingFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(shaking)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling shaking data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.ShakingFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, shaking)
 	})
 }
 
@@ -81,30 +67,31 @@ func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 		var shObj db.Shaker
 		err = json.NewDecoder(req.Body).Decode(&shObj)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding shaking data")
+			logger.WithField("err", err.Error()).Errorln(responses.ShakingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ShakingDecodeError.Error()})
 			return
 		}
 		valid, respBytes := validate(shObj)
 		if !valid {
+			logger.WithField("err", err.Error()).Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
 		shObj.ProcessID = id
 		err = deps.Store.UpdateShaking(req.Context(), shObj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update shaking")
+			logger.WithField("err", err.Error()).Error(responses.ShakingUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ShakingUpdateError.Error()})
 			return
 		}
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"shaking record updated successfully"}`))
+
+		logger.Infoln(responses.ShakingUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ShakingUpdateSuccess})
 	})
 }

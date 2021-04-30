@@ -85,6 +85,7 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(adobj)
 		if !valid {
+			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
