@@ -29,3 +29,23 @@ export const abortCleanUpAction = {
   abortCleanUpFailed: "ABORT_CLEAN_UP_FAILED",
   abortCleanUpReset: "ABORT_CLEAN_UP_RESET",
 };
+
+export const setCleanUpHoursAction = {
+  setHours: "SET_HOURS",
+  resetHours: "RESET_HOURS",
+};
+
+export const setCleanUpMinsAction = {
+  setMins: "SET_MINS",
+  resetMins: "RESET_MINS",
+};
+
+export const setCleanUpSecsAction = {
+  setSecs: "SET_SECS",
+  resetSecs: "RESET_SECS",
+};
+
+export const setShowCleanUpAction = {
+  setShowCleanUp: "SET_SHOW_CLEAN_UP",
+  resetShowCleanUp: "RESET_SHOW_CLEAN_UP",
+};

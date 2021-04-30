@@ -115,14 +115,13 @@ const RecipeListingComponent = (props) => {
   //   (state) => state.operatorLoginModalReducer
   // );
   // const { deckName } = operatorLoginModalReducer.toJS();
-  const loginReducer = useSelector(
-    (state) => state.loginReducer
-  );
+  const loginReducer = useSelector((state) => state.loginReducer);
 
-  const loginReducerData = loginReducer.toJS()
-  let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
-  let deckName  = activeDeckObj ? activeDeckObj.name : ''
-  
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  let deckName = activeDeckObj ? activeDeckObj.name : "";
+
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const {
     runRecipeError,

@@ -7,13 +7,21 @@ import { Icon, VideoCard, ButtonIcon } from "shared-components";
 
 import SearchBox from "shared-components/SearchBox";
 import PaginationBox from "shared-components/PaginationBox";
-import MlModal from "shared-components/MlModal"
+import MlModal from "shared-components/MlModal";
+import TimeModal from "components/modals/TimeModal";
 import RecipeCard from "components/RecipeListing/RecipeCard";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
 import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
-import { loginReset } from 'action-creators/loginActionCreators';
+import { loginReset } from "action-creators/loginActionCreators";
+import {
+  setCleanUpHours,
+  setCleanUpMins,
+  setCleanUpSecs,
+  setShowCleanUp,
+  resetShowCleanUp,
+} from "action-creators/cleanUpActionCreators";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -49,19 +57,51 @@ const RecipeListingComponent = (props) => {
     onConfirmedRecipeSelection,
   } = props;
 
+  const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
+
   const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
+
+  const [timeModal, setTimeModal] = useState(false);
 
   const onLogoutClicked = () => {
     toggleLogoutModalVisibility();
     dispatch(loginReset(deckName));
     history.push(ROUTES.landing);
-  }
+  };
 
   const toggleLogoutModalVisibility = () => {
     setLogoutModalVisibility(!isLogoutModalVisible);
-  }
+  };
+
+  const toggleTimeModal = () => {
+    setTimeModal(!timeModal);
+  };
+
+  const submitTime = () => {
+    setTimeModal(!timeModal);
+    dispatch(setShowCleanUp({ deckName: deckName }));
+  };
+
+  const handleChangeTime = (event) => {
+    let name = event.target.name;
+        
+    if (name === "hours") {
+      dispatch(
+        setCleanUpHours({ deckName: deckName, hours: event.target.value })
+      );
+    } else if (name === "minutes") {
+      dispatch(
+        setCleanUpMins({ deckName: deckName, mins: event.target.value })
+      );
+    } else if (name === "seconds") {
+      dispatch(
+        setCleanUpSecs({ deckName: deckName, secs: event.target.value })
+      );
+    }
+  };
+
   return (
     <>
       <div className="landing-content px-2">
@@ -73,10 +113,23 @@ const RecipeListingComponent = (props) => {
             onConfirmedRecipeSelection={onConfirmedRecipeSelection}
           />
         )}
+
+        {timeModal && (
+          <TimeModal
+            timeModal={timeModal}
+            toggleTimeModal={toggleTimeModal}
+            handleChangeTime={handleChangeTime}
+            submitTime={submitTime}
+            deckName={deckName}
+          />
+        )}
+
         <MlModal
           isOpen={isLogoutModalVisible}
           textHead={deckName}
-          textBody={`Are you sure you want to sign out of ${isAdmin ? 'Admin':'Operator'} role?`}
+          textBody={`Are you sure you want to sign out of ${
+            isAdmin ? "Admin" : "Operator"
+          } role?`}
           handleSuccessBtn={onLogoutClicked}
           handleCrossBtn={toggleLogoutModalVisibility}
           successBtn={MODAL_BTN.yes}
@@ -116,7 +169,7 @@ const RecipeListingComponent = (props) => {
                   <Button
                     color="secondary"
                     className="ml-2 border-primary btn-clean-up bg-white"
-                    // onClick={handleTimeModal}
+                    onClick={toggleTimeModal}
                   >
                     {" "}
                     Clean Up

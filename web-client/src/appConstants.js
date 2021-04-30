@@ -39,7 +39,7 @@ export const SOCKET_MESSAGE_TYPE = {
   uvLightProgress: "PROGRESS_UVLIGHT",
   uvLightSuccess: "SUCCESS_UVLIGHT",
   discardTipProgress: "DISCARD_TIP_PROGRESS",
-  discardTipSuccess: "DISCARD_TIP_SUCCESS"
+  discardTipSuccess: "DISCARD_TIP_SUCCESS",
 };
 
 export const EXPERIMENT_STATUS = {
@@ -55,7 +55,7 @@ export const EXPERIMENT_STATUS = {
 export const ROUTES = {
   landing: "landing",
   splashScreen: "splashscreen",
-  recipeListing: "recipe-listing"
+  recipeListing: "recipe-listing",
 };
 
 export const API_ENDPOINTS = {
@@ -68,7 +68,7 @@ export const API_ENDPOINTS = {
   restoreDeck: "restore-deck",
   recipeListing: "recipes",
   discardTipAndHoming: "discard-tip-and-home",
-  cleanUp: "uv"
+  cleanUp: "uv",
 };
 
 export const MODAL_MESSAGE = {
@@ -107,18 +107,20 @@ export const DECKCARD_BTN = {
     pause: "pause",
     done: "done",
     resume: "resume",
-  }
+  },
 };
 
 export const DECKNAME = {
   DeckA: "Deck A",
   DeckB: "Deck B",
+  DeckAShort: "A",
+  DeckBShort: "B",
 };
 
 export const USER_ROLES = {
   ADMIN: "admin",
   OPERATOR: "operator",
-}
+};
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
-}
+};

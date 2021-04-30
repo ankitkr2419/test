@@ -322,7 +322,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 ...state,
                 decks: newDecksAfterLoggedOut,
             };
-            return state;
 
         default:
             return state;

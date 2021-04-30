@@ -15,6 +15,7 @@ import {
 } from "action-creators/cleanUpActionCreators";
 
 export function* runUVCleaning(actions) {
+
   const {
     payload: {
       params: { time, deckName },
