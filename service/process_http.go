@@ -214,17 +214,17 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(process)
-		if !valid {
-			logger.Errorln(responses.ProcessValidationError)
-			responseBadRequest(rw, respBytes)
-			return
-		}
-
 		err = json.Unmarshal(processBytes, &process)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
 			logger.WithField("err", err.Error()).Error(responses.ProcessDecodeError.Error())
+			return
+		}
+
+		valid, respBytes := validate(process)
+		if !valid {
+			logger.Errorln(responses.ProcessValidationError)
+			responseBadRequest(rw, respBytes)
 			return
 		}
 
