@@ -124,23 +124,23 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
             return {
                 ...state,
                 decks: decksAfterRunInitiated,
-                isLoading: true,
             };
         case runRecipeAction.runRecipeSuccess:
             console.log("action success: ", action);
-            return {
-                ...state,
-                runRecipeResponse: action.payload.response,
-                isLoading: false,
-                runRecipeError: false,
-            };
+            return state;
+        // return {
+        //     ...state,
+        //     // runRecipeResponse: action.payload.response,
+        //     // isLoading: false,
+        //     // runRecipeError: false,
+        // };
         case runRecipeAction.runRecipeFailed:
             console.log("action run failed", action);
             return {
                 ...state,
-                serverErrors: action.payload.serverErrors,
-                isLoading: false,
-                runRecipeError: true,
+                // serverErrors: action.payload.serverErrors,
+                // isLoading: false,
+                // runRecipeError: true,
             };
         case runRecipeAction.runRecipeReset:
             let deckNameToReset = action.payload.deckName;
@@ -152,7 +152,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                               (initialDeckObj) =>
                                   initialDeckObj.name === deckNameToReset
                           ),
-                          allRecipeData: recipeListOfDeckObj
+                          allRecipeData: recipeListOfDeckObj,
                       }
                     : deckObj;
             });
@@ -182,6 +182,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
             };
 
         case pauseRecipeAction.pauseRecipeInitiated:
+            console.log("");
             return { ...state, ...action.payload, isLoading: true };
         case pauseRecipeAction.pauseRecipeSuccess:
             return {
@@ -296,14 +297,14 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         case recipeListingAction.recipeListingFailed:
             return {
                 ...state,
-                serverErrors: action.payload.serverErrors,
-                recipeListingError: true,
-                isLoading: false,
+                // serverErrors: action.payload.serverErrors,
+                // recipeListingError: true,
+                // isLoading: false,
             };
         case recipeListingAction.recipeListingReset:
             return {
                 ...state,
-                recipeListingError: null,
+                // recipeListingError: null,
             };
 
         case loginActions.loginReset:
