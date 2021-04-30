@@ -66,6 +66,10 @@ var (
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
+	DelayRangeInvalid = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
+	
+	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
+
 )
 
 // Special errors which are in []byte format

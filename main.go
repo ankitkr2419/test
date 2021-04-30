@@ -11,6 +11,7 @@ import (
 	"mylab/cpagent/plc/simulator"
 
 	"github.com/goburrow/modbus"
+	"mylab/cpagent/responses"
 
 	"mylab/cpagent/service"
 	"net/http"
@@ -62,7 +63,7 @@ func main() {
 	cliApp.Commands = []cli.Command{
 		{
 			Name:  "start",
-			Usage: "start server [--plc {simulator|compact32}]",
+			Usage: "start server [--plc {simulator|compact32}] [--delay range:(0,100] ]",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:  "plc",
@@ -73,8 +74,21 @@ func main() {
 					Name:  "test",
 					Usage: "Run in test mode!",
 				},
+				&cli.IntFlag{
+					Name:  "delay",
+					Value: 50,
+					Usage: "Input a delay in range (0, 100]",
+				},
 			},
 			Action: func(c *cli.Context) error {
+				if c.String("plc") != "simulator" {
+					return responses.SimulatorReservedDelayError
+				}
+				err := simulator.UpdateDelay(c.Int("delay"))
+				if err != nil {
+					logger.Error("Re-check delay argument")
+					return err
+				}
 				return startApp(c.String("plc"), c.Bool("test"))
 			},
 		},
@@ -261,6 +275,7 @@ func startApp(plcName string, test bool) (err error) {
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:3000"},
 		AllowedMethods: []string{"PUT", "DELETE", "POST", "GET"},
+		AllowedHeaders: []string{"*"},
 	})
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
