@@ -2,9 +2,12 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
+	"mylab/cpagent/responses"
+
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -83,7 +86,7 @@ type AspireDispense struct {
 func (s *pgStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (dbAspireDispense AspireDispense, err error) {
 	err = s.db.Get(&dbAspireDispense, getAspireDispenseQuery, id)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching aspire dispense")
+		logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDBFetchError)
 		return
 	}
 	return
@@ -99,16 +102,40 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 }
 
 func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (createdAspireDispense AspireDispense, err error) {
-	var lastInsertID uuid.UUID
+	var tx *sql.Tx
 
 	//update the process name before record creation
 	err = s.UpdateProcessName(ctx, ad.ProcessID, "AspireDispense", ad)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
 		return
 	}
 
-	err = s.db.QueryRow(
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseInitiateDBTxError)
+		return AspireDispense{}, err
+	}
+
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+
+	createdAspireDispense, err = s.createAspireDispense(ctx, ad, tx)
+	// failures are already logged
+	return
+}
+
+func (s *pgStore) createAspireDispense(ctx context.Context, ad AspireDispense, tx *sql.Tx) (createdAspireDispense AspireDispense, err error) {
+
+	var lastInsertID uuid.UUID
+
+	err = tx.QueryRow(
 		createAspireDispenseQuery,
 		ad.Category,
 		ad.CartridgeType,
@@ -126,16 +153,12 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 	).Scan(&lastInsertID)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating aspire dispense")
+		logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDBCreateError)
 		return
 	}
 
-	err = s.db.Get(&createdAspireDispense, getAspireDispenseQuery, ad.ProcessID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting aspire dispense")
-		return
-	}
-
+	createdAspireDispense, err = s.ShowAspireDispense(ctx, ad.ProcessID)
+	// failures are already logged
 	return
 }
 
