@@ -129,6 +129,7 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID, pro
 		return
 	}
 
+	// TODO: Handle this querying in private method
 	// Get highest sequence number
 	// This sequence number is updation, we only need to get something unique
 	err = s.db.QueryRow(
@@ -154,6 +155,7 @@ func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processTy
 		err = fmt.Errorf("error in updating new process name")
 		return
 	}
+
 	_, err = s.db.Exec(
 		updateProcessNameQuery,
 		processWithName.Name,
