@@ -1,12 +1,15 @@
 package plc
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
 	"strconv"
 	"strings"
 	"time"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
@@ -163,8 +166,22 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 		d.WsErrCh <- err
 		return
 	}
+	// send success ws data
+	successWsData := WSData{
+		Progress: 100,
+		Deck:     d.name,
+		Status:   "SUCCESS_UVLIGHT",
+		OperationDetails: OperationDetails{
+			Message: fmt.Sprintf("successfully completed UV Light clean up for deck %v", d.name),
+		},
+	}
+	wsData, err := json.Marshal(successWsData)
+	if err != nil {
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		d.WsErrCh <- err
+	}
+	d.WsMsgCh <- fmt.Sprintf("success_uvlight_%v", string(wsData))
 
-	d.WsMsgCh <- fmt.Sprintf("success_uvlight_UV Light Completed Successfully %v", d.name)
 	return "UV Light Completed Successfully", nil
 }
 

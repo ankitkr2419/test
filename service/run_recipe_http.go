@@ -50,8 +50,6 @@ func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	})
 }
 
-
-
 func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
@@ -139,8 +137,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		// TODO : percentage calculation from inside the process.
 		sendWSData(deps, deck, recipeID, len(processes), i+1)
 
-		if runStepWise{
-		
+		if runStepWise {
+
 			logger.Infoln("Waiting to run next process")
 			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
@@ -288,8 +286,24 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 		}
 	}
-
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_recipeId %v", recipeID)
+	// send websocket success data
+	successWsData := plc.WSData{
+		Progress: 100,
+		Deck:     deck,
+		Status:   "SUCCESS_RECIPE",
+		OperationDetails: plc.OperationDetails{
+			Message:        fmt.Sprintf("successfully completed recipe %v for deck %v", recipeID, deck),
+			CurrentStep:    len(processes),
+			RecipeID:       recipeID,
+			TotalProcesses: len(processes),
+		},
+	}
+	wsData, err := json.Marshal(successWsData)
+	if err != nil {
+		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		deps.WsErrCh <- err
+	}
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v_%v", deck, string(wsData))
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()
