@@ -2,11 +2,12 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"database/sql"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/responses"
 )
 
 type Shaker struct {
@@ -55,24 +56,48 @@ func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker S
 		shakerID,
 	)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error getting shaking data")
+		logger.WithField("err", err.Error()).Errorln(responses.ShakingDBFetchError)
 		return
 	}
 
-	fmt.Printf("shaker %v", shaker)
 	return
 }
 
 func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking Shaker, err error) {
-	var lastInsertID uuid.UUID
+	var tx *sql.Tx
 
+	//update the process name before record creation
 	err = s.UpdateProcessName(ctx, sh.ProcessID, "Shaking", sh)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in updating shakingprocess name")
+		logger.WithField("err", err.Error()).Errorln(responses.ShakingUpdateNameError)
 		return
 	}
 
-	err = s.db.QueryRow(
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.ShakingInitiateDBTxError)
+		return Shaker{}, err
+	}
+
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+
+	createdShaking, err = s.createShaking(ctx, sh, tx)
+	// failures are already logged
+	return
+}
+
+func (s *pgStore) createShaking(ctx context.Context, sh Shaker, tx *sql.Tx) (createdShaking Shaker, err error) {
+
+	var lastInsertID uuid.UUID
+
+	err = tx.QueryRow(
 		createShakingQuery,
 		sh.WithTemp,
 		sh.Temperature,
@@ -85,15 +110,12 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking 
 	).Scan(&lastInsertID)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating Shaking")
+		logger.WithField("err", err.Error()).Errorln(responses.ShakingDBCreateError)
 		return
 	}
 
-	err = s.db.Get(&createdShaking, getShakerQuery, sh.ProcessID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting Shaking")
-		return
-	}
+	createdShaking, err = s.ShowShaking(ctx, sh.ProcessID)
+	// failures are already logged
 	return
 }
 
