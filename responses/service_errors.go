@@ -56,6 +56,9 @@ var (
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
 	DelayRangeInvalid = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
+	
+	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
+
 )
 
 // Special errors which are in []byte format
