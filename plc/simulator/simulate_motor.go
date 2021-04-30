@@ -23,7 +23,7 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 		if !d.isMotorInProgress() {
 			break
 		}
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(delay * 4 * time.Millisecond)
 	}
 	d.setMotorInProgress()
 	defer d.resetMotorInProgress()
@@ -61,7 +61,7 @@ func (d *SimulatorDriver) simulateOnMotor() (err error) {
 func (d *SimulatorDriver) simulateShakerMotor() (err error) {
 	logger.Infoln("Shaker motor simulation started")
 	for {
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(delay * 4 * time.Millisecond)
 
 		if d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][5]) == plc.OFF {
 			logger.Infoln("Shaker motor simulation stopped")
@@ -91,7 +91,7 @@ func (d *SimulatorDriver) updatePulses() (err error) {
 			logger.Debugln("sensor has cut for deck ", d.DeckName)
 			return
 		default:
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(delay * 4 * time.Millisecond)
 			// if motor is OFF then return
 			if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][0]) {
 				return
@@ -148,7 +148,6 @@ func (d *SimulatorDriver) monitorSensorCut() (err error) {
 			d.setSensorDone()
 			return
 		}
-
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(delay * 4 * time.Millisecond)
 	}
 }

@@ -12,6 +12,7 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 	// Machine Should be in aborted state
 	if !d.isMachineInAbortedState() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		logger.Errorln("previous run already in progress... wait or abort it", d.name)
 		return "", err
 	}
 
