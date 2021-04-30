@@ -275,6 +275,7 @@ func startApp(plcName string, test bool) (err error) {
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:3000"},
 		AllowedMethods: []string{"PUT", "DELETE", "POST", "GET"},
+		AllowedHeaders: []string{"*"},
 	})
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
