@@ -103,7 +103,6 @@ const RecipeListingContainer = (props) => {
   //   },
   // ];
 
-  const [isProcessInProgress, setIsProcessInProcess] = useState(false); //to be changed and data should come from Reducer
   const [
     isOperatorRunRecipeCarousalModalVisible,
     setOperatorRunRecipeCarousalModalVisible,
@@ -145,6 +144,8 @@ const RecipeListingContainer = (props) => {
   const  recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(deck => deck.name === deckName);
   const recipeData = recipeReducerDataOfActiveDeck.allRecipeData;
   const isLoading = recipeReducerDataOfActiveDeck.isLoading;
+  const isProcessInProgress = recipeReducerDataOfActiveDeck.showProcess;
+  
   const returnRecipeDetails = (data) => {
     // let requiredData  =  {
     //   data,

@@ -107,8 +107,25 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 decks: newDecksAfterRequiredUpdations,
             };
         case runRecipeAction.runRecipeInitiated:
-            console.log("action: ", action); // only change the loading of deck and buttons
-            return { ...state, ...action.payload, isLoading: true };
+            let deckNameToInitiateRun = action.payload.params.deckName;
+            let decksAfterRunInitiated = state.decks.map((deckObj) => {
+                return deckObj.name === deckNameToInitiateRun
+                    ? {
+                          ...deckObj,
+                          runRecipeResponse: {
+                              recipeId: action.payload.params.recipeId,
+                          },
+                          leftActionBtn: DECKCARD_BTN.text.pause,
+                          rightActionBtn: DECKCARD_BTN.text.abort,
+                      }
+                    : deckObj;
+            });
+
+            return {
+                ...state,
+                decks: decksAfterRunInitiated,
+                isLoading: true,
+            };
         case runRecipeAction.runRecipeSuccess:
             console.log("action success: ", action);
             return {
@@ -118,6 +135,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 runRecipeError: false,
             };
         case runRecipeAction.runRecipeFailed:
+            console.log("action run failed", action);
             return {
                 ...state,
                 serverErrors: action.payload.serverErrors,
@@ -125,9 +143,23 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 runRecipeError: true,
             };
         case runRecipeAction.runRecipeReset:
+            let deckNameToReset = action.payload.deckName;
+            const decksAfterRecipeReset = state.decks.map((deckObj) => {
+                let recipeListOfDeckObj = deckObj.allRecipeData;
+                return deckObj.name === deckNameToReset
+                    ? {
+                          ...initialState.decks.find(
+                              (initialDeckObj) =>
+                                  initialDeckObj.name === deckNameToReset
+                          ),
+                          allRecipeData: recipeListOfDeckObj
+                      }
+                    : deckObj;
+            });
             return {
                 ...state,
-                runRecipeError: null,
+                // runRecipeError: null,
+                decks: decksAfterRecipeReset,
             };
         case runRecipeAction.runRecipeInProgress:
             console.log("action inProgress: ", action);

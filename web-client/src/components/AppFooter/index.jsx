@@ -213,7 +213,7 @@ const AppFooter = (props) => {
 
         switch (
             showProcess
-                ? recipeActionReducer.rightActionBtn
+                ? recipeReducerData.rightActionBtn
                 : cleanUpReducerData.rightActionBtn
         ) {
             case DECKCARD_BTN.text.abort:
@@ -230,20 +230,14 @@ const AppFooter = (props) => {
     };
     const handleCancelActionDeckA = () => {
         let recipeReducerData = recipeActionReducerForDeckA;
-        dispatch(
-            updateRecipeReducerDataForDeck(recipeReducerData.name, {
-                showProcess: false,
-            })
-        );
+        let deckName = recipeReducerData.name;
+        dispatch(runRecipeReset(deckName));
         // setShowCleanUp(false); //check
     };
     const handleCancelActionDeckB = () => {
         let recipeReducerData = recipeActionReducerForDeckB;
-        dispatch(
-            updateRecipeReducerDataForDeck(recipeReducerData.name, {
-                showProcess: false,
-            })
-        );
+        let deckName = recipeReducerData.name;
+        dispatch(runRecipeReset(deckName));
         // setShowCleanUp(false);//check
     };
 

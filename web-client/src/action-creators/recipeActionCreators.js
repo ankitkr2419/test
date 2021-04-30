@@ -28,9 +28,9 @@ export const runRecipeFailed = (serverErrors) => ({
   },
 });
 
-export const runRecipeReset = () => ({
+export const runRecipeReset = (deckName) => ({
   type: runRecipeAction.runRecipeReset,
-  payload: {},
+  payload: {deckName},
 });
 
 export const runRecipeInProgress = (runRecipeInProgress) => ({
