@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"sync"
 	"time"
+	"mylab/cpagent/responses"
 )
 
 type SimulatorDriver struct {
@@ -11,7 +12,9 @@ type SimulatorDriver struct {
 	DeckName string
 }
 
-const delay = 50
+// Below delay should be 50 for almost real simulation, 
+// all other delay's are its proportinate
+var delay time.Duration = 50
 
 // simulating masterLock like in compact32
 var masterLock sync.Mutex
@@ -77,4 +80,12 @@ func (d *SimulatorDriver) WriteSingleCoil(address, value uint16) (err error) {
 	time.Sleep(delay * time.Millisecond)
 	err = d.simulateWriteSingleCoil(address, value)
 	return
+}
+
+func UpdateDelay(d int) error {
+	if d > 0 && d <= 100 {
+		delay = time.Duration(d)
+		return nil
+	}
+	return responses.DelayRangeInvalid
 }
