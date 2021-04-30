@@ -138,13 +138,13 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID, pro
 	// get the highest sequence number for our process
 	parent.SequenceNumber = highestSeqNum + 1
 
-	createdP, err := s.processOperation(ctx, "duplicate", parent.Type, process, parent)
+	duplicate, err = s.processOperation(ctx, "duplicate", parent.Type, process, parent)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error creating duplicate process")
 		return
 	}
 
-	logger.Infoln("Duplicate process created in db : ", createdP)
+	logger.Infoln("Duplicate process created in db : ", duplicate)
 	return
 }
 
@@ -167,8 +167,6 @@ func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processTy
 }
 
 func (s *pgStore) processOperation(ctx context.Context, operation string, processType string, process interface{}, parent Process) (pr Process, err error) {
-
-	// TODO: handle type conversion panic by defer
 
 	var tx *sql.Tx
 	var lastInsertID uuid.UUID
@@ -206,17 +204,29 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		pr = parent
 		pr.ID = lastInsertID
+		// Avoiding complete fetch and only updating these fields
+		pr.CreatedAt = time.Now()
+		pr.UpdatedAt = time.Now()
+		logger.Infoln("Process Duplicated => ", pr)
+
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = responses.InvalidInterfaceConversionError
+		}
+	}()
 
 	switch processType {
 	case "Piercing":
-		p := process.(Piercing)
 		if operation == "name" {
+			p := process.(Piercing)
 			pr.Name = fmt.Sprintf("Piercing_%s", p.Type)
 			return
 		}
 
 		// Create Piercing process
+		p := process.(*Piercing)
 		p.ProcessID = pr.ID
 
 		err = tx.QueryRow(
@@ -237,12 +247,14 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "TipOperation":
-		t := process.(TipOperation)
 		if operation == "name" {
+			t := process.(TipOperation)
 			pr.Name = fmt.Sprintf("Tip_Operation_%s", t.Type)
 			return
 		}
+		
 		// Create TipOperation  process
+		t := process.(*TipOperation)
 		t.ProcessID = pr.ID
 
 		err = tx.QueryRow(
