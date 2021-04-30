@@ -180,6 +180,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return Process{}, err
 		}
 
+		// End the transaction in defer call
 		defer func() {
 			if err != nil {
 				tx.Rollback()
@@ -252,7 +253,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			pr.Name = fmt.Sprintf("Tip_Operation_%s", t.Type)
 			return
 		}
-		
+
 		// Create TipOperation  process
 		t := process.(*TipOperation)
 		t.ProcessID = pr.ID
@@ -274,12 +275,13 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "TipDocking":
-		t := process.(TipDock)
 		if operation == "name" {
+			t := process.(TipDock)
 			pr.Name = fmt.Sprintf("Tip_Docking_%s", t.Type)
 			return
 		}
 		// Create TipDocking process
+		t := process.(*TipDock)
 		t.ProcessID = pr.ID
 
 		err = tx.QueryRow(
@@ -300,12 +302,13 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "AspireDispense":
-		ad := process.(AspireDispense)
 		if operation == "name" {
+			ad := process.(AspireDispense)
 			pr.Name = fmt.Sprintf("Aspire_Dispense_%s", ad.Category)
 			return
 		}
 		// Create AspireDispense process
+		ad := process.(*AspireDispense)
 		ad.ProcessID = pr.ID
 
 		err = tx.QueryRow(
@@ -340,7 +343,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 		// Create Heating process
-		h := process.(Heating)
+		h := process.(*Heating)
 		h.ProcessID = pr.ID
 
 		err = tx.QueryRow(
@@ -361,8 +364,8 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "Shaking":
-		sh := process.(Shaker)
 		if operation == "name" {
+			sh := process.(Shaker)
 			if sh.WithTemp {
 				pr.Name = "Shaking_With_temperature"
 				return
@@ -371,6 +374,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 		// Create Shaking process
+		sh := process.(*Shaker)
 		sh.ProcessID = pr.ID
 
 		err = tx.QueryRow(
@@ -395,12 +399,13 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "AttachDetach":
-		ad := process.(AttachDetach)
 		if operation == "name" {
+			ad := process.(AttachDetach)
 			pr.Name = fmt.Sprintf("Magnet_%s", ad.Operation)
 			return
 		}
 		// Create AttachDetach process
+		ad := process.(*AttachDetach)
 		ad.ProcessID = pr.ID
 
 		err = tx.QueryRow(
@@ -425,7 +430,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 		// Create Delay process
-		d := process.(Delay)
+		d := process.(*Delay)
 		d.ProcessID = pr.ID
 
 		err = tx.QueryRow(
