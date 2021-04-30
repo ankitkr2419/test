@@ -64,26 +64,27 @@ func (s *pgStore) ListProcesses(ctx context.Context, id uuid.UUID) (dbProcess []
 	return
 }
 
-func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdDelay Process, err error) {
+func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess Process, err error) {
 	var tx *sql.Tx
 
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
-		logger.WithField("err:", err.Error()).Errorln(responses.DelayInitiateDBTxError)
+		logger.WithField("err:", err.Error()).Errorln(responses.ProcessInitiateDBTxError)
 		return Process{}, err
 	}
 
-	// End the transaction in defer call
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-			return
-		}
-		tx.Commit()
-	}()
-
-	createdDelay, err = s.createProcess(ctx, p, tx)
+	createdProcess, err = s.createProcess(ctx, p, tx)
 	// failures are already logged
+	// Commit the transaction else won't be able to Show
+	
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
+
+	createdProcess, err = s.ShowProcess(ctx, createdProcess.ID)
+
 	return
 }
 
@@ -103,10 +104,9 @@ func (s *pgStore) createProcess(ctx context.Context, p Process, tx *sql.Tx) (cre
 		logger.WithField("err", err.Error()).Errorln(responses.ProcessDBCreateError)
 		return
 	}
-
-	createdProcess, err = s.ShowProcess(ctx, lastInsertID)
-	// failures are already logged
-	return
+	
+	p.ID = lastInsertID
+	return p, err
 }
 
 func (s *pgStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
