@@ -264,9 +264,8 @@ const AppFooter = (props) => {
                 }
                 processNumber={
                     recipeActionReducerForDeckA.runRecipeInProgress
-                        ? JSON.parse(
-                              recipeActionReducerForDeckA.runRecipeInProgress
-                          ).operation_details.current_step
+                        ? recipeActionReducerForDeckA.runRecipeInProgress
+                              .operation_details.current_step
                         : 0
                 }
                 processTotal={
@@ -298,9 +297,8 @@ const AppFooter = (props) => {
                 secs={recipeActionReducerForDeckA.secs}
                 progressPercentComplete={
                     recipeActionReducerForDeckA.runRecipeInProgress
-                        ? JSON.parse(
-                              recipeActionReducerForDeckA.runRecipeInProgress
-                          ).progress
+                        ? recipeActionReducerForDeckA.runRecipeInProgress
+                              .progress
                         : 0
                 }
                 showCleanUp={recipeActionReducerForDeckA.showCleanUp}

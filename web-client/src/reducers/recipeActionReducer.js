@@ -162,47 +162,76 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 decks: decksAfterRecipeReset,
             };
         case runRecipeAction.runRecipeInProgress:
-            console.log("action inProgress: ", action);
+            let response = action.payload.runRecipeInProgress;
+            let deckNameRunInProgress =
+                response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
+
+            let decksAfterRunInProgress = state.decks.map((deckObj) => {
+                return deckObj.name === deckNameRunInProgress
+                    ? {
+                          ...deckObj,
+                          runRecipeInProgress: {
+                              ...response,
+                          },
+                      }
+                    : deckObj;
+            });
+
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                isRunRecipeCompleted: false,
-                leftActionBtn: DECKCARD_BTN.text.pause,
-                rightActionBtn: DECKCARD_BTN.text.abort,
+                decks: decksAfterRunInProgress,
+                // ...action.payload,
+                // isLoading: false,
+                // isRunRecipeCompleted: false,
+                // leftActionBtn: DECKCARD_BTN.text.pause,
+                // rightActionBtn: DECKCARD_BTN.text.abort,
             };
         case runRecipeAction.runRecipeInCompleted:
             console.log("action completed", action);
             return {
                 ...state,
-                ...action.payload,
-                isRunRecipeCompleted: true,
-                leftActionBtn: DECKCARD_BTN.text.done,
-                rightActionBtn: DECKCARD_BTN.text.cancel,
+                // ...action.payload,
+                // isRunRecipeCompleted: true,
+                // leftActionBtn: DECKCARD_BTN.text.done,
+                // rightActionBtn: DECKCARD_BTN.text.cancel,
             };
 
         case pauseRecipeAction.pauseRecipeInitiated:
-            console.log("");
-            return { ...state, ...action.payload, isLoading: true };
+            return { ...state /*...action.payload, isLoading: true */ };
         case pauseRecipeAction.pauseRecipeSuccess:
+            // console.log("action: pauseSuccess", action);
+            let responsePauseSuccess = action.payload.response;
+            let deckNamePauseSuccess =
+                responsePauseSuccess.deck === "A"
+                    ? DECKNAME.DeckA
+                    : DECKNAME.DeckB;
+            let decksAfterPauseSuccess = state.decks.map((deckObj) => {
+                return deckObj.name === deckNamePauseSuccess
+                    ? {
+                          ...deckObj,
+                          pauseRecipeResponse: responsePauseSuccess,
+                          pauseRecipeError: false,
+                          leftActionBtn: DECKCARD_BTN.text.resume,
+                      }
+                    : deckObj;
+            });
+
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                pauseRecipeError: false,
-                leftActionBtn: DECKCARD_BTN.text.resume,
+                decks: decksAfterPauseSuccess,
             };
         case pauseRecipeAction.pauseRecipeFailed:
+            console.log("action: pauseFailed", action);
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                pauseRecipeError: true,
+                // ...action.payload,
+                // isLoading: false,
+                // pauseRecipeError: true,
             };
         case pauseRecipeAction.pauseRecipeReset:
             return {
                 ...state,
-                pauseRecipeError: null,
+                // pauseRecipeError: null,
             };
 
         case abortRecipeAction.abortRecipeInitiated:
@@ -235,37 +264,54 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
             };
 
         case resumeRecipeAction.resumeRecipeInitiated:
-            return { ...state, ...action.payload, isLoading: true };
+            return { ...state /*...action.payload, isLoading: true*/ };
         case resumeRecipeAction.resumeRecipeSuccess:
+            let deckNameResumeSuccess =
+                action.payload.response.deck === "A"
+                    ? DECKNAME.DeckA
+                    : DECKNAME.DeckB;
+            let decksAfterResumeSuccess = state.decks.map((deckObj) => {
+                return deckObj.name === deckNameResumeSuccess
+                    ? {
+                          ...deckObj,
+                          leftActionBtn: DECKCARD_BTN.text.pause,
+                          resumeRecipeError: false,
+                      }
+                    : deckObj;
+            });
+
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                resumeRecipeError: false,
-                leftActionBtn: DECKCARD_BTN.text.pause,
+                decks: decksAfterResumeSuccess,
+                // ...action.payload,
+                // isLoading: false,
+                // resumeRecipeError: false,
+                // leftActionBtn: DECKCARD_BTN.text.pause,
             };
         case resumeRecipeAction.resumeRecipeFailed:
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                resumeRecipeError: true,
+                // ...action.payload,
+                // isLoading: false,
+                // resumeRecipeError: true,
             };
 
         case resumeRecipeAction.resumeRecipeReset:
             return {
                 ...state,
-                resumeRecipeError: null,
+                // resumeRecipeError: null,
             };
 
         case resumeRecipeAction.resumeRecipeInProgress:
+            console.log("action resumeRecipeInProgress", action);
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                isResumeRecipeCompleted: false,
+                // ...action.payload,
+                // isLoading: false,
+                // isResumeRecipeCompleted: false,
             };
         case resumeRecipeAction.resumeRecipeInCompleted:
+            console.log("action resumeRecipeInCompleted", action);
             return {
                 ...state,
                 ...action.payload,
@@ -323,7 +369,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 ...state,
                 decks: newDecksAfterLoggedOut,
             };
-            return state;
 
         default:
             return state;

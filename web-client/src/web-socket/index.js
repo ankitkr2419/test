@@ -42,7 +42,7 @@ export const connectSocket = (dispatch) => {
   webSocket.onmessage = (event) => {
     if (event.data) {
       const { type, data } = JSON.parse(event.data);
-      //console.log('type', type, 'data: ', data);
+      console.log('type', type, 'data: ', data);
       switch (type) {
         case SOCKET_MESSAGE_TYPE.graphData:
           dispatch(wellGraphSucceeded(data));
@@ -64,10 +64,10 @@ export const connectSocket = (dispatch) => {
           dispatch(homingActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
-          dispatch(runRecipeInProgress(data));
+          dispatch(runRecipeInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeSuccess:
-          dispatch(runRecipeInCompleted(data));
+          dispatch(runRecipeInCompleted(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.uvLightProgress:
           dispatch(runCleanUpActionInProgress(data));
