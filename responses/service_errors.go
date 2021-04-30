@@ -54,6 +54,8 @@ var (
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
+
+	DelayRangeInvalid = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
 )
 
 // Special errors which are in []byte format
