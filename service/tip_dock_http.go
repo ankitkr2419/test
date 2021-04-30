@@ -23,7 +23,7 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(tdObj)
 		if !valid {
-			logger.WithField("err", err.Error()).Errorln(responses.TipDockingValidationError)
+			logger.WithField("err", responses.TipDockingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -79,7 +79,7 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 		}
 		valid, respBytes := validate(tdObj)
 		if !valid {
-			logger.WithField("err", err.Error()).Errorln(responses.TipDockingValidationError)
+			logger.WithField("err", responses.TipDockingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}

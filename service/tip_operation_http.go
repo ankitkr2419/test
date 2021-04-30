@@ -22,7 +22,7 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(tipOpr)
 		if !valid {
-			logger.WithField("err", err.Error()).Errorln(responses.TipOperationValidationError)
+			logger.WithField("err", responses.TipOperationValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -83,7 +83,7 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(tipOpr)
 		if !valid {
-			logger.WithField("err", err.Error()).Errorln(responses.TipOperationValidationError)
+			logger.WithField("err", responses.TipOperationValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}

@@ -22,7 +22,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(htObj)
 		if !valid {
-			logger.WithField("err", err.Error()).Errorln(responses.HeatingValidationError)
+			logger.WithField("err", responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -83,7 +83,7 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(htObj)
 		if !valid {
-			logger.WithField("err", err.Error()).Errorln(responses.HeatingValidationError)
+			logger.WithField("err", responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
