@@ -55,6 +55,7 @@ var (
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
+	ProcessValidationError   = fmt.Errorf("error validating process record")
 	ProcessDecodeError            = fmt.Errorf("error decoding process record")
 	ProcessFetchError             = fmt.Errorf("error fetching process record")
 	ProcessCreateError            = fmt.Errorf("error creating process record")
@@ -63,6 +64,8 @@ var (
 	ProcessTypeInvalid            = fmt.Errorf("error process type is wrong")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
+
+	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 )
 
 // Special errors which are in []byte format
