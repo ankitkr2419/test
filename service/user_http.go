@@ -14,6 +14,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		var u db.User
+		var token string
 		err := json.NewDecoder(req.Body).Decode(&u)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
@@ -23,17 +24,19 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		logger.Infoln(deck)
-		value, ok := userLogin.Load(deck)
-		if !ok {
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"error:"invalid deck name"}`))
-			return
-		}
-		if value.(bool) == true {
-			rw.WriteHeader(http.StatusForbidden)
-			rw.Write([]byte(`{"error:"not allowed to login"}`))
-			return
+
+		if deck != "" {
+			value, ok := userLogin.Load(deck)
+			if !ok {
+				rw.WriteHeader(http.StatusBadRequest)
+				rw.Write([]byte(`{"error:"invalid deck name"}`))
+				return
+			}
+			if value.(bool) == true {
+				rw.WriteHeader(http.StatusForbidden)
+				rw.Write([]byte(`{"error:"not allowed to login"}`))
+				return
+			}
 		}
 
 		valid, respBytes := validate(u)
@@ -57,7 +60,20 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		token, err := EncodeToken(u.Username, u.Role, "A", map[string]string{})
+		//create a new user_auth record
+		authID, err := deps.Store.InsertUserAuths(req.Context(), u.Username)
+		if err != nil {
+			rw.Write([]byte(`{"msg":"user login failed"}`))
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if deck != "" {
+			token, err = EncodeToken(u.Username, authID, u.Role, deck, map[string]string{})
+			userLogin.Store(deck, true)
+		} else {
+			token, err = EncodeToken(u.Username, authID, u.Role, "", map[string]string{})
+		}
 
 		response, err := json.Marshal(map[string]string{
 			"msg":   "user logged in successfully",
@@ -99,12 +115,12 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.InsertUser(req.Context(), u)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while inserting user", u)	
+			logger.WithField("err", err.Error()).Error("Error while inserting user", u)
 			rw.WriteHeader(http.StatusInternalServerError)
 			rw.Write([]byte(`{"msg":"Error while inserting user"}`))
 			return
 		}
-		
+
 		logger.Infoln(u, "user inserted successfully")
 		rw.WriteHeader(http.StatusCreated)
 		rw.Write([]byte(`{"msg":"Created User Sucessfully"}`))

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -18,13 +19,14 @@ type Token struct {
 	jwt.StandardClaims
 	Role    string            `json:"role"`
 	Deck    string            `json:"deck"`
+	AuthID  uuid.UUID         `json:"auth_id"`
 	Payload map[string]string `json:"payload,omitempty"`
 }
 
 // Encodes information into token
-func EncodeToken(userID string, role string, deck string, payload map[string]string) (string, error) {
+func EncodeToken(userID string, authID uuid.UUID, role string, deck string, payload map[string]string) (string, error) {
 	accessKey := config.GetSecretKey()
-	token, tokenErr := generateToken(userID, role, deck, accessKey, payload)
+	token, tokenErr := generateToken(userID, authID, role, deck, accessKey, payload)
 
 	if tokenErr != nil {
 		return "", fmt.Errorf("TOKEN ERROR: %v ", tokenErr)
@@ -33,10 +35,11 @@ func EncodeToken(userID string, role string, deck string, payload map[string]str
 
 }
 
-func generateToken(userID, role, deck, accessKey string, payload map[string]string) (string, error) {
+func generateToken(userID string, authID uuid.UUID, role, deck, accessKey string, payload map[string]string) (string, error) {
 	tokenClaims := &Token{
 		Role:    role,
 		Deck:    deck,
+		AuthID:  authID,
 		Payload: payload,
 		StandardClaims: jwt.StandardClaims{
 			Subject:  userID,
