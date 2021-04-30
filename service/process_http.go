@@ -1,6 +1,7 @@
 package service
 
 import (
+	"io/ioutil"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
@@ -181,7 +182,46 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = json.NewDecoder(req.Body).Decode(&process)
+		processType := vars["process_type"]
+
+		processBytes, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.ProcessDecodeError.Error())
+			return
+		}
+
+		switch processType{
+		case "Piercing":
+			process = &db.Piercing{}
+		case "TipOperation":
+			process = &db.TipOperation{}
+		case "TipDocking":
+			process = &db.TipDock{}
+		case "AspireDispense":
+			process = &db.AspireDispense{}
+		case "Heating":
+			process = &db.Heating{}
+		case "Shaking":
+			process = &db.Shaker{}
+		case "AttachDetach":
+			process = &db.AttachDetach{}
+		case "Delay":
+			process = &db.Delay{}
+		default:
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessTypeInvalid.Error()})
+			logger.Errorln(responses.ProcessTypeInvalid.Error())
+			return
+		}
+
+		valid, respBytes := validate(process)
+		if !valid {
+			logger.Errorln(responses.ProcessValidationError)
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = json.Unmarshal(processBytes, &process)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
 			logger.WithField("err", err.Error()).Error(responses.ProcessDecodeError.Error())
