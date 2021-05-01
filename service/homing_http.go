@@ -83,6 +83,7 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			if err != nil {
 				logger.Errorf("error in marshalling web socket data %v", err.Error())
 				deps.WsErrCh <- err
+				return "", err
 			}
 			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
 			fmt.Println(operationSuccessMsg)
@@ -133,6 +134,7 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 			if err != nil {
 				logger.Errorf("error in marshalling web socket data %v", err.Error())
 				deps.WsErrCh <- err
+				return "", err
 			}
 			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v_%v", deck, string(wsData))
 		}

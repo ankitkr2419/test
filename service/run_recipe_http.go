@@ -302,6 +302,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		deps.WsErrCh <- err
+		return
 	}
 	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v_%v", deck, string(wsData))
 

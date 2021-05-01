@@ -179,6 +179,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		d.WsErrCh <- err
+		return
 	}
 	d.WsMsgCh <- fmt.Sprintf("success_uvlight_%v", string(wsData))
 

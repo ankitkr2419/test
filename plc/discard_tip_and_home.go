@@ -48,6 +48,7 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
 		d.WsErrCh <- err
+		return
 	}
 	d.WsMsgCh <- fmt.Sprintf("success_discardAndHomed_%v_%v", messageWithTipDiscard, string(wsData))
 
