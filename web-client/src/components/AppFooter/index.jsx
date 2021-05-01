@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import DeckCard from "shared-components/DeckCard";
 import { DECKNAME } from "appConstants";
 import { useSelector, useDispatch } from "react-redux";
-import { DECKCARD_BTN } from "appConstants";
+import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+
 import {
     abortRecipeInitiated,
     pauseRecipeInitiated,
@@ -14,9 +15,27 @@ import {
     abortRecipeReset,
     updateRecipeReducerDataForDeck,
 } from "action-creators/recipeActionCreators";
+import MlModal from "shared-components/MlModal";
+import { loginReset } from "action-creators/loginActionCreators";
 
 const AppFooter = (props) => {
     const dispatch = useDispatch();
+
+    const [
+        isConfirmationModalVisibleDeckA,
+        setIsConfirmationModalVisibleDeckA,
+    ] = useState(false);
+    const [
+        isConfirmationModalVisibleDeckB,
+        setIsConfirmationModalVisibleDeckB,
+    ] = useState(false);
+
+    const [abortConfirmationModalA, setAbortConfirmationModalA] = useState(
+        false
+    );
+    const [abortConfirmationModalB, setAbortConfirmationModalB] = useState(
+        false
+    );
 
     //login reducer
     const loginReducer = useSelector((state) => state.loginReducer);
@@ -186,20 +205,10 @@ const AppFooter = (props) => {
     };
 
     const handleDoneActionDeckA = () => {
-        let recipeReducerData = recipeActionReducerForDeckA;
-        dispatch(
-            updateRecipeReducerDataForDeck(recipeReducerData.name, {
-                showProcess: !recipeReducerData.showProcess,
-            })
-        );
+        toggleComfirmationModal(DECKNAME.DeckA);
     };
     const handleDoneActionDeckB = () => {
-        let recipeReducerData = recipeActionReducerForDeckB;
-        dispatch(
-            updateRecipeReducerDataForDeck(recipeReducerData.name, {
-                showProcess: !recipeReducerData.showProcess,
-            })
-        );
+        toggleComfirmationModal(DECKNAME.DeckB);
     };
 
     const getRightActionBtnHandler = (deckName) => {
@@ -242,17 +251,89 @@ const AppFooter = (props) => {
     };
 
     const handleAbortActionDeckA = () => {
-        //check
-        // setConfirmationModal(true);
+        toggleAbortConfirmationModal(DECKNAME.DeckA);
     };
 
     const handleAbortActionDeckB = () => {
-        //check
-        // setConfirmationModal(true);
+        toggleAbortConfirmationModal(DECKNAME.DeckB);
+    };
+
+    const toggleAbortConfirmationModal = (deckName) => {
+        if (deckName === DECKNAME.DeckA) {
+            setAbortConfirmationModalA(!abortConfirmationModalA);
+        } else {
+            setAbortConfirmationModalB(!abortConfirmationModalB);
+        }
+    };
+
+    const onAbortConfirmed = (deckName) => {
+        toggleAbortConfirmationModal(deckName);
+        dispatch(abortRecipeInitiated({ deckName }));
+    };
+
+    const onNextClickedAfterDoneRecipe = (deckName) => {
+        dispatch(loginReset(deckName));
+    };
+    const toggleComfirmationModal = (deckName) => {
+        if (deckName === DECKNAME.DeckA) {
+            setIsConfirmationModalVisibleDeckA(
+                !isConfirmationModalVisibleDeckA
+            );
+        } else {
+            setIsConfirmationModalVisibleDeckB(
+                !isConfirmationModalVisibleDeckB
+            );
+        }
     };
 
     return (
         <div className="d-flex justify-content-center align-items-center">
+            <MlModal
+                isOpen={isConfirmationModalVisibleDeckA}
+                textHead={DECKNAME.DeckA}
+                textBody={`Experiment was successful`}
+                handleSuccessBtn={() =>
+                    onNextClickedAfterDoneRecipe(DECKNAME.DeckA)
+                }
+                handleCrossBtn={() => toggleComfirmationModal(DECKNAME.DeckA)}
+                successBtn={MODAL_BTN.next}
+            />
+
+            <MlModal
+                isOpen={isConfirmationModalVisibleDeckB}
+                textHead={DECKNAME.DeckB}
+                textBody={`Experiment was successful`}
+                handleSuccessBtn={() =>
+                    onNextClickedAfterDoneRecipe(DECKNAME.DeckB)
+                }
+                handleCrossBtn={() => toggleComfirmationModal(DECKNAME.DeckB)}
+                successBtn={MODAL_BTN.next}
+            />
+
+            <MlModal
+                isOpen={abortConfirmationModalA}
+                textHead={DECKNAME.DeckA}
+                textBody={MODAL_MESSAGE.abortConfirmation}
+                handleSuccessBtn={() => onAbortConfirmed(DECKNAME.DeckA)}
+                handleCrossBtn={() =>
+                    toggleAbortConfirmationModal(DECKNAME.DeckA)
+                }
+                successBtn={MODAL_BTN.yes}
+                failureBtn={MODAL_BTN.no}
+            />
+
+            <MlModal
+                isOpen={abortConfirmationModalB}
+                textHead={DECKNAME.DeckB}
+                textBody={MODAL_MESSAGE.abortConfirmation}
+                handleSuccessBtn={() => onAbortConfirmed(DECKNAME.DeckB)}
+                handleCrossBtn={() =>
+                    toggleAbortConfirmationModal(DECKNAME.DeckB)
+                }
+                successBtn={MODAL_BTN.yes}
+                failureBtn={MODAL_BTN.no}
+            />
+
             {/**Deck A */}
             <DeckCard
                 deckName={DECKNAME.DeckA}

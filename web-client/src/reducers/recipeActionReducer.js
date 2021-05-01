@@ -187,9 +187,30 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 // rightActionBtn: DECKCARD_BTN.text.abort,
             };
         case runRecipeAction.runRecipeInCompleted:
-            console.log("action completed", action);
+            let responseRunRecipeInCompleted =
+                action.payload.runRecipeInCompleted;
+            let deckNameOfRunRecipeInCompleted =
+                responseRunRecipeInCompleted.deck === "A"
+                    ? DECKNAME.DeckA
+                    : DECKNAME.DeckB;
+            let decksAfterRunRecipeInCompleted = state.decks.map((deckObj) => {
+                return deckObj.name === deckNameOfRunRecipeInCompleted
+                    ? {
+                          ...deckObj,
+                          runRecipeInCompleted: {
+                              ...responseRunRecipeInCompleted,
+                          },
+                          leftActionBtn: DECKCARD_BTN.text.done,
+                          rightActionBtn: DECKCARD_BTN.text.cancel,
+                          rightActionBtnDisabled: true,
+                          isRunRecipeCompleted: true,
+                      }
+                    : deckObj;
+            });
+
             return {
                 ...state,
+                decks: decksAfterRunRecipeInCompleted,
                 // ...action.payload,
                 // isRunRecipeCompleted: true,
                 // leftActionBtn: DECKCARD_BTN.text.done,
@@ -235,32 +256,34 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
             };
 
         case abortRecipeAction.abortRecipeInitiated:
+          console.log('action abort init: ', action)
             return {
                 ...state,
-                ...action.payload,
-                isLoading: true,
-                abortRecipeError: null,
+                // ...action.payload,
+                // isLoading: true,
+                // abortRecipeError: null,
             };
         case abortRecipeAction.abortRecipeSuccess:
+            console.log('action abort success', action);
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                abortRecipeError: false,
-                leftActionBtn: DECKCARD_BTN.text.run,
-                rightActionBtn: DECKCARD_BTN.text.cancel,
+                // ...action.payload,
+                // isLoading: false,
+                // abortRecipeError: false,
+                // leftActionBtn: DECKCARD_BTN.text.run,
+                // rightActionBtn: DECKCARD_BTN.text.cancel,
             };
         case abortRecipeAction.abortRecipeFailed:
             return {
                 ...state,
-                ...action.payload,
-                isLoading: false,
-                abortRecipeError: true,
+                // ...action.payload,
+                // isLoading: false,
+                // abortRecipeError: true,
             };
         case abortRecipeAction.abortRecipeReset:
             return {
                 ...state,
-                abortRecipeError: null,
+                // abortRecipeError: null,
             };
 
         case resumeRecipeAction.resumeRecipeInitiated:
