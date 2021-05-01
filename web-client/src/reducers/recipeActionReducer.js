@@ -77,7 +77,6 @@ export const initialState = {
 export const recipeActionReducer = (state = initialState, action = {}) => {
     switch (action.type) {
         case saveRecipeDataAction.saveRecipeDataForDeck: //set and update: depend on deckName
-            // console.log("action: ", action);
             let deckNameForRecipe = action.payload.deckName;
             let newDecksAfterRecipeDataAdded = state.decks.map((deckObj) => {
                 return deckObj.name === deckNameForRecipe
@@ -126,7 +125,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 decks: decksAfterRunInitiated,
             };
         case runRecipeAction.runRecipeSuccess:
-            console.log("action success: ", action);
             return state;
         // return {
         //     ...state,
@@ -135,7 +133,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         //     // runRecipeError: false,
         // };
         case runRecipeAction.runRecipeFailed:
-            console.log("action run failed", action);
             return {
                 ...state,
                 // serverErrors: action.payload.serverErrors,
@@ -220,7 +217,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         case pauseRecipeAction.pauseRecipeInitiated:
             return { ...state /*...action.payload, isLoading: true */ };
         case pauseRecipeAction.pauseRecipeSuccess:
-            // console.log("action: pauseSuccess", action);
             let responsePauseSuccess = action.payload.response;
             let deckNamePauseSuccess =
                 responsePauseSuccess.deck === "A"
@@ -242,7 +238,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 decks: decksAfterPauseSuccess,
             };
         case pauseRecipeAction.pauseRecipeFailed:
-            console.log("action: pauseFailed", action);
             return {
                 ...state,
                 // ...action.payload,
@@ -256,7 +251,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
             };
 
         case abortRecipeAction.abortRecipeInitiated:
-          console.log('action abort init: ', action)
             return {
                 ...state,
                 // ...action.payload,
@@ -264,7 +258,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 // abortRecipeError: null,
             };
         case abortRecipeAction.abortRecipeSuccess:
-            console.log('action abort success', action);
             return {
                 ...state,
                 // ...action.payload,
@@ -326,7 +319,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
             };
 
         case resumeRecipeAction.resumeRecipeInProgress:
-            console.log("action resumeRecipeInProgress", action);
             return {
                 ...state,
                 // ...action.payload,
@@ -334,7 +326,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
                 // isResumeRecipeCompleted: false,
             };
         case resumeRecipeAction.resumeRecipeInCompleted:
-            console.log("action resumeRecipeInCompleted", action);
             return {
                 ...state,
                 ...action.payload,

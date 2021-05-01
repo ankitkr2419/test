@@ -18,7 +18,7 @@ const LandingScreen = styled.div`
 `;
 
 const LandingScreenComponent = (props) => {
-  let { deckName }  = props;
+  // let { deckName }  = props;
   const dispatch = useDispatch();
   const homingReducer = useSelector((state) => state.homingReducer);
 

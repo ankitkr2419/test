@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import styled from "styled-components";
 import { Card, CardBody, Button, Row, Col } from "core-components";
@@ -14,10 +14,8 @@ import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeC
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
 import {
-  DECKCARD_BTN,
   DECKNAME,
   MODAL_BTN,
-  MODAL_MESSAGE,
   ROUTES,
 } from "appConstants";
 import { loginReset } from "action-creators/loginActionCreators";
@@ -26,7 +24,6 @@ import {
   setCleanUpMins,
   setCleanUpSecs,
   setShowCleanUp,
-  resetShowCleanUp,
 } from "action-creators/cleanUpActionCreators";
 import TrayDiscardModal from "components/modals/TrayDiscardModal";
 import { discardDeckInitiated } from "action-creators/discardDeckActionCreators";

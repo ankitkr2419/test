@@ -10,9 +10,7 @@ import {
 } from "action-creators/recipeActionCreators";
 import { ROUTES } from "appConstants";
 import { Redirect } from "react-router-dom";
-import { useHistory } from "react-router-dom";
-import { toast } from "react-toastify";
-import { cleanUpReducer } from "reducers/cleanUpReducer";
+// import { useHistory } from "react-router-dom";
 
 // import { Loader } from 'shared-components'
 const RecipeListing = styled.div`
@@ -29,7 +27,7 @@ const RecipeListing = styled.div`
 
 const RecipeListingContainer = (props) => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  // const history = useHistory();
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
   const [recipeFetched, setRecipeFetched] = useState(false);
@@ -148,7 +146,7 @@ const RecipeListingContainer = (props) => {
     (deck) => deck.name === deckName
   );
   const recipeData = recipeReducerDataOfActiveDeck.allRecipeData;
-  const isLoading = recipeReducerDataOfActiveDeck.isLoading;
+  // const isLoading = recipeReducerDataOfActiveDeck.isLoading;
 
   const cleanUpReducerDataOfActiveDeck = cleanUpReducer.decks.find(
     (deck) => deck.name === deckName

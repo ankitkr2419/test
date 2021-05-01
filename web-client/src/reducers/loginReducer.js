@@ -136,7 +136,6 @@ export const loginReducer = (state = loginInitialState, action) => {
                 return state;
             }
         case loginActions.failureAction:
-            // console.log("action: ", action);
             let err =
                 action.payload.serverErrors && action.payload.serverErrors.msg
                     ? action.payload.serverErrors.msg

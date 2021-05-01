@@ -9,10 +9,10 @@ import {
   resumeRecipeInitiated,
   runRecipeInitiated,
   runRecipeReset,
-  pauseRecipeReset,
-  resumeRecipeReset,
-  abortRecipeReset,
-  updateRecipeReducerDataForDeck,
+//   pauseRecipeReset,
+//   resumeRecipeReset,
+//   abortRecipeReset,
+//   updateRecipeReducerDataForDeck,
 } from "action-creators/recipeActionCreators";
 import {
   abortCleanUpActionInitiated,
@@ -37,8 +37,8 @@ const AppFooter = (props) => {
   //login reducer
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+//   let activeDeckObj =
+//     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
   let loginDataOfA =
     loginReducerData &&
@@ -81,7 +81,7 @@ const AppFooter = (props) => {
       deckName === DECKNAME.DeckA
         ? cleanUpReducerForDeckA
         : cleanUpReducerForDeckB;
-    let showCleanUp = cleanUpReducerData.showCleanUp;
+    // let showCleanUp = cleanUpReducerData.showCleanUp;
 
     switch (
       showProcess
