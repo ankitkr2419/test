@@ -332,7 +332,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
               ),
               isLoading: false,
               resumeCleanUpError: false,
-              leftActionBtn: DECKCARD_BTN.text.pause,
+              leftActionBtn: DECKCARD_BTN.text.pauseUv,
               rightActionBtn: DECKCARD_BTN.text.abort,
             }
           : deckObj;
@@ -424,6 +424,11 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
               abortCleanUpError: false,
               leftActionBtn: DECKCARD_BTN.text.startUv,
               rightActionBtn: DECKCARD_BTN.text.cancel,
+              hours: 0,
+              mins: 0,
+              secs: 0,
+              progress: 0,
+              cleanUpData: null
             }
           : deckObj;
       });
@@ -467,6 +472,11 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
               abortCleanUpError: null,
               leftActionBtn: DECKCARD_BTN.text.startUv,
               rightActionBtn: DECKCARD_BTN.text.cancel,
+              hours: 0,
+              mins: 0,
+              secs: 0,
+              progress: 0,
+              cleanUpData: null
             }
           : deckObj;
       });
@@ -479,57 +489,94 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       let deckNameToSetHours = action.payload.params.deckName;
       let newHours = parseInt(action.payload.params.hours);
 
-      state.decks.forEach((deckObj, index) => {
-        if (deckObj.name === deckNameToSetHours) {
-          state.decks[index].hours = newHours;
-        }
+      let dockAfterHoursSet = state.decks.map((deckObj) => {
+        return deckObj.name === deckNameToSetHours
+          ? {
+              ...state.decks.find(
+                (initialDeckObj) => initialDeckObj.name === deckNameToSetHours
+              ),
+              hours: newHours,
+            }
+          : deckObj;
       });
-
-      return state;
+      return {
+        ...state,
+        decks: dockAfterHoursSet,
+      };
 
     case setCleanUpMinsAction.setMins:
       let deckNameToSetMins = action.payload.params.deckName;
       let newMins = parseInt(action.payload.params.mins);
 
-      state.decks.forEach((deckObj, index) => {
-        if (deckObj.name === deckNameToSetMins) {
-          state.decks[index].mins = newMins;
-        }
+      let dockAfterMinsSet = state.decks.map((deckObj) => {
+        return deckObj.name === deckNameToSetMins
+          ? {
+              ...state.decks.find(
+                (initialDeckObj) => initialDeckObj.name === deckNameToSetMins
+              ),
+              mins: newMins,
+            }
+          : deckObj;
       });
-
-      return state;
+      return {
+        ...state,
+        decks: dockAfterMinsSet,
+      };
 
     case setCleanUpSecsAction.setSecs:
       let deckNameToSetSecs = action.payload.params.deckName;
       let newSecs = parseInt(action.payload.params.secs);
 
-      state.decks.forEach((deckObj, index) => {
-        if (deckObj.name === deckNameToSetSecs) {
-          state.decks[index].secs = newSecs;
-        }
+      let dockAfterSecsSet = state.decks.map((deckObj) => {
+        return deckObj.name === deckNameToSetSecs
+          ? {
+              ...state.decks.find(
+                (initialDeckObj) => initialDeckObj.name === deckNameToSetSecs
+              ),
+              secs: newSecs,
+            }
+          : deckObj;
       });
-
-      return state;
+      return {
+        ...state,
+        decks: dockAfterSecsSet,
+      };
 
     case setShowCleanUpAction.setShowCleanUp:
       let deckNameToShowCleanUp = action.payload.params.deckName;
-
-      state.decks.forEach((deckObj, index) => {
-        if (deckObj.name === deckNameToShowCleanUp) {
-          state.decks[index].showCleanUp = true;
-        }
+      let dockAfterShowCleanUp = state.decks.map((deckObj) => {
+        return deckObj.name === deckNameToShowCleanUp
+          ? {
+              ...state.decks.find(
+                (initialDeckObj) =>
+                  initialDeckObj.name === deckNameToShowCleanUp
+              ),
+              showCleanUp: true,
+            }
+          : deckObj;
       });
-
-      return state;
+      return {
+        ...state,
+        decks: dockAfterShowCleanUp,
+      };
 
     case setShowCleanUpAction.resetShowCleanUp:
       let deckNameToHideCleanUp = action.payload.params.deckName;
-
-      state.decks.forEach((deckObj, index) => {
-        if (deckObj.name === deckNameToHideCleanUp) {
-          state.decks[index].showCleanUp = false;
-        }
+      let dockAfterHideCleanUp = state.decks.map((deckObj) => {
+        return deckObj.name === deckNameToHideCleanUp
+          ? {
+              ...state.decks.find(
+                (initialDeckObj) =>
+                  initialDeckObj.name === deckNameToHideCleanUp
+              ),
+              showCleanUp: false,
+            }
+          : deckObj;
       });
+      return {
+        ...state,
+        decks: dockAfterHideCleanUp,
+      };
 
     default:
       return state;

@@ -27,7 +27,7 @@ const TrayDiscardModal = (props) => {
     toggleTrayDiscardModal,
     deckName,
     handleSuccessBtn,
-    switchModalContent,
+    nextModal,
   } = props;
 
   const [enableContent, setEnableContent] = useState(false);
@@ -57,7 +57,7 @@ const TrayDiscardModal = (props) => {
 
             <TrayDiscardSection className="gray-scale-box d-flex justify-content-center align-items-center">
               <Center className="mt-4">
-                {switchModalContent ? (
+                {nextModal ? (
                   <>
                     <ImageIcon
                       src={alertIcon}
@@ -128,13 +128,13 @@ const TrayDiscardModal = (props) => {
 TrayDiscardModal.propTypes = {
   //confirmationText: PropTypes.string,
   isOpen: PropTypes.bool,
-  switchModalContent: PropTypes.bool,
+  nextModal: PropTypes.bool,
   confirmationClickHandler: PropTypes.func,
 };
 
 TrayDiscardModal.defaultProps = {
   //confirmationText: 'Are you sure you want to Exit?',
-  switchModalContent: true,
+  nextModal: true,
   isOpen: false,
 };
 

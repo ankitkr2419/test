@@ -264,7 +264,7 @@ const AppFooter = (props) => {
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
     }
-    dispatch(loginReset({ deckName: DECKNAME.DeckA }));
+    dispatch(loginReset(DECKNAME.DeckA));
     setConfirmDoneModal(!confirmDoneModal);
   };
 
@@ -276,7 +276,7 @@ const AppFooter = (props) => {
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
-    dispatch(loginReset({ deckName: DECKNAME.DeckB }));
+    dispatch(loginReset(DECKNAME.DeckB));
     setConfirmDoneModal(!confirmDoneModal);
   };
 
@@ -312,11 +312,13 @@ const AppFooter = (props) => {
   const handleAbortModalDeckA = () => {
     setConfirmAbortModal(!confirmAbortModal);
     dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
+    dispatch(loginReset(DECKNAME.DeckA));
   };
 
   const handleAbortModalDeckB = () => {
     setConfirmAbortModal(!confirmAbortModal);
     dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort }));
+    dispatch(loginReset(DECKNAME.DeckB));
   };
 
   return (
@@ -403,7 +405,8 @@ const AppFooter = (props) => {
         progressPercentComplete={
           isDeckALoggedIn
             ? recipeActionReducerForDeckA.showProcess
-              ? JSON.parse(recipeActionReducerForDeckA.runRecipeInProgress)
+              ? recipeActionReducerForDeckA.runRecipeInProgress &&
+                JSON.parse(recipeActionReducerForDeckA.runRecipeInProgress)
                   .progress
               : cleanUpReducerForDeckA.cleanUpData &&
                 JSON.parse(cleanUpReducerForDeckA.cleanUpData).progress
@@ -472,7 +475,8 @@ const AppFooter = (props) => {
         progressPercentComplete={
           isDeckBLoggedIn
             ? recipeActionReducerForDeckB.showProcess
-              ? JSON.parse(recipeActionReducerForDeckB.runRecipeInProgress)
+              ? recipeActionReducerForDeckB.runRecipeInProgress &&
+                JSON.parse(recipeActionReducerForDeckB.runRecipeInProgress)
                   .progress
               : cleanUpReducerForDeckB.cleanUpData &&
                 JSON.parse(cleanUpReducerForDeckB.cleanUpData).progress

@@ -13,7 +13,13 @@ import RecipeCard from "components/RecipeListing/RecipeCard";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
-import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
+import {
+  DECKCARD_BTN,
+  DECKNAME,
+  MODAL_BTN,
+  MODAL_MESSAGE,
+  ROUTES,
+} from "appConstants";
 import { loginReset } from "action-creators/loginActionCreators";
 import {
   setCleanUpHours,
@@ -22,6 +28,9 @@ import {
   setShowCleanUp,
   resetShowCleanUp,
 } from "action-creators/cleanUpActionCreators";
+import TrayDiscardModal from "components/modals/TrayDiscardModal";
+import { discardDeckInitiated } from "action-creators/discardDeckActionCreators";
+import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -57,13 +66,13 @@ const RecipeListingComponent = (props) => {
     onConfirmedRecipeSelection,
   } = props;
 
-  const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
-
   const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
 
   const [timeModal, setTimeModal] = useState(false);
+  const [trayDiscardModal, setTrayDiscardModal] = useState(false);
+  const [nextModal, setNextModal] = useState(true);
 
   const onLogoutClicked = () => {
     toggleLogoutModalVisibility();
@@ -79,6 +88,35 @@ const RecipeListingComponent = (props) => {
     setTimeModal(!timeModal);
   };
 
+  const toggleTrayDiscardModal = () => {
+    setTrayDiscardModal(!trayDiscardModal);
+  };
+
+  const handleSuccessBtn = () => {
+    if (nextModal) {
+      dispatch(
+        discardDeckInitiated({
+          deckName:
+            deckName === DECKNAME.DeckA
+              ? DECKNAME.DeckAShort
+              : DECKNAME.DeckBShort,
+        })
+      );
+      setNextModal(!nextModal);
+    } else {
+      dispatch(
+        restoreDeckInitiated({
+          deckName:
+            deckName === DECKNAME.DeckA
+              ? DECKNAME.DeckAShort
+              : DECKNAME.DeckBShort,
+        })
+      );
+      setTrayDiscardModal(!trayDiscardModal);
+      dispatch(loginReset(deckName));
+    }
+  };
+
   const submitTime = () => {
     setTimeModal(!timeModal);
     dispatch(setShowCleanUp({ deckName: deckName }));
@@ -86,7 +124,7 @@ const RecipeListingComponent = (props) => {
 
   const handleChangeTime = (event) => {
     let name = event.target.name;
-        
+
     if (name === "hours") {
       dispatch(
         setCleanUpHours({ deckName: deckName, hours: event.target.value })
@@ -124,6 +162,16 @@ const RecipeListingComponent = (props) => {
           />
         )}
 
+        {trayDiscardModal && (
+          <TrayDiscardModal
+            trayDiscardModal={trayDiscardModal}
+            toggleTrayDiscardModal={toggleTrayDiscardModal}
+            handleSuccessBtn={handleSuccessBtn}
+            nextModal={nextModal}
+            deckName={deckName}
+          />
+        )}
+
         <MlModal
           isOpen={isLogoutModalVisible}
           textHead={deckName}
@@ -139,7 +187,9 @@ const RecipeListingComponent = (props) => {
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
           {isProcessInProgress ? null : (
             <div className="d-flex align-items-center">
-              <Icon name="angle-left" size={32} className="text-white" />
+              <div style={{ cursor: "pointer" }} onClick={onLogoutClicked}>
+                <Icon name="angle-left" size={32} className="text-white" />
+              </div>
               <HeadingTitle
                 Tag="h5"
                 className="text-white font-weight-bold ml-3 mb-0"
@@ -177,7 +227,7 @@ const RecipeListingComponent = (props) => {
                   <Button
                     color="secondary"
                     className="ml-2 border-primary btn-discard-tray bg-white"
-                    // onClick={handleTrayDiscardModal}
+                    onClick={toggleTrayDiscardModal}
                   >
                     Discard Tray
                   </Button>

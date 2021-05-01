@@ -56,18 +56,38 @@ const ActionBtn = styled.button`
   }
 `;
 
+const CardOverlay = styled.div`
+  position: absolute;
+  // display: none;
+  width: 100%;
+  height: 20rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.28);
+  z-index: 3;
+  cursor: pointer;
+`;
+
 const ActionButton = (props) => {
-  const { label, icon, disabled } = props;
+  const { label, icon, disabled, showCardOverLay } = props;
 
   return (
-    <ActionBtn className="d-flex justify-content-center align-items-center" disabled={disabled}>
-      <div className="semi-circle-outter-box">
-        <div className="semi-circular-button">
-          <Icon name={icon} size={18} />
-          <div className="btn-label font-weight-bold">{label}</div>
+    <>
+      <CardOverlay className={showCardOverLay() ? "" : "d-none"} />
+      <ActionBtn
+        className="d-flex justify-content-center align-items-center"
+        disabled={disabled}
+      >
+        <div className="semi-circle-outter-box">
+          <div className="semi-circular-button">
+            <Icon name={icon} size={18} />
+            <div className="btn-label font-weight-bold">{label}</div>
+          </div>
         </div>
-      </div>
-    </ActionBtn>
+      </ActionBtn>
+    </>
   );
 };
 
