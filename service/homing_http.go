@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/plc"
 	"net/http"
@@ -40,7 +41,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		} else {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,msg, deck)))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`, msg, deck)))
 			logger.Infoln(msg)
 		}
 
@@ -70,7 +71,21 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
-			deps.WsMsgCh <- fmt.Sprintf("success_homing_successfully homed")
+			successWsData := plc.WSData{
+				Progress: 100,
+				Deck:     "",
+				Status:   "SUCCESS_HOMING",
+				OperationDetails: plc.OperationDetails{
+					Message: operationSuccessMsg,
+				},
+			}
+			wsData, err := json.Marshal(successWsData)
+			if err != nil {
+				logger.Errorf("error in marshalling web socket data %v", err.Error())
+				deps.WsErrCh <- err
+				return "", err
+			}
+			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
 			fmt.Println(operationSuccessMsg)
 			return operationSuccessMsg, nil
 		default:
@@ -106,8 +121,22 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 			deps.WsErrCh <- err
 			return "", err
 		}
-		if operation == "Homing"{
-			deps.WsMsgCh <- fmt.Sprintf("success_homing%v_successfully homed", deck)
+		if operation == "Homing" {
+			successWsData := plc.WSData{
+				Progress: 100,
+				Deck:     deck,
+				Status:   "SUCCESS_HOMING",
+				OperationDetails: plc.OperationDetails{
+					Message: fmt.Sprintf("successfully homed for deck %v", deck),
+				},
+			}
+			wsData, err := json.Marshal(successWsData)
+			if err != nil {
+				logger.Errorf("error in marshalling web socket data %v", err.Error())
+				deps.WsErrCh <- err
+				return "", err
+			}
+			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v_%v", deck, string(wsData))
 		}
 	}
 
