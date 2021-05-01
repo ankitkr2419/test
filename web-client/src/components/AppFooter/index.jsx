@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import DeckCard from "shared-components/DeckCard";
-import {
-  DECKNAME,
-  MODAL_BTN,
-  MODAL_MESSAGE,
-  DECKCARD_BTN,
-} from "appConstants";
+import { DECKNAME, MODAL_BTN, MODAL_MESSAGE, DECKCARD_BTN } from "appConstants";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
@@ -44,6 +39,10 @@ const AppFooter = (props) => {
   const [abortConfirmationModalA, setAbortConfirmationModalA] = useState(false);
   const [abortConfirmationModalB, setAbortConfirmationModalB] = useState(false);
 
+  const [confirmAbortModal, setConfirmAbortModal] = useState(false);
+  const [confirmDoneModal, setConfirmDoneModal] = useState(false);
+  const [deckName, setDeckName] = useState("");
+
   //login reducer
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
@@ -79,10 +78,6 @@ const AppFooter = (props) => {
   let cleanUpReducerForDeckB = cleanUpReducer.decks.find(
     (deckObj) => deckObj.name === DECKNAME.DeckB
   );
-
-  const [confirmAbortModal, setConfirmAbortModal] = useState(false);
-  const [confirmDoneModal, setConfirmDoneModal] = useState(false);
-  const [deckName, setDeckName] = useState("");
 
   const getLeftActionBtnHandler = (deckName) => {
     let recipeReducerData =
@@ -459,8 +454,8 @@ const AppFooter = (props) => {
         }
         processNumber={
           recipeActionReducerForDeckA.runRecipeInProgress
-            ? JSON.parse(recipeActionReducerForDeckA.runRecipeInProgress)
-                .operation_details.current_step
+            ? recipeActionReducerForDeckA.runRecipeInProgress.operation_details
+                .current_step
             : 0
         }
         processTotal={
@@ -496,10 +491,14 @@ const AppFooter = (props) => {
           isDeckALoggedIn
             ? recipeActionReducerForDeckA.showProcess
               ? recipeActionReducerForDeckA.runRecipeInProgress &&
-                JSON.parse(recipeActionReducerForDeckA.runRecipeInProgress)
-                  .progress
+                recipeActionReducerForDeckA.runRecipeInProgress.progress
               : cleanUpReducerForDeckA.cleanUpData &&
                 JSON.parse(cleanUpReducerForDeckA.cleanUpData).progress
+            : 0
+        }
+        progressPercentComplete={
+          recipeActionReducerForDeckA.runRecipeInProgress
+            ? recipeActionReducerForDeckA.runRecipeInProgress.progress
             : 0
         }
         showCleanUp={
