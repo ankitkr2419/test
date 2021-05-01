@@ -60,14 +60,21 @@ export const connectSocket = (dispatch) => {
           dispatch(homingActionInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
-          toast.success("Homing Successfull");
+          let parsedData = JSON.parse(data);
+          let homingSuccessMsg = 
+            parsedData && 
+            parsedData.operation_details && 
+            parsedData.operation_details.message 
+              ? parsedData.operation_details.message 
+              : "Homing Successfull" 
+          toast.success(homingSuccessMsg)
           dispatch(homingActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
-          dispatch(runRecipeInProgress(data));
+          dispatch(runRecipeInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeSuccess:
-          dispatch(runRecipeInCompleted(data));
+          dispatch(runRecipeInCompleted(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.uvLightProgress:
           dispatch(runCleanUpActionInProgress(data));

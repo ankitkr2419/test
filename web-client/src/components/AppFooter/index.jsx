@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import DeckCard from "shared-components/DeckCard";
-import { DECKNAME, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import {
+  DECKNAME,
+  MODAL_BTN,
+  MODAL_MESSAGE,
+  DECKCARD_BTN,
+} from "appConstants";
 import { useSelector, useDispatch } from "react-redux";
-import { DECKCARD_BTN } from "appConstants";
+
 import {
   abortRecipeInitiated,
   pauseRecipeInitiated,
@@ -26,6 +31,18 @@ import { loginReset } from "action-creators/loginActionCreators";
 
 const AppFooter = (props) => {
   const dispatch = useDispatch();
+
+  const [
+    isConfirmationModalVisibleDeckA,
+    setIsConfirmationModalVisibleDeckA,
+  ] = useState(false);
+  const [
+    isConfirmationModalVisibleDeckB,
+    setIsConfirmationModalVisibleDeckB,
+  ] = useState(false);
+
+  const [abortConfirmationModalA, setAbortConfirmationModalA] = useState(false);
+  const [abortConfirmationModalB, setAbortConfirmationModalB] = useState(false);
 
   //login reducer
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -233,24 +250,17 @@ const AppFooter = (props) => {
   const handleDoneActionDeckA = () => {
     let recipeReducerData = recipeActionReducerForDeckA;
     if (recipeReducerData.showProcess) {
-      dispatch(
-        updateRecipeReducerDataForDeck(recipeReducerData.name, {
-          showProcess: !recipeReducerData.showProcess,
-        })
-      );
+      toggleComfirmationModal(DECKNAME.DeckA);
     } else {
       setDeckName(DECKNAME.DeckA);
       setConfirmDoneModal(!confirmDoneModal);
     }
   };
+
   const handleDoneActionDeckB = () => {
     let recipeReducerData = recipeActionReducerForDeckB;
     if (recipeReducerData.showProcess) {
-      dispatch(
-        updateRecipeReducerDataForDeck(recipeReducerData.name, {
-          showProcess: !recipeReducerData.showProcess,
-        })
-      );
+      toggleComfirmationModal(DECKNAME.DeckB);
     } else {
       setDeckName(DECKNAME.DeckB);
       setConfirmDoneModal(!confirmDoneModal);
@@ -300,19 +310,61 @@ const AppFooter = (props) => {
   };
 
   const handleAbortActionDeckA = () => {
-    setConfirmAbortModal(!confirmAbortModal);
-    setDeckName(DECKNAME.DeckA);
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      toggleAbortConfirmationModal(DECKNAME.DeckA);
+    } else {
+      setConfirmAbortModal(!confirmAbortModal);
+      setDeckName(DECKNAME.DeckA);
+    }
   };
 
   const handleAbortActionDeckB = () => {
-    setConfirmAbortModal(!confirmAbortModal);
-    setDeckName(DECKNAME.DeckB);
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      toggleAbortConfirmationModal(DECKNAME.DeckB);
+    } else {
+      setConfirmAbortModal(!confirmAbortModal);
+      setDeckName(DECKNAME.DeckB);
+    }
   };
 
   const handleAbortModalDeckA = () => {
-    setConfirmAbortModal(!confirmAbortModal);
-    dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
-    dispatch(loginReset(DECKNAME.DeckA));
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+    } else {
+      setConfirmAbortModal(!confirmAbortModal);
+      dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
+      dispatch(loginReset(DECKNAME.DeckA));
+    }
+  };
+
+  const toggleComfirmationModal = (deckName) => {
+    if (deckName === DECKNAME.DeckA) {
+      setIsConfirmationModalVisibleDeckA(!isConfirmationModalVisibleDeckA);
+    } else {
+      setIsConfirmationModalVisibleDeckB(!isConfirmationModalVisibleDeckB);
+    }
+  };
+
+  const toggleAbortConfirmationModal = (deckName) => {
+    if (deckName === DECKNAME.DeckA) {
+      setAbortConfirmationModalA(!abortConfirmationModalA);
+    } else {
+      setAbortConfirmationModalB(!abortConfirmationModalB);
+    }
+  };
+
+  const onAbortConfirmed = (deckName) => {
+    toggleAbortConfirmationModal(deckName);
+    dispatch(abortRecipeInitiated({ deckName }));
+  };
+
+  const onNextClickedAfterDoneRecipe = (deckName) => {
+    dispatch(loginReset(deckName));
   };
 
   const handleAbortModalDeckB = () => {
@@ -340,6 +392,44 @@ const AppFooter = (props) => {
           }}
         />
       )}
+
+      <MlModal
+        isOpen={isConfirmationModalVisibleDeckA}
+        textHead={DECKNAME.DeckA}
+        textBody={`Experiment was successful`}
+        handleSuccessBtn={() => onNextClickedAfterDoneRecipe(DECKNAME.DeckA)}
+        handleCrossBtn={() => toggleComfirmationModal(DECKNAME.DeckA)}
+        successBtn={MODAL_BTN.next}
+      />
+
+      <MlModal
+        isOpen={isConfirmationModalVisibleDeckB}
+        textHead={DECKNAME.DeckB}
+        textBody={`Experiment was successful`}
+        handleSuccessBtn={() => onNextClickedAfterDoneRecipe(DECKNAME.DeckB)}
+        handleCrossBtn={() => toggleComfirmationModal(DECKNAME.DeckB)}
+        successBtn={MODAL_BTN.next}
+      />
+
+      <MlModal
+        isOpen={abortConfirmationModalA}
+        textHead={DECKNAME.DeckA}
+        textBody={MODAL_MESSAGE.abortConfirmation}
+        handleSuccessBtn={() => onAbortConfirmed(DECKNAME.DeckA)}
+        handleCrossBtn={() => toggleAbortConfirmationModal(DECKNAME.DeckA)}
+        successBtn={MODAL_BTN.yes}
+        failureBtn={MODAL_BTN.no}
+      />
+
+      <MlModal
+        isOpen={abortConfirmationModalB}
+        textHead={DECKNAME.DeckB}
+        textBody={MODAL_MESSAGE.abortConfirmation}
+        handleSuccessBtn={() => onAbortConfirmed(DECKNAME.DeckB)}
+        handleCrossBtn={() => toggleAbortConfirmationModal(DECKNAME.DeckB)}
+        successBtn={MODAL_BTN.yes}
+        failureBtn={MODAL_BTN.no}
+      />
 
       {confirmDoneModal && (
         <MlModal
@@ -429,12 +519,6 @@ const AppFooter = (props) => {
           recipeActionReducerForDeckB.recipeData &&
           recipeActionReducerForDeckB.recipeData.recipeName
             ? recipeActionReducerForDeckB.recipeData.recipeName
-            : null
-        }
-        recipeName={
-          recipeActionReducerForDeckA.recipeData &&
-          recipeActionReducerForDeckA.recipeData.recipeName
-            ? recipeActionReducerForDeckA.recipeData.recipeName
             : null
         }
         processNumber={
