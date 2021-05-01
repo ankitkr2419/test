@@ -136,7 +136,7 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 				deps.WsErrCh <- err
 				return "", err
 			}
-			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v_%v", deck, string(wsData))
+			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
 		}
 	}
 

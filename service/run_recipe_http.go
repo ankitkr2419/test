@@ -304,7 +304,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		deps.WsErrCh <- err
 		return
 	}
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v_%v", deck, string(wsData))
+	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v", string(wsData))
 
 	// Home the machine
 	deps.PlcDeck[deck].ResetRunInProgress()
