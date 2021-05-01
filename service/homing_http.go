@@ -104,6 +104,8 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	//  this will make Call to any method generic
 	// TODO : Handle Panics with recover()
 
+	fmt.Println("Result from Operation ", operation, result)
+
 	if len(result) != 2 {
 		fmt.Println("result is different in this reflect Call !", result)
 		err := fmt.Errorf("unexpected length result")
@@ -111,7 +113,6 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 		return "", err
 	}
 
-	fmt.Println("Correct Result: ", result)
 	response = result[0].String()
 	if len(response) > 0 {
 		errRes := result[1].Interface()
@@ -120,23 +121,6 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 			err := fmt.Errorf("%v", errRes)
 			deps.WsErrCh <- err
 			return "", err
-		}
-		if operation == "Homing" {
-			successWsData := plc.WSData{
-				Progress: 100,
-				Deck:     deck,
-				Status:   "SUCCESS_HOMING",
-				OperationDetails: plc.OperationDetails{
-					Message: fmt.Sprintf("successfully homed for deck %v", deck),
-				},
-			}
-			wsData, err := json.Marshal(successWsData)
-			if err != nil {
-				logger.Errorf("error in marshalling web socket data %v", err.Error())
-				deps.WsErrCh <- err
-				return "", err
-			}
-			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
 		}
 	}
 
