@@ -12,6 +12,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -65,6 +66,7 @@ func decodeToken(token string) (jwt.MapClaims, error) {
 	})
 
 	if err != nil {
+
 		return nil, err
 	}
 	if parsedToken.Valid {
@@ -82,15 +84,11 @@ func authenticate(next http.HandlerFunc, deps Dependencies) http.HandlerFunc {
 
 		token := extractToken(req.Header.Get("Authorization"))
 		if token != "" {
-			decodedToken, err := decodeToken(token)
+			vars := mux.Vars(req)
+			deck := vars["deck"]
+			_, err := getUserAuth(token, deck, deps)
 			if err != nil {
-				res.WriteHeader(http.StatusUnauthorized)
-				res.Write([]byte(`{"error":"error in decoding token"}`))
-				return
-			}
-
-			_, err = getUser(decodedToken, deps)
-			if err != nil {
+				logger.Errorln("error in authorizing user :", err.Error())
 				res.WriteHeader(http.StatusUnauthorized)
 				res.Write([]byte(`{"error":"unauthorised user"}`))
 				return
@@ -105,13 +103,62 @@ func authenticate(next http.HandlerFunc, deps Dependencies) http.HandlerFunc {
 	}
 }
 
-func getUser(token jwt.MapClaims, deps Dependencies) (user db.User, err error) {
-	username, ok := token["sub"].(string)
+func getUserAuth(token, deck string, deps Dependencies) (user db.UserAuth, err error) {
+
+	decodedToken, err := decodeToken(token)
+	if err != nil {
+		logger.Errorln("decoding token error", err.Error())
+		err = errors.New("failed to decode token")
+		return
+	}
+
+	if deck != "" {
+		tokenDeck, ok := decodedToken["deck"].(string)
+		if !ok {
+			logger.Errorln("failed to fetch deck error")
+			err = errors.New("failed to fetch deck")
+			return
+		}
+
+		if tokenDeck != deck {
+			logger.Errorln("invalid token for deck error")
+			err = errors.New("wrong token for deck")
+			return
+		}
+
+		value, ok := userLogin.Load(deck)
+		if !ok {
+			logger.Errorln("invalid deck name error")
+			err = errors.New("invalid deck name")
+			return
+		}
+		if value.(bool) == false {
+			logger.Errorln("deck logged out error")
+			err = fmt.Errorf(`"error":"already logged out of deck %s"`, deck)
+			return
+		}
+
+	}
+
+	username, ok := decodedToken["sub"].(string)
 	if !ok {
+		logger.Errorln("username error")
 		err = errors.New("failed to fetch user")
 		return
 	}
-	user, err = deps.Store.ShowUser(context.Background(), username)
+	id, ok := decodedToken["auth_id"].(string)
+	if !ok {
+		logger.Errorln("authID error")
+		err = errors.New("failed to fetch user")
+		return
+	}
+	authID, err := uuid.Parse(id)
+	if err != nil {
+		logger.Errorln("authID parse error")
+		err = errors.New("failed to fetch user auth")
+		return
+	}
+	user, err = deps.Store.ShowUserAuth(context.Background(), username, authID)
 	if err != nil {
 		logger.Errorln("user not found")
 		return
@@ -138,6 +185,8 @@ func authenticateAdmin(next http.HandlerFunc, deps Dependencies) http.HandlerFun
 
 		if token != "" {
 
+			vars := mux.Vars(req)
+			deck := vars["deck"]
 			decodedToken, err := decodeToken(token)
 			if err != nil {
 				res.WriteHeader(http.StatusUnauthorized)
@@ -159,7 +208,7 @@ func authenticateAdmin(next http.HandlerFunc, deps Dependencies) http.HandlerFun
 				return
 			}
 
-			_, err = getUser(decodedToken, deps)
+			_, err = getUserAuth(token, deck, deps)
 			if err != nil {
 				res.WriteHeader(http.StatusUnauthorized)
 				res.Write([]byte(`{"error":"unauthorised user"}`))

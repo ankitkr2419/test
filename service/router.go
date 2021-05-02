@@ -110,8 +110,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tip-operation", authenticateAdmin(createTipOperationHandler(deps), deps)).Methods(http.MethodPost)
 	router.HandleFunc("/tip-operation/{id}", authenticate(showTipOperationHandler(deps), deps)).Methods(http.MethodGet)
 	router.HandleFunc("/tip-operation/{id}", authenticateAdmin(updateTipOperationHandler(deps), deps)).Methods(http.MethodPut)
-	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}", listTipsTubesHandler(deps)).Methods(http.MethodGet)
-	router.HandleFunc("/cartridges", listCartridgesHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}", authenticate(listTipsTubesHandler(deps), deps)).Methods(http.MethodGet)
+	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps)).Methods(http.MethodGet)
+	router.HandleFunc("/logout/{deck:[A-B]?}", logoutUserHandler(deps)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
 	return
 }

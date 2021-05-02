@@ -127,3 +127,38 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 		return
 	})
 }
+
+func logoutUserHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		token := extractToken(req.Header.Get("Authorization"))
+		vars := mux.Vars(req)
+		deck := vars["deck"]
+
+		userAuth, err := getUserAuth(token, deck, deps)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while fetching user authentication data", userAuth)
+			rw.WriteHeader(http.StatusForbidden)
+			// TODO check what message to give here.
+			rw.Write([]byte(`{"msg":"Error while fetching user authentication data"}`))
+			return
+		}
+
+		err = deps.Store.DeleteUserAuth(req.Context(), userAuth)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while deleting user authentication data", userAuth)
+			rw.WriteHeader(http.StatusInternalServerError)
+			rw.Write([]byte(`{"msg":"Error while deleting user authentication data"}`))
+			return
+		}
+		if deck != "" {
+			userLogin.Store(deck, false)
+		}
+
+		logger.Infoln(userAuth, "user logged out successfully")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"msg":"user logged out successfully"}`))
+		return
+
+	})
+}
