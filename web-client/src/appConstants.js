@@ -40,6 +40,7 @@ export const SOCKET_MESSAGE_TYPE = {
   uvLightSuccess: "SUCCESS_UVLIGHT",
   discardTipProgress: "DISCARD_TIP_PROGRESS",
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
+  ErrorExtractionMonitor: "ErrorExtractionMonitor",
 };
 
 export const EXPERIMENT_STATUS = {

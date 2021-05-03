@@ -98,6 +98,13 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
           // dispatch(showErrorModal(data));
           break;
+        case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:
+          let parsedErrorData = JSON.parse(data);
+          let errorMessage = parsedErrorData.message;
+          if(errorMessage) {
+           toast.error(errorMessage)
+          }
+          break;
         default:
           break;
       }
