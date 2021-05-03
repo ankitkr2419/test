@@ -51,7 +51,7 @@ func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heatin
 
 }
 
-func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdHeating Heating, err error) {
+func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdH Heating, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -67,6 +67,10 @@ func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdHeating 
 		return Heating{}, err
 	}
 
+	createdH, err = s.createHeating(ctx, h, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -74,14 +78,19 @@ func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdHeating 
 			return
 		}
 		tx.Commit()
+		createdH, err = s.ShowHeating(ctx, createdH.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Heating process")
+			return
+		}
+		logger.Infoln("Created Heating Process: ", createdH)
+		return
 	}()
 
-	createdHeating, err = s.createHeating(ctx, h, tx)
-	// failures are already logged
 	return
 }
 
-func (s *pgStore) createHeating(ctx context.Context, h Heating, tx *sql.Tx) (createdHeating Heating, err error) {
+func (s *pgStore) createHeating(ctx context.Context, h Heating, tx *sql.Tx) (createdH Heating, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -98,9 +107,8 @@ func (s *pgStore) createHeating(ctx context.Context, h Heating, tx *sql.Tx) (cre
 		return
 	}
 
-	createdHeating, err = s.ShowHeating(ctx, lastInsertID)
-	// failures are already logged
-	return
+	h.ID = lastInsertID
+	return h, err
 }
 
 func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {

@@ -101,7 +101,7 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 	return
 }
 
-func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (createdAspireDispense AspireDispense, err error) {
+func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (createdAD AspireDispense, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -117,6 +117,10 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		return AspireDispense{}, err
 	}
 
+	createdAD, err = s.createAspireDispense(ctx, ad, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -124,14 +128,19 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 			return
 		}
 		tx.Commit()
+		createdAD, err = s.ShowAspireDispense(ctx, createdAD.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating AspireDispense process")
+			return
+		}
+		logger.Infoln("Created AspireDispense Process: ", createdAD)
+		return
 	}()
 
-	createdAspireDispense, err = s.createAspireDispense(ctx, ad, tx)
-	// failures are already logged
 	return
 }
 
-func (s *pgStore) createAspireDispense(ctx context.Context, ad AspireDispense, tx *sql.Tx) (createdAspireDispense AspireDispense, err error) {
+func (s *pgStore) createAspireDispense(ctx context.Context, ad AspireDispense, tx *sql.Tx) (a AspireDispense, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -157,9 +166,8 @@ func (s *pgStore) createAspireDispense(ctx context.Context, ad AspireDispense, t
 		return
 	}
 
-	createdAspireDispense, err = s.ShowAspireDispense(ctx, lastInsertID)
-	// failures are already logged
-	return
+	ad.ID = lastInsertID
+	return ad, err
 }
 
 func (s *pgStore) DeleteAspireDispense(ctx context.Context, id uuid.UUID) (err error) {

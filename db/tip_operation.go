@@ -63,7 +63,7 @@ func (s *pgStore) ListTipOperation(ctx context.Context) (dbTipOperation []TipOpe
 	return
 }
 
-func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (createdTipOperation TipOperation, err error) {
+func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (createdTO TipOperation, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -79,6 +79,10 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (crea
 		return TipOperation{}, err
 	}
 
+	createdTO, err = s.createTipOperation(ctx, to, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -86,10 +90,15 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (crea
 			return
 		}
 		tx.Commit()
+		createdTO, err = s.ShowTipOperation(ctx, createdTO.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Tip Operation process")
+			return
+		}
+		logger.Infoln("Created Tip Operation Process: ", createdTO)
+		return
 	}()
 
-	createdTipOperation, err = s.createTipOperation(ctx, to, tx)
-	// failures are already logged
 	return
 }
 
@@ -109,9 +118,8 @@ func (s *pgStore) createTipOperation(ctx context.Context, to TipOperation, tx *s
 		return
 	}
 
-	createdTipOperation, err = s.ShowTipOperation(ctx, lastInsertID)
-	// failures are already logged
-	return
+	to.ID = lastInsertID
+	return to, err
 }
 
 func (s *pgStore) DeleteTipOperation(ctx context.Context, id uuid.UUID) (err error) {

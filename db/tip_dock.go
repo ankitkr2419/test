@@ -46,7 +46,7 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 	return
 }
 
-func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTipDocking TipDock, err error) {
+func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTD TipDock, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -62,6 +62,10 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTipD
 		return TipDock{}, err
 	}
 
+	createdTD, err = s.createTipDocking(ctx, td, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -69,14 +73,19 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTipD
 			return
 		}
 		tx.Commit()
+		createdTD, err = s.ShowTipDocking(ctx, createdTD.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Tip Docking process")
+			return
+		}
+		logger.Infoln("Created Tip Docking Process: ", createdTD)
+		return
 	}()
 
-	createdTipDocking, err = s.createTipDocking(ctx, td, tx)
-	// failures are already logged
 	return
 }
 
-func (s *pgStore) createTipDocking(ctx context.Context, t TipDock, tx *sql.Tx) (createdTipDocking TipDock, err error) {
+func (s *pgStore) createTipDocking(ctx context.Context, t TipDock, tx *sql.Tx) (createdTD TipDock, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -93,9 +102,8 @@ func (s *pgStore) createTipDocking(ctx context.Context, t TipDock, tx *sql.Tx) (
 		return
 	}
 
-	createdTipDocking, err = s.ShowTipDocking(ctx, lastInsertID)
-	// failures are already logged
-	return
+	t.ID = lastInsertID
+	return t, err
 }
 
 func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {

@@ -43,7 +43,7 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 	return
 }
 
-func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (createdAttachDetach AttachDetach, err error) {
+func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (createdAD AttachDetach, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -59,6 +59,10 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (crea
 		return AttachDetach{}, err
 	}
 
+	createdAD, err = s.createAttachDetach(ctx, ad, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -66,14 +70,19 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (crea
 			return
 		}
 		tx.Commit()
+		createdAD, err = s.ShowAttachDetach(ctx, createdAD.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Attach Detach process")
+			return
+		}
+		logger.Infoln("Created Attach Detach Process: ", createdAD)
+		return
 	}()
 
-	createdAttachDetach, err = s.createAttachDetach(ctx, ad, tx)
-	// failures are already logged
 	return
 }
 
-func (s *pgStore) createAttachDetach(ctx context.Context, ad AttachDetach, tx *sql.Tx) (createdAttachDetach AttachDetach, err error) {
+func (s *pgStore) createAttachDetach(ctx context.Context, ad AttachDetach, tx *sql.Tx) (createdAD AttachDetach, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -89,9 +98,8 @@ func (s *pgStore) createAttachDetach(ctx context.Context, ad AttachDetach, tx *s
 		return
 	}
 
-	createdAttachDetach, err = s.ShowAttachDetach(ctx, lastInsertID)
-	// failures are already logged
-	return
+	ad.ID = lastInsertID
+	return ad, err
 }
 
 func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error) {

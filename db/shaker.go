@@ -63,7 +63,7 @@ func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker S
 	return
 }
 
-func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking Shaker, err error) {
+func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdSh Shaker, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -79,6 +79,10 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking 
 		return Shaker{}, err
 	}
 
+	createdSh, err = s.createShaking(ctx, sh, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -86,14 +90,19 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking 
 			return
 		}
 		tx.Commit()
+		createdSh, err = s.ShowShaking(ctx, createdSh.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Shaking process")
+			return
+		}
+		logger.Infoln("Created Shaking Process: ", createdSh)
+		return
 	}()
 
-	createdShaking, err = s.createShaking(ctx, sh, tx)
-	// failures are already logged
 	return
 }
 
-func (s *pgStore) createShaking(ctx context.Context, sh Shaker, tx *sql.Tx) (createdShaking Shaker, err error) {
+func (s *pgStore) createShaking(ctx context.Context, sh Shaker, tx *sql.Tx) (createdSh Shaker, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -114,9 +123,8 @@ func (s *pgStore) createShaking(ctx context.Context, sh Shaker, tx *sql.Tx) (cre
 		return
 	}
 
-	createdShaking, err = s.ShowShaking(ctx, lastInsertID)
-	// failures are already logged
-	return
+	sh.ID = lastInsertID
+	return sh, err
 }
 
 func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {

@@ -67,7 +67,7 @@ func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err 
 	return
 }
 
-func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPiercing Piercing, err error) {
+func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPi Piercing, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -83,6 +83,10 @@ func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPierc
 		return Piercing{}, err
 	}
 
+	createdPi, err = s.createPiercing(ctx, pi, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -90,10 +94,15 @@ func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPierc
 			return
 		}
 		tx.Commit()
+		createdPi, err = s.ShowPiercing(ctx, createdPi.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Piercing process")
+			return
+		}
+		logger.Infoln("Created Piercing Process: ", createdPi)
+		return
 	}()
 
-	createdPiercing, err = s.createPiercing(ctx, pi, tx)
-	// failures are already logged
 	return
 }
 
@@ -114,9 +123,8 @@ func (s *pgStore) createPiercing(ctx context.Context, pi Piercing, tx *sql.Tx) (
 		return
 	}
 
-	createdPiercing, err = s.ShowPiercing(ctx, lastInsertID)
-	// failures are already logged
-	return
+	pi.ID = lastInsertID
+	return pi, err
 }
 
 func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {

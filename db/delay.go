@@ -42,7 +42,7 @@ func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err
 	return
 }
 
-func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay, err error) {
+func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdD Delay, err error) {
 	var tx *sql.Tx
 
 	//update the process name before record creation
@@ -58,6 +58,10 @@ func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay,
 		return Delay{}, err
 	}
 
+	createdD, err = s.createDelay(ctx, d, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
 	// End the transaction in defer call
 	defer func() {
 		if err != nil {
@@ -65,14 +69,19 @@ func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay,
 			return
 		}
 		tx.Commit()
+		createdD, err = s.ShowDelay(ctx, createdD.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Delay process")
+			return
+		}
+		logger.Infoln("Created Delay Process: ", createdD)
+		return
 	}()
 
-	createdDelay, err = s.createDelay(ctx, d, tx)
-	// failures are already logged
 	return
 }
 
-func (s *pgStore) createDelay(ctx context.Context, d Delay, tx *sql.Tx) (createdDelay Delay, err error) {
+func (s *pgStore) createDelay(ctx context.Context, d Delay, tx *sql.Tx) (createdD Delay, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -87,9 +96,8 @@ func (s *pgStore) createDelay(ctx context.Context, d Delay, tx *sql.Tx) (created
 		return
 	}
 
-	createdDelay, err = s.ShowDelay(ctx, lastInsertID)
-	// failures are already logged
-	return
+	d.ID = lastInsertID
+	return d, err
 }
 
 func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
