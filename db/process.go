@@ -76,19 +76,23 @@ func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess 
 	createdProcess, err = s.createProcess(ctx, p, tx)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
-	
-	if err != nil {
-		tx.Rollback()
-		return
-	}
-	tx.Commit()
 
-	createdProcess, err = s.ShowProcess(ctx, createdProcess.ID)
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+		createdProcess, err = s.ShowProcess(ctx, createdProcess.ID)
+		logger.Infoln("Created Process: ", createdProcess)
+		return
+	}()
 
 	return
 }
 
-func (s *pgStore) createProcess(ctx context.Context, p Process, tx *sql.Tx) (createdProcess Process, err error) {
+func (s *pgStore) createProcess(ctx context.Context, p Process, tx *sql.Tx) (cp Process, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -104,7 +108,7 @@ func (s *pgStore) createProcess(ctx context.Context, p Process, tx *sql.Tx) (cre
 		logger.WithField("err", err.Error()).Errorln(responses.ProcessDBCreateError)
 		return
 	}
-	
+
 	p.ID = lastInsertID
 	return p, err
 }
@@ -150,7 +154,7 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID, pro
 		return
 	}
 
-	logger.Infoln( responses.ProcessDuplicateCreateSuccess, duplicate)
+	logger.Infoln(responses.ProcessDuplicateCreateSuccess, duplicate)
 	return
 }
 
@@ -193,9 +197,14 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 				tx.Rollback()
 				return
 			}
-			logger.Infoln("Process Duplicated => ", pr)
-
 			tx.Commit()
+
+			pr, err = s.ShowProcess(ctx, pr.ID)
+			if err != nil {
+				logger.Infoln("Process Duplicated => ", pr)
+				return
+			}
+			logger.Infoln("Error Duplicating process")
 		}()
 
 		// Get highest sequence number
@@ -210,7 +219,6 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		// Insert parent entry into Process table
 		pr, err = s.createProcess(ctx, parent, tx)
-		fmt.Println("ppp", pr)
 		if err != nil {
 			// failure will be logged in defer before rollback
 			return Process{}, err
@@ -244,7 +252,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("Piercing Process Duplicated => ", pi)
+		logger.Infoln("Piercing Process Duplication in Progress => ", pi)
 		return
 
 	case "TipOperation":
@@ -265,7 +273,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("Tip Operation Process Duplicated => ", to)
+		logger.Infoln("Tip Operation Process Duplication in Progress => ", to)
 		return
 
 	case "TipDocking":
@@ -285,7 +293,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("Tip Docking Process Duplicated => ", td)
+		logger.Infoln("Tip Docking Process Duplication in Progress  => ", td)
 		return
 
 	case "AspireDispense":
@@ -305,7 +313,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("Aspire Dispense Process Duplicated => ", ad)
+		logger.Infoln("Aspire Dispense Process Duplication in Progress  => ", ad)
 		return
 
 	case "Heating":
@@ -324,7 +332,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("Heating Process Duplicated => ", ht)
+		logger.Infoln("Heating Process Duplication in Progress  => ", ht)
 		return
 
 	case "Shaking":
@@ -348,7 +356,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("Shaking Process Duplicated => ", sk)
+		logger.Infoln("Shaking Process Duplication in Progress  => ", sk)
 		return
 
 	case "AttachDetach":
@@ -368,7 +376,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("AttachDetach Process Duplicated => ", ad)
+		logger.Infoln("AttachDetach Process Duplication in Progress  => ", ad)
 		return
 
 	case "Delay":
@@ -387,7 +395,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 			return
 		}
 
-		logger.Infoln("Delay Process Duplicated => ", dl)
+		logger.Infoln("Delay Process Duplication in Progress  => ", dl)
 		return
 	default:
 		return Process{}, responses.ProcessTypeInvalid
