@@ -384,10 +384,18 @@ const DeckCard = (props) => {
           <div className="d-none1">
             {showProcess && (
               <>
-                <div className="resume-button" onClick={handleLeftAction}>
+                <div className="resume-button" onClick={() => {
+                  if(!leftActionBtnDisabled){
+                    handleLeftAction()
+                  }
+                }}>
                   {getLeftActionBtn(leftActionBtn)}
                 </div>
-                <div className="abort-button" onClick={handleRightAction}>
+                <div className="abort-button" onClick={() => {
+                  if(!rightActionBtnDisabled){
+                    handleRightAction()
+                  }
+                }}>
                   {getRightActionBtn(rightActionBtn)}
                 </div>
 

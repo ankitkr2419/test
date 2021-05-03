@@ -83,6 +83,7 @@ const ActionButton = (props) => {
       <ActionBtn
         className="d-flex justify-content-center align-items-center"
         disabled={disabled}
+        style={disabled ? {opacity: "0.4", pointerEvents:"none"}:{}}
       >
         <div className="semi-circle-outter-box">
           <div className="semi-circular-button">
