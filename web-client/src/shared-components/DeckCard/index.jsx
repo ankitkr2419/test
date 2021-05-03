@@ -495,7 +495,7 @@ const DeckCard = (props) => {
         {(showProcess || showCleanUp) && (
           <Progress
             value={progressPercentComplete}
-            className="custom-progress-bar"
+            className="mt-3 custom-progress-bar"
           />
         )}
       </div>
