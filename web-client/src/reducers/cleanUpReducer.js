@@ -184,10 +184,14 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       };
 
     case runCleanUpAction.runCleanUpInCompleted:
-      const progressEndDeck = action.payload.cleanUpActionInCompleted.slice(-1);
+      const progressEndDeck =
+        action.payload.cleanUpActionInCompleted &&
+        JSON.parse(action.payload.cleanUpActionInCompleted).deck;
 
       const deckInCompleteResponse =
-        progressEndDeck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
+        progressEndDeck === DECKNAME.DeckAShort
+          ? DECKNAME.DeckA
+          : DECKNAME.DeckB;
 
       let dockAfterProgressCompleted = state.decks.map((deckObj) => {
         return deckObj.name === deckInCompleteResponse
@@ -200,7 +204,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
               isCleanUpActionCompleted: true,
               isCleanUpActionInProgress: false,
               leftActionBtn: DECKCARD_BTN.text.done,
-              rightActionBtn: DECKCARD_BTN.text.abort,
+              rightActionBtn: DECKCARD_BTN.text.cancel,
               rightActionBtnDisabled: true,
             }
           : deckObj;
@@ -428,7 +432,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
               mins: 0,
               secs: 0,
               progress: 0,
-              cleanUpData: null
+              cleanUpData: null,
             }
           : deckObj;
       });
@@ -476,7 +480,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
               mins: 0,
               secs: 0,
               progress: 0,
-              cleanUpData: null
+              cleanUpData: null,
             }
           : deckObj;
       });
