@@ -110,7 +110,7 @@ func (s *pgStore) createPiercing(ctx context.Context, pi Piercing, tx *sql.Tx) (
 
 	var lastInsertID uuid.UUID
 
-	err = s.db.QueryRow(
+	err = tx.QueryRow(
 		createPiercingQuery,
 		pi.Type,
 		pi.CartridgeWells,
