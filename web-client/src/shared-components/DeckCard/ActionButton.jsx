@@ -45,6 +45,10 @@ const ActionBtn = styled.button`
       bottom: -2rem;
       left: 0;
       right: 0;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       font-size: 0.75rem;
       line-height: 0.875rem;
       color: #3c3c3c;
@@ -83,7 +87,9 @@ const ActionButton = (props) => {
         <div className="semi-circle-outter-box">
           <div className="semi-circular-button">
             <Icon name={icon} size={18} />
-            <div className="btn-label font-weight-bold">{label}</div>
+            <div className="btn-label row flex-nowrap font-weight-bold">
+              {label} 
+            </div>
           </div>
         </div>
       </ActionBtn>
