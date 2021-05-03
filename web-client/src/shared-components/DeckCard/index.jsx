@@ -48,6 +48,8 @@ const DeckCardBox = styled.div`
     line-height: 1.688rem;
     font-weight: bold;
     color: #51575a;
+    // background-color: #b2dad1;
+    // border: 1px solid #ffffff;
     border: 1px solid transparent;
     box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.16);
     > label {
@@ -62,7 +64,7 @@ const DeckCardBox = styled.div`
   }
   .deck-content {
     position: relative;
-    background: #fff url("/images/deck-card-bg.svg") no-repeat;
+    // background: #fff url("/images/deck-card-bg.svg") no-repeat;
     > button {
       min-width: 7.063rem;
       height: 2.5rem;
@@ -151,19 +153,23 @@ const DeckCardBox = styled.div`
       background-color: #9d9d9d;
     }
   }
-  .marquee{
+  .marquee {
     width: 80%;
     white-space: nowrap;
     overflow: hidden;
     box-sizing: border-box;
-    .recipe-name{
+    .recipe-name {
       display: inline-block;
       padding-left: 100%;
       animation: marquee 10s linear infinite;
     }
     @keyframes marquee {
-      0%   { transform: translate(0, 0); }
-      100% { transform: translate(-100%, 0); }
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(-100%, 0);
+      }
     }
   }
 `;
@@ -210,8 +216,19 @@ const DeckCard = (props) => {
 
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
-  let activeDeckObj = loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   let activeDeckName = activeDeckObj && activeDeckObj.name;
+
+  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  let recipeActionReducerForDeck = recipeActionReducer.decks.find(
+    (deckObj) => deckObj.name === deckName
+  );
+
+  const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
+  let cleanUpReducerForDeck = cleanUpReducer.decks.find(
+    (deckObj) => deckObj.name === deckName
+  );
 
   const toggleOperatorLoginModal = () => {
     setCurrentDeckActive();
@@ -226,6 +243,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.run}
             icon={DECKCARD_BTN.icon.run}
             disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.pause:
@@ -234,6 +252,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.pause}
             icon={DECKCARD_BTN.icon.pause}
             disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.resume:
@@ -242,6 +261,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.resume}
             icon={DECKCARD_BTN.icon.resume}
             disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.done:
@@ -250,6 +270,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.done}
             icon={DECKCARD_BTN.icon.done}
             disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.startUv:
@@ -258,6 +279,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.startUv}
             icon={DECKCARD_BTN.icon.run}
             disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.pauseUv:
@@ -266,6 +288,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.pauseUv}
             icon={DECKCARD_BTN.icon.pause}
             disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.resumeUv:
@@ -274,6 +297,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.resumeUv}
             icon={DECKCARD_BTN.icon.resume}
             disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       default:
@@ -289,6 +313,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.cancel}
             icon={DECKCARD_BTN.icon.cancel}
             disabled={rightActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.abort:
@@ -297,6 +322,7 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.abort}
             icon={DECKCARD_BTN.icon.abort}
             disabled={rightActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
           />
         );
       default:
@@ -308,33 +334,68 @@ const DeckCard = (props) => {
     /**
      *  set active deck to current deck if:
      *  activeDeckName not found or not equal to current deck
-    */
-    if(!activeDeckName || deckName !== activeDeckName)
-      dispatch(setActiveDeck(deckName))
-  }
+     */
+    if (!activeDeckName || deckName !== activeDeckName)
+      dispatch(setActiveDeck(deckName));
+  };
+
+  const showCardOverLay = () => {
+    return (
+      (isAnotherDeckLoggedIn && loginBtn && !isActiveDeck) ||
+      (isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck) ||
+      (!isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck)
+    );
+  };
+
+  const isProcessRunning = () => {
+    return (
+      recipeActionReducerForDeck.showProcess ||
+      cleanUpReducerForDeck.showCleanUp
+    );
+  };
 
   return (
-    <DeckCardBox className="d-flex justify-content-start align-items-center" onClick={setCurrentDeckActive}>
-      <CardOverlay className={
-        (isAnotherDeckLoggedIn && loginBtn && !isActiveDeck) || 
-        (isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck) 
-          ? ''
-          : 'd-none'
-      } />
-      <div className="d-flex justify-content-center align-items-center deck-title">
+    <DeckCardBox
+      className="d-flex justify-content-start align-items-center"
+      onClick={setCurrentDeckActive}
+    >
+      <CardOverlay className={showCardOverLay() ? "" : "d-none"} />
+      <div
+        className="d-flex justify-content-center align-items-center deck-title"
+        style={
+          isProcessRunning()
+            ? { backgroundColor: "#B2DAD1", border: "1px solid #ffffff" }
+            : null
+        }
+      >
         <Text Tag="label" size={20}>
           {deckName}
         </Text>
       </div>
-      <div className="p-4 w-100 h-100 deck-content logged-in1">
+      <div
+        className="p-4 w-100 h-100 deck-content logged-in1"
+        style={
+          isProcessRunning()
+            ? { background: null }
+            : { background: '#fff url("/images/deck-card-bg.svg") no-repeat' }
+        }
+      >
         <div className="d-flex justify-content-between align-items-center">
           <div className="d-none1">
             {showProcess && (
               <>
-                <div className="resume-button" onClick={handleLeftAction}>
+                <div className="resume-button" onClick={() => {
+                  if(!leftActionBtnDisabled){
+                    handleLeftAction()
+                  }
+                }}>
                   {getLeftActionBtn(leftActionBtn)}
                 </div>
-                <div className="abort-button" onClick={handleRightAction}>
+                <div className="abort-button" onClick={() => {
+                  if(!rightActionBtnDisabled){
+                    handleRightAction()
+                  }
+                }}>
                   {getRightActionBtn(rightActionBtn)}
                 </div>
 
@@ -343,7 +404,6 @@ const DeckCard = (props) => {
                     Tag="h5"
                     size={18}
                     className="mb-2 font-weight-bold recipe-name"
-                    
                   >
                     {recipeName}
                   </Text>
@@ -443,7 +503,7 @@ const DeckCard = (props) => {
         {(showProcess || showCleanUp) && (
           <Progress
             value={progressPercentComplete}
-            className="custom-progress-bar"
+            className="mt-3 custom-progress-bar"
           />
         )}
       </div>

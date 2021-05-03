@@ -7,12 +7,11 @@ import {
 } from "components/modals/OperatorLoginModal/state";
 import OperatorLoginModal from "components/modals/OperatorLoginModal";
 
-import { operatorLoginInitiated } from "action-creators/operatorLoginModalActionCreators";
+// import { operatorLoginInitiated } from "action-creators/operatorLoginModalActionCreators";
 import { login } from "../action-creators/loginActionCreators";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router";
-import { USER_ROLES, ROUTES } from "../appConstants";
-import { toast } from "react-toastify";
+import { ROUTES } from "../appConstants";
 
 const OperatorLoginModalContainer = (props) => {
     const {
@@ -42,7 +41,7 @@ const OperatorLoginModalContainer = (props) => {
     let activeDeckObj =
         loginReducerData &&
         loginReducerData.decks.find((deck) => deck.isActive);
-    let { isLoggedIn, error, msg } = activeDeckObj ? activeDeckObj : {};
+    let { isLoggedIn, error } = activeDeckObj ? activeDeckObj : {};
     const [authData, setAuthData] = useReducer(reducer, initialState);
 
 

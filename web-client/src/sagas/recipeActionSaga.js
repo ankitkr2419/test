@@ -31,9 +31,13 @@ export function* runRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.run}/${recipeId}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.run}/${recipeId}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -55,9 +59,13 @@ export function* resumeRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.resume}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.resume}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: resumeRecipeSuccess,
         failureAction: resumeRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -72,6 +80,7 @@ export function* abortRecipe(actions) {
       params: { deckName },
     },
   } = actions;
+
   const { abortRecipeSuccess, abortRecipeFailed } = abortRecipeAction;
 
   try {
@@ -79,9 +88,13 @@ export function* abortRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.abort}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.abort}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: abortRecipeSuccess,
         failureAction: abortRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -103,9 +116,13 @@ export function* pauseRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.pause}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.pause}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: pauseRecipeSuccess,
         failureAction: pauseRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -118,7 +135,7 @@ export function* recipeListing(actions) {
   const { recipeListingSuccess, recipeListingFailed } = recipeListingAction;
 
   const token = actions.payload.token;
-  
+
   try {
     yield call(callApi, {
       payload: {
@@ -127,7 +144,9 @@ export function* recipeListing(actions) {
         reqPath: API_ENDPOINTS.recipeListing,
         successAction: recipeListingSuccess,
         failureAction: recipeListingFailed,
-        token
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
       },
     });
   } catch (error) {

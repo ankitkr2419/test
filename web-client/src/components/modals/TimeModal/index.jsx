@@ -37,9 +37,6 @@ const TimeModal = (props) => {
   const {
     timeModal,
     toggleTimeModal,
-    hours,
-    mins,
-    secs,
     handleChangeTime,
     submitTime,
     deckName,
@@ -89,7 +86,6 @@ const TimeModal = (props) => {
                           id="hours"
                           placeholder=""
                           min={0}
-                          value={hours}
                           onChange={handleChangeTime}
                         />
                         <Label for="hours" className="font-weight-bold">
@@ -104,7 +100,6 @@ const TimeModal = (props) => {
                           id="minutes"
                           placeholder=""
                           min={0}
-                          value={mins}
                           onChange={handleChangeTime}
                         />
                         <Label for="minutes" className="font-weight-bold px-2">
@@ -119,7 +114,6 @@ const TimeModal = (props) => {
                           id="seconds"
                           placeholder=""
                           min={0}
-                          value={secs}
                           onChange={handleChangeTime}
                         />
                         <Label for="seconds" className="font-weight-bold">

@@ -118,9 +118,9 @@ const OperatorRunRecipeCarousalModal = (props) => {
     handleCarousalModal(isOpen);
   };
 
-  const handleStartRunRecipe = () => {
-    toggleModalView();
-  };
+  // const handleStartRunRecipe = () => {
+  //   toggleModalView();
+  // };
 
   return (
     <Modal isOpen={isOpen} centered size="lg" className="recipe-flow-modal">

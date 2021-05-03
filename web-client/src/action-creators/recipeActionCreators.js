@@ -166,7 +166,7 @@ export const saveRecipeDataForDeck = (recipeData, deckName) => ({//deckName shou
 });
 
 export const resetRecipeDataForDeck = (deckName) => ({//deckName should be passed
-  type: saveRecipeDataAction.saveRecipeDataForDeck,
+  type: saveRecipeDataAction.resetRecipeDataForDeck,
   payload: {
     deckName
   },

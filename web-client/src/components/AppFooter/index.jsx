@@ -1,461 +1,544 @@
 import React, { useState } from "react";
 import DeckCard from "shared-components/DeckCard";
-import { DECKNAME } from "appConstants";
+import { DECKNAME, MODAL_BTN, MODAL_MESSAGE, DECKCARD_BTN } from "appConstants";
 import { useSelector, useDispatch } from "react-redux";
-import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 
 import {
-    abortRecipeInitiated,
-    pauseRecipeInitiated,
-    resumeRecipeInitiated,
-    runRecipeInitiated,
-    runRecipeReset,
-    pauseRecipeReset,
-    resumeRecipeReset,
-    abortRecipeReset,
-    updateRecipeReducerDataForDeck,
+  abortRecipeInitiated,
+  pauseRecipeInitiated,
+  resetRecipeDataForDeck,
+  resumeRecipeInitiated,
+  runRecipeInitiated,
+  runRecipeReset,
+  //   pauseRecipeReset,
+  //   resumeRecipeReset,
+  //   abortRecipeReset,
+  //   updateRecipeReducerDataForDeck,
 } from "action-creators/recipeActionCreators";
-import MlModal from "shared-components/MlModal";
+import {
+  abortCleanUpActionInitiated,
+  pauseCleanUpActionInitiated,
+  resumeCleanUpActionInitiated,
+  runCleanUpActionInitiated,
+  runCleanUpActionReset,
+} from "action-creators/cleanUpActionCreators";
+import { MlModal } from "shared-components";
 import { loginReset } from "action-creators/loginActionCreators";
+import TipDiscardModal from "components/modals/TipDiscardModal";
+import { discardTipAndHomingActionInitiated } from "action-creators/homingActionCreators";
 
 const AppFooter = (props) => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    const [
-        isConfirmationModalVisibleDeckA,
-        setIsConfirmationModalVisibleDeckA,
-    ] = useState(false);
-    const [
-        isConfirmationModalVisibleDeckB,
-        setIsConfirmationModalVisibleDeckB,
-    ] = useState(false);
+  const [confirmAbortModal, setConfirmAbortModal] = useState(false);
+  const [confirmDoneModal, setConfirmDoneModal] = useState(false);
+  const [tipDiscardModal, setTipDiscardModal] = useState(false);
+  const [deckName, setDeckName] = useState("");
 
-    const [abortConfirmationModalA, setAbortConfirmationModalA] = useState(
-        false
-    );
-    const [abortConfirmationModalB, setAbortConfirmationModalB] = useState(
-        false
-    );
+  //login reducer
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  //   let activeDeckObj =
+  //     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
-    //login reducer
-    const loginReducer = useSelector((state) => state.loginReducer);
-    const loginReducerData = loginReducer.toJS();
-    let activeDeckObj =
-        loginReducerData &&
-        loginReducerData.decks.find((deck) => deck.isActive);
-    let loginDataOfA =
-        loginReducerData &&
-        loginReducerData.decks.find((deck) => deck.name === DECKNAME.DeckA);
-    let isDeckALoggedIn = loginDataOfA.isLoggedIn;
-    let isDeckAActive = loginDataOfA.isActive;
-    let loginDataOfB =
-        loginReducerData &&
-        loginReducerData.decks.find((deck) => deck.name === DECKNAME.DeckB);
-    let isDeckBLoggedIn = loginDataOfB.isLoggedIn;
-    let isDeckBActive = loginDataOfB.isActive;
+  let loginDataOfA =
+    loginReducerData &&
+    loginReducerData.decks.find((deck) => deck.name === DECKNAME.DeckA);
+  let isDeckALoggedIn = loginDataOfA.isLoggedIn;
+  let isDeckAActive = loginDataOfA.isActive;
 
-    //recipe reducer
-    const recipeActionReducer = useSelector(
-        (state) => state.recipeActionReducer
-    );
-    let recipeActionReducerForDeckA = recipeActionReducer.decks.find(
-        (deckObj) => deckObj.name === DECKNAME.DeckA
-    );
-    let recipeActionReducerForDeckB = recipeActionReducer.decks.find(
-        (deckObj) => deckObj.name === DECKNAME.DeckB
-    );
+  let loginDataOfB =
+    loginReducerData &&
+    loginReducerData.decks.find((deck) => deck.name === DECKNAME.DeckB);
+  let isDeckBLoggedIn = loginDataOfB.isLoggedIn;
+  let isDeckBActive = loginDataOfB.isActive;
 
-    const getLeftActionBtnHandler = (deckName) => {
-        let recipeReducerData =
+  //recipe reducer
+  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  let recipeActionReducerForDeckA = recipeActionReducer.decks.find(
+    (deckObj) => deckObj.name === DECKNAME.DeckA
+  );
+  let recipeActionReducerForDeckB = recipeActionReducer.decks.find(
+    (deckObj) => deckObj.name === DECKNAME.DeckB
+  );
+
+  //cleanUp reducer
+  const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
+  let cleanUpReducerForDeckA = cleanUpReducer.decks.find(
+    (deckObj) => deckObj.name === DECKNAME.DeckA
+  );
+  let cleanUpReducerForDeckB = cleanUpReducer.decks.find(
+    (deckObj) => deckObj.name === DECKNAME.DeckB
+  );
+
+  const getLeftActionBtnHandler = (deckName) => {
+    let recipeReducerData =
+      deckName === DECKNAME.DeckA
+        ? recipeActionReducerForDeckA
+        : recipeActionReducerForDeckB;
+    let showProcess = recipeReducerData.showProcess;
+
+    let cleanUpReducerData =
+      deckName === DECKNAME.DeckA
+        ? cleanUpReducerForDeckA
+        : cleanUpReducerForDeckB;
+    // let showCleanUp = cleanUpReducerData.showCleanUp;
+
+    switch (
+      showProcess
+        ? recipeReducerData.leftActionBtn
+        : cleanUpReducerData.leftActionBtn
+    ) {
+      case DECKCARD_BTN.text.run:
+        return deckName === DECKNAME.DeckA
+          ? handleRunActionDeckA
+          : handleRunActionDeckB;
+      case DECKCARD_BTN.text.pause:
+        return deckName === DECKNAME.DeckA
+          ? handlePauseActionDeckA
+          : handlePauseActionDeckB;
+      case DECKCARD_BTN.text.resume:
+        return deckName === DECKNAME.DeckA
+          ? handleResumeActionDeckA
+          : handleResumeActionDeckB;
+
+      case DECKCARD_BTN.text.startUv:
+        return deckName === DECKNAME.DeckA
+          ? handleRunActionDeckA
+          : handleRunActionDeckB;
+      case DECKCARD_BTN.text.pauseUv:
+        return deckName === DECKNAME.DeckA
+          ? handlePauseActionDeckA
+          : handlePauseActionDeckB;
+      case DECKCARD_BTN.text.resumeUv:
+        return deckName === DECKNAME.DeckA
+          ? handleResumeActionDeckA
+          : handleResumeActionDeckB;
+      case DECKCARD_BTN.text.done:
+        return deckName === DECKNAME.DeckA
+          ? handleDoneActionDeckA
+          : handleDoneActionDeckB;
+
+      default:
+        break;
+    }
+  };
+
+  const getRightActionBtnHandler = (deckName) => {
+    let recipeReducerData =
+      deckName === DECKNAME.DeckA
+        ? recipeActionReducerForDeckA
+        : recipeActionReducerForDeckB;
+    let showProcess = recipeReducerData.showProcess;
+
+    let cleanUpReducerData =
+      deckName === DECKNAME.DeckA
+        ? cleanUpReducerForDeckA
+        : cleanUpReducerForDeckB;
+
+    switch (
+      showProcess
+        ? recipeReducerData.rightActionBtn
+        : cleanUpReducerData.rightActionBtn
+    ) {
+      case DECKCARD_BTN.text.abort:
+        return deckName === DECKNAME.DeckA
+          ? handleAbortActionDeckA
+          : handleAbortActionDeckB;
+      case DECKCARD_BTN.text.cancel:
+        return deckName === DECKNAME.DeckA
+          ? handleCancelActionDeckA
+          : handleCancelActionDeckB;
+      default:
+        break;
+    }
+  };
+
+  // RUN
+  const handleRunActionDeckA = () => {
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      const { recipeId } = recipeReducerData.recipeData;
+      dispatch(
+        runRecipeInitiated({
+          recipeId: recipeId,
+          deckName: recipeReducerData.name, //deck A
+        })
+      );
+    } else {
+      dispatch(
+        runCleanUpActionInitiated({
+          time: `${cleanUpReducerForDeckA.hours}:${cleanUpReducerForDeckA.mins}:${cleanUpReducerForDeckA.secs}`,
+          deckName: DECKNAME.DeckAShort,
+        })
+      );
+    }
+  };
+  const handleRunActionDeckB = () => {
+    let recipeReducerData = recipeActionReducerForDeckB;
+
+    if (recipeReducerData.showProcess) {
+      const { recipeId } = recipeReducerData.recipeData;
+      dispatch(
+        runRecipeInitiated({
+          recipeId: recipeId,
+          deckName: recipeReducerData.name, //deck B
+        })
+      );
+    } else {
+      dispatch(
+        runCleanUpActionInitiated({
+          time: `${cleanUpReducerForDeckB.hours}:${cleanUpReducerForDeckB.mins}:${cleanUpReducerForDeckB.secs}`,
+          deckName: DECKNAME.DeckBShort,
+        })
+      );
+    }
+  };
+
+  //PAUSE
+  const handlePauseActionDeckA = () => {
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(pauseRecipeInitiated({ deckName: recipeReducerData.name }));
+    } else {
+      dispatch(pauseCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
+    }
+  };
+  const handlePauseActionDeckB = () => {
+    let recipeReducerData = recipeActionReducerForDeckB;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(pauseRecipeInitiated({ deckName: recipeReducerData.name }));
+    } else {
+      dispatch(pauseCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort }));
+    }
+  };
+
+  // RESUME
+  const handleResumeActionDeckA = () => {
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(resumeRecipeInitiated({ deckName: recipeReducerData.name }));
+    } else {
+      dispatch(resumeCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
+    }
+  };
+
+  const handleResumeActionDeckB = () => {
+    let recipeReducerData = recipeActionReducerForDeckB;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(resumeRecipeInitiated({ deckName: recipeReducerData.name }));
+    } else {
+      dispatch(resumeCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort }));
+    }
+  };
+
+  // CANCEL
+  const handleCancelActionDeckA = () => {
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(runRecipeReset(DECKNAME.DeckA));
+    } else {
+      dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
+    }
+  };
+  const handleCancelActionDeckB = () => {
+    let recipeReducerData = recipeActionReducerForDeckB;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(runRecipeReset(DECKNAME.DeckB));
+    } else {
+      dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
+    }
+  };
+
+  //ABORT
+  const handleAbortActionDeckA = () => {
+    setDeckName(DECKNAME.DeckA);
+    setConfirmAbortModal(!confirmAbortModal);
+  };
+
+  const handleAbortActionDeckB = () => {
+    setDeckName(DECKNAME.DeckB);
+    setConfirmAbortModal(!confirmAbortModal);
+  };
+
+  const handleAbortModalDeckA = () => {
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckA }));
+      setTipDiscardModal(!tipDiscardModal);
+    } else {
+      dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
+      dispatch(loginReset(DECKNAME.DeckA));
+    }
+    setConfirmAbortModal(!confirmAbortModal);
+  };
+
+  const handleAbortModalDeckB = () => {
+    let recipeReducerData = recipeActionReducerForDeckB;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckB }));
+      setTipDiscardModal(!tipDiscardModal);
+    } else {
+      dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort }));
+      dispatch(loginReset(DECKNAME.DeckB));
+    }
+    setConfirmAbortModal(!confirmAbortModal);
+  };
+
+  const toggleTipDiscardModal = (discardTip) => {
+    if (deckName === DECKNAME.DeckA) {
+      dispatch(
+        discardTipAndHomingActionInitiated({
+          deckName: DECKNAME.DeckAShort,
+          discardTip: discardTip,
+        })
+      );
+      dispatch(resetRecipeDataForDeck(DECKNAME.DeckA));
+    } else {
+      dispatch(
+        discardTipAndHomingActionInitiated({
+          deckName: DECKNAME.DeckBShort,
+          discardTip: discardTip,
+        })
+      );
+      dispatch(resetRecipeDataForDeck(DECKNAME.DeckB));
+    }
+    setTipDiscardModal(!tipDiscardModal);
+  };
+
+  //DONE
+  const handleDoneActionDeckA = () => {
+    setDeckName(DECKNAME.DeckA);
+    setConfirmDoneModal(!confirmDoneModal);
+  };
+
+  const handleDoneActionDeckB = () => {
+    setDeckName(DECKNAME.DeckB);
+    setConfirmDoneModal(!confirmDoneModal);
+  };
+
+  const handleDoneModalDeckA = () => {
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(runRecipeReset(deckName));
+    } else {
+      dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
+    }
+    dispatch(loginReset(DECKNAME.DeckA));
+    setConfirmDoneModal(!confirmDoneModal);
+  };
+
+  const handleDoneModalDeckB = () => {
+    let recipeReducerData = recipeActionReducerForDeckA;
+
+    if (recipeReducerData.showProcess) {
+      dispatch(runRecipeReset(deckName));
+    } else {
+      dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
+    }
+    dispatch(loginReset(DECKNAME.DeckB));
+    setConfirmDoneModal(!confirmDoneModal);
+  };
+
+  return (
+    <div className="d-flex justify-content-center align-items-center">
+      {confirmAbortModal && (
+        <MlModal
+          isOpen={confirmAbortModal}
+          textHead={deckName}
+          textBody={
+            recipeActionReducerForDeckA.showProcess
+              ? MODAL_MESSAGE.abortConfirmation
+              : MODAL_MESSAGE.abortCleanupConfirmation
+          }
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
+          handleSuccessBtn={
             deckName === DECKNAME.DeckA
-                ? recipeActionReducerForDeckA
-                : recipeActionReducerForDeckB;
-        let showProcess = recipeReducerData.showProcess;
+              ? handleAbortModalDeckA
+              : handleAbortModalDeckB
+          }
+          handleCrossBtn={() => {
+            setConfirmAbortModal(!confirmAbortModal);
+          }}
+        />
+      )}
 
-        let cleanUpReducerData = { leftActionBtn: undefined }; //check //change (use cleanUpReducer data here)
-
-        switch (
-            showProcess
-                ? recipeReducerData.leftActionBtn
-                : cleanUpReducerData.leftActionBtn
-        ) {
-            case DECKCARD_BTN.text.run:
-                return deckName === DECKNAME.DeckA
-                    ? handleRunActionDeckA
-                    : handleRunActionDeckB;
-            case DECKCARD_BTN.text.pause:
-                return deckName === DECKNAME.DeckA
-                    ? handlePauseActionDeckA
-                    : handlePauseActionDeckB;
-            case DECKCARD_BTN.text.resume:
-                return deckName === DECKNAME.DeckA
-                    ? handleResumeActionDeckA
-                    : handleResumeActionDeckB;
-
-            case DECKCARD_BTN.text.startUv:
-                return deckName === DECKNAME.DeckA
-                    ? handleRunActionDeckA
-                    : handleRunActionDeckB;
-            case DECKCARD_BTN.text.pauseUv:
-                return deckName === DECKNAME.DeckA
-                    ? handlePauseActionDeckA
-                    : handlePauseActionDeckB;
-            case DECKCARD_BTN.text.resumeUv:
-                return deckName === DECKNAME.DeckA
-                    ? handleResumeActionDeckA
-                    : handleResumeActionDeckB;
-            case DECKCARD_BTN.text.done:
-                return deckName === DECKNAME.DeckA
-                    ? handleDoneActionDeckA
-                    : handleDoneActionDeckB;
-
-            default:
-                break;
-        }
-    };
-
-    const handleRunActionDeckA = () => {
-        let recipeReducerData = recipeActionReducerForDeckA;
-
-        if (recipeReducerData.showProcess) {
-            const { recipeId } = recipeReducerData.recipeData;
-            dispatch(
-                runRecipeInitiated({
-                    recipeId: recipeId,
-                    deckName: recipeReducerData.name, //deck A
-                })
-            );
-        } else {
-            console.log("cleanUp in development");
-            // dispatch(
-            //     runCleanUpActionInitiated({
-            //         time: `${recipeReducerData.hours}:${recipeReducerData.mins}:${recipeReducerData.secs}`,
-            //         deckName: recipeReducerData.name,
-            //     })
-            // );
-        }
-    };
-    const handleRunActionDeckB = () => {
-        let recipeReducerData = recipeActionReducerForDeckB;
-
-        if (recipeReducerData.showProcess) {
-            const { recipeId } = recipeReducerData.recipeData;
-            dispatch(
-                runRecipeInitiated({
-                    recipeId: recipeId,
-                    deckName: recipeReducerData.name, //deck B
-                })
-            );
-        } else {
-            console.log("cleanUp in development");
-            // dispatch(
-            //     runCleanUpActionInitiated({
-            //         time: `${recipeReducerData.hours}:${recipeReducerData.mins}:${recipeReducerData.secs}`,
-            //         deckName: recipeReducerData.name,
-            //     })
-            // );
-        }
-    };
-
-    const handlePauseActionDeckA = () => {
-        let recipeReducerData = recipeActionReducerForDeckA;
-
-        if (recipeReducerData.showProcess) {
-            dispatch(
-                pauseRecipeInitiated({ deckName: recipeReducerData.name })
-            );
-        } else {
-            //dispatch(pauseCleanUpActionInitiated({ deckName: recipeReducerData.name }));
-        }
-    };
-    const handlePauseActionDeckB = () => {
-        let recipeReducerData = recipeActionReducerForDeckB;
-
-        if (recipeReducerData.showProcess) {
-            dispatch(
-                pauseRecipeInitiated({ deckName: recipeReducerData.name })
-            );
-        } else {
-            //dispatch(pauseCleanUpActionInitiated({ deckName: recipeReducerData.name }));
-        }
-    };
-
-    const handleResumeActionDeckA = () => {
-        let recipeReducerData = recipeActionReducerForDeckA;
-
-        if (recipeReducerData.showProcess) {
-            dispatch(
-                resumeRecipeInitiated({ deckName: recipeReducerData.name })
-            );
-        } else {
-            //dispatch(resumeCleanUpActionInitiated({ deckName: recipeReducerData.name }));
-        }
-    };
-
-    const handleResumeActionDeckB = () => {
-        let recipeReducerData = recipeActionReducerForDeckB;
-
-        if (recipeReducerData.showProcess) {
-            dispatch(
-                resumeRecipeInitiated({ deckName: recipeReducerData.name })
-            );
-        } else {
-            //dispatch(resumeCleanUpActionInitiated({ deckName: recipeReducerData.name }));
-        }
-    };
-
-    const handleDoneActionDeckA = () => {
-        toggleComfirmationModal(DECKNAME.DeckA);
-    };
-    const handleDoneActionDeckB = () => {
-        toggleComfirmationModal(DECKNAME.DeckB);
-    };
-
-    const getRightActionBtnHandler = (deckName) => {
-        let recipeReducerData =
+      {confirmDoneModal && (
+        <MlModal
+          isOpen={confirmDoneModal}
+          textHead={deckName}
+          textBody={
+            recipeActionReducerForDeckA.showProcess
+              ? MODAL_MESSAGE.experimentSuccess
+              : MODAL_MESSAGE.uvSuccess
+          }
+          successBtn={MODAL_BTN.next}
+          handleSuccessBtn={
             deckName === DECKNAME.DeckA
-                ? recipeActionReducerForDeckA
-                : recipeActionReducerForDeckB;
-        let showProcess = recipeReducerData.showProcess;
+              ? handleDoneModalDeckA
+              : handleDoneModalDeckB
+          }
+          handleCrossBtn={() => {
+            setConfirmDoneModal(!confirmDoneModal);
+          }}
+        />
+      )}
 
-        let cleanUpReducerData = { leftActionBtn: undefined }; //check //change (use cleanUpReducer data here)
+      {
+        <TipDiscardModal
+          isOpen={tipDiscardModal}
+          handleSuccessBtn={toggleTipDiscardModal}
+          deckName={deckName}
+        />
+      }
 
-        switch (
-            showProcess
-                ? recipeReducerData.rightActionBtn
-                : cleanUpReducerData.rightActionBtn
-        ) {
-            case DECKCARD_BTN.text.abort:
-                return deckName === DECKNAME.DeckA
-                    ? handleAbortActionDeckA
-                    : handleAbortActionDeckB;
-            case DECKCARD_BTN.text.cancel:
-                return deckName === DECKNAME.DeckA
-                    ? handleCancelActionDeckA
-                    : handleCancelActionDeckB;
-            default:
-                break;
+      {/**Deck A */}
+      <DeckCard
+        deckName={DECKNAME.DeckA}
+        recipeName={
+          recipeActionReducerForDeckA.recipeData &&
+          recipeActionReducerForDeckA.recipeData.recipeName
+            ? recipeActionReducerForDeckA.recipeData.recipeName
+            : null
         }
-    };
-    const handleCancelActionDeckA = () => {
-        let recipeReducerData = recipeActionReducerForDeckA;
-        let deckName = recipeReducerData.name;
-        dispatch(runRecipeReset(deckName));
-        // setShowCleanUp(false); //check
-    };
-    const handleCancelActionDeckB = () => {
-        let recipeReducerData = recipeActionReducerForDeckB;
-        let deckName = recipeReducerData.name;
-        dispatch(runRecipeReset(deckName));
-        // setShowCleanUp(false);//check
-    };
-
-    const handleAbortActionDeckA = () => {
-        toggleAbortConfirmationModal(DECKNAME.DeckA);
-    };
-
-    const handleAbortActionDeckB = () => {
-        toggleAbortConfirmationModal(DECKNAME.DeckB);
-    };
-
-    const toggleAbortConfirmationModal = (deckName) => {
-        if (deckName === DECKNAME.DeckA) {
-            setAbortConfirmationModalA(!abortConfirmationModalA);
-        } else {
-            setAbortConfirmationModalB(!abortConfirmationModalB);
+        processNumber={
+          recipeActionReducerForDeckA.runRecipeInProgress
+            ? recipeActionReducerForDeckA.runRecipeInProgress.operation_details
+                .current_step
+            : 0
         }
-    };
-
-    const onAbortConfirmed = (deckName) => {
-        toggleAbortConfirmationModal(deckName);
-        dispatch(abortRecipeInitiated({ deckName }));
-    };
-
-    const onNextClickedAfterDoneRecipe = (deckName) => {
-        dispatch(loginReset(deckName));
-    };
-    const toggleComfirmationModal = (deckName) => {
-        if (deckName === DECKNAME.DeckA) {
-            setIsConfirmationModalVisibleDeckA(
-                !isConfirmationModalVisibleDeckA
-            );
-        } else {
-            setIsConfirmationModalVisibleDeckB(
-                !isConfirmationModalVisibleDeckB
-            );
+        processTotal={
+          recipeActionReducerForDeckA.recipeData &&
+          recipeActionReducerForDeckA.recipeData.processCount
+            ? recipeActionReducerForDeckA.recipeData.processCount
+            : null
         }
-    };
+        isActiveDeck={isDeckAActive}
+        loginBtn={!isDeckALoggedIn}
+        isAnotherDeckLoggedIn={isDeckBLoggedIn}
+        leftActionBtn={
+          isDeckALoggedIn
+            ? recipeActionReducerForDeckA.showProcess
+              ? recipeActionReducerForDeckA.leftActionBtn
+              : cleanUpReducerForDeckA.leftActionBtn
+            : ""
+        }
+        rightActionBtn={
+          isDeckALoggedIn
+            ? recipeActionReducerForDeckA.showProcess
+              ? recipeActionReducerForDeckA.rightActionBtn
+              : cleanUpReducerForDeckA.rightActionBtn
+            : ""
+        }
+        showProcess={
+          isDeckALoggedIn ? recipeActionReducerForDeckA.showProcess : false
+        }
+        hours={cleanUpReducerForDeckA.hours}
+        mins={cleanUpReducerForDeckA.mins}
+        secs={cleanUpReducerForDeckA.secs}
+        progressPercentComplete={
+          isDeckALoggedIn
+            ? recipeActionReducerForDeckA.showProcess
+              ? recipeActionReducerForDeckA.runRecipeInProgress &&
+                recipeActionReducerForDeckA.runRecipeInProgress.progress
+              : cleanUpReducerForDeckA.cleanUpData &&
+                JSON.parse(cleanUpReducerForDeckA.cleanUpData).progress
+            : 0
+        }
+        showCleanUp={
+          isDeckALoggedIn ? cleanUpReducerForDeckA.showCleanUp : false
+        }
+        handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckA)}
+        handleRightAction={getRightActionBtnHandler(DECKNAME.DeckA)}
+        leftActionBtnDisabled={
+          recipeActionReducerForDeckA.leftActionBtnDisabled ||
+          cleanUpReducerForDeckA.leftActionBtnDisabled
+        }
+        rightActionBtnDisabled={
+          recipeActionReducerForDeckA.rightActionBtnDisabled ||
+          cleanUpReducerForDeckA.rightActionBtnDisabled
+        }
+      />
 
-    return (
-        <div className="d-flex justify-content-center align-items-center">
-            <MlModal
-                isOpen={isConfirmationModalVisibleDeckA}
-                textHead={DECKNAME.DeckA}
-                textBody={`Experiment was successful`}
-                handleSuccessBtn={() =>
-                    onNextClickedAfterDoneRecipe(DECKNAME.DeckA)
-                }
-                handleCrossBtn={() => toggleComfirmationModal(DECKNAME.DeckA)}
-                successBtn={MODAL_BTN.next}
-            />
-
-            <MlModal
-                isOpen={isConfirmationModalVisibleDeckB}
-                textHead={DECKNAME.DeckB}
-                textBody={`Experiment was successful`}
-                handleSuccessBtn={() =>
-                    onNextClickedAfterDoneRecipe(DECKNAME.DeckB)
-                }
-                handleCrossBtn={() => toggleComfirmationModal(DECKNAME.DeckB)}
-                successBtn={MODAL_BTN.next}
-            />
-
-            <MlModal
-                isOpen={abortConfirmationModalA}
-                textHead={DECKNAME.DeckA}
-                textBody={MODAL_MESSAGE.abortConfirmation}
-                handleSuccessBtn={() => onAbortConfirmed(DECKNAME.DeckA)}
-                handleCrossBtn={() =>
-                    toggleAbortConfirmationModal(DECKNAME.DeckA)
-                }
-                successBtn={MODAL_BTN.yes}
-                failureBtn={MODAL_BTN.no}
-            />
-
-            <MlModal
-                isOpen={abortConfirmationModalB}
-                textHead={DECKNAME.DeckB}
-                textBody={MODAL_MESSAGE.abortConfirmation}
-                handleSuccessBtn={() => onAbortConfirmed(DECKNAME.DeckB)}
-                handleCrossBtn={() =>
-                    toggleAbortConfirmationModal(DECKNAME.DeckB)
-                }
-                successBtn={MODAL_BTN.yes}
-                failureBtn={MODAL_BTN.no}
-            />
-
-            {/**Deck A */}
-            <DeckCard
-                deckName={DECKNAME.DeckA}
-                recipeName={
-                    recipeActionReducerForDeckA.recipeData &&
-                    recipeActionReducerForDeckA.recipeData.recipeName
-                        ? recipeActionReducerForDeckA.recipeData.recipeName
-                        : null
-                }
-                processNumber={
-                    recipeActionReducerForDeckA.runRecipeInProgress
-                        ? recipeActionReducerForDeckA.runRecipeInProgress
-                              .operation_details.current_step
-                        : 0
-                }
-                processTotal={
-                    recipeActionReducerForDeckA.recipeData &&
-                    recipeActionReducerForDeckA.recipeData.processCount
-                        ? recipeActionReducerForDeckA.recipeData.processCount
-                        : null
-                }
-                isActiveDeck={isDeckAActive}
-                loginBtn={!isDeckALoggedIn}
-                isAnotherDeckLoggedIn={isDeckBLoggedIn}
-                leftActionBtn={
-                    isDeckALoggedIn
-                        ? recipeActionReducerForDeckA.leftActionBtn
-                        : ""
-                }
-                rightActionBtn={
-                    isDeckALoggedIn
-                        ? recipeActionReducerForDeckA.rightActionBtn
-                        : ""
-                }
-                showProcess={
-                    isDeckALoggedIn
-                        ? recipeActionReducerForDeckA.showProcess
-                        : false
-                }
-                hours={recipeActionReducerForDeckA.hours}
-                mins={recipeActionReducerForDeckA.mins}
-                secs={recipeActionReducerForDeckA.secs}
-                progressPercentComplete={
-                    recipeActionReducerForDeckA.runRecipeInProgress
-                        ? recipeActionReducerForDeckA.runRecipeInProgress
-                              .progress
-                        : 0
-                }
-                showCleanUp={recipeActionReducerForDeckA.showCleanUp}
-                handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckA)}
-                handleRightAction={getRightActionBtnHandler(DECKNAME.DeckA)}
-                leftActionBtnDisabled={
-                    recipeActionReducerForDeckA.leftActionBtnDisabled
-                }
-                rightActionBtnDisabled={
-                    recipeActionReducerForDeckA.rightActionBtnDisabled
-                }
-            />
-
-            {/** Deck B */}
-            <DeckCard
-                deckName={DECKNAME.DeckB}
-                recipeName={
-                    recipeActionReducerForDeckB &&
-                    recipeActionReducerForDeckB.recipeData &&
-                    recipeActionReducerForDeckB.recipeData.recipeName
-                        ? recipeActionReducerForDeckB.recipeData.recipeName
-                        : null
-                }
-                processNumber={
-                    recipeActionReducerForDeckB.runRecipeInProgress
-                        ? JSON.parse(
-                              recipeActionReducerForDeckB.runRecipeInProgress
-                          ).operation_details.current_step
-                        : 0
-                }
-                processTotal={
-                    recipeActionReducerForDeckB.recipeData &&
-                    recipeActionReducerForDeckB.recipeData.processCount
-                        ? recipeActionReducerForDeckB.recipeData.processCount
-                        : null
-                }
-                isActiveDeck={isDeckBActive}
-                loginBtn={!isDeckBLoggedIn}
-                isAnotherDeckLoggedIn={isDeckALoggedIn}
-                leftActionBtn={
-                    isDeckALoggedIn
-                        ? recipeActionReducerForDeckB.leftActionBtn
-                        : ""
-                }
-                rightActionBtn={
-                    isDeckALoggedIn
-                        ? recipeActionReducerForDeckB.rightActionBtn
-                        : ""
-                }
-                showProcess={
-                    isDeckALoggedIn
-                        ? recipeActionReducerForDeckB.showProcess
-                        : false
-                }
-                hours={recipeActionReducerForDeckB.hours}
-                mins={recipeActionReducerForDeckB.mins}
-                secs={recipeActionReducerForDeckB.secs}
-                progressPercentComplete={
-                    recipeActionReducerForDeckB.runRecipeInProgress
-                        ? JSON.parse(
-                              recipeActionReducerForDeckB.runRecipeInProgress
-                          ).progress
-                        : 0
-                }
-                showCleanUp={recipeActionReducerForDeckA.showCleanUp}
-                handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckB)}
-                handleRightAction={getRightActionBtnHandler(DECKNAME.DeckB)}
-                leftActionBtnDisabled={
-                    recipeActionReducerForDeckB.leftActionBtnDisabled
-                }
-                rightActionBtnDisabled={
-                    recipeActionReducerForDeckB.rightActionBtnDisabled
-                }
-            />
-        </div>
-    );
+      {/** Deck B */}
+      <DeckCard
+        deckName={DECKNAME.DeckB}
+        recipeName={
+          // recipeActionReducerForDeckB &&
+          recipeActionReducerForDeckB.recipeData &&
+          recipeActionReducerForDeckB.recipeData.recipeName
+            ? recipeActionReducerForDeckB.recipeData.recipeName
+            : null
+        }
+        processNumber={
+          recipeActionReducerForDeckB.runRecipeInProgress
+            ? recipeActionReducerForDeckB.runRecipeInProgress.operation_details
+                .current_step
+            : 0
+        }
+        processTotal={
+          recipeActionReducerForDeckB.recipeData &&
+          recipeActionReducerForDeckB.recipeData.processCount
+            ? recipeActionReducerForDeckB.recipeData.processCount
+            : null
+        }
+        isActiveDeck={isDeckBActive}
+        loginBtn={!isDeckBLoggedIn}
+        isAnotherDeckLoggedIn={isDeckALoggedIn}
+        leftActionBtn={
+          isDeckBLoggedIn
+            ? recipeActionReducerForDeckB.showProcess
+              ? recipeActionReducerForDeckB.leftActionBtn
+              : cleanUpReducerForDeckB.leftActionBtn
+            : ""
+        }
+        rightActionBtn={
+          isDeckBLoggedIn
+            ? recipeActionReducerForDeckB.showProcess
+              ? recipeActionReducerForDeckB.rightActionBtn
+              : cleanUpReducerForDeckB.rightActionBtn
+            : ""
+        }
+        showProcess={
+          isDeckBLoggedIn ? recipeActionReducerForDeckB.showProcess : false
+        }
+        hours={cleanUpReducerForDeckB.hours}
+        mins={cleanUpReducerForDeckB.mins}
+        secs={cleanUpReducerForDeckB.secs}
+        progressPercentComplete={
+          isDeckBLoggedIn
+            ? recipeActionReducerForDeckB.showProcess
+              ? recipeActionReducerForDeckB.runRecipeInProgress &&
+                recipeActionReducerForDeckB.runRecipeInProgress.progress
+              : cleanUpReducerForDeckB.cleanUpData &&
+                JSON.parse(cleanUpReducerForDeckB.cleanUpData).progress
+            : 0
+        }
+        showCleanUp={cleanUpReducerForDeckB.showCleanUp}
+        handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckB)}
+        handleRightAction={getRightActionBtnHandler(DECKNAME.DeckB)}
+        leftActionBtnDisabled={
+          recipeActionReducerForDeckB.leftActionBtnDisabled ||
+          cleanUpReducerForDeckB.leftActionBtnDisabled
+        }
+        rightActionBtnDisabled={
+          recipeActionReducerForDeckB.rightActionBtnDisabled ||
+          cleanUpReducerForDeckB.rightActionBtnDisabled
+        }
+      />
+    </div>
+  );
 };
 
 /**old code for reference */
@@ -532,7 +615,7 @@ const AppFooter = (props) => {
 AppFooter.propTypes = {};
 
 AppFooter.defaultProps = {
-    loginBtn: false,
+  loginBtn: false,
 };
 
 export default AppFooter;

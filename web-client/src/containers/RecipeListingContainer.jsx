@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import RecipeListingComponent from "components/RecipeListing";
 
-import { recipeListingInitiated, saveRecipeDataForDeck } from "action-creators/recipeActionCreators";
+import {
+  recipeListingInitiated,
+  saveRecipeDataForDeck,
+} from "action-creators/recipeActionCreators";
 import { ROUTES } from "appConstants";
 import { Redirect } from "react-router-dom";
-import { useHistory } from "react-router-dom";
-import { toast } from "react-toastify";
+// import { useHistory } from "react-router-dom";
 
 // import { Loader } from 'shared-components'
 const RecipeListing = styled.div`
@@ -25,9 +27,10 @@ const RecipeListing = styled.div`
 
 const RecipeListingContainer = (props) => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  // const history = useHistory();
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
-  const [recipeFetched, setRecipeFetched] = useState(false)
+  const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
+  const [recipeFetched, setRecipeFetched] = useState(false);
   // const recipeData = [
   //   {
   //     id: "28101940-718b-4937-913d-39cb6b9057ba",
@@ -108,8 +111,8 @@ const RecipeListingContainer = (props) => {
     setOperatorRunRecipeCarousalModalVisible,
   ] = useState(false);
 
-  const [selectedRecipeData, setSelectedRecipeData] = useState({}) 
-  const [token, setToken] = useState()
+  const [selectedRecipeData, setSelectedRecipeData] = useState({});
+  const [token, setToken] = useState();
 
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
@@ -118,34 +121,41 @@ const RecipeListingContainer = (props) => {
   };
 
   //useEffect(() => {
-    // dispatch(recipeListingInitiated());
+  // dispatch(recipeListingInitiated());
   //}, [dispatch]);
   useEffect(() => {
-    if(token && !recipeFetched){
-      dispatch(recipeListingInitiated(token, deckName))
-      setRecipeFetched(true)
+    if (token && !recipeFetched) {
+      dispatch(recipeListingInitiated(token, deckName));
+      setRecipeFetched(true);
     }
-  }, [token])
+  }, [token]);
 
-  const loginReducer = useSelector(
-    (state) => state.loginReducer
-  );
+  const loginReducer = useSelector((state) => state.loginReducer);
 
-  const loginReducerData = loginReducer.toJS()
-  let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
-  if(!activeDeckObj.isLoggedIn){
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  if (!activeDeckObj.isLoggedIn) {
     return <Redirect to={`/${ROUTES.landing}`} />;
   }
-  let deckName  = activeDeckObj.name
-  let isAdmin = activeDeckObj.isAdmin
-  if(!token)
-    setToken(activeDeckObj.token);
+  let deckName = activeDeckObj.name;
+  let isAdmin = activeDeckObj.isAdmin;
+  if (!token) setToken(activeDeckObj.token);
 
-  const  recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(deck => deck.name === deckName);
+  const recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(
+    (deck) => deck.name === deckName
+  );
   const recipeData = recipeReducerDataOfActiveDeck.allRecipeData;
-  const isLoading = recipeReducerDataOfActiveDeck.isLoading;
-  const isProcessInProgress = recipeReducerDataOfActiveDeck.showProcess;
-  
+  // const isLoading = recipeReducerDataOfActiveDeck.isLoading;
+
+  const cleanUpReducerDataOfActiveDeck = cleanUpReducer.decks.find(
+    (deck) => deck.name === deckName
+  );
+
+  const isProcessInProgress =
+    recipeReducerDataOfActiveDeck.showProcess ||
+    cleanUpReducerDataOfActiveDeck.showCleanUp;
+
   const returnRecipeDetails = (data) => {
     // let requiredData  =  {
     //   data,
@@ -153,19 +163,19 @@ const RecipeListingContainer = (props) => {
     // }
     // console.log("DATA returned--->", requiredData);
     // store data in reducer
-    setSelectedRecipeData({data, deckName})
+    setSelectedRecipeData({ data, deckName });
   };
 
   const onConfirmedRecipeSelection = () => {
     let { data, deckName } = selectedRecipeData;
-    if(!deckName){
-      console.error('deckName not found!')
+    if (!deckName) {
+      console.error("deckName not found!");
       return;
-    } 
-    dispatch(saveRecipeDataForDeck(data, deckName))
+    }
+    dispatch(saveRecipeDataForDeck(data, deckName));
     // history.push(ROUTES.landing);//go to landing page
     // return <Redirect to={`/${ROUTES.landing}`} />;
-  }
+  };
 
   return (
     <RecipeListing>

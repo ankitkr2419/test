@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import styled from "styled-components";
 import { Card, CardBody, Button, Row, Col } from "core-components";
@@ -7,13 +7,27 @@ import { Icon, VideoCard, ButtonIcon } from "shared-components";
 
 import SearchBox from "shared-components/SearchBox";
 import PaginationBox from "shared-components/PaginationBox";
-import MlModal from "shared-components/MlModal"
+import MlModal from "shared-components/MlModal";
+import TimeModal from "components/modals/TimeModal";
 import RecipeCard from "components/RecipeListing/RecipeCard";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
-import { DECKCARD_BTN, MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
-import { loginReset } from 'action-creators/loginActionCreators';
+import {
+  DECKNAME,
+  MODAL_BTN,
+  ROUTES,
+} from "appConstants";
+import { loginReset } from "action-creators/loginActionCreators";
+import {
+  setCleanUpHours,
+  setCleanUpMins,
+  setCleanUpSecs,
+  setShowCleanUp,
+} from "action-creators/cleanUpActionCreators";
+import TrayDiscardModal from "components/modals/TrayDiscardModal";
+import { discardDeckInitiated } from "action-creators/discardDeckActionCreators";
+import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -53,15 +67,76 @@ const RecipeListingComponent = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const [timeModal, setTimeModal] = useState(false);
+  const [trayDiscardModal, setTrayDiscardModal] = useState(false);
+  const [nextModal, setNextModal] = useState(true);
+
   const onLogoutClicked = () => {
     toggleLogoutModalVisibility();
     dispatch(loginReset(deckName));
     history.push(ROUTES.landing);
-  }
+  };
 
   const toggleLogoutModalVisibility = () => {
     setLogoutModalVisibility(!isLogoutModalVisible);
-  }
+  };
+
+  const toggleTimeModal = () => {
+    setTimeModal(!timeModal);
+  };
+
+  const toggleTrayDiscardModal = () => {
+    setTrayDiscardModal(!trayDiscardModal);
+  };
+
+  const handleSuccessBtn = () => {
+    if (nextModal) {
+      dispatch(
+        discardDeckInitiated({
+          deckName:
+            deckName === DECKNAME.DeckA
+              ? DECKNAME.DeckAShort
+              : DECKNAME.DeckBShort,
+        })
+      );
+      setNextModal(!nextModal);
+    } else {
+      dispatch(
+        restoreDeckInitiated({
+          deckName:
+            deckName === DECKNAME.DeckA
+              ? DECKNAME.DeckAShort
+              : DECKNAME.DeckBShort,
+        })
+      );
+      setTrayDiscardModal(!trayDiscardModal);
+      dispatch(loginReset(deckName));
+    }
+  };
+
+  const submitTime = () => {
+    setTimeModal(!timeModal);
+    dispatch(setShowCleanUp({ deckName: deckName }));
+  };
+
+  const handleChangeTime = (event) => {
+    let name = event.target.name;
+
+    if (name === "hours") {
+      dispatch(
+        setCleanUpHours({ deckName: deckName, hours: event.target.value })
+      );
+    } else if (name === "minutes") {
+      dispatch(
+        setCleanUpMins({ deckName: deckName, mins: event.target.value })
+      );
+    } else if (name === "seconds") {
+      dispatch(
+        setCleanUpSecs({ deckName: deckName, secs: event.target.value })
+      );
+    }
+  };
+
   return (
     <>
       <div className="landing-content px-2">
@@ -73,10 +148,33 @@ const RecipeListingComponent = (props) => {
             onConfirmedRecipeSelection={onConfirmedRecipeSelection}
           />
         )}
+
+        {timeModal && (
+          <TimeModal
+            timeModal={timeModal}
+            toggleTimeModal={toggleTimeModal}
+            handleChangeTime={handleChangeTime}
+            submitTime={submitTime}
+            deckName={deckName}
+          />
+        )}
+
+        {trayDiscardModal && (
+          <TrayDiscardModal
+            trayDiscardModal={trayDiscardModal}
+            toggleTrayDiscardModal={toggleTrayDiscardModal}
+            handleSuccessBtn={handleSuccessBtn}
+            nextModal={nextModal}
+            deckName={deckName}
+          />
+        )}
+
         <MlModal
           isOpen={isLogoutModalVisible}
           textHead={deckName}
-          textBody={`Are you sure you want to sign out of ${isAdmin ? 'Admin':'Operator'} role?`}
+          textBody={`Are you sure you want to sign out of ${
+            isAdmin ? "Admin" : "Operator"
+          } role?`}
           handleSuccessBtn={onLogoutClicked}
           handleCrossBtn={toggleLogoutModalVisibility}
           successBtn={MODAL_BTN.yes}
@@ -86,7 +184,9 @@ const RecipeListingComponent = (props) => {
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
           {isProcessInProgress ? null : (
             <div className="d-flex align-items-center">
-              <Icon name="angle-left" size={32} className="text-white" />
+              <div style={{ cursor: "pointer" }} onClick={onLogoutClicked}>
+                <Icon name="angle-left" size={32} className="text-white" />
+              </div>
               <HeadingTitle
                 Tag="h5"
                 className="text-white font-weight-bold ml-3 mb-0"
@@ -116,7 +216,7 @@ const RecipeListingComponent = (props) => {
                   <Button
                     color="secondary"
                     className="ml-2 border-primary btn-clean-up bg-white"
-                    // onClick={handleTimeModal}
+                    onClick={toggleTimeModal}
                   >
                     {" "}
                     Clean Up
@@ -124,7 +224,7 @@ const RecipeListingComponent = (props) => {
                   <Button
                     color="secondary"
                     className="ml-2 border-primary btn-discard-tray bg-white"
-                    // onClick={handleTrayDiscardModal}
+                    onClick={toggleTrayDiscardModal}
                   >
                     Discard Tray
                   </Button>

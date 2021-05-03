@@ -1,10 +1,9 @@
-import { takeEvery, put, call } from 'redux-saga/effects';
+import { takeEvery, call } from 'redux-saga/effects';
 // Purposefully commented code, will remvove once api is integrated
 import { callApi } from 'apis/apiHelper';
 import loginActions from 'actions/loginActions';
-import { loginFailed } from 'action-creators/loginActionCreators';
+// import { loginFailed } from 'action-creators/loginActionCreators';
 import { DECKNAME, HTTP_METHODS } from '../appConstants';
-import { toast } from "react-toastify";
 
 export function* login(actions) {
 	const {
