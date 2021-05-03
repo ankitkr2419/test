@@ -6,13 +6,14 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   abortRecipeInitiated,
   pauseRecipeInitiated,
+  resetRecipeDataForDeck,
   resumeRecipeInitiated,
   runRecipeInitiated,
   runRecipeReset,
-//   pauseRecipeReset,
-//   resumeRecipeReset,
-//   abortRecipeReset,
-//   updateRecipeReducerDataForDeck,
+  //   pauseRecipeReset,
+  //   resumeRecipeReset,
+  //   abortRecipeReset,
+  //   updateRecipeReducerDataForDeck,
 } from "action-creators/recipeActionCreators";
 import {
   abortCleanUpActionInitiated,
@@ -37,8 +38,8 @@ const AppFooter = (props) => {
   //login reducer
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
-//   let activeDeckObj =
-//     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  //   let activeDeckObj =
+  //     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
   let loginDataOfA =
     loginReducerData &&
@@ -241,7 +242,7 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckA;
 
     if (recipeReducerData.showProcess) {
-      dispatch(runRecipeReset(deckName));
+      dispatch(runRecipeReset(DECKNAME.DeckA));
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
     }
@@ -250,7 +251,7 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckB;
 
     if (recipeReducerData.showProcess) {
-      dispatch(runRecipeReset(deckName));
+      dispatch(runRecipeReset(DECKNAME.DeckB));
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
@@ -271,7 +272,7 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckA;
 
     if (recipeReducerData.showProcess) {
-      dispatch(abortRecipeInitiated(DECKNAME.DeckA));
+      dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckA }));
       setTipDiscardModal(!tipDiscardModal);
     } else {
       dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
@@ -284,7 +285,7 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckB;
 
     if (recipeReducerData.showProcess) {
-      dispatch(abortRecipeInitiated(DECKNAME.DeckB));
+      dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckB }));
       setTipDiscardModal(!tipDiscardModal);
     } else {
       dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort }));
@@ -292,6 +293,10 @@ const AppFooter = (props) => {
     }
     setConfirmAbortModal(!confirmAbortModal);
   };
+
+  const discardTipAndHomingReducer = useSelector(
+    (state) => state.discardTipAndHomingReducer
+  );
 
   const toggleTipDiscardModal = (discardTip) => {
     if (deckName === DECKNAME.DeckA) {
@@ -301,7 +306,7 @@ const AppFooter = (props) => {
           discardTip: discardTip,
         })
       );
-      dispatch(loginReset(DECKNAME.DeckA));
+      dispatch(resetRecipeDataForDeck(DECKNAME.DeckA));
     } else {
       dispatch(
         discardTipAndHomingActionInitiated({
@@ -309,7 +314,7 @@ const AppFooter = (props) => {
           discardTip: discardTip,
         })
       );
-      dispatch(loginReset(DECKNAME.DeckB));
+      dispatch(resetRecipeDataForDeck(DECKNAME.DeckB));
     }
     setTipDiscardModal(!tipDiscardModal);
   };

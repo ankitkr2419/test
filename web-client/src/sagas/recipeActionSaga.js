@@ -31,7 +31,9 @@ export function* runRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.run}/${recipeId}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.run}/${recipeId}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
       },
@@ -55,7 +57,9 @@ export function* resumeRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.resume}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.resume}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: resumeRecipeSuccess,
         failureAction: resumeRecipeFailed,
       },
@@ -72,6 +76,7 @@ export function* abortRecipe(actions) {
       params: { deckName },
     },
   } = actions;
+
   const { abortRecipeSuccess, abortRecipeFailed } = abortRecipeAction;
 
   try {
@@ -79,7 +84,9 @@ export function* abortRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.abort}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.abort}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: abortRecipeSuccess,
         failureAction: abortRecipeFailed,
       },
@@ -103,7 +110,9 @@ export function* pauseRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.pause}/${deckName === DECKNAME.DeckA ? "A": "B"}`,
+        reqPath: `${API_ENDPOINTS.pause}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: pauseRecipeSuccess,
         failureAction: pauseRecipeFailed,
       },
@@ -118,7 +127,7 @@ export function* recipeListing(actions) {
   const { recipeListingSuccess, recipeListingFailed } = recipeListingAction;
 
   const token = actions.payload.token;
-  
+
   try {
     yield call(callApi, {
       payload: {
@@ -127,7 +136,7 @@ export function* recipeListing(actions) {
         reqPath: API_ENDPOINTS.recipeListing,
         successAction: recipeListingSuccess,
         failureAction: recipeListingFailed,
-        token
+        token,
       },
     });
   } catch (error) {
