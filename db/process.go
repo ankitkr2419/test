@@ -201,10 +201,11 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 			pr, err = s.ShowProcess(ctx, pr.ID)
 			if err != nil {
-				logger.Infoln("Process Duplicated => ", pr)
+				logger.Infoln("Error Duplicating process")
 				return
 			}
-			logger.Infoln("Error Duplicating process")
+			logger.Infoln("Process Duplicated => ", pr)
+
 		}()
 
 		// Get highest sequence number
