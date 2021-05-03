@@ -137,7 +137,7 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	return
 }
 
-func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID, process interface{}) (duplicate Process, err error) {
+func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (duplicate Process, err error) {
 
 	var parent Process
 
@@ -148,7 +148,9 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID, pro
 		return
 	}
 
-	duplicate, err = s.processOperation(ctx, "duplicate", parent.Type, process, parent)
+	var p interface{}
+	// pass empty interface, just to use same method
+	duplicate, err = s.processOperation(ctx, "duplicate", parent.Type, p, parent)
 	if err != nil {
 		// failure already logged
 		return
@@ -159,6 +161,7 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID, pro
 }
 
 func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
+	// pass Process{} just to keep dame method call
 	processWithName, err := s.processOperation(ctx, "name", processType, process, Process{})
 	if err != nil {
 		err = fmt.Errorf("error in updating new process name")
@@ -236,18 +239,22 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	switch processType {
 	case "Piercing":
+		var pi Piercing
 		if operation == "name" {
-			p := process.(Piercing)
-			pr.Name = fmt.Sprintf("Piercing_%s", p.Type)
+			pi = process.(Piercing)
+			pr.Name = fmt.Sprintf("Piercing_%s", pi.Type)
 			return
 		}
 
-		// Create Piercing process
-		p := process.(*Piercing)
-		p.ProcessID = pr.ID
-		var pi Piercing
+		// Fetch Piercing process
+		pi, err = s.ShowPiercing(ctx, parent.ID)
+		if err != nil {
+			return
+		}
 
-		pi, err = s.createPiercing(ctx, *p, tx)
+		pi.ProcessID = pr.ID
+		// Create Piercing process
+		pi, err = s.createPiercing(ctx, pi, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingDuplicateCreateError)
 			return
@@ -257,18 +264,22 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "TipOperation":
+		var to TipOperation
 		if operation == "name" {
-			t := process.(TipOperation)
-			pr.Name = fmt.Sprintf("Tip_Operation_%s", t.Type)
+			to = process.(TipOperation)
+			pr.Name = fmt.Sprintf("Tip_Operation_%s", to.Type)
 			return
 		}
 
-		// Create TipOperation  process
-		t := process.(*TipOperation)
-		t.ProcessID = pr.ID
-		var to TipOperation
+		// Fetch TipOperation process
+		to, err = s.ShowTipOperation(ctx, parent.ID)
+		if err != nil {
+			return
+		}
 
-		to, err = s.createTipOperation(ctx, *t, tx)
+		to.ProcessID = pr.ID
+		// Create TipOperation process
+		to, err = s.createTipOperation(ctx, to, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipOperationDuplicateCreateError)
 			return
@@ -278,17 +289,22 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "TipDocking":
+		var td TipDock
 		if operation == "name" {
-			t := process.(TipDock)
-			pr.Name = fmt.Sprintf("Tip_Docking_%s", t.Type)
+			td = process.(TipDock)
+			pr.Name = fmt.Sprintf("Tip_Docking_%s", td.Type)
 			return
 		}
-		// Create TipDocking process
-		t := process.(*TipDock)
-		t.ProcessID = pr.ID
-		var td TipDock
 
-		td, err = s.createTipDocking(ctx, *t, tx)
+		// Fetch TipDocking process
+		td, err = s.ShowTipDocking(ctx, parent.ID)
+		if err != nil {
+			return
+		}
+
+		td.ProcessID = pr.ID
+		// Create TipDocking process
+		td, err = s.createTipDocking(ctx, td, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipDockingDuplicateCreateError)
 			return
@@ -298,17 +314,22 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "AspireDispense":
+		var ad AspireDispense
 		if operation == "name" {
-			ad := process.(AspireDispense)
+			ad = process.(AspireDispense)
 			pr.Name = fmt.Sprintf("Aspire_Dispense_%s", ad.Category)
 			return
 		}
-		// Create AspireDispense process
-		a := process.(*AspireDispense)
-		a.ProcessID = pr.ID
-		var ad AspireDispense
 
-		ad, err = s.createAspireDispense(ctx, *a, tx)
+		// Fetch AspireDispense process
+		ad, err = s.ShowAspireDispense(ctx, parent.ID)
+		if err != nil {
+			return
+		}
+
+		ad.ProcessID = pr.ID
+		// Create AspireDispense process
+		ad, err = s.createAspireDispense(ctx, ad, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDuplicateCreateError)
 			return
@@ -318,16 +339,21 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "Heating":
+		var ht Heating
 		if operation == "name" {
 			pr.Name = "Heating"
 			return
 		}
-		// Create Heating process
-		h := process.(*Heating)
-		h.ProcessID = pr.ID
-		var ht Heating
 
-		ht, err = s.createHeating(ctx, *h, tx)
+		// Fetch Heating process
+		ht, err = s.ShowHeating(ctx, parent.ID)
+		if err != nil {
+			return
+		}
+
+		ht.ProcessID = pr.ID
+		// Create Heating process
+		ht, err = s.createHeating(ctx, ht, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.HeatingDuplicateCreateError)
 			return
@@ -337,21 +363,26 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "Shaking":
+		var sk Shaker
 		if operation == "name" {
-			sh := process.(Shaker)
-			if sh.WithTemp {
+			sk = process.(Shaker)
+			if sk.WithTemp {
 				pr.Name = "Shaking_With_temperature"
 				return
 			}
 			pr.Name = "Shaking_Without_temperature"
 			return
 		}
-		// Create Shaking process
-		sh := process.(*Shaker)
-		sh.ProcessID = pr.ID
-		var sk Shaker
 
-		sk, err = s.createShaking(ctx, *sh, tx)
+		// Fetch Shaking process
+		sk, err = s.ShowShaking(ctx, parent.ID)
+		if err != nil {
+			return
+		}
+
+		sk.ProcessID = pr.ID
+		// Create Shaking process
+		sk, err = s.createShaking(ctx, sk, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ShakingDuplicateCreateError)
 			return
@@ -361,17 +392,22 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "AttachDetach":
+		var ad AttachDetach
 		if operation == "name" {
-			ad := process.(AttachDetach)
+			ad = process.(AttachDetach)
 			pr.Name = fmt.Sprintf("Magnet_%s", ad.Operation)
 			return
 		}
-		// Create AttachDetach process
-		a := process.(*AttachDetach)
-		a.ProcessID = pr.ID
-		var ad AttachDetach
 
-		ad, err = s.createAttachDetach(ctx, *a, tx)
+		// Fetch AttachDetach process
+		ad, err = s.ShowAttachDetach(ctx, parent.ID)
+		if err != nil {
+			return
+		}
+
+		ad.ProcessID = pr.ID
+		// Create AttachDetach process
+		ad, err = s.createAttachDetach(ctx, ad, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AttachDetachDuplicateCreateError)
 			return
@@ -381,21 +417,24 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return
 
 	case "Delay":
+		var dl Delay
 		if operation == "name" {
 			pr.Name = "Delay"
 			return
 		}
-		// Create Delay process
-		d := process.(*Delay)
-		d.ProcessID = pr.ID
-		var dl Delay
+		// Fetch Delay process
+		dl, err = s.ShowDelay(ctx, parent.ID)
+		if err != nil {
+			return
+		}
 
-		dl, err = s.createDelay(ctx, *d, tx)
+		dl.ProcessID = pr.ID
+		// Create Delay process
+		dl, err = s.createDelay(ctx, dl, tx)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.DelayDuplicateCreateError)
 			return
 		}
-
 		logger.Infoln("Delay Process Duplication in Progress  => ", dl)
 		return
 	default:
