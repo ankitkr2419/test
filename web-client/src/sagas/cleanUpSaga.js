@@ -15,7 +15,6 @@ import {
 } from "action-creators/cleanUpActionCreators";
 
 export function* runUVCleaning(actions) {
-
   const {
     payload: {
       params: { time, deckName },
@@ -31,6 +30,8 @@ export function* runUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.cleanUp}/${time}/${deckName}`,
         successAction: runCleanUpSuccess,
         failureAction: runCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -55,6 +56,8 @@ export function* pauseUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.pause}/${deckName}`,
         successAction: pauseCleanUpSuccess,
         failureAction: pauseCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -79,6 +82,8 @@ export function* resumeUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.resume}/${deckName}`,
         successAction: resumeCleanUpSuccess,
         failureAction: resumeCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -103,6 +108,8 @@ export function* abortUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.abort}/${deckName}`,
         successAction: abortCleanUpSuccess,
         failureAction: abortCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {

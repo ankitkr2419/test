@@ -36,6 +36,8 @@ export function* runRecipe(actions) {
         }`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -62,6 +64,8 @@ export function* resumeRecipe(actions) {
         }`,
         successAction: resumeRecipeSuccess,
         failureAction: resumeRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -89,6 +93,8 @@ export function* abortRecipe(actions) {
         }`,
         successAction: abortRecipeSuccess,
         failureAction: abortRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -115,6 +121,8 @@ export function* pauseRecipe(actions) {
         }`,
         successAction: pauseRecipeSuccess,
         failureAction: pauseRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -136,6 +144,8 @@ export function* recipeListing(actions) {
         reqPath: API_ENDPOINTS.recipeListing,
         successAction: recipeListingSuccess,
         failureAction: recipeListingFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
         token,
       },
     });

@@ -294,10 +294,6 @@ const AppFooter = (props) => {
     setConfirmAbortModal(!confirmAbortModal);
   };
 
-  const discardTipAndHomingReducer = useSelector(
-    (state) => state.discardTipAndHomingReducer
-  );
-
   const toggleTipDiscardModal = (discardTip) => {
     if (deckName === DECKNAME.DeckA) {
       dispatch(
@@ -465,8 +461,14 @@ const AppFooter = (props) => {
         }
         handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckA)}
         handleRightAction={getRightActionBtnHandler(DECKNAME.DeckA)}
-        leftActionBtnDisabled={cleanUpReducerForDeckA.leftActionBtnDisabled}
-        rightActionBtnDisabled={cleanUpReducerForDeckA.rightActionBtnDisabled}
+        leftActionBtnDisabled={
+          recipeActionReducerForDeckA.leftActionBtnDisabled ||
+          cleanUpReducerForDeckA.leftActionBtnDisabled
+        }
+        rightActionBtnDisabled={
+          recipeActionReducerForDeckA.rightActionBtnDisabled ||
+          cleanUpReducerForDeckA.rightActionBtnDisabled
+        }
       />
 
       {/** Deck B */}
@@ -526,8 +528,14 @@ const AppFooter = (props) => {
         showCleanUp={cleanUpReducerForDeckB.showCleanUp}
         handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckB)}
         handleRightAction={getRightActionBtnHandler(DECKNAME.DeckB)}
-        leftActionBtnDisabled={cleanUpReducerForDeckB.leftActionBtnDisabled}
-        rightActionBtnDisabled={cleanUpReducerForDeckB.rightActionBtnDisabled}
+        leftActionBtnDisabled={
+          recipeActionReducerForDeckB.leftActionBtnDisabled ||
+          cleanUpReducerForDeckB.leftActionBtnDisabled
+        }
+        rightActionBtnDisabled={
+          recipeActionReducerForDeckB.rightActionBtnDisabled ||
+          cleanUpReducerForDeckB.rightActionBtnDisabled
+        }
       />
     </div>
   );
