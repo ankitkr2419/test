@@ -1,7 +1,6 @@
 package service
 
 import (
-	"io/ioutil"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
@@ -173,8 +172,6 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
-		var process interface{}
-
 		processID, err := parseUUID(vars["process_id"])
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ProcessIDInvalidError)
@@ -182,60 +179,14 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		processType := vars["process_type"]
-
-		processBytes, err := ioutil.ReadAll(req.Body)
+		process, err := deps.Store.DuplicateProcess(req.Context(), processID)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
-			logger.WithField("err", err.Error()).Error(responses.ProcessDecodeError.Error())
+			logger.WithField("err", err.Error()).Error(responses.ProcessDuplicationError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessDuplicationError.Error()})
 			return
 		}
 
-		switch processType{
-		case "Piercing":
-			process = &db.Piercing{}
-		case "TipOperation":
-			process = &db.TipOperation{}
-		case "TipDocking":
-			process = &db.TipDock{}
-		case "AspireDispense":
-			process = &db.AspireDispense{}
-		case "Heating":
-			process = &db.Heating{}
-		case "Shaking":
-			process = &db.Shaker{}
-		case "AttachDetach":
-			process = &db.AttachDetach{}
-		case "Delay":
-			process = &db.Delay{}
-		default:
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessTypeInvalid.Error()})
-			logger.Errorln(responses.ProcessTypeInvalid.Error())
-			return
-		}
-
-		err = json.Unmarshal(processBytes, &process)
-		if err != nil {
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
-			logger.WithField("err", err.Error()).Error(responses.ProcessDecodeError.Error())
-			return
-		}
-
-		valid, respBytes := validate(process)
-		if !valid {
-			logger.Errorln(responses.ProcessValidationError)
-			responseBadRequest(rw, respBytes)
-			return
-		}
-
-		process, err = deps.Store.DuplicateProcess(req.Context(), processID, process)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.DuplicateProcessCreationError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DuplicateProcessCreationError.Error()})
-			return
-		}
-
-		logger.Infoln(responses.DuplicateProcessCreationSuccess)
+		logger.Infoln(responses.ProcessDuplicationSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, process)
 	})
 }
