@@ -35,5 +35,5 @@ var (
 	TipOperationFetchSuccess  = "tip operation record fetched successfully"
 	TipOperationUpdateSuccess = "tip operation record updated successfully"
 
-	DuplicateProcessCreationSuccess = "duplicate process record created successfully"
+	ProcessDuplicationSuccess = "duplicate process record created successfully"
 )
