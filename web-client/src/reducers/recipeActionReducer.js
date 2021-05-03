@@ -164,18 +164,17 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         // isLoading: false,
         // runRecipeError: true,
       };
+
     case runRecipeAction.runRecipeReset:
       let deckNameToReset = action.payload.deckName;
       const decksAfterRecipeReset = state.decks.map((deckObj) => {
-        const prevRecipeData = deckObj.recipeData;
+        let recipeListOfDeckObj = deckObj.allRecipeData;
         return deckObj.name === deckNameToReset
           ? {
               ...initialState.decks.find(
                 (initialDeckObj) => initialDeckObj.name === deckNameToReset
               ),
-              recipeData: null,
-              allRecipeData: prevRecipeData,
-              showProcess: false,
+              allRecipeData: recipeListOfDeckObj,
             }
           : deckObj;
       });
@@ -184,6 +183,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         // runRecipeError: null,
         decks: decksAfterRecipeReset,
       };
+
     case runRecipeAction.runRecipeInProgress:
       let response = action.payload.runRecipeInProgress;
       let deckNameRunInProgress =
