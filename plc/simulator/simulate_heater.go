@@ -47,7 +47,7 @@ func (d *SimulatorDriver) simulateOnHeater() (err error) {
 		if !d.isHeaterInProgress() {
 			break
 		}
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(delay * 4 * time.Millisecond)
 	}
 	d.setHeaterInProgress()
 	defer d.resetHeaterInProgress()
@@ -65,7 +65,7 @@ func (d *SimulatorDriver) updateTemperature() {
 	var temp uint16 = 0
 
 	for {
-		time.Sleep(time.Second)
+		time.Sleep(delay * 20 * time.Millisecond)
 		if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]) {
 			go d.coolDown()
 			return
@@ -105,7 +105,7 @@ func (d *SimulatorDriver) coolDown() {
 	var temp uint16 = 0
 
 	for {
-		time.Sleep(2 * time.Second)
+		time.Sleep( delay * 40 * time.Millisecond)
 		if d.isHeaterInProgress() || (heater1Cooled && heater2Cooled) {
 			return
 		}
