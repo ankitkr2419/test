@@ -187,7 +187,7 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		logger.Infoln(responses.ProcessDuplicationSuccess)
-		responseCodeAndMsg(rw, http.StatusOK, process)
+		responseCodeAndMsg(rw, http.StatusCreated, process)
 	})
 }
 
