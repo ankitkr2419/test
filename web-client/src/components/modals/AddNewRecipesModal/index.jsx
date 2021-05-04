@@ -93,7 +93,7 @@ const AddNewRecipesModal = (props) => {
                     <div className="d-flex justify-content-center align-items-center flex-column h-100 pt-5 pb-4">
                         <Text
                             Tag="h5"
-                            size="20"
+                            size={20}
                             className="text-center font-weight-bold mb-4"
                         >
                             {confirmationText}
