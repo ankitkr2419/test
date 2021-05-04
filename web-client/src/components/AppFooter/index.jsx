@@ -357,7 +357,11 @@ const AppFooter = (props) => {
           isOpen={confirmAbortModal}
           textHead={deckName}
           textBody={
-            recipeActionReducerForDeckA.showProcess
+            deckName === DECKNAME.DeckA
+              ? recipeActionReducerForDeckA.showProcess
+                ? MODAL_MESSAGE.abortConfirmation
+                : MODAL_MESSAGE.abortCleanupConfirmation
+              : recipeActionReducerForDeckB.showProcess
               ? MODAL_MESSAGE.abortConfirmation
               : MODAL_MESSAGE.abortCleanupConfirmation
           }
@@ -379,7 +383,11 @@ const AppFooter = (props) => {
           isOpen={confirmDoneModal}
           textHead={deckName}
           textBody={
-            recipeActionReducerForDeckA.showProcess
+            deckName === DECKNAME.DeckA
+              ? recipeActionReducerForDeckA.showProcess
+                ? MODAL_MESSAGE.experimentSuccess
+                : MODAL_MESSAGE.uvSuccess
+              : recipeActionReducerForDeckB.showProcess
               ? MODAL_MESSAGE.experimentSuccess
               : MODAL_MESSAGE.uvSuccess
           }
