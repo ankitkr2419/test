@@ -87,6 +87,7 @@ const RecipeListingComponent = (props) => {
 
   const toggleTrayDiscardModal = () => {
     setTrayDiscardModal(!trayDiscardModal);
+    setNextModal(true);
   };
 
   const handleSuccessBtn = () => {
@@ -111,6 +112,7 @@ const RecipeListingComponent = (props) => {
       );
       setTrayDiscardModal(!trayDiscardModal);
       dispatch(loginReset(deckName));
+      setNextModal(true);
     }
   };
 
