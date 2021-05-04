@@ -110,18 +110,20 @@ ALGORITHM
 */
 
 func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
+	defer func() {
+		if err != nil {
+			logger.Errorln(err.Error())
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+		}
+	}()
 
 	if !d.IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
-		d.WsErrCh <- err
-
 		return
 	}
 
 	if d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		d.WsErrCh <- err
-
 		return
 	}
 
@@ -147,7 +149,6 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	//
 	response, err = d.switchOnUVLight()
 	if err != nil {
-		d.WsErrCh <- err
 		return
 	}
 	d.setUVLightInProgress()
@@ -163,7 +164,6 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 
 	response, err = d.AddDelay(delay)
 	if err != nil {
-		d.WsErrCh <- err
 		return
 	}
 	// send success ws data
@@ -178,7 +178,6 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	wsData, err := json.Marshal(successWsData)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		d.WsErrCh <- err
 		return
 	}
 	d.WsMsgCh <- fmt.Sprintf("success_uvlight_%v", string(wsData))

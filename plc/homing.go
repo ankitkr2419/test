@@ -26,13 +26,12 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 			time.Sleep(2 * time.Second)
 			if !d.IsMachineHomed() {
-				d.ExitCh <- err
+				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 				time.Sleep(5 * time.Second)
 				response, err = d.Homing()
 			}
 		}
 	}()
-
 
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
@@ -69,7 +68,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	wsData, err := json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		d.WsErrCh <- err
+		d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 	}
 	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
 
@@ -88,7 +87,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		d.WsErrCh <- err
+		d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 	}
 
 	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
@@ -108,7 +107,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		d.WsErrCh <- err
+		d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 	}
 
 	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
@@ -128,7 +127,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	wsData, err = json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		d.WsErrCh <- err
+		d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 	}
 	d.WsMsgCh <- fmt.Sprintf("progress_homing_%v", string(wsData))
 
@@ -145,7 +144,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	wsData, err = json.Marshal(successWsData)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		d.WsErrCh <- err
+		d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 		return "", err
 	}
 	d.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
