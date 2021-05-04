@@ -191,12 +191,12 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc{
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request){
+func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
 		recipeID, err := parseUUID(vars["recipe_id"])
-		if err != nil{
+		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.RecipeIDInvalidError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
 		}
@@ -210,11 +210,7 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc{
 			return
 		}
 
-		valid, respBytes := validate(sequenceArr)
-		if !valid {
-			responseBadRequest(rw, respBytes)
-			return
-		}
+		logger.Infoln("Sequence Array: ", sequenceArr)
 
 		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
 		if err != nil {
@@ -222,7 +218,7 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc{
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessesRearrangeError.Error()})
 			return
 		}
-		
+
 		logger.Infoln(responses.ProcessesRearrangeSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, processes)
 	})
