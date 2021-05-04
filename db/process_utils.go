@@ -10,15 +10,14 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const(
-	updateProcessNameQuery = `UPDATE processes SET name = $1 WHERE id = $2`
-
-	getHighestSequenceNumberQuery = `SELECT max(sequence_num) FROM processes; `
+const (
+	updateProcessNameQuery       = `UPDATE processes SET name = $1 WHERE id = $2;`
+	getProcessCountQuery         = `SELECT count(*) FROM processes WHERE recipe_id = $1;`
+	subtractProcessSequenceQuery = `UPDATE processes SET sequence_num = (sequence_num - $1) WHERE recipe_id = $2;`
+	rearrangeSequenceQuery       = `UPDATE processes SET sequence_num = $1 WHERE id = $2`
 )
 
-
-
-func (s *pgStore) createProcess(ctx context.Context, p Process, tx *sql.Tx) (cp Process, err error) {
+func (s *pgStore) createProcess(ctx context.Context, tx *sql.Tx, p Process) (cp Process, err error) {
 
 	var lastInsertID uuid.UUID
 
@@ -59,18 +58,54 @@ func (s *pgStore) updateProcessName(ctx context.Context, id uuid.UUID, processTy
 	return
 }
 
-
-func (s *pgStore) getHighestSequenceNumber(ctx context.Context, tx *sql.Tx) (highestSeqNum int64, err error) {
+func (s *pgStore) getProcessCount(ctx context.Context, tx *sql.Tx, recipeID uuid.UUID) (processCount int64, err error) {
 	err = tx.QueryRow(
-		getHighestSequenceNumberQuery,
-	).Scan(&highestSeqNum)
+		getProcessCountQuery,
+		recipeID,
+	).Scan(&processCount)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.ProcessHighestSeqNumFetchError)
+		logger.WithField("err", err.Error()).Errorln(responses.ProcessCountFetchError)
+		return
+	}
+	logger.Infoln(responses.ProcessCountFetchSuccess, processCount)
+
+	return
+}
+
+func (s *pgStore) rearrangeProcessSequence(ctx context.Context, tx *sql.Tx, sequenceArr []ProcessSequence, processCount int64) (err error) {
+
+	for _, pr := range sequenceArr {
+		_, err = tx.Exec(
+			rearrangeSequenceQuery,
+			pr.SequenceNumber+processCount,
+			pr.ID,
+		)
+
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessRearrangeDBError)
+			return
+		}
 	}
 
-	logger.Infoln(responses.ProcessHighestSeqNumFetchSuccess, highestSeqNum)
+	logger.Infoln(responses.ProcessRearrangeDBSuccess, processCount)
+	return
+}
 
+//  subtract processCount from sequence num of process
+func (s *pgStore) subtractFromSequence(ctx context.Context, tx *sql.Tx, recipeID uuid.UUID, processCount int64) (err error) {
+	_, err = tx.Query(
+		subtractProcessSequenceQuery,
+		processCount,
+		recipeID,
+	)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.ProcessSubtractError)
+		return
+	}
+
+	logger.Infoln(responses.ProcessSubtractSuccess, processCount)
 	return
 }
 
@@ -107,7 +142,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		// Get highest sequence number
 		// This sequence number is updation, we only need to get something unique
-		highestSeqNum, err := s.getHighestSequenceNumber(ctx, tx)
+		highestSeqNum, err := s.getProcessCount(ctx, tx, parent.RecipeID)
 		if err != nil {
 			// failure already logged
 			return Process{}, err
@@ -116,7 +151,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		parent.SequenceNumber = highestSeqNum + 1
 
 		// Insert parent entry into Process table
-		pr, err = s.createProcess(ctx, parent, tx)
+		pr, err = s.createProcess(ctx, tx, parent)
 		if err != nil {
 			// failure will be logged in defer before rollback
 			return Process{}, err
@@ -148,7 +183,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		pi.ProcessID = pr.ID
 		// Create Piercing process
-		pi, err = s.createPiercing(ctx, pi, tx)
+		pi, err = s.createPiercing(ctx, tx, pi)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingDuplicateCreateError)
 			return
@@ -173,7 +208,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		to.ProcessID = pr.ID
 		// Create TipOperation process
-		to, err = s.createTipOperation(ctx, to, tx)
+		to, err = s.createTipOperation(ctx, tx, to)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipOperationDuplicateCreateError)
 			return
@@ -198,7 +233,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		td.ProcessID = pr.ID
 		// Create TipDocking process
-		td, err = s.createTipDocking(ctx, td, tx)
+		td, err = s.createTipDocking(ctx, tx, td)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipDockingDuplicateCreateError)
 			return
@@ -223,7 +258,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		ad.ProcessID = pr.ID
 		// Create AspireDispense process
-		ad, err = s.createAspireDispense(ctx, ad, tx)
+		ad, err = s.createAspireDispense(ctx, tx, ad)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDuplicateCreateError)
 			return
@@ -247,7 +282,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		ht.ProcessID = pr.ID
 		// Create Heating process
-		ht, err = s.createHeating(ctx, ht, tx)
+		ht, err = s.createHeating(ctx, tx, ht)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.HeatingDuplicateCreateError)
 			return
@@ -276,7 +311,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		sk.ProcessID = pr.ID
 		// Create Shaking process
-		sk, err = s.createShaking(ctx, sk, tx)
+		sk, err = s.createShaking(ctx, tx, sk)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ShakingDuplicateCreateError)
 			return
@@ -301,7 +336,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		ad.ProcessID = pr.ID
 		// Create AttachDetach process
-		ad, err = s.createAttachDetach(ctx, ad, tx)
+		ad, err = s.createAttachDetach(ctx, tx, ad)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AttachDetachDuplicateCreateError)
 			return
@@ -324,7 +359,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		dl.ProcessID = pr.ID
 		// Create Delay process
-		dl, err = s.createDelay(ctx, dl, tx)
+		dl, err = s.createDelay(ctx, tx, dl)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.DelayDuplicateCreateError)
 			return
@@ -335,4 +370,3 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 		return Process{}, responses.ProcessTypeInvalid
 	}
 }
-
