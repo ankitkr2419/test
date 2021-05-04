@@ -62,7 +62,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTD T
 		return TipDock{}, err
 	}
 
-	createdTD, err = s.createTipDocking(ctx, td, tx)
+	createdTD, err = s.createTipDocking(ctx, tx, td)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -85,7 +85,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTD T
 	return
 }
 
-func (s *pgStore) createTipDocking(ctx context.Context, t TipDock, tx *sql.Tx) (createdTD TipDock, err error) {
+func (s *pgStore) createTipDocking(ctx context.Context, tx *sql.Tx, t TipDock) (createdTD TipDock, err error) {
 
 	var lastInsertID uuid.UUID
 

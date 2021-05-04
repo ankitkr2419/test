@@ -117,7 +117,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 		return AspireDispense{}, err
 	}
 
-	createdAD, err = s.createAspireDispense(ctx, ad, tx)
+	createdAD, err = s.createAspireDispense(ctx, tx, ad)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -140,7 +140,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 	return
 }
 
-func (s *pgStore) createAspireDispense(ctx context.Context, ad AspireDispense, tx *sql.Tx) (a AspireDispense, err error) {
+func (s *pgStore) createAspireDispense(ctx context.Context, tx *sql.Tx, ad AspireDispense) (a AspireDispense, err error) {
 
 	var lastInsertID uuid.UUID
 

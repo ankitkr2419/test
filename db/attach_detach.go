@@ -59,7 +59,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (crea
 		return AttachDetach{}, err
 	}
 
-	createdAD, err = s.createAttachDetach(ctx, ad, tx)
+	createdAD, err = s.createAttachDetach(ctx, tx, ad)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -82,7 +82,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (crea
 	return
 }
 
-func (s *pgStore) createAttachDetach(ctx context.Context, ad AttachDetach, tx *sql.Tx) (createdAD AttachDetach, err error) {
+func (s *pgStore) createAttachDetach(ctx context.Context, tx *sql.Tx, ad AttachDetach) (createdAD AttachDetach, err error) {
 
 	var lastInsertID uuid.UUID
 

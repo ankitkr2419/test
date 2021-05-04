@@ -67,7 +67,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdH Heatin
 		return Heating{}, err
 	}
 
-	createdH, err = s.createHeating(ctx, h, tx)
+	createdH, err = s.createHeating(ctx, tx, h)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -90,7 +90,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdH Heatin
 	return
 }
 
-func (s *pgStore) createHeating(ctx context.Context, h Heating, tx *sql.Tx) (createdH Heating, err error) {
+func (s *pgStore) createHeating(ctx context.Context, tx *sql.Tx, h Heating) (createdH Heating, err error) {
 
 	var lastInsertID uuid.UUID
 

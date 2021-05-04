@@ -83,7 +83,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPi Pi
 		return Piercing{}, err
 	}
 
-	createdPi, err = s.createPiercing(ctx, pi, tx)
+	createdPi, err = s.createPiercing(ctx, tx, pi)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -106,7 +106,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPi Pi
 	return
 }
 
-func (s *pgStore) createPiercing(ctx context.Context, pi Piercing, tx *sql.Tx) (createdPiercing Piercing, err error) {
+func (s *pgStore) createPiercing(ctx context.Context, tx *sql.Tx, pi Piercing) (createdPiercing Piercing, err error) {
 
 	var lastInsertID uuid.UUID
 

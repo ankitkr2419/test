@@ -58,7 +58,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdD Delay, err
 		return Delay{}, err
 	}
 
-	createdD, err = s.createDelay(ctx, d, tx)
+	createdD, err = s.createDelay(ctx, tx, d)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -81,7 +81,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdD Delay, err
 	return
 }
 
-func (s *pgStore) createDelay(ctx context.Context, d Delay, tx *sql.Tx) (createdD Delay, err error) {
+func (s *pgStore) createDelay(ctx context.Context, tx *sql.Tx, d Delay) (createdD Delay, err error) {
 
 	var lastInsertID uuid.UUID
 

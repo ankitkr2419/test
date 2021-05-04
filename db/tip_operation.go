@@ -79,7 +79,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (crea
 		return TipOperation{}, err
 	}
 
-	createdTO, err = s.createTipOperation(ctx, to, tx)
+	createdTO, err = s.createTipOperation(ctx, tx, to)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -102,7 +102,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (crea
 	return
 }
 
-func (s *pgStore) createTipOperation(ctx context.Context, to TipOperation, tx *sql.Tx) (createdTipOperation TipOperation, err error) {
+func (s *pgStore) createTipOperation(ctx context.Context, tx *sql.Tx, to TipOperation) (createdTipOperation TipOperation, err error) {
 
 	var lastInsertID uuid.UUID
 
