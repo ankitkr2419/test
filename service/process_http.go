@@ -190,3 +190,40 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 		responseCodeAndMsg(rw, http.StatusOK, process)
 	})
 }
+
+func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc{
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request){
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil{
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeIDInvalidError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+		}
+
+		var sequenceArr []db.ProcessSequence
+
+		err = json.NewDecoder(req.Body).Decode(&sequenceArr)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessesDecodeSeqError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessesDecodeSeqError.Error()})
+			return
+		}
+
+		valid, respBytes := validate(sequenceArr)
+		if !valid {
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessesRearrangeError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessesRearrangeError})
+			return
+		}
+		
+		logger.Infoln(responses.ProcessesRearrangeSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, processes)
+	})
+}
