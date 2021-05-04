@@ -2,10 +2,12 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/responses"
 )
 
 type TipDock struct {
@@ -38,22 +40,56 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 
 	err = s.db.Get(&td, getTipDockQuery, pid)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error getting tip docking details")
+		logger.WithField("err", err.Error()).Errorln(responses.TipDockingDBFetchError)
 		return
 	}
 	return
 }
 
-func (s *pgStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDocking TipDock, err error) {
-	var lastInsertID uuid.UUID
+func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTD TipDock, err error) {
+	var tx *sql.Tx
 
-	err = s.UpdateProcessName(ctx, t.ProcessID, "TipDocking", t)
+	//update the process name before record creation
+	err = s.UpdateProcessName(ctx, td.ProcessID, "TipDocking", td)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in updating aspire dispense process name")
+		logger.WithField("err", err.Error()).Errorln(responses.TipDockingUpdateNameError)
 		return
 	}
 
-	err = s.db.QueryRow(
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.TipDockingInitiateDBTxError)
+		return TipDock{}, err
+	}
+
+	createdTD, err = s.createTipDocking(ctx, td, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+		createdTD, err = s.ShowTipDocking(ctx, createdTD.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Tip Docking process")
+			return
+		}
+		logger.Infoln("Created Tip Docking Process: ", createdTD)
+		return
+	}()
+
+	return
+}
+
+func (s *pgStore) createTipDocking(ctx context.Context, t TipDock, tx *sql.Tx) (createdTD TipDock, err error) {
+
+	var lastInsertID uuid.UUID
+
+	err = tx.QueryRow(
 		createTipDockQuery,
 		t.Type,
 		t.Position,
@@ -62,16 +98,12 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDo
 	).Scan(&lastInsertID)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating Tip Docking")
+		logger.WithField("err", err.Error()).Errorln(responses.TipDockingDBCreateError)
 		return
 	}
 
-	err = s.db.Get(&createdTipDocking, getTipDockQuery, t.ProcessID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting Tip Docking")
-		return
-	}
-	return
+	t.ID = lastInsertID
+	return t, err
 }
 
 func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
