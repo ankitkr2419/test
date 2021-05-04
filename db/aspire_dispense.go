@@ -105,7 +105,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, ad.ProcessID, "AspireDispense", ad)
+	err = s.updateProcessName(ctx, ad.ProcessID, "AspireDispense", ad)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
 		return

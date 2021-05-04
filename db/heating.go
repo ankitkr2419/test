@@ -55,7 +55,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdH Heatin
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, h.ProcessID, "Heating", h)
+	err = s.updateProcessName(ctx, h.ProcessID, "Heating", h)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.HeatingUpdateNameError)
 		return

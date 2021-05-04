@@ -71,7 +71,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPi Pi
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, pi.ProcessID, "Piercing", pi)
+	err = s.updateProcessName(ctx, pi.ProcessID, "Piercing", pi)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.PiercingUpdateNameError)
 		return

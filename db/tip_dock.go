@@ -50,7 +50,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTD T
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, td.ProcessID, "TipDocking", td)
+	err = s.updateProcessName(ctx, td.ProcessID, "TipDocking", td)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.TipDockingUpdateNameError)
 		return

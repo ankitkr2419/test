@@ -67,7 +67,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdSh Shake
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, sh.ProcessID, "Shaking", sh)
+	err = s.updateProcessName(ctx, sh.ProcessID, "Shaking", sh)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.ShakingUpdateNameError)
 		return

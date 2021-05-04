@@ -67,7 +67,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (crea
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, to.ProcessID, "TipOperation", to)
+	err = s.updateProcessName(ctx, to.ProcessID, "TipOperation", to)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.TipOperationUpdateNameError)
 		return

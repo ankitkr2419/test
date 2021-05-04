@@ -47,7 +47,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (crea
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, ad.ProcessID, "AttachDetach", ad)
+	err = s.updateProcessName(ctx, ad.ProcessID, "AttachDetach", ad)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.AttachDetachUpdateNameError)
 		return

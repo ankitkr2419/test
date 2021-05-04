@@ -46,7 +46,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdD Delay, err
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, d.ProcessID, "Delay", d)
+	err = s.updateProcessName(ctx, d.ProcessID, "Delay", d)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.DelayUpdateNameError)
 		return
