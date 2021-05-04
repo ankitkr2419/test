@@ -68,7 +68,7 @@ func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess 
 		return Process{}, err
 	}
 
-	createdProcess, err = s.createProcess(ctx, p, tx)
+	createdProcess, err = s.createProcess(ctx, tx, p)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -134,8 +134,68 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 	return
 }
 
-func (s *pgStore) RearrangeProcesses(ctx context.Context, id uuid.UUID, sequenceArr []ProcessSequence) (processes []Process, err error){
+//********************
+//      ALGORITHM    *
+//********************
+// 1. initiate transaction
+// 2. get count of processes of recipeID
+// 3. if count is equal to len of sequenceArr, only then proceed
+// 4. update each process by that sequence num + HSN in separate private method
+// 5. subtract HSN from sequence num of process
+// 6. end transaction
+//
+// 7. list processes
+//
+func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, sequenceArr []ProcessSequence) (processes []Process, err error) {
+	var tx *sql.Tx
+
+	// 1. initiate transaction
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.ProcessInitiateDBTxError)
+		return []Process{}, err
+	}
+
+	// End the transaction in defer call
+	defer func() {
+		// 6. end transaction
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+		// 7. list processes
+		processes, err = s.ListProcesses(ctx, recipeID)
+		if err != nil {
+			logger.Infoln(responses.ProcessRearrangeSuccess, processes)
+		}
+		logger.Errorln(responses.ProcessFetchError)
+		return
+	}()
+
+	// 2. get count of processes of recipeID
+	processCount, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		// failure already logged
+		return []Process{}, err
+	}
+	// processCount serves as the highest sequence number for our process when updating in db
+
+	// 3. if count is equal to len of sequenceArr, only then proceed
+	if len(sequenceArr) != int(processCount) {
+		err = responses.ProcessCountDifferError
+		logger.WithField("err", responses.ProcessCountDifferError).
+			Errorln("length of sequence Arr:", len(sequenceArr), "process count: ", processCount)
+		return
+	}
+
+	// 4. update each process by that sequence num + HSN in separate private method
+	err = s.rearrangeProcessSequence(ctx, tx, sequenceArr, processCount)
+	if err != nil {
+		return
+	}
+
+	// 5. subtract HSN from sequence num of process
+	err = s.subtractFromSequence(ctx, tx, recipeID, processCount)
 	return
 }
-
-
