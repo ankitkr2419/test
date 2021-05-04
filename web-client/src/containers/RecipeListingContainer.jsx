@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
 import RecipeListingComponent from "components/RecipeListing";
-
 import {
   recipeListingInitiated,
   saveRecipeDataForDeck,
@@ -176,6 +175,13 @@ const RecipeListingContainer = (props) => {
     // history.push(ROUTES.landing);//go to landing page
     // return <Redirect to={`/${ROUTES.landing}`} />;
   };
+  const loginReducerData = loginReducer.toJS()
+  let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
+  if(!activeDeckObj){//if not found active deck goto landing page for relogin
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
+  let deckName  = activeDeckObj.name
+  let isAdmin = activeDeckObj.isAdmin
 
   return (
     <RecipeListing>
