@@ -219,7 +219,7 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc{
 		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ProcessesRearrangeError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessesRearrangeError})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessesRearrangeError.Error()})
 			return
 		}
 		

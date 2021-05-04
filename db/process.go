@@ -134,7 +134,7 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 	return
 }
 
-func (s *pgStore) RearrangeProcesses(ctx context.Context, id uuid.UUID, sequenceArr ProcessSequence) (processes []Process, err error){
+func (s *pgStore) RearrangeProcesses(ctx context.Context, id uuid.UUID, sequenceArr []ProcessSequence) (processes []Process, err error){
 	return
 }
 
