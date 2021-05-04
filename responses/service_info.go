@@ -36,4 +36,6 @@ var (
 	TipOperationUpdateSuccess = "tip operation record updated successfully"
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
+	ProcessesRearrangeSuccess = "rearranging processes success"
+
 )
