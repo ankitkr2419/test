@@ -37,5 +37,4 @@ var (
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
 	ProcessesRearrangeSuccess = "rearranging processes success"
-
 )
