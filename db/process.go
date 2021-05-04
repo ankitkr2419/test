@@ -160,7 +160,11 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 	return
 }
 
-func (s *pgStore) UpdateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
+func (s *pgStore) RearrangeProcesses(ctx context.Context, id uuid.UUID, sequenceArr ProcessSequence) (processes []Process, err error){
+	return
+}
+
+func (s *pgStore) updateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
 	// pass Process{} just to keep dame method call
 	processWithName, err := s.processOperation(ctx, "name", processType, process, Process{})
 	if err != nil {
@@ -213,7 +217,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 		// Get highest sequence number
 		// This sequence number is updation, we only need to get something unique
-		highestSeqNum, err := s.getHighestSequenceNumber(ctx)
+		highestSeqNum, err := s.getHighestSequenceNumber(ctx, tx)
 		if err != nil {
 			// failure already logged
 			return Process{}, err
@@ -442,8 +446,8 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 	}
 }
 
-func (s *pgStore) getHighestSequenceNumber(ctx context.Context) (highestSeqNum int64, err error) {
-	err = s.db.QueryRow(
+func (s *pgStore) getHighestSequenceNumber(ctx context.Context, tx *sql.Tx) (highestSeqNum int64, err error) {
+	err = tx.QueryRow(
 		getHighestSequenceNumberQuery,
 	).Scan(&highestSeqNum)
 
