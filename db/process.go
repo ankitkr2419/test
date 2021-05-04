@@ -167,9 +167,9 @@ func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, se
 		// 7. list processes
 		processes, err = s.ListProcesses(ctx, recipeID)
 		if err != nil {
-			logger.Infoln(responses.ProcessRearrangeSuccess, processes)
+			logger.Errorln(responses.ProcessRearrangeDBError, processes)
 		}
-		logger.Errorln(responses.ProcessFetchError)
+		logger.Infoln(responses.ProcessRearrangeSuccess)
 		return
 	}()
 
