@@ -54,8 +54,9 @@ skipToStartTimer:
 			}
 			if d.isUVLightInProgress() {
 				uvtime := time.Now()
-				uvTimePassed := uvtime.Sub(time1).Seconds()
-				progress = (int64(uvTimePassed) * 100) / delay.DelayTime
+				uvTimePassed := int64(uvtime.Sub(time1).Seconds()) + *timeElapsed
+				logger.Infoln("time passed , elasped time", uvTimePassed, *timeElapsed)
+				progress = (uvTimePassed * 100) / delay.DelayTime
 				wsProgressOperation := WSData{
 					Progress: float64(progress),
 					Deck:     d.name,

@@ -44,7 +44,6 @@ func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusBadRequest)
 			rw.Write([]byte(`{"msg":"check your deck name"}`))
-			deps.WsErrCh <- err
 			logger.Errorln(err.Error())
 		}
 	})
@@ -84,7 +83,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusBadRequest)
 			rw.Write([]byte(`{"msg":"check your deck name"}`))
-			deps.WsErrCh <- err
+
 			logger.Errorln(err.Error())
 		}
 		return
@@ -93,15 +92,21 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 
 func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise bool, recipeID uuid.UUID) (response string, err error) {
 
+	defer func() {
+		if err != nil {
+			logger.Errorln(err.Error())
+			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+		}
+	}()
+
 	if !deps.PlcDeck[deck].IsMachineHomed() {
 		err = fmt.Errorf("Please home the machine first!")
-		deps.WsErrCh <- err
 		return
 	}
 
 	if deps.PlcDeck[deck].IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
-		deps.WsErrCh <- err
+
 		return
 	}
 
@@ -111,14 +116,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
-		deps.WsErrCh <- err
+
 		return
 	}
 
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
-		deps.WsErrCh <- err
+
 		return "", err
 	}
 
@@ -151,7 +156,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		case "AspireDispense":
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
-				deps.WsErrCh <- err
+
 				return "", err
 			}
 			fmt.Println(ad)
@@ -164,7 +169,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
 			if err != nil {
-				deps.WsErrCh <- err
+
 				return "", err
 			}
 
@@ -173,7 +178,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			fmt.Printf("heat object %v", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
 			if err != nil {
-				deps.WsErrCh <- err
+
 				return "", err
 			}
 			fmt.Println(ht)
@@ -206,7 +211,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -214,26 +218,22 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
 			fmt.Printf("attach detach record %v \n", ad)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 			response, err = deps.PlcDeck[deck].AttachDetach(ad)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 
 		case "TipOperation":
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(to)
 
 			response, err = deps.PlcDeck[deck].TipOperation(to)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -242,12 +242,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				// Store Current Tip here
 				tipID, err := getTipIDFromRecipePosition(recipe, to.Position)
 				if err != nil {
-					deps.WsErrCh <- err
 					return "", err
 				}
 				currentTip, err = deps.Store.ShowTip(tipID)
 				if err != nil {
-					deps.WsErrCh <- err
 					return "", err
 				}
 			case db.DiscardTip:
@@ -257,7 +255,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		case "TipDocking":
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Println(td)
@@ -268,19 +265,16 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 		case "Delay":
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 			fmt.Print(delay)
 			response, err = deps.PlcDeck[deck].AddDelay(delay)
 			if err != nil {
-				deps.WsErrCh <- err
 				return "", err
 			}
 
@@ -301,7 +295,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	wsData, err := json.Marshal(successWsData)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		deps.WsErrCh <- err
 		return
 	}
 	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v", string(wsData))
@@ -310,7 +303,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	deps.PlcDeck[deck].ResetRunInProgress()
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
-		deps.WsErrCh <- err
 		return
 	}
 
@@ -352,7 +344,6 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 	wsData, err := json.Marshal(wsProgressOperation)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		deps.WsErrCh <- err
 	}
 	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
