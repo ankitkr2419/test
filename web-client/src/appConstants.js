@@ -125,3 +125,8 @@ export const USER_ROLES = {
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
 };
+
+export const RUN_RECIPE_TYPE = {
+  CONTINUOUS_RUN: 0,
+  STEP_RUN: 1,
+}

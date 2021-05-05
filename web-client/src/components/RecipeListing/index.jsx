@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import styled from "styled-components";
@@ -25,6 +25,7 @@ import TrayDiscardModal from "components/modals/TrayDiscardModal";
 import { discardDeckInitiated } from "action-creators/discardDeckActionCreators";
 import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators";
 import AddNewRecipesModal from "components/modals/AddNewRecipesModal";
+import RunRecipesModal from "components/modals/RunRecipesModal";
 
 const TopContent = styled.div`
     margin-bottom: 2.25rem;
@@ -58,6 +59,11 @@ const RecipeListingComponent = (props) => {
         handleCarousalModal,
         returnRecipeDetails,
         onConfirmedRecipeSelection,
+        onConfirmedRunRecipeByAdmin,
+        runRecipesmodal,
+        toggleRunRecipesModal,
+        onChangeRunRecipeType,
+        runRecipeType,
     } = props;
 
     const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
@@ -68,6 +74,16 @@ const RecipeListingComponent = (props) => {
     const [trayDiscardModal, setTrayDiscardModal] = useState(false);
     const [nextModal, setNextModal] = useState(true);
     const [addNewRecipesModal, setAddNewRecipesModal] = useState(false);
+    const [searchRecipeText, setSearchRecipeText] = useState("");
+
+    useEffect(() => {
+        setSearchRecipeText("");
+    }, [deckName]);
+
+    const onSearchRecipeTextChanged = (e) => {
+        const value = e.target.value;
+        setSearchRecipeText(value);
+    };
 
     const toggleAddNewRecipesModal = () => {
         setAddNewRecipesModal(!addNewRecipesModal);
@@ -144,6 +160,10 @@ const RecipeListingComponent = (props) => {
         }
     };
 
+    const fileteredRecipeData = recipeData.filter((recipeObj) =>
+        recipeObj.name.toLowerCase().includes(searchRecipeText.toLowerCase())
+    );
+
     return (
         <>
             <div className="landing-content px-2">
@@ -153,6 +173,17 @@ const RecipeListingComponent = (props) => {
                         isOpen={isOperatorRunRecipeCarousalModalVisible}
                         handleCarousalModal={handleCarousalModal}
                         onConfirmedRecipeSelection={onConfirmedRecipeSelection}
+                    />
+                )}
+
+                {runRecipesmodal && isAdmin && (
+                    <RunRecipesModal
+                        isOpen={runRecipesmodal}
+                        deckName={deckName}
+                        toggleRunRecipesModal={toggleRunRecipesModal}
+                        runRecipeType={runRecipeType}
+                        onChange={(type) => onChangeRunRecipeType(type)}
+                        onConfirmed={onConfirmedRunRecipeByAdmin}
                     />
                 )}
 
@@ -270,35 +301,45 @@ const RecipeListingComponent = (props) => {
                             <CardBody className="p-5">
                                 {/* Search Functionality Input not working */}
                                 <div className="d-flex justify-content-between align-items-center">
-                                    {isAdmin ? <SearchBox /> : null}
+                                    {isAdmin ? (
+                                        <SearchBox
+                                            value={searchRecipeText}
+                                            onChange={onSearchRecipeTextChanged}
+                                        />
+                                    ) : null}
                                     <div className="d-flex justify-content-end">
                                         <PaginationBox />
                                     </div>
                                 </div>
 
                                 <Row>
-                                    {recipeData?.length ? (
-                                        recipeData.map((recipe, index) => (
-                                            <Col md={6} key={index}>
-                                                <RecipeCard
-                                                    isAdmin={isAdmin}
-                                                    recipeId={recipe.id}
-                                                    recipeName={recipe.name}
-                                                    processCount={
-                                                        recipe.process_count
-                                                    }
-                                                    isPublished={
-                                                        recipe.isPublished
-                                                    }
-                                                    handleCarousalModal={
-                                                        handleCarousalModal
-                                                    }
-                                                    returnRecipeDetails={
-                                                        returnRecipeDetails
-                                                    }
-                                                />
-                                            </Col>
-                                        ))
+                                    {fileteredRecipeData?.length ? (
+                                        fileteredRecipeData.map(
+                                            (recipe, index) => (
+                                                <Col md={6} key={index}>
+                                                    <RecipeCard
+                                                        isAdmin={isAdmin}
+                                                        recipeId={recipe.id}
+                                                        recipeName={recipe.name}
+                                                        processCount={
+                                                            recipe.process_count
+                                                        }
+                                                        isPublished={
+                                                            recipe.isPublished
+                                                        }
+                                                        handleCarousalModal={
+                                                            handleCarousalModal
+                                                        }
+                                                        returnRecipeDetails={
+                                                            returnRecipeDetails
+                                                        }
+                                                        toggleRunRecipesModal={
+                                                            toggleRunRecipesModal
+                                                        }
+                                                    />
+                                                </Col>
+                                            )
+                                        )
                                     ) : (
                                         <h4>No recipes to show!</h4>
                                     )}

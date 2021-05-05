@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DeckCard from "shared-components/DeckCard";
-import { DECKNAME, MODAL_BTN, MODAL_MESSAGE, DECKCARD_BTN } from "appConstants";
+import { DECKNAME, MODAL_BTN, MODAL_MESSAGE, DECKCARD_BTN, RUN_RECIPE_TYPE } from "appConstants";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
@@ -155,10 +155,24 @@ const AppFooter = (props) => {
   };
 
   // RUN
+  /**
+   * showProcess: indicates it is recipe action
+   * !showProcess: indicates it is clean up action
+   * recipe action (showProcess): can be RUN_RECIPE_TYPE.STEP_RUN or RUN_RECIPE_TYPE.CONTINUOUS_RUN
+   * for operators RUN_RECIPE_TYPE.CONTINUOUS_RUN is selected by default
+   */
   const handleRunActionDeckA = () => {
     let recipeReducerData = recipeActionReducerForDeckA;
 
     if (recipeReducerData.showProcess) {
+      let type = recipeReducerData.runRecipeType;
+      //if step run is selected
+      if(type === RUN_RECIPE_TYPE.STEP_RUN){
+        console.log('Step run under development');
+        return;
+      } 
+
+      //else run default i.e., continuous run
       const { recipeId } = recipeReducerData.recipeData;
       dispatch(
         runRecipeInitiated({
@@ -179,6 +193,14 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckB;
 
     if (recipeReducerData.showProcess) {
+      let type = recipeReducerData.runRecipeType;
+      //if step run is selected
+      if(type === RUN_RECIPE_TYPE.STEP_RUN){
+        console.log('Step run under development');
+        return;
+      } 
+
+      //else run default i.e., continuous run
       const { recipeId } = recipeReducerData.recipeData;
       dispatch(
         runRecipeInitiated({
