@@ -111,7 +111,7 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	return
 }
 
-func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (duplicate Process, err error) {
+func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (duplicateP Process, err error) {
 
 	var parent Process
 
@@ -124,13 +124,13 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 
 	var p interface{}
 	// pass empty interface, just to use same method
-	duplicate, err = s.processOperation(ctx, "duplicate", parent.Type, p, parent)
+	duplicateP, err = s.processOperation(ctx, duplicate, ProcessName(parent.Type) , p, parent)
 	if err != nil {
 		// failure already logged
 		return
 	}
 
-	logger.Infoln(responses.ProcessDuplicateCreateSuccess, duplicate)
+	logger.Infoln(responses.ProcessDuplicateCreateSuccess, duplicateP)
 	return
 }
 
