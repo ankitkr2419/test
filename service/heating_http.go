@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -21,7 +20,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
 			return
 		}
-		
+
 		var htObj db.Heating
 		err = json.NewDecoder(req.Body).Decode(&htObj)
 		if err != nil {

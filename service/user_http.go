@@ -99,12 +99,12 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.InsertUser(req.Context(), u)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while inserting user", u)	
+			logger.WithField("err", err.Error()).Error("Error while inserting user", u)
 			rw.WriteHeader(http.StatusInternalServerError)
 			rw.Write([]byte(`{"msg":"Error while inserting user"}`))
 			return
 		}
-		
+
 		logger.Infoln(u, "user inserted successfully")
 		rw.WriteHeader(http.StatusCreated)
 		rw.Write([]byte(`{"msg":"Created User Sucessfully"}`))

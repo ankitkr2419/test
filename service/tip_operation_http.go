@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -21,7 +20,7 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
 			return
 		}
-		
+
 		var tipOpr db.TipOperation
 		err = json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {

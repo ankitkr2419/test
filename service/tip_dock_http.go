@@ -20,7 +20,7 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
 			return
 		}
-		
+
 		var tdObj db.TipDock
 		err = json.NewDecoder(req.Body).Decode(&tdObj)
 		if err != nil {

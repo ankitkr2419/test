@@ -20,7 +20,7 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
 			return
 		}
-		
+
 		var adobj db.AspireDispense
 
 		err = json.NewDecoder(req.Body).Decode(&adobj)

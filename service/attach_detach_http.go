@@ -20,7 +20,7 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
 			return
 		}
-		
+
 		var adObj db.AttachDetach
 		err = json.NewDecoder(req.Body).Decode(&adObj)
 		if err != nil {

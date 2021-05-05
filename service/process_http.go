@@ -39,7 +39,7 @@ func listProcessesHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-// This Handler will be used when we need entry inside only processes table 
+// This Handler will be used when we need entry inside only processes table
 func createProcessHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var process db.Process
