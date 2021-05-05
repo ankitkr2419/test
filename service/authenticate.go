@@ -79,14 +79,14 @@ func decodeToken(token string) (jwt.MapClaims, error) {
 
 // Authenticate ... Authenticate token sent in the request
 // if token is valid set userId in the context
-func authenticate(next http.HandlerFunc, deps Dependencies, role ...string) http.HandlerFunc {
+func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		token := extractToken(req.Header.Get("Authorization"))
 		if token != "" {
 			vars := mux.Vars(req)
 			deck := vars["deck"]
-			_, err := getUserAuth(token, deck, deps, role...)
+			_, err := getUserAuth(token, deck, deps, roles...)
 			if err != nil {
 				logger.Errorln("error in authorizing user :", err.Error())
 				res.WriteHeader(http.StatusUnauthorized)
@@ -103,7 +103,7 @@ func authenticate(next http.HandlerFunc, deps Dependencies, role ...string) http
 	}
 }
 
-func getUserAuth(token, deck string, deps Dependencies, role ...string) (user db.UserAuth, err error) {
+func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user db.UserAuth, err error) {
 
 	var validRole bool
 	decodedToken, err := decodeToken(token)
@@ -121,9 +121,9 @@ func getUserAuth(token, deck string, deps Dependencies, role ...string) (user db
 	}
 
 	//validating role
-	if len(role) != 0 {
-		for i := 0; i < len(role); i++ {
-			if roleFromToken == role[i] {
+	if len(roles) != 0 {
+		for i := 0; i < len(roles); i++ {
+			if roleFromToken == roles[i] {
 				validRole = true
 			}
 		}
@@ -132,6 +132,7 @@ func getUserAuth(token, deck string, deps Dependencies, role ...string) (user db
 			validRole = true
 		}
 	}
+
 	if !validRole {
 		logger.Errorln("invalid role")
 		err = errors.New("invalid role")

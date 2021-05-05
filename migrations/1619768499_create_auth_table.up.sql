@@ -3,4 +3,4 @@ CREATE TABLE IF NOT EXISTS user_auths(
     username text,
     unique(auth_id,username),
     FOREIGN KEY (username) REFERENCES users(username) ON UPDATE CASCADE ON DELETE CASCADE);
-);
+
