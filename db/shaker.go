@@ -18,7 +18,7 @@ type Shaker struct {
 	ProcessID   uuid.UUID `json:"process_id" db:"process_id" validate:"required"`
 	RPM1        int64     `json:"rpm_1" db:"rpm_1" validate:"required"`
 	RPM2        int64     `json:"rpm_2" db:"rpm_2"`
-	Time1       int64     `json:"time_1" db:"time_1" validate:"required"`
+	Time1       int64     `json:"time_1" db:"time_1"`
 	Time2       int64     `json:"time_2" db:"time_2"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
@@ -63,42 +63,55 @@ func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker S
 	return
 }
 
-func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdSh Shaker, err error) {
+func (s *pgStore) CreateShaking(ctx context.Context, ad Shaker, recipeID uuid.UUID) (createdAD Shaker, err error) {
 	var tx *sql.Tx
-
-	//update the process name before record creation
-	err = s.updateProcessName(ctx, sh.ProcessID, "Shaking", sh)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.ShakingUpdateNameError)
-		return
-	}
-
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
 		logger.WithField("err:", err.Error()).Errorln(responses.ShakingInitiateDBTxError)
-		return Shaker{}, err
+		return
 	}
 
-	createdSh, err = s.createShaking(ctx, tx, sh)
-	// failures are already logged
-	// Commit the transaction else won't be able to Show
-
-	// End the transaction in defer call
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			logger.Errorln(responses.ShakingCreateError)
 			return
 		}
 		tx.Commit()
-		createdSh, err = s.ShowShaking(ctx, createdSh.ProcessID)
+		createdAD, err = s.ShowShaking(ctx, createdAD.ProcessID)
 		if err != nil {
-			logger.Infoln("Error Creating Shaking process")
+			logger.Errorln(responses.ShakingFetchError)
 			return
 		}
-		logger.Infoln("Created Shaking Process: ", createdSh)
+		logger.Infoln(responses.ShakingCreateSuccess, createdAD)
 		return
 	}()
 
+	// Get highest sequence number
+	// NOTE: failure already logged in internal calls
+
+	highestSeqNum, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		return
+	}
+	
+	process, err := s.processOperation(ctx, name, ShakingProcess, ad, Process{})
+	if err != nil {
+		return
+	}
+	// process has only a valid name
+	process.SequenceNumber = highestSeqNum + 1
+	process.Type = string(ShakingProcess)
+	process.RecipeID = recipeID
+
+	// create the process
+	process, err = s.createProcess(ctx, tx, process)
+	if err != nil {
+		return
+	}
+
+	ad.ProcessID = process.ID
+	createdAD, err = s.createShaking(ctx, tx, ad)
 	return
 }
 
