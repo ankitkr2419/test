@@ -127,7 +127,7 @@ const RecipeListingContainer = (props) => {
       dispatch(recipeListingInitiated(token, deckName));
       setRecipeFetched(true);
     }
-  }, [token]);
+  }, [token, recipeFetched, dispatch]);
 
   const loginReducer = useSelector((state) => state.loginReducer);
 

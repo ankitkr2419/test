@@ -1,6 +1,6 @@
 import { DECKNAME } from "appConstants";
 import { saveNewRecipeAction } from "actions/saveNewRecipeActions";
-import { fromJS } from "immutable";
+// import { fromJS } from "immutable";
 
 const initialState = {
   decks: [
