@@ -12,9 +12,17 @@ import (
 
 func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
 
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+		
 		var tdObj db.TipDock
-		err := json.NewDecoder(req.Body).Decode(&tdObj)
+		err = json.NewDecoder(req.Body).Decode(&tdObj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipDockingDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipDockingDecodeError.Error()})
@@ -29,7 +37,7 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var tipDock db.TipDock
-		tipDock, err = deps.Store.CreateTipDocking(req.Context(), tdObj)
+		tipDock, err = deps.Store.CreateTipDocking(req.Context(), tdObj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipDockingCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipDockingCreateError.Error()})

@@ -12,9 +12,17 @@ import (
 
 func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
 
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+		
 		var adObj db.AttachDetach
-		err := json.NewDecoder(req.Body).Decode(&adObj)
+		err = json.NewDecoder(req.Body).Decode(&adObj)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Errorln(responses.AttachDetachDecodeError)
@@ -30,7 +38,7 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdAtDt db.AttachDetach
-		createdAtDt, err = deps.Store.CreateAttachDetach(req.Context(), adObj)
+		createdAtDt, err = deps.Store.CreateAttachDetach(req.Context(), adObj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AttachDetachCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.AttachDetachCreateError.Error()})
