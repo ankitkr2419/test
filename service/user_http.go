@@ -134,13 +134,14 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 		token := extractToken(req.Header.Get("Authorization"))
 		vars := mux.Vars(req)
 		deck := vars["deck"]
+		validRoles := []string{admin, engineer, supervisor, operator}
 
-		userAuth, err := getUserAuth(token, deck, deps)
+		userAuth, err := getUserAuth(token, deck, deps, validRoles...)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error while fetching user authentication data", userAuth)
 			rw.WriteHeader(http.StatusForbidden)
 			// TODO check what message to give here.
-			rw.Write([]byte(`{"msg":"Error while fetching user authentication data"}`))
+			rw.Write([]byte(`{"error":"invalid user authentication data"}`))
 			return
 		}
 
