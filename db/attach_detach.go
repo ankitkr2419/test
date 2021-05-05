@@ -2,10 +2,12 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/responses"
 )
 
 type AttachDetach struct {
@@ -35,40 +37,69 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 
 	err = s.db.Get(&ad, getAttachDetachQuery, processID)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching attach/detach operation")
+		logger.WithField("err", err.Error()).Errorln(responses.AttachDetachDBFetchError)
 		return
 	}
 	return
 }
 
-func (s *pgStore) CreateAttachDetach(ctx context.Context, a AttachDetach) (createdAttachDetach AttachDetach, err error) {
-	var lastInsertID uuid.UUID
+func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (createdAD AttachDetach, err error) {
+	var tx *sql.Tx
 
-	err = s.UpdateProcessName(ctx, a.ProcessID, "AttachDetach", a)
+	//update the process name before record creation
+	err = s.UpdateProcessName(ctx, ad.ProcessID, "AttachDetach", ad)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in updating attach detach process name")
+		logger.WithField("err", err.Error()).Errorln(responses.AttachDetachUpdateNameError)
 		return
 	}
 
-	err = s.db.QueryRow(
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AttachDetachInitiateDBTxError)
+		return AttachDetach{}, err
+	}
+
+	createdAD, err = s.createAttachDetach(ctx, ad, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+		createdAD, err = s.ShowAttachDetach(ctx, createdAD.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Attach Detach process")
+			return
+		}
+		logger.Infoln("Created Attach Detach Process: ", createdAD)
+		return
+	}()
+
+	return
+}
+
+func (s *pgStore) createAttachDetach(ctx context.Context, ad AttachDetach, tx *sql.Tx) (createdAD AttachDetach, err error) {
+
+	var lastInsertID uuid.UUID
+
+	err = tx.QueryRow(
 		createAttachDetachQuery,
-		a.Operation,
-		a.OperationType,
-		a.ProcessID,
+		ad.Operation,
+		ad.OperationType,
+		ad.ProcessID,
 	).Scan(&lastInsertID)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating AttachDetach")
+		logger.WithField("err", err.Error()).Errorln(responses.AttachDetachDBCreateError)
 		return
 	}
 
-	err = s.db.Get(&createdAttachDetach, getAttachDetachQuery, a.ProcessID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting AttachDetach")
-		return
-	}
-
-	return
+	ad.ID = lastInsertID
+	return ad, err
 }
 
 func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error) {

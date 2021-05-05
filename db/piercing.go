@@ -2,11 +2,13 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/responses"
 )
 
 type Discard string
@@ -50,7 +52,7 @@ type Piercing struct {
 func (s *pgStore) ShowPiercing(ctx context.Context, processID uuid.UUID) (dbPiercing Piercing, err error) {
 	err = s.db.Get(&dbPiercing, getPiercingQuery, processID)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching piercing")
+		logger.WithField("err", err.Error()).Errorln(responses.PiercingDBFetchError)
 		return
 	}
 	return
@@ -65,35 +67,64 @@ func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err 
 	return
 }
 
-func (s *pgStore) CreatePiercing(ctx context.Context, p Piercing) (createdPiercing Piercing, err error) {
+func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPi Piercing, err error) {
+	var tx *sql.Tx
+
+	//update the process name before record creation
+	err = s.UpdateProcessName(ctx, pi.ProcessID, "Piercing", pi)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.PiercingUpdateNameError)
+		return
+	}
+
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.PiercingInitiateDBTxError)
+		return Piercing{}, err
+	}
+
+	createdPi, err = s.createPiercing(ctx, pi, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+		createdPi, err = s.ShowPiercing(ctx, createdPi.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Piercing process")
+			return
+		}
+		logger.Infoln("Created Piercing Process: ", createdPi)
+		return
+	}()
+
+	return
+}
+
+func (s *pgStore) createPiercing(ctx context.Context, pi Piercing, tx *sql.Tx) (createdPiercing Piercing, err error) {
 
 	var lastInsertID uuid.UUID
 
-	err = s.UpdateProcessName(ctx, p.ProcessID, "Piercing", p)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in updating piercing process name")
-		return
-	}
-
-	err = s.db.QueryRow(
+	err = tx.QueryRow(
 		createPiercingQuery,
-		p.Type,
-		p.CartridgeWells,
-		p.Discard,
-		p.ProcessID,
+		pi.Type,
+		pi.CartridgeWells,
+		pi.Discard,
+		pi.ProcessID,
 	).Scan(&lastInsertID)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating Piercing")
+		logger.WithField("err", err.Error()).Errorln(responses.PiercingDBCreateError)
 		return
 	}
 
-	err = s.db.Get(&createdPiercing, getPiercingQuery, p.ProcessID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting Piercing")
-		return
-	}
-	return
+	pi.ID = lastInsertID
+	return pi, err
 }
 
 func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {

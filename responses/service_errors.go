@@ -55,10 +55,20 @@ var (
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
-	DelayRangeInvalid = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
-	
-	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
+	ProcessValidationError  = fmt.Errorf("error validating process record")
+	ProcessDecodeError      = fmt.Errorf("error decoding process record")
+	ProcessFetchError       = fmt.Errorf("error fetching process record")
+	ProcessCreateError      = fmt.Errorf("error creating process record")
+	ProcessIDInvalidError   = fmt.Errorf("error process id is invalid")
+	ProcessDuplicationError = fmt.Errorf("error creating duplicate process record")
+	ProcessTypeInvalid      = fmt.Errorf("error process type is wrong")
 
+	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
+
+	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
+	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
+
+	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
 )
 
 // Special errors which are in []byte format
