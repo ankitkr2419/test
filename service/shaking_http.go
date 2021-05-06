@@ -8,7 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 func createShakingHandler(deps Dependencies) http.HandlerFunc {
