@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -164,5 +165,28 @@ func updateProcessHandler(deps Dependencies) http.HandlerFunc {
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
 		rw.Write([]byte(`{"msg":"process updated successfully"}`))
+	})
+}
+
+func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		processID, err := parseUUID(vars["process_id"])
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessIDInvalidError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessIDInvalidError.Error()})
+			return
+		}
+
+		process, err := deps.Store.DuplicateProcess(req.Context(), processID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ProcessDuplicationError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessDuplicationError.Error()})
+			return
+		}
+
+		logger.Infoln(responses.ProcessDuplicationSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, process)
 	})
 }
