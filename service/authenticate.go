@@ -128,9 +128,7 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 			}
 		}
 	} else {
-		if roleFromToken == operator {
-			validRole = true
-		}
+		validRole = true
 	}
 
 	if !validRole {
