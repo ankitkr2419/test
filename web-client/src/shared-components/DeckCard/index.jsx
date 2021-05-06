@@ -300,6 +300,15 @@ const DeckCard = (props) => {
             showCardOverLay={showCardOverLay}
           />
         );
+      case DECKCARD_BTN.text.next:
+        return (
+          <ActionButton
+            label={DECKCARD_BTN.text.next}
+            icon={DECKCARD_BTN.icon.next}
+            disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
+          />
+      );
       default:
         break;
     }

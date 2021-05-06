@@ -10,6 +10,8 @@ import {
   resumeRecipeInitiated,
   runRecipeInitiated,
   runRecipeReset,
+  stepRunRecipeInitiated,
+  nextStepRunRecipeInitiated,
   //   pauseRecipeReset,
   //   resumeRecipeReset,
   //   abortRecipeReset,
@@ -118,7 +120,10 @@ const AppFooter = (props) => {
         return deckName === DECKNAME.DeckA
           ? handleDoneActionDeckA
           : handleDoneActionDeckB;
-
+      case DECKCARD_BTN.text.next:
+        return deckName === DECKNAME.DeckA
+          ? handleNextActionDeckA
+          : handleNextActionDeckB;
       default:
         break;
     }
@@ -166,20 +171,23 @@ const AppFooter = (props) => {
 
     if (recipeReducerData.showProcess) {
       let type = recipeReducerData.runRecipeType;
+      const { recipeId } = recipeReducerData.recipeData;
+      
       //if step run is selected
       if(type === RUN_RECIPE_TYPE.STEP_RUN){
-        console.log('Step run under development');
-        return;
-      } 
-
-      //else run default i.e., continuous run
-      const { recipeId } = recipeReducerData.recipeData;
-      dispatch(
-        runRecipeInitiated({
+        dispatch(stepRunRecipeInitiated({
           recipeId: recipeId,
-          deckName: recipeReducerData.name, //deck A
-        })
-      );
+          deckName: recipeReducerData.name,
+        }))
+      } else {
+        //else run default i.e., continuous run
+        dispatch(
+          runRecipeInitiated({
+            recipeId: recipeId,
+            deckName: recipeReducerData.name, //deck A
+          })
+        );
+      }
     } else {
       dispatch(
         runCleanUpActionInitiated({
@@ -194,20 +202,23 @@ const AppFooter = (props) => {
 
     if (recipeReducerData.showProcess) {
       let type = recipeReducerData.runRecipeType;
+      const { recipeId } = recipeReducerData.recipeData;
+     
       //if step run is selected
       if(type === RUN_RECIPE_TYPE.STEP_RUN){
-        console.log('Step run under development');
-        return;
-      } 
-
-      //else run default i.e., continuous run
-      const { recipeId } = recipeReducerData.recipeData;
-      dispatch(
-        runRecipeInitiated({
+        dispatch(stepRunRecipeInitiated({
           recipeId: recipeId,
-          deckName: recipeReducerData.name, //deck B
-        })
-      );
+          deckName: recipeReducerData.name,
+        }));
+      } else {
+        //else run default i.e., continuous run
+        dispatch(
+          runRecipeInitiated({
+            recipeId: recipeId,
+            deckName: recipeReducerData.name, //deck B
+          })
+        );
+      }
     } else {
       dispatch(
         runCleanUpActionInitiated({
@@ -278,6 +289,14 @@ const AppFooter = (props) => {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
   };
+
+  const handleNextActionDeckA = () => {
+    dispatch(nextStepRunRecipeInitiated({deckName: DECKNAME.DeckA}))
+  }
+
+  const handleNextActionDeckB = () => {
+    dispatch(nextStepRunRecipeInitiated({deckName: DECKNAME.DeckB}))
+  }
 
   //ABORT
   const handleAbortActionDeckA = () => {

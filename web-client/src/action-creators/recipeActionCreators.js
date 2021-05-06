@@ -4,7 +4,8 @@ import {
   resumeRecipeAction,
   abortRecipeAction,
   recipeListingAction,
-  saveRecipeDataAction
+  saveRecipeDataAction,
+  stepRunRecipeAction,
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
@@ -179,3 +180,17 @@ export const updateRecipeReducerDataForDeck = (deckName, body) => ({//deckName s
     body
   },
 });
+
+export const stepRunRecipeInitiated = (params) => ({
+  type: stepRunRecipeAction.stepRunRecipeInitiated,
+  payload: {
+    params,
+  },
+});
+
+export const nextStepRunRecipeInitiated = (params) => ({
+  type: stepRunRecipeAction.nextStepRunRecipeInitiated,
+  payload: {
+    params,
+  },
+})

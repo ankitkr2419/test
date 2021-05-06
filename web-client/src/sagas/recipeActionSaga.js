@@ -6,6 +6,7 @@ import {
   resumeRecipeAction,
   abortRecipeAction,
   recipeListingAction,
+  stepRunRecipeAction
 } from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
 import {
@@ -156,10 +157,67 @@ export function* recipeListing(actions) {
   }
 }
 
+
+export function* stepRunRecipe(actions) {
+  const {
+    payload: {
+      params: { recipeId, deckName },
+    },
+  } = actions;
+  const { runRecipeSuccess, runRecipeFailed } = runRecipeAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.stepRun}/${recipeId}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
+        successAction: runRecipeSuccess,
+        failureAction: runRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error in running a recipe", error);
+    yield put(runrecipeFailure(error));
+  }
+}
+
+export function* nextStepRunRecipe(actions) {
+  const {
+    payload: {
+      params: { deckName },
+    },
+  } = actions;
+  const { runRecipeSuccess, runRecipeFailed } = runRecipeAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.runNextStep}/${deckName === DECKNAME.DeckA ? "A" : "B"}`,
+        successAction: runRecipeSuccess,
+        failureAction: runRecipeFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error in running a recipe", error);
+    yield put(runrecipeFailure(error));
+  }
+}
+
 export function* recipeActionSaga() {
   yield takeEvery(runRecipeAction.runRecipeInitiated, runRecipe);
   yield takeEvery(abortRecipeAction.abortRecipeInitiated, abortRecipe);
   yield takeEvery(pauseRecipeAction.pauseRecipeInitiated, pauseRecipe);
   yield takeEvery(resumeRecipeAction.resumeRecipeInitiated, resumeRecipe);
   yield takeEvery(recipeListingAction.recipeListingInitiated, recipeListing);
+  yield takeEvery(stepRunRecipeAction.stepRunRecipeInitiated, stepRunRecipe);
+  yield takeEvery(stepRunRecipeAction.nextStepRunRecipeInitiated, nextStepRunRecipe);
 }

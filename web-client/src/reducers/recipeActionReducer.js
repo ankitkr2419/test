@@ -194,12 +194,24 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
       let decksAfterRunInProgress = state.decks.map((deckObj) => {
+        let isStepRun = deckObj.runRecipeType === RUN_RECIPE_TYPE.STEP_RUN;
+        
+        //for admin: step-run: if current_step !== old_step then activate next button
+        let shouldActivateNextProcess = (isStepRun && 
+            deckObj.runRecipeInProgress && 
+            deckObj.runRecipeInProgress.operation_details &&
+            deckObj.runRecipeInProgress.operation_details.current_step) && 
+            deckObj.runRecipeInProgress.operation_details.current_step !== response.operation_details.current_step;
+            
         return deckObj.name === deckNameRunInProgress
           ? {
               ...deckObj,
               runRecipeInProgress: {
                 ...response,
               },
+              ...(shouldActivateNextProcess && {
+                leftActionBtn: DECKCARD_BTN.text.next
+              })
             }
           : deckObj;
       });

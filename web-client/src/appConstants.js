@@ -71,6 +71,8 @@ export const API_ENDPOINTS = {
   recipeListing: "recipes",
   discardTipAndHoming: "discard-tip-and-home",
   cleanUp: "uv",
+  stepRun: "step-run",
+  runNextStep: "run-next-step",
 };
 
 export const MODAL_MESSAGE = {
@@ -101,6 +103,7 @@ export const DECKCARD_BTN = {
     startUv: "START UV",
     pauseUv: "PAUSE UV",
     resumeUv: "RESUME UV",
+    next: "NEXT",
   },
   icon: {
     run: "play",
@@ -109,6 +112,7 @@ export const DECKCARD_BTN = {
     pause: "pause",
     done: "done",
     resume: "resume",
+    next: "next"
   },
 };
 

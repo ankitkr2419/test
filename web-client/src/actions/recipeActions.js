@@ -41,3 +41,10 @@ export const saveRecipeDataAction = {
   resetRecipeDataForDeck: "RESET_RECIPE_DATA_FOR_DECK",
   updateRecipeReducerDataForDeck: "UPDATE_RECIPE_REDUCER_DATA_FOR_DECK"
 }
+
+export const stepRunRecipeAction = {
+  stepRunRecipeInitiated: "STEP_RUN_RECIPE_INITIATED",
+  stepRunRecipeSuccess: "RUN_RECIPE_SUCCESS",
+  stepRunRecipeFailed: "RUN_RECIPE_FAILED",
+  nextStepRunRecipeInitiated: "NEXT_STEP_RUN_RECIPE_INITIATED",
+}
