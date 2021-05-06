@@ -7,6 +7,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -97,6 +98,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
 		}
+		resetStepRunInProgress(deck)
 	}()
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
@@ -116,7 +118,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
-
 		return
 	}
 
@@ -137,6 +138,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	//  This field will be set when a tip is picked up
 	//  We will get its id from recipe and its details from tipsTubes
 
+	if runStepWise {
+		setStepRunInProgress(deck)
+		logger.Infoln("Populating the nextStep channel for 1st process for deck", deck)
+		nextStep[deck] <- struct{}{}
+	}
+
 	for i, p := range processes {
 
 		// TODO : percentage calculation from inside the process.
@@ -147,7 +154,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			logger.Infoln("Waiting to run next process")
 			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
-			<-nextStep[deck]
+			err = checkForAbortOrNext(deck)
+			if err != nil {
+				return
+			}
 			setRunNext(deck)
 			logger.Infoln("Next process is in progress")
 		}
@@ -156,7 +166,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		case "AspireDispense":
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
-
 				return "", err
 			}
 			fmt.Println(ad)
@@ -169,7 +178,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
 			if err != nil {
-
 				return "", err
 			}
 
@@ -348,4 +356,18 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
 	return
+}
+
+func checkForAbortOrNext(deck string) (err error) {
+	for {
+		time.Sleep(200 * time.Millisecond)
+		select {
+		case <-nextStep[deck]:
+			logger.Infoln("Next Step will be Run")
+			return nil
+		case <-abortStepRun[deck]:
+			logger.Infoln("Step Run will be Aborted")
+			return fmt.Errorf("step run aborted")
+		}
+	}
 }
