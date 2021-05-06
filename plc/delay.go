@@ -55,14 +55,15 @@ skipToStartTimer:
 			if d.isUVLightInProgress() {
 				uvtime := time.Now()
 				uvTimePassed := int64(uvtime.Sub(time1).Seconds()) + *timeElapsed
-				logger.Infoln("time passed , elasped time", uvTimePassed, *timeElapsed)
+				uvRemainingTime := delay.DelayTime - uvTimePassed
 				progress = (uvTimePassed * 100) / delay.DelayTime
 				wsProgressOperation := WSData{
 					Progress: float64(progress),
 					Deck:     d.name,
 					Status:   "PROGRESS_UVLIGHT",
 					OperationDetails: OperationDetails{
-						Message: fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
+						Message:       fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
+						RemainingTime: uvRemainingTime,
 					},
 				}
 
