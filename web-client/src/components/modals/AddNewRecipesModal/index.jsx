@@ -54,7 +54,9 @@ const AddNewRecipesModal = (props) => {
       dispatch(
         saveNewRecipe({
           deckName: deckName,
-          recipeName: recipeName,
+          recipeDetails: {
+            name: recipeName,
+          },
         })
       );
       toggleAddNewRecipesModal();

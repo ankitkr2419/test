@@ -25,18 +25,18 @@ const initialState = {
   ],
 };
 
-export const saveNewRecipeReducer = (state = initialState, actions) => {
+export const updateRecipeDetailsReducer = (state = initialState, actions) => {
   switch (actions.type) {
     case saveNewRecipeAction.saveRecipeName:
       const deckNameToSaveRecipeTo = actions.payload.deckName;
       let deckAfterSave = state.decks.map((deckObj, index) => {
         return deckObj.name === deckNameToSaveRecipeTo
           ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckNameToSaveRecipeTo
-              ),
-              recipeDetails: { name: actions.payload.recipeName },
+              ...deckObj,
+              recipeDetails: {
+                ...deckObj.recipeDetails,
+                ...actions.payload.recipeDetails,
+              },
             }
           : deckObj;
       });
