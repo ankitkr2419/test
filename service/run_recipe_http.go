@@ -335,7 +335,7 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
 	// percentage calculation for each process
 
-	progress := float64((currentStep * 100) / processLength)
+	progress := float64(((currentStep -1) * 100) / processLength)
 
 	wsProgressOperation := plc.WSData{
 		Progress: progress,
