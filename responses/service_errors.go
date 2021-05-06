@@ -94,7 +94,7 @@ var (
 	UserTokenUsernameError      = fmt.Errorf("error username not in token ")
 	UserTokenAuthIdError        = fmt.Errorf("error auth_id not in token ")
 	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
-	UserAuthNotFoundError       = fmt.Errorf("error user auth record not found")
+	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
 )
 
 // Special errors which are in []byte format

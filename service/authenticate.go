@@ -90,7 +90,7 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 			_, err := getUserAuth(token, deck, deps, roles...)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
-				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: responses.UserUnauthorised.Error()})
+				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: err.Error()})
 				return
 			}
 			next(res, req)
