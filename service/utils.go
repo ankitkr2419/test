@@ -30,8 +30,10 @@ const (
 var userLogin sync.Map
 
 // runNext will run the next step of process when set
-var runNext map[string]bool
-var nextStep map[string]chan struct{}
+var runNext, stepRunInProgress map[string]bool
+
+// abortStepRun will help track if abort was performed after process completion
+var nextStep, abortStepRun map[string]chan struct{}
 
 func resetRunNext(deck string) {
 	runNext[deck] = false
@@ -39,6 +41,14 @@ func resetRunNext(deck string) {
 
 func setRunNext(deck string) {
 	runNext[deck] = true
+}
+
+func resetStepRunInProgress(deck string) {
+	stepRunInProgress[deck] = false
+}
+
+func setStepRunInProgress(deck string) {
+	stepRunInProgress[deck] = true
 }
 
 func LoadUtils() {
@@ -49,12 +59,25 @@ func LoadUtils() {
 		"B": false,
 	}
 
+	stepRunInProgress = map[string]bool{
+		"A": false,
+		"B": false,
+	}
+
 	chanA := make(chan struct{}, 1)
 	chanB := make(chan struct{}, 1)
 
 	nextStep = map[string]chan struct{}{
 		"A": chanA,
 		"B": chanB,
+	}
+
+	chanC := make(chan struct{}, 1)
+	chanD := make(chan struct{}, 1)
+
+	abortStepRun = map[string]chan struct{}{
+		"A": chanC,
+		"B": chanD,
 	}
 }
 
