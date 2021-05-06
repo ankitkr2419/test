@@ -239,7 +239,7 @@ const RecipeListingComponent = (props) => {
                                     <Button
                                         color="secondary"
                                         className="ml-2 border-primary btn-clean-up bg-white"
-                                        // onClick={handleTimeModal}
+                                        onClick={toggleTimeModal}
                                     >
                                         {" "}
                                         Clean Up
@@ -247,7 +247,7 @@ const RecipeListingComponent = (props) => {
                                     <Button
                                         color="secondary"
                                         className="ml-2 border-primary btn-discard-tray bg-white"
-                                        // onClick={handleTrayDiscardModal}
+                                        onClick={toggleTrayDiscardModal}
                                     >
                                         Discard Tray
                                     </Button>
@@ -257,41 +257,11 @@ const RecipeListingComponent = (props) => {
                                 name="logout"
                                 size={28}
                                 className="ml-2 bg-white border-primary"
+                                onClick={toggleLogoutModalVisibility}
                             />
                         </div>
                     )}
                 </TopContent>
-                {isAdmin ? null : (
-                    <>
-                        <ButtonIcon
-                            name="download-1"
-                            size={28}
-                            className="bg-white border-primary"
-                        />
-                        <Button
-                            color="secondary"
-                            className="ml-2 border-primary btn-clean-up bg-white"
-                            onClick={toggleTimeModal}
-                        >
-                            {" "}
-                            Clean Up
-                        </Button>
-                        <Button
-                            color="secondary"
-                            className="ml-2 border-primary btn-discard-tray bg-white"
-                            onClick={toggleTrayDiscardModal}
-                        >
-                            Discard Tray
-                        </Button>
-
-                        <ButtonIcon
-                            name="logout"
-                            size={28}
-                            className="ml-2 bg-white border-primary"
-                            onClick={toggleLogoutModalVisibility}
-                        />
-                    </>
-                )}
                 <>
                     {isProcessInProgress ? (
                         <VideoCard />
