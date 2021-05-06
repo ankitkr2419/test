@@ -147,7 +147,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	for i, p := range processes {
 
 		// TODO : percentage calculation from inside the process.
-		sendWSData(deps, deck, recipeID, len(processes), i+1)
+		sendWSData(deps, deck, recipeID, len(processes), i+1, p.Name)
 
 		if runStepWise {
 
@@ -332,10 +332,10 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	return 0, err
 }
 
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName string) (response string, err error) {
 	// percentage calculation for each process
 
-	progress := float64(((currentStep -1) * 100) / processLength)
+	progress := float64(((currentStep - 1) * 100) / processLength)
 
 	wsProgressOperation := plc.WSData{
 		Progress: progress,
@@ -346,6 +346,7 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 			CurrentStep:    currentStep,
 			RecipeID:       recipeID,
 			TotalProcesses: processLength,
+			ProcessName:    processName,
 		},
 	}
 
