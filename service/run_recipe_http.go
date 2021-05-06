@@ -288,6 +288,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 		}
 	}
+
+	sendWSData(deps, deck, recipeID, len(processes), len(processes)+1)
+
 	// send websocket success data
 	successWsData := plc.WSData{
 		Progress: 100,
@@ -347,6 +350,11 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 			RecipeID:       recipeID,
 			TotalProcesses: processLength,
 		},
+	}
+
+	if processLength < currentStep{
+		wsProgressOperation.OperationDetails.Message = fmt.Sprintf("process %v for deck %v completed", processLength, deck)
+		wsProgressOperation.OperationDetails.CurrentStep = processLength
 	}
 
 	wsData, err := json.Marshal(wsProgressOperation)
