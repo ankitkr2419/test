@@ -7,7 +7,7 @@ import {
   recipeListingAction,
   saveRecipeDataAction,
 } from "actions/recipeActions";
-import { DECKCARD_BTN, DECKNAME } from "appConstants";
+import { DECKCARD_BTN, DECKNAME, RUN_RECIPE_TYPE } from "appConstants";
 
 export const initialState = {
   // recipeData: [], //all recipe data
@@ -41,6 +41,7 @@ export const initialState = {
       showCleanUp: false,
       leftActionBtnDisabled: false,
       rightActionBtnDisabled: false,
+      runRecipeType: RUN_RECIPE_TYPE.CONTINUOUS_RUN,
     },
     {
       name: DECKNAME.DeckB,
@@ -70,6 +71,7 @@ export const initialState = {
       showCleanUp: false,
       leftActionBtnDisabled: false,
       rightActionBtnDisabled: false,
+      runRecipeType: RUN_RECIPE_TYPE.CONTINUOUS_RUN,
     },
   ],
 };
@@ -78,12 +80,14 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
   switch (action.type) {
     case saveRecipeDataAction.saveRecipeDataForDeck: //set and update: depend on deckName
       let deckNameForRecipe = action.payload.deckName;
+      let isAdmin = action.payload.recipeData && action.payload.recipeData.isAdmin ? action.payload.recipeData.isAdmin: false;
       let newDecksAfterRecipeDataAdded = state.decks.map((deckObj) => {
         return deckObj.name === deckNameForRecipe
           ? {
               ...deckObj,
               recipeData: action.payload.recipeData,
               showProcess: true,
+              runRecipeType: isAdmin ? action.payload.recipeData.runRecipeType : RUN_RECIPE_TYPE.CONTINUOUS_RUN
             }
           : deckObj;
       });

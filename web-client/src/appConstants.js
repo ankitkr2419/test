@@ -205,3 +205,7 @@ export const LABWARE_INITIAL_STATE = {
   cartridge2: { cartridgeType: null },
   deckPosition4: { tubeType: null },
 };
+export const RUN_RECIPE_TYPE = {
+  CONTINUOUS_RUN: 0,
+  STEP_RUN: 1,
+}

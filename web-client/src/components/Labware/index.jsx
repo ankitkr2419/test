@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { useFormik } from "formik";
 
 import { Row, Col, Card, CardBody } from "core-components";
@@ -8,7 +9,7 @@ import { TabContent, TabPane, Nav } from "reactstrap";
 import AppFooter from "components/AppFooter";
 import labwarePlate from "assets/images/labware-plate.png";
 import {
-  LABWARE_INITIAL_STATE,
+  LABWARE_INITIAL_STATE, ROUTES,
 } from "appConstants";
 import {
   getSideBarNavItems,
@@ -18,17 +19,27 @@ import {
   getTipPiercingAtPosition,
 } from "./HelperFunctions";
 import { LabwareBox, PageBody, ProcessSetting } from "./Styles";
+import { Redirect } from "react-router";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
+  
+  const formik = useFormik({
+    initialValues: LABWARE_INITIAL_STATE,
+  });
+
+  const loginReducer = useSelector((state) => state.loginReducer);
+
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
-
-  const formik = useFormik({
-    initialValues: LABWARE_INITIAL_STATE,
-  });
 
   return (
     <>

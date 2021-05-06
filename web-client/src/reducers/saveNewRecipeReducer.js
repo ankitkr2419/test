@@ -6,14 +6,18 @@ const initialState = {
   decks: [
     {
       name: DECKNAME.DeckA,
-      recipeName: "",
+      recipeDetails: {
+        name: "",
+      },
       isLoading: false,
       isSaved: false,
       errorInSaving: false,
     },
     {
       name: DECKNAME.DeckB,
-      recipeName: "",
+      recipeDetails: {
+        name: "",
+      },
       isLoading: false,
       isSaved: false,
       errorInSaving: false,
@@ -32,7 +36,7 @@ export const saveNewRecipeReducer = (state = initialState, actions) => {
                 (initialDeckObj) =>
                   initialDeckObj.name === deckNameToSaveRecipeTo
               ),
-              recipeName: actions.payload.recipeName,
+              recipeDetails: { name: actions.payload.recipeName },
             }
           : deckObj;
       });
