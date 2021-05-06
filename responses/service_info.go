@@ -1,7 +1,5 @@
 package responses
 
-import ()
-
 var (
 	PiercingCreateSuccess = "piercing record created successfully"
 	PiercingFetchSuccess  = "piercing record fetched successfully"
@@ -36,4 +34,8 @@ var (
 	TipOperationUpdateSuccess = "tip operation record updated successfully"
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
+
+	UserLoginSuccess  = "user successfully logged in."
+	UserCreateSuccess = "user successfully created"
+	UserLogoutSuccess = "user successfully logged out"
 )

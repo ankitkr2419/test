@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,8 +18,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		var token string
 		err := json.NewDecoder(req.Body).Decode(&u)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding user data")
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
 			return
 		}
 
@@ -28,13 +28,13 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		if deck != "" {
 			value, ok := userLogin.Load(deck)
 			if !ok {
-				rw.WriteHeader(http.StatusBadRequest)
-				rw.Write([]byte(`{"error:"invalid deck name"}`))
+				logger.WithField("err", err.Error()).Error(responses.UserInvalidDeckError)
+				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserInvalidDeckError.Error()})
 				return
 			}
 			if value.(bool) == true {
-				rw.WriteHeader(http.StatusForbidden)
-				rw.Write([]byte(`{"error:"not allowed to login"}`))
+				logger.WithField("err", err.Error()).Error(responses.UserDeckLoginError)
+				responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserDeckLoginError.Error()})
 				return
 			}
 		}
@@ -51,9 +51,8 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		err = deps.Store.ValidateUser(req.Context(), u)
 		if err != nil {
 			if err.Error() == "Record Not Found" {
-				rw.Header().Add("Content-Type", "application/json")
-				rw.WriteHeader(http.StatusExpectationFailed)
-				rw.Write([]byte(`{"msg":"Invalid User"}`))
+				logger.WithField("err", err.Error()).Error(responses.UserInvalidError)
+				responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.UserInvalidError.Error()})
 				return
 			}
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -63,8 +62,8 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		//create a new user_auth record
 		authID, err := deps.Store.InsertUserAuths(req.Context(), u.Username)
 		if err != nil {
-			rw.Write([]byte(`{"msg":"user login failed"}`))
-			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error(responses.UserAuthError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthError.Error()})
 			return
 		}
 
@@ -75,19 +74,22 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			token, err = EncodeToken(u.Username, authID, u.Role, "", map[string]string{})
 		}
 
-		response, err := json.Marshal(map[string]string{
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.UserTokenEncodeError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserTokenEncodeError.Error()})
+		}
+		response := map[string]string{
 			"msg":   "user logged in successfully",
 			"token": token,
-		})
+		}
 
 		if err != nil {
-			rw.Write([]byte(`{"msg":"user login failed"}`))
-			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error(responses.UserMarshallingError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserMarshallingError.Error()})
 			return
 		}
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(response)
+		logger.Infoln(responses.UserLoginSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, response)
 	})
 }
 
@@ -98,9 +100,7 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 		rw.Header().Add("Content-Type", "application/json")
 		err := json.NewDecoder(req.Body).Decode(&u)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while decoding user data: ", req.Body)
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"msg":"Error while decoding user data"}`))
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
 			return
 		}
 
@@ -115,15 +115,13 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.InsertUser(req.Context(), u)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while inserting user", u)
-			rw.WriteHeader(http.StatusInternalServerError)
-			rw.Write([]byte(`{"msg":"Error while inserting user"}`))
+			logger.WithField("err", err.Error()).Error(responses.UserInsertError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserInsertError.Error()})
 			return
 		}
 
-		logger.Infoln(u, "user inserted successfully")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write([]byte(`{"msg":"Created User Sucessfully"}`))
+		logger.Infoln(responses.UserCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, MsgObj{Msg: responses.UserCreateSuccess})
 		return
 	})
 }
@@ -138,27 +136,23 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 
 		userAuth, err := getUserAuth(token, deck, deps, validRoles...)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while fetching user authentication data", userAuth)
-			rw.WriteHeader(http.StatusForbidden)
-			// TODO check what message to give here.
-			rw.Write([]byte(`{"error":"invalid user authentication data"}`))
+			logger.WithField("err", err.Error()).Error(responses.UserAuthDataFetchError)
+			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserAuthDataFetchError.Error()})
 			return
 		}
 
 		err = deps.Store.DeleteUserAuth(req.Context(), userAuth)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while deleting user authentication data", userAuth)
-			rw.WriteHeader(http.StatusInternalServerError)
-			rw.Write([]byte(`{"msg":"Error while deleting user authentication data"}`))
+			logger.WithField("err", err.Error()).Error(responses.UserAuthDataDeleteError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
 			return
 		}
 		if deck != "" {
 			userLogin.Store(deck, false)
 		}
 
-		logger.Infoln(userAuth, "user logged out successfully")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(`{"msg":"user logged out successfully"}`))
+		logger.Infoln(responses.UserLogoutSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UserLogoutSuccess})
 		return
 
 	})

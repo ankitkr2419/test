@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"strings"
 	"time"
@@ -88,16 +88,15 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 			deck := vars["deck"]
 			_, err := getUserAuth(token, deck, deps, roles...)
 			if err != nil {
-				logger.Errorln("error in authorizing user :", err.Error())
-				res.WriteHeader(http.StatusUnauthorized)
-				res.Write([]byte(`{"error":"unauthorised user"}`))
+				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
+				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: responses.UserUnauthorised.Error()})
 				return
 			}
 			next(res, req)
 
 		} else {
-			res.WriteHeader(http.StatusUnauthorized)
-			res.Write([]byte(`{"error":"unauthorised access"}`))
+			logger.WithField("err", "TOKEN EMPTY").Error(responses.UserTokenEmptyError)
+			responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: responses.UserTokenEmptyError.Error()})
 			return
 		}
 	}
@@ -108,15 +107,15 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 	var validRole bool
 	decodedToken, err := decodeToken(token)
 	if err != nil {
-		logger.Errorln("decoding token error", err.Error())
-		err = errors.New("failed to decode token")
+		logger.WithField("err", err.Error()).Error(responses.UserTokenDecodeError)
+		err = responses.UserTokenDecodeError
 		return
 	}
 
 	roleFromToken, ok := decodedToken["role"]
 	if !ok {
-		logger.Errorln("failed to fetch role error")
-		err = errors.New("failed to fetch role")
+		logger.WithField("err", err.Error()).Error(responses.UserTokenRoleEmptyError)
+		err = responses.UserTokenRoleEmptyError
 		return
 	}
 
@@ -132,60 +131,62 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 	}
 
 	if !validRole {
-		logger.Errorln("invalid role")
-		err = errors.New("invalid role")
+		logger.WithField("err", "INVALID ROLE").Error(responses.UserTokenInvalidRoleError)
+		err = responses.UserTokenInvalidRoleError
 		return
 	}
 
 	//validate deck
 	tokenDeck, ok := decodedToken["deck"].(string)
 	if !ok {
-		logger.Errorln("failed to fetch deck error")
-		err = errors.New("failed to fetch deck")
-		return
-	}
-
-	if tokenDeck != deck {
-		logger.Errorln("invalid token for deck error")
-		err = errors.New("wrong token for deck")
+		logger.WithField("err", "DECK TOKEN").Error(responses.UserTokenDeckError)
+		err = responses.UserTokenDeckError
 		return
 	}
 
 	if deck != "" {
+
+		if tokenDeck != deck {
+			logger.WithField("err", "CROSS DECK TOKEN").Error(responses.UserTokenCrossDeckError)
+			err = responses.UserTokenCrossDeckError
+			return
+		}
+
 		value, ok := userLogin.Load(deck)
 		if !ok {
-			logger.Errorln("invalid deck name error")
-			err = errors.New("invalid deck name")
+			logger.WithField("err", "DECK TOKEN").Error(responses.UserInvalidDeckError)
+			err = responses.UserInvalidDeckError
 			return
 		}
 		if value.(bool) == false {
-			logger.Errorln("deck logged out error")
-			err = fmt.Errorf(`"error":"already logged out of deck %s"`, deck)
+			logger.WithField("err", "DECK LOGGED OUT").Error(responses.UserTokenLoggedOutDeckError)
+			err = responses.UserTokenLoggedOutDeckError
 			return
 		}
 	}
 
 	username, ok := decodedToken["sub"].(string)
 	if !ok {
-		logger.Errorln("username error")
-		err = errors.New("failed to fetch user")
+		logger.WithField("err", "USERNAME").Error(responses.UserTokenUsernameError)
+		err = responses.UserTokenUsernameError
 		return
 	}
 	id, ok := decodedToken["auth_id"].(string)
 	if !ok {
-		logger.Errorln("authID error")
-		err = errors.New("failed to fetch user")
+		logger.WithField("err", "AUTHID").Error(responses.UserTokenAuthIdError)
+		err = responses.UserTokenAuthIdError
 		return
 	}
 	authID, err := uuid.Parse(id)
 	if err != nil {
-		logger.Errorln("authID parse error")
-		err = errors.New("failed to fetch user auth")
+		logger.WithField("err", err.Error()).Error(responses.UserTokenAuthIdParseError)
+		err = responses.UserTokenAuthIdParseError
 		return
 	}
 	user, err = deps.Store.ShowUserAuth(context.Background(), username, authID)
 	if err != nil {
-		logger.Errorln("user not found")
+		logger.WithField("err", err.Error()).Error(responses.UserAuthNotFoundError)
+		err = responses.UserAuthNotFoundError
 		return
 	}
 	return
