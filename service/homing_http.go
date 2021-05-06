@@ -126,6 +126,10 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 			err := fmt.Errorf("%v", errRes)
 			return "", err
 		}
+		if operation == "Abort" && stepRunInProgress[deck] && !runNext[deck] {
+			// handle the abortStepRun channel
+			abortStepRun[deck] <- struct{}{}
+		}
 	}
 
 	return

@@ -63,6 +63,7 @@ type OperationDetails struct {
 	CurrentStep    int       `json:"current_step,omitempty"`
 	TotalProcesses int       `json:"total_processes,omitempty"`
 	RecipeID       uuid.UUID `json:"recipe_id,omitempty"`
+	RemainingTime  int64     `json:"remaining_time,omitempty"`
 }
 
 type Compact32Deck struct {
