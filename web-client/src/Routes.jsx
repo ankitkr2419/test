@@ -12,6 +12,7 @@ import SplashScreenContainer from "containers/SplashScreenContainer";
 import LandingPageContainer from "containers/LandingPageContainer";
 import RecipeListingContainer from "containers/RecipeListingContainer";
 import AllSetContainer from "containers/AllSetContainer";
+import LabwareContainer from "containers/LabwareContainer";
 import { ROOT_URL_PATH } from "./appConstants";
 
 export const routeDefinitions = [
@@ -68,6 +69,12 @@ export const routeDefinitions = [
         exact: true,
         component: AllSetContainer,
         key: 10,
+      },
+      {
+        path: `${ROOT_URL_PATH}labware`,
+        exact: true,
+        component: LabwareContainer,
+        key: 21,
       },
     ],
   },

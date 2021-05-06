@@ -7,7 +7,7 @@ import {
   recipeListingInitiated,
   saveRecipeDataForDeck,
 } from "action-creators/recipeActionCreators";
-import { ROUTES } from "appConstants";
+import { ROUTES, RUN_RECIPE_TYPE } from "appConstants";
 import { Redirect } from "react-router-dom";
 // import { useHistory } from "react-router-dom";
 
@@ -112,6 +112,10 @@ const RecipeListingContainer = (props) => {
 
   const [selectedRecipeData, setSelectedRecipeData] = useState({});
   const [token, setToken] = useState();
+  const [runRecipesmodal, setRunRecipesModal] = useState(false);
+  const [runRecipeType, setRunRecipeType] = useState(
+      RUN_RECIPE_TYPE.CONTINUOUS_RUN
+  );
 
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
@@ -127,7 +131,7 @@ const RecipeListingContainer = (props) => {
       dispatch(recipeListingInitiated(token, deckName));
       setRecipeFetched(true);
     }
-  }, [token]);
+  }, [token, recipeFetched, dispatch]);
 
   const loginReducer = useSelector((state) => state.loginReducer);
 
@@ -176,6 +180,28 @@ const RecipeListingContainer = (props) => {
     // return <Redirect to={`/${ROUTES.landing}`} />;
   };
 
+  const onChangeRunRecipeType = (type) => {
+    setRunRecipeType(type);
+  };
+
+  const onConfirmedRunRecipeByAdmin = () => {
+    //save selected recipe data to reducer
+    let { data, deckName } = selectedRecipeData;
+    if (!deckName) {
+      console.error("deckName not found!");
+      return;
+    }
+    data = {
+      ...data, 
+      runRecipeType
+    }
+    dispatch(saveRecipeDataForDeck(data, deckName));
+
+    //toggle modal
+    toggleRunRecipesModal();
+};
+const toggleRunRecipesModal = () => setRunRecipesModal(!runRecipesmodal);
+
   return (
     <RecipeListing>
       {/* {(!isLoading) && <Loader/>} */}
@@ -188,6 +214,11 @@ const RecipeListingContainer = (props) => {
         handleCarousalModal={handleCarousalModal}
         returnRecipeDetails={returnRecipeDetails}
         onConfirmedRecipeSelection={onConfirmedRecipeSelection}
+        onConfirmedRunRecipeByAdmin={onConfirmedRunRecipeByAdmin}
+        runRecipesmodal={runRecipesmodal}
+        toggleRunRecipesModal={toggleRunRecipesModal}
+        runRecipeType={runRecipeType}
+        onChangeRunRecipeType={onChangeRunRecipeType}
         deckName={deckName}
         isAdmin={isAdmin}
       />

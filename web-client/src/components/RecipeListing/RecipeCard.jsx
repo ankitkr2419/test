@@ -53,6 +53,7 @@ const RecipeCard = (props) => {
     isPublished,
     handleCarousalModal,
     returnRecipeDetails,
+    toggleRunRecipesModal
   } = props;
 
   const [toggle, setToggle] = useState(true);
@@ -67,6 +68,11 @@ const RecipeCard = (props) => {
       returnRecipeDetails({ recipeId, recipeName, processCount });
     }
   };
+
+  const handleRunRecipeByAdmin = () => {
+    toggleRunRecipesModal();
+    returnRecipeDetails({ recipeId, recipeName, processCount, isAdmin });
+  }
 
   return (
     <div onClick={handleClickOnCard}>
@@ -106,7 +112,7 @@ const RecipeCard = (props) => {
                     size={14}
                     name="play"
                     className="border-gray text-primary"
-                    // onClick={toggleExportDataModal}
+                    onClick={handleRunRecipeByAdmin}
                   />
                   <ButtonIcon
                     size={14}

@@ -71,6 +71,8 @@ const StyledSearchBox = styled.div`
 `;
 
 const SearchBox = (props) => {
+  const { value, onChange} = props;
+
   return (
     <StyledSearchBox className="mb-3">
       <div className="d-flex h-100">
@@ -79,6 +81,8 @@ const SearchBox = (props) => {
             className="search-input"
             type="text"
             name=""
+            value={value}
+            onChange={onChange}
             placeholder="Search..."
           />
           <div className="search-icon">

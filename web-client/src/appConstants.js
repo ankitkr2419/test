@@ -57,6 +57,7 @@ export const ROUTES = {
   landing: "landing",
   splashScreen: "splashscreen",
   recipeListing: "recipe-listing",
+  labware: "labware",
 };
 
 export const API_ENDPOINTS = {
@@ -125,3 +126,86 @@ export const USER_ROLES = {
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
 };
+
+export const LABWARE_ITEMS_NAME = [
+  "Tips",
+  "Tip Piercing",
+  "Deck Position 1",
+  "Deck Position 2 ",
+  "Cartidge 1",
+  "Deck Position 3",
+  "Cartidge 2",
+  "Deck Position 4",
+];
+
+export const LABWARE_TIPS_OPTIONS = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+  { value: "option4", label: "Option 4" },
+  { value: "option5", label: "Option 5" },
+];
+
+export const LABWARE_DECK_POS_1_OPTIONS = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+  { value: "option4", label: "Option 4" },
+  { value: "option5", label: "Option 5" },
+];
+
+export const LABWARE_DECK_POS_2_OPTIONS = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+  { value: "option4", label: "Option 4" },
+  { value: "option5", label: "Option 5" },
+];
+
+export const LABWARE_DECK_POS_3_OPTIONS = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+  { value: "option4", label: "Option 4" },
+  { value: "option5", label: "Option 5" },
+];
+
+export const LABWARE_DECK_POS_4_OPTIONS = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+  { value: "option4", label: "Option 4" },
+  { value: "option5", label: "Option 5" },
+];
+
+export const LABWARE_CARTRIDGE_1_OPTIONS = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+  { value: "option4", label: "Option 4" },
+  { value: "option5", label: "Option 5" },
+];
+
+export const LABWARE_CARTRIDGE_2_OPTIONS = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+  { value: "option4", label: "Option 4" },
+  { value: "option5", label: "Option 5" },
+];
+
+// do not change the order!
+export const LABWARE_INITIAL_STATE = {
+  tips: { tipPosition1: null, tipPosition2: null, tipPosition3: null },
+  tipPiercing: { position1: false, position2: false },
+  deckPosition1: { tubeType: null },
+  deckPosition2: { tubeType: null },
+  cartridge1: { cartridgeType: null },
+  deckPosition3: { tubeType: null },
+  cartridge2: { cartridgeType: null },
+  deckPosition4: { tubeType: null },
+};
+export const RUN_RECIPE_TYPE = {
+  CONTINUOUS_RUN: 0,
+  STEP_RUN: 1,
+}
