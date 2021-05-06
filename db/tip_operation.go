@@ -2,10 +2,12 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/responses"
 )
 
 type TipOps string
@@ -46,7 +48,7 @@ type TipOperation struct {
 func (s *pgStore) ShowTipOperation(ctx context.Context, id uuid.UUID) (dbTipOperation TipOperation, err error) {
 	err = s.db.Get(&dbTipOperation, getTipOperationQuery, id)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching tip operation")
+		logger.WithField("err", err.Error()).Errorln(responses.TipOperationDBFetchError)
 		return
 	}
 	return
@@ -61,33 +63,63 @@ func (s *pgStore) ListTipOperation(ctx context.Context) (dbTipOperation []TipOpe
 	return
 }
 
-func (s *pgStore) CreateTipOperation(ctx context.Context, t TipOperation) (createdTipOperation TipOperation, err error) {
-	var lastInsertID uuid.UUID
+func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (createdTO TipOperation, err error) {
+	var tx *sql.Tx
 
-	err = s.UpdateProcessName(ctx, t.ProcessID, "TipOperation", t)
+	//update the process name before record creation
+	err = s.UpdateProcessName(ctx, to.ProcessID, "TipOperation", to)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in updating tip operation process name")
+		logger.WithField("err", err.Error()).Errorln(responses.TipOperationUpdateNameError)
 		return
 	}
 
-	err = s.db.QueryRow(
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.TipOperationInitiateDBTxError)
+		return TipOperation{}, err
+	}
+
+	createdTO, err = s.createTipOperation(ctx, to, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+		createdTO, err = s.ShowTipOperation(ctx, createdTO.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Tip Operation process")
+			return
+		}
+		logger.Infoln("Created Tip Operation Process: ", createdTO)
+		return
+	}()
+
+	return
+}
+
+func (s *pgStore) createTipOperation(ctx context.Context, to TipOperation, tx *sql.Tx) (createdTipOperation TipOperation, err error) {
+
+	var lastInsertID uuid.UUID
+
+	err = tx.QueryRow(
 		createTipOperationQuery,
-		t.Type,
-		t.Position,
-		t.ProcessID,
+		to.Type,
+		to.Position,
+		to.ProcessID,
 	).Scan(&lastInsertID)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating TipOperation")
+		logger.WithField("err", err.Error()).Errorln(responses.TipOperationDBCreateError)
 		return
 	}
 
-	err = s.db.Get(&createdTipOperation, getTipOperationQuery, t.ProcessID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting Tip Operation")
-		return
-	}
-	return
+	to.ID = lastInsertID
+	return to, err
 }
 
 func (s *pgStore) DeleteTipOperation(ctx context.Context, id uuid.UUID) (err error) {
