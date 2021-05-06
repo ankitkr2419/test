@@ -86,6 +86,7 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 		if token != "" {
 			vars := mux.Vars(req)
 			deck := vars["deck"]
+
 			_, err := getUserAuth(token, deck, deps, roles...)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
@@ -114,7 +115,7 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 
 	roleFromToken, ok := decodedToken["role"]
 	if !ok {
-		logger.WithField("err", err.Error()).Error(responses.UserTokenRoleEmptyError)
+		logger.WithField("err", "EMPTY ROLE").Error(responses.UserTokenRoleEmptyError)
 		err = responses.UserTokenRoleEmptyError
 		return
 	}
@@ -144,7 +145,17 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 		return
 	}
 
+	// First if the deck is received from an api other than logout then for cloud user the deck
+	// value is "" hence this condition becomes false and it will not validate deck.
 	if deck != "" {
+
+		// Since the logout api doesnot call authenticate method and call getUserAuth method
+		// directly for fetching userAuth, so deck passed earlier was "" hence cross deck
+		// validation could not be performed for logout.
+		// So passing deck as cloudUser when the cloud user wants to logout and setting it to "" for cross deck validation.
+		if deck == "cloudUser" {
+			deck = ""
+		}
 
 		if tokenDeck != deck {
 			logger.WithField("err", "CROSS DECK TOKEN").Error(responses.UserTokenCrossDeckError)
@@ -152,17 +163,6 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 			return
 		}
 
-		value, ok := userLogin.Load(deck)
-		if !ok {
-			logger.WithField("err", "DECK TOKEN").Error(responses.UserInvalidDeckError)
-			err = responses.UserInvalidDeckError
-			return
-		}
-		if value.(bool) == false {
-			logger.WithField("err", "DECK LOGGED OUT").Error(responses.UserTokenLoggedOutDeckError)
-			err = responses.UserTokenLoggedOutDeckError
-			return
-		}
 	}
 
 	username, ok := decodedToken["sub"].(string)

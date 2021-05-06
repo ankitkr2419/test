@@ -28,12 +28,12 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		if deck != "" {
 			value, ok := userLogin.Load(deck)
 			if !ok {
-				logger.WithField("err", err.Error()).Error(responses.UserInvalidDeckError)
+				logger.WithField("err", "DECK ERROR").Error(responses.UserInvalidDeckError)
 				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserInvalidDeckError.Error()})
 				return
 			}
 			if value.(bool) == true {
-				logger.WithField("err", err.Error()).Error(responses.UserDeckLoginError)
+				logger.WithField("err", "DECK ERROR").Error(responses.UserDeckLoginError)
 				responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserDeckLoginError.Error()})
 				return
 			}
@@ -133,6 +133,27 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 		validRoles := []string{admin, engineer, supervisor, operator}
+
+		// if the user is a deck user then only validate that if the user is logged out.
+		// otherwise set the deck to cloud user
+		if deck != "" {
+			value, ok := userLogin.Load(deck)
+			if !ok {
+				logger.WithField("err", "DECK TOKEN").Error(responses.UserInvalidDeckError)
+				responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserInvalidDeckError.Error()})
+
+				return
+			}
+			if value.(bool) == false {
+				logger.WithField("err", "DECK LOGGED OUT").Error(responses.UserTokenLoggedOutDeckError)
+				responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserTokenLoggedOutDeckError.Error()})
+
+				return
+			}
+
+		} else {
+			deck = "cloudUser"
+		}
 
 		userAuth, err := getUserAuth(token, deck, deps, validRoles...)
 		if err != nil {
