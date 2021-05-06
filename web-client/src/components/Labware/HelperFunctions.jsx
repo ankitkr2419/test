@@ -8,6 +8,7 @@ import {
   LABWARE_DECK_POS_4_OPTIONS,
   LABWARE_ITEMS_NAME,
   LABWARE_TIPS_OPTIONS,
+  LABWARE_NAME
 } from "appConstants";
 
 import labwareTips from "assets/images/labware-plate-tips.png";
@@ -19,7 +20,7 @@ import labwareDeckPosition4 from "assets/images/labware-plate-deck-position-4.pn
 import labwareCartridePosition1 from "assets/images/labware-plate-cartridge-1.png";
 import labwareCartridePosition2 from "assets/images/labware-plate-cartridge-2.png";
 
-import { Icon, ImageIcon } from "shared-components";
+import { Icon, ImageIcon, Text,  } from "shared-components";
 import { NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 import { FormGroup, Label, FormError, Select, CheckBox } from "core-components";
@@ -241,4 +242,48 @@ export const getCartidgeAtPosition = (position, formik) => {
       </ProcessSetting>
     </>
   );
+};
+
+export const getSubHead = (key, formik) => {
+  const recipeData = formik.values;
+  const nestedKeys = Object.keys(recipeData[key]);
+  const LEN = nestedKeys.length;
+  const previewInfoSubHead = [];
+
+  nestedKeys.forEach((nestedKey) => {
+    recipeData[key][nestedKey] &&
+      previewInfoSubHead.push(
+        <Text>
+          {LEN > 1 && (
+            <Text Tag="span" className="font-weight-bold">
+              {LABWARE_NAME[nestedKey]} :{" "}
+            </Text>
+          )}
+          <Text Tag="span" className={LEN === 1 ? "font-weight-bold" : ""}>
+            {recipeData[key][nestedKey]}{" "}
+          </Text>
+        </Text>
+      );
+  });
+  return previewInfoSubHead;
+};
+
+export const getPreviewInfo = (formik) => {
+  const previewInfoHead = [];
+  const recipeData = formik.values;
+  Object.keys(recipeData).forEach((key) => {
+    previewInfoHead.push(
+      <li className="d-flex justify-content-between">
+        <Text className="d-flex w-25 font-weight-bold">
+          {LABWARE_NAME[key]} :{" "}
+        </Text>
+        <div className="w-75">
+          <div className="ml-2 setting-value">
+            <Text>{getSubHead(key, formik)}</Text>
+          </div>
+        </div>
+      </li>
+    );
+  });
+  return previewInfoHead;
 };

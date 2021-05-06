@@ -209,3 +209,21 @@ export const RUN_RECIPE_TYPE = {
   CONTINUOUS_RUN: 0,
   STEP_RUN: 1,
 }
+
+export const LABWARE_NAME = {
+  tips: "Tips",
+  tipPosition1: "Tip Position 1",
+  tipPosition2: "Tip Position 2",
+  tipPosition3: "Tip Position 3", 
+  tipPiercing: "Tip Piercing",
+  position1: "Position 1",
+  position2: "Position 2",
+  deckPosition1: "Deck Position 1",
+  deckPosition2: "Deck Position 2",
+  deckPosition3: "Deck Position 3",
+  deckPosition4: "Deck Position 4",
+  cartridge1: "Cartridge 1",
+  cartridge2: "Cartridge 2",
+  cartridgeType : "Cartridge Type"
+
+}
