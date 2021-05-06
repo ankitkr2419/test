@@ -2,10 +2,12 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/responses"
 )
 
 type Delay struct {
@@ -34,38 +36,68 @@ func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err
 		id,
 	)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error getting delay process")
+		logger.WithField("err", err.Error()).Errorln(responses.DelayDBFetchError)
 		return
 	}
 	return
 }
 
-func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay, err error) {
-	var lastInsertID uuid.UUID
+func (s *pgStore) CreateDelay(ctx context.Context, d Delay) (createdD Delay, err error) {
+	var tx *sql.Tx
 
+	//update the process name before record creation
 	err = s.UpdateProcessName(ctx, d.ProcessID, "Delay", d)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in updating delay process name")
+		logger.WithField("err", err.Error()).Errorln(responses.DelayUpdateNameError)
 		return
 	}
 
-	err = s.db.QueryRow(
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.DelayInitiateDBTxError)
+		return Delay{}, err
+	}
+
+	createdD, err = s.createDelay(ctx, d, tx)
+	// failures are already logged
+	// Commit the transaction else won't be able to Show
+
+	// End the transaction in defer call
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+		createdD, err = s.ShowDelay(ctx, createdD.ProcessID)
+		if err != nil {
+			logger.Infoln("Error Creating Delay process")
+			return
+		}
+		logger.Infoln("Created Delay Process: ", createdD)
+		return
+	}()
+
+	return
+}
+
+func (s *pgStore) createDelay(ctx context.Context, d Delay, tx *sql.Tx) (createdD Delay, err error) {
+
+	var lastInsertID uuid.UUID
+
+	err = tx.QueryRow(
 		createDelayQuery,
 		d.DelayTime,
 		d.ProcessID,
 	).Scan(&lastInsertID)
 
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error creating Delay")
+		logger.WithField("err", err.Error()).Errorln(responses.DelayDBCreateError)
 		return
 	}
 
-	err = s.db.Get(&createdDelay, getDelayQuery, d.ProcessID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error in getting Delay")
-		return
-	}
-	return
+	d.ID = lastInsertID
+	return d, err
 }
 
 func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {

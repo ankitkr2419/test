@@ -4,6 +4,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const ErrorExtractionMonitor = "ErrorExtractionMonitor"
+
 type Status int32
 
 const (
@@ -52,7 +54,10 @@ type WSData struct {
 	Status           string           `json:"status"`
 	OperationDetails OperationDetails `json:"operation_details"`
 }
-
+type WSError struct {
+	Message string `json:"message"`
+	Deck    string `json:"deck"`
+}
 type OperationDetails struct {
 	Message        string    `json:"message"`
 	CurrentStep    int       `json:"current_step,omitempty"`

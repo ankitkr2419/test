@@ -9,6 +9,13 @@ import (
 
 func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err error) {
 
+	defer func() {
+		if err != nil {
+			logger.Errorln(err.Error())
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+		}
+	}()
+
 	//Machine Should be in aborted state
 	if !d.isMachineInAbortedState() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
@@ -45,7 +52,6 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 	wsData, err := json.Marshal(successWsData)
 	if err != nil {
 		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		d.WsErrCh <- err
 		return
 	}
 	d.WsMsgCh <- fmt.Sprintf("success_discardAndHomed_%v", string(wsData))

@@ -37,7 +37,6 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			rw.Write([]byte(err.Error()))
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.Errorln(err)
-			deps.WsErrCh <- err
 		} else {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
@@ -82,7 +81,7 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 			wsData, err := json.Marshal(successWsData)
 			if err != nil {
 				logger.Errorf("error in marshalling web socket data %v", err.Error())
-				deps.WsErrCh <- err
+				deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, "", err.Error())
 				return "", err
 			}
 			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
@@ -97,6 +96,12 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 }
 
 func singleDeckOperation(deps Dependencies, deck, operation string) (response string, err error) {
+	defer func() {
+		if err != nil {
+			logger.Errorln(err.Error())
+			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+		}
+	}()
 
 	// Compact32Deck is the type of deps.PlcDeck[deck]
 	result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(operation).Call([]reflect.Value{})
@@ -109,7 +114,7 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	if len(result) != 2 {
 		fmt.Println("result is different in this reflect Call !", result)
 		err := fmt.Errorf("unexpected length result")
-		deps.WsErrCh <- err
+
 		return "", err
 	}
 
@@ -119,7 +124,6 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 		if errRes != nil {
 			fmt.Println(errRes)
 			err := fmt.Errorf("%v", errRes)
-			deps.WsErrCh <- err
 			return "", err
 		}
 	}

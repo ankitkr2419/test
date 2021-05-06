@@ -84,6 +84,7 @@ type Storer interface {
 	CreateProcess(context.Context, Process) (Process, error)
 	DeleteProcess(context.Context, uuid.UUID) error
 	UpdateProcess(context.Context, Process) error
+	DuplicateProcess(context.Context, uuid.UUID) (Process, error)
 	ListPiercing(context.Context) ([]Piercing, error)
 	CreatePiercing(context.Context, Piercing) (Piercing, error)
 	UpdatePiercing(context.Context, Piercing) error
