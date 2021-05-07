@@ -113,4 +113,6 @@ type Storer interface {
 	InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error)
 	ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error)
 	DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error)
+	InsertAuditLog(ctx context.Context, al AuditLog) (err error)
+	ShowAuditLog(ctx context.Context) (al AuditLog, err error)
 }

@@ -59,4 +59,7 @@ var (
 	ProcessDBCreateError           = fmt.Errorf("Error creating process in db")
 	ProcessDuplicateCreationError  = fmt.Errorf("error creating duplicate process in db")
 	ProcessHighestSeqNumFetchError = fmt.Errorf("error getting highest sequence number of process in db")
+
+	AuditLogCreateError = fmt.Errorf("error in creating audit log in db")
+	AuditLogShowError   = fmt.Errorf("error in showing audit log ")
 )
