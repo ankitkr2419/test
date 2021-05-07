@@ -64,6 +64,7 @@ type OperationDetails struct {
 	TotalProcesses int       `json:"total_processes,omitempty"`
 	RecipeID       uuid.UUID `json:"recipe_id,omitempty"`
 	RemainingTime  int64     `json:"remaining_time,omitempty"`
+	ProcessName    string    `json:"process_name,omitempty"`
 }
 
 type Compact32Deck struct {
