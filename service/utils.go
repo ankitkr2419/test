@@ -15,6 +15,8 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+const contextKeyUsername = "username"
+const contextKeyUserAuthID = "auth_id"
 const (
 	hold  = "hold"
 	cycle = "cycle"
