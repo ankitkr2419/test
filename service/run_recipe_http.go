@@ -101,16 +101,16 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		resetStepRunInProgress(deck)
 	}()
 
-	// if !deps.PlcDeck[deck].IsMachineHomed() {
-	// 	err = fmt.Errorf("Please home the machine first!")
-	// 	return
-	// }
+	if !deps.PlcDeck[deck].IsMachineHomed() {
+		err = fmt.Errorf("Please home the machine first!")
+		return
+	}
 
-	// if deps.PlcDeck[deck].IsRunInProgress() {
-	// 	err = fmt.Errorf("previous run already in progress... wait or abort it")
+	if deps.PlcDeck[deck].IsRunInProgress() {
+		err = fmt.Errorf("previous run already in progress... wait or abort it")
 
-	// 	return
-	// }
+		return
+	}
 
 	deps.PlcDeck[deck].SetRunInProgress()
 	defer deps.PlcDeck[deck].ResetRunInProgress()
