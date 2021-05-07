@@ -147,7 +147,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	for i, p := range processes {
 
 		// TODO : percentage calculation from inside the process.
-		sendWSData(deps, deck, recipeID, len(processes), i+1)
+		sendWSData(deps, deck, recipeID, len(processes), i+1, p.Name, p.Type)
 
 		if runStepWise {
 
@@ -289,7 +289,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		}
 	}
 
-	sendWSData(deps, deck, recipeID, len(processes), len(processes)+1)
+	plength := len(processes)
+	sendWSData(deps, deck, recipeID, plength, plength+1, processes[plength-1].Name, processes[plength-1].Type)
 
 	// send websocket success data
 	successWsData := plc.WSData{
@@ -335,10 +336,10 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	return 0, err
 }
 
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName, processType string) {
 	// percentage calculation for each process
 
-	progress := float64(((currentStep -1) * 100) / processLength)
+	progress := float64(((currentStep - 1) * 100) / processLength)
 
 	wsProgressOperation := plc.WSData{
 		Progress: progress,
@@ -349,10 +350,12 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 			CurrentStep:    currentStep,
 			RecipeID:       recipeID,
 			TotalProcesses: processLength,
+			ProcessName:    processName,
+			ProcessType:    processType,
 		},
 	}
 
-	if processLength < currentStep{
+	if processLength < currentStep {
 		wsProgressOperation.OperationDetails.Message = fmt.Sprintf("process %v for deck %v completed", processLength, deck)
 		wsProgressOperation.OperationDetails.CurrentStep = processLength
 	}
