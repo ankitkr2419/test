@@ -67,7 +67,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdSh Shake
 	var tx *sql.Tx
 
 	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, sh.ProcessID, "Shaking", sh)
+	err = s.updateProcessName(ctx, sh.ProcessID, "Shaking", sh)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.ShakingUpdateNameError)
 		return
@@ -79,7 +79,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdSh Shake
 		return Shaker{}, err
 	}
 
-	createdSh, err = s.createShaking(ctx, sh, tx)
+	createdSh, err = s.createShaking(ctx, tx, sh)
 	// failures are already logged
 	// Commit the transaction else won't be able to Show
 
@@ -102,7 +102,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, sh Shaker) (createdSh Shake
 	return
 }
 
-func (s *pgStore) createShaking(ctx context.Context, sh Shaker, tx *sql.Tx) (createdSh Shaker, err error) {
+func (s *pgStore) createShaking(ctx context.Context, tx *sql.Tx, sh Shaker) (createdSh Shaker, err error) {
 
 	var lastInsertID uuid.UUID
 

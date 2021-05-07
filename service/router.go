@@ -83,6 +83,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/processes", authenticate(createProcessHandler(deps), deps, admin, engineer)).Methods(http.MethodPost)
 	router.HandleFunc("/recipe/{id}/processes", listProcessesHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/duplicate-process/{process_id}", duplicateProcessHandler(deps)).Methods(http.MethodGet)
+	router.HandleFunc("/rearrange-processes/{recipe_id}", rearrangeProcessesHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/processes/{id}", showProcessHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/processes/{id}", authenticate(deleteProcessHandler(deps), deps, admin, engineer)).Methods(http.MethodDelete)
 	router.HandleFunc("/processes/{id}", updateProcessHandler(deps)).Methods(http.MethodPut)
