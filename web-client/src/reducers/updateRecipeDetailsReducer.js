@@ -1,15 +1,21 @@
 import { DECKNAME } from "appConstants";
-import { saveNewRecipeAction } from "actions/saveNewRecipeActions";
+import {
+  getRecipeDetailsAction,
+  saveNewRecipeAction,
+} from "actions/saveNewRecipeActions";
 // import { fromJS } from "immutable";
 
 const initialState = {
+  tempDeckName: "",
+  isLoading: null,
+  error: null,
   decks: [
     {
       name: DECKNAME.DeckA,
       recipeDetails: {
         name: "",
       },
-      isLoading: false,
+      recipeOptions: null,
       isSaved: false,
       errorInSaving: false,
     },
@@ -18,7 +24,7 @@ const initialState = {
       recipeDetails: {
         name: "",
       },
-      isLoading: false,
+      recipeOptions: null,
       isSaved: false,
       errorInSaving: false,
     },
@@ -43,6 +49,44 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
       return {
         ...state,
         decks: deckAfterSave,
+      };
+
+    //Save options
+    case getRecipeDetailsAction.getRecipeDetailsInitiated:
+      return {
+        ...state,
+        isLoading: true,
+        tempDeckName: actions.payload.deckName,
+      };
+
+    case getRecipeDetailsAction.getRecipeDetailsSuccess:
+      let deckAfterLoadingSuccess = state.decks.map((deckObj, index) => {
+        return deckObj.name === state.tempDeckName
+          ? {
+              ...deckObj,
+              recipeOptions: actions.payload.response,
+            }
+          : deckObj;
+      });
+      return {
+        ...state,
+        decks: deckAfterLoadingSuccess,
+        isLoading: false,
+        error: false,
+      };
+
+    case getRecipeDetailsAction.getRecipeDetailsFailure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
+
+    case getRecipeDetailsAction.getRecipeDetailsReset:
+      return {
+        ...state,
+        isLoading: null,
+        error: null,
       };
 
     default:

@@ -71,6 +71,7 @@ export const API_ENDPOINTS = {
   recipeListing: "recipes",
   discardTipAndHoming: "discard-tip-and-home",
   cleanUp: "uv",
+  tipsTubes: "tips-tubes",
 };
 
 export const MODAL_MESSAGE = {
@@ -196,25 +197,35 @@ export const LABWARE_CARTRIDGE_2_OPTIONS = [
 
 // do not change the order!
 export const LABWARE_INITIAL_STATE = {
-  tips: { tipPosition1: null, tipPosition2: null, tipPosition3: null },
-  tipPiercing: { position1: false, position2: false },
-  deckPosition1: { tubeType: null },
-  deckPosition2: { tubeType: null },
-  cartridge1: { cartridgeType: null },
-  deckPosition3: { tubeType: null },
-  cartridge2: { cartridgeType: null },
-  deckPosition4: { tubeType: null },
+  tips: {
+    isTicked: false,
+    processDetails: {
+      tipPosition1: null,
+      tipPosition2: null,
+      tipPosition3: null,
+    },
+  },
+  tipPiercing: {
+    isTicked: false,
+    processDetails: { position1: false, position2: false },
+  },
+  deckPosition1: { isTicked: false, processDetails: { tubeType: null } },
+  deckPosition2: { isTicked: false, processDetails: { tubeType: null } },
+  cartridge1: { isTicked: false, processDetails: { cartridgeType: null } },
+  deckPosition3: { isTicked: false, processDetails: { tubeType: null } },
+  cartridge2: { isTicked: false, processDetails: { cartridgeType: null } },
+  deckPosition4: { isTicked: false, processDetails: { tubeType: null } },
 };
 export const RUN_RECIPE_TYPE = {
   CONTINUOUS_RUN: 0,
   STEP_RUN: 1,
-}
+};
 
 export const LABWARE_NAME = {
   tips: "Tips",
   tipPosition1: "Tip Position 1",
   tipPosition2: "Tip Position 2",
-  tipPosition3: "Tip Position 3", 
+  tipPosition3: "Tip Position 3",
   tipPiercing: "Tip Piercing",
   position1: "Position 1",
   position2: "Position 2",
@@ -224,6 +235,5 @@ export const LABWARE_NAME = {
   deckPosition4: "Deck Position 4",
   cartridge1: "Cartridge 1",
   cartridge2: "Cartridge 2",
-  cartridgeType : "Cartridge Type"
-
-}
+  cartridgeType: "Cartridge Type",
+};

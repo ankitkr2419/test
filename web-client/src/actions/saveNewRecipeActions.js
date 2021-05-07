@@ -6,6 +6,13 @@ export const saveNewRecipeAction = {
   saveRecipeReset: "SAVE_RECIPE_RESET",
 };
 
+export const getRecipeDetailsAction = {
+  getRecipeDetailsInitiated: "GET_RECIPE_DETAILS_INITIATED",
+  getRecipeDetailsSuccess: "GET_RECIPE_DETAILS_SUCCESS",
+  getRecipeDetailsFailure: "GET_RECIPE_DETAILS_FAILED",
+  getRecipeDetailsReset: "GET_RECIPE_DETAILS_RESET",
+}
+
 export default {
   updateRecipe: "UPDATE_RECIPE",
   saveRecipe: "SAVE_RECIPE",
