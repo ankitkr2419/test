@@ -143,8 +143,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
               runRecipeResponse: {
                 recipeId: action.payload.params.recipeId,
               },
-              leftActionBtn: DECKCARD_BTN.text.pause,
-              rightActionBtn: DECKCARD_BTN.text.abort,
             }
           : deckObj;
       });
@@ -154,7 +152,22 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         decks: decksAfterRunInitiated,
       };
     case runRecipeAction.runRecipeSuccess:
-      return state;
+       let deckNameRunSuccess = action.payload.response.deck === DECKNAME.DeckAShort ? DECKNAME.DeckA : DECKNAME.DeckB;
+
+       let decksAfterRunSuccess = state.decks.map((deckObj) => {
+        return deckObj.name === deckNameRunSuccess
+          ? {
+              ...deckObj,
+              leftActionBtn: DECKCARD_BTN.text.pause,
+              rightActionBtn: DECKCARD_BTN.text.abort,
+            }
+          : deckObj;
+      });
+
+      return {
+        ...state,
+        decks: decksAfterRunSuccess,
+      };
     // return {
     //     ...state,
     //     // runRecipeResponse: action.payload.response,

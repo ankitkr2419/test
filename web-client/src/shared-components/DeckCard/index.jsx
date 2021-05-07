@@ -209,6 +209,8 @@ const DeckCard = (props) => {
     progressPercentComplete,
     isActiveDeck,
     isAnotherDeckLoggedIn,
+    processName,
+    processType
   } = props;
 
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
@@ -441,7 +443,7 @@ const DeckCard = (props) => {
                       </Text>{" "}
                     </Text>
                     <Text Tag="span" className="ml-1 process-remaining">
-                      Processes remaining
+                      {processName ? processName : 'Processes remaining'}
                     </Text>
                   </Text>
                 </div>

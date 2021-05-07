@@ -391,6 +391,44 @@ const AppFooter = (props) => {
     setConfirmDoneModal(!confirmDoneModal);
   };
 
+  const getProcessDetails = (fieldName, deckName) => {
+    let isAdmin = deckName === DECKNAME.DeckA
+      ? loginDataOfA.isAdmin
+      : loginDataOfB.isAdmin
+    let recipeReducerData =
+      deckName === DECKNAME.DeckA
+        ? recipeActionReducerForDeckA
+        : recipeActionReducerForDeckB;
+
+    let defaultProcessName = "Processes remaining"
+    let defaultProcessType = "process";
+
+    switch (fieldName){
+      case 'name':
+        if(isAdmin && 
+          recipeReducerData.runRecipeInProgress && 
+          recipeReducerData.runRecipeInProgress.operation_details && 
+          recipeReducerData.runRecipeInProgress.operation_details.process_name
+        ) {
+          return recipeReducerData.runRecipeInProgress.operation_details.process_name;
+        } else {
+          return defaultProcessName;
+        }
+      case 'type':
+        if(isAdmin && 
+          recipeReducerData.runRecipeInProgress && 
+          recipeReducerData.runRecipeInProgress.operation_details && 
+          recipeReducerData.runRecipeInProgress.operation_details.process_type
+        ) {
+          return recipeReducerData.runRecipeInProgress.operation_details.process_type;
+        } else {
+          return defaultProcessType;
+        }
+      default:
+        break;
+    }
+  }
+
   return (
     <div className="d-flex justify-content-center align-items-center">
       {confirmAbortModal && (
@@ -518,6 +556,8 @@ const AppFooter = (props) => {
           recipeActionReducerForDeckA.rightActionBtnDisabled ||
           cleanUpReducerForDeckA.rightActionBtnDisabled
         }
+        processName={getProcessDetails('name', DECKNAME.DeckA)}
+        processType={getProcessDetails('type', DECKNAME.DeckA)}
       />
 
       {/** Deck B */}
@@ -585,6 +625,8 @@ const AppFooter = (props) => {
           recipeActionReducerForDeckB.rightActionBtnDisabled ||
           cleanUpReducerForDeckB.rightActionBtnDisabled
         }
+        processName={getProcessDetails('name', DECKNAME.DeckB)}
+        processType={getProcessDetails('type', DECKNAME.DeckB)}
       />
     </div>
   );
