@@ -186,3 +186,38 @@ func MD5Hash(s string) string {
 
 	return hex.EncodeToString(hash[:])
 }
+
+func addAuditLog(ctx context.Context, deps Dependencies) (err error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = responses.InvalidInterfaceConversionError
+		}
+
+	}()
+	username := ctx.Value("username").(string)
+
+	activityType := ctx.Value("activityType").(string)
+
+	stateType := ctx.Value("stateType").(string)
+
+	deck := ctx.Value("deck").(string)
+
+	description := ctx.Value("deck").(string)
+
+	log := db.AuditLog{
+		Username:     username,
+		ActivityType: activityType,
+		StateType:    stateType,
+		Deck:         deck,
+		Description:  description,
+	}
+
+	err = deps.Store.InsertAuditLog(ctx, log)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.AuditLogCreateError)
+		return
+	}
+
+	return
+}
