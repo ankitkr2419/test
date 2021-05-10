@@ -1,6 +1,7 @@
 import { DECKNAME } from "appConstants";
 import {
-  getRecipeDetailsAction,
+  getTipsAndTubesAction,
+  getCartridgeAction,
   saveNewRecipeAction,
 } from "actions/saveNewRecipeActions";
 // import { fromJS } from "immutable";
@@ -16,6 +17,7 @@ const initialState = {
         name: "",
       },
       recipeOptions: null,
+      cartridgeOptions: null,
       isSaved: false,
       errorInSaving: false,
     },
@@ -25,6 +27,7 @@ const initialState = {
         name: "",
       },
       recipeOptions: null,
+      cartrideOptions: null,
       isSaved: false,
       errorInSaving: false,
     },
@@ -52,14 +55,14 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
       };
 
     //Save options
-    case getRecipeDetailsAction.getRecipeDetailsInitiated:
+    case getTipsAndTubesAction.getTipsAndTubesInitiated:
       return {
         ...state,
         isLoading: true,
         tempDeckName: actions.payload.deckName,
       };
 
-    case getRecipeDetailsAction.getRecipeDetailsSuccess:
+    case getTipsAndTubesAction.getTipsAndTubesSuccess:
       let deckAfterLoadingSuccess = state.decks.map((deckObj, index) => {
         return deckObj.name === state.tempDeckName
           ? {
@@ -75,14 +78,52 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
         error: false,
       };
 
-    case getRecipeDetailsAction.getRecipeDetailsFailure:
+    case getTipsAndTubesAction.getTipsAndTubesFailure:
       return {
         ...state,
         isLoading: false,
         error: true,
       };
 
-    case getRecipeDetailsAction.getRecipeDetailsReset:
+    case getTipsAndTubesAction.getTipsAndTubesReset:
+      return {
+        ...state,
+        isLoading: null,
+        error: null,
+      };
+
+    //cartridge options
+    case getCartridgeAction.getCartridgeInitiated:
+      return {
+        ...state,
+        isLoading: true,
+        tempDeckName: actions.payload.deckName,
+      };
+
+    case getCartridgeAction.getCartridgeSuccess:
+      let deckAfterCartridgeLoadingSuccess = state.decks.map((deckObj, index) => {
+        return deckObj.name === state.tempDeckName
+          ? {
+              ...deckObj,
+              cartridgeOptions: actions.payload.response,
+            }
+          : deckObj;
+      });
+      return {
+        ...state,
+        decks: deckAfterCartridgeLoadingSuccess,
+        isLoading: false,
+        error: false,
+      };
+
+    case getCartridgeAction.getCartridgeFailure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
+
+    case getCartridgeAction.getCartridgeReset:
       return {
         ...state,
         isLoading: null,

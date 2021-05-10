@@ -1,13 +1,6 @@
 import React from "react";
 import {
-  LABWARE_CARTRIDGE_1_OPTIONS,
-  LABWARE_CARTRIDGE_2_OPTIONS,
-  LABWARE_DECK_POS_1_OPTIONS,
-  LABWARE_DECK_POS_2_OPTIONS,
-  LABWARE_DECK_POS_3_OPTIONS,
-  LABWARE_DECK_POS_4_OPTIONS,
   LABWARE_ITEMS_NAME,
-  LABWARE_TIPS_OPTIONS,
   LABWARE_NAME,
 } from "appConstants";
 
@@ -32,29 +25,19 @@ import { ProcessSetting } from "./Styles";
 export const updateAllTicks = (formik) => {
   const currentState = formik.values;
 
-  Object.keys(currentState).forEach((key) => {
-    const processDetails = currentState[key].processDetails;  
-    // const tick = currentState[key].isTicked;
+  Object.keys(currentState).forEach((key, index) => {
+    const processDetails = currentState[key].processDetails;
     let tick = false;
 
-    Object.values(processDetails).forEach((value) => {
-      if (value) {
+    // key : tipPosition1 tipPosition2 tipPosition3 position1 position2
+    for (const key in processDetails) {
+      if(processDetails[key].id){
         tick = true;
-        return;
+        break;
       }
-    });
+    }
     formik.setFieldValue(`${key}.isTicked`, tick);
   });
-
-  // const processDetails = currentState[key].processDetails;
-  // const tick = currentState[key].isTicked;
-
-  // Object.values(processDetails).forEach((value) => {
-  //   if (value && !tick) {
-  //     formik.setFieldValue(`${key}.isTicked`, true);
-  //     return;
-  //   }
-  // });
 };
 
 export const getSideBarNavItems = (formik, activeTab, toggle) => {
@@ -62,7 +45,6 @@ export const getSideBarNavItems = (formik, activeTab, toggle) => {
   LABWARE_ITEMS_NAME.forEach((name, index) => {
     const currentState = formik.values;
     const key = Object.keys(currentState)[index];
-    // getTicked(key, formik);
     navItems.push(
       <NavItem>
         <NavLink
@@ -87,7 +69,7 @@ export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
   const tipsPiercingCheckbox = [];
   for (let index = 0; index < nCheckboxes; index++) {
     let checked =
-      formik.values.tipPiercing.processDetails[`position${index + 1}`];
+      formik.values.tipPiercing.processDetails[`position${index + 1}`].id;
     tipsPiercingCheckbox.push(
       <CheckBox
         id={`position${index + 1}`}
@@ -97,7 +79,7 @@ export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
         checked={checked}
         onChange={(e) => {
           formik.setFieldValue(
-            `tipPiercing.processDetails.position${index + 1}`,
+            `tipPiercing.processDetails.position${index + 1}.id`,
             e.target.checked
           );
         }}
@@ -112,10 +94,8 @@ export const getTipsDropdown = (formik, options) => {
   const nDropdown = 3;
   const tipsOptions = [];
   for (let i = 0; i < nDropdown; i++) {
-    let tipPosition = tips.processDetails[`tipPosition${i + 1}`];
-    let index = options.map((item) => item.value).indexOf(
-      tipPosition
-    );
+    let tipPosition = tips.processDetails[`tipPosition${i + 1}`].id;
+    let index = options.map((item) => item.value).indexOf(tipPosition);
     tipsOptions.push(
       <FormGroup className="d-flex align-items-center mb-4">
         <Label for={`tip-position-${i + 1}`} className="px-0 label-name">
@@ -128,12 +108,16 @@ export const getTipsDropdown = (formik, options) => {
             size="sm"
             value={options[index]}
             options={options}
-            onChange={(e) =>
+            onChange={(e) => {
               formik.setFieldValue(
-                `tips.processDetails.tipPosition${i + 1}`,
+                `tips.processDetails.tipPosition${i + 1}.id`,
                 e.value
-              )
-            }
+              );
+              formik.setFieldValue(
+                `tips.processDetails.tipPosition${i + 1}.label`,
+                e.label
+              );
+            }}
           />
           <FormError>Incorrect Tip Position {index + 1}</FormError>
         </div>
@@ -144,9 +128,10 @@ export const getTipsDropdown = (formik, options) => {
 };
 
 export const getTipsAtPosition = (position, formik, options) => {
-  const tipPosition1Value = formik.values.tips.processDetails.tipPosition1;
-  const tipPosition2Value = formik.values.tips.processDetails.tipPosition2;
-  const tipPosition3Value = formik.values.tips.processDetails.tipPosition3;
+  const tips = formik.values.tips;
+  const tipPosition1Value = tips.processDetails.tipPosition1.id;
+  const tipPosition2Value = tips.processDetails.tipPosition2.id;
+  const tipPosition3Value = tips.processDetails.tipPosition3.id;
 
   return (
     <>
@@ -186,8 +171,8 @@ export const getTipsAtPosition = (position, formik, options) => {
 };
 
 export const getTipPiercingAtPosition = (position, formik) => {
-  const position1 = formik.values.tipPiercing.processDetails.position1;
-  const position2 = formik.values.tipPiercing.processDetails.position2;
+  const position1 = formik.values.tipPiercing.processDetails.position1.id;
+  const position2 = formik.values.tipPiercing.processDetails.position2.id;
 
   return (
     <>
@@ -231,18 +216,21 @@ export const getDeckAtPosition = (position, formik, options) => {
     labwareDeckPosition3,
     labwareDeckPosition4,
   ];
-  const deckPositionValue = formik.values[`deckPosition${position}`].processDetails;
-  const index = options
-    .map((item) => item.value)
-    .indexOf(deckPositionValue);
-  
+  const deckPositionValue =
+    formik.values[`deckPosition${position}`].processDetails.id;
+  const index = options.map((item) => item.value).indexOf(deckPositionValue);
+
   return (
     <>
       <TubeSelection
         handleOptionChange={(e) => {
           formik.setFieldValue(
-            `deckPosition${position}.processDetails.tubeType`,
+            `deckPosition${position}.processDetails.id`,
             e.value
+          );
+          formik.setFieldValue(
+            `deckPosition${position}.processDetails.tubeType`,
+            e.label
           );
         }}
         value={options[index]}
@@ -267,20 +255,11 @@ export const getDeckAtPosition = (position, formik, options) => {
 };
 
 export const getCartidgeAtPosition = (position, formik, options) => {
-  const cartidgePositionOptions = [
-    LABWARE_CARTRIDGE_1_OPTIONS,
-    LABWARE_CARTRIDGE_2_OPTIONS,
-  ];
   const cartridgeImages = [labwareCartridePosition1, labwareCartridePosition2];
+  const cartridgeTypeValue =
+    formik.values[`cartridge${position}`].processDetails.cartridgeType.id;
+  const index = options.map((item) => item.value).indexOf(cartridgeTypeValue);
 
-  const cartridgeValue =
-    formik.values[`cartridge${position}`].processDetails.cartridgeType;
-  const index = cartidgePositionOptions[position - 1]
-    .map((item) => item.value)
-    .indexOf(cartridgeValue);
-
-  const cartridgeType =
-    formik.values[`cartridge${position}`].processDetails.cartridgeType;
   return (
     <>
       <CartridgeSelection
@@ -290,13 +269,13 @@ export const getCartidgeAtPosition = (position, formik, options) => {
             e.value
           );
         }}
-        options={cartidgePositionOptions[position - 1]}
-        value={cartidgePositionOptions[position - 1][index]}
+        value={options[index]}
+        options={options}
       />
       <ProcessSetting>
         <div className="cartridge-position-info">
           <ul class="list-unstyled cartridge-position active">
-            {cartridgeType && (
+            {cartridgeTypeValue && (
               <li class={`highlighted cartridge-position-${position} active`} />
             )}
           </ul>

@@ -40,25 +40,42 @@ const LabWareComponent = (props) => {
     (state) => state.updateRecipeDetailsReducer
   );
   const deckIndex = activeDeckObj.name === DECKNAME.DeckA ? 0 : 1;
-  const recipeProcessOptions =
+  const tipsAndTubesOptions =
     recipeDetailsReducer.decks[deckIndex].recipeOptions;
+  const cartridgeOptions =
+    recipeDetailsReducer.decks[deckIndex].cartridgeOptions;
 
-  const getOptions = (lowerLimit, higherLimit) => {
+  const getOptions = (lowerLimit, higherLimit, options) => {
     const optionsObj = [];
-    if (recipeProcessOptions) {
-      recipeProcessOptions.forEach((recipeOptionObj) => {
-        if (
-          recipeOptionObj.id >= lowerLimit &&
-          recipeOptionObj.id <= higherLimit
-        ) {
+    if (options) {
+      options.forEach((optionObj) => {
+        if (optionObj.id >= lowerLimit && optionObj.id <= higherLimit) {
           optionsObj.push({
-            value: recipeOptionObj.id,
-            label: recipeOptionObj.name,
+            value: optionObj.id,
+            label: optionObj.name ? optionObj.name : optionObj.description,
           });
         }
       });
     }
     return optionsObj;
+  };
+
+  const handleSaveBtn = () => {
+    const selectedOptions = formik.values;
+    const requestBody = {
+      pos_1: selectedOptions.tips.processDetails.tipPosition1,
+      pos_2: selectedOptions.tips.processDetails.tipPosition2,
+      pos_3: selectedOptions.tips.processDetails.tipPosition3,
+      pos_4: selectedOptions.tipPiercing.processDetails.position1,
+      pos_5: selectedOptions.tipPiercing.processDetails.position2,
+      pos_6: selectedOptions.deckPosition1.processDetails.tubeType,
+      pos_7: selectedOptions.deckPosition2.processDetails.tubeType,
+      pos_cartridge_1: selectedOptions.cartridge1.processDetails.cartridgeType,
+      pos_9: selectedOptions.deckPosition3.processDetails.tubeType,
+      pos_cartridge_2: selectedOptions.cartridge2.processDetails.cartridgeType,
+      pos_11: selectedOptions.deckPosition4.processDetails.tubeType,
+    };
+    console.log(requestBody);
   };
 
   const toggle = (tab) => {
@@ -181,33 +198,63 @@ const LabWareComponent = (props) => {
 
                     <TabContent activeTab={activeTab} className="flex-grow-1">
                       <TabPane tabId="1">
-                        {getOptions(1, 3) &&
-                          getTipsAtPosition(1, formik, getOptions(1, 3))}
+                        {getOptions(1, 3, tipsAndTubesOptions) &&
+                          getTipsAtPosition(
+                            1,
+                            formik,
+                            getOptions(1, 3, tipsAndTubesOptions)
+                          )}
                       </TabPane>
                       <TabPane tabId="2">
                         {getTipPiercingAtPosition(1, formik)}
                       </TabPane>
                       <TabPane tabId="3">
-                        {getOptions(4, 4) &&
-                          getDeckAtPosition(1, formik, getOptions(4, 4))}
+                        {getOptions(4, 4, tipsAndTubesOptions) &&
+                          getDeckAtPosition(
+                            1,
+                            formik,
+                            getOptions(4, 4, tipsAndTubesOptions)
+                          )}
                       </TabPane>
                       <TabPane tabId="4">
-                        {getOptions(5, 5) &&
-                          getDeckAtPosition(2, formik, getOptions(5, 5))}
+                        {getOptions(5, 5, tipsAndTubesOptions) &&
+                          getDeckAtPosition(
+                            2,
+                            formik,
+                            getOptions(5, 5, tipsAndTubesOptions)
+                          )}
                       </TabPane>
                       <TabPane tabId="5">
-                        {getCartidgeAtPosition(1, formik)}
+                        {getOptions(1, 1, cartridgeOptions) &&
+                          getCartidgeAtPosition(
+                            1,
+                            formik,
+                            getOptions(1, 1, cartridgeOptions)
+                          )}
                       </TabPane>
                       <TabPane tabId="6">
-                        {getOptions(6, 6) &&
-                          getDeckAtPosition(3, formik, getOptions(6, 6))}
+                        {getOptions(6, 6, tipsAndTubesOptions) &&
+                          getDeckAtPosition(
+                            3,
+                            formik,
+                            getOptions(6, 6, tipsAndTubesOptions)
+                          )}
                       </TabPane>
                       <TabPane tabId="7">
-                        {getCartidgeAtPosition(2, formik)}
+                        {getOptions(2, 2, cartridgeOptions) &&
+                          getCartidgeAtPosition(
+                            2,
+                            formik,
+                            getOptions(2, 2, cartridgeOptions)
+                          )}
                       </TabPane>
                       <TabPane tabId="8">
-                        {getOptions(7, 7) &&
-                          getDeckAtPosition(4, formik, getOptions(7, 7))}
+                        {getOptions(7, 7, tipsAndTubesOptions) &&
+                          getDeckAtPosition(
+                            4,
+                            formik,
+                            getOptions(7, 7, tipsAndTubesOptions)
+                          )}
                       </TabPane>
                     </TabContent>
                   </div>
@@ -217,13 +264,15 @@ const LabWareComponent = (props) => {
                 {preview ? (
                   <ButtonBar
                     handleLeftBtn={() => setPreview(!preview)}
-                    // handleRightBtn={() => console.log("pre")}
+                    handleRightBtn={handleSaveBtn}
                     leftBtnLabel={"Modify"}
                     rightBtnLabel={"Save"}
                   />
                 ) : (
                   <ButtonBar
-                    handleRightBtn={() => setPreview(!preview)}
+                    handleRightBtn={() => {
+                      setPreview(!preview);
+                    }}
                     rightBtnLabel={"Preview"}
                   />
                 )}

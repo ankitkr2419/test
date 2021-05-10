@@ -72,6 +72,7 @@ export const API_ENDPOINTS = {
   discardTipAndHoming: "discard-tip-and-home",
   cleanUp: "uv",
   tipsTubes: "tips-tubes",
+  cartridge: "cartridges",
 };
 
 export const MODAL_MESSAGE = {
@@ -139,83 +140,46 @@ export const LABWARE_ITEMS_NAME = [
   "Deck Position 4",
 ];
 
-export const LABWARE_TIPS_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_1_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_2_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_3_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_4_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_CARTRIDGE_1_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_CARTRIDGE_2_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
 // do not change the order!
 export const LABWARE_INITIAL_STATE = {
   tips: {
     isTicked: false,
     processDetails: {
-      tipPosition1: null,
-      tipPosition2: null,
-      tipPosition3: null,
+      tipPosition1: { id: null, label: null },
+      tipPosition2: { id: null, label: null },
+      tipPosition3: { id: null, label: null },
     },
   },
   tipPiercing: {
     isTicked: false,
-    processDetails: { position1: false, position2: false },
+    processDetails: { position1: { id: null }, position2: { id: null } }, 
   },
-  deckPosition1: { isTicked: false, processDetails: { tubeType: null } },
-  deckPosition2: { isTicked: false, processDetails: { tubeType: null } },
-  cartridge1: { isTicked: false, processDetails: { cartridgeType: null } },
-  deckPosition3: { isTicked: false, processDetails: { tubeType: null } },
-  cartridge2: { isTicked: false, processDetails: { cartridgeType: null } },
-  deckPosition4: { isTicked: false, processDetails: { tubeType: null } },
+  deckPosition1: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
+  deckPosition2: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
+  cartridge1: {
+    isTicked: false,
+    processDetails: { cartridgeType: { id: null, label: null } },
+  },
+  deckPosition3: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
+  cartridge2: {
+    isTicked: false,
+    processDetails: { cartridgeType: { id: null, label: null } },
+  },
+  deckPosition4: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
 };
+
 export const RUN_RECIPE_TYPE = {
   CONTINUOUS_RUN: 0,
   STEP_RUN: 1,

@@ -6,11 +6,18 @@ export const saveNewRecipeAction = {
   saveRecipeReset: "SAVE_RECIPE_RESET",
 };
 
-export const getRecipeDetailsAction = {
-  getRecipeDetailsInitiated: "GET_RECIPE_DETAILS_INITIATED",
-  getRecipeDetailsSuccess: "GET_RECIPE_DETAILS_SUCCESS",
-  getRecipeDetailsFailure: "GET_RECIPE_DETAILS_FAILED",
-  getRecipeDetailsReset: "GET_RECIPE_DETAILS_RESET",
+export const getTipsAndTubesAction = {
+  getTipsAndTubesInitiated: "GET_TIPS_AND_TUBES_INITIATED",
+  getTipsAndTubesSuccess: "GET_TIPS_AND_TUBES_SUCCESS",
+  getTipsAndTubesFailure: "GET_TIPS_AND_TUBES_FAILED",
+  getTipsAndTubesReset: "GET_TIPS_AND_TUBES_RESET",
+}
+
+export const getCartridgeAction = {
+  getCartridgeInitiated: "GET_CARTRIDGE_INITIATED",
+  getCartridgeSuccess: "GET_CARTRIDGE_SUCCESS",
+  getCartridgeFailure: "GET_CARTRIDGE_FAILED",
+  getCartridgeReset: "GET_CARTRIDGE_RESET",
 }
 
 export default {

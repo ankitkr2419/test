@@ -1,6 +1,7 @@
 import {
   saveNewRecipeAction,
-  getRecipeDetailsAction,
+  getTipsAndTubesAction,
+  getCartridgeAction,
 } from "actions/saveNewRecipeActions";
 
 export const saveNewRecipe = (params) => ({
@@ -8,23 +9,43 @@ export const saveNewRecipe = (params) => ({
   payload: params,
 });
 
-export const getRecipeDetailsActionInitiaed = (params) => ({
-  type: getRecipeDetailsAction.getRecipeDetailsInitiated,
+export const getTipsAndTubesActionInitiated = (params) => ({
+  type: getTipsAndTubesAction.getTipsAndTubesInitiated,
   payload: params
 });
 
-export const getRecipeDetailsActionSuccess = (params) => ({
-  type: getRecipeDetailsAction.getRecipeDetailsSuccess,
+export const getTipsAndTubesActionSuccess = (params) => ({
+  type: getTipsAndTubesAction.getTipsAndTubesSuccess,
   payload: params
 });
 
-export const getRecipeDetailsActionFailure = (params) => ({
-  type: getRecipeDetailsAction.getRecipeDetailsFailure,
+export const getTipsAndTubesActionFailure = (params) => ({
+  type: getTipsAndTubesAction.getTipsAndTubesFailure,
   payload: params
 });
 
-export const getRecipeDetailsActionReset = (params) => ({
-  type: getRecipeDetailsAction.getRecipeDetailsReset,
+export const getTipsAndTubesActionReset = (params) => ({
+  type: getTipsAndTubesAction.getTipsAndTubesReset,
+  payload: params
+});
+
+export const getCartridgeActionInitiated = (params) => ({
+  type: getCartridgeAction.getCartridgeInitiated,
+  payload: params
+});
+
+export const getCartridgeActionSuccess = (params) => ({
+  type: getCartridgeAction.getCartridgeSuccess,
+  payload: params
+});
+
+export const getCartridgeActionFailure = (params) => ({
+  type: getCartridgeAction.getCartridgeActionFailure,
+  payload: params
+});
+
+export const getCartridgeActionReset = (params) => ({
+  type: getCartridgeAction.getCartridgeActionSuccess,
   payload: params
 });
 
