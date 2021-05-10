@@ -391,6 +391,11 @@ const AppFooter = (props) => {
     setConfirmDoneModal(!confirmDoneModal);
   };
 
+  /**
+   * This method used to extract process details (name,type) from web-socket responses 
+   * fieldName: can be name, type
+   * deckName: to get process details deckWise
+   */
   const getProcessDetails = (fieldName, deckName) => {
     let isAdmin = deckName === DECKNAME.DeckA
       ? loginDataOfA.isAdmin
@@ -401,7 +406,7 @@ const AppFooter = (props) => {
         : recipeActionReducerForDeckB;
 
     let defaultProcessName = "Processes remaining"
-    let defaultProcessType = "process";
+    let defaultProcessType;
 
     switch (fieldName){
       case 'name':

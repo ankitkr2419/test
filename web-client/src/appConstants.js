@@ -213,3 +213,51 @@ export const RUN_RECIPE_TYPE = {
   CONTINUOUS_RUN: 0,
   STEP_RUN: 1,
 }
+
+/**
+ * get process icon_name associated with processType
+ * */
+export const PROCESS_ICON_CONSTANTS = [
+  //if processType not found, use default process icon
+  {
+    processType: 'default',
+    iconName: 'process'
+  },
+
+  //other icons:
+  {
+    processType: 'Piercing',
+    iconName: 'piercing'
+  },
+  {
+    processType: 'AspireDispense',
+    iconName: 'aspire-dispense'
+  },
+  {
+    processType:  'Heating',
+    iconName: 'heating'
+  },
+  {
+    processType: 'Shaking', 
+    iconName: 'shaking'
+  },
+  {
+    processType: 'Delay',
+    iconName: 'delay'
+  },
+  /**TODO:
+   * following icons not available in fonts.scss
+   */
+  {
+    processType: 'TipOperation',
+    iconName: ''
+  },
+  {
+    processType: 'TipDocking',
+    iconName: ''
+  },
+  {
+    processType: 'AttachDetach',
+    iconName: ''
+  },
+]
