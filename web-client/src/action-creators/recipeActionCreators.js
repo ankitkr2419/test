@@ -6,6 +6,7 @@ import {
   recipeListingAction,
   saveRecipeDataAction,
   stepRunRecipeAction,
+  publishRecipeAction
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
@@ -190,6 +191,13 @@ export const stepRunRecipeInitiated = (params) => ({
 
 export const nextStepRunRecipeInitiated = (params) => ({
   type: stepRunRecipeAction.nextStepRunRecipeInitiated,
+  payload: {
+    params,
+  },
+})
+
+export const publishRecipeInitiated = (params) => ({
+  type: publishRecipeAction.publishRecipeInitiated,
   payload: {
     params,
   },

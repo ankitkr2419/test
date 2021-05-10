@@ -13,7 +13,7 @@ import RecipeCard from "components/RecipeListing/RecipeCard";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
-import { DECKNAME, MODAL_BTN, ROUTES } from "appConstants";
+import { DECKNAME, MODAL_BTN, ROUTES, MODAL_MESSAGE } from "appConstants";
 import { loginReset } from "action-creators/loginActionCreators";
 import {
   setCleanUpHours,
@@ -26,6 +26,7 @@ import { discardDeckInitiated } from "action-creators/discardDeckActionCreators"
 import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators";
 import AddNewRecipesModal from "components/modals/AddNewRecipesModal";
 import RunRecipesModal from "components/modals/RunRecipesModal";
+import { publishRecipeInitiated } from "action-creators/recipeActionCreators";
 
 const TopContent = styled.div`
   margin-bottom: 2.25rem;
@@ -75,6 +76,8 @@ const RecipeListingComponent = (props) => {
   const [nextModal, setNextModal] = useState(true);
   const [addNewRecipesModal, setAddNewRecipesModal] = useState(false);
   const [searchRecipeText, setSearchRecipeText] = useState("");
+  const [recipeIdToPublish, setRecipeIdToPublish] = useState("")
+  const [publishModal, setPublishModal] = useState(false)
 
   useEffect(() => {
     setSearchRecipeText("");
@@ -107,6 +110,24 @@ const RecipeListingComponent = (props) => {
     setTrayDiscardModal(!trayDiscardModal);
     setNextModal(true);
   };
+
+  const togglePublishModal = () => {
+    setPublishModal(!publishModal)
+  }
+
+  const handlePublishModalClick = (recipeId) => {
+    setRecipeIdToPublish(recipeId)
+    if(recipeId)
+      togglePublishModal();
+  }
+
+  const handlePublishConfirmation = () => {
+    togglePublishModal();
+    if(recipeIdToPublish)
+      dispatch(publishRecipeInitiated({recipeId: recipeIdToPublish, deckName}))
+    else 
+      console.error('recipeId not found!');
+  }
 
   const handleSuccessBtn = () => {
     if (nextModal) {
@@ -228,6 +249,19 @@ const RecipeListingComponent = (props) => {
           />
         )}
 
+        {/** publish confirmation modal */}
+        {publishModal && (
+        <MlModal
+          isOpen={publishModal}
+          textHead={deckName}
+          textBody={MODAL_MESSAGE.publishConfirmation}
+          handleSuccessBtn={handlePublishConfirmation}
+          handleCrossBtn={togglePublishModal}
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
+        />
+        )}
+
         <TopContent className="d-flex justify-content-between align-items-center mx-5">
           {isProcessInProgress ? null : (
             <div className="d-flex align-items-center">
@@ -314,10 +348,11 @@ const RecipeListingComponent = (props) => {
                           recipeId={recipe.id}
                           recipeName={recipe.name}
                           processCount={recipe.process_count}
-                          isPublished={recipe.isPublished}
+                          isPublished={recipe.is_published}
                           handleCarousalModal={handleCarousalModal}
                           returnRecipeDetails={returnRecipeDetails}
                           toggleRunRecipesModal={toggleRunRecipesModal}
+                          handlePublishModalClick={(recipeId) => handlePublishModalClick(recipeId)}
                         />
                       </Col>
                     ))

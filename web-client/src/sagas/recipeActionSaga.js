@@ -6,7 +6,8 @@ import {
   resumeRecipeAction,
   abortRecipeAction,
   recipeListingAction,
-  stepRunRecipeAction
+  stepRunRecipeAction,
+  publishRecipeAction
 } from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
 import {
@@ -212,6 +213,32 @@ export function* nextStepRunRecipe(actions) {
   }
 }
 
+
+export function* publishRecipe(actions) {
+  const {
+    payload: {
+      params: { recipeId, deckName },
+    },
+  } = actions;
+  const { publishRecipeSuccess, publishRecipeFailed } = publishRecipeAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: null,
+        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}/publish`,
+        successAction: publishRecipeSuccess,
+        failureAction: publishRecipeFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error in publish recipe", error);
+  }
+}
+
 export function* recipeActionSaga() {
   yield takeEvery(runRecipeAction.runRecipeInitiated, runRecipe);
   yield takeEvery(abortRecipeAction.abortRecipeInitiated, abortRecipe);
@@ -220,4 +247,5 @@ export function* recipeActionSaga() {
   yield takeEvery(recipeListingAction.recipeListingInitiated, recipeListing);
   yield takeEvery(stepRunRecipeAction.stepRunRecipeInitiated, stepRunRecipe);
   yield takeEvery(stepRunRecipeAction.nextStepRunRecipeInitiated, nextStepRunRecipe);
+  yield takeEvery(publishRecipeAction.publishRecipeInitiated, publishRecipe);
 }

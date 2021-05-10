@@ -82,6 +82,7 @@ export const MODAL_MESSAGE = {
   abortConfirmation: "Are you sure you want to abort now?",
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",
+  publishConfirmation: "Are you sure you want to Publish this recipe?"
 };
 
 export const MODAL_BTN = {

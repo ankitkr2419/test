@@ -53,7 +53,8 @@ const RecipeCard = (props) => {
     isPublished,
     handleCarousalModal,
     returnRecipeDetails,
-    toggleRunRecipesModal
+    toggleRunRecipesModal,
+    handlePublishModalClick
   } = props;
 
   const [toggle, setToggle] = useState(true);
@@ -124,7 +125,7 @@ const RecipeCard = (props) => {
                     size={14}
                     name="publish"
                     className="border-gray text-primary"
-                    // onClick={toggleExportDataModal}
+                    onClick={() => handlePublishModalClick(recipeId)}
                   />
                 </div>
                 <ButtonIcon

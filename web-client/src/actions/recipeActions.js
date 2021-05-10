@@ -48,3 +48,9 @@ export const stepRunRecipeAction = {
   stepRunRecipeFailed: "RUN_RECIPE_FAILED",
   nextStepRunRecipeInitiated: "NEXT_STEP_RUN_RECIPE_INITIATED",
 }
+
+export const publishRecipeAction = {
+  publishRecipeInitiated: "PUBLISH_RECIPE_INITIATED",
+  publishRecipeSuccess: "PUBLISH_RECIPE_SUCCESS",
+  publishRecipeFailed: "PUBLISH_RECIPE_FAILED"
+}
