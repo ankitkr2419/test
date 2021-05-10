@@ -123,7 +123,7 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseFailure() {
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 
-	suite.dbMock.On("UpdateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(testAspireDispenseRecord, nil)
+	suite.dbMock.On("UpdateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 
@@ -144,7 +144,7 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
 
-	suite.dbMock.On("UpdateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(db.AspireDispense{}, responses.AspireDispenseUpdateError)
+	suite.dbMock.On("UpdateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(responses.AspireDispenseUpdateError)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 

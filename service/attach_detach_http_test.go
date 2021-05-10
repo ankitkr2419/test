@@ -113,7 +113,7 @@ func (suite *AttachDetachHandlerTestSuite) TestShowAttachDetachFailure() {
 
 func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachSuccess() {
 
-	suite.dbMock.On("UpdateAttachDetach", mock.Anything, testAttachDetachRecord).Return(testAttachDetachRecord, nil)
+	suite.dbMock.On("UpdateAttachDetach", mock.Anything, testAttachDetachRecord).Return(nil)
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 
@@ -134,7 +134,7 @@ func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachSuccess() {
 
 func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachFailure() {
 
-	suite.dbMock.On("UpdateAttachDetach", mock.Anything, testAttachDetachRecord).Return(db.AttachDetach{}, responses.AttachDetachUpdateError)
+	suite.dbMock.On("UpdateAttachDetach", mock.Anything, testAttachDetachRecord).Return(responses.AttachDetachUpdateError)
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 
