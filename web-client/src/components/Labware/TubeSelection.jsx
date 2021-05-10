@@ -1,23 +1,6 @@
 import React from "react";
-
 import { FormGroup, Label, FormError, Select } from "core-components";
-
-import styled from "styled-components";
-
-const CommmonTubeFields = styled.div`
-  .label-name {
-    width: 9.125rem;
-  }
-  .input-field {
-    width: 14.125rem;
-    height: 2.25rem;
-    .height-icon-box {
-      position: absolute;
-      top: 3px;
-      right: 0.75rem;
-    }
-  }
-`;
+import { CommmonTubeFields } from './CommmonTubeFields';
 
 const TubeSelection = (props) => {
   const { handleOptionChange, options } = props;

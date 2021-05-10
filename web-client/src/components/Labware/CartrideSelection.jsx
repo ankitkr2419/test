@@ -6,26 +6,7 @@ import {
   FormError,
 	Select
 } from 'core-components';
-import {
-
-} from 'shared-components';
-
-import styled from 'styled-components';
-
-const CommmonCartridgeFields = styled.div`
-  .label-name{
-    width:9.125rem;
-  }
-  .input-field{
-    width:14.125rem;
-    height:2.25rem;
-    .height-icon-box{
-      position:absolute;
-      top:3px;
-      right:0.75rem;
-    }
-  }
-`;
+import { CommmonCartridgeFields } from './CommmonCartridgeFields';
 
 const CartridgeSelection = (props) => {
   const {
