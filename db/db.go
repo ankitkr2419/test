@@ -115,4 +115,5 @@ type Storer interface {
 	DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error)
 	InsertAuditLog(ctx context.Context, al AuditLog) (err error)
 	ShowAuditLog(ctx context.Context) (al AuditLog, err error)
+	AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description, username string) (err error)
 }
