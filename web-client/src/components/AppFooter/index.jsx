@@ -610,7 +610,7 @@ const AppFooter = (props) => {
             : 0
         }
         showCleanUp={cleanUpReducerForDeckB.showCleanUp}
-        handleLef tAction={getLeftActionBtnHandler(DECKNAME.DeckB)}
+        handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckB)}
         handleRightAction={getRightActionBtnHandler(DECKNAME.DeckB)}
         leftActionBtnDisabled={
           recipeActionReducerForDeckB.leftActionBtnDisabled ||
