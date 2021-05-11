@@ -1,15 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Button, Modal, ModalBody } from 'core-components';
+import { Button, ModalBody } from 'core-components';
 import { Center, Text, ImageIcon } from 'shared-components';
-
 import alertIcon from 'assets/images/alertIcon.svg';
-
-const StyledModal = styled(Modal)`
-  .modal-content {
-    min-height: 300px;
-  }
-`;
+import { StyledModal } from './StyledModal';
 
 const ErrorModal = ({ isOpen, hideModal, message }) => (
 	<StyledModal isOpen={isOpen} toggle={hideModal} centered size="sm">

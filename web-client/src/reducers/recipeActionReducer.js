@@ -80,7 +80,8 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
   switch (action.type) {
     case saveRecipeDataAction.saveRecipeDataForDeck: //set and update: depend on deckName
       let deckNameForRecipe = action.payload.deckName;
-      let isAdmin = action.payload.recipeData && action.payload.recipeData.isAdmin ? action.payload.recipeData.isAdmin: false;
+
+      let isAdmin = action.payload.recipeData?.isAdmin ? action.payload.recipeData.isAdmin: false;
       let newDecksAfterRecipeDataAdded = state.decks.map((deckObj) => {
         return deckObj.name === deckNameForRecipe
           ? {
@@ -143,8 +144,6 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
               runRecipeResponse: {
                 recipeId: action.payload.params.recipeId,
               },
-              leftActionBtn: DECKCARD_BTN.text.pause,
-              rightActionBtn: DECKCARD_BTN.text.abort,
             }
           : deckObj;
       });
@@ -154,7 +153,22 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         decks: decksAfterRunInitiated,
       };
     case runRecipeAction.runRecipeSuccess:
-      return state;
+       let deckNameRunSuccess = action.payload.response.deck === DECKNAME.DeckAShort ? DECKNAME.DeckA : DECKNAME.DeckB;
+
+       let decksAfterRunSuccess = state.decks.map((deckObj) => {
+        return deckObj.name === deckNameRunSuccess
+          ? {
+              ...deckObj,
+              leftActionBtn: DECKCARD_BTN.text.pause,
+              rightActionBtn: DECKCARD_BTN.text.abort,
+            }
+          : deckObj;
+      });
+
+      return {
+        ...state,
+        decks: decksAfterRunSuccess,
+      };
     // return {
     //     ...state,
     //     // runRecipeResponse: action.payload.response,
@@ -194,12 +208,24 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
       let decksAfterRunInProgress = state.decks.map((deckObj) => {
+        let isStepRun = deckObj.runRecipeType === RUN_RECIPE_TYPE.STEP_RUN;
+
+        //for admin: step-run: if current_step !== old_step then activate next button
+        let shouldActivateNextProcess = (isStepRun && 
+            deckObj.runRecipeInProgress && 
+            deckObj.runRecipeInProgress.operation_details &&
+            deckObj.runRecipeInProgress.operation_details.current_step) && 
+            deckObj.runRecipeInProgress.operation_details.current_step !== response.operation_details.current_step;
+            
         return deckObj.name === deckNameRunInProgress
           ? {
               ...deckObj,
               runRecipeInProgress: {
                 ...response,
               },
+              ...(shouldActivateNextProcess && {
+                leftActionBtn: DECKCARD_BTN.text.next
+              })
             }
           : deckObj;
       });

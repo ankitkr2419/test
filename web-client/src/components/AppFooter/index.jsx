@@ -10,6 +10,8 @@ import {
   resumeRecipeInitiated,
   runRecipeInitiated,
   runRecipeReset,
+  stepRunRecipeInitiated,
+  nextStepRunRecipeInitiated,
   //   pauseRecipeReset,
   //   resumeRecipeReset,
   //   abortRecipeReset,
@@ -118,7 +120,10 @@ const AppFooter = (props) => {
         return deckName === DECKNAME.DeckA
           ? handleDoneActionDeckA
           : handleDoneActionDeckB;
-
+      case DECKCARD_BTN.text.next:
+        return deckName === DECKNAME.DeckA
+          ? handleNextActionDeckA
+          : handleNextActionDeckB;
       default:
         break;
     }
@@ -166,20 +171,23 @@ const AppFooter = (props) => {
 
     if (recipeReducerData.showProcess) {
       let type = recipeReducerData.runRecipeType;
+      const { recipeId } = recipeReducerData.recipeData;
+      
       //if step run is selected
       if(type === RUN_RECIPE_TYPE.STEP_RUN){
-        console.log('Step run under development');
-        return;
-      } 
-
-      //else run default i.e., continuous run
-      const { recipeId } = recipeReducerData.recipeData;
-      dispatch(
-        runRecipeInitiated({
+        dispatch(stepRunRecipeInitiated({
           recipeId: recipeId,
-          deckName: recipeReducerData.name, //deck A
-        })
-      );
+          deckName: recipeReducerData.name,
+        }))
+      } else {
+        //else run default i.e., continuous run
+        dispatch(
+          runRecipeInitiated({
+            recipeId: recipeId,
+            deckName: recipeReducerData.name, //deck A
+          })
+        );
+      }
     } else {
       dispatch(
         runCleanUpActionInitiated({
@@ -194,20 +202,23 @@ const AppFooter = (props) => {
 
     if (recipeReducerData.showProcess) {
       let type = recipeReducerData.runRecipeType;
+      const { recipeId } = recipeReducerData.recipeData;
+     
       //if step run is selected
       if(type === RUN_RECIPE_TYPE.STEP_RUN){
-        console.log('Step run under development');
-        return;
-      } 
-
-      //else run default i.e., continuous run
-      const { recipeId } = recipeReducerData.recipeData;
-      dispatch(
-        runRecipeInitiated({
+        dispatch(stepRunRecipeInitiated({
           recipeId: recipeId,
-          deckName: recipeReducerData.name, //deck B
-        })
-      );
+          deckName: recipeReducerData.name,
+        }));
+      } else {
+        //else run default i.e., continuous run
+        dispatch(
+          runRecipeInitiated({
+            recipeId: recipeId,
+            deckName: recipeReducerData.name, //deck B
+          })
+        );
+      }
     } else {
       dispatch(
         runCleanUpActionInitiated({
@@ -278,6 +289,14 @@ const AppFooter = (props) => {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
   };
+
+  const handleNextActionDeckA = () => {
+    dispatch(nextStepRunRecipeInitiated({deckName: DECKNAME.DeckA}))
+  }
+
+  const handleNextActionDeckB = () => {
+    dispatch(nextStepRunRecipeInitiated({deckName: DECKNAME.DeckB}))
+  }
 
   //ABORT
   const handleAbortActionDeckA = () => {
@@ -372,6 +391,45 @@ const AppFooter = (props) => {
     setConfirmDoneModal(!confirmDoneModal);
   };
 
+  /**
+   * This method used to extract process details (name,type) from web-socket responses 
+   * fieldName: can be name, type
+   * deckName: to get process details deckWise
+   */
+  const getProcessDetails = (fieldName, deckName) => {
+    let isAdmin = deckName === DECKNAME.DeckA
+      ? loginDataOfA.isAdmin
+      : loginDataOfB.isAdmin
+    let recipeReducerData =
+      deckName === DECKNAME.DeckA
+        ? recipeActionReducerForDeckA
+        : recipeActionReducerForDeckB;
+
+    let defaultProcessName = "Processes remaining"
+    let defaultProcessType;
+
+    switch (fieldName){
+      case 'name':
+        if(isAdmin && 
+          recipeReducerData.runRecipeInProgress?.operation_details?.process_name
+        ) {
+          return recipeReducerData.runRecipeInProgress.operation_details.process_name;
+        } else {
+          return defaultProcessName;
+        }
+      case 'type':
+        if(isAdmin && 
+          recipeReducerData.runRecipeInProgress?.operation_details?.process_type
+        ) {
+          return recipeReducerData.runRecipeInProgress.operation_details.process_type;
+        } else {
+          return defaultProcessType;
+        }
+      default:
+        break;
+    }
+  }
+
   return (
     <div className="d-flex justify-content-center align-items-center">
       {confirmAbortModal && (
@@ -437,8 +495,7 @@ const AppFooter = (props) => {
       <DeckCard
         deckName={DECKNAME.DeckA}
         recipeName={
-          recipeActionReducerForDeckA.recipeData &&
-          recipeActionReducerForDeckA.recipeData.recipeName
+          recipeActionReducerForDeckA.recipeData?.recipeName
             ? recipeActionReducerForDeckA.recipeData.recipeName
             : null
         }
@@ -449,8 +506,7 @@ const AppFooter = (props) => {
             : 0
         }
         processTotal={
-          recipeActionReducerForDeckA.recipeData &&
-          recipeActionReducerForDeckA.recipeData.processCount
+          recipeActionReducerForDeckA.recipeData?.processCount
             ? recipeActionReducerForDeckA.recipeData.processCount
             : null
         }
@@ -480,8 +536,7 @@ const AppFooter = (props) => {
         progressPercentComplete={
           isDeckALoggedIn
             ? recipeActionReducerForDeckA.showProcess
-              ? recipeActionReducerForDeckA.runRecipeInProgress &&
-                recipeActionReducerForDeckA.runRecipeInProgress.progress
+              ? recipeActionReducerForDeckA.runRecipeInProgress?.progress
               : cleanUpReducerForDeckA.cleanUpData &&
                 JSON.parse(cleanUpReducerForDeckA.cleanUpData).progress
             : 0
@@ -499,6 +554,8 @@ const AppFooter = (props) => {
           recipeActionReducerForDeckA.rightActionBtnDisabled ||
           cleanUpReducerForDeckA.rightActionBtnDisabled
         }
+        processName={getProcessDetails('name', DECKNAME.DeckA)}
+        processType={getProcessDetails('type', DECKNAME.DeckA)}
       />
 
       {/** Deck B */}
@@ -506,8 +563,7 @@ const AppFooter = (props) => {
         deckName={DECKNAME.DeckB}
         recipeName={
           // recipeActionReducerForDeckB &&
-          recipeActionReducerForDeckB.recipeData &&
-          recipeActionReducerForDeckB.recipeData.recipeName
+          recipeActionReducerForDeckB.recipeData?.recipeName
             ? recipeActionReducerForDeckB.recipeData.recipeName
             : null
         }
@@ -518,8 +574,7 @@ const AppFooter = (props) => {
             : 0
         }
         processTotal={
-          recipeActionReducerForDeckB.recipeData &&
-          recipeActionReducerForDeckB.recipeData.processCount
+          recipeActionReducerForDeckB.recipeData?.processCount
             ? recipeActionReducerForDeckB.recipeData.processCount
             : null
         }
@@ -549,8 +604,7 @@ const AppFooter = (props) => {
         progressPercentComplete={
           isDeckBLoggedIn
             ? recipeActionReducerForDeckB.showProcess
-              ? recipeActionReducerForDeckB.runRecipeInProgress &&
-                recipeActionReducerForDeckB.runRecipeInProgress.progress
+              ? recipeActionReducerForDeckB.runRecipeInProgress?.progress
               : cleanUpReducerForDeckB.cleanUpData &&
                 JSON.parse(cleanUpReducerForDeckB.cleanUpData).progress
             : 0
@@ -566,6 +620,8 @@ const AppFooter = (props) => {
           recipeActionReducerForDeckB.rightActionBtnDisabled ||
           cleanUpReducerForDeckB.rightActionBtnDisabled
         }
+        processName={getProcessDetails('name', DECKNAME.DeckB)}
+        processType={getProcessDetails('type', DECKNAME.DeckB)}
       />
     </div>
   );
@@ -648,4 +704,4 @@ AppFooter.defaultProps = {
   loginBtn: false,
 };
 
-export default AppFooter;
+export default React.memo(AppFooter);

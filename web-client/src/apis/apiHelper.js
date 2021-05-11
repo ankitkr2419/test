@@ -116,12 +116,12 @@ export function* callApi(actions) {
 
     if (response.ok) {
       yield put(dispatcherHelper(successAction, parsedResponse));
-      if(showPopupSuccessMessage && parsedResponse && parsedResponse.msg){
+      if(showPopupSuccessMessage && parsedResponse?.msg){
         toast.success(parsedResponse.msg)
       }
     } else {
       yield put(dispatcherHelper(failureAction, parsedResponse, true));
-      if(showPopupFailureMessage && parsedResponse && parsedResponse.msg){
+      if(showPopupFailureMessage && parsedResponse?.msg){
         toast.error(parsedResponse.msg)
       }
     }

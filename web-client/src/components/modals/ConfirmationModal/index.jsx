@@ -50,4 +50,4 @@ ConfirmationModal.defaultProps = {
   isOpen: false,
 };
 
-export default ConfirmationModal;
+export default React.memo(ConfirmationModal);

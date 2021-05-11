@@ -73,6 +73,8 @@ export const API_ENDPOINTS = {
   cleanUp: "uv",
   tipsTubes: "tips-tubes",
   cartridge: "cartridges",
+  stepRun: "step-run",
+  runNextStep: "run-next-step",
 };
 
 export const MODAL_MESSAGE = {
@@ -82,6 +84,7 @@ export const MODAL_MESSAGE = {
   abortConfirmation: "Are you sure you want to abort now?",
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",
+  publishConfirmation: "Are you sure you want to Publish this recipe?"
 };
 
 export const MODAL_BTN = {
@@ -103,14 +106,17 @@ export const DECKCARD_BTN = {
     startUv: "START UV",
     pauseUv: "PAUSE UV",
     resumeUv: "RESUME UV",
+    next: "NEXT",
   },
   icon: {
     run: "play",
+    startUv: "play",
     abort: "abort",
     cancel: "cancel",
     pause: "pause",
     done: "done",
     resume: "resume",
+    next: "next"
   },
 };
 
@@ -201,3 +207,52 @@ export const LABWARE_NAME = {
   cartridge2: "Cartridge 2",
   cartridgeType: "Cartridge Type",
 };
+
+
+/**
+ * get process icon_name associated with processType
+ * */
+export const PROCESS_ICON_CONSTANTS = [
+  //if processType not found, use default process icon
+  {
+    processType: 'default',
+    iconName: 'process'
+  },
+
+  //other icons:
+  {
+    processType: 'Piercing',
+    iconName: 'piercing'
+  },
+  {
+    processType: 'AspireDispense',
+    iconName: 'aspire-dispense'
+  },
+  {
+    processType:  'Heating',
+    iconName: 'heating'
+  },
+  {
+    processType: 'Shaking', 
+    iconName: 'shaking'
+  },
+  {
+    processType: 'Delay',
+    iconName: 'delay'
+  },
+  /**TODO:
+   * following icons not available in fonts.scss
+   */
+  {
+    processType: 'TipOperation',
+    iconName: ''
+  },
+  {
+    processType: 'TipDocking',
+    iconName: ''
+  },
+  {
+    processType: 'AttachDetach',
+    iconName: ''
+  },
+]

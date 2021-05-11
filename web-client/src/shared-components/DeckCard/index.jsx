@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { Text, Icon } from "shared-components";
 import { Button } from "core-components";
 import ActionButton from "./ActionButton";
-import { DECKCARD_BTN } from "appConstants";
+import { DECKCARD_BTN, PROCESS_ICON_CONSTANTS } from "appConstants";
 import { Progress } from "reactstrap";
 import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer";
 import { useDispatch, useSelector } from "react-redux";
@@ -209,6 +209,8 @@ const DeckCard = (props) => {
     progressPercentComplete,
     isActiveDeck,
     isAnotherDeckLoggedIn,
+    processName,
+    processType
   } = props;
 
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
@@ -300,6 +302,15 @@ const DeckCard = (props) => {
             showCardOverLay={showCardOverLay}
           />
         );
+      case DECKCARD_BTN.text.next:
+        return (
+          <ActionButton
+            label={DECKCARD_BTN.text.next}
+            icon={DECKCARD_BTN.icon.next}
+            disabled={leftActionBtnDisabled}
+            showCardOverLay={showCardOverLay}
+          />
+      );
       default:
         break;
     }
@@ -353,6 +364,22 @@ const DeckCard = (props) => {
       cleanUpReducerForDeck.showCleanUp
     );
   };
+
+
+  /* get icon by process type
+    * if process type not found use 'default'
+    * if process type found but icon not found, use 'default'
+  */
+  const getIconName = () => {
+    let processTypeText = processType ? processType : 'default'
+    
+    let obj = PROCESS_ICON_CONSTANTS.find(obj => obj.processType === processTypeText)
+    
+    let iconName = (obj?.iconName)
+      ? obj.iconName 
+      : PROCESS_ICON_CONSTANTS.find(obj => obj.processType === 'default').iconName
+    return iconName;
+  }
 
   return (
     <DeckCardBox
@@ -417,7 +444,7 @@ const DeckCard = (props) => {
 								</Text> */}
 
                   <Text Tag="label" className="mb-1 d-flex align-items-center">
-                    <Icon name="process" size={19} className="text-primary" />
+                    <Icon name={getIconName()} size={19} className="text-primary" />
                     <Text
                       Tag="span"
                       className="process-count-label font-weight-bold ml-2"
@@ -432,7 +459,7 @@ const DeckCard = (props) => {
                       </Text>{" "}
                     </Text>
                     <Text Tag="span" className="ml-1 process-remaining">
-                      Processes remaining
+                      {processName ? processName : 'Processes remaining'}
                     </Text>
                   </Text>
                 </div>
@@ -541,4 +568,4 @@ DeckCard.defaultProps = {
   rightActionBtnDisabled: false,
 };
 
-export default DeckCard;
+export default React.memo(DeckCard);

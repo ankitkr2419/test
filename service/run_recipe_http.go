@@ -7,6 +7,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -97,6 +98,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
 		}
+		resetStepRunInProgress(deck)
 	}()
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
@@ -116,7 +118,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
-
 		return
 	}
 
@@ -137,17 +138,26 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	//  This field will be set when a tip is picked up
 	//  We will get its id from recipe and its details from tipsTubes
 
+	if runStepWise {
+		setStepRunInProgress(deck)
+		logger.Infoln("Populating the nextStep channel for 1st process for deck", deck)
+		nextStep[deck] <- struct{}{}
+	}
+
 	for i, p := range processes {
 
 		// TODO : percentage calculation from inside the process.
-		sendWSData(deps, deck, recipeID, len(processes), i+1)
+		sendWSData(deps, deck, recipeID, len(processes), i+1, p.Name, p.Type)
 
 		if runStepWise {
 
 			logger.Infoln("Waiting to run next process")
 			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
-			<-nextStep[deck]
+			err = checkForAbortOrNext(deck)
+			if err != nil {
+				return
+			}
 			setRunNext(deck)
 			logger.Infoln("Next process is in progress")
 		}
@@ -156,7 +166,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		case "AspireDispense":
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
-
 				return "", err
 			}
 			fmt.Println(ad)
@@ -169,7 +178,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
 			if err != nil {
-
 				return "", err
 			}
 
@@ -280,6 +288,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 		}
 	}
+
+	plength := len(processes)
+	sendWSData(deps, deck, recipeID, plength, plength+1, processes[plength-1].Name, processes[plength-1].Type)
+
 	// send websocket success data
 	successWsData := plc.WSData{
 		Progress: 100,
@@ -324,10 +336,10 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	return 0, err
 }
 
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int) (response string, err error) {
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName, processType string) {
 	// percentage calculation for each process
 
-	progress := float64((currentStep * 100) / processLength)
+	progress := float64(((currentStep - 1) * 100) / processLength)
 
 	wsProgressOperation := plc.WSData{
 		Progress: progress,
@@ -338,7 +350,14 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 			CurrentStep:    currentStep,
 			RecipeID:       recipeID,
 			TotalProcesses: processLength,
+			ProcessName:    processName,
+			ProcessType:    processType,
 		},
+	}
+
+	if processLength < currentStep {
+		wsProgressOperation.OperationDetails.Message = fmt.Sprintf("process %v for deck %v completed", processLength, deck)
+		wsProgressOperation.OperationDetails.CurrentStep = processLength
 	}
 
 	wsData, err := json.Marshal(wsProgressOperation)
@@ -348,4 +367,18 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
 	return
+}
+
+func checkForAbortOrNext(deck string) (err error) {
+	for {
+		time.Sleep(200 * time.Millisecond)
+		select {
+		case <-nextStep[deck]:
+			logger.Infoln("Next Step will be Run")
+			return nil
+		case <-abortStepRun[deck]:
+			logger.Infoln("Step Run will be Aborted")
+			return fmt.Errorf("step run aborted")
+		}
+	}
 }

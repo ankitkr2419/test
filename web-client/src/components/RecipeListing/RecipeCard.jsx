@@ -53,16 +53,15 @@ const RecipeCard = (props) => {
     isPublished,
     handleCarousalModal,
     returnRecipeDetails,
-    toggleRunRecipesModal
+    toggleRunRecipesModal,
+    handlePublishModalClick
   } = props;
 
   const [toggle, setToggle] = useState(true);
 
   const handleClickOnCard = () => {
     if (isAdmin) {
-      if (!isPublished) {
         setToggle(!toggle);
-      }
     } else {
       handleCarousalModal();
       returnRecipeDetails({ recipeId, recipeName, processCount });
@@ -124,7 +123,7 @@ const RecipeCard = (props) => {
                     size={14}
                     name="publish"
                     className="border-gray text-primary"
-                    // onClick={toggleExportDataModal}
+                    onClick={() => handlePublishModalClick(recipeId)}
                   />
                 </div>
                 <ButtonIcon
@@ -142,4 +141,4 @@ const RecipeCard = (props) => {
   );
 };
 
-export default RecipeCard;
+export default React.memo(RecipeCard);

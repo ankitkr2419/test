@@ -42,7 +42,6 @@ export const connectSocket = (dispatch) => {
   webSocket.onmessage = (event) => {
     if (event.data) {
       const { type, data } = JSON.parse(event.data);
-      // console.log('type', type, 'data: ', data);
       switch (type) {
         case SOCKET_MESSAGE_TYPE.graphData:
           dispatch(wellGraphSucceeded(data));

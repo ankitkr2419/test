@@ -1,10 +1,10 @@
 import React from "react";
 
 import styled from "styled-components";
-// import { Link } from 'react-router-dom';
 import PropTypes from "prop-types";
 import { Icon } from "shared-components";
-import {} from "core-components";
+
+
 
 const ActionBtn = styled.button`
   position: absolute;
@@ -59,27 +59,11 @@ const ActionBtn = styled.button`
     }
   }
 `;
-
-const CardOverlay = styled.div`
-  position: absolute;
-  // display: none;
-  width: 100%;
-  height: 20rem;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.28);
-  z-index: 3;
-  cursor: pointer;
-`;
-
 const ActionButton = (props) => {
-  const { label, icon, disabled, showCardOverLay } = props;
+  const { label, icon, disabled } = props;
 
   return (
     <>
-      <CardOverlay className={showCardOverLay() ? "" : "d-none"} />
       <ActionBtn
         className="d-flex justify-content-center align-items-center"
         disabled={disabled}
@@ -108,4 +92,4 @@ ActionButton.defaultProps = {
   disabled: false,
 };
 
-export default ActionButton;
+export default React.memo(ActionButton);
