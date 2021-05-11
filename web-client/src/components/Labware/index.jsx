@@ -16,6 +16,7 @@ import {
   getTipsAtPosition,
   getTipPiercingAtPosition,
   getPreviewInfo,
+  updateAllTicks,
 } from "./HelperFunctions";
 import { LabwareBox, PageBody, ProcessSetting } from "./Styles";
 
@@ -63,17 +64,17 @@ const LabWareComponent = (props) => {
   const handleSaveBtn = () => {
     const selectedOptions = formik.values;
     const requestBody = {
-      pos_1: selectedOptions.tips.processDetails.tipPosition1,
-      pos_2: selectedOptions.tips.processDetails.tipPosition2,
-      pos_3: selectedOptions.tips.processDetails.tipPosition3,
-      pos_4: selectedOptions.tipPiercing.processDetails.position1,
-      pos_5: selectedOptions.tipPiercing.processDetails.position2,
-      pos_6: selectedOptions.deckPosition1.processDetails.tubeType,
-      pos_7: selectedOptions.deckPosition2.processDetails.tubeType,
-      pos_cartridge_1: selectedOptions.cartridge1.processDetails.cartridgeType,
-      pos_9: selectedOptions.deckPosition3.processDetails.tubeType,
-      pos_cartridge_2: selectedOptions.cartridge2.processDetails.cartridgeType,
-      pos_11: selectedOptions.deckPosition4.processDetails.tubeType,
+      pos_1: selectedOptions.tips.processDetails.tipPosition1.id,
+      pos_2: selectedOptions.tips.processDetails.tipPosition2.id,
+      pos_3: selectedOptions.tips.processDetails.tipPosition3.id,
+      pos_4: selectedOptions.tipPiercing.processDetails.position1.id,
+      pos_5: selectedOptions.tipPiercing.processDetails.position2.id,
+      pos_6: selectedOptions.deckPosition1.processDetails.tubeType.id,
+      pos_7: selectedOptions.deckPosition2.processDetails.tubeType.id,
+      pos_cartridge_1: selectedOptions.cartridge1.processDetails.cartridgeType.id,
+      pos_9: selectedOptions.deckPosition3.processDetails.tubeType.id,
+      pos_cartridge_2: selectedOptions.cartridge2.processDetails.cartridgeType.id,
+      pos_11: selectedOptions.deckPosition4.processDetails.tubeType.id,
     };
     console.log(requestBody);
   };
@@ -89,6 +90,7 @@ const LabWareComponent = (props) => {
           <div className="process-content process-labware px-2">
             <Card className="labware-card-box">
               <CardBody className="p-0 overflow-hidden">
+                {/* Preview Body */}
                 {preview ? (
                   <div className="w-100 h-100 preview-box">
                     <Row>
@@ -114,15 +116,15 @@ const LabWareComponent = (props) => {
                           <div className="tips-info">
                             <ul class="list-unstyled tip-position active">
                               {formik.values.tips.processDetails
-                                .tipPosition1 && (
+                                .tipPosition1.id && (
                                 <li class="highlighted tip-position-1"></li>
                               )}
                               {formik.values.tips.processDetails
-                                .tipPosition2 && (
+                                .tipPosition2.id && (
                                 <li class="highlighted tip-position-2"></li>
                               )}
                               {formik.values.tips.processDetails
-                                .tipPosition3 && (
+                                .tipPosition3.id && (
                                 <li class="highlighted tip-position-3"></li>
                               )}
                             </ul>
@@ -131,11 +133,11 @@ const LabWareComponent = (props) => {
                           <div className="piercing-info">
                             <ul class="list-unstyled piercing-position active">
                               {formik.values.tipPiercing.processDetails
-                                .position1 && (
+                                .position1.id && (
                                 <li class="highlighted piercing-position-1"></li>
                               )}
                               {formik.values.tipPiercing.processDetails
-                                .position2 && (
+                                .position2.id && (
                                 <li class="highlighted piercing-position-2"></li>
                               )}
                             </ul>
@@ -144,19 +146,19 @@ const LabWareComponent = (props) => {
                           <div className="deck-position-info">
                             <ul class="list-unstyled deck-position active">
                               {formik.values.deckPosition1.processDetails
-                                .tubeType && (
+                                .tubeType.id && (
                                 <li class="highlighted deck-position-1 active" />
                               )}
                               {formik.values.deckPosition2.processDetails
-                                .tubeType && (
+                                .tubeType.id && (
                                 <li class="highlighted deck-position-2 active" />
                               )}
                               {formik.values.deckPosition3.processDetails
-                                .tubeType && (
+                                .tubeType.id && (
                                 <li class="highlighted deck-position-3 active" />
                               )}
                               {formik.values.deckPosition4.processDetails
-                                .tubeType && (
+                                .tubeType.id && (
                                 <li class="highlighted deck-position-4 active" />
                               )}
                             </ul>
@@ -165,11 +167,11 @@ const LabWareComponent = (props) => {
                           <div className="cartridge-position-info">
                             <ul class="list-unstyled cartridge-position active">
                               {formik.values.cartridge1.processDetails
-                                .cartridgeType && (
+                                .cartridgeType.id && (
                                 <li class="highlighted cartridge-position-1 active" />
                               )}
                               {formik.values.cartridge2.processDetails
-                                .cartridgeType && (
+                                .cartridgeType.id && (
                                 <li class="highlighted cartridge-position-2 active" />
                               )}
                             </ul>
@@ -185,6 +187,7 @@ const LabWareComponent = (props) => {
                     </div>
                   </div>
                 ) : (
+                  // Select Process 
                   <div className="d-flex">
                     <Nav tabs className="d-flex flex-column border-0 side-bar">
                       <Text className="d-flex justify-content-center align-items-center px-3 pt-3 pb-3 mb-0 font-weight-bold text-white">
@@ -272,6 +275,7 @@ const LabWareComponent = (props) => {
                   <ButtonBar
                     handleRightBtn={() => {
                       setPreview(!preview);
+                      updateAllTicks(formik);
                     }}
                     rightBtnLabel={"Preview"}
                   />

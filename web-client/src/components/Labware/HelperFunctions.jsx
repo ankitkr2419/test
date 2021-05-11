@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  LABWARE_ITEMS_NAME,
-  LABWARE_NAME,
-} from "appConstants";
+import { LABWARE_ITEMS_NAME, LABWARE_NAME } from "appConstants";
 
 import labwareTips from "assets/images/labware-plate-tips.png";
 import labwarePiercing from "assets/images/labware-plate-piercing.png";
@@ -29,9 +26,8 @@ export const updateAllTicks = (formik) => {
     const processDetails = currentState[key].processDetails;
     let tick = false;
 
-    // key : tipPosition1 tipPosition2 tipPosition3 position1 position2
     for (const key in processDetails) {
-      if(processDetails[key].id){
+      if (processDetails[key].id) {
         tick = true;
         break;
       }
@@ -68,7 +64,7 @@ export const getSideBarNavItems = (formik, activeTab, toggle) => {
 export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
   const tipsPiercingCheckbox = [];
   for (let index = 0; index < nCheckboxes; index++) {
-    let checked =
+    let isChecked =
       formik.values.tipPiercing.processDetails[`position${index + 1}`].id;
     tipsPiercingCheckbox.push(
       <CheckBox
@@ -76,11 +72,11 @@ export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
         name={`position${index + 1}`}
         label={`Position ${index + 1}`}
         className={index > 0 ? "ml-4" : ""}
-        checked={checked}
+        checked={isChecked}
         onChange={(e) => {
           formik.setFieldValue(
             `tipPiercing.processDetails.position${index + 1}.id`,
-            e.target.checked
+            e.target.checked ? 3 : 0
           );
         }}
       />
@@ -225,11 +221,11 @@ export const getDeckAtPosition = (position, formik, options) => {
       <TubeSelection
         handleOptionChange={(e) => {
           formik.setFieldValue(
-            `deckPosition${position}.processDetails.id`,
+            `deckPosition${position}.processDetails.tubeType.id`,
             e.value
           );
           formik.setFieldValue(
-            `deckPosition${position}.processDetails.tubeType`,
+            `deckPosition${position}.processDetails.tubeType.label`,
             e.label
           );
         }}
@@ -265,8 +261,12 @@ export const getCartidgeAtPosition = (position, formik, options) => {
       <CartridgeSelection
         handleOptionChange={(e) => {
           formik.setFieldValue(
-            `cartridge${position}.processDetails.cartridgeType`,
+            `cartridge${position}.processDetails.cartridgeType.id`,
             e.value
+          );
+          formik.setFieldValue(
+            `cartridge${position}.processDetails.cartridgeType.label`,
+            e.label
           );
         }}
         value={options[index]}
@@ -297,7 +297,7 @@ export const getSubHead = (key, formik) => {
   const previewInfoSubHead = [];
 
   nestedKeys.forEach((nestedKey) => {
-    recipeData[key].processDetails[nestedKey] &&
+    recipeData[key].processDetails[nestedKey].id &&
       previewInfoSubHead.push(
         <Text>
           {LEN > 1 && (
@@ -306,7 +306,7 @@ export const getSubHead = (key, formik) => {
             </Text>
           )}
           <Text Tag="span" className={LEN === 1 ? "font-weight-bold" : ""}>
-            {recipeData[key].processDetails[nestedKey]}{" "}
+            {recipeData[key].processDetails[nestedKey].label}{" "}
           </Text>
         </Text>
       );

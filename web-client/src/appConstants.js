@@ -152,7 +152,7 @@ export const LABWARE_INITIAL_STATE = {
   },
   tipPiercing: {
     isTicked: false,
-    processDetails: { position1: { id: null }, position2: { id: null } }, 
+    processDetails: { position1: { id: 0 }, position2: { id: 0 } },
   },
   deckPosition1: {
     isTicked: false,
