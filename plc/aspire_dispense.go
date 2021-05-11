@@ -442,6 +442,8 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 
 	syringeModuleDeckAndMotor := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
 
+	logger.Infoln("syringe module is inDeck, moving it to rest position")
+
 	if position, ok = consDistance["resting_position"]; !ok {
 		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
