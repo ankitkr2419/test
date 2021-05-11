@@ -4,7 +4,7 @@ application\.yml
 db/application_test\.yml
 
 # mylab zip file
-mylab.zip
+artifact.zip
 
 
 # web-client dependencies
