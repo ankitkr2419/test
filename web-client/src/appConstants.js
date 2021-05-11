@@ -108,6 +108,7 @@ export const DECKCARD_BTN = {
   },
   icon: {
     run: "play",
+    startUv: "play",
     abort: "abort",
     cancel: "cancel",
     pause: "pause",

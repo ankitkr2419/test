@@ -137,7 +137,7 @@ export const loginReducer = (state = loginInitialState, action) => {
             }
         case loginActions.failureAction:
             let err =
-                action.payload.serverErrors && action.payload.serverErrors.msg
+                action.payload.serverErrors?.msg
                     ? action.payload.serverErrors.msg
                     : "Something went wrong!";
             let newDecks = state.toJS().decks.map((deckObj) => {

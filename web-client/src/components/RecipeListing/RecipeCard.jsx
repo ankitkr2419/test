@@ -61,9 +61,7 @@ const RecipeCard = (props) => {
 
   const handleClickOnCard = () => {
     if (isAdmin) {
-      if (!isPublished) {
         setToggle(!toggle);
-      }
     } else {
       handleCarousalModal();
       returnRecipeDetails({ recipeId, recipeName, processCount });
@@ -143,4 +141,4 @@ const RecipeCard = (props) => {
   );
 };
 
-export default RecipeCard;
+export default React.memo(RecipeCard);

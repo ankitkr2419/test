@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import PropTypes from "prop-types";
-import styled from "styled-components";
 import {
   Modal,
   ModalBody,
@@ -17,16 +16,7 @@ import { useDispatch } from "react-redux";
 import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
 import { ROUTES } from "appConstants";
 import { Redirect } from "react-router";
-
-const AddNewRecipesForm = styled.div`
-  .recipe-name {
-    width: 362px;
-  }
-  label {
-    font-size: 0.813rem;
-    line-height: 0.938rem;
-  }
-`;
+import { AddNewRecipesForm } from './AddNewRecipesForm';
 
 const AddNewRecipesModal = (props) => {
   const {
@@ -72,9 +62,6 @@ const AddNewRecipesModal = (props) => {
 
   return (
     <>
-      {/* <Button color="primary" onClick={toggleAddNewRecipesModal}>
-                Add New Recipes Modal
-            </Button> */}
       <Modal
         isOpen={isOpen}
         toggle={toggleAddNewRecipesModal}
@@ -147,4 +134,4 @@ AddNewRecipesModal.defaultProps = {
   isOpen: false,
 };
 
-export default AddNewRecipesModal;
+export default React.memo(AddNewRecipesModal);

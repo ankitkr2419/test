@@ -411,9 +411,7 @@ const AppFooter = (props) => {
     switch (fieldName){
       case 'name':
         if(isAdmin && 
-          recipeReducerData.runRecipeInProgress && 
-          recipeReducerData.runRecipeInProgress.operation_details && 
-          recipeReducerData.runRecipeInProgress.operation_details.process_name
+          recipeReducerData.runRecipeInProgress?.operation_details?.process_name
         ) {
           return recipeReducerData.runRecipeInProgress.operation_details.process_name;
         } else {
@@ -421,9 +419,7 @@ const AppFooter = (props) => {
         }
       case 'type':
         if(isAdmin && 
-          recipeReducerData.runRecipeInProgress && 
-          recipeReducerData.runRecipeInProgress.operation_details && 
-          recipeReducerData.runRecipeInProgress.operation_details.process_type
+          recipeReducerData.runRecipeInProgress?.operation_details?.process_type
         ) {
           return recipeReducerData.runRecipeInProgress.operation_details.process_type;
         } else {
@@ -499,8 +495,7 @@ const AppFooter = (props) => {
       <DeckCard
         deckName={DECKNAME.DeckA}
         recipeName={
-          recipeActionReducerForDeckA.recipeData &&
-          recipeActionReducerForDeckA.recipeData.recipeName
+          recipeActionReducerForDeckA.recipeData?.recipeName
             ? recipeActionReducerForDeckA.recipeData.recipeName
             : null
         }
@@ -511,8 +506,7 @@ const AppFooter = (props) => {
             : 0
         }
         processTotal={
-          recipeActionReducerForDeckA.recipeData &&
-          recipeActionReducerForDeckA.recipeData.processCount
+          recipeActionReducerForDeckA.recipeData?.processCount
             ? recipeActionReducerForDeckA.recipeData.processCount
             : null
         }
@@ -542,8 +536,7 @@ const AppFooter = (props) => {
         progressPercentComplete={
           isDeckALoggedIn
             ? recipeActionReducerForDeckA.showProcess
-              ? recipeActionReducerForDeckA.runRecipeInProgress &&
-                recipeActionReducerForDeckA.runRecipeInProgress.progress
+              ? recipeActionReducerForDeckA.runRecipeInProgress?.progress
               : cleanUpReducerForDeckA.cleanUpData &&
                 JSON.parse(cleanUpReducerForDeckA.cleanUpData).progress
             : 0
@@ -570,8 +563,7 @@ const AppFooter = (props) => {
         deckName={DECKNAME.DeckB}
         recipeName={
           // recipeActionReducerForDeckB &&
-          recipeActionReducerForDeckB.recipeData &&
-          recipeActionReducerForDeckB.recipeData.recipeName
+          recipeActionReducerForDeckB.recipeData?.recipeName
             ? recipeActionReducerForDeckB.recipeData.recipeName
             : null
         }
@@ -582,8 +574,7 @@ const AppFooter = (props) => {
             : 0
         }
         processTotal={
-          recipeActionReducerForDeckB.recipeData &&
-          recipeActionReducerForDeckB.recipeData.processCount
+          recipeActionReducerForDeckB.recipeData?.processCount
             ? recipeActionReducerForDeckB.recipeData.processCount
             : null
         }
@@ -613,8 +604,7 @@ const AppFooter = (props) => {
         progressPercentComplete={
           isDeckBLoggedIn
             ? recipeActionReducerForDeckB.showProcess
-              ? recipeActionReducerForDeckB.runRecipeInProgress &&
-                recipeActionReducerForDeckB.runRecipeInProgress.progress
+              ? recipeActionReducerForDeckB.runRecipeInProgress?.progress
               : cleanUpReducerForDeckB.cleanUpData &&
                 JSON.parse(cleanUpReducerForDeckB.cleanUpData).progress
             : 0
@@ -714,4 +704,4 @@ AppFooter.defaultProps = {
   loginBtn: false,
 };
 
-export default AppFooter;
+export default React.memo(AppFooter);
