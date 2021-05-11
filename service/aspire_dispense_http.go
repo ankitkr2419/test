@@ -12,8 +12,26 @@ import (
 
 func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AspireDispenseInitialisedState, username)
+
 		var adobj db.AspireDispense
 		err := json.NewDecoder(req.Body).Decode(&adobj)
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AspireDispenseCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.AspireDispenseDecodeError.Error()})
@@ -41,9 +59,25 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
 
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.AspireDispenseInitialisedState, username)
+
+		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AspireDispenseCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
@@ -66,8 +100,26 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.AspireDispenseInitialisedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AspireDispenseCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})

@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,9 +12,24 @@ import (
 
 func createShakingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.ShakingInitialisedState, username)
 
 		var shaObj db.Shaker
 		err := json.NewDecoder(req.Body).Decode(&shaObj)
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.ShakingCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding shaking data")
@@ -49,8 +65,25 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 
 func showShakingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.ShakingInitialisedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.ShakingCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
@@ -78,8 +111,24 @@ func showShakingHandler(deps Dependencies) http.HandlerFunc {
 
 func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.ShakingInitialisedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.ShakingCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return

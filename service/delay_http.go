@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,8 +12,25 @@ import (
 
 func createDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.DelayInitialisedState, username)
+
 		var delay db.Delay
 		err := json.NewDecoder(req.Body).Decode(&delay)
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.DelayCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding Delay data")
@@ -48,9 +66,27 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 
 func showDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.DelayInitialisedState, username)
+
 		vars := mux.Vars(req)
 
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.DelayCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
@@ -80,8 +116,24 @@ func showDelayHandler(deps Dependencies) http.HandlerFunc {
 
 func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.DelayInitialisedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.DelayCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return

@@ -96,7 +96,8 @@ var (
 	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
 	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
 
-	AuditLogFetchError = fmt.Errorf("error failed saving log")
+	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
+	AuditLogCreateError = fmt.Errorf("error failed saving log")
 )
 
 // Special errors which are in []byte format

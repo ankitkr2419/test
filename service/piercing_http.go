@@ -12,8 +12,22 @@ import (
 
 func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.PiercingInitialisedState, username)
+
 		var pobj db.Piercing
 		err := json.NewDecoder(req.Body).Decode(&pobj)
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.PiercingCompletedState, username)
+
+			}
+
+		}()
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PiercingDecodeError.Error()})
@@ -41,9 +55,25 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.PiercingInitialisedState, username)
+
 		vars := mux.Vars(req)
 
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.PiercingCompletedState, username)
+
+			}
+
+		}()
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
@@ -66,8 +96,24 @@ func showPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.PiercingInitialisedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.PiercingCompletedState, username)
+
+			}
+
+		}()
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
