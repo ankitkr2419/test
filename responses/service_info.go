@@ -43,4 +43,5 @@ var (
 	NextStepWillRun       = "next step will be run"
 	StepRunWillAbort      = "step run will be aborted"
 	WaitingRunNextProcess = "waiting to run next process"
+	NextProcessInProgress = "next process is in progress"
 )

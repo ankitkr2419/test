@@ -297,7 +297,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	}
 	wsData, err := json.Marshal(successWsData)
 	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(response.WebsocketMarshallingError)
+		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
 		return
 	}
 	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v", string(wsData))
@@ -358,7 +358,7 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 
 	wsData, err := json.Marshal(wsProgressOperation)
 	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(response.WebsocketMarshallingError)
+		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
 	}
 	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
