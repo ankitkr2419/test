@@ -1,42 +1,8 @@
 import React from "react";
-
-import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Icon } from "shared-components";
 import { Button } from "core-components";
-
-const ButtonBarBox = styled.div`
-  width: 93.82%;
-  height: 3.25rem;
-  background-color: #fff;
-  z-index: 2;
-  border-radius: 2rem 0 0 2rem;
-  padding: 0.5rem 4.938rem 0.5rem 2.375rem;
-  box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.06);
-  position: absolute;
-  right: 0;
-  // bottom: 3rem;
-  top: 29rem;
-  > button {
-    width: 160px;
-    &:hover,
-    &:focus {
-      color: #ffffff !important;
-      > i {
-        color: #ffffff !important;
-      }
-    }
-    > i {
-      color: #f38220;
-    }
-  }
-`;
-const PrevBtn = styled.div`
-  min-width: inherit;
-  border: 0;
-  box-shadow: none;
-  color: #f38220;
-`;
+import { ButtonBarBox, PrevBtn } from './Styles';
 
 const ButtonBar = (props) => {
   const { handleTemp } = props;
