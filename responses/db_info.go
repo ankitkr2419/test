@@ -1,6 +1,9 @@
 package responses
 
 var (
-	ProcessHighestSeqNumFetchSuccess = "process highest sequence number fetch success"
-	ProcessDuplicateCreateSuccess    = "Duplicate process created in db"
+	ProcessCountFetchSuccess      = "process count fetch success for recipe in db"
+	ProcessDuplicateCreateSuccess = "duplicate process created in db"
+	ProcessRearrangeSuccess       = "processes arrangement was successful in db"
+	ProcessSubtractSuccess        = "process sequence number subtraction was successful in db"
+	ProcessRearrangeDBSuccess     = "process rearranging was successful"
 )

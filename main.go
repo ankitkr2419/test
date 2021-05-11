@@ -81,7 +81,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				if c.String("plc") != "simulator" {
+				if c.String("plc") != "simulator" && c.Int("delay") != 50 {
 					return responses.SimulatorReservedDelayError
 				}
 				err := simulator.UpdateDelay(c.Int("delay"))
