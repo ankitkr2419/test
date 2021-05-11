@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import DeckCard from "shared-components/DeckCard";
-import { DECKNAME, MODAL_BTN, MODAL_MESSAGE, DECKCARD_BTN, RUN_RECIPE_TYPE } from "appConstants";
+import {
+  DECKNAME,
+  MODAL_BTN,
+  MODAL_MESSAGE,
+  DECKCARD_BTN,
+  RUN_RECIPE_TYPE,
+} from "appConstants";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
@@ -172,13 +178,15 @@ const AppFooter = (props) => {
     if (recipeReducerData.showProcess) {
       let type = recipeReducerData.runRecipeType;
       const { recipeId } = recipeReducerData.recipeData;
-      
+
       //if step run is selected
-      if(type === RUN_RECIPE_TYPE.STEP_RUN){
-        dispatch(stepRunRecipeInitiated({
-          recipeId: recipeId,
-          deckName: recipeReducerData.name,
-        }))
+      if (type === RUN_RECIPE_TYPE.STEP_RUN) {
+        dispatch(
+          stepRunRecipeInitiated({
+            recipeId: recipeId,
+            deckName: recipeReducerData.name,
+          })
+        );
       } else {
         //else run default i.e., continuous run
         dispatch(
@@ -203,13 +211,15 @@ const AppFooter = (props) => {
     if (recipeReducerData.showProcess) {
       let type = recipeReducerData.runRecipeType;
       const { recipeId } = recipeReducerData.recipeData;
-     
+
       //if step run is selected
-      if(type === RUN_RECIPE_TYPE.STEP_RUN){
-        dispatch(stepRunRecipeInitiated({
-          recipeId: recipeId,
-          deckName: recipeReducerData.name,
-        }));
+      if (type === RUN_RECIPE_TYPE.STEP_RUN) {
+        dispatch(
+          stepRunRecipeInitiated({
+            recipeId: recipeId,
+            deckName: recipeReducerData.name,
+          })
+        );
       } else {
         //else run default i.e., continuous run
         dispatch(
@@ -291,12 +301,12 @@ const AppFooter = (props) => {
   };
 
   const handleNextActionDeckA = () => {
-    dispatch(nextStepRunRecipeInitiated({deckName: DECKNAME.DeckA}))
-  }
+    dispatch(nextStepRunRecipeInitiated({ deckName: DECKNAME.DeckA }));
+  };
 
   const handleNextActionDeckB = () => {
-    dispatch(nextStepRunRecipeInitiated({deckName: DECKNAME.DeckB}))
-  }
+    dispatch(nextStepRunRecipeInitiated({ deckName: DECKNAME.DeckB }));
+  };
 
   //ABORT
   const handleAbortActionDeckA = () => {
@@ -392,43 +402,92 @@ const AppFooter = (props) => {
   };
 
   /**
-   * This method used to extract process details (name,type) from web-socket responses 
+   * This method used to extract process details (name,type) from web-socket responses
    * fieldName: can be name, type
    * deckName: to get process details deckWise
    */
   const getProcessDetails = (fieldName, deckName) => {
-    let isAdmin = deckName === DECKNAME.DeckA
-      ? loginDataOfA.isAdmin
-      : loginDataOfB.isAdmin
+    let isAdmin =
+      deckName === DECKNAME.DeckA ? loginDataOfA.isAdmin : loginDataOfB.isAdmin;
     let recipeReducerData =
       deckName === DECKNAME.DeckA
         ? recipeActionReducerForDeckA
         : recipeActionReducerForDeckB;
 
-    let defaultProcessName = "Processes remaining"
+    let defaultProcessName = "Processes remaining";
     let defaultProcessType;
 
-    switch (fieldName){
-      case 'name':
-        if(isAdmin && 
+    switch (fieldName) {
+      case "name":
+        if (
+          isAdmin &&
           recipeReducerData.runRecipeInProgress?.operation_details?.process_name
         ) {
-          return recipeReducerData.runRecipeInProgress.operation_details.process_name;
+          return recipeReducerData.runRecipeInProgress.operation_details
+            .process_name;
         } else {
           return defaultProcessName;
         }
-      case 'type':
-        if(isAdmin && 
+      case "type":
+        if (
+          isAdmin &&
           recipeReducerData.runRecipeInProgress?.operation_details?.process_type
         ) {
-          return recipeReducerData.runRecipeInProgress.operation_details.process_type;
+          return recipeReducerData.runRecipeInProgress.operation_details
+            .process_type;
         } else {
           return defaultProcessType;
         }
       default:
         break;
     }
-  }
+  };
+
+  /**
+   * This method checks the type of modal and return
+   * body text msg accordingly for done and abort.
+   * type: type of modal - done or abort.
+   */
+  const getModalTextBodyMsg = (type) => {
+    // modal type = abort
+    if (type === DECKCARD_BTN.text.abort) {
+      if (deckName === DECKNAME.DeckA) {
+        // recipeProcess
+        if (recipeActionReducerForDeckA.showProcess) {
+          return MODAL_MESSAGE.abortConfirmation;
+        } else {
+          return MODAL_MESSAGE.abortCleanupConfirmation;
+        }
+      }
+      // cleanUpProcess
+      else {
+        if (recipeActionReducerForDeckB.showProcess) {
+          return MODAL_MESSAGE.abortConfirmation;
+        } else {
+          return MODAL_MESSAGE.abortCleanupConfirmation;
+        }
+      }
+    }
+    //modal type = done
+    else {
+      if (deckName === DECKNAME.DeckA) {
+        // recipeProcess
+        if (recipeActionReducerForDeckA.showProcess) {
+          return MODAL_MESSAGE.experimentSuccess;
+        } else {
+          return MODAL_MESSAGE.uvSuccess;
+        }
+      }
+      // cleanUpProcess
+      else {
+        if (recipeActionReducerForDeckB.showProcess) {
+          return MODAL_MESSAGE.experimentSuccess;
+        } else {
+          return MODAL_MESSAGE.uvSuccess;
+        }
+      }
+    }
+  };
 
   return (
     <div className="d-flex justify-content-center align-items-center">
@@ -436,15 +495,7 @@ const AppFooter = (props) => {
         <MlModal
           isOpen={confirmAbortModal}
           textHead={deckName}
-          textBody={
-            deckName === DECKNAME.DeckA
-              ? recipeActionReducerForDeckA.showProcess
-                ? MODAL_MESSAGE.abortConfirmation
-                : MODAL_MESSAGE.abortCleanupConfirmation
-              : recipeActionReducerForDeckB.showProcess
-              ? MODAL_MESSAGE.abortConfirmation
-              : MODAL_MESSAGE.abortCleanupConfirmation
-          }
+          textBody={getModalTextBodyMsg(DECKCARD_BTN.text.abort)}
           successBtn={MODAL_BTN.yes}
           failureBtn={MODAL_BTN.no}
           handleSuccessBtn={
@@ -462,15 +513,7 @@ const AppFooter = (props) => {
         <MlModal
           isOpen={confirmDoneModal}
           textHead={deckName}
-          textBody={
-            deckName === DECKNAME.DeckA
-              ? recipeActionReducerForDeckA.showProcess
-                ? MODAL_MESSAGE.experimentSuccess
-                : MODAL_MESSAGE.uvSuccess
-              : recipeActionReducerForDeckB.showProcess
-              ? MODAL_MESSAGE.experimentSuccess
-              : MODAL_MESSAGE.uvSuccess
-          }
+          textBody={getModalTextBodyMsg(DECKCARD_BTN.text.done)}
           successBtn={MODAL_BTN.next}
           handleSuccessBtn={
             deckName === DECKNAME.DeckA
@@ -554,8 +597,8 @@ const AppFooter = (props) => {
           recipeActionReducerForDeckA.rightActionBtnDisabled ||
           cleanUpReducerForDeckA.rightActionBtnDisabled
         }
-        processName={getProcessDetails('name', DECKNAME.DeckA)}
-        processType={getProcessDetails('type', DECKNAME.DeckA)}
+        processName={getProcessDetails("name", DECKNAME.DeckA)}
+        processType={getProcessDetails("type", DECKNAME.DeckA)}
       />
 
       {/** Deck B */}
@@ -620,8 +663,8 @@ const AppFooter = (props) => {
           recipeActionReducerForDeckB.rightActionBtnDisabled ||
           cleanUpReducerForDeckB.rightActionBtnDisabled
         }
-        processName={getProcessDetails('name', DECKNAME.DeckB)}
-        processType={getProcessDetails('type', DECKNAME.DeckB)}
+        processName={getProcessDetails("name", DECKNAME.DeckB)}
+        processType={getProcessDetails("type", DECKNAME.DeckB)}
       />
     </div>
   );
