@@ -18,10 +18,6 @@ import {
   runRecipeReset,
   stepRunRecipeInitiated,
   nextStepRunRecipeInitiated,
-  //   pauseRecipeReset,
-  //   resumeRecipeReset,
-  //   abortRecipeReset,
-  //   updateRecipeReducerDataForDeck,
 } from "action-creators/recipeActionCreators";
 import {
   abortCleanUpActionInitiated,
@@ -402,35 +398,126 @@ const AppFooter = (props) => {
   };
 
   /**
-   * This method used to extract process details (name,type) from web-socket responses
-   * fieldName: can be name, type
-   * deckName: to get process details deckWise
+   * This method checks the type of modal and return
+   * body text msg accordingly for done and abort.
+   * fieldName: type of modal - done or abort.
    */
-  const getProcessDetails = (fieldName, deckName) => {
-    let isAdmin =
-      deckName === DECKNAME.DeckA ? loginDataOfA.isAdmin : loginDataOfB.isAdmin;
+  const getModalTextBodyMsg = (fieldName) => {
     let recipeReducerData =
       deckName === DECKNAME.DeckA
         ? recipeActionReducerForDeckA
         : recipeActionReducerForDeckB;
 
-    let defaultProcessName = "Processes remaining";
-    let defaultProcessType;
+    let isShowProcessForCurrentDeck = recipeReducerData.showProcess;
 
     switch (fieldName) {
-      case "name":
+      case DECKCARD_BTN.text.abort:
+        return isShowProcessForCurrentDeck
+          ? MODAL_MESSAGE.abortConfirmation
+          : MODAL_MESSAGE.abortCleanupConfirmation;
+
+      case DECKCARD_BTN.text.done:
+        return isShowProcessForCurrentDeck
+          ? MODAL_MESSAGE.experimentSuccess
+          : MODAL_MESSAGE.uvSuccess;
+      default:
+        return;
+    }
+  };
+
+  /**
+   * This method returns the proper props' value which
+   * is to be passed to DeckCard component.
+   * fieldName: different types of prop.
+   */
+  const getPropsValue = (fieldName, deckName) => {
+    let recipeReducerData =
+      deckName === DECKNAME.DeckA
+        ? recipeActionReducerForDeckA
+        : recipeActionReducerForDeckB;
+
+    let cleanUpReducerData =
+      deckName === DECKNAME.DeckA
+        ? cleanUpReducerForDeckA
+        : cleanUpReducerForDeckB;
+
+    let loggedInDeck =
+      deckName === DECKNAME.DeckA ? isDeckALoggedIn : isDeckBLoggedIn;
+
+    switch (fieldName) {
+      case "recipeName":
+        return recipeReducerData.recipeData?.recipeName
+          ? recipeReducerData.recipeData.recipeName
+          : null;
+
+      case "processNumber":
+        let recipeInProgressData = recipeReducerData.runRecipeInProgress;
+        return recipeInProgressData
+          ? recipeInProgressData.operation_details.current_step
+          : 0;
+
+      case "processTotal":
+        return recipeReducerData.recipeData?.processCount
+          ? recipeReducerData.recipeData.processCount
+          : null;
+
+      case "leftActionBtn":
+        return loggedInDeck
+          ? recipeReducerData.showProcess
+            ? recipeReducerData.leftActionBtn
+            : cleanUpReducerData.leftActionBtn
+          : "";
+
+      case "rightActionBtn":
+        return loggedInDeck
+          ? recipeReducerData.showProcess
+            ? recipeReducerData.rightActionBtn
+            : cleanUpReducerData.rightActionBtn
+          : "";
+
+      case "progressPercentComplete":
+        return loggedInDeck
+          ? recipeReducerData.showProcess
+            ? recipeReducerData.runRecipeInProgress?.progress
+            : cleanUpReducerData.cleanUpData &&
+              JSON.parse(cleanUpReducerData.cleanUpData).progress
+          : 0;
+
+      case "leftActionBtnDisabled":
+        return (
+          recipeReducerData.leftActionBtnDisabled ||
+          recipeReducerData.leftActionBtnDisabled
+        );
+
+      case "rightActionBtnDisabled":
+        return (
+          recipeReducerData.rightActionBtnDisabled ||
+          recipeReducerData.rightActionBtnDisabled
+        );
+
+      case "processName":
+        let checkIsAdminForName =
+          deckName === DECKNAME.DeckA
+            ? loginDataOfA.isAdmin
+            : loginDataOfB.isAdmin;
         if (
-          isAdmin &&
+          checkIsAdminForName &&
           recipeReducerData.runRecipeInProgress?.operation_details?.process_name
         ) {
           return recipeReducerData.runRecipeInProgress.operation_details
             .process_name;
         } else {
-          return defaultProcessName;
+          return "Processes remaining";
         }
-      case "type":
+
+      case "processType":
+        let checkIsAdminForType =
+          deckName === DECKNAME.DeckA
+            ? loginDataOfA.isAdmin
+            : loginDataOfB.isAdmin;
+        let defaultProcessType;
         if (
-          isAdmin &&
+          checkIsAdminForType &&
           recipeReducerData.runRecipeInProgress?.operation_details?.process_type
         ) {
           return recipeReducerData.runRecipeInProgress.operation_details
@@ -438,54 +525,9 @@ const AppFooter = (props) => {
         } else {
           return defaultProcessType;
         }
+
       default:
         break;
-    }
-  };
-
-  /**
-   * This method checks the type of modal and return
-   * body text msg accordingly for done and abort.
-   * type: type of modal - done or abort.
-   */
-  const getModalTextBodyMsg = (type) => {
-    // modal type = abort
-    if (type === DECKCARD_BTN.text.abort) {
-      if (deckName === DECKNAME.DeckA) {
-        // recipeProcess
-        if (recipeActionReducerForDeckA.showProcess) {
-          return MODAL_MESSAGE.abortConfirmation;
-        } else {
-          return MODAL_MESSAGE.abortCleanupConfirmation;
-        }
-      }
-      // cleanUpProcess
-      else {
-        if (recipeActionReducerForDeckB.showProcess) {
-          return MODAL_MESSAGE.abortConfirmation;
-        } else {
-          return MODAL_MESSAGE.abortCleanupConfirmation;
-        }
-      }
-    }
-    //modal type = done
-    else {
-      if (deckName === DECKNAME.DeckA) {
-        // recipeProcess
-        if (recipeActionReducerForDeckA.showProcess) {
-          return MODAL_MESSAGE.experimentSuccess;
-        } else {
-          return MODAL_MESSAGE.uvSuccess;
-        }
-      }
-      // cleanUpProcess
-      else {
-        if (recipeActionReducerForDeckB.showProcess) {
-          return MODAL_MESSAGE.experimentSuccess;
-        } else {
-          return MODAL_MESSAGE.uvSuccess;
-        }
-      }
     }
   };
 
@@ -537,209 +579,79 @@ const AppFooter = (props) => {
       {/**Deck A */}
       <DeckCard
         deckName={DECKNAME.DeckA}
-        recipeName={
-          recipeActionReducerForDeckA.recipeData?.recipeName
-            ? recipeActionReducerForDeckA.recipeData.recipeName
-            : null
-        }
-        processNumber={
-          recipeActionReducerForDeckA.runRecipeInProgress
-            ? recipeActionReducerForDeckA.runRecipeInProgress.operation_details
-                .current_step
-            : 0
-        }
-        processTotal={
-          recipeActionReducerForDeckA.recipeData?.processCount
-            ? recipeActionReducerForDeckA.recipeData.processCount
-            : null
-        }
+        recipeName={getPropsValue("recipeName", DECKNAME.DeckA)}
+        processNumber={getPropsValue("processNumber", DECKNAME.DeckA)}
+        processTotal={getPropsValue("processTotal", DECKNAME.DeckA)}
         isActiveDeck={isDeckAActive}
         loginBtn={!isDeckALoggedIn}
         isAnotherDeckLoggedIn={isDeckBLoggedIn}
-        leftActionBtn={
-          isDeckALoggedIn
-            ? recipeActionReducerForDeckA.showProcess
-              ? recipeActionReducerForDeckA.leftActionBtn
-              : cleanUpReducerForDeckA.leftActionBtn
-            : ""
-        }
-        rightActionBtn={
-          isDeckALoggedIn
-            ? recipeActionReducerForDeckA.showProcess
-              ? recipeActionReducerForDeckA.rightActionBtn
-              : cleanUpReducerForDeckA.rightActionBtn
-            : ""
-        }
+        leftActionBtn={getPropsValue("leftActionBtn", DECKNAME.DeckA)}
+        rightActionBtn={getPropsValue("rightActionBtn", DECKNAME.DeckA)}
         showProcess={
           isDeckALoggedIn ? recipeActionReducerForDeckA.showProcess : false
         }
         hours={cleanUpReducerForDeckA.hours}
         mins={cleanUpReducerForDeckA.mins}
         secs={cleanUpReducerForDeckA.secs}
-        progressPercentComplete={
-          isDeckALoggedIn
-            ? recipeActionReducerForDeckA.showProcess
-              ? recipeActionReducerForDeckA.runRecipeInProgress?.progress
-              : cleanUpReducerForDeckA.cleanUpData &&
-                JSON.parse(cleanUpReducerForDeckA.cleanUpData).progress
-            : 0
-        }
+        progressPercentComplete={getPropsValue(
+          "progressPercentComplete",
+          DECKNAME.DeckA
+        )}
         showCleanUp={
           isDeckALoggedIn ? cleanUpReducerForDeckA.showCleanUp : false
         }
         handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckA)}
         handleRightAction={getRightActionBtnHandler(DECKNAME.DeckA)}
-        leftActionBtnDisabled={
-          recipeActionReducerForDeckA.leftActionBtnDisabled ||
-          cleanUpReducerForDeckA.leftActionBtnDisabled
-        }
-        rightActionBtnDisabled={
-          recipeActionReducerForDeckA.rightActionBtnDisabled ||
-          cleanUpReducerForDeckA.rightActionBtnDisabled
-        }
-        processName={getProcessDetails("name", DECKNAME.DeckA)}
-        processType={getProcessDetails("type", DECKNAME.DeckA)}
+        leftActionBtnDisabled={getPropsValue(
+          "leftActionBtnDisabled",
+          DECKNAME.DeckA
+        )}
+        rightActionBtnDisabled={getPropsValue(
+          "rightActionBtnDisabled",
+          DECKNAME.DeckA
+        )}
+        processName={getPropsValue("processName", DECKNAME.DeckA)}
+        processType={getPropsValue("processType", DECKNAME.DeckA)}
       />
 
       {/** Deck B */}
       <DeckCard
         deckName={DECKNAME.DeckB}
-        recipeName={
-          // recipeActionReducerForDeckB &&
-          recipeActionReducerForDeckB.recipeData?.recipeName
-            ? recipeActionReducerForDeckB.recipeData.recipeName
-            : null
-        }
-        processNumber={
-          recipeActionReducerForDeckB.runRecipeInProgress
-            ? recipeActionReducerForDeckB.runRecipeInProgress.operation_details
-                .current_step
-            : 0
-        }
-        processTotal={
-          recipeActionReducerForDeckB.recipeData?.processCount
-            ? recipeActionReducerForDeckB.recipeData.processCount
-            : null
-        }
+        recipeName={getPropsValue("recipeName", DECKNAME.DeckB)}
+        processNumber={getPropsValue("processNumber", DECKNAME.DeckB)}
+        processTotal={getPropsValue("processTotal", DECKNAME.DeckB)}
         isActiveDeck={isDeckBActive}
         loginBtn={!isDeckBLoggedIn}
         isAnotherDeckLoggedIn={isDeckALoggedIn}
-        leftActionBtn={
-          isDeckBLoggedIn
-            ? recipeActionReducerForDeckB.showProcess
-              ? recipeActionReducerForDeckB.leftActionBtn
-              : cleanUpReducerForDeckB.leftActionBtn
-            : ""
-        }
-        rightActionBtn={
-          isDeckBLoggedIn
-            ? recipeActionReducerForDeckB.showProcess
-              ? recipeActionReducerForDeckB.rightActionBtn
-              : cleanUpReducerForDeckB.rightActionBtn
-            : ""
-        }
+        leftActionBtn={getPropsValue("leftActionBtn", DECKNAME.DeckB)}
+        rightActionBtn={getPropsValue("rightActionBtn", DECKNAME.DeckB)}
         showProcess={
           isDeckBLoggedIn ? recipeActionReducerForDeckB.showProcess : false
         }
         hours={cleanUpReducerForDeckB.hours}
         mins={cleanUpReducerForDeckB.mins}
         secs={cleanUpReducerForDeckB.secs}
-        progressPercentComplete={
-          isDeckBLoggedIn
-            ? recipeActionReducerForDeckB.showProcess
-              ? recipeActionReducerForDeckB.runRecipeInProgress?.progress
-              : cleanUpReducerForDeckB.cleanUpData &&
-                JSON.parse(cleanUpReducerForDeckB.cleanUpData).progress
-            : 0
-        }
+        progressPercentComplete={getPropsValue(
+          "progressPercentComplete",
+          DECKNAME.DeckB
+        )}
         showCleanUp={cleanUpReducerForDeckB.showCleanUp}
         handleLeftAction={getLeftActionBtnHandler(DECKNAME.DeckB)}
         handleRightAction={getRightActionBtnHandler(DECKNAME.DeckB)}
-        leftActionBtnDisabled={
-          recipeActionReducerForDeckB.leftActionBtnDisabled ||
-          cleanUpReducerForDeckB.leftActionBtnDisabled
-        }
-        rightActionBtnDisabled={
-          recipeActionReducerForDeckB.rightActionBtnDisabled ||
-          cleanUpReducerForDeckB.rightActionBtnDisabled
-        }
-        processName={getProcessDetails("name", DECKNAME.DeckB)}
-        processType={getProcessDetails("type", DECKNAME.DeckB)}
+        leftActionBtnDisabled={getPropsValue(
+          "leftActionBtnDisabled",
+          DECKNAME.DeckB
+        )}
+        rightActionBtnDisabled={getPropsValue(
+          "rightActionBtnDisabled",
+          DECKNAME.DeckB
+        )}
+        processName={getPropsValue("processName", DECKNAME.DeckB)}
+        processType={getPropsValue("processType", DECKNAME.DeckB)}
       />
     </div>
   );
 };
-
-/**old code for reference */
-// const AppFooter = (props) => {
-//   const {
-//     loginBtn,
-//     showProcess,
-//     showCleanUp,
-//     deckName,
-//     recipeName,
-//     processNumber,
-//     processTotal,
-//     hours,
-//     mins,
-//     secs,
-//     handleLeftAction,
-//     handleRightAction,
-//     leftActionBtn,
-//     rightActionBtn,
-//     progressPercentComplete,
-//     leftActionBtnDisabled,
-//     rightActionBtnDisabled,
-//   } = props;
-
-//   return deckName === DECKNAME.DeckA ? (
-//     <div className="d-flex justify-content-center align-items-center">
-//       <DeckCard
-//         deckName={DECKNAME.DeckA}//
-//         recipeName={recipeName}//
-//         processNumber={processNumber}//
-//         processTotal={processTotal}//
-//         hours={hours}//
-//         mins={mins}//
-//         secs={secs}//
-//         loginBtn={loginBtn}//
-//         showProcess={showProcess}//
-//         showCleanUp={showCleanUp}//
-//         handleLeftAction={handleLeftAction}//
-//         handleRightAction={handleRightAction}//
-//         leftActionBtn={leftActionBtn}//
-//         rightActionBtn={rightActionBtn}//
-//         progressPercentComplete={progressPercentComplete}//
-//         leftActionBtnDisabled={leftActionBtnDisabled}//
-//         rightActionBtnDisabled={rightActionBtnDisabled}//
-//       />
-//       <DeckCard deckName={DECKNAME.DeckB} loginBtn={true} />
-//     </div>
-//   ) : (
-//     <div className="d-flex justify-content-center align-items-center">
-//       <DeckCard deckName={DECKNAME.DeckA} loginBtn={true} />
-//       <DeckCard
-//         deckName={DECKNAME.DeckB}
-//         recipeName={recipeName}
-//         processNumber={processNumber}
-//         processTotal={processTotal}
-//         hours={hours}
-//         mins={mins}
-//         secs={secs}
-//         loginBtn={loginBtn}
-//         showProcess={showProcess}
-//         showCleanUp={showCleanUp}
-//         handleLeftAction={handleLeftAction}
-//         handleRightAction={handleRightAction}
-//         leftActionBtn={leftActionBtn}
-//         rightActionBtn={rightActionBtn}
-//         progressPercentComplete={progressPercentComplete}
-//         leftActionBtnDisabled={leftActionBtnDisabled}
-//         rightActionBtnDisabled={rightActionBtnDisabled}
-//       />
-//     </div>
-//   );
-// };
 
 AppFooter.propTypes = {};
 
