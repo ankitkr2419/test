@@ -461,7 +461,6 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 	syringeModuleState.Store(d.name, OutDeck)
 
 	return
-
 }
 
 func (d *Compact32Deck) setIndeck(deckBase, tipHeight float64) {
