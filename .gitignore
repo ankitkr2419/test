@@ -3,7 +3,8 @@ cpagent
 application\.yml
 db/application_test\.yml
 
-
+# mylab zip file
+mylab.zip
 
 
 # web-client dependencies
