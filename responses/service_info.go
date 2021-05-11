@@ -37,4 +37,10 @@ var (
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
 	ProcessesRearrangeSuccess = "rearranging processes success"
+
+	RecipeRunInProgress   = "recipe run is in progress"
+	NextStepRunInProgress = "next step run is in progress"
+	NextStepWillRun       = "next step will be run"
+	StepRunWillAbort      = "step run will be aborted"
+	WaitingRunNextProcess = "waiting to run next process"
 )

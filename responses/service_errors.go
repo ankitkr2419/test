@@ -70,7 +70,15 @@ var (
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
 
-	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
+	SimulatorReservedDelayError = fmt.Errorf("error delay is allowed only for simulator")
+
+	StepRunNotInProgressError  = fmt.Errorf("error step run is not in progress")
+	StepRunAborted             = fmt.Errorf("error step run aborted")
+	DeckNameInvalid            = fmt.Errorf("error deck name is invalid")
+	PleaseHomeMachineError     = fmt.Errorf("error please home the machine first")
+	PreviousRunInProgressError = fmt.Errorf("error previous run already in progress... wait or abort it")
+	PickupPositionInvalid      = fmt.Errorf("position is invalid to pickup the tip")
+	WebsocketMarshallingError  = fmt.Errorf("error in marshalling web socket data")
 )
 
 // Special errors which are in []byte format
