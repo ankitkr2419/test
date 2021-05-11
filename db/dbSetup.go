@@ -129,20 +129,6 @@ func makeDyeList(configDyes Config) (Dyes []Dye) {
 	return
 }
 
-// add Default User to DB
-
-func addDefaultUser(s Storer, u User) error {
-
-	err := s.InsertUser(context.Background(), u)
-	if err != nil {
-		return err
-	}
-
-	logger.Info("Default user added")
-	return nil
-
-}
-
 // DBSetup initializes motors in DB
 func setupMotor(s Storer) (err error) {
 	var config MotorConfig
