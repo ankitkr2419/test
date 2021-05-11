@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Card, CardBody, Button, Row, Col } from "core-components";
-import { Icon, VideoCard, ButtonIcon } from "shared-components";
-
-import SearchBox from "shared-components/SearchBox";
-import PaginationBox from "shared-components/PaginationBox";
+import {  VideoCard } from "shared-components";
 import MlModal from "shared-components/MlModal";
 import TimeModal from "components/modals/TimeModal";
-import RecipeCard from "components/RecipeListing/RecipeCard";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
@@ -25,8 +20,8 @@ import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators"
 import AddNewRecipesModal from "components/modals/AddNewRecipesModal";
 import RunRecipesModal from "components/modals/RunRecipesModal";
 import { publishRecipeInitiated } from "action-creators/recipeActionCreators";
-import { TopContent } from './TopContent';
-import { HeadingTitle } from './HeadingTitle';
+import TopContentComponent from "./TopContentComponent";
+import RecipeListingCards from "./RecipeListingCards";
 
 const RecipeListingComponent = (props) => {
   const {
@@ -163,6 +158,10 @@ const RecipeListingComponent = (props) => {
     recipeObj.name.toLowerCase().includes(searchRecipeText.toLowerCase())
   );
 
+  const getLogoutTextBody = () => {
+    return `Are you sure you want to sign out of ${isAdmin ? "Admin" : "Operator"} role?`
+  }
+
   return (
     <>
       <div className="landing-content px-2">
@@ -209,9 +208,7 @@ const RecipeListingComponent = (props) => {
         <MlModal
           isOpen={isLogoutModalVisible}
           textHead={deckName}
-          textBody={`Are you sure you want to sign out of ${
-            isAdmin ? "Admin" : "Operator"
-          } role?`}
+          textBody={getLogoutTextBody()}
           handleSuccessBtn={onLogoutClicked}
           handleCrossBtn={toggleLogoutModalVisibility}
           successBtn={MODAL_BTN.yes}
@@ -240,106 +237,42 @@ const RecipeListingComponent = (props) => {
         />
         )}
 
-        <TopContent className="d-flex justify-content-between align-items-center mx-5">
-          {isProcessInProgress ? null : (
-            <div className="d-flex align-items-center">
-              <div style={{ cursor: "pointer" }} onClick={onLogoutClicked}>
-                <Icon name="angle-left" size={32} className="text-white" />
-              </div>
-              <HeadingTitle
-                Tag="h5"
-                className="text-white font-weight-bold ml-3 mb-0"
-              >
-                {`Select a Recipe for ${deckName}`}
-              </HeadingTitle>
-            </div>
-          )}
+        {/** Sub - Menu above recipe listings (like addNewRecipe/ cleanUp/ etc) */}
+        <TopContentComponent 
+          isProcessInProgress={isProcessInProgress}
+          onLogoutClicked={onLogoutClicked}
+          deckName={deckName}
+          isAdmin={isAdmin}
+          toggleAddNewRecipesModal={toggleAddNewRecipesModal}
+          toggleTimeModal={toggleTimeModal}
+          toggleTrayDiscardModal={toggleTrayDiscardModal}
+          toggleLogoutModalVisibility={toggleLogoutModalVisibility}
+        />
 
-          {isProcessInProgress ? null : (
-            <div className="d-flex align-items-center ml-auto">
-              {isAdmin ? (
-                <Button
-                  color="secondary"
-                  className="ml-2 border-primary btn-discard-tray bg-white"
-                  onClick={toggleAddNewRecipesModal}
-                >
-                  Add Recipe
-                </Button>
-              ) : (
-                <>
-                  <ButtonIcon
-                    name="download-1"
-                    size={28}
-                    className="bg-white border-primary"
-                  />
-                  <Button
-                    color="secondary"
-                    className="ml-2 border-primary btn-clean-up bg-white"
-                    onClick={toggleTimeModal}
-                  >
-                    {" "}
-                    Clean Up
-                  </Button>
-                  <Button
-                    color="secondary"
-                    className="ml-2 border-primary btn-discard-tray bg-white"
-                    onClick={toggleTrayDiscardModal}
-                  >
-                    Discard Tray
-                  </Button>
-                </>
-              )}
-              <ButtonIcon
-                name="logout"
-                size={28}
-                className="ml-2 bg-white border-primary"
-                onClick={toggleLogoutModalVisibility}
-              />
-            </div>
-          )}
-        </TopContent>
+        {/**
+         * Show Video if some process is going on, like runRecipe
+         * else show Recipe list
+         * 
+         * RecipeListingCards: pagination, searchRecipe, recipeList, etc
+         */}
         <>
           {isProcessInProgress ? (
             <VideoCard />
           ) : (
-            <Card className="recipe-listing-cards">
-              <CardBody className="p-5">
-                {/* Search Functionality Input not working */}
-                <div className="d-flex justify-content-between align-items-center">
-                  {isAdmin ? (
-                    <SearchBox
-                      value={searchRecipeText}
-                      onChange={onSearchRecipeTextChanged}
-                    />
-                  ) : null}
-                  <div className="d-flex justify-content-end">
-                    <PaginationBox />
-                  </div>
-                </div>
-
-                <Row>
-                  {fileteredRecipeData?.length ? (
-                    fileteredRecipeData.map((recipe, index) => (
-                      <Col md={6} key={index}>
-                        <RecipeCard
-                          isAdmin={isAdmin}
-                          recipeId={recipe.id}
-                          recipeName={recipe.name}
-                          processCount={recipe.process_count}
-                          isPublished={recipe.is_published}
-                          handleCarousalModal={handleCarousalModal}
-                          returnRecipeDetails={returnRecipeDetails}
-                          toggleRunRecipesModal={toggleRunRecipesModal}
-                          handlePublishModalClick={(recipeId) => handlePublishModalClick(recipeId)}
-                        />
-                      </Col>
-                    ))
-                  ) : (
-                    <h4>No recipes to show!</h4>
-                  )}
-                </Row>
-              </CardBody>
-            </Card>
+            <RecipeListingCards 
+              isAdmin={isAdmin}
+              searchRecipeText={searchRecipeText}
+              onSearchRecipeTextChanged={onSearchRecipeTextChanged}
+              fileteredRecipeData={fileteredRecipeData}
+              handleCarousalModal={handleCarousalModal}
+              returnRecipeDetails={returnRecipeDetails}
+              toggleRunRecipesModal={
+                toggleRunRecipesModal
+              }
+              handlePublishModalClick={(recipeId) =>
+                handlePublishModalClick(recipeId)
+              }
+            />
           )}
         </>
       </div>
