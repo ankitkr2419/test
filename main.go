@@ -31,31 +31,7 @@ func main() {
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
 
-	config.Load("application")
-
-	// config file to configure dye & targets
-	config.Load("config")
-
-	// simulator config file to configure controls & wells in simulator
-	config.Load("simulator")
-
-	// config file to configure motors
-	config.Load("motor_config")
-
-	// config file to configure consumable distance
-	config.Load("consumable_config")
-
-	// config file to configure labware
-	config.Load("labware_config")
-
-	// config file to configure labware
-	config.Load("tips_tubes_config")
-
-	// config file to configure cartridge
-	config.Load("cartridges_config")
-
-	// config file to configure cartridge wells
-	config.Load("cartridge_wells_config")
+	config.LoadAllConfs()
 
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
@@ -192,77 +168,26 @@ func startApp(plcName string, test bool) (err error) {
 
 	go monitorForPLCTimeout(&deps, exit)
 
-	// setup Db with dyes & targets
-	err = db.Setup(store)
+	err = db.LoadAllDBFuncs(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Dyes & Targets failed")
+		logger.WithField("err", err.Error()).Error("Loading DB Functions failed")
 		return
 	}
 
-	// setup Db with motors
-	err = db.SetupMotor(store)
+	err = plc.LoadAllPLCFuncs(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Motors failed")
+		logger.WithField("err", err.Error()).Error("Loading PLC Functions failed")
 		return
 	}
 
-	err = plc.SelectAllMotors(store)
+	err = service.LoadAllServiceFuncs(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Select All Motors failed")
-		return
-	}
-
-	// setup Db with consumable distance
-	err = db.SetupConsumable(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Cosumable Distance failed")
-		return
-	}
-	err = plc.SelectAllConsDistances(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Select All Cosumable Distances failed")
-		return
-	}
-
-	// setup Db with tipstube
-	err = db.SetupTipsTubes(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup TipsTubes failed")
-		return
-	}
-	err = plc.SelectAllTipsTubes(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Select All Tips and Tubes failed")
-		return
-	}
-
-	// setup Db with cartridge
-	err = db.SetupCartridges(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Cartridge failed")
-		return
-	}
-	err = plc.SelectAllCartridges(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
+		logger.WithField("err", err.Error()).Error("Loading Service Functions failed")
 		return
 	}
 
 	plc.LoadUtils()
 	service.LoadUtils()
-
-	// Create a default User
-	u := db.User{
-		Username: "supervisor",
-		Password: service.MD5Hash("supervisor"),
-		Role:     "supervisor",
-	}
-	// Add Default supervisor user to DB
-	db.AddDefaultUser(store, u)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
-		return
-	}
 
 	var addr = flag.String("addr", "0.0.0.0:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
