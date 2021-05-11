@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
@@ -35,41 +36,45 @@ var testType = "testType"
 var recipeUUID = uuid.New()
 var sequenceNumber int64 = 1
 
+var testProcessRecord = db.Process{
+	ID:             testUUID,
+	Name:           "test process",
+	Type:           "AttachDetach",
+	SequenceNumber: 1,
+	RecipeID:       recipeUUID,
+}
+var listProcesses = []db.Process{
+	testProcessRecord,
+}
+
 func (suite *ProcessHandlerTestSuite) TestCreateProcessSuccess() {
 
-	suite.dbMock.On("CreateProcess", mock.Anything, mock.Anything).Return(db.Process{
-		ID:             testUUID,
-		Name:           testName,
-		Type:           testType,
-		RecipeID:       recipeUUID,
-		SequenceNumber: sequenceNumber,
-	}, nil)
+	suite.dbMock.On("CreateProcess", mock.Anything, testProcessRecord).Return(testProcessRecord, nil)
+	body, _ := json.Marshal(testProcessRecord)
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/processes",
 		"/processes",
-		body,
+		string(body),
 		createProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *ProcessHandlerTestSuite) TestCreateProcessFailure() {
-	testUUID := uuid.New()
-	suite.dbMock.On("CreateProcess", mock.Anything, mock.Anything).Return(db.Process{}, fmt.Errorf("Error creating process"))
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
+	suite.dbMock.On("CreateProcess", mock.Anything, testProcessRecord).Return(db.Process{}, fmt.Errorf("Error creating process"))
+
+	body, _ := json.Marshal(testProcessRecord)
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/processes",
 		"/processes",
-		body,
+		string(body),
 		createProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 	output := fmt.Errorf("Error creating process")
@@ -83,16 +88,9 @@ func (suite *ProcessHandlerTestSuite) TestCreateProcessFailure() {
 func (suite *ProcessHandlerTestSuite) TestListProcessSuccess() {
 	testUUID := uuid.New()
 	suite.dbMock.On("ListProcesses", mock.Anything, mock.Anything).Return(
-		[]db.Process{
-			db.Process{
-				ID:             testUUID,
-				Name:           testName,
-				Type:           testType,
-				RecipeID:       recipeUUID,
-				SequenceNumber: sequenceNumber,
-			},
-		}, nil)
+		listProcesses, nil)
 
+	body, _ := json.Marshal(listProcesses)
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/processes/{id}",
@@ -100,9 +98,8 @@ func (suite *ProcessHandlerTestSuite) TestListProcessSuccess() {
 		"",
 		listProcessesHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
@@ -118,20 +115,15 @@ func (suite *ProcessHandlerTestSuite) TestListProcessFailure() {
 		listProcessesHandler(Dependencies{Store: suite.dbMock}),
 	)
 	output := ""
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), http.StatusNotFound, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *ProcessHandlerTestSuite) TestShowProcessSuccess() {
 	testUUID := uuid.New()
-	suite.dbMock.On("ShowProcess", mock.Anything, mock.Anything).Return(db.Process{
-		ID:             testUUID,
-		Name:           testName,
-		Type:           testType,
-		RecipeID:       recipeUUID,
-		SequenceNumber: sequenceNumber,
-	}, nil)
+	suite.dbMock.On("ShowProcess", mock.Anything, mock.Anything).Return(testProcessRecord, nil)
+	body, _ := json.Marshal(testProcessRecord)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/processes/{id}",
@@ -139,9 +131,8 @@ func (suite *ProcessHandlerTestSuite) TestShowProcessSuccess() {
 		"",
 		showProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -165,20 +156,14 @@ func (suite *ProcessHandlerTestSuite) TestShowProcessFailure() {
 
 func (suite *ProcessHandlerTestSuite) TestUpdateProcessSuccess() {
 	testUUID := uuid.New()
-	suite.dbMock.On("UpdateProcess", mock.Anything, mock.Anything).Return(db.Process{
-		ID:             testUUID,
-		Name:           testName,
-		Type:           testType,
-		RecipeID:       recipeUUID,
-		SequenceNumber: sequenceNumber,
-	}, nil)
+	suite.dbMock.On("UpdateProcess", mock.Anything, mock.Anything).Return(nil)
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
+	body, _ := json.Marshal(testProcessRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/processes/{id}",
 		"/processes/"+testUUID.String(),
-		body,
+		string(body),
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
@@ -190,14 +175,14 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessSuccess() {
 
 func (suite *ProcessHandlerTestSuite) TestUpdateProcessFailure() {
 	testUUID := uuid.New()
-	suite.dbMock.On("UpdateProcess", mock.Anything, mock.Anything).Return(db.Process{}, fmt.Errorf("Error creating process"))
+	suite.dbMock.On("UpdateProcess", mock.Anything, mock.Anything).Return(fmt.Errorf("Error creating process"))
 
-	body := fmt.Sprintf(`{"id":"%s","name":"%s","type":"%s","recipe_id":"%s","sequence_num":%d,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, testName, testType, recipeUUID, sequenceNumber)
+	body, _ := json.Marshal(testProcessRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/processes/{id}",
 		"/processes/"+testUUID.String(),
-		body,
+		string(body),
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
@@ -209,9 +194,7 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessFailure() {
 
 func (suite *ProcessHandlerTestSuite) TestDeleteProcessSuccess() {
 	testUUID := uuid.New()
-	suite.dbMock.On("DeleteProcess", mock.Anything, mock.Anything).Return(
-		testUUID,
-		nil)
+	suite.dbMock.On("DeleteProcess", mock.Anything, mock.Anything).Return(nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
 		"/processes/{id}",
@@ -219,6 +202,7 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessSuccess() {
 		"",
 		deleteProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
+
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), `{"msg":"process deleted successfully"}`, recorder.Body.String())
 
@@ -227,7 +211,7 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessSuccess() {
 
 func (suite *ProcessHandlerTestSuite) TestDeleteProcessFailure() {
 	testUUID := uuid.New()
-	suite.dbMock.On("DeleteProcess", mock.Anything, mock.Anything).Return("", fmt.Errorf("Error deleting process"))
+	suite.dbMock.On("DeleteProcess", mock.Anything, mock.Anything).Return(fmt.Errorf("Error deleting process"))
 
 	recorder := makeHTTPCall(http.MethodDelete,
 		"/processes/{id}",
