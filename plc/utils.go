@@ -83,7 +83,7 @@ var homingPercent sync.Map
 // variable map Registers to keep track of machine related variables.
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
-func LoadUtils() {
+func loadUtils() {
 	wrotePulses.Store("A", uint16(0))
 	wrotePulses.Store("B", uint16(0))
 	executedPulses.Store("A", uint16(0))
@@ -190,6 +190,8 @@ func LoadAllPLCFuncs(store db.Storer) (err error) {
 		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
 		return
 	}
+
+	loadUtils()
 	return nil
 }
 

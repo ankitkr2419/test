@@ -44,7 +44,7 @@ func setStepRunInProgress(deck string) {
 	stepRunInProgress[deck] = true
 }
 
-func LoadUtils() {
+func loadUtils() {
 	userLogin.Store("A", false)
 	userLogin.Store("B", false)
 	runNext = map[string]bool{
@@ -195,5 +195,6 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 
 	logger.Info("Default user added")
 
+	loadUtils()
 	return nil
 }
