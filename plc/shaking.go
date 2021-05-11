@@ -12,7 +12,7 @@ import (
 /* Algorithm ******************
 1. Validate that rpm 2 and time 2 value is not set before setting rpm 1 and time 1
 2. Switch off the shaker bit first and reset the completion bit to avoid any inconsistency.
-3. Set the shaker , here in this case it is both the shaker.
+3. Set the shaker, here in this case it is both the shaker.
 4. Set the rpm 1 value.
 5. If withTemp is true then operate with temp according to follow up or not follow up.
 6. If follow up then wait for the temperature to reach that certain value and then start shaking.
@@ -31,7 +31,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	var results []byte
 
-	//validate that rpm 1 is definately set and futher
+	// 1. validate that rpm 1 is definately set and futher
 	if shakerData.RPM1 == 0 || shakerData.Time1 == 0 {
 		if shakerData.RPM2 != 0 || shakerData.Time2 != 0 {
 			err = errors.New("please check value for rpm 1 data")
@@ -48,14 +48,14 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		}
 	}
 
-	//switch off the shaker
+	// 2.1 switch off the shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
 		logger.Errorln("err starting shaker: ", err)
 		return "", err
 	}
 
-	//reset completion bit
+	// 2.2 reset completion bit
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
 	if err != nil {
 		logger.Errorln("err resetting completion bit: ", err)
@@ -84,7 +84,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		return "", err
 	}
 
-	//set shaker selection register
+	// 3 set shaker selection register
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][220], uint16(shakerNo))
 	if err != nil {
 		logger.Errorln("error in setting shaker selection : ", err)
@@ -92,13 +92,24 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	}
 	logger.Infof("selected shaker %v", results)
 
-	//set shaker register with rpm 1
+	// 4 set shaker register with rpm 1
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM1))
 	if err != nil {
 		logger.Errorln("error in setting rpm 1 value : ", err)
 		return "", err
 	}
 
+	// Check if syringe module is inDeck, then get it to rest position
+	if d.getSyringeModuleState() == InDeck {
+		response, err = d.SyringeRestPosition()
+		if err != nil {
+			logger.Errorln(err)
+			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
+		}
+	}
+
+	// 5. WithTemp handle
+	// 6. Handle Follow Temp
 	if shakerData.WithTemp {
 
 		ht := db.Heating{
@@ -113,9 +124,10 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		d.switchOnHeater()
 		logger.Infoln("switched on heater")
 		d.setHeaterInProgress()
-
 	}
 
+	// 7. Else if not follow up then just start the heater and then start the shaker.
+	// 8. If withTemp is false then proceed with the normal flow by starting the shaker.
 	//check if aborted
 	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Operation was ABORTED!")
@@ -123,6 +135,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	}
 
 	//start shaker
+	// 9. Let the shaker run at the specified rpm1 till the time1 duration is completed.
 	response, err = d.switchOnShaker()
 	if err != nil {
 		logger.Errorln("err in switching on shaker---> error: ", err)
@@ -144,6 +157,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "completed")
 
+	// 10. After this run the shaker with rpm 2 till the time1 duration is
+	// completed if rpm 2 is specified.
 	//set shaker value with rpm 2 if it exists
 	if shakerData.RPM2 != 0 {
 
@@ -169,6 +184,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		}
 	}
 
+	// 11. After all this process is done switch the shaker and the heater off.
 	//switch off both shaker and heater
 	response, err = d.switchOffHeater()
 	if err != nil {
