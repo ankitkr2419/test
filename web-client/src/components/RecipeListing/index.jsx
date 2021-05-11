@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-
-import styled from "styled-components";
 import { Card, CardBody, Button, Row, Col } from "core-components";
 import { Icon, VideoCard, ButtonIcon } from "shared-components";
 
@@ -27,28 +25,8 @@ import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators"
 import AddNewRecipesModal from "components/modals/AddNewRecipesModal";
 import RunRecipesModal from "components/modals/RunRecipesModal";
 import { publishRecipeInitiated } from "action-creators/recipeActionCreators";
-
-const TopContent = styled.div`
-  margin-bottom: 2.25rem;
-  .icon-download-1 {
-    font-size: 1.125rem;
-    color: #3c3c3c;
-  }
-  .btn-clean-up {
-    width: 7.063rem;
-  }
-  .btn-discard-tray {
-    width: 10rem;
-  }
-  .icon-logout {
-    font-size: 1rem;
-  }
-`;
-
-const HeadingTitle = styled.label`
-  font-size: 1.25rem;
-  line-height: 1.438rem;
-`;
+import { TopContent } from './TopContent';
+import { HeadingTitle } from './HeadingTitle';
 
 const RecipeListingComponent = (props) => {
   const {

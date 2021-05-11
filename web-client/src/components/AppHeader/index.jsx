@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Logo, ButtonIcon, Text, Icon } from 'shared-components';
 import { loginReset } from 'action-creators/loginActionCreators';
@@ -26,30 +25,9 @@ import { getRunExperimentReducer } from 'selectors/runExperimentSelector';
 import ConfirmationModal from 'components/modals/ConfirmationModal';
 import { EXPERIMENT_STATUS } from 'appConstants';
 import { NAV_ITEMS } from './constants';
+import { Header } from './Header';
+import { ActionBtnList, ActionBtnListItem } from './ActionBtnList';
 
-const Header = styled.header`
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 60px;
-  background: white 0% 0% no-repeat padding-box;
-  padding: 16px 24px 16px 48px;
-  box-shadow: 0 4px 16px #00000029;
-  z-index: 1;
-`;
-
-const ActionBtnList= styled.ul`
-`;
-const ActionBtnListItem = styled.li`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 2.25rem;
-	height: 2.25rem;
-	> i{
-		color: #666666;
-	}
-`
 const AppHeader = (props) => {
 	const {
 		isUserLoggedIn,
