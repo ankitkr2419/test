@@ -5,11 +5,11 @@ test-coverage:
 	go test ./... -coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
-build-and-zip:
+build:
 	sudo ./build-binary.sh
-	zip mylab.zip migrations conf cpagent installation.sh
-	echo "zip created"
 
 zip:
-	zip mylab.zip migrations conf cpagent installation.sh
-	echo "zip created"
+	./build-zip.sh
+	echo "zip created successfully"
+
+build-and-zip: build zip
