@@ -70,7 +70,7 @@ type CartridgeWellsConfig struct {
 }
 
 // DBSetup initializes dye & targets in DB
-func Setup(s Storer) (err error) {
+func SetupDyeAndTargets(s Storer) (err error) {
 	var config Config
 	err = viper.Unmarshal(&config)
 	if err != nil {
@@ -129,9 +129,9 @@ func makeDyeList(configDyes Config) (Dyes []Dye) {
 	return
 }
 
-// AddDefaultUser to DB
+// add Default User to DB
 
-func AddDefaultUser(s Storer, u User) error {
+func addDefaultUser(s Storer, u User) error {
 
 	err := s.InsertUser(context.Background(), u)
 	if err != nil {
@@ -144,7 +144,7 @@ func AddDefaultUser(s Storer, u User) error {
 }
 
 // DBSetup initializes motors in DB
-func SetupMotor(s Storer) (err error) {
+func setupMotor(s Storer) (err error) {
 	var config MotorConfig
 	err = viper.Unmarshal(&config)
 	if err != nil {
@@ -166,7 +166,7 @@ func SetupMotor(s Storer) (err error) {
 }
 
 // DBSetup initializes consumable distance in DB
-func SetupConsumable(s Storer) (err error) {
+func setupConsumable(s Storer) (err error) {
 	var config ConsumableConfig
 	err = viper.Unmarshal(&config)
 	if err != nil {
@@ -189,7 +189,7 @@ func SetupConsumable(s Storer) (err error) {
 }
 
 // DBSetup initializes tips and tubes in DB
-func SetupTipsTubes(s Storer) (err error) {
+func setupTipsTubes(s Storer) (err error) {
 	var config TipsTubesConfig
 	err = viper.Unmarshal(&config)
 	if err != nil {
@@ -211,7 +211,7 @@ func SetupTipsTubes(s Storer) (err error) {
 }
 
 // DBSetup initializes cartridge in DB
-func SetupCartridges(s Storer) (err error) {
+func setupCartridges(s Storer) (err error) {
 	var cartridgesConfig CartridgesConfig
 	var wellsConfig CartridgeWellsConfig
 	err = viper.Unmarshal(&cartridgesConfig)
@@ -303,4 +303,44 @@ func makeCartridgeWellsList(configCartridge CartridgeWellsConfig) (cartridgeWell
 		cartridgeWells = append(cartridgeWells, cartridgeWell)
 	}
 	return
+}
+
+func LoadAllDBFuncs(s Storer) (err error) {
+
+	// setup Db with dyes & targets
+	err = SetupDyeAndTargets(s)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Dyes & Targets failed")
+		return
+	}
+
+	// setup Db with motors
+	err = setupMotor(s)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Motors failed")
+		return
+	}
+
+	// setup Db with consumable distance
+	err = setupConsumable(s)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Cosumable Distance failed")
+		return
+	}
+
+	// setup Db with tipstube
+	err = setupTipsTubes(s)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup TipsTubes failed")
+		return
+	}
+
+	// setup Db with cartridge
+	err = setupCartridges(s)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Cartridge failed")
+		return
+	}
+
+	return nil
 }
