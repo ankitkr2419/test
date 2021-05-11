@@ -149,4 +149,4 @@ TimeModal.defaultProps = {
   isOpen: false,
 };
 
-export default TimeModal;
+export default React.memo(TimeModal);

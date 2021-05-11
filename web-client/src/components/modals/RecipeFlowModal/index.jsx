@@ -174,4 +174,4 @@ const RecipeFlowModal = (props) => {
 
 RecipeFlowModal.propTypes = {};
 
-export default RecipeFlowModal;
+export default React.memo(RecipeFlowModal);

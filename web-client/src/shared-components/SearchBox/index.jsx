@@ -102,4 +102,4 @@ SearchBox.defaultProps = {
   isUserLoggedIn: false,
 };
 
-export default SearchBox;
+export default React.memo(SearchBox);

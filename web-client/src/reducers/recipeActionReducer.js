@@ -80,7 +80,8 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
   switch (action.type) {
     case saveRecipeDataAction.saveRecipeDataForDeck: //set and update: depend on deckName
       let deckNameForRecipe = action.payload.deckName;
-      let isAdmin = action.payload.recipeData && action.payload.recipeData.isAdmin ? action.payload.recipeData.isAdmin: false;
+
+      let isAdmin = action.payload.recipeData?.isAdmin ? action.payload.recipeData.isAdmin: false;
       let newDecksAfterRecipeDataAdded = state.decks.map((deckObj) => {
         return deckObj.name === deckNameForRecipe
           ? {
@@ -208,7 +209,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
 
       let decksAfterRunInProgress = state.decks.map((deckObj) => {
         let isStepRun = deckObj.runRecipeType === RUN_RECIPE_TYPE.STEP_RUN;
-        
+
         //for admin: step-run: if current_step !== old_step then activate next button
         let shouldActivateNextProcess = (isStepRun && 
             deckObj.runRecipeInProgress && 

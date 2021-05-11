@@ -55,4 +55,4 @@ const LandingScreenComponent = (props) => {
 
 LandingScreenComponent.propTypes = {};
 
-export default LandingScreenComponent;
+export default React.memo(LandingScreenComponent);

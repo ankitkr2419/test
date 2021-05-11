@@ -156,4 +156,4 @@ const LabWareComponent = (props) => {
 
 LabWareComponent.propTypes = {};
 
-export default LabWareComponent;
+export default React.memo(LabWareComponent);

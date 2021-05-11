@@ -375,7 +375,7 @@ const DeckCard = (props) => {
     
     let obj = PROCESS_ICON_CONSTANTS.find(obj => obj.processType === processTypeText)
     
-    let iconName = (obj && obj.iconName)
+    let iconName = (obj?.iconName)
       ? obj.iconName 
       : PROCESS_ICON_CONSTANTS.find(obj => obj.processType === 'default').iconName
     return iconName;
@@ -568,4 +568,4 @@ DeckCard.defaultProps = {
   rightActionBtnDisabled: false,
 };
 
-export default DeckCard;
+export default React.memo(DeckCard);

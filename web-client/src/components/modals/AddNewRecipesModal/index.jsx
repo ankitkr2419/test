@@ -72,9 +72,6 @@ const AddNewRecipesModal = (props) => {
 
   return (
     <>
-      {/* <Button color="primary" onClick={toggleAddNewRecipesModal}>
-                Add New Recipes Modal
-            </Button> */}
       <Modal
         isOpen={isOpen}
         toggle={toggleAddNewRecipesModal}
@@ -147,4 +144,4 @@ AddNewRecipesModal.defaultProps = {
   isOpen: false,
 };
 
-export default AddNewRecipesModal;
+export default React.memo(AddNewRecipesModal);

@@ -138,4 +138,4 @@ TrayDiscardModal.defaultProps = {
   isOpen: false,
 };
 
-export default TrayDiscardModal;
+export default React.memo(TrayDiscardModal);

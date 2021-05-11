@@ -108,4 +108,4 @@ const RunRecipesModal = (props) => {
     );
 };
 
-export default RunRecipesModal;
+export default React.memo(RunRecipesModal);

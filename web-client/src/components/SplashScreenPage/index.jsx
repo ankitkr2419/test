@@ -36,4 +36,4 @@ const SplashScreenComponent = () => {
   );
 };
 
-export default SplashScreenComponent;
+export default React.memo(SplashScreenComponent);

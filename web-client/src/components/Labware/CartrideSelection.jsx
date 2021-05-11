@@ -62,4 +62,4 @@ const CartridgeSelection = (props) => {
 
 CartridgeSelection.propTypes = {};
 
-export default CartridgeSelection;
+export default React.memo(CartridgeSelection);

@@ -141,4 +141,4 @@ OperatorLoginModal.defaultProps = {
 	isOpen: false,
 };
 
-export default OperatorLoginModal;
+export default React.memo(OperatorLoginModal);

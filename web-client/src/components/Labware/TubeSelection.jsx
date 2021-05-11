@@ -47,4 +47,4 @@ const TubeSelection = (props) => {
 
 TubeSelection.propTypes = {};
 
-export default TubeSelection;
+export default React.memo(TubeSelection);
