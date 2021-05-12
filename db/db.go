@@ -85,6 +85,7 @@ type Storer interface {
 	DeleteProcess(context.Context, uuid.UUID) error
 	UpdateProcess(context.Context, Process) error
 	DuplicateProcess(context.Context, uuid.UUID) (Process, error)
+	RearrangeProcesses(context.Context, uuid.UUID, []ProcessSequence) ([]Process, error)
 	ListPiercing(context.Context) ([]Piercing, error)
 	CreatePiercing(context.Context, Piercing) (Piercing, error)
 	UpdatePiercing(context.Context, Piercing) error
@@ -108,7 +109,7 @@ type Storer interface {
 	UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error)
 	UpdateTipDock(ctx context.Context, t TipDock) (err error)
 	UpdateHeating(ctx context.Context, ht Heating) (err error)
-	UpdateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error)
+	updateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error)
 	ShowUser(ctx context.Context, username string) (user User, err error)
 	InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error)
 	ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error)

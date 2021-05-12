@@ -51,7 +51,8 @@ var (
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
 
-	UserLoginSuccess  = "user successfully logged in."
-	UserCreateSuccess = "user successfully created"
-	UserLogoutSuccess = "user successfully logged out"
+	UserLoginSuccess          = "user successfully logged in."
+	UserCreateSuccess         = "user successfully created"
+	UserLogoutSuccess         = "user successfully logged out"
+	ProcessesRearrangeSuccess = "rearranging processes success"
 )

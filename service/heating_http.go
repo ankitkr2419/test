@@ -31,13 +31,14 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding heating data")
+			logger.WithField("err", err.Error()).Errorln(responses.HeatingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.HeatingDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(htObj)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -45,21 +46,12 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 		var createdTemp db.Heating
 		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create Heating")
+			logger.WithField("err", err.Error()).Errorln(responses.HeatingCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.HeatingCreateError.Error()})
 			return
 		}
-
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling heating data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.HeatingCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, createdTemp)
 	})
 }
 
@@ -87,7 +79,7 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -95,21 +87,13 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 		heating, err = deps.Store.ShowHeating(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show heating")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.HeatingFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.HeatingFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(heating)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling heating data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.HeatingFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, heating)
 	})
 }
 
@@ -134,7 +118,7 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -142,13 +126,14 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&htObj)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding piercing data")
+			logger.WithField("err", err.Error()).Errorln(responses.HeatingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.HeatingDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(htObj)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -156,13 +141,12 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 		htObj.ProcessID = id
 		err = deps.Store.UpdateHeating(req.Context(), htObj)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update piercing")
+			logger.WithField("err", err.Error()).Error(responses.HeatingUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.HeatingUpdateError.Error()})
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"heating record updated successfully"}`))
+		logger.Infoln(responses.HeatingUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.HeatingUpdateSuccess})
 	})
 }

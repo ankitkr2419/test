@@ -31,35 +31,27 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding TipOperation data")
+			logger.WithField("err", err.Error()).Errorln(responses.TipOperationDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipOperationDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(tipOpr)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln( responses.TipOperationValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		var createdTemp db.TipOperation
-		createdTemp, err = deps.Store.CreateTipOperation(req.Context(), tipOpr)
+		var tipOperation db.TipOperation
+		tipOperation, err = deps.Store.CreateTipOperation(req.Context(), tipOpr)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create TipOperation")
+			logger.WithField("err", err.Error()).Errorln(responses.TipOperationCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipOperationCreateError.Error()})
 			return
 		}
-
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling TipOperation data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.TipOperationCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, tipOperation)
 	})
 }
 
@@ -86,29 +78,21 @@ func showTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
-		var TipOperation db.TipOperation
+		var tipOperation db.TipOperation
 
-		TipOperation, err = deps.Store.ShowTipOperation(req.Context(), id)
+		tipOperation, err = deps.Store.ShowTipOperation(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show TipOperation")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipOperationFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.TipOperationFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(TipOperation)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling TipOperation data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.TipOperationFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, tipOperation)
 	})
 }
 
@@ -134,7 +118,7 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -142,13 +126,14 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding tip operation data")
+			logger.WithField("err", err.Error()).Errorln(responses.TipOperationDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipOperationDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(tipOpr)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln( responses.TipOperationValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -156,13 +141,12 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		tipOpr.ProcessID = id
 		err = deps.Store.UpdateTipOperation(req.Context(), tipOpr)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update tip operation")
+			logger.WithField("err", err.Error()).Error(responses.TipOperationUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipOperationUpdateError.Error()})
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"TipOperation record updated successfully"}`))
+		logger.Infoln(responses.TipOperationUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.TipOperationUpdateSuccess})
 	})
 }

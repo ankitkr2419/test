@@ -42,12 +42,14 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	//
 	// move the syringe module to rest position if the Motor Num is of deck
-	// or Magnet Rev Fwd motor as suggested by @Sanket
+	// or Magnet RevFwd or Magnet UpDown motor as suggested by @Sanket
 	// and syringe tips are inside of deck positions.
 	//
 
 	// if tip discard is in progress that means avoid moving module up when motor is K5
-	if d.getSyringeModuleState() == InDeck && ( (motorNum == K5_Deck  && !d.isTipDiscardInProgress() ) || motorNum == K7_Magnet_Rev_Fwd) {
+	if d.getSyringeModuleState() == InDeck && // Syringe module has to be indeck 
+		((motorNum == K5_Deck && !d.isTipDiscardInProgress()) || //Tip Discard Special handling
+			motorNum == K7_Magnet_Rev_Fwd || motorNum == K6_Magnet_Up_Down) { //Magnet Special Handling
 		response, err = d.SyringeRestPosition()
 		if err != nil {
 			logger.Errorln(err)
