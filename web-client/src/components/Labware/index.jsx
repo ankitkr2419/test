@@ -3,12 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 
 import { Row, Col, Card, CardBody } from "core-components";
-import { ButtonBar, ImageIcon, Text, Icon } from "shared-components";
+import { ButtonBar, ImageIcon, Text, Icon, MlModal } from "shared-components";
 import { TabContent, TabPane, Nav } from "reactstrap";
 
 import AppFooter from "components/AppFooter";
 import labwarePlate from "assets/images/labware-plate.png";
-import { LABWARE_INITIAL_STATE, DECKNAME, ROUTES } from "appConstants";
+import {
+  LABWARE_INITIAL_STATE,
+  DECKNAME,
+  ROUTES,
+  MODAL_BTN,
+} from "appConstants";
 import {
   getSideBarNavItems,
   getDeckAtPosition,
@@ -20,14 +25,16 @@ import {
 } from "./HelperFunctions";
 import { LabwareBox, PageBody, ProcessSetting } from "./Styles";
 import { updateRecipeActionInitiated } from "action-creators/saveNewRecipeActionCreators";
-import { Redirect } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { getRequestBody, getOptions } from "./functions";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
   const [preview, setPreview] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const formik = useFormik({
     initialValues: LABWARE_INITIAL_STATE,
@@ -42,10 +49,9 @@ const LabWareComponent = (props) => {
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  // if (!activeDeckObj.isLoggedIn) {
-  //   console.log("redirect to landing", activeDeckObj);
-  //   return <Redirect to={`/${ROUTES.landing}`} />;
-  // }
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   const deckIndex = activeDeckObj.name === DECKNAME.DeckA ? 0 : 1;
   const tipsAndTubesOptions =
@@ -54,7 +60,6 @@ const LabWareComponent = (props) => {
     recipeDetailsReducer.decks[deckIndex].cartridgeOptions;
   const newRecipeName =
     recipeDetailsReducer.decks[deckIndex].recipeDetails.name;
-
 
   const handleSaveBtn = () => {
     const requestBody = getRequestBody(newRecipeName, formik.values);
@@ -66,14 +71,33 @@ const LabWareComponent = (props) => {
         token: activeDeckObj.token,
       })
     );
+
+    setShowConfirmModal(!showConfirmModal);
   };
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
 
+  const handleSuccessBtn = () => {
+    setShowConfirmModal(!showConfirmModal);
+    // history.push(); redirect to next page
+  };
+
   return (
     <>
+      {showConfirmModal && (
+        <MlModal
+          textHead={activeDeckObj.name}
+          textBody={"Labware is set!"}
+          isOpen={showConfirmModal}
+          successBtn={MODAL_BTN.okay}
+          handleSuccessBtn={handleSuccessBtn}
+          handleCrossBtn={() => {
+            setShowConfirmModal(!showConfirmModal);
+          }}
+        />
+      )}
       <PageBody>
         <LabwareBox>
           <div className="process-content process-labware px-2">
