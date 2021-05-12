@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,7 +12,23 @@ import (
 
 func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeListInitialisedState, username)
+
 		list, err := deps.Store.ListRecipes(req.Context())
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeListCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -32,8 +49,24 @@ func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 
 func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.RecipeInitialisedState, username)
+
 		var recipe db.Recipe
 		err := json.NewDecoder(req.Body).Decode(&recipe)
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.RecipeCompletedState, username)
+
+			}
+
+		}()
+
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding recipe data")
@@ -69,9 +102,24 @@ func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeInitialisedState, username)
+
 		vars := mux.Vars(req)
 
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeCompletedState, username)
+
+			}
+
+		}()
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
@@ -101,8 +149,23 @@ func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.DeleteOperation, "", responses.RecipeInitialisedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.DeleteOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.DeleteOperation, "", responses.RecipeCompletedState, username)
+
+			}
+
+		}()
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
@@ -123,8 +186,23 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipeInitialisedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipeCompletedState, username)
+
+			}
+
+		}()
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
@@ -161,8 +239,24 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipePublishedState, username)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipePublishedState, username)
+
+			}
+
+		}()
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return

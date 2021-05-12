@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"time"
 
@@ -18,7 +19,22 @@ import (
 func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
+		username := req.Context().Value(contextKeyUsername).(string)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.RunRecipeInitialisedState, username)
+
 		var err error
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error(), username)
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.DelayCompletedState, username)
+
+			}
+
+		}()
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
@@ -33,20 +49,18 @@ func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 		switch deck {
 		case "A", "B":
 			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
-			rw.WriteHeader(http.StatusOK)
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"recipe run is in progress", "deck": "%v"}`, deck)))
+			responseCodeAndMsg(rw, http.StatusBadRequest, MsgObj{Msg: responses.RunRecipeProgress, Deck: deck})
 
 		default:
-			err = fmt.Errorf("Check your deck name")
+			err = responses.RunRecipeWrongDeckError
 		}
 
 		if err != nil {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"msg":"check your deck name"}`))
-			logger.Errorln(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RunRecipeWrongDeckError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.RunRecipeWrongDeckError)
+
 		}
+		return
 	})
 }
 
@@ -62,30 +76,25 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 		case "A", "B":
 			// If runNext is set means this API is called at wrong time
 			if runNext[deck] {
-				rw.WriteHeader(http.StatusBadRequest)
-				rw.Header().Add("Content-Type", "application/json")
-				rw.Write([]byte(fmt.Sprintf(`{"msg":"check if the step-run is in progress", "deck": "%v"}`, deck)))
+				responseCodeAndMsg(rw, http.StatusBadRequest, MsgObj{Msg: responses.RunRecipeCheckStepRun, Deck: deck})
 				return
 			}
 
 			logger.Infoln("Populating the nextStep channel for deck", deck)
 			nextStep[deck] <- struct{}{}
 
-			rw.WriteHeader(http.StatusOK)
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"next step run is in progress", "deck":"%v"}`, deck)))
+			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RunRecipeStepRunSuccess, Deck: deck})
+
 			return
 
 		default:
-			err = fmt.Errorf("Check your deck name")
+			err = responses.RunRecipeWrongDeckError
 		}
 
 		if err != nil {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"msg":"check your deck name"}`))
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.StepRunRecipeWrongDeckError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.StepRunRecipeWrongDeckError)
 
-			logger.Errorln(err.Error())
 		}
 		return
 	})

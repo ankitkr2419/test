@@ -85,11 +85,13 @@ func LoadUtils() {
 }
 
 type ErrObj struct {
-	Err string `json:"err"`
+	Err  string `json:"err"`
+	Deck string `json:"deck,omitempty"`
 }
 
 type MsgObj struct {
-	Msg string `json:"msg"`
+	Msg  string `json:"msg"`
+	Deck string `json:"deck,omitempty"`
 }
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
