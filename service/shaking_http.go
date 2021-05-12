@@ -12,9 +12,17 @@ import (
 
 func createShakingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
 
 		var shaObj db.Shaker
-		err := json.NewDecoder(req.Body).Decode(&shaObj)
+		err = json.NewDecoder(req.Body).Decode(&shaObj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ShakingDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ShakingDecodeError.Error()})
@@ -29,7 +37,7 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var shaker db.Shaker
-		shaker, err = deps.Store.CreateShaking(req.Context(), shaObj)
+		shaker, err = deps.Store.CreateShaking(req.Context(), shaObj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ShakingCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ShakingCreateError.Error()})

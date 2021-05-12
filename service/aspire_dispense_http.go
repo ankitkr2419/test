@@ -12,8 +12,18 @@ import (
 
 func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
 		var adobj db.AspireDispense
-		err := json.NewDecoder(req.Body).Decode(&adobj)
+
+		err = json.NewDecoder(req.Body).Decode(&adobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.AspireDispenseDecodeError.Error()})
@@ -28,7 +38,7 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdTemp db.AspireDispense
-		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj)
+		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.AspireDispenseCreateError.Error()})
