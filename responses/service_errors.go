@@ -107,6 +107,9 @@ var (
 	AuditLogCreateError = fmt.Errorf("error failed saving log")
 
 	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
+
+	RunRecipeWrongDeckError     = fmt.Errorf("error fetching cartridge record")
+	StepRunRecipeWrongDeckError = fmt.Errorf("error fetching cartridge record")
 )
 
 // Special errors which are in []byte format

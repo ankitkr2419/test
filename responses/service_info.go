@@ -60,11 +60,23 @@ var (
 	CartridgeFetchSuccess = "cartridge record fetched successfully"
 
 	CartridgeInitialisedState = "cartridge api initialised"
-	CartridgeCompletedState   = "cartridge api initialised"
+	CartridgeCompletedState   = "cartridge api completed"
 
 	TipTubeFetchSuccess  = "tip tube record fetched successfully"
 	TipTubeCreateSuccess = "tip tube record created successfully"
 
 	TipTubeInitialisedState = "tip operation api initialised"
 	TipTubeCompletedState   = "tip operation api initialised"
+
+	RunRecipeInitialisedState = "run recipe api initialised"
+	RunRecipeCheckStepRun     = "check if the step-run is in progress"
+	RunRecipeStepRunSuccess   = "next step run is in progress"
+
+	RecipeInitialisedState     = "recipe api initialised"
+	RecipeCompletedState       = "recipe api completed"
+	RecipePublishedState       = "recipe api publish completed"
+	RecipeListInitialisedState = "recipe list api initialised"
+	RecipeListCompletedState   = "recipe list api Completed"
+
+	RunRecipeProgress = "next step run is in progress"
 )
