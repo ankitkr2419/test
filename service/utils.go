@@ -20,6 +20,13 @@ const (
 	cycle = "cycle"
 )
 
+const (
+	admin      = "admin"
+	supervisor = "supervisor"
+	engineer   = "engineer"
+	operator   = "operator"
+)
+
 var userLogin sync.Map
 
 // runNext will run the next step of process when set
