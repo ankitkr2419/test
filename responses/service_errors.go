@@ -97,6 +97,8 @@ var (
 	UserTokenAuthIdError        = fmt.Errorf("error auth_id not in token ")
 	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
 	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
+
+	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
 )
 
 // Special errors which are in []byte format

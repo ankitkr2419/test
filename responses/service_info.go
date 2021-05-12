@@ -40,4 +40,8 @@ var (
 	UserLogoutSuccess = "user successfully logged out"
 
 	ProcessesRearrangeSuccess = "rearranging processes success"
+
+	SafeToUpgrade          = "safe to upgrade the cpagent version"
+	TempSettingBothDeckRun = "temporary setting both deck run in progress"
+	ResettingBothDeckRun   = "resetting both deck run in progress"
 )
