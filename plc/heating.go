@@ -76,7 +76,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		logger.Errorln("Error failed to write temperature: ", err)
 		return "", err
 	}
-	logger.Infoln("result from temperature selection", result)
+	logger.Infoln("result from temperature set ", result, ht.Temperature)
 
 	// Step 6 : Check if Aborted
 	// first check aborted if yes then exit
