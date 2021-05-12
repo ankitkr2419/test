@@ -12,8 +12,17 @@ import (
 
 func createDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
 		var delay db.Delay
-		err := json.NewDecoder(req.Body).Decode(&delay)
+		err = json.NewDecoder(req.Body).Decode(&delay)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.DelayDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DelayDecodeError.Error()})
@@ -28,7 +37,7 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdTemp db.Delay
-		createdTemp, err = deps.Store.CreateDelay(req.Context(), delay)
+		createdTemp, err = deps.Store.CreateDelay(req.Context(), delay, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.DelayCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DelayCreateError.Error()})
