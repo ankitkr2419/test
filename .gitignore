@@ -30,3 +30,4 @@ config\.yml
 swaggerui/
 
 rice-box\.go
+coverage.*
