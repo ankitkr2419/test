@@ -32,7 +32,7 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(adObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.AttachDetachValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.AttachDetachValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -90,7 +90,7 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		}
 		valid, respBytes := validate(adObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.AttachDetachValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.AttachDetachValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
