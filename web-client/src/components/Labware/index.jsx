@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 
 import { Row, Col, Card, CardBody } from "core-components";
@@ -19,10 +19,13 @@ import {
   updateAllTicks,
 } from "./HelperFunctions";
 import { LabwareBox, PageBody, ProcessSetting } from "./Styles";
+import { updateRecipeActionInitiated } from "action-creators/saveNewRecipeActionCreators";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
   const [preview, setPreview] = useState(false);
+
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: LABWARE_INITIAL_STATE,
@@ -45,6 +48,8 @@ const LabWareComponent = (props) => {
     recipeDetailsReducer.decks[deckIndex].recipeOptions;
   const cartridgeOptions =
     recipeDetailsReducer.decks[deckIndex].cartridgeOptions;
+  const newRecipeName =
+    recipeDetailsReducer.decks[deckIndex].recipeDetails.name;
 
   const getOptions = (lowerLimit, higherLimit, options) => {
     const optionsObj = [];
@@ -64,6 +69,8 @@ const LabWareComponent = (props) => {
   const handleSaveBtn = () => {
     const selectedOptions = formik.values;
     const requestBody = {
+      name: newRecipeName,
+      description: "",
       pos_1: selectedOptions.tips.processDetails.tipPosition1.id,
       pos_2: selectedOptions.tips.processDetails.tipPosition2.id,
       pos_3: selectedOptions.tips.processDetails.tipPosition3.id,
@@ -71,12 +78,16 @@ const LabWareComponent = (props) => {
       pos_5: selectedOptions.tipPiercing.processDetails.position2.id,
       pos_6: selectedOptions.deckPosition1.processDetails.tubeType.id,
       pos_7: selectedOptions.deckPosition2.processDetails.tubeType.id,
-      pos_cartridge_1: selectedOptions.cartridge1.processDetails.cartridgeType.id,
+      pos_cartridge_1:
+        selectedOptions.cartridge1.processDetails.cartridgeType.id,
       pos_9: selectedOptions.deckPosition3.processDetails.tubeType.id,
-      pos_cartridge_2: selectedOptions.cartridge2.processDetails.cartridgeType.id,
+      pos_cartridge_2:
+        selectedOptions.cartridge2.processDetails.cartridgeType.id,
       pos_11: selectedOptions.deckPosition4.processDetails.tubeType.id,
     };
-    console.log(requestBody);
+
+    // console.log(requestBody);
+    dispatch(updateRecipeActionInitiated({requestBody: requestBody, deckName: DECKNAME.DeckA}));
   };
 
   const toggle = (tab) => {
@@ -115,16 +126,16 @@ const LabWareComponent = (props) => {
                         <ProcessSetting>
                           <div className="tips-info">
                             <ul class="list-unstyled tip-position active">
-                              {formik.values.tips.processDetails
-                                .tipPosition1.id && (
+                              {formik.values.tips.processDetails.tipPosition1
+                                .id && (
                                 <li class="highlighted tip-position-1"></li>
                               )}
-                              {formik.values.tips.processDetails
-                                .tipPosition2.id && (
+                              {formik.values.tips.processDetails.tipPosition2
+                                .id && (
                                 <li class="highlighted tip-position-2"></li>
                               )}
-                              {formik.values.tips.processDetails
-                                .tipPosition3.id && (
+                              {formik.values.tips.processDetails.tipPosition3
+                                .id && (
                                 <li class="highlighted tip-position-3"></li>
                               )}
                             </ul>
@@ -187,7 +198,7 @@ const LabWareComponent = (props) => {
                     </div>
                   </div>
                 ) : (
-                  // Select Process 
+                  // Select Process
                   <div className="d-flex">
                     <Nav tabs className="d-flex flex-column border-0 side-bar">
                       <Text className="d-flex justify-content-center align-items-center px-3 pt-3 pb-3 mb-0 font-weight-bold text-white">

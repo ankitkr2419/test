@@ -69,6 +69,7 @@ export const API_ENDPOINTS = {
   discardDeck: "discard-box/cleanup",
   restoreDeck: "restore-deck",
   recipeListing: "recipes",
+  saveAndUpdateRecipes: "recipes",
   discardTipAndHoming: "discard-tip-and-home",
   cleanUp: "uv",
   tipsTubes: "tips-tubes",
@@ -84,7 +85,7 @@ export const MODAL_MESSAGE = {
   abortConfirmation: "Are you sure you want to abort now?",
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",
-  publishConfirmation: "Are you sure you want to Publish this recipe?"
+  publishConfirmation: "Are you sure you want to Publish this recipe?",
 };
 
 export const MODAL_BTN = {
@@ -116,7 +117,7 @@ export const DECKCARD_BTN = {
     pause: "pause",
     done: "done",
     resume: "resume",
-    next: "next"
+    next: "next",
   },
 };
 
@@ -158,7 +159,7 @@ export const LABWARE_INITIAL_STATE = {
   },
   tipPiercing: {
     isTicked: false,
-    processDetails: { position1: { id: 0 }, position2: { id: 0 } },
+    processDetails: { position1: { id: null }, position2: { id: null } },
   },
   deckPosition1: {
     isTicked: false,
@@ -208,51 +209,50 @@ export const LABWARE_NAME = {
   cartridgeType: "Cartridge Type",
 };
 
-
 /**
  * get process icon_name associated with processType
  * */
 export const PROCESS_ICON_CONSTANTS = [
   //if processType not found, use default process icon
   {
-    processType: 'default',
-    iconName: 'process'
+    processType: "default",
+    iconName: "process",
   },
 
   //other icons:
   {
-    processType: 'Piercing',
-    iconName: 'piercing'
+    processType: "Piercing",
+    iconName: "piercing",
   },
   {
-    processType: 'AspireDispense',
-    iconName: 'aspire-dispense'
+    processType: "AspireDispense",
+    iconName: "aspire-dispense",
   },
   {
-    processType:  'Heating',
-    iconName: 'heating'
+    processType: "Heating",
+    iconName: "heating",
   },
   {
-    processType: 'Shaking', 
-    iconName: 'shaking'
+    processType: "Shaking",
+    iconName: "shaking",
   },
   {
-    processType: 'Delay',
-    iconName: 'delay'
+    processType: "Delay",
+    iconName: "delay",
   },
   /**TODO:
    * following icons not available in fonts.scss
    */
   {
-    processType: 'TipOperation',
-    iconName: ''
+    processType: "TipOperation",
+    iconName: "",
   },
   {
-    processType: 'TipDocking',
-    iconName: ''
+    processType: "TipDocking",
+    iconName: "",
   },
   {
-    processType: 'AttachDetach',
-    iconName: ''
+    processType: "AttachDetach",
+    iconName: "",
   },
-]
+];

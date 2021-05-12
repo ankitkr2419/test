@@ -1,5 +1,6 @@
 import { takeEvery, put, call } from "redux-saga/effects";
 import saveNewRecipeActions, {
+  saveNewRecipeAction,
   getTipsAndTubesAction,
   getCartridgeAction,
 } from "actions/saveNewRecipeActions";
@@ -9,6 +10,29 @@ import { callApi } from "apis/apiHelper";
 export function* saveRecipe(actions) {
   //in dev
   //api call
+}
+
+export function* updateRecipe(actions) {
+  const { updateRecipeSuccess, updateRecipeFailure } = saveNewRecipeAction;
+  const requestBody = actions.payload.params;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.saveAndUpdateRecipes}`,
+        successAction: updateRecipeSuccess,
+        failureAction: updateRecipeFailure,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: "",
+      },
+    });
+  } catch (error) {
+    console.error("error while starting", error);
+    yield put(updateRecipeFailure(error));
+  }
 }
 
 export function* getTipsAndTubes(actions) {
@@ -60,6 +84,7 @@ export function* getCartridge(actions) {
 
 export function* saveNewRecipeSaga() {
   yield takeEvery(saveNewRecipeActions.saveRecipe, saveRecipe);
+  yield takeEvery(saveNewRecipeAction.updateRecipeInitiated, updateRecipe);
   yield takeEvery(
     getTipsAndTubesAction.getTipsAndTubesInitiated,
     getTipsAndTubes

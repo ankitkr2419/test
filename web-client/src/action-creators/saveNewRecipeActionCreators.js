@@ -9,44 +9,67 @@ export const saveNewRecipe = (params) => ({
   payload: params,
 });
 
+//posting new recipe
+export const updateRecipeActionInitiated = (params) => ({
+  type: saveNewRecipeAction.updateRecipeInitiated,
+  payload: params,
+});
+
+export const updateRecipeActionSuccess = (params) => ({
+  type: saveNewRecipeAction.updateRecipeSuccess,
+  payload: params,
+});
+
+export const updateRecipeActionFailure = (params) => ({
+  type: saveNewRecipeAction.updateRecipeFailure,
+  payload: params,
+});
+
+export const updateRecipeActionReset = (params) => ({
+  type: saveNewRecipeAction.updateRecipeReset,
+  payload: params,
+});
+
+// getting and saving tips and tubes options
 export const getTipsAndTubesActionInitiated = (params) => ({
   type: getTipsAndTubesAction.getTipsAndTubesInitiated,
-  payload: params
+  payload: params,
 });
 
 export const getTipsAndTubesActionSuccess = (params) => ({
   type: getTipsAndTubesAction.getTipsAndTubesSuccess,
-  payload: params
+  payload: params,
 });
 
 export const getTipsAndTubesActionFailure = (params) => ({
   type: getTipsAndTubesAction.getTipsAndTubesFailure,
-  payload: params
+  payload: params,
 });
 
 export const getTipsAndTubesActionReset = (params) => ({
   type: getTipsAndTubesAction.getTipsAndTubesReset,
-  payload: params
+  payload: params,
 });
 
+// getting and saving cartridge options
 export const getCartridgeActionInitiated = (params) => ({
   type: getCartridgeAction.getCartridgeInitiated,
-  payload: params
+  payload: params,
 });
 
 export const getCartridgeActionSuccess = (params) => ({
   type: getCartridgeAction.getCartridgeSuccess,
-  payload: params
+  payload: params,
 });
 
 export const getCartridgeActionFailure = (params) => ({
   type: getCartridgeAction.getCartridgeActionFailure,
-  payload: params
+  payload: params,
 });
 
 export const getCartridgeActionReset = (params) => ({
   type: getCartridgeAction.getCartridgeActionSuccess,
-  payload: params
+  payload: params,
 });
 
 // //create/edit recipe detials
