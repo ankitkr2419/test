@@ -168,9 +168,9 @@ func startApp(plcName string, test bool) (err error) {
 
 	go monitorForPLCTimeout(&deps, exit)
 
-	err = db.LoadAllDBFuncs(store)
+	err = db.LoadAllDBSetups(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Loading DB Functions failed")
+		logger.WithField("err", err.Error()).Error("Loading DB Setups failed")
 		return
 	}
 

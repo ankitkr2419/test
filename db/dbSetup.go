@@ -291,7 +291,7 @@ func makeCartridgeWellsList(configCartridge CartridgeWellsConfig) (cartridgeWell
 	return
 }
 
-func LoadAllDBFuncs(s Storer) (err error) {
+func LoadAllDBSetups(s Storer) (err error) {
 
 	// setup Db with dyes & targets
 	err = SetupDyeAndTargets(s)
