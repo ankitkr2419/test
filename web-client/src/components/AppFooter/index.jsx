@@ -27,7 +27,6 @@ import {
   runCleanUpActionReset,
 } from "action-creators/cleanUpActionCreators";
 import { MlModal } from "shared-components";
-import { loginReset } from "action-creators/loginActionCreators";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 import { discardTipAndHomingActionInitiated } from "action-creators/homingActionCreators";
 
@@ -323,8 +322,9 @@ const AppFooter = (props) => {
       setTipDiscardModal(!tipDiscardModal);
     } else {
       dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort }));
-      dispatch(loginReset(DECKNAME.DeckA));
+      dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
     }
+
     setConfirmAbortModal(!confirmAbortModal);
   };
 
@@ -336,7 +336,7 @@ const AppFooter = (props) => {
       setTipDiscardModal(!tipDiscardModal);
     } else {
       dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort }));
-      dispatch(loginReset(DECKNAME.DeckB));
+      dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
     setConfirmAbortModal(!confirmAbortModal);
   };
@@ -381,19 +381,17 @@ const AppFooter = (props) => {
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
     }
-    dispatch(loginReset(DECKNAME.DeckA));
     setConfirmDoneModal(!confirmDoneModal);
   };
 
   const handleDoneModalDeckB = () => {
-    let recipeReducerData = recipeActionReducerForDeckA;
+    let recipeReducerData = recipeActionReducerForDeckB;
 
     if (recipeReducerData.showProcess) {
       dispatch(runRecipeReset(deckName));
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
-    dispatch(loginReset(DECKNAME.DeckB));
     setConfirmDoneModal(!confirmDoneModal);
   };
 
