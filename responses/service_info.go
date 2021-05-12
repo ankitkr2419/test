@@ -51,8 +51,20 @@ var (
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
 
-	UserLoginSuccess          = "user successfully logged in."
-	UserCreateSuccess         = "user successfully created"
-	UserLogoutSuccess         = "user successfully logged out"
+	UserLoginSuccess  = "user successfully logged in."
+	UserCreateSuccess = "user successfully created"
+	UserLogoutSuccess = "user successfully logged out"
+
 	ProcessesRearrangeSuccess = "rearranging processes success"
+
+	CartridgeFetchSuccess = "cartridge record fetched successfully"
+
+	CartridgeInitialisedState = "cartridge api initialised"
+	CartridgeCompletedState   = "cartridge api initialised"
+
+	TipTubeFetchSuccess  = "tip tube record fetched successfully"
+	TipTubeCreateSuccess = "tip tube record created successfully"
+
+	TipTubeInitialisedState = "tip operation api initialised"
+	TipTubeCompletedState   = "tip operation api initialised"
 )

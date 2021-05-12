@@ -53,6 +53,11 @@ var (
 	TipOperationFetchError      = fmt.Errorf("error fetching tip operation record")
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
 
+	TipTubeDecodeError    = fmt.Errorf("error decoding tip tube record")
+	TipTubeCreateError    = fmt.Errorf("error creating tip tube record")
+	TipTubeFetchError     = fmt.Errorf("error fetching tip tube record")
+	TipTubeArgumentsError = fmt.Errorf("error invalid tip tube arguments")
+
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
 	ProcessValidationError  = fmt.Errorf("error validating process record")
@@ -100,6 +105,8 @@ var (
 
 	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
 	AuditLogCreateError = fmt.Errorf("error failed saving log")
+
+	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
 )
 
 // Special errors which are in []byte format
