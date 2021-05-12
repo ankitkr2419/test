@@ -17,9 +17,9 @@ import (
 4. Select shaker/s for heating
 5. Set Temperature
 6. Check if aborted before setting heater on
-7. Heater on
-8. check if followup is to be kept on
-9. if no then then start heating and the timer and after specified time turn off heater and return.
+7. Check if syringe module is inDeck, then get it to rest position
+8. Heater on
+9. check if followup is to be kept on if no then then start heating and the timer and after specified time turn off heater and return.
 10. if yes then start heating let it reach to specified temperature and then start timer and after time switch heater off.
 11. Switch heater OFF
 */
@@ -76,13 +76,24 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		logger.Errorln("Error failed to write temperature: ", err)
 		return "", err
 	}
-	logger.Infoln("result from temperature selection", result)
+	logger.Infoln("result from temperature set ", result, ht.Temperature)
 
 	// Step 6 : Check if Aborted
 	// first check aborted if yes then exit
 	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Operation was ABORTED!")
 		return "", err
+	}
+
+	// Step 7 : Syringe To Rest Position
+	// Check if syringe module is inDeck, then get it to rest position
+
+	if d.getSyringeModuleState() == InDeck {
+		response, err = d.SyringeRestPosition()
+		if err != nil {
+			logger.Errorln(err)
+			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
+		}
 	}
 
 	// Step 7 : Switch heater on
@@ -95,11 +106,9 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	d.setHeaterInProgress()
 	defer d.resetHeaterInProgress()
 
-	// Step 8:
+	// Step 8: For not follow Temp
 	// first check if not follow up then call delay function.
-
-	// Step 9:
-	//if no then then start heating  after specified time turn off heater and return
+	// if no then then start heating  after specified time turn off heater and return
 	// as we do not need to monitor the temperature here.
 	if !ht.FollowTemp {
 		logger.Infoln("not follow temperature")
@@ -114,7 +123,6 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 			logger.Errorln("error in switching heater off ", err)
 			return
 		}
-
 		return
 	}
 
@@ -220,7 +228,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 				prevTemp1 = setTemp1
 				prevTemp2 = setTemp2
 
-				if heatingFailCounter1 >= 5 || heatingFailCounter2 >= 5 {
+				if heatingFailCounter1 >= 15 || heatingFailCounter2 >= 15 {
 					err = fmt.Errorf("temperature not upgrading")
 					return "", err
 				}
@@ -246,11 +254,9 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 					logger.Errorln("Error failed to add delay in monitor temperature \n", err)
 					return "", err
 				}
-
 			}
 		}
 	}
-
 }
 
 func (d *Compact32Deck) stopMonitorTemperature(stop chan bool) {

@@ -110,4 +110,7 @@ type Storer interface {
 	UpdateTipDock(ctx context.Context, t TipDock) (err error)
 	UpdateHeating(ctx context.Context, ht Heating) (err error)
 	ShowUser(ctx context.Context, username string) (user User, err error)
+	InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error)
+	ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error)
+	DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error)
 }
