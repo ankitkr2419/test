@@ -2,6 +2,7 @@ package plc
 
 import (
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
 	"sync"
 )
@@ -82,7 +83,7 @@ var homingPercent sync.Map
 // variable map Registers to keep track of machine related variables.
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
-func LoadUtils() {
+func loadUtils() {
 	wrotePulses.Store("A", uint16(0))
 	wrotePulses.Store("B", uint16(0))
 	executedPulses.Store("A", uint16(0))
@@ -164,7 +165,37 @@ var labwares = make(map[int]string)
 var cartridges = make(map[UniqueCartridge]map[string]float64)
 var Calibs = make(map[DeckNumber]float64)
 
-func SelectAllMotors(store db.Storer) (err error) {
+func LoadAllPLCFuncs(store db.Storer) (err error) {
+
+	err = selectAllMotors(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Motors failed")
+		return
+	}
+
+	err = selectAllConsDistances(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Cosumable Distances failed")
+		return
+	}
+
+	err = selectAllTipsTubes(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Tips and Tubes failed")
+		return
+	}
+
+	err = selectAllCartridges(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
+		return
+	}
+
+	loadUtils()
+	return nil
+}
+
+func selectAllMotors(store db.Storer) (err error) {
 	allMotors, err := store.ListMotors()
 	if err != nil {
 		return
@@ -181,7 +212,7 @@ func SelectAllMotors(store db.Storer) (err error) {
 	return
 }
 
-func SelectAllConsDistances(store db.Storer) (err error) {
+func selectAllConsDistances(store db.Storer) (err error) {
 	allConsDistances, err := store.ListConsDistances()
 	if err != nil {
 		return
@@ -210,7 +241,7 @@ func SelectAllConsDistances(store db.Storer) (err error) {
 // 1001- 1050 for deck A
 // 1051- 1100 for deck B
 
-func SelectAllTipsTubes(store db.Storer) (err error) {
+func selectAllTipsTubes(store db.Storer) (err error) {
 	ttype := ""
 	allTipsTubes, err := store.ListTipsTubes(ttype)
 	if err != nil {
@@ -228,7 +259,7 @@ func SelectAllTipsTubes(store db.Storer) (err error) {
 	return
 }
 
-func SelectAllCartridges(store db.Storer) (err error) {
+func selectAllCartridges(store db.Storer) (err error) {
 	allCartridges, err := store.ListCartridges()
 	if err != nil {
 		return

@@ -8,7 +8,7 @@ import (
 
 var motorDone, sensorDone, motorInProgress, heaterInProgress sync.Map
 
-func LoadUtils() {
+func loadUtils() {
 	motorDone.Store("A", false)
 	motorDone.Store("B", false)
 	sensorDone.Store("A", false)

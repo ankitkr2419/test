@@ -95,3 +95,31 @@ func checkIfSet(key string) {
 		panic(err)
 	}
 }
+
+func LoadAllConfs() {
+	Load("application")
+
+	// config file to configure dye & targets
+	Load("config")
+
+	// simulator config file to configure controls & wells in simulator
+	Load("simulator")
+
+	// config file to configure motors
+	Load("motor_config")
+
+	// config file to configure consumable distance
+	Load("consumable_config")
+
+	// config file to configure labware
+	Load("labware_config")
+
+	// config file to configure labware
+	Load("tips_tubes_config")
+
+	// config file to configure cartridge
+	Load("cartridges_config")
+
+	// config file to configure cartridge wells
+	Load("cartridge_wells_config")
+}

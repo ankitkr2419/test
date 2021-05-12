@@ -12,8 +12,17 @@ import (
 
 func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
 		var htObj db.Heating
-		err := json.NewDecoder(req.Body).Decode(&htObj)
+		err = json.NewDecoder(req.Body).Decode(&htObj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.HeatingDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.HeatingDecodeError.Error()})
@@ -28,7 +37,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdTemp db.Heating
-		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj)
+		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.HeatingCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.HeatingCreateError.Error()})
