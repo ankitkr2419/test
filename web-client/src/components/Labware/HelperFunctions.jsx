@@ -42,7 +42,7 @@ export const getSideBarNavItems = (formik, activeTab, toggle) => {
     const currentState = formik.values;
     const key = Object.keys(currentState)[index];
     navItems.push(
-      <NavItem>
+      <NavItem key={key}>
         <NavLink
           className={classnames({ active: activeTab === `${index + 1}` })}
           onClick={() => {
@@ -93,7 +93,7 @@ export const getTipsDropdown = (formik, options) => {
     let tipPosition = tips.processDetails[`tipPosition${i + 1}`].id;
     let index = options.map((item) => item.value).indexOf(tipPosition);
     tipsOptions.push(
-      <FormGroup className="d-flex align-items-center mb-4">
+      <FormGroup key={i} className="d-flex align-items-center mb-4">
         <Label for={`tip-position-${i + 1}`} className="px-0 label-name">
           Tip Position {i + 1}
         </Label>
@@ -150,13 +150,13 @@ export const getTipsAtPosition = (position, formik, options) => {
       </div>
       <ProcessSetting>
         <div className="tips-info">
-          <ul class="list-unstyled tip-position active">
-            {tipPosition1Value && <li class="highlighted tip-position-1"></li>}
+          <ul className="list-unstyled tip-position active">
+            {tipPosition1Value && <li className="highlighted tip-position-1"></li>}
             {tipPosition2Value && (
-              <li class="highlighted tip-position-2 active"></li>
+              <li className="highlighted tip-position-2 active"></li>
             )}
             {tipPosition3Value && (
-              <li class="highlighted tip-position-3 active"></li>
+              <li className="highlighted tip-position-3 active"></li>
             )}
           </ul>
           <ImageIcon src={labwareTips} alt="Tip Pickup Process" className="" />
@@ -187,10 +187,10 @@ export const getTipPiercingAtPosition = (position, formik) => {
         {getTipPiercingCheckbox(formik)}
         <ProcessSetting>
           <div className="piercing-info">
-            <ul class="list-unstyled piercing-position active">
-              {position1 && <li class="highlighted piercing-position-1"></li>}
+            <ul className="list-unstyled piercing-position active">
+              {position1 && <li className="highlighted piercing-position-1"></li>}
               {position2 && (
-                <li class="highlighted piercing-position-2 active"></li>
+                <li className="highlighted piercing-position-2 active"></li>
               )}
             </ul>
             <ImageIcon
@@ -234,9 +234,9 @@ export const getDeckAtPosition = (position, formik, options) => {
       />
       <ProcessSetting>
         <div className="deck-position-info">
-          <ul class="list-unstyled deck-position active">
+          <ul className="list-unstyled deck-position active">
             {deckPositionValue && (
-              <li class={`highlighted deck-position-${position} active`} />
+              <li className={`highlighted deck-position-${position} active`} />
             )}
           </ul>
           <ImageIcon
@@ -274,9 +274,9 @@ export const getCartidgeAtPosition = (position, formik, options) => {
       />
       <ProcessSetting>
         <div className="cartridge-position-info">
-          <ul class="list-unstyled cartridge-position active">
+          <ul className="list-unstyled cartridge-position active">
             {cartridgeTypeValue && (
-              <li class={`highlighted cartridge-position-${position} active`} />
+              <li className={`highlighted cartridge-position-${position} active`} />
             )}
           </ul>
           <ImageIcon

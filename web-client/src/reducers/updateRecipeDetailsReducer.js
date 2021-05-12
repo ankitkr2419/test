@@ -38,6 +38,25 @@ const initialState = {
 
 export const updateRecipeDetailsReducer = (state = initialState, actions) => {
   switch (actions.type) {
+    case saveNewRecipeAction.saveRecipeName:
+      const deckNameToSaveRecipeTo = actions.payload.deckName;
+
+      let deckAfterSave = state.decks.map((deckObj, index) => {
+        return deckObj.name === deckNameToSaveRecipeTo
+          ? {
+              ...deckObj,
+              recipeDetails: {
+                ...deckObj.recipeDetails,
+                ...actions.payload.recipeDetails,
+              },
+            }
+          : deckObj;
+      });
+      return {
+        ...state,
+        decks: deckAfterSave,
+      };
+
     //saving and updating new recipe
     case saveNewRecipeAction.updateRecipeInitiated:
       const deckName = actions.payload.deckName;
@@ -51,32 +70,21 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
       };
 
     case saveNewRecipeAction.updateRecipeSuccess:
-      console.log(actions);
-
       return state;
 
-    // const deckNameToSaveRecipeTo = deckName;
-    // return {
-    //   ...state,
-    //   isLoading: true,
-    //   tempDeckName: deckName,
-    // };
+    case saveNewRecipeAction.updateRecipeFailure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
 
-    // let deckAfterSave = state.decks.map((deckObj, index) => {
-    //   return deckObj.name === deckNameToSaveRecipeTo
-    //     ? {
-    //         ...deckObj,
-    //         recipeDetails: {
-    //           ...deckObj.recipeDetails,
-    //           ...actions.payload.recipeDetails,
-    //         },
-    //       }
-    //     : deckObj;
-    // });
-    // return {
-    //   ...state,
-    //   decks: deckAfterSave,
-    // };
+    case saveNewRecipeAction.updateRecipeReset:
+      return {
+        ...state,
+        isLoading: null,
+        error: null,
+      };
 
     //tips and tubes options
     case getTipsAndTubesAction.getTipsAndTubesInitiated:

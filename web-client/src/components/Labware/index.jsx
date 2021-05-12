@@ -8,7 +8,7 @@ import { TabContent, TabPane, Nav } from "reactstrap";
 
 import AppFooter from "components/AppFooter";
 import labwarePlate from "assets/images/labware-plate.png";
-import { LABWARE_INITIAL_STATE, DECKNAME } from "appConstants";
+import { LABWARE_INITIAL_STATE, DECKNAME, ROUTES } from "appConstants";
 import {
   getSideBarNavItems,
   getDeckAtPosition,
@@ -20,6 +20,8 @@ import {
 } from "./HelperFunctions";
 import { LabwareBox, PageBody, ProcessSetting } from "./Styles";
 import { updateRecipeActionInitiated } from "action-creators/saveNewRecipeActionCreators";
+import { Redirect } from "react-router";
+import { getRequestBody, getOptions } from "./functions";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
@@ -33,16 +35,18 @@ const LabWareComponent = (props) => {
   });
 
   const loginReducer = useSelector((state) => state.loginReducer);
+  const recipeDetailsReducer = useSelector(
+    (state) => state.updateRecipeDetailsReducer
+  );
+
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   // if (!activeDeckObj.isLoggedIn) {
+  //   console.log("redirect to landing", activeDeckObj);
   //   return <Redirect to={`/${ROUTES.landing}`} />;
   // }
 
-  const recipeDetailsReducer = useSelector(
-    (state) => state.updateRecipeDetailsReducer
-  );
   const deckIndex = activeDeckObj.name === DECKNAME.DeckA ? 0 : 1;
   const tipsAndTubesOptions =
     recipeDetailsReducer.decks[deckIndex].recipeOptions;
@@ -51,47 +55,15 @@ const LabWareComponent = (props) => {
   const newRecipeName =
     recipeDetailsReducer.decks[deckIndex].recipeDetails.name;
 
-  const getOptions = (lowerLimit, higherLimit, options) => {
-    const optionsObj = [];
-    if (options) {
-      options.forEach((optionObj) => {
-        if (optionObj.id >= lowerLimit && optionObj.id <= higherLimit) {
-          optionsObj.push({
-            value: optionObj.id,
-            label: optionObj.name ? optionObj.name : optionObj.description,
-          });
-        }
-      });
-    }
-    return optionsObj;
-  };
 
   const handleSaveBtn = () => {
-    const selectedOptions = formik.values;
-    const requestBody = {
-      name: newRecipeName,
-      description: "",
-      pos_1: selectedOptions.tips.processDetails.tipPosition1.id,
-      pos_2: selectedOptions.tips.processDetails.tipPosition2.id,
-      pos_3: selectedOptions.tips.processDetails.tipPosition3.id,
-      pos_4: selectedOptions.tipPiercing.processDetails.position1.id,
-      pos_5: selectedOptions.tipPiercing.processDetails.position2.id,
-      pos_6: selectedOptions.deckPosition1.processDetails.tubeType.id,
-      pos_7: selectedOptions.deckPosition2.processDetails.tubeType.id,
-      pos_cartridge_1:
-        selectedOptions.cartridge1.processDetails.cartridgeType.id,
-      pos_9: selectedOptions.deckPosition3.processDetails.tubeType.id,
-      pos_cartridge_2:
-        selectedOptions.cartridge2.processDetails.cartridgeType.id,
-      pos_11: selectedOptions.deckPosition4.processDetails.tubeType.id,
-    };
+    const requestBody = getRequestBody(newRecipeName, formik.values);
 
-    // console.log(requestBody);
     dispatch(
       updateRecipeActionInitiated({
         requestBody: requestBody,
         deckName: DECKNAME.DeckA,
-        token: "",
+        token: activeDeckObj.token,
       })
     );
   };
@@ -131,65 +103,65 @@ const LabWareComponent = (props) => {
                       <div className="img-box">
                         <ProcessSetting>
                           <div className="tips-info">
-                            <ul class="list-unstyled tip-position active">
+                            <ul className="list-unstyled tip-position active">
                               {formik.values.tips.processDetails.tipPosition1
                                 .id && (
-                                <li class="highlighted tip-position-1"></li>
+                                <li className="highlighted tip-position-1"></li>
                               )}
                               {formik.values.tips.processDetails.tipPosition2
                                 .id && (
-                                <li class="highlighted tip-position-2"></li>
+                                <li className="highlighted tip-position-2"></li>
                               )}
                               {formik.values.tips.processDetails.tipPosition3
                                 .id && (
-                                <li class="highlighted tip-position-3"></li>
+                                <li className="highlighted tip-position-3"></li>
                               )}
                             </ul>
                           </div>
 
                           <div className="piercing-info">
-                            <ul class="list-unstyled piercing-position active">
+                            <ul className="list-unstyled piercing-position active">
                               {formik.values.tipPiercing.processDetails
                                 .position1.id && (
-                                <li class="highlighted piercing-position-1"></li>
+                                <li className="highlighted piercing-position-1"></li>
                               )}
                               {formik.values.tipPiercing.processDetails
                                 .position2.id && (
-                                <li class="highlighted piercing-position-2"></li>
+                                <li className="highlighted piercing-position-2"></li>
                               )}
                             </ul>
                           </div>
 
                           <div className="deck-position-info">
-                            <ul class="list-unstyled deck-position active">
+                            <ul className="list-unstyled deck-position active">
                               {formik.values.deckPosition1.processDetails
                                 .tubeType.id && (
-                                <li class="highlighted deck-position-1 active" />
+                                <li className="highlighted deck-position-1 active" />
                               )}
                               {formik.values.deckPosition2.processDetails
                                 .tubeType.id && (
-                                <li class="highlighted deck-position-2 active" />
+                                <li className="highlighted deck-position-2 active" />
                               )}
                               {formik.values.deckPosition3.processDetails
                                 .tubeType.id && (
-                                <li class="highlighted deck-position-3 active" />
+                                <li className="highlighted deck-position-3 active" />
                               )}
                               {formik.values.deckPosition4.processDetails
                                 .tubeType.id && (
-                                <li class="highlighted deck-position-4 active" />
+                                <li className="highlighted deck-position-4 active" />
                               )}
                             </ul>
                           </div>
 
                           <div className="cartridge-position-info">
-                            <ul class="list-unstyled cartridge-position active">
+                            <ul className="list-unstyled cartridge-position active">
                               {formik.values.cartridge1.processDetails
                                 .cartridgeType.id && (
-                                <li class="highlighted cartridge-position-1 active" />
+                                <li className="highlighted cartridge-position-1 active" />
                               )}
                               {formik.values.cartridge2.processDetails
                                 .cartridgeType.id && (
-                                <li class="highlighted cartridge-position-2 active" />
+                                <li className="highlighted cartridge-position-2 active" />
                               )}
                             </ul>
                           </div>

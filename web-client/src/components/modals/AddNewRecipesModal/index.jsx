@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
 import { ROUTES } from "appConstants";
-import { Redirect } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { AddNewRecipesForm } from './AddNewRecipesForm';
 
 const AddNewRecipesModal = (props) => {
@@ -30,6 +30,7 @@ const AddNewRecipesModal = (props) => {
   const [submitted, setSubmitted] = useState(false);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const onChangeRecipeName = (e) => {
     setSubmitted(false);
@@ -52,8 +53,8 @@ const AddNewRecipesModal = (props) => {
       toggleAddNewRecipesModal();
 
       //go to labware page
-      // history.push(ROUTES.labware);
-      return <Redirect to={ROUTES.labware} />;
+      history.push(ROUTES.labware);
+      // history.push(ROUTES.splashScreen);
     } else {
       setSubmitted(true);
       toast.error("Enter recipe name");
