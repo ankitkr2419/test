@@ -1,15 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-
-const StyledSidebarBody = styled.div`
-	background: #fafafa 0% 0% no-repeat padding-box;
-	padding: 48px;
-	text-align: center;
-	border: 1px solid #e5e5e5;
-	border-left: 0 none;
-	border-radius: 0px 24px 24px 0px;
-`;
+import { StyledSidebarBody } from './Styles';
 
 const SidebarBody = ({ className, children }) => {
 	return (
