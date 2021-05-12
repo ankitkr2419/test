@@ -18,7 +18,7 @@ type Shaker struct {
 	ProcessID   uuid.UUID `json:"process_id" db:"process_id" validate:"required"`
 	RPM1        int64     `json:"rpm_1" db:"rpm_1" validate:"required"`
 	RPM2        int64     `json:"rpm_2" db:"rpm_2"`
-	Time1       int64     `json:"time_1" db:"time_1"`
+	Time1       int64     `json:"time_1" db:"time_1" validate:"required"`
 	Time2       int64     `json:"time_2" db:"time_2"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
