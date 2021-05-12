@@ -1,7 +1,7 @@
 
 CREATE TYPE audit_activity_type  AS ENUM ('api','db','machine');
 CREATE TYPE audit_state_type  AS ENUM ('initialised','completed','aborted','error','paused','resumed');
-CREATE TYPE audit_Operation_type  AS ENUM ('create','show','update','delete');
+CREATE TYPE audit_Operation_type  AS ENUM ('create','show','update','delete','run');
 
 
 

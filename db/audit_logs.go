@@ -27,6 +27,7 @@ const (
 	ShowOperation    OperationType = "show"
 	UpdateOperation  OperationType = "update"
 	DeleteOperation  OperationType = "delete"
+	ExecuteOperation OperationType = "run"
 )
 
 type AuditLog struct {
