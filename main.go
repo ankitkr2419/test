@@ -124,7 +124,7 @@ func startApp(plcName string, test bool) (err error) {
 	var driverDeckB *plc.Compact32Deck
 
 	if plcName != "simulator" && plcName != "compact32" {
-		logger.Error("Unsupported PLC. Valid PLC: 'simulator' or 'compact32'")
+		logger.Errorln(responses.UnsupportedPLCError)
 		return
 	}
 
@@ -148,7 +148,7 @@ func startApp(plcName string, test bool) (err error) {
 
 	store, err = db.Init()
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Database init failed")
+		logger.WithField("err", err.Error()).Errorln(responses.DatabaseInitError)
 		return
 	}
 
@@ -170,19 +170,19 @@ func startApp(plcName string, test bool) (err error) {
 
 	err = db.LoadAllDBSetups(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Loading DB Setups failed")
+		logger.WithField("err", err.Error()).Errorln(responses.DBAllSetupError)
 		return
 	}
 
 	err = plc.LoadAllPLCFuncs(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Loading PLC Functions failed")
+		logger.WithField("err", err.Error()).Errorln(responses.PLCAllLoadError)
 		return
 	}
 
 	err = service.LoadAllServiceFuncs(store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Loading Service Functions failed")
+		logger.WithField("err", err.Error()).Errorln(responses.ServiceAllLoadError)
 		return
 	}
 
