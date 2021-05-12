@@ -228,7 +228,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 				prevTemp1 = setTemp1
 				prevTemp2 = setTemp2
 
-				if heatingFailCounter1 >= 5 || heatingFailCounter2 >= 5 {
+				if heatingFailCounter1 >= 15 || heatingFailCounter2 >= 15 {
 					err = fmt.Errorf("temperature not upgrading")
 					return "", err
 				}
