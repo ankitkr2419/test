@@ -21,7 +21,6 @@ const OperatorLoginModalContainer = (props) => {
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  let { isLoggedIn, error } = activeDeckObj ? activeDeckObj : {};
   const [authData, setAuthData] = useReducer(reducer, initialState);
 
   //change local state value of email

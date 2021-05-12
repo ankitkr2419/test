@@ -3,6 +3,8 @@ import saveNewRecipeActions, {
   saveNewRecipeAction,
   getTipsAndTubesAction,
   getCartridgeAction,
+  getTipsAction,
+  getTubesAction,
 } from "actions/saveNewRecipeActions";
 import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import { callApi } from "apis/apiHelper";
@@ -83,6 +85,50 @@ export function* getCartridge(actions) {
   }
 }
 
+// for tubes
+export function* getTubes(actions) {
+  const { getTubesSuccess, getTubesFailure } = getTubesAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.tipsTubes}/${API_ENDPOINTS.tubes}`,
+        successAction: getTubesSuccess,
+        failureAction: getTubesFailure,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+      },
+    });
+  } catch (error) {
+    console.error("error while starting", error);
+    yield put(getTubesFailure(error));
+  }
+}
+
+//for tips
+export function* getTips(actions) {
+  const { getTipsSuccess, getTipsFailure } = getTipsAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.tipsTubes}/${API_ENDPOINTS.tips}`,
+        successAction: getTipsSuccess,
+        failureAction: getTipsFailure,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+      },
+    });
+  } catch (error) {
+    console.error("error while starting", error);
+    yield put(getTipsFailure(error));
+  }
+}
+
 export function* saveNewRecipeSaga() {
   yield takeEvery(saveNewRecipeActions.saveRecipe, saveRecipe);
   yield takeEvery(saveNewRecipeAction.updateRecipeInitiated, updateRecipe);
@@ -91,4 +137,6 @@ export function* saveNewRecipeSaga() {
     getTipsAndTubes
   );
   yield takeEvery(getCartridgeAction.getCartridgeInitiated, getCartridge);
+  yield takeEvery(getTipsAction.getTipsInitiated, getTips);
+  yield takeEvery(getTubesAction.getTubesInitiated, getTubes);
 }
