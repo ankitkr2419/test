@@ -87,7 +87,13 @@ const LabWareComponent = (props) => {
     };
 
     // console.log(requestBody);
-    dispatch(updateRecipeActionInitiated({requestBody: requestBody, deckName: DECKNAME.DeckA}));
+    dispatch(
+      updateRecipeActionInitiated({
+        requestBody: requestBody,
+        deckName: DECKNAME.DeckA,
+        token: "",
+      })
+    );
   };
 
   const toggle = (tab) => {

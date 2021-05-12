@@ -40,14 +40,14 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
   switch (actions.type) {
     //saving and updating new recipe
     case saveNewRecipeAction.updateRecipeInitiated:
-      const requestBody = actions.payload.requestBody;
       const deckName = actions.payload.deckName;
+      const token = actions.payload.token;
 
-      const deckNameToSaveRecipeTo = deckName;
       return {
         ...state,
         isLoading: true,
         tempDeckName: deckName,
+        token: token,
       };
 
     case saveNewRecipeAction.updateRecipeSuccess:

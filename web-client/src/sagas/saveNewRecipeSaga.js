@@ -14,7 +14,8 @@ export function* saveRecipe(actions) {
 
 export function* updateRecipe(actions) {
   const { updateRecipeSuccess, updateRecipeFailure } = saveNewRecipeAction;
-  const requestBody = actions.payload.params;
+  const requestBody = actions.payload.requestBody;
+  const token = actions.payload.token;
 
   try {
     yield call(callApi, {
@@ -26,7 +27,7 @@ export function* updateRecipe(actions) {
         failureAction: updateRecipeFailure,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token: "",
+        token: token,
       },
     });
   } catch (error) {
