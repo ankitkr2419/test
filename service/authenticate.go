@@ -2,15 +2,17 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -18,13 +20,14 @@ type Token struct {
 	jwt.StandardClaims
 	Role    string            `json:"role"`
 	Deck    string            `json:"deck"`
+	AuthID  uuid.UUID         `json:"auth_id"`
 	Payload map[string]string `json:"payload,omitempty"`
 }
 
 // Encodes information into token
-func EncodeToken(userID string, role string, deck string, payload map[string]string) (string, error) {
+func EncodeToken(userID string, authID uuid.UUID, role string, deck string, payload map[string]string) (string, error) {
 	accessKey := config.GetSecretKey()
-	token, tokenErr := generateToken(userID, role, deck, accessKey, payload)
+	token, tokenErr := generateToken(userID, authID, role, deck, accessKey, payload)
 
 	if tokenErr != nil {
 		return "", fmt.Errorf("TOKEN ERROR: %v ", tokenErr)
@@ -33,10 +36,11 @@ func EncodeToken(userID string, role string, deck string, payload map[string]str
 
 }
 
-func generateToken(userID, role, deck, accessKey string, payload map[string]string) (string, error) {
+func generateToken(userID string, authID uuid.UUID, role, deck, accessKey string, payload map[string]string) (string, error) {
 	tokenClaims := &Token{
 		Role:    role,
 		Deck:    deck,
+		AuthID:  authID,
 		Payload: payload,
 		StandardClaims: jwt.StandardClaims{
 			Subject:  userID,
@@ -62,6 +66,7 @@ func decodeToken(token string) (jwt.MapClaims, error) {
 	})
 
 	if err != nil {
+
 		return nil, err
 	}
 	if parsedToken.Valid {
@@ -74,43 +79,114 @@ func decodeToken(token string) (jwt.MapClaims, error) {
 
 // Authenticate ... Authenticate token sent in the request
 // if token is valid set userId in the context
-func authenticate(next http.HandlerFunc, deps Dependencies) http.HandlerFunc {
+func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		token := extractToken(req.Header.Get("Authorization"))
 		if token != "" {
-			decodedToken, err := decodeToken(token)
-			if err != nil {
-				res.WriteHeader(http.StatusUnauthorized)
-				res.Write([]byte(`{"error":"error in decoding token"}`))
-				return
-			}
+			vars := mux.Vars(req)
+			deck := vars["deck"]
 
-			_, err = getUser(decodedToken, deps)
+			_, err := getUserAuth(token, deck, deps, roles...)
 			if err != nil {
-				res.WriteHeader(http.StatusUnauthorized)
-				res.Write([]byte(`{"error":"unauthorised user"}`))
+				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
+				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: err.Error()})
 				return
 			}
 			next(res, req)
 
 		} else {
-			res.WriteHeader(http.StatusUnauthorized)
-			res.Write([]byte(`{"error":"unauthorised access"}`))
+			logger.WithField("err", "TOKEN EMPTY").Error(responses.UserTokenEmptyError)
+			responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: responses.UserTokenEmptyError.Error()})
 			return
 		}
 	}
 }
 
-func getUser(token jwt.MapClaims, deps Dependencies) (user db.User, err error) {
-	username, ok := token["sub"].(string)
-	if !ok {
-		err = errors.New("failed to fetch user")
+func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user db.UserAuth, err error) {
+
+	var validRole bool
+	decodedToken, err := decodeToken(token)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.UserTokenDecodeError)
+		err = responses.UserTokenDecodeError
 		return
 	}
-	user, err = deps.Store.ShowUser(context.Background(), username)
+
+	roleFromToken, ok := decodedToken["role"]
+	if !ok {
+		logger.WithField("err", "EMPTY ROLE").Error(responses.UserTokenRoleEmptyError)
+		err = responses.UserTokenRoleEmptyError
+		return
+	}
+
+	//validating role
+	if len(roles) != 0 {
+		for i := 0; i < len(roles); i++ {
+			if roleFromToken == roles[i] {
+				validRole = true
+			}
+		}
+	} else {
+		validRole = true
+	}
+
+	if !validRole {
+		logger.WithField("err", "INVALID ROLE").Error(responses.UserTokenInvalidRoleError)
+		err = responses.UserTokenInvalidRoleError
+		return
+	}
+
+	//validate deck
+	tokenDeck, ok := decodedToken["deck"].(string)
+	if !ok {
+		logger.WithField("err", "DECK TOKEN").Error(responses.UserTokenDeckError)
+		err = responses.UserTokenDeckError
+		return
+	}
+
+	// First if the deck is received from an api other than logout then for cloud user the deck
+	// value is "" hence this condition becomes false and it will not validate deck.
+	if deck != "" {
+
+		// Since the logout api doesnot call authenticate method and call getUserAuth method
+		// directly for fetching userAuth, so deck passed earlier was "" hence cross deck
+		// validation could not be performed for logout.
+		// So passing deck as cloudUser when the cloud user wants to logout and setting it to "" for cross deck validation.
+		if deck == "cloudUser" {
+			deck = ""
+		}
+
+		if tokenDeck != deck {
+			logger.WithField("err", "CROSS DECK TOKEN").Error(responses.UserTokenCrossDeckError)
+			err = responses.UserTokenCrossDeckError
+			return
+		}
+
+	}
+
+	username, ok := decodedToken["sub"].(string)
+	if !ok {
+		logger.WithField("err", "USERNAME").Error(responses.UserTokenUsernameError)
+		err = responses.UserTokenUsernameError
+		return
+	}
+	id, ok := decodedToken["auth_id"].(string)
+	if !ok {
+		logger.WithField("err", "AUTHID").Error(responses.UserTokenAuthIdError)
+		err = responses.UserTokenAuthIdError
+		return
+	}
+	authID, err := uuid.Parse(id)
 	if err != nil {
-		logger.Errorln("user not found")
+		logger.WithField("err", err.Error()).Error(responses.UserTokenAuthIdParseError)
+		err = responses.UserTokenAuthIdParseError
+		return
+	}
+	user, err = deps.Store.ShowUserAuth(context.Background(), username, authID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.UserAuthNotFoundError)
+		err = responses.UserAuthNotFoundError
 		return
 	}
 	return
@@ -126,47 +202,4 @@ func extractToken(tokenWithBearer string) string {
 	}
 	return ""
 
-}
-
-func authenticateAdmin(next http.HandlerFunc, deps Dependencies) http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-
-		token := extractToken(req.Header.Get("Authorization"))
-
-		if token != "" {
-
-			decodedToken, err := decodeToken(token)
-			if err != nil {
-				res.WriteHeader(http.StatusUnauthorized)
-				res.Write([]byte(`{"error":"error in decoding token"}`))
-				return
-			}
-
-			role, ok := decodedToken["role"].(string)
-			if !ok {
-				res.WriteHeader(http.StatusUnauthorized)
-				res.Write([]byte(`{"error":"role not specified"}`))
-				return
-			}
-
-			// TODO : add condition for engineer too when that flow is clear.
-			if role != "admin" {
-				res.WriteHeader(http.StatusForbidden)
-				res.Write([]byte(`{"error":"action forbidden"}`))
-				return
-			}
-
-			_, err = getUser(decodedToken, deps)
-			if err != nil {
-				res.WriteHeader(http.StatusUnauthorized)
-				res.Write([]byte(`{"error":"unauthorised user"}`))
-				return
-			}
-			next(res, req)
-		} else {
-			res.WriteHeader(http.StatusUnauthorized)
-			res.Write([]byte(`{"error":"unauthorised access"}`))
-			return
-		}
-	}
 }
