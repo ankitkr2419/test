@@ -123,7 +123,6 @@ const RecipeListingComponent = (props) => {
         })
       );
       setTrayDiscardModal(!trayDiscardModal);
-      dispatch(loginReset(deckName));
       setNextModal(true);
     }
   };
