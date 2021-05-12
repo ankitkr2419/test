@@ -29,12 +29,12 @@ func (m *DBMockStore) CreateTemplate(ctx context.Context, tp Template) (t Templa
 
 func (m *DBMockStore) UpdateTemplate(ctx context.Context, t Template) (err error) {
 	args := m.Called(ctx, t)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) DeleteTemplate(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ShowTemplate(ctx context.Context, id uuid.UUID) (t Template, err error) {
@@ -54,12 +54,12 @@ func (m *DBMockStore) CreateStages(ctx context.Context, stg []Stage) (s []Stage,
 
 func (m *DBMockStore) UpdateStage(ctx context.Context, s Stage) (err error) {
 	args := m.Called(ctx, s)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) DeleteStage(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ShowStage(ctx context.Context, id uuid.UUID) (s Stage, err error) {
@@ -314,8 +314,8 @@ func (m *DBMockStore) ListCartridges() (c []Cartridge, err error) {
 	return args.Get(0).([]Cartridge), args.Error(1)
 }
 
-func (m *DBMockStore) ListTipsTubes() (t []TipsTubes, err error) {
-	args := m.Called(t)
+func (m *DBMockStore) ListTipsTubes(ttype string) (t []TipsTubes, err error) {
+	args := m.Called(ttype)
 	return args.Get(0).([]TipsTubes), args.Error(1)
 }
 
@@ -391,12 +391,12 @@ func (m *DBMockStore) CreateProcess(ctx context.Context, p Process) (pi Process,
 
 func (m *DBMockStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	args := m.Called(ctx, p)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ListCartridgeWells() (cw []CartridgeWells, err error) {
@@ -421,27 +421,27 @@ func (m *DBMockStore) CreateAspireDispense(ctx context.Context, ad AspireDispens
 
 func (m *DBMockStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (err error) {
 	args := m.Called(ctx, ad)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) UpdateAttachDetach(ctx context.Context, ad AttachDetach) (err error) {
 	args := m.Called(ctx, ad)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
 	args := m.Called(ctx, sh)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) UpdateTipDock(ctx context.Context, td TipDock) (err error) {
 	args := m.Called(ctx, td)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	args := m.Called(ctx, ht)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (createdAttachDetach AttachDetach, err error) {
@@ -507,4 +507,33 @@ func (m *DBMockStore) ShowTipOperation(ctx context.Context, id uuid.UUID) (dbTip
 func (m *DBMockStore) ShowTip(id int64) (tip TipsTubes, err error) {
 	args := m.Called(id)
 	return args.Get(0).(TipsTubes), args.Error(1)
+}
+
+func (m *DBMockStore) DuplicateProcess(ctx context.Context, id uuid.UUID) (Process, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(Process), args.Error(1)
+}
+func (m *DBMockStore) RearrangeProcesses(ctx context.Context, id uuid.UUID, ps []ProcessSequence) ([]Process, error) {
+	args := m.Called(ctx, id, ps)
+	return args.Get(0).([]Process), args.Error(1)
+}
+
+func (m *DBMockStore) ShowUser(ctx context.Context, username string) (user User, err error) {
+	args := m.Called(ctx, username)
+	return args.Get(0).(User), args.Error(1)
+}
+
+func (m *DBMockStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
+	args := m.Called(ctx, d)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err error) {
+	args := m.Called(ctx, t)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) updateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
+	args := m.Called(ctx, id, processType, process)
+	return args.Error(0)
 }
