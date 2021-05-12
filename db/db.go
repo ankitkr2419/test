@@ -111,4 +111,7 @@ type Storer interface {
 	UpdateHeating(ctx context.Context, ht Heating) (err error)
 	updateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error)
 	ShowUser(ctx context.Context, username string) (user User, err error)
+	InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error)
+	ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error)
+	DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error)
 }
