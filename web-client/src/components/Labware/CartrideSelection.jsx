@@ -11,7 +11,8 @@ import { CommmonCartridgeFields } from './CommmonCartridgeFields';
 const CartridgeSelection = (props) => {
   const {
     handleOptionChange,
-    options
+    options,
+    value
   } = props;
 	return (
 		<>
@@ -31,6 +32,7 @@ const CartridgeSelection = (props) => {
               className=""
               size="sm"
               options={options}
+              value={value}
               onChange={handleOptionChange}
             />
             <FormError>Incorrect Cartridge Type</FormError>

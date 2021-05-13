@@ -1,26 +1,37 @@
 import { DECKNAME } from "appConstants";
-import { saveNewRecipeAction } from "actions/saveNewRecipeActions";
+import {
+  getTipsAndTubesAction,
+  getCartridgeAction,
+  saveNewRecipeAction,
+} from "actions/saveNewRecipeActions";
 // import { fromJS } from "immutable";
 
 const initialState = {
+  tempDeckName: "",
+  isLoading: null,
+  error: null,
   decks: [
     {
       name: DECKNAME.DeckA,
       recipeDetails: {
         name: "",
       },
-      isLoading: false,
+      recipeOptions: null,
+      cartridgeOptions: null,
       isSaved: false,
       errorInSaving: false,
+      token: "",
     },
     {
       name: DECKNAME.DeckB,
       recipeDetails: {
         name: "",
       },
-      isLoading: false,
+      recipeOptions: null,
+      cartrideOptions: null,
       isSaved: false,
       errorInSaving: false,
+      token: "",
     },
   ],
 };
@@ -29,6 +40,7 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
   switch (actions.type) {
     case saveNewRecipeAction.saveRecipeName:
       const deckNameToSaveRecipeTo = actions.payload.deckName;
+
       let deckAfterSave = state.decks.map((deckObj, index) => {
         return deckObj.name === deckNameToSaveRecipeTo
           ? {
@@ -45,30 +57,114 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
         decks: deckAfterSave,
       };
 
+    //saving and updating new recipe
+    case saveNewRecipeAction.updateRecipeInitiated:
+      const deckName = actions.payload.deckName;
+      const token = actions.payload.token;
+
+      return {
+        ...state,
+        isLoading: true,
+        tempDeckName: deckName,
+        token: token,
+      };
+
+    case saveNewRecipeAction.updateRecipeSuccess:
+      return state;
+
+    case saveNewRecipeAction.updateRecipeFailure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
+
+    case saveNewRecipeAction.updateRecipeReset:
+      return {
+        ...state,
+        isLoading: null,
+        error: null,
+      };
+
+    //tips and tubes options
+    case getTipsAndTubesAction.getTipsAndTubesInitiated:
+      return {
+        ...state,
+        isLoading: true,
+        tempDeckName: actions.payload.deckName,
+      };
+
+    case getTipsAndTubesAction.getTipsAndTubesSuccess:
+      let deckAfterLoadingSuccess = state.decks.map((deckObj, index) => {
+        return deckObj.name === state.tempDeckName
+          ? {
+              ...deckObj,
+              recipeOptions: actions.payload.response,
+            }
+          : deckObj;
+      });
+      return {
+        ...state,
+        decks: deckAfterLoadingSuccess,
+        isLoading: false,
+        error: false,
+      };
+
+    case getTipsAndTubesAction.getTipsAndTubesFailure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
+
+    case getTipsAndTubesAction.getTipsAndTubesReset:
+      return {
+        ...state,
+        isLoading: null,
+        error: null,
+      };
+
+    //cartridge options
+    case getCartridgeAction.getCartridgeInitiated:
+      return {
+        ...state,
+        isLoading: true,
+        tempDeckName: actions.payload.deckName,
+      };
+
+    case getCartridgeAction.getCartridgeSuccess:
+      let deckAfterCartridgeLoadingSuccess = state.decks.map(
+        (deckObj, index) => {
+          return deckObj.name === state.tempDeckName
+            ? {
+                ...deckObj,
+                cartridgeOptions: actions.payload.response,
+              }
+            : deckObj;
+        }
+      );
+      return {
+        ...state,
+        decks: deckAfterCartridgeLoadingSuccess,
+        isLoading: false,
+        error: false,
+      };
+
+    case getCartridgeAction.getCartridgeFailure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
+
+    case getCartridgeAction.getCartridgeReset:
+      return {
+        ...state,
+        isLoading: null,
+        error: null,
+      };
+
     default:
       return state;
   }
 };
-
-// const saveRecipeInitialState = fromJS({
-//   name: "",
-//   //isSaved
-//   //deckName
-//   //others...
-// });
-
-// export const saveNewRecipeReducer = (
-//   state = saveRecipeInitialState,
-//   action
-// ) => {
-//   switch (action.type) {
-//     case saveNewRecipeActions.updateRecipe:
-//       return state.merge({
-//         ...action.payload,
-//       });
-//     case saveNewRecipeActions.resetRecipe:
-//       return saveRecipeInitialState;
-//     default:
-//       return state;
-//   }
-// };

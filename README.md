@@ -98,13 +98,8 @@ NOTE: This will create binary for linux platform with amd64 architecture,
 in case your's is different please change build-binary's line number 9 accordingly.
 
 ```
-sh build-binary.sh
+make build
 ```
-or
-```
-sudo ./build-binary.sh
-```
-Run it with sudo if permission denied is displayed for any operation.
 
 Please refer README inside web-client directory if you are facing any issue and then escalate it to us.
 
@@ -166,6 +161,16 @@ PATH_TO_CSV contains name of the csv along its extension.
 E.g
 ```
 ./cpagent import --recipename covidExtract --csv /home/josh/Downloads/CER.csv
+```
+
+# Create Zipped Artifact
+```
+make zip
+```
+
+# Create Zipped Artifact after Building the Binary
+```
+make build-and-zip
 ```
 
 ### Testing

@@ -14,7 +14,7 @@ type AttachDetach struct {
 	ID            uuid.UUID `db:"id" json:"id"`
 	Operation     string    `db:"operation" json:"operation"  validate:"required"`
 	OperationType string    `db:"operation_type" json:"operation_type"`
-	ProcessID     uuid.UUID `db:"process_id" json:"process_id" validate:"required"`
+	ProcessID     uuid.UUID `db:"process_id" json:"process_id"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -43,42 +43,55 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 	return
 }
 
-func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (createdAD AttachDetach, err error) {
+func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recipeID uuid.UUID) (createdAD AttachDetach, err error) {
 	var tx *sql.Tx
-
-	//update the process name before record creation
-	err = s.updateProcessName(ctx, ad.ProcessID, "AttachDetach", ad)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.AttachDetachUpdateNameError)
-		return
-	}
-
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
 		logger.WithField("err:", err.Error()).Errorln(responses.AttachDetachInitiateDBTxError)
-		return AttachDetach{}, err
+		return
 	}
 
-	createdAD, err = s.createAttachDetach(ctx, tx, ad)
-	// failures are already logged
-	// Commit the transaction else won't be able to Show
-
-	// End the transaction in defer call
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			logger.Errorln(responses.AttachDetachCreateError)
 			return
 		}
 		tx.Commit()
 		createdAD, err = s.ShowAttachDetach(ctx, createdAD.ProcessID)
 		if err != nil {
-			logger.Infoln("Error Creating Attach Detach process")
+			logger.Errorln(responses.AttachDetachFetchError)
 			return
 		}
-		logger.Infoln("Created Attach Detach Process: ", createdAD)
+		logger.Infoln(responses.AttachDetachCreateSuccess, createdAD)
 		return
 	}()
 
+	// Get highest sequence number
+	// NOTE: failure already logged in internal calls
+
+	highestSeqNum, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		return
+	}
+	
+	process, err := s.processOperation(ctx, name, AttachDetachProcess, ad, Process{})
+	if err != nil {
+		return
+	}
+	// process has only a valid name
+	process.SequenceNumber = highestSeqNum + 1
+	process.Type = string(AttachDetachProcess)
+	process.RecipeID = recipeID
+
+	// create the process
+	process, err = s.createProcess(ctx, tx, process)
+	if err != nil {
+		return
+	}
+
+	ad.ProcessID = process.ID
+	createdAD, err = s.createAttachDetach(ctx, tx, ad)
 	return
 }
 

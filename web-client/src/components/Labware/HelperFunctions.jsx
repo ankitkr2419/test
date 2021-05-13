@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  LABWARE_CARTRIDGE_1_OPTIONS,
-  LABWARE_CARTRIDGE_2_OPTIONS,
-  LABWARE_DECK_POS_1_OPTIONS,
-  LABWARE_DECK_POS_2_OPTIONS,
-  LABWARE_DECK_POS_3_OPTIONS,
-  LABWARE_DECK_POS_4_OPTIONS,
-  LABWARE_ITEMS_NAME,
-  LABWARE_TIPS_OPTIONS,
-} from "appConstants";
+import { LABWARE_ITEMS_NAME, LABWARE_NAME } from "appConstants";
 
 import labwareTips from "assets/images/labware-plate-tips.png";
 import labwarePiercing from "assets/images/labware-plate-piercing.png";
@@ -19,7 +10,7 @@ import labwareDeckPosition4 from "assets/images/labware-plate-deck-position-4.pn
 import labwareCartridePosition1 from "assets/images/labware-plate-cartridge-1.png";
 import labwareCartridePosition2 from "assets/images/labware-plate-cartridge-2.png";
 
-import { Icon, ImageIcon } from "shared-components";
+import { Icon, ImageIcon, Text } from "shared-components";
 import { NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 import { FormGroup, Label, FormError, Select, CheckBox } from "core-components";
@@ -28,30 +19,39 @@ import TubeSelection from "./TubeSelection";
 import CartridgeSelection from "./CartrideSelection";
 import { ProcessSetting } from "./Styles";
 
-export const getTick = (index, formik) => {
+export const updateAllTicks = (formik) => {
   const currentState = formik.values;
-  const name = currentState[Object.keys(currentState)[index]];
 
-  let tick = false;
-  Object.values(name).forEach((value) => {
-    if (value) tick = true;
+  Object.keys(currentState).forEach((key, index) => {
+    const processDetails = currentState[key].processDetails;
+    let tick = false;
+
+    for (const key in processDetails) {
+      if (processDetails[key].id) {
+        tick = true;
+        break;
+      }
+    }
+    formik.setFieldValue(`${key}.isTicked`, tick);
   });
-  return tick;
 };
 
 export const getSideBarNavItems = (formik, activeTab, toggle) => {
   const navItems = [];
   LABWARE_ITEMS_NAME.forEach((name, index) => {
+    const currentState = formik.values;
+    const key = Object.keys(currentState)[index];
     navItems.push(
-      <NavItem>
+      <NavItem key={key}>
         <NavLink
           className={classnames({ active: activeTab === `${index + 1}` })}
           onClick={() => {
             toggle(`${index + 1}`);
+            updateAllTicks(formik);
           }}
         >
           {name}
-          {getTick(index, formik) ? (
+          {currentState[key].isTicked ? (
             <Icon name="tick" size={12} className="ml-auto" />
           ) : null}
         </NavLink>
@@ -64,16 +64,19 @@ export const getSideBarNavItems = (formik, activeTab, toggle) => {
 export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
   const tipsPiercingCheckbox = [];
   for (let index = 0; index < nCheckboxes; index++) {
+    let isChecked =
+      formik.values.tipPiercing.processDetails[`position${index + 1}`].id;
     tipsPiercingCheckbox.push(
       <CheckBox
         id={`position${index + 1}`}
         name={`position${index + 1}`}
         label={`Position ${index + 1}`}
         className={index > 0 ? "ml-4" : ""}
+        checked={isChecked}
         onChange={(e) => {
           formik.setFieldValue(
-            `tipPiercing.position${index + 1}`,
-            e.target.checked
+            `tipPiercing.processDetails.position${index + 1}.id`,
+            e.target.checked ? 3 : 0
           );
         }}
       />
@@ -82,23 +85,35 @@ export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
   return tipsPiercingCheckbox;
 };
 
-export const getTipsDropdown = (formik, nDropdown = 3) => {
+export const getTipsDropdown = (formik, options) => {
+  const tips = formik.values.tips;
+  const nDropdown = 3;
   const tipsOptions = [];
-  for (let index = 0; index < nDropdown; index++) {
+  for (let i = 0; i < nDropdown; i++) {
+    let tipPosition = tips.processDetails[`tipPosition${i + 1}`].id;
+    let index = options.map((item) => item.value).indexOf(tipPosition);
     tipsOptions.push(
-      <FormGroup className="d-flex align-items-center mb-4">
-        <Label for={`tip-position-${index + 1}`} className="px-0 label-name">
-          Tip Position {index + 1}
+      <FormGroup key={i} className="d-flex align-items-center mb-4">
+        <Label for={`tip-position-${i + 1}`} className="px-0 label-name">
+          Tip Position {i + 1}
         </Label>
         <div className="d-flex flex-column input-field position-relative">
           <Select
             placeholder="Select Option"
             className=""
             size="sm"
-            options={LABWARE_TIPS_OPTIONS}
-            onChange={(e) =>
-              formik.setFieldValue(`tips.tipPosition${index + 1}`, e.value)
-            }
+            value={options[index]}
+            options={options}
+            onChange={(e) => {
+              formik.setFieldValue(
+                `tips.processDetails.tipPosition${i + 1}.id`,
+                e.value
+              );
+              formik.setFieldValue(
+                `tips.processDetails.tipPosition${i + 1}.label`,
+                e.label
+              );
+            }}
           />
           <FormError>Incorrect Tip Position {index + 1}</FormError>
         </div>
@@ -108,7 +123,12 @@ export const getTipsDropdown = (formik, nDropdown = 3) => {
   return tipsOptions;
 };
 
-export const getTipsAtPosition = (position, formik) => {
+export const getTipsAtPosition = (position, formik, options) => {
+  const tips = formik.values.tips;
+  const tipPosition1Value = tips.processDetails.tipPosition1.id;
+  const tipPosition2Value = tips.processDetails.tipPosition2.id;
+  const tipPosition3Value = tips.processDetails.tipPosition3.id;
+
   return (
     <>
       <div className="">
@@ -124,16 +144,20 @@ export const getTipsAtPosition = (position, formik) => {
           </FormGroup>
         </div>
         <div className="">
-          {getTipsDropdown(formik)}
+          {getTipsDropdown(formik, options)}
           {/* <CommonField /> */}
         </div>
       </div>
       <ProcessSetting>
         <div className="tips-info">
-          <ul class="list-unstyled tip-position active">
-            <li class="highlighted tip-position-1"></li>
-            <li class="highlighted tip-position-2 active"></li>
-            <li class="highlighted tip-position-3 active"></li>
+          <ul className="list-unstyled tip-position active">
+            {tipPosition1Value && <li className="highlighted tip-position-1"></li>}
+            {tipPosition2Value && (
+              <li className="highlighted tip-position-2 active"></li>
+            )}
+            {tipPosition3Value && (
+              <li className="highlighted tip-position-3 active"></li>
+            )}
           </ul>
           <ImageIcon src={labwareTips} alt="Tip Pickup Process" className="" />
         </div>
@@ -143,6 +167,9 @@ export const getTipsAtPosition = (position, formik) => {
 };
 
 export const getTipPiercingAtPosition = (position, formik) => {
+  const position1 = formik.values.tipPiercing.processDetails.position1.id;
+  const position2 = formik.values.tipPiercing.processDetails.position2.id;
+
   return (
     <>
       <div className="mb-3">
@@ -160,9 +187,11 @@ export const getTipPiercingAtPosition = (position, formik) => {
         {getTipPiercingCheckbox(formik)}
         <ProcessSetting>
           <div className="piercing-info">
-            <ul class="list-unstyled piercing-position active">
-              <li class="highlighted piercing-position-1"></li>
-              <li class="highlighted piercing-position-2 active"></li>
+            <ul className="list-unstyled piercing-position active">
+              {position1 && <li className="highlighted piercing-position-1"></li>}
+              {position2 && (
+                <li className="highlighted piercing-position-2 active"></li>
+              )}
             </ul>
             <ImageIcon
               src={labwarePiercing}
@@ -176,31 +205,39 @@ export const getTipPiercingAtPosition = (position, formik) => {
   );
 };
 
-export const getDeckAtPosition = (position, formik) => {
-  const deckPositionOptions = [
-    LABWARE_DECK_POS_1_OPTIONS,
-    LABWARE_DECK_POS_2_OPTIONS,
-    LABWARE_DECK_POS_3_OPTIONS,
-    LABWARE_DECK_POS_4_OPTIONS,
-  ];
+export const getDeckAtPosition = (position, formik, options) => {
   const deckImages = [
     labwareDeckPosition1,
     labwareDeckPosition2,
     labwareDeckPosition3,
     labwareDeckPosition4,
   ];
+  const deckPositionValue =
+    formik.values[`deckPosition${position}`].processDetails.id;
+  const index = options.map((item) => item.value).indexOf(deckPositionValue);
+
   return (
     <>
       <TubeSelection
         handleOptionChange={(e) => {
-          formik.setFieldValue(`deckPosition${position}.tubeType`, e.value);
+          formik.setFieldValue(
+            `deckPosition${position}.processDetails.tubeType.id`,
+            e.value
+          );
+          formik.setFieldValue(
+            `deckPosition${position}.processDetails.tubeType.label`,
+            e.label
+          );
         }}
-        options={deckPositionOptions[position - 1]}
+        value={options[index]}
+        options={options}
       />
       <ProcessSetting>
         <div className="deck-position-info">
-          <ul class="list-unstyled deck-position active">
-            <li class={`highlighted deck-position-${position} active`} />
+          <ul className="list-unstyled deck-position active">
+            {deckPositionValue && (
+              <li className={`highlighted deck-position-${position} active`} />
+            )}
           </ul>
           <ImageIcon
             src={deckImages[position - 1]}
@@ -213,24 +250,34 @@ export const getDeckAtPosition = (position, formik) => {
   );
 };
 
-export const getCartidgeAtPosition = (position, formik) => {
-  const cartidgePositionOptions = [
-    LABWARE_CARTRIDGE_1_OPTIONS,
-    LABWARE_CARTRIDGE_2_OPTIONS,
-  ];
+export const getCartidgeAtPosition = (position, formik, options) => {
   const cartridgeImages = [labwareCartridePosition1, labwareCartridePosition2];
+  const cartridgeTypeValue =
+    formik.values[`cartridge${position}`].processDetails.cartridgeType.id;
+  const index = options.map((item) => item.value).indexOf(cartridgeTypeValue);
+
   return (
     <>
       <CartridgeSelection
         handleOptionChange={(e) => {
-          formik.setFieldValue(`cartridge${position}.cartridgeType`, e.value);
+          formik.setFieldValue(
+            `cartridge${position}.processDetails.cartridgeType.id`,
+            e.value
+          );
+          formik.setFieldValue(
+            `cartridge${position}.processDetails.cartridgeType.label`,
+            e.label
+          );
         }}
-        options={cartidgePositionOptions[position - 1]}
+        value={options[index]}
+        options={options}
       />
       <ProcessSetting>
         <div className="cartridge-position-info">
-          <ul class="list-unstyled cartridge-position active">
-            <li class={`highlighted cartridge-position-${position} active`} />
+          <ul className="list-unstyled cartridge-position active">
+            {cartridgeTypeValue && (
+              <li className={`highlighted cartridge-position-${position} active`} />
+            )}
           </ul>
           <ImageIcon
             src={cartridgeImages[position - 1]}
@@ -241,4 +288,49 @@ export const getCartidgeAtPosition = (position, formik) => {
       </ProcessSetting>
     </>
   );
+};
+
+export const getSubHead = (key, formik) => {
+  const recipeData = formik.values;
+  const nestedKeys = Object.keys(recipeData[key].processDetails);
+  const LEN = nestedKeys.length;
+  const previewInfoSubHead = [];
+
+  nestedKeys.forEach((nestedKey) => {
+    recipeData[key].processDetails[nestedKey].id &&
+      previewInfoSubHead.push(
+        <Text>
+          {LEN > 1 && (
+            <Text Tag="span" className="font-weight-bold">
+              {LABWARE_NAME[nestedKey]} :{" "}
+            </Text>
+          )}
+          <Text Tag="span" className={LEN === 1 ? "font-weight-bold" : ""}>
+            {recipeData[key].processDetails[nestedKey].label}{" "}
+          </Text>
+        </Text>
+      );
+  });
+  return previewInfoSubHead;
+};
+
+export const getPreviewInfo = (formik) => {
+  const previewInfoHead = [];
+  const recipeData = formik.values;
+  Object.keys(recipeData).forEach((key) => {
+    recipeData[key].isTicked &&
+      previewInfoHead.push(
+        <li className="d-flex justify-content-between">
+          <Text className="d-flex w-25 font-weight-bold">
+            {LABWARE_NAME[key]} :{" "}
+          </Text>
+          <div className="w-75">
+            <div className="ml-2 setting-value">
+              <Text>{getSubHead(key, formik)}</Text>
+            </div>
+          </div>
+        </li>
+      );
+  });
+  return previewInfoHead;
 };
