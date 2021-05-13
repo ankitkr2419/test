@@ -5,17 +5,14 @@ import { VideoCard, MlModal } from "shared-components";
 
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
-import { LandingScreen } from './LandingScreen';
+import { LandingScreen } from "./LandingScreen";
 
 const LandingScreenComponent = (props) => {
-  // let { deckName }  = props;
   const dispatch = useDispatch();
   const homingReducer = useSelector((state) => state.homingReducer);
 
-  const {
-    isHomingActionCompleted,
-    homingAllDeckCompletionPercentage,
-  } = homingReducer;
+  const { isHomingActionCompleted, homingAllDeckCompletionPercentage } =
+    homingReducer;
 
   const [isProgressBarVisible, setIsProgressBarVisible] = useState(false);
 

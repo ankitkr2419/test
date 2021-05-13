@@ -9,7 +9,7 @@ import { Progress } from "reactstrap";
 import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveDeck } from "action-creators/loginActionCreators";
-import { DeckCardBox, CardOverlay } from './Styles';
+import { DeckCardBox, CardOverlay } from "./Styles";
 
 const DeckCard = (props) => {
   const {
@@ -33,7 +33,7 @@ const DeckCard = (props) => {
     isActiveDeck,
     isAnotherDeckLoggedIn,
     processName,
-    processType
+    processType,
   } = props;
 
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
@@ -133,7 +133,7 @@ const DeckCard = (props) => {
             disabled={leftActionBtnDisabled}
             showCardOverLay={showCardOverLay}
           />
-      );
+        );
       default:
         break;
     }
@@ -188,21 +188,23 @@ const DeckCard = (props) => {
     );
   };
 
-
   /* get icon by process type
-    * if process type not found use 'default'
-    * if process type found but icon not found, use 'default'
-  */
+   * if process type not found use 'default'
+   * if process type found but icon not found, use 'default'
+   */
   const getIconName = () => {
-    let processTypeText = processType ? processType : 'default'
-    
-    let obj = PROCESS_ICON_CONSTANTS.find(obj => obj.processType === processTypeText)
-    
-    let iconName = (obj?.iconName)
-      ? obj.iconName 
-      : PROCESS_ICON_CONSTANTS.find(obj => obj.processType === 'default').iconName
+    let processTypeText = processType ? processType : "default";
+
+    let obj = PROCESS_ICON_CONSTANTS.find(
+      (obj) => obj.processType === processTypeText
+    );
+
+    let iconName = obj?.iconName
+      ? obj.iconName
+      : PROCESS_ICON_CONSTANTS.find((obj) => obj.processType === "default")
+          .iconName;
     return iconName;
-  }
+  };
 
   return (
     <DeckCardBox
@@ -234,18 +236,24 @@ const DeckCard = (props) => {
           <div className="d-none1">
             {showProcess && (
               <>
-                <div className="resume-button" onClick={() => {
-                  if(!leftActionBtnDisabled){
-                    handleLeftAction()
-                  }
-                }}>
+                <div
+                  className="resume-button"
+                  onClick={() => {
+                    if (!leftActionBtnDisabled) {
+                      handleLeftAction();
+                    }
+                  }}
+                >
                   {getLeftActionBtn(leftActionBtn)}
                 </div>
-                <div className="abort-button" onClick={() => {
-                  if(!rightActionBtnDisabled){
-                    handleRightAction()
-                  }
-                }}>
+                <div
+                  className="abort-button"
+                  onClick={() => {
+                    if (!rightActionBtnDisabled) {
+                      handleRightAction();
+                    }
+                  }}
+                >
                   {getRightActionBtn(rightActionBtn)}
                 </div>
 
@@ -257,17 +265,12 @@ const DeckCard = (props) => {
                   >
                     {recipeName}
                   </Text>
-                  {/* TODO : Remove this commented code after clean up process developement done */}
-                  {/* <Text Tag="label" className="mb-1">Current Processes - (Process Name)</Text>
-								<Text Tag="label" className="mb-1 d-flex align-items-center">
-									<Icon name='timer' size={19} className="text-primary"/>
-									<Text Tag="span" className="hour-label font-weight-bold ml-2"> 1 Hr </Text>
-									<Text Tag="span" className="min-label ml-2 font-weight-bold">8 min</Text>
-									<Text Tag="span" className="ml-1">remaining</Text>
-								</Text> */}
-
                   <Text Tag="label" className="mb-1 d-flex align-items-center">
-                    <Icon name={getIconName()} size={19} className="text-primary" />
+                    <Icon
+                      name={getIconName()}
+                      size={19}
+                      className="text-primary"
+                    />
                     <Text
                       Tag="span"
                       className="process-count-label font-weight-bold ml-2"
@@ -282,7 +285,7 @@ const DeckCard = (props) => {
                       </Text>{" "}
                     </Text>
                     <Text Tag="span" className="ml-1 process-remaining">
-                      {processName ? processName : 'Processes remaining'}
+                      {processName ? processName : "Processes remaining"}
                     </Text>
                   </Text>
                 </div>
@@ -343,17 +346,21 @@ const DeckCard = (props) => {
               </Button>
             </>
           )}
-          <OperatorLoginModalContainer
-            operatorLoginModalOpen={operatorLoginModalOpen}
-            toggleOperatorLoginModal={toggleOperatorLoginModal}
-            deckName={deckName}
-          />
+          {loginBtn && (
+            <OperatorLoginModalContainer
+              operatorLoginModalOpen={operatorLoginModalOpen}
+              toggleOperatorLoginModal={toggleOperatorLoginModal}
+              deckName={deckName}
+            />
+          )}
         </div>
 
         {(showProcess || showCleanUp) && (
           <Progress
             value={progressPercentComplete}
-            className={showProcess ? "custom-progress-bar" : "mt-3 custom-progress-bar"}
+            className={
+              showProcess ? "custom-progress-bar" : "mt-3 custom-progress-bar"
+            }
           />
         )}
       </div>

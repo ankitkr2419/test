@@ -58,7 +58,8 @@ export const ROUTES = {
   splashScreen: "splashscreen",
   recipeListing: "recipe-listing",
   labware: "labware",
-  processListing: "process-listing"
+  processListing: "process-listing",
+  selectProcess: "select-process",
 };
 
 export const API_ENDPOINTS = {
@@ -75,6 +76,8 @@ export const API_ENDPOINTS = {
   cleanUp: "uv",
   tipsTubes: "tips-tubes",
   cartridge: "cartridges",
+  tubes: "tube",
+  tips: "tip",
   stepRun: "step-run",
   runNextStep: "run-next-step",
 };

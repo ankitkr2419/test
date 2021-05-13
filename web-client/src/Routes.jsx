@@ -15,6 +15,7 @@ import AllSetContainer from "containers/AllSetContainer";
 import LabwareContainer from "containers/LabwareContainer";
 import ProcessListingContainer from "containers/ProcessListingContainer"
 import { ROOT_URL_PATH, ROUTES } from "./appConstants";
+import SelectProcessContainer from "containers/SelectProcessContainer";
 
 export const routeDefinitions = [
   {
@@ -71,6 +72,12 @@ export const routeDefinitions = [
         component: AllSetContainer,
         key: 10,
       },
+      {
+				path: `${ROOT_URL_PATH}select-process`,
+				exact: true,
+				component: SelectProcessContainer,
+				key: 18,
+			},
       {
         path: `${ROOT_URL_PATH}labware`,
         exact: true,

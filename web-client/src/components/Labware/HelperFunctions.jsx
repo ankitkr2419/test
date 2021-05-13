@@ -14,10 +14,9 @@ import { Icon, ImageIcon, Text } from "shared-components";
 import { NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 import { FormGroup, Label, FormError, Select, CheckBox } from "core-components";
-
-import TubeSelection from "./TubeSelection";
-import CartridgeSelection from "./CartrideSelection";
 import { ProcessSetting } from "./Styles";
+import HeaderAndLabel from "./HeaderAndLabel";
+import { getOptionsForTubesAndCartridges } from "./functions";
 
 export const updateAllTicks = (formik) => {
   const currentState = formik.values;
@@ -72,7 +71,7 @@ export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
         name={`position${index + 1}`}
         label={`Position ${index + 1}`}
         className={index > 0 ? "ml-4" : ""}
-        checked={isChecked}
+        checked={isChecked ? true : false}
         onChange={(e) => {
           formik.setFieldValue(
             `tipPiercing.processDetails.position${index + 1}.id`,
@@ -151,7 +150,9 @@ export const getTipsAtPosition = (position, formik, options) => {
       <ProcessSetting>
         <div className="tips-info">
           <ul className="list-unstyled tip-position active">
-            {tipPosition1Value && <li className="highlighted tip-position-1"></li>}
+            {tipPosition1Value && (
+              <li className="highlighted tip-position-1"></li>
+            )}
             {tipPosition2Value && (
               <li className="highlighted tip-position-2 active"></li>
             )}
@@ -188,8 +189,10 @@ export const getTipPiercingAtPosition = (position, formik) => {
         <ProcessSetting>
           <div className="piercing-info">
             <ul className="list-unstyled piercing-position active">
-              {position1 && <li className="highlighted piercing-position-1"></li>}
-              {position2 && (
+              {position1 !== 0 && (
+                <li className="highlighted piercing-position-1"></li>
+              )}
+              {position2 !== 0 && (
                 <li className="highlighted piercing-position-2 active"></li>
               )}
             </ul>
@@ -205,89 +208,52 @@ export const getTipPiercingAtPosition = (position, formik) => {
   );
 };
 
-export const getDeckAtPosition = (position, formik, options) => {
-  const deckImages = [
-    labwareDeckPosition1,
-    labwareDeckPosition2,
-    labwareDeckPosition3,
-    labwareDeckPosition4,
-  ];
-  const deckPositionValue =
-    formik.values[`deckPosition${position}`].processDetails.id;
-  const index = options.map((item) => item.value).indexOf(deckPositionValue);
-
-  return (
-    <>
-      <TubeSelection
-        handleOptionChange={(e) => {
-          formik.setFieldValue(
-            `deckPosition${position}.processDetails.tubeType.id`,
-            e.value
-          );
-          formik.setFieldValue(
-            `deckPosition${position}.processDetails.tubeType.label`,
-            e.label
-          );
-        }}
-        value={options[index]}
-        options={options}
-      />
-      <ProcessSetting>
-        <div className="deck-position-info">
-          <ul className="list-unstyled deck-position active">
-            {deckPositionValue && (
-              <li className={`highlighted deck-position-${position} active`} />
-            )}
-          </ul>
-          <ImageIcon
-            src={deckImages[position - 1]}
-            alt={`Deck Position ${position} Process`}
-            className=""
-          />
-        </div>
-      </ProcessSetting>
-    </>
+const handleOptionChange = (formik, position, e, key, type) => {
+  formik.setFieldValue(`${key}${position}.processDetails.${type}.id`, e.value);
+  formik.setFieldValue(
+    `${key}${position}.processDetails.${type}.label`,
+    e.label
   );
 };
 
-export const getCartidgeAtPosition = (position, formik, options) => {
-  const cartridgeImages = [labwareCartridePosition1, labwareCartridePosition2];
-  const cartridgeTypeValue =
-    formik.values[`cartridge${position}`].processDetails.cartridgeType.id;
-  const index = options.map((item) => item.value).indexOf(cartridgeTypeValue);
+const deckImages = [
+  labwareDeckPosition1,
+  labwareDeckPosition2,
+  labwareDeckPosition3,
+  labwareDeckPosition4,
+];
+const cartridgeImages = [labwareCartridePosition1, labwareCartridePosition2];
 
-  return (
-    <>
-      <CartridgeSelection
-        handleOptionChange={(e) => {
-          formik.setFieldValue(
-            `cartridge${position}.processDetails.cartridgeType.id`,
-            e.value
-          );
-          formik.setFieldValue(
-            `cartridge${position}.processDetails.cartridgeType.label`,
-            e.label
-          );
-        }}
-        value={options[index]}
-        options={options}
-      />
-      <ProcessSetting>
-        <div className="cartridge-position-info">
-          <ul className="list-unstyled cartridge-position active">
-            {cartridgeTypeValue && (
-              <li className={`highlighted cartridge-position-${position} active`} />
-            )}
-          </ul>
-          <ImageIcon
-            src={cartridgeImages[position - 1]}
-            alt={`Cartridge Position ${position} Process`}
-            className=""
-          />
-        </div>
-      </ProcessSetting>
-    </>
-  );
+export const getFieldAtPosition = (position, formik, allOptions, key) => {
+  const images = key === "deckPosition" ? deckImages : cartridgeImages;
+
+  if (allOptions) {
+    //id in response from backend starts from 4 for tubes and
+    // starts with 1 for catridge.
+    const n = key === "deckPosition" ? 3 : 0;
+    const options = getOptionsForTubesAndCartridges(allOptions, position + n);
+    const type = key === "deckPosition" ? "tubeType" : "cartridgeType";
+
+    const selectedOptionID =
+      formik.values[`${key}${position}`].processDetails[type].id;
+    const index = options.map((item) => item.value).indexOf(selectedOptionID);
+
+    return (
+      <>
+        <HeaderAndLabel
+          isDeck={key}
+          handleOptionChange={(e) =>
+            handleOptionChange(formik, position, e, key, type)
+          }
+          value={options[index]}
+          options={options}
+          position={position}
+          images={images}
+          typeValue={selectedOptionID}
+        />
+      </>
+    );
+  }
 };
 
 export const getSubHead = (key, formik) => {

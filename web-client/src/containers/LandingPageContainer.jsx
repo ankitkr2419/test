@@ -6,9 +6,7 @@ import { Redirect } from "react-router";
 import { ROUTES } from "../appConstants";
 
 const LandingPageContainer = (props) => {
-  const loginReducer = useSelector(
-    (state) => state.loginReducer
-  );
+  const loginReducer = useSelector((state) => state.loginReducer);
 
   const loginReducerData = loginReducer.toJS()
   let activeDeckObj = loginReducerData && loginReducerData.decks.find(deck => deck.isActive)
