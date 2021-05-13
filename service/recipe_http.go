@@ -5,7 +5,6 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -141,7 +140,7 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var publish bool
+		var publishFlag bool
 		var successMsg string
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -150,9 +149,16 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		if publish, err = strconv.ParseBool(vars["publish"]); err != nil {
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.BOOLParseError.Error()})
-			return
+		//for more clarity, we take whole keywords(publish and unpublish) from the url
+		publish := vars["publish"]
+
+		switch publish {
+		case "publish":
+			publishFlag = true
+		case "unpublish":
+			publishFlag = false
+		default:
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidUrlArgument.Error()})
 		}
 
 		var recipe db.Recipe
@@ -165,7 +171,7 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		if publish == recipe.IsPublished {
+		if publishFlag == recipe.IsPublished {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipePublishError.Error()})
 			logger.WithField("err", "PUBLISH_ERROR").Error(responses.RecipePublishError)
 			return
@@ -173,7 +179,7 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 		}
 		//TODO : check if the recipe is published on the cloud and if there then delete
 		// it from the cloud.
-		recipe.IsPublished = publish
+		recipe.IsPublished = publishFlag
 
 		err = deps.Store.UpdateRecipe(req.Context(), recipe)
 		if err != nil {

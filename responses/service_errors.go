@@ -80,7 +80,7 @@ var (
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
 
 	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
-	BOOLParseError              = fmt.Errorf("error unable to parse input value to bool")
+	InvalidUrlArgument          = fmt.Errorf("error invalid url argument")
 
 	//user
 	UserDecodeError         = fmt.Errorf("error decoding user record")
