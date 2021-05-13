@@ -36,7 +36,7 @@ export function* login(actions) {
                     "role": body.role
                 },
                 // reqPath: 'users/admin/validate',
-				reqPath: `users/validate/${deckName}`,
+				reqPath: `login/${deckName}`,
                 method: HTTP_METHODS.POST,
                 successAction,
                 failureAction,

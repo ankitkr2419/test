@@ -48,7 +48,7 @@ const LabWareComponent = (props) => {
       setShowConfirmModal(!showConfirmModal);
       dispatch(updateRecipeActionReset());
     }
-  });
+  }, [isSuccess]);
 
   const loginReducer = useSelector((state) => state.loginReducer);
   const recipeDetailsReducer = useSelector(
