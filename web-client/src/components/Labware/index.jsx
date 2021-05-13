@@ -12,7 +12,6 @@ import {
   LABWARE_INITIAL_STATE,
   DECKNAME,
   MODAL_BTN,
-  TOAST_MESSAGE,
   ROUTES,
 } from "appConstants";
 import {
@@ -30,7 +29,6 @@ import {
 } from "action-creators/saveNewRecipeActionCreators";
 import { Redirect, useHistory } from "react-router";
 import { getRequestBody, getOptions } from "./functions";
-import { toast } from "react-toastify";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
