@@ -6,10 +6,10 @@ test-coverage:
 	go tool cover -html=coverage.out
 
 build:
-	sudo ./build-binary.sh
+	sudo utils/build-binary.sh
 
 zip:
-	./build-zip.sh
+	utils/build-zip.sh
 	echo "zip created successfully"
 
 build-and-zip: build zip
