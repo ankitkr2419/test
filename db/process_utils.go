@@ -10,12 +10,34 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+type ProcessName string
+type processOperation string
+
+const(
+	AspireDispenseProcess ProcessName = "AspireDispense"
+	AttachDetachProcess ProcessName = "AttachDetach"
+	DelayProcess ProcessName = "Delay"
+	PiercingProcess ProcessName = "Piercing"
+	TipDockingProcess ProcessName = "TipDocking"
+	TipOperationProcess ProcessName = "TipOperation"
+	ShakingProcess ProcessName = "Shaking"
+	HeatingProcess ProcessName = "Heating"
+)
+
+
+const(
+	name processOperation = "name"
+	duplicate processOperation = "duplicate"
+)
+
 const (
 	updateProcessNameQuery       = `UPDATE processes SET name = $1 WHERE id = $2;`
 	getProcessCountQuery         = `SELECT count(*) FROM processes WHERE recipe_id = $1;`
 	subtractProcessSequenceQuery = `UPDATE processes SET sequence_num = (sequence_num - $1) WHERE recipe_id = $2;`
 	rearrangeSequenceQuery       = `UPDATE processes SET sequence_num = $1 WHERE id = $2`
 )
+
+
 
 func (s *pgStore) createProcess(ctx context.Context, tx *sql.Tx, p Process) (cp Process, err error) {
 
@@ -38,15 +60,15 @@ func (s *pgStore) createProcess(ctx context.Context, tx *sql.Tx, p Process) (cp 
 	return p, err
 }
 
-func (s *pgStore) updateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
+func (s *pgStore) updateProcessName(ctx context.Context, tx *sql.Tx, id uuid.UUID, processType ProcessName, process interface{}) (err error) {
 	// pass Process{} just to keep dame method call
-	processWithName, err := s.processOperation(ctx, "name", processType, process, Process{})
+	processWithName, err := s.processOperation(ctx, name, processType, process, Process{})
 	if err != nil {
 		err = fmt.Errorf("error in updating new process name")
 		return
 	}
 
-	_, err = s.db.Exec(
+	_, err = tx.Exec(
 		updateProcessNameQuery,
 		processWithName.Name,
 		id,
@@ -109,11 +131,11 @@ func (s *pgStore) subtractFromSequence(ctx context.Context, tx *sql.Tx, recipeID
 	return
 }
 
-func (s *pgStore) processOperation(ctx context.Context, operation string, processType string, process interface{}, parent Process) (pr Process, err error) {
+func (s *pgStore) processOperation(ctx context.Context, operation processOperation, processType ProcessName, process interface{}, parent Process) (pr Process, err error) {
 
 	var tx *sql.Tx
 
-	if operation == "duplicate" {
+	if operation == duplicate {
 		// In a transaction insert entry into Process table
 		// and then into its type table
 		tx, err = s.db.BeginTx(ctx, nil)
@@ -169,7 +191,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 	switch processType {
 	case "Piercing":
 		var pi Piercing
-		if operation == "name" {
+		if operation == name {
 			pi = process.(Piercing)
 			pr.Name = fmt.Sprintf("Piercing_%s", pi.Type)
 			return
@@ -194,7 +216,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	case "TipOperation":
 		var to TipOperation
-		if operation == "name" {
+		if operation == name {
 			to = process.(TipOperation)
 			pr.Name = fmt.Sprintf("Tip_Operation_%s", to.Type)
 			return
@@ -219,7 +241,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	case "TipDocking":
 		var td TipDock
-		if operation == "name" {
+		if operation == name {
 			td = process.(TipDock)
 			pr.Name = fmt.Sprintf("Tip_Docking_%s", td.Type)
 			return
@@ -244,7 +266,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	case "AspireDispense":
 		var ad AspireDispense
-		if operation == "name" {
+		if operation == name {
 			ad = process.(AspireDispense)
 			pr.Name = fmt.Sprintf("Aspire_Dispense_%s", ad.Category)
 			return
@@ -269,7 +291,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	case "Heating":
 		var ht Heating
-		if operation == "name" {
+		if operation == name {
 			pr.Name = "Heating"
 			return
 		}
@@ -293,7 +315,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	case "Shaking":
 		var sk Shaker
-		if operation == "name" {
+		if operation == name {
 			sk = process.(Shaker)
 			if sk.WithTemp {
 				pr.Name = "Shaking_With_temperature"
@@ -322,7 +344,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	case "AttachDetach":
 		var ad AttachDetach
-		if operation == "name" {
+		if operation == name {
 			ad = process.(AttachDetach)
 			pr.Name = fmt.Sprintf("Magnet_%s", ad.Operation)
 			return
@@ -347,7 +369,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation string, proces
 
 	case "Delay":
 		var dl Delay
-		if operation == "name" {
+		if operation == name {
 			pr.Name = "Delay"
 			return
 		}
