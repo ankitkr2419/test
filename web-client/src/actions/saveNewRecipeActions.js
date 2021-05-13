@@ -13,6 +13,20 @@ export const getTipsAndTubesAction = {
   getTipsAndTubesReset: "GET_TIPS_AND_TUBES_RESET",
 };
 
+export const getTipsAction = {
+  getTipsInitiated: "GET_TIPS_OPTIONS_INITIATED",
+  getTipsSuccess: "GET_TIPS_OPTIONS_SUCCESS",
+  getTipsFailure: "GET_TIPS_OPTIONS_FAILED",
+  getTipsReset: "GET_TIPS_OPTIONS_RESET",
+};
+
+export const getTubesAction = {
+  getTubesInitiated: "GET_TIPS_OPTIONS_INITIATED",
+  getTubesSuccess: "GET_TIPS_OPTIONS_SUCCESS",
+  getTubesFailure: "GET_TIPS_OPTIONS_FAILED",
+  getTubesReset: "GET_TIPS_OPTIONS_RESET",
+};
+
 export const getCartridgeAction = {
   getCartridgeInitiated: "GET_CARTRIDGE_INITIATED",
   getCartridgeSuccess: "GET_CARTRIDGE_SUCCESS",

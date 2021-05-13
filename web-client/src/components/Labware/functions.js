@@ -54,3 +54,20 @@ export const getOptions = (lowerLimit, higherLimit, options) => {
   }
   return optionsObj;
 };
+
+export const getOptionsForTubesAndCartridges = (options, position) => {
+  let optionsObj;
+  if (options) {
+    optionsObj = options.map((optionObject) => {
+      if (optionObject.id === position) {
+        return {
+          value: optionObject.id,
+          label: optionObject.name
+            ? optionObject.name
+            : optionObject.description,
+        };
+      }
+    });
+  }
+  return optionsObj.filter((item) => item);
+};

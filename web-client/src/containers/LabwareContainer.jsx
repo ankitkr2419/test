@@ -4,7 +4,9 @@ import LabWareComponent from "components/Labware";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCartridgeActionInitiated,
+  getTipsActionInitiated,
   getTipsAndTubesActionInitiated,
+  getTubesActionInitiated,
 } from "action-creators/saveNewRecipeActionCreators";
 
 const LabwareContainer = (props) => {
@@ -19,6 +21,8 @@ const LabwareContainer = (props) => {
   useEffect(() => {
     dispatch(getTipsAndTubesActionInitiated({ deckName: currentDeckName }));
     dispatch(getCartridgeActionInitiated({ deckName: currentDeckName }));
+    dispatch(getTipsActionInitiated({ deckName: currentDeckName }));
+    dispatch(getTubesActionInitiated({ deckName: currentDeckName }));
   }, [dispatch]);
   return <LabWareComponent />;
 };
