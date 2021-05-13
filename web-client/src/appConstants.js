@@ -58,6 +58,7 @@ export const ROUTES = {
   splashScreen: "splashscreen",
   recipeListing: "recipe-listing",
   labware: "labware",
+  processListing: "process-listing"
 };
 
 export const API_ENDPOINTS = {

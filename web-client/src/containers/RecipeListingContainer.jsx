@@ -123,9 +123,6 @@ const RecipeListingContainer = (props) => {
     setOperatorRunRecipeCarousalModalVisible(!prevState);
   };
 
-  //useEffect(() => {
-  // dispatch(recipeListingInitiated());
-  //}, [dispatch]);
   useEffect(() => {
     if (token && !recipeFetched) {
       dispatch(recipeListingInitiated(token, deckName));
@@ -149,7 +146,6 @@ const RecipeListingContainer = (props) => {
     (deck) => deck.name === deckName
   );
   const recipeData = recipeReducerDataOfActiveDeck.allRecipeData;
-  // const isLoading = recipeReducerDataOfActiveDeck.isLoading;
 
   const cleanUpReducerDataOfActiveDeck = cleanUpReducer.decks.find(
     (deck) => deck.name === deckName
@@ -160,12 +156,6 @@ const RecipeListingContainer = (props) => {
     cleanUpReducerDataOfActiveDeck.showCleanUp;
 
   const returnRecipeDetails = (data) => {
-    // let requiredData  =  {
-    //   data,
-    //   deckName //active deck
-    // }
-    // console.log("DATA returned--->", requiredData);
-    // store data in reducer
     setSelectedRecipeData({ data, deckName });
   };
 

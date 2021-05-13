@@ -84,9 +84,6 @@ const OperatorLoginModalContainer = (props) => {
     //     })
     // );
 
-    if (isLoggedIn && !error) {
-        return <Redirect to={`/${ROUTES.recipeListing}`} />;
-    }
 
     return (
         <OperatorLoginModal
