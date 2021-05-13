@@ -6,18 +6,21 @@ import { ProcessSetting } from "./Styles";
 
 const HeaderAndLabel = (props) => {
   const {
-    key,
+    isDeck,
     handleOptionChange,
     options,
     value,
-    headerText,
-    label,
     images,
     position,
     typeValue,
   } = props;
 
-  const type = (key==="deckPosition") ? "deck" : "cartridge";
+  const headerText =
+    isDeck === "deckPosition" ? "Select Deck" : "Select Cartridge";
+
+  const label = isDeck === "deckPosition" ? "Tube Type" : "Cartridge Type";
+
+  const type = isDeck === "deckPosition" ? "deck" : "cartridge";
   return (
     <>
       <CommmonTubeFields>

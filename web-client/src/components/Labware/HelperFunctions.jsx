@@ -71,7 +71,7 @@ export const getTipPiercingCheckbox = (formik, nCheckboxes = 2) => {
         name={`position${index + 1}`}
         label={`Position ${index + 1}`}
         className={index > 0 ? "ml-4" : ""}
-        checked={isChecked}
+        checked={isChecked ? true : false}
         onChange={(e) => {
           formik.setFieldValue(
             `tipPiercing.processDetails.position${index + 1}.id`,
@@ -189,10 +189,10 @@ export const getTipPiercingAtPosition = (position, formik) => {
         <ProcessSetting>
           <div className="piercing-info">
             <ul className="list-unstyled piercing-position active">
-              {position1 && (
+              {position1 !== 0 && (
                 <li className="highlighted piercing-position-1"></li>
               )}
-              {position2 && (
+              {position2 !== 0 && (
                 <li className="highlighted piercing-position-2 active"></li>
               )}
             </ul>
@@ -241,11 +241,7 @@ export const getFieldAtPosition = (position, formik, allOptions, key) => {
     return (
       <>
         <HeaderAndLabel
-          key={key}
-          headerText={
-            key === "deckPosition" ? "Select Deck" : "Select Cartridge"
-          }
-          label={key === "deckPosition" ? "Tube Type" : "Cartridge Type"}
+          isDeck={key}
           handleOptionChange={(e) =>
             handleOptionChange(formik, position, e, key, type)
           }

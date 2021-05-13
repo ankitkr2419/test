@@ -12,6 +12,7 @@ const initialState = {
   tempDeckName: "",
   isLoading: null,
   error: null,
+  isSuccess: null,
   decks: [
     {
       name: DECKNAME.DeckA,
@@ -76,13 +77,14 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
       };
 
     case saveNewRecipeAction.updateRecipeSuccess:
-      return state;
+      return { ...state, isLoading: false, error: false, isSuccess: true };
 
     case saveNewRecipeAction.updateRecipeFailure:
       return {
         ...state,
         isLoading: false,
         error: true,
+        isSuccess: false
       };
 
     case saveNewRecipeAction.updateRecipeReset:
@@ -90,6 +92,7 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
         ...state,
         isLoading: null,
         error: null,
+        isSuccess: null
       };
 
     //tips and tubes options

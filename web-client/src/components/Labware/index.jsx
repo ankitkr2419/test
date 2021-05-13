@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 
@@ -12,6 +12,8 @@ import {
   LABWARE_INITIAL_STATE,
   DECKNAME,
   MODAL_BTN,
+  TOAST_MESSAGE,
+  ROUTES,
 } from "appConstants";
 import {
   getSideBarNavItems,
@@ -22,9 +24,13 @@ import {
   getFieldAtPosition,
 } from "./HelperFunctions";
 import { LabwareBox, PageBody, ProcessSetting } from "./Styles";
-import { updateRecipeActionInitiated } from "action-creators/saveNewRecipeActionCreators";
+import {
+  updateRecipeActionInitiated,
+  updateRecipeActionReset,
+} from "action-creators/saveNewRecipeActionCreators";
 import { Redirect, useHistory } from "react-router";
 import { getRequestBody, getOptions } from "./functions";
+import { toast } from "react-toastify";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
@@ -39,6 +45,13 @@ const LabWareComponent = (props) => {
     enableReinitialize: true,
   });
 
+  useEffect(() => {
+    if (isSuccess) {
+      setShowConfirmModal(!showConfirmModal);
+      dispatch(updateRecipeActionReset());
+    }
+  });
+
   const loginReducer = useSelector((state) => state.loginReducer);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
@@ -47,21 +60,21 @@ const LabWareComponent = (props) => {
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  // if (!activeDeckObj.isLoggedIn) {
-  //   return <Redirect to={`/${ROUTES.landing}`} />;
-  // }
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   const deckIndex = activeDeckObj.name === DECKNAME.DeckA ? 0 : 1;
-  const tubesOptions =
-    recipeDetailsReducer.decks[deckIndex].tubesOptions;
-  const tipsOptions =
-    recipeDetailsReducer.decks[deckIndex].tipsOptions;
+  const tubesOptions = recipeDetailsReducer.decks[deckIndex].tubesOptions;
+  const tipsOptions = recipeDetailsReducer.decks[deckIndex].tipsOptions;
   const tipsAndTubesOptions =
     recipeDetailsReducer.decks[deckIndex].recipeOptions;
   const cartridgeOptions =
     recipeDetailsReducer.decks[deckIndex].cartridgeOptions;
   const newRecipeName =
     recipeDetailsReducer.decks[deckIndex].recipeDetails.name;
+
+  const isSuccess = recipeDetailsReducer.isSuccess;
 
   const handleSaveBtn = () => {
     const requestBody = getRequestBody(newRecipeName, formik.values);
@@ -73,8 +86,6 @@ const LabWareComponent = (props) => {
         token: activeDeckObj.token,
       })
     );
-
-    setShowConfirmModal(!showConfirmModal);
   };
 
   const toggle = (tab) => {
@@ -83,7 +94,7 @@ const LabWareComponent = (props) => {
 
   const handleSuccessBtn = () => {
     setShowConfirmModal(!showConfirmModal);
-    // history.push(); redirect to next page
+    history.push(ROUTES.selectProcess); //redirect to next page
   };
 
   return (
@@ -227,22 +238,52 @@ const LabWareComponent = (props) => {
                         {getTipPiercingAtPosition(1, formik)}
                       </TabPane>
                       <TabPane tabId="3">
-                      {getFieldAtPosition(1, formik, tubesOptions, "deckPosition")}
+                        {getFieldAtPosition(
+                          1,
+                          formik,
+                          tubesOptions,
+                          "deckPosition"
+                        )}
                       </TabPane>
                       <TabPane tabId="4">
-                      {getFieldAtPosition(2, formik, tubesOptions, "deckPosition")}
+                        {getFieldAtPosition(
+                          2,
+                          formik,
+                          tubesOptions,
+                          "deckPosition"
+                        )}
                       </TabPane>
                       <TabPane tabId="5">
-                      {getFieldAtPosition(1, formik, cartridgeOptions, "cartridge")}
+                        {getFieldAtPosition(
+                          1,
+                          formik,
+                          cartridgeOptions,
+                          "cartridge"
+                        )}
                       </TabPane>
                       <TabPane tabId="6">
-                      {getFieldAtPosition(3, formik, tubesOptions, "deckPosition")}
+                        {getFieldAtPosition(
+                          3,
+                          formik,
+                          tubesOptions,
+                          "deckPosition"
+                        )}
                       </TabPane>
                       <TabPane tabId="7">
-                      {getFieldAtPosition(2, formik, cartridgeOptions, "cartridge")}
+                        {getFieldAtPosition(
+                          2,
+                          formik,
+                          cartridgeOptions,
+                          "cartridge"
+                        )}
                       </TabPane>
                       <TabPane tabId="8">
-                        {getFieldAtPosition(4, formik, tubesOptions, "deckPosition")}
+                        {getFieldAtPosition(
+                          4,
+                          formik,
+                          tubesOptions,
+                          "deckPosition"
+                        )}
                       </TabPane>
                     </TabContent>
                   </div>
