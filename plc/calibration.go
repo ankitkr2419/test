@@ -3,38 +3,36 @@ package plc
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
-	"strconv"
-
-	"strings"
-	"time"
+	"context"
 
 	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// TODO: Logging this PLC Operation
+	defer func(){
+		if err != nil{
+			logger.Errorln(err)
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+		}
+	}()
 
-	var response string
-
-	if d.IsRunInProgress() {
-		err = responses.PreviousRunInProgressError
-		return
-	}
+	d.setPIDCalibrationInProgress()
+	defer d.resetPIDCalibrationInProgress()
 
 	// Start Heater
-	response, err = d.switchOnHeater()
+	_, err = d.switchOnHeater()
 	if err != nil {
 		return
 	}
 	// Reset Heater in defer
 	defer d.switchOffHeater()
-	logger.Infoln(responses.HeaterStartedForPIDCalibration)
+	logger.Infoln(responses.PIDCalibrationHeaterStarted)
 
 	// Start PID for deck
-	response, err = d.switchOnPIDCalibration()
+	_, err = d.switchOnPIDCalibration()
 	if err != nil {
 		return
 	}
@@ -43,7 +41,7 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	logger.Infoln(responses.PIDCalibrationStarted)
 
 	// Sleep for 15 minutes
-	response, err = d.AddDelay(db.Delay{DelayTime: 15 * 60})
+	_, err = d.AddDelay(db.Delay{DelayTime: 15 * 60})
 	if err != nil {
 		return
 	}
@@ -66,4 +64,5 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	}
 	d.WsMsgCh <- fmt.Sprintf("success_pidCalibration_%v", string(wsData))
 
+	return
 }

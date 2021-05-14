@@ -81,11 +81,11 @@ func (d *Compact32Deck) resetUVLightInProgress() {
 }
 
 func (d *Compact32Deck) setPIDCalibrationInProgress() {
-	PIDCalibrationInProgress.Store(d.name, true)
+	pIDCalibrationInProgress.Store(d.name, true)
 }
 
 func (d *Compact32Deck) resetPIDCalibrationInProgress() {
-	PIDCalibrationInProgress.Store(d.name, false)
+	pIDCalibrationInProgress.Store(d.name, false)
 }
 
 func (d *Compact32Deck) setHomingPercent(percent float64) {
@@ -165,8 +165,8 @@ func (d *Compact32Deck) isUVLightInProgress() bool {
 }
 
 func (d *Compact32Deck) isPIDCalibrationInProgress() bool {
-	if temp, ok := PIDCalibrationInProgress.Load(d.name); !ok {
-		logger.Errorln("PIDCalibrationInProgress isn't loaded!")
+	if temp, ok := pIDCalibrationInProgress.Load(d.name); !ok {
+		logger.Errorln("pIDCalibrationInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}

@@ -65,7 +65,7 @@ skipToStartTimer:
 					Deck:     d.name,
 					Status:   "PROGRESS_UVLIGHT",
 					OperationDetails: OperationDetails{
-						Message:       fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
+						Message:       fmt.Sprintf("uv light cleanup in progress for deck %s ", d.name),
 						RemainingTime: uvRemainingTime,
 					},
 				}
@@ -86,7 +86,7 @@ skipToStartTimer:
 					Deck:     d.name,
 					Status:   "PROGRESS_PIDCALIBRATION",
 					OperationDetails: OperationDetails{
-						Message:       fmt.Sprintf("progress_pidCalibration_pid calibration in progress for deck %s ", d.name),
+						Message:       fmt.Sprintf("pid calibration in progress for deck %s ", d.name),
 						RemainingTime: pidRemainingTime,
 					},
 				}

@@ -14,8 +14,17 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 		// TODO: Logging this API
 		vars := mux.Vars(req)
 		deck := vars["deck"]
+		var err error
 
-		err := deps.PlcDeck[deck].PIDCalibration(req.Context())
+		if deps.PlcDeck[deck].IsRunInProgress() {
+			logger.WithField("err", err.Error()).Error(responses.PreviousRunInProgressError)
+			return
+		}
+	
+		deps.PlcDeck[deck].SetRunInProgress()
+		defer deps.PlcDeck[deck].ResetRunInProgress()
+
+		go deps.PlcDeck[deck].PIDCalibration(req.Context())
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.PIDCalibrationError)
 			// TODO: Add Deck below whenever Deck PR is merged
