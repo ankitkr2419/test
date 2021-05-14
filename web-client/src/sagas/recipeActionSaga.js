@@ -217,7 +217,7 @@ export function* nextStepRunRecipe(actions) {
 export function* publishRecipe(actions) {
   const {
     payload: {
-      params: { recipeId, deckName },
+      params: { recipeId },
     },
   } = actions;
   const { publishRecipeSuccess, publishRecipeFailed } = publishRecipeAction;

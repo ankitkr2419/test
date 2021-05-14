@@ -1,3 +1,5 @@
+//this will be changed to null values instead of 0 in future
+//after backend gets fixed.
 export const getRequestBody = (recipeName, formikState) => {
   const requestBody = {
     name: recipeName,
