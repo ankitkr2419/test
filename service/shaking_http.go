@@ -31,7 +31,7 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(shaObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.ShakingValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -87,7 +87,7 @@ func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 		}
 		valid, respBytes := validate(shObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.ShakingValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
