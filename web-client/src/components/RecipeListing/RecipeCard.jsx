@@ -14,7 +14,8 @@ const RecipeCard = (props) => {
     handleCarousalModal,
     returnRecipeDetails,
     toggleRunRecipesModal,
-    handlePublishModalClick
+    handlePublishModalClick,
+    handleEditRecipe,
   } = props;
 
   const [toggle, setToggle] = useState(true);
@@ -77,7 +78,7 @@ const RecipeCard = (props) => {
                     size={14}
                     name="edit-pencil"
                     className="border-gray text-primary"
-                    // onClick={toggleExportDataModal}
+                    onClick={handleEditRecipe}
                   />
                   <ButtonIcon
                     size={14}
