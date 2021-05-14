@@ -10,6 +10,15 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+// ASK: Is Pause to be allowed?
+
+// ALGORITHM
+// 1. Start Heater
+// 2. Reset Heater in defer
+// 3. Start PID for deck
+// 4. Reset PID in defer
+// 5. Sleep for 15 minutes
+
 func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// TODO: Logging this PLC Operation
 	defer func(){
