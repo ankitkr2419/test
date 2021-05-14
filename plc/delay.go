@@ -49,6 +49,9 @@ skipToStartTimer:
 			time.Sleep(time.Millisecond * 300)
 			if d.isMachineInAbortedState() {
 				t.Stop()
+				if d.isUVLightInProgress() {
+					d.resetAborted()
+				}
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}
