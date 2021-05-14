@@ -4,9 +4,10 @@ import AppFooter from "components/AppFooter";
 import { useSelector } from "react-redux";
 import { Redirect } from "react-router";
 import { ROUTES } from "appConstants";
+import TopContentComponent from "components/RecipeListing/TopContentComponent";
 
 const ProcessListComponent = (props) => {
-    let { processList } = props;
+    let { recipeDetails } = props;
 
     /**
      * get active login deck data
@@ -25,7 +26,16 @@ const ProcessListComponent = (props) => {
     return (
         <StyledProcessListing>
             <div className="landing-content px-2">
-                {/* TODO process listing page UI*/}
+
+                {/**
+                 * TopContentComponent: to show recipe details at top
+                 */}
+                <TopContentComponent 
+                    isProcessListingPage={true}
+                    recipeName={recipeDetails.name}
+                    createdAt={recipeDetails.created_at}
+                    updatedAt={recipeDetails.updated_at}
+                />
 
             </div>
             <AppFooter />
