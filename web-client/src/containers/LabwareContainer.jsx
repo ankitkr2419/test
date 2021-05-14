@@ -17,12 +17,24 @@ const LabwareContainer = (props) => {
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const currentDeckName = activeDeckObj.name;
+  const token = activeDeckObj.token;
 
   useEffect(() => {
-    dispatch(getTipsAndTubesActionInitiated({ deckName: currentDeckName }));
-    dispatch(getCartridgeActionInitiated({ deckName: currentDeckName }));
-    dispatch(getTipsActionInitiated({ deckName: currentDeckName }));
-    dispatch(getTubesActionInitiated({ deckName: currentDeckName }));
+    dispatch(
+      getTipsAndTubesActionInitiated({
+        deckName: currentDeckName,
+        token: token,
+      })
+    );
+    dispatch(
+      getCartridgeActionInitiated({ deckName: currentDeckName, token: token })
+    );
+    dispatch(
+      getTipsActionInitiated({ deckName: currentDeckName, token: token })
+    );
+    dispatch(
+      getTubesActionInitiated({ deckName: currentDeckName, token: token })
+    );
   }, [dispatch]);
   return <LabWareComponent />;
 };
