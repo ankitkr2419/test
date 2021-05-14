@@ -8,7 +8,7 @@ import {
 import OperatorLoginModal from "components/modals/OperatorLoginModal";
 
 import { login } from "../action-creators/loginActionCreators";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const OperatorLoginModalContainer = (props) => {
     const { operatorLoginModalOpen, toggleOperatorLoginModal, deckName } =
@@ -17,13 +17,8 @@ const OperatorLoginModalContainer = (props) => {
     const { SET_EMAIL, SET_PASSWORD, SET_EMAIL_INVALID, SET_PASSWORD_INVALID } =
         authDataStateActions;
 
-    const dispatch = useDispatch();
-    const loginReducer = useSelector((state) => state.loginReducer);
-    const loginReducerData = loginReducer.toJS();
-    let activeDeckObj =
-        loginReducerData &&
-        loginReducerData.decks.find((deck) => deck.isActive);
-    const [authData, setAuthData] = useReducer(reducer, initialState);
+  const dispatch = useDispatch();
+  const [authData, setAuthData] = useReducer(reducer, initialState);
 
     //change local state value of email
     const handleEmailChange = (event) => {
