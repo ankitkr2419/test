@@ -12,8 +12,10 @@ build:
 	go build -v -ldflags=" \
 	-X 'main.Version=v1.2.1' \
 	-X 'main.User=$(shell id -u -n)' \
-	-X 'main.Built=$(shell date)' \
-	-X 'main.CommitID=$(shell git rev-list -1 HEAD)'"
+	-X 'main.BuiltOn=$(shell date)' \
+	-X 'main.CommitID=$(shell git rev-list -1 HEAD)' \
+	-X 'main.Branch=$(shell git rev-parse --abbrev-ref HEAD)' \
+	-X 'main.Machine=$(shell hostname)'"
 	echo "binary created"
 
 zip:
