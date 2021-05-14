@@ -80,6 +80,14 @@ func (d *Compact32Deck) resetUVLightInProgress() {
 	uvLightInProgress.Store(d.name, false)
 }
 
+func (d *Compact32Deck) setPIDCalibrationInProgress() {
+	PIDCalibrationInProgress.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetPIDCalibrationInProgress() {
+	PIDCalibrationInProgress.Store(d.name, false)
+}
+
 func (d *Compact32Deck) setHomingPercent(percent float64) {
 	homingPercent.Store(d.name, percent)
 }
@@ -146,9 +154,19 @@ func (d *Compact32Deck) isShakerInProgress() bool {
 	}
 	return false
 }
+
 func (d *Compact32Deck) isUVLightInProgress() bool {
 	if temp, ok := uvLightInProgress.Load(d.name); !ok {
 		logger.Errorln("uvLightInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) isPIDCalibrationInProgress() bool {
+	if temp, ok := PIDCalibrationInProgress.Load(d.name); !ok {
+		logger.Errorln("PIDCalibrationInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}

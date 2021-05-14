@@ -147,6 +147,24 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return "ABORT UV LIGHT SUCCESS", nil
 	}
 
+	if d.isPIDCalibrationInProgress() {
+		//  Switch off Heater
+		response, err = d.switchOffHeater()
+		if err != nil {
+			logger.Errorln("couldn't switch OFF Heater", d.name, err)
+			return "", err
+		}
+		//  Switch off PID Calibration
+		response, err = d.switchOffPIDCalibration()
+		if err != nil {
+			logger.Errorln("couldn't switch OFF PID Calibration", d.name, err)
+			return "", err
+		}
+		d.setAborted()
+
+		return "ABORT PID CALIBRATION SUCCESS", nil
+	}
+
 	homed.Store(d.name, false)
 
 	logger.Infoln("switching motor off....")

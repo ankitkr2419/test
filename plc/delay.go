@@ -49,7 +49,7 @@ skipToStartTimer:
 			time.Sleep(time.Millisecond * 300)
 			if d.isMachineInAbortedState() {
 				t.Stop()
-				if d.isUVLightInProgress() {
+				if d.isUVLightInProgress() || d.isPIDCalibrationInProgress() {
 					d.resetAborted()
 				}
 				err = fmt.Errorf("Operation was ABORTED!")
@@ -76,6 +76,27 @@ skipToStartTimer:
 					d.WsErrCh <- err
 				}
 				d.WsMsgCh <- fmt.Sprintf("progress_uvLight_%v", string(wsData))
+			} else if d.isPIDCalibrationInProgress() {
+				pidtime := time.Now()
+				pidTimePassed := int64(pidtime.Sub(time1).Seconds()) + *timeElapsed
+				pidRemainingTime := delay.DelayTime - pidTimePassed
+				progress = (pidTimePassed * 100) / delay.DelayTime
+				wsProgressOperation := WSData{
+					Progress: float64(progress),
+					Deck:     d.name,
+					Status:   "PROGRESS_PIDCALIBRATION",
+					OperationDetails: OperationDetails{
+						Message:       fmt.Sprintf("progress_pidCalibration_pid calibration in progress for deck %s ", d.name),
+						RemainingTime: pidRemainingTime,
+					},
+				}
+
+				wsData, err := json.Marshal(wsProgressOperation)
+				if err != nil {
+					logger.Errorf("error in marshalling web socket data %v", err.Error())
+					d.WsErrCh <- err
+				}
+				d.WsMsgCh <- fmt.Sprintf("progress_pidCalibration_%v", string(wsData))
 			}
 			// if paused then
 			// when timer was paused go again to timer start
