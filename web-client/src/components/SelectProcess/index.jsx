@@ -6,8 +6,11 @@ import { ButtonBar, ButtonIcon, Text } from "shared-components";
 import AppFooter from "components/AppFooter";
 import Process from "./Process";
 import { HeadingTitle, PageBody, ProcessOuterBox, TopContent } from "./Style";
+import { useHistory } from "react-router";
+import { ROUTES, SELECT_PROCESS_PROPS } from "appConstants";
 
 const SelectProcessPageComponent = () => {
+  
   return (
     <>
       <PageBody>
@@ -26,31 +29,15 @@ const SelectProcessPageComponent = () => {
             <Card className="process-content-box">
               <CardBody className="p-0">
                 <Row className="row-small-gutter">
-                  <Process iconName="piercing" processName="Piercing" />
-                  <Process iconName="tip-pickup" processName="Tip Pickup" />
-                  <Process
-                    iconName="aspire-dispense"
-                    processName="Aspire & Dispense"
-                  />
-                  <Process iconName="shaking" processName="Shaking" />
-                  <Process iconName="heating" processName="Heating" />
-                  <Process iconName="magnet" processName="Magnet" />
-                  <Process iconName="tip-discard" processName="Tip Discard" />
-                  <Process iconName="delay" processName="Delay" />
-                  <Process iconName="tip-position" processName="Tip Position" />
-                  {/* <Col md={4}>
-									<div className="process-card bg-white d-flex align-items-center frame-icon">
-										<ButtonIcon
-												size={51}
-												name='piercing'
-												className="border-gray text-primary"
-												//onClick={toggleExportDataModal}
-										/>
-										<Text Tag="span" className="ml-2 process-name">
-											Piercing
-										</Text>
-									</div>
-								</Col> */}
+                  {SELECT_PROCESS_PROPS.map((propObj) => {
+                    return (
+                      <Process
+                        iconName={propObj.iconName}
+                        processName={propObj.processName}
+                        route={propObj.route}
+                      />
+                    );
+                  })}
                 </Row>
               </CardBody>
             </Card>

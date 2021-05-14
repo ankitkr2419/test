@@ -43,17 +43,20 @@ const LabWareComponent = (props) => {
     enableReinitialize: true,
   });
 
+
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const recipeDetailsReducer = useSelector(
+    (state) => state.updateRecipeDetailsReducer
+  );
+
+  const isSuccess = recipeDetailsReducer.isSuccess;
+
   useEffect(() => {
     if (isSuccess) {
       setShowConfirmModal(!showConfirmModal);
       dispatch(updateRecipeActionReset());
     }
   }, [isSuccess]);
-
-  const loginReducer = useSelector((state) => state.loginReducer);
-  const recipeDetailsReducer = useSelector(
-    (state) => state.updateRecipeDetailsReducer
-  );
 
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
@@ -71,8 +74,6 @@ const LabWareComponent = (props) => {
     recipeDetailsReducer.decks[deckIndex].cartridgeOptions;
   const newRecipeName =
     recipeDetailsReducer.decks[deckIndex].recipeDetails.name;
-
-  const isSuccess = recipeDetailsReducer.isSuccess;
 
   const handleSaveBtn = () => {
     const requestBody = getRequestBody(newRecipeName, formik.values);

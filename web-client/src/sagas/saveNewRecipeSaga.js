@@ -40,10 +40,9 @@ export function* updateRecipe(actions) {
 
 export function* getTipsAndTubes(actions) {
   //api call
-  const {
-    getTipsAndTubesFailure,
-    getTipsAndTubesSuccess,
-  } = getTipsAndTubesAction;
+  const { getTipsAndTubesFailure, getTipsAndTubesSuccess } =
+    getTipsAndTubesAction;
+  const token = actions.payload.token;
 
   try {
     yield call(callApi, {
@@ -55,6 +54,7 @@ export function* getTipsAndTubes(actions) {
         failureAction: getTipsAndTubesFailure,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token: token,
       },
     });
   } catch (error) {
@@ -66,6 +66,7 @@ export function* getTipsAndTubes(actions) {
 export function* getCartridge(actions) {
   //api call
   const { getCartridgeSuccess, getCartridgeFailure } = getCartridgeAction;
+  const token = actions.payload.token;
 
   try {
     yield call(callApi, {
@@ -77,6 +78,7 @@ export function* getCartridge(actions) {
         failureAction: getCartridgeFailure,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token: token,
       },
     });
   } catch (error) {
@@ -88,6 +90,7 @@ export function* getCartridge(actions) {
 // for tubes
 export function* getTubes(actions) {
   const { getTubesSuccess, getTubesFailure } = getTubesAction;
+  const token = actions.payload.token;
 
   try {
     yield call(callApi, {
@@ -99,6 +102,7 @@ export function* getTubes(actions) {
         failureAction: getTubesFailure,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token: token,
       },
     });
   } catch (error) {
@@ -110,6 +114,7 @@ export function* getTubes(actions) {
 //for tips
 export function* getTips(actions) {
   const { getTipsSuccess, getTipsFailure } = getTipsAction;
+  const token = actions.payload.token;
 
   try {
     yield call(callApi, {
@@ -121,6 +126,7 @@ export function* getTips(actions) {
         failureAction: getTipsFailure,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token: token,
       },
     });
   } catch (error) {

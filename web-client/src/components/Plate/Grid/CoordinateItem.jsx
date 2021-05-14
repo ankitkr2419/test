@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 const StyledCoordinateItem = styled.li`
 	display: flex;
+	text-align: center;
 	align-items: center;
 	justify-content: center;
 	font-size: 18px;

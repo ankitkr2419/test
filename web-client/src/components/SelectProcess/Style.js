@@ -17,6 +17,7 @@ margin-bottom:14px;
         line-height:21px;
         color: #666666;
     }
+	cursor: pointer;
 }
 `;
 
@@ -24,6 +25,7 @@ export const ProcessOuterBox = styled.div`
 .select-process-bg {
 	// background:black;
 	padding: 16px 94px;
+	// height: 459px;
 	&::after {
 		background:url('/images/process-bg.svg')no-repeat;
 		background-position: top right;

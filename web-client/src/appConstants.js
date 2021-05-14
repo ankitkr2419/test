@@ -59,6 +59,15 @@ export const ROUTES = {
   recipeListing: "recipe-listing",
   labware: "labware",
   selectProcess: "select-process",
+  piercing: "piercing",
+  tipPickup: "tip-pickup",
+  aspireDispense: "aspire-dispense",
+  shaking: "shaking",
+  heating: "heating",
+  magnet: "magnet",
+  tipDiscard: "tip-discard",
+  delay: "delay",
+  tipPosition: "tip-position",
 };
 
 export const API_ENDPOINTS = {
@@ -257,5 +266,33 @@ export const PROCESS_ICON_CONSTANTS = [
   {
     processType: "AttachDetach",
     iconName: "",
+  },
+];
+
+export const SELECT_PROCESS_PROPS = [
+  { iconName: "piercing", processName: "Piercing", route: ROUTES.piercing },
+  {
+    iconName: "tip-pickup",
+    processName: "Tip Pickup",
+    route: ROUTES.tipPickup,
+  },
+  {
+    iconName: "aspire-dispense",
+    processName: "Aspire & Dispense",
+    route: ROUTES.aspireDispense,
+  },
+  { iconName: "shaking", processName: "Shaking", route: ROUTES.shaking },
+  { iconName: "heating", processName: "Heating", route: ROUTES.heating },
+  { iconName: "magnet", processName: "Magnet", route: ROUTES.magnet },
+  {
+    iconName: "tip-discard",
+    processName: "Tip Discard",
+    route: ROUTES.tipDiscard,
+  },
+  { iconName: "delay", processName: "Delay", route: ROUTES.delay },
+  {
+    iconName: "tip-position",
+    processName: "Tip Position",
+    route: ROUTES.tipPosition,
   },
 ];
