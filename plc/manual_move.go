@@ -140,7 +140,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		//  Switch off UV Light
 		response, err = d.switchOffUVLight()
 		if err != nil {
-			fmt.Println("From deck ", d.name, err)
+			logger.Errorln("From deck ", d.name, err)
 			return "", err
 		}
 		d.setAborted()
