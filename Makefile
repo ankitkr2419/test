@@ -6,7 +6,7 @@ test-coverage:
 	go tool cover -html=coverage.out
 
 build:
-	sudo utils/build-binary.sh
+	sudo utils/build-yarn.sh
 	echo "building go code"
 	GOARCH=amd64 GOOS=linux
 	go build -v -ldflags=" \
