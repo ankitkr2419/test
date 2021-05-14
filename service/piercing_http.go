@@ -14,8 +14,9 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.PiercingInitialisedState)
 
-		var pobj db.Piercing
-		err := json.NewDecoder(req.Body).Decode(&pobj)
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
@@ -27,6 +28,16 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 			}
 
 		}()
+
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
+		var pobj db.Piercing
+
+		err = json.NewDecoder(req.Body).Decode(&pobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PiercingDecodeError.Error()})
@@ -41,7 +52,7 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdTemp db.Piercing
-		createdTemp, err = deps.Store.CreatePiercing(req.Context(), pobj)
+		createdTemp, err = deps.Store.CreatePiercing(req.Context(), pobj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.PiercingCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PiercingCreateError.Error()})

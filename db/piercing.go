@@ -44,7 +44,7 @@ type Piercing struct {
 	Type           CartridgeType `db:"type" json:"type" validate:"required"`
 	CartridgeWells pq.Int64Array `db:"cartridge_wells" json:"cartridge_wells" validate:"required"`
 	Discard        Discard       `db:"discard" json:"discard"`
-	ProcessID      uuid.UUID     `db:"process_id" json:"process_id" validate:"required"`
+	ProcessID      uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt      time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt      time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -67,42 +67,55 @@ func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err 
 	return
 }
 
-func (s *pgStore) CreatePiercing(ctx context.Context, pi Piercing) (createdPi Piercing, err error) {
+func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid.UUID) (createdAD Piercing, err error) {
 	var tx *sql.Tx
-
-	//update the process name before record creation
-	err = s.updateProcessName(ctx, pi.ProcessID, "Piercing", pi)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.PiercingUpdateNameError)
-		return
-	}
-
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
 		logger.WithField("err:", err.Error()).Errorln(responses.PiercingInitiateDBTxError)
-		return Piercing{}, err
+		return
 	}
 
-	createdPi, err = s.createPiercing(ctx, tx, pi)
-	// failures are already logged
-	// Commit the transaction else won't be able to Show
-
-	// End the transaction in defer call
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			logger.Errorln(responses.PiercingCreateError)
 			return
 		}
 		tx.Commit()
-		createdPi, err = s.ShowPiercing(ctx, createdPi.ProcessID)
+		createdAD, err = s.ShowPiercing(ctx, createdAD.ProcessID)
 		if err != nil {
-			logger.Infoln("Error Creating Piercing process")
+			logger.Errorln(responses.PiercingFetchError)
 			return
 		}
-		logger.Infoln("Created Piercing Process: ", createdPi)
+		logger.Infoln(responses.PiercingCreateSuccess, createdAD)
 		return
 	}()
 
+	// Get highest sequence number
+	// NOTE: failure already logged in internal calls
+
+	highestSeqNum, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		return
+	}
+	
+	process, err := s.processOperation(ctx, name, PiercingProcess, ad, Process{})
+	if err != nil {
+		return
+	}
+	// process has only a valid name
+	process.SequenceNumber = highestSeqNum + 1
+	process.Type = string(PiercingProcess)
+	process.RecipeID = recipeID
+
+	// create the process
+	process, err = s.createProcess(ctx, tx, process)
+	if err != nil {
+		return
+	}
+
+	ad.ProcessID = process.ID
+	createdAD, err = s.createPiercing(ctx, tx, ad)
 	return
 }
 

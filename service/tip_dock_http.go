@@ -12,23 +12,28 @@ import (
 
 func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.TipDockingInitialisedState)
 
-		var tdObj db.TipDock
-		err := json.NewDecoder(req.Body).Decode(&tdObj)
+		vars := mux.Vars(req)
 
+		recipeID, err := parseUUID(vars["recipe_id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.TipDockingCompletedState)
-
 			}
 
 		}()
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
+		var tdObj db.TipDock
+		err = json.NewDecoder(req.Body).Decode(&tdObj)
 
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipDockingDecodeError)
@@ -44,7 +49,7 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var tipDock db.TipDock
-		tipDock, err = deps.Store.CreateTipDocking(req.Context(), tdObj)
+		tipDock, err = deps.Store.CreateTipDocking(req.Context(), tdObj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipDockingCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipDockingCreateError.Error()})

@@ -42,7 +42,7 @@ skipToStartTimer:
 		select {
 		// wait for the timer to finish
 		case n := <-t.C:
-			fmt.Printf("delay time over %v", n)
+			logger.Infoln("delay time over ", n)
 			return "SUCCESS", nil
 		default:
 			// delay of 300 ms for checking the delay over time to avoid too much loop

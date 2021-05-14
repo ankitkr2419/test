@@ -54,7 +54,7 @@ func setStepRunInProgress(deck string) {
 	stepRunInProgress[deck] = true
 }
 
-func LoadUtils() {
+func loadUtils() {
 	userLogin.Store("A", false)
 	userLogin.Store("B", false)
 	runNext = map[string]bool{
@@ -188,4 +188,25 @@ func MD5Hash(s string) string {
 	hash := md5.Sum([]byte(s))
 
 	return hex.EncodeToString(hash[:])
+}
+
+func LoadAllServiceFuncs(s db.Storer) (err error) {
+	// Create a default supervisor
+	u := db.User{
+		Username: "supervisor",
+		Password: MD5Hash("supervisor"),
+		Role:     "supervisor",
+	}
+
+	// Add Default supervisor user to DB
+	err = s.InsertUser(context.Background(), u)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		return
+	}
+
+	logger.Info("Default user added")
+
+	loadUtils()
+	return nil
 }

@@ -15,20 +15,27 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.TipOperationInitialisedState)
 
-		var tipOpr db.TipOperation
-		err := json.NewDecoder(req.Body).Decode(&tipOpr)
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.TipOperationCompletedState)
-
 			}
 
 		}()
 
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
+		var tipOpr db.TipOperation
+		err = json.NewDecoder(req.Body).Decode(&tipOpr)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipOperationDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipOperationDecodeError.Error()})
@@ -43,7 +50,7 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var tipOperation db.TipOperation
-		tipOperation, err = deps.Store.CreateTipOperation(req.Context(), tipOpr)
+		tipOperation, err = deps.Store.CreateTipOperation(req.Context(), tipOpr, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipOperationCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipOperationCreateError.Error()})

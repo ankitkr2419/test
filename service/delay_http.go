@@ -15,9 +15,8 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.DelayInitialisedState)
 
-		var delay db.Delay
-		err := json.NewDecoder(req.Body).Decode(&delay)
-
+		vars := mux.Vars(req)
+		recipeID, err := parseUUID(vars["recipe_id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
@@ -30,6 +29,14 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 
 		}()
 
+		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
+		var delay db.Delay
+		err = json.NewDecoder(req.Body).Decode(&delay)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.DelayDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DelayDecodeError.Error()})
@@ -44,7 +51,7 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdTemp db.Delay
-		createdTemp, err = deps.Store.CreateDelay(req.Context(), delay)
+		createdTemp, err = deps.Store.CreateDelay(req.Context(), delay, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.DelayCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DelayCreateError.Error()})

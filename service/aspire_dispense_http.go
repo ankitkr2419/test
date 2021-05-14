@@ -16,8 +16,9 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		//logging when the api is initialised
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AspireDispenseInitialisedState)
 
-		var adobj db.AspireDispense
-		err := json.NewDecoder(req.Body).Decode(&adobj)
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
 
 		// for logging error if there is any otherwise logging success
 		defer func() {
@@ -32,6 +33,14 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
+		var adobj db.AspireDispense
+		err = json.NewDecoder(req.Body).Decode(&adobj)
+		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.AspireDispenseDecodeError.Error()})
 			return
@@ -45,7 +54,7 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdTemp db.AspireDispense
-		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj)
+		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.AspireDispenseCreateError.Error()})

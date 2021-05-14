@@ -14,8 +14,9 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.HeatingInitialisedState)
 
-		var htObj db.Heating
-		err := json.NewDecoder(req.Body).Decode(&htObj)
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
 
 		// for logging error if there is any otherwise logging success
 		defer func() {
@@ -30,6 +31,14 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
+			// This error is already logged
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
+		var htObj db.Heating
+		err = json.NewDecoder(req.Body).Decode(&htObj)
+		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.HeatingDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.HeatingDecodeError.Error()})
 			return
@@ -43,7 +52,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var createdTemp db.Heating
-		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj)
+		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj, recipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.HeatingCreateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.HeatingCreateError.Error()})
