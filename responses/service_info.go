@@ -40,4 +40,12 @@ var (
 	UserLogoutSuccess = "user successfully logged out"
 
 	ProcessesRearrangeSuccess = "rearranging processes success"
+
+	RecipeCreateSuccess    = "Recipe record created successfully"
+	RecipeFetchSuccess     = "Recipe record fetched successfully"
+	RecipeListFetchSuccess = "Recipe list fetched successfully"
+	RecipeUpdateSuccess    = "Recipe record updated successfully"
+	RecipeDeleteSuccess    = "Recipe record deleted successfully"
+	RecipePublishSuccess   = "Recipe published successfully"
+	RecipeUnPublishSuccess = "Recipe unpublished successfully"
 )
