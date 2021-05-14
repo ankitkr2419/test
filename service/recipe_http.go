@@ -159,6 +159,7 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 			publishFlag = false
 		default:
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidUrlArgument.Error()})
+			return
 		}
 
 		var recipe db.Recipe
