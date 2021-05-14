@@ -83,7 +83,8 @@ func (s *pgStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error) {
 }
 
 func (s *pgStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType,
-	oprType OperationType, deck, description, username string) (err error) {
+	oprType OperationType, deck, description string) (err error) {
+	username := ctx.Value(ContextKeyUsername).(string)
 
 	log := AuditLog{
 		Username:     username,

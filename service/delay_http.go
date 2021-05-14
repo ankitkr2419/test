@@ -13,8 +13,7 @@ import (
 func createDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.DelayInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.DelayInitialisedState)
 
 		var delay db.Delay
 		err := json.NewDecoder(req.Body).Decode(&delay)
@@ -22,10 +21,10 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.DelayCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.DelayCompletedState)
 
 			}
 
@@ -61,8 +60,7 @@ func showDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.DelayInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.DelayInitialisedState)
 
 		vars := mux.Vars(req)
 
@@ -71,10 +69,10 @@ func showDelayHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.DelayCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.DelayCompletedState)
 
 			}
 
@@ -103,18 +101,17 @@ func showDelayHandler(deps Dependencies) http.HandlerFunc {
 func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.DelayInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.DelayInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.DelayCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.DelayCompletedState)
 
 			}
 

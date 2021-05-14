@@ -14,8 +14,7 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AspireDispenseInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AspireDispenseInitialisedState)
 
 		var adobj db.AspireDispense
 		err := json.NewDecoder(req.Body).Decode(&adobj)
@@ -23,10 +22,10 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AspireDispenseCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AspireDispenseCompletedState)
 
 			}
 
@@ -40,7 +39,7 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(adobj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.AspireDispenseValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.AspireDispenseValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -61,18 +60,17 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.AspireDispenseInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.AspireDispenseInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AspireDispenseCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AspireDispenseCompletedState)
 
 			}
 
@@ -102,8 +100,7 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.AspireDispenseInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.AspireDispenseInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -111,10 +108,10 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AspireDispenseCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AspireDispenseCompletedState)
 
 			}
 
@@ -137,7 +134,7 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(adobj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.AspireDispenseValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.AspireDispenseValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}

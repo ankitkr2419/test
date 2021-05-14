@@ -13,8 +13,7 @@ import (
 func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.TipDockingInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.TipDockingInitialisedState)
 
 		var tdObj db.TipDock
 		err := json.NewDecoder(req.Body).Decode(&tdObj)
@@ -22,10 +21,10 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.TipDockingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.TipDockingCompletedState)
 
 			}
 
@@ -39,7 +38,7 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(tdObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.TipDockingValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.TipDockingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -60,8 +59,8 @@ func showTipDockHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.TipDockingInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.TipDockingInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -69,10 +68,10 @@ func showTipDockHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.TipDockingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.TipDockingCompletedState)
 
 			}
 
@@ -100,18 +99,18 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.TipDockingInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.TipDockingInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.TipDockingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.TipDockingCompletedState)
 
 			}
 
@@ -129,7 +128,7 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 		}
 		valid, respBytes := validate(tdObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.TipDockingValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.TipDockingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}

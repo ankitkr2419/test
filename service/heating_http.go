@@ -12,8 +12,7 @@ import (
 
 func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.HeatingInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.HeatingInitialisedState)
 
 		var htObj db.Heating
 		err := json.NewDecoder(req.Body).Decode(&htObj)
@@ -21,10 +20,10 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.HeatingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.HeatingCompletedState)
 
 			}
 
@@ -59,8 +58,7 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.HeatingInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.HeatingInitialisedState)
 
 		vars := mux.Vars(req)
 
@@ -69,10 +67,10 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.HeatingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.HeatingCompletedState)
 
 			}
 
@@ -99,8 +97,7 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.HeatingInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.HeatingInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -108,10 +105,10 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.HeatingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.HeatingCompletedState)
 
 			}
 

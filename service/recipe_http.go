@@ -12,18 +12,18 @@ import (
 
 func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeListInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeListInitialisedState)
 
 		list, err := deps.Store.ListRecipes(req.Context())
 
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeListCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeListCompletedState)
 
 			}
 
@@ -50,18 +50,17 @@ func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.RecipeInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.RecipeInitialisedState)
 
 		var recipe db.Recipe
 		err := json.NewDecoder(req.Body).Decode(&recipe)
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.RecipeCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.RecipeCompletedState)
 
 			}
 
@@ -103,8 +102,7 @@ func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeInitialisedState)
 
 		vars := mux.Vars(req)
 
@@ -112,10 +110,10 @@ func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeCompletedState)
 
 			}
 
@@ -150,18 +148,17 @@ func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.DeleteOperation, "", responses.RecipeInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.DeleteOperation, "", responses.RecipeInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.DeleteOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.DeleteOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.DeleteOperation, "", responses.RecipeCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.DeleteOperation, "", responses.RecipeCompletedState)
 
 			}
 
@@ -187,18 +184,17 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipeInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipeInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipeCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipeCompletedState)
 
 			}
 
@@ -240,8 +236,7 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipePublishedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipePublishedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -249,10 +244,10 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipePublishedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipePublishedState)
 
 			}
 

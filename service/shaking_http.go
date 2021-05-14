@@ -12,8 +12,8 @@ import (
 
 func createShakingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.ShakingInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.ShakingInitialisedState)
 
 		var shaObj db.Shaker
 		err := json.NewDecoder(req.Body).Decode(&shaObj)
@@ -21,10 +21,10 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.ShakingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.ShakingCompletedState)
 
 			}
 
@@ -38,7 +38,7 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(shaObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.ShakingValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -58,8 +58,8 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 func showShakingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.ShakingInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.ShakingInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -67,10 +67,10 @@ func showShakingHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.ShakingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.ShakingCompletedState)
 
 			}
 
@@ -97,18 +97,18 @@ func showShakingHandler(deps Dependencies) http.HandlerFunc {
 func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.ShakingInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.ShakingInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.ShakingCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.ShakingCompletedState)
 
 			}
 
@@ -127,7 +127,7 @@ func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 		}
 		valid, respBytes := validate(shObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.ShakingValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}

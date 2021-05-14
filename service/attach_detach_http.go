@@ -13,8 +13,7 @@ import (
 func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AttachDetachInitialisedState, username)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AttachDetachInitialisedState)
 
 		var adObj db.AttachDetach
 		err := json.NewDecoder(req.Body).Decode(&adObj)
@@ -22,10 +21,10 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AttachDetachCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AttachDetachCompletedState)
 
 			}
 
@@ -40,7 +39,7 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(adObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.AttachDetachValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.AttachDetachValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -61,8 +60,8 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 func showAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.AttachDetachInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.AttachDetachInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -70,10 +69,10 @@ func showAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AttachDetachCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AttachDetachCompletedState)
 
 			}
 
@@ -101,8 +100,8 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		username := req.Context().Value(contextKeyUsername).(string)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.AttachDetachInitialisedState, username)
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.AttachDetachInitialisedState)
 
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
@@ -110,10 +109,10 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error(), username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
 
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AttachDetachCompletedState, username)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AttachDetachCompletedState)
 
 			}
 
@@ -133,7 +132,7 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		}
 		valid, respBytes := validate(adObj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.AttachDetachValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.AttachDetachValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
