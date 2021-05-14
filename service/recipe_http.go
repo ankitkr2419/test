@@ -30,20 +30,13 @@ func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		respBytes, err := json.Marshal(list)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling recipe data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeListFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.RecipeListFetchError)
 			return
 		}
 
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.RecipeListFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, list)
 	})
 }
 
@@ -67,35 +60,29 @@ func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 		}()
 
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding recipe data")
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(recipe)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.RecipeValidationError)
 			responseBadRequest(rw, respBytes)
+
 			return
 		}
 
 		var createdTemp db.Recipe
 		createdTemp, err = deps.Store.CreateRecipe(req.Context(), recipe)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create recipe")
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeCreateError.Error()})
 			return
 		}
 
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling recipe data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.RecipeCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, createdTemp)
 	})
 }
 
@@ -119,7 +106,7 @@ func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		}()
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -127,21 +114,13 @@ func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowRecipe(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusNotFound)
-			logger.WithField("err", err.Error()).Error("Error show recipe")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(latestT)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling recipe data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.RecipeFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, latestT)
 	})
 }
 
@@ -164,20 +143,19 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		}()
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
 		err = deps.Store.DeleteRecipe(req.Context(), id)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while deleting recipe")
-			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error(responses.RecipeDeleteError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeDeleteError.Error()})
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"recipe deleted successfully"}`))
+		logger.Infoln(responses.RecipeUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RecipeDeleteSuccess})
 	})
 }
 
@@ -200,7 +178,7 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		}()
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -208,13 +186,14 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&recipe)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding recipe data")
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(recipe)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.RecipeValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -222,14 +201,13 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 		recipe.ID = id
 		err = deps.Store.UpdateRecipe(req.Context(), recipe)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update recipe")
+			logger.WithField("err", err.Error()).Error(responses.RecipeUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeUpdateError.Error()})
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"recipe updated successfully"}`))
+		logger.Infoln(responses.RecipeUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RecipeUpdateSuccess})
 	})
 }
 
@@ -238,6 +216,8 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipePublishedState)
 
+		var publishFlag bool
+		var successMsg string
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 
@@ -253,7 +233,20 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 		}()
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
+			return
+		}
+
+		//for more clarity, we take whole keywords(publish and unpublish) from the url
+		publish := vars["publish"]
+
+		switch publish {
+		case "publish":
+			publishFlag = true
+		case "unpublish":
+			publishFlag = false
+		default:
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidUrlArgument.Error()})
 			return
 		}
 
@@ -262,22 +255,35 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 		recipe.ID = id
 		recipe, err = deps.Store.ShowRecipe(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error show recipe")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
 			return
 		}
-		//TODO : publish recipe to the cloud when cloud is available.
 
-		recipe.IsPublished = true
+		if publishFlag == recipe.IsPublished {
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipePublishError.Error()})
+			logger.WithField("err", "PUBLISH_ERROR").Error(responses.RecipePublishError)
+			return
+
+		}
+		//TODO : check if the recipe is published on the cloud and if there then delete
+		// it from the cloud.
+		recipe.IsPublished = publishFlag
+
 		err = deps.Store.UpdateRecipe(req.Context(), recipe)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update recipe")
+			logger.WithField("err", err.Error()).Error(responses.RecipeUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeUpdateError.Error()})
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"recipe published successfully"}`))
+		if recipe.IsPublished {
+			successMsg = responses.RecipePublishSuccess
+		} else {
+			successMsg = responses.RecipeUnPublishSuccess
+		}
+
+		logger.Infoln(responses.RecipeUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: successMsg})
 	})
 }

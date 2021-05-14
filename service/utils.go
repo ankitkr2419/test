@@ -28,6 +28,8 @@ const (
 	supervisor = "supervisor"
 	engineer   = "engineer"
 	operator   = "operator"
+	deckA      = "A"
+	deckB      = "B"
 )
 
 var userLogin sync.Map
