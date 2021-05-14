@@ -44,7 +44,7 @@ var (
 	SafeToUpgrade          = "safe to upgrade the cpagent version"
 	TempSettingBothDeckRun = "temporary setting both deck run in progress"
 	ResettingBothDeckRun   = "resetting both deck run in progress"
-	
+
 	RecipeCreateSuccess    = "Recipe record created successfully"
 	RecipeFetchSuccess     = "Recipe record fetched successfully"
 	RecipeListFetchSuccess = "Recipe list fetched successfully"
