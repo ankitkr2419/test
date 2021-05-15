@@ -90,4 +90,15 @@ var (
 	RecipeDeleteSuccess    = "Recipe record deleted successfully"
 	RecipePublishSuccess   = "Recipe published successfully"
 	RecipeUnPublishSuccess = "Recipe unpublished successfully"
+
+	DiscardBoxInitialisedState     = "discard box operation initialised"
+	DiscardBoxCompletedState       = "discard box operation completed"
+	RestoreDeckInitialisedState    = "restore deck operation initialised"
+	RestoreDeckCompletedState      = "restore deck operation completed"
+	UvLightInitialisedState        = "uv light operation initialised"
+	UvLightCompletedState          = "uv light operation completed"
+	DiscardTipHomeInitialisedState = "discard tip and home operation initialised"
+	DiscardTipHomeCompletedState   = "discard tip and home operation completed"
+	UvCleanUpSuccess               = "uv light clean up in progress"
+	DiscardTipHomeSuccess          = "discard-tip-and-home in progress"
 )

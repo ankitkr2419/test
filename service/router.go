@@ -63,7 +63,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments/{id}/emission", getResultHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{id}/temperature", getTemperatureHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//usercreate
-	router.HandleFunc("/users/", authenticate(createUserHandler(deps), deps, supervisor)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/users", authenticate(createUserHandler(deps), deps, supervisor)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	//userlogin
 	router.HandleFunc("/login/{deck:[A-B]?}", validateUserHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	//userlogout

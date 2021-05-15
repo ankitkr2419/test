@@ -118,9 +118,10 @@ var (
 
 	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
 
-	RunRecipeWrongDeckError       = fmt.Errorf("error fetching cartridge record")
-	StepRunRecipeWrongDeckError   = fmt.Errorf("error fetching cartridge record")
+	WrongDeckError = fmt.Errorf("error invalid deck name")
+
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
+	DiscardBoolOptionError        = fmt.Errorf("Invalid boolean value for tip discard option")
 )
 
 // Special errors which are in []byte format

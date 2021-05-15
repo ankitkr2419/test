@@ -51,13 +51,12 @@ func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, MsgObj{Msg: responses.RunRecipeProgress, Deck: deck})
 
 		default:
-			err = responses.RunRecipeWrongDeckError
+			err = responses.WrongDeckError
 		}
 
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RunRecipeWrongDeckError.Error()})
-			logger.WithField("err", err.Error()).Error(responses.RunRecipeWrongDeckError)
-
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.WrongDeckError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.WrongDeckError)
 		}
 		return
 	})
@@ -87,13 +86,12 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 
 		default:
-			err = responses.RunRecipeWrongDeckError
+			err = responses.WrongDeckError
 		}
 
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.StepRunRecipeWrongDeckError.Error()})
-			logger.WithField("err", err.Error()).Error(responses.StepRunRecipeWrongDeckError)
-
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.WrongDeckError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.WrongDeckError)
 		}
 		return
 	})
@@ -116,7 +114,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	if deps.PlcDeck[deck].IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
-
 		return
 	}
 
@@ -132,7 +129,6 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
-
 		return "", err
 	}
 

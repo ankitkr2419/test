@@ -12,19 +12,17 @@ import (
 
 func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AttachDetachInitialisedState)
 
+		vars := mux.Vars(req)
 		recipeID, err := parseUUID(vars["recipe_id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AttachDetachCompletedState)
-
 			}
-
 		}()
 
 		if err != nil {
@@ -32,8 +30,6 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
 			return
 		}
-
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AttachDetachInitialisedState)
 
 		var adObj db.AttachDetach
 		err = json.NewDecoder(req.Body).Decode(&adObj)
@@ -77,12 +73,9 @@ func showAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AttachDetachCompletedState)
-
 			}
-
 		}()
 
 		if err != nil {
@@ -107,7 +100,6 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.AttachDetachInitialisedState)
 
 		vars := mux.Vars(req)
@@ -117,12 +109,9 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AttachDetachCompletedState)
-
 			}
-
 		}()
 
 		if err != nil {

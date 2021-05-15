@@ -24,10 +24,8 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AspireDispenseCompletedState)
-
 			}
 
 		}()
@@ -77,12 +75,9 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AspireDispenseCompletedState)
-
 			}
-
 		}()
 
 		if err != nil {
@@ -118,12 +113,9 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AspireDispenseCompletedState)
-
 			}
-
 		}()
 
 		if err != nil {

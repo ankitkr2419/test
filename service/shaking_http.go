@@ -15,7 +15,6 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.ShakingInitialisedState)
 
 		vars := mux.Vars(req)
-
 		recipeID, err := parseUUID(vars["recipe_id"])
 		// for logging error if there is any otherwise logging success
 		defer func() {
@@ -24,7 +23,6 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.ShakingCompletedState)
 			}
-
 		}()
 		if err != nil {
 			// This error is already logged
@@ -33,8 +31,6 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var shaObj db.Shaker
-		err = json.NewDecoder(req.Body).Decode(&shaObj)
-
 		err = json.NewDecoder(req.Body).Decode(&shaObj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ShakingDecodeError)

@@ -21,14 +21,10 @@ func listCartridgesHandler(deps Dependencies) http.HandlerFunc {
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
-
 			} else {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.CartridgeCompletedState)
-
 			}
-
 		}()
-
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CartridgeFetchError.Error()})
 			logger.WithField("err", err.Error()).Error(responses.CartridgeFetchError)
