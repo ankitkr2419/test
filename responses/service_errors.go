@@ -67,6 +67,15 @@ var (
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 
+	RecipeDecodeError     = fmt.Errorf("error decoding Recipe record")
+	RecipeValidationError = fmt.Errorf("error validating Recipe record")
+	RecipeCreateError     = fmt.Errorf("error creating Recipe record")
+	RecipeFetchError      = fmt.Errorf("error fetching Recipe record")
+	RecipeListFetchError  = fmt.Errorf("error fetching Recipe list")
+	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
+	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
+	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
+
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
 
@@ -79,6 +88,7 @@ var (
 	PreviousRunInProgressError = fmt.Errorf("error previous run already in progress... wait or abort it")
 	PickupPositionInvalid      = fmt.Errorf("position is invalid to pickup the tip")
 	WebsocketMarshallingError  = fmt.Errorf("error in marshalling web socket data")
+	UrlArgumentInvalid         = fmt.Errorf("error invalid url argument")
 
 	//user
 	UserDecodeError         = fmt.Errorf("error decoding user record")
@@ -105,6 +115,8 @@ var (
 	UserTokenAuthIdError        = fmt.Errorf("error auth_id not in token ")
 	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
 	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
+
+	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
 )
 
 // Special errors which are in []byte format
