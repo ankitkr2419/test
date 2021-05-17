@@ -48,7 +48,7 @@ func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 		switch deck {
 		case "A", "B":
 			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
-			responseCodeAndMsg(rw, http.StatusBadRequest, MsgObj{Msg: responses.RunRecipeProgress, Deck: deck})
+			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RunRecipeProgress, Deck: deck})
 
 		default:
 			err = responses.WrongDeckError
