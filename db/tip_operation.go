@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"time"
 
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 type TipOps string
@@ -46,7 +47,16 @@ type TipOperation struct {
 }
 
 func (s *pgStore) ShowTipOperation(ctx context.Context, id uuid.UUID) (dbTipOperation TipOperation, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.TipOperationInitialisedState)
+
 	err = s.db.Get(&dbTipOperation, getTipOperationQuery, id)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.TipOperationCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.TipOperationDBFetchError)
 		return
@@ -64,6 +74,8 @@ func (s *pgStore) ListTipOperation(ctx context.Context) (dbTipOperation []TipOpe
 }
 
 func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recipeID uuid.UUID) (createdAD TipOperation, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.TipOperationInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -75,6 +87,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.TipOperationCreateError)
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -84,6 +97,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 			return
 		}
 		logger.Infoln(responses.TipOperationCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.TipOperationCompletedState)
 		return
 	}()
 
@@ -94,7 +108,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, TipOperationProcess, ad, Process{})
 	if err != nil {
 		return
@@ -145,6 +159,8 @@ func (s *pgStore) DeleteTipOperation(ctx context.Context, id uuid.UUID) (err err
 }
 
 func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipOperationInitialisedState)
+
 	_, err = s.db.Exec(
 		updateTipOperationQuery,
 		t.Type,
@@ -152,6 +168,14 @@ func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err e
 		time.Now(),
 		t.ProcessID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipOperationCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating tip operation")
 		return

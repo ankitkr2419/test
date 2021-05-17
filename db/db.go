@@ -68,7 +68,7 @@ type Storer interface {
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
-	ListCartridges() ([]Cartridge, error)
+	ListCartridges(ctx context.Context) ([]Cartridge, error)
 	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
 	ShowTipOperation(context.Context, uuid.UUID) (TipOperation, error)

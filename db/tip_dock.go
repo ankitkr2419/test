@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"time"
 
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 type TipDock struct {
@@ -37,8 +38,16 @@ const (
 )
 
 func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.TipDockingInitialisedState)
 
 	err = s.db.Get(&td, getTipDockQuery, pid)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.TipDockingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.TipDockingDBFetchError)
 		return
@@ -47,6 +56,8 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 }
 
 func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uuid.UUID) (createdAD TipDock, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.TipDockingInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -58,6 +69,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.TipDockingCreateError)
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -67,6 +79,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 			return
 		}
 		logger.Infoln(responses.TipDockingCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.TipDockingCompletedState)
 		return
 	}()
 
@@ -77,7 +90,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, TipDockingProcess, ad, Process{})
 	if err != nil {
 		return
@@ -120,6 +133,8 @@ func (s *pgStore) createTipDocking(ctx context.Context, tx *sql.Tx, t TipDock) (
 }
 
 func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipDockingInitialisedState)
+
 	_, err = s.db.Exec(
 		updateTipDockQuery,
 		t.Type,
@@ -128,6 +143,13 @@ func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 		time.Now(),
 		t.ProcessID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipDockingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating TipDocking")
 		return

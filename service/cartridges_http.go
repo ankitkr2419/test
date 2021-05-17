@@ -12,17 +12,17 @@ func listCartridgesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//logging when the api is initialised
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.CartridgeInitialisedState)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.CartridgeListInitialisedState)
 
 		var cartridges []db.Cartridge
-		cartridges, err := deps.Store.ListCartridges()
+		cartridges, err := deps.Store.ListCartridges(req.Context())
 
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.CartridgeCompletedState)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.CartridgeListCompletedState)
 			}
 		}()
 		if err != nil {

@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/google/uuid"
 	"mylab/cpagent/responses"
+
+	"github.com/google/uuid"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -84,16 +85,42 @@ type AspireDispense struct {
 }
 
 func (s *pgStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (dbAspireDispense AspireDispense, err error) {
+	// logging initialised db operation
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseInitialisedState)
 	err = s.db.Get(&dbAspireDispense, getAspireDispenseQuery, id)
+
+	//logging error if there is any otherwise logging success
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDBFetchError)
 		return
 	}
+
 	return
 }
 
 func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []AspireDispense, err error) {
+
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseListInitialisedState)
+
 	err = s.db.Select(&dbAspireDispense, selectAspireDispenseQuery)
+
+	//logging error if there is any otherwise logging success
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseListCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching aspire dispense")
 		return
@@ -101,8 +128,10 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 	return
 }
 
-
 func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, recipeID uuid.UUID) (createdAD AspireDispense, err error) {
+	// logging initialised db operation
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.AspireDispenseInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -114,6 +143,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.AspireDispenseCreateError)
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -123,6 +153,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 			return
 		}
 		logger.Infoln(responses.AspireDispenseCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.AspireDispenseCompletedState)
 		return
 	}()
 
@@ -133,7 +164,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, AspireDispenseProcess, ad, Process{})
 	if err != nil {
 		return
@@ -194,6 +225,9 @@ func (s *pgStore) DeleteAspireDispense(ctx context.Context, id uuid.UUID) (err e
 }
 
 func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (err error) {
+	// logging initialised db operation
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AspireDispenseInitialisedState)
+
 	_, err = s.db.Exec(
 		updateAspireDispenseQuery,
 		ad.Category,
@@ -211,6 +245,15 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 		time.Now(),
 		ad.ID,
 	)
+	//logging error if there is any otherwise logging success
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AspireDispenseCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating aspire dispense")
 		return
