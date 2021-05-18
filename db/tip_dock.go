@@ -15,7 +15,7 @@ type TipDock struct {
 	Type      string    `json:"type" db:"type" validate:"required"`
 	Position  int64     `json:"position" db:"position" validate:"required"`
 	Height    float64   `json:"height" db:"height" validate:"required"`
-	ProcessID uuid.UUID `json:"process_id" db:"process_id" validate:"required"`
+	ProcessID uuid.UUID `json:"process_id" db:"process_id"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -46,46 +46,59 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 	return
 }
 
-func (s *pgStore) CreateTipDocking(ctx context.Context, td TipDock) (createdTD TipDock, err error) {
+func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uuid.UUID) (createdAD TipDock, err error) {
 	var tx *sql.Tx
-
-	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, td.ProcessID, "TipDocking", td)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.TipDockingUpdateNameError)
-		return
-	}
-
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
 		logger.WithField("err:", err.Error()).Errorln(responses.TipDockingInitiateDBTxError)
-		return TipDock{}, err
+		return
 	}
 
-	createdTD, err = s.createTipDocking(ctx, td, tx)
-	// failures are already logged
-	// Commit the transaction else won't be able to Show
-
-	// End the transaction in defer call
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			logger.Errorln(responses.TipDockingCreateError)
 			return
 		}
 		tx.Commit()
-		createdTD, err = s.ShowTipDocking(ctx, createdTD.ProcessID)
+		createdAD, err = s.ShowTipDocking(ctx, createdAD.ProcessID)
 		if err != nil {
-			logger.Infoln("Error Creating Tip Docking process")
+			logger.Errorln(responses.TipDockingFetchError)
 			return
 		}
-		logger.Infoln("Created Tip Docking Process: ", createdTD)
+		logger.Infoln(responses.TipDockingCreateSuccess, createdAD)
 		return
 	}()
 
+	// Get highest sequence number
+	// NOTE: failure already logged in internal calls
+
+	highestSeqNum, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		return
+	}
+	
+	process, err := s.processOperation(ctx, name, TipDockingProcess, ad, Process{})
+	if err != nil {
+		return
+	}
+	// process has only a valid name
+	process.SequenceNumber = highestSeqNum + 1
+	process.Type = string(TipDockingProcess)
+	process.RecipeID = recipeID
+
+	// create the process
+	process, err = s.createProcess(ctx, tx, process)
+	if err != nil {
+		return
+	}
+
+	ad.ProcessID = process.ID
+	createdAD, err = s.createTipDocking(ctx, tx, ad)
 	return
 }
 
-func (s *pgStore) createTipDocking(ctx context.Context, t TipDock, tx *sql.Tx) (createdTD TipDock, err error) {
+func (s *pgStore) createTipDocking(ctx context.Context, tx *sql.Tx, t TipDock) (createdTD TipDock, err error) {
 
 	var lastInsertID uuid.UUID
 

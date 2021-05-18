@@ -39,6 +39,7 @@ func listProcessesHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+// This Handler will be used when we need entry inside only processes table
 func createProcessHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var process db.Process
@@ -187,6 +188,39 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		logger.Infoln(responses.ProcessDuplicationSuccess)
-		responseCodeAndMsg(rw, http.StatusOK, process)
+		responseCodeAndMsg(rw, http.StatusCreated, process)
+	})
+}
+
+func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeIDInvalidError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+		}
+
+		var sequenceArr []db.ProcessSequence
+
+		err = json.NewDecoder(req.Body).Decode(&sequenceArr)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessesDecodeSeqError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessesDecodeSeqError.Error()})
+			return
+		}
+
+		logger.Infoln("Sequence Array: ", sequenceArr)
+
+		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessesRearrangeError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessesRearrangeError.Error()})
+			return
+		}
+
+		logger.Infoln(responses.ProcessesRearrangeSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, processes)
 	})
 }

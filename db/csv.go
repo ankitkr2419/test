@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
-
 	_ "github.com/lib/pq"
 	logger "github.com/sirupsen/logrus"
 )
@@ -123,39 +121,26 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 // NOTE: Passing db connection as function parameter isn't the best approach
 // But this avoids populating Storer interface with CSV Methods
 func createProcesses(record []string, store Storer) (err error) {
-	sequenceNumber++
 
-	p := Process{
-		Name:           "Process",
-		Type:           strings.TrimSpace(record[0]),
-		SequenceNumber: sequenceNumber,
-		RecipeID:       createdRecipe.ID,
-	}
-	// Insert into processes, note created processID
-	createdProcess, err := store.CreateProcess(context.Background(), p)
-	if err != nil {
-		logger.Errorln("Error creating Process: ", p)
-		return
-	}
 	// Create database entry for individual process here
 	// based on the name in record[0]
 	switch strings.TrimSpace(record[0]) {
 	case "AspireDispense":
-		err = createAspireDispenseProcess(record[1:], createdProcess.ID, store)
+		err = createAspireDispenseProcess(record[1:], store)
 	case "AttachDetach":
-		err = createAttachDetachProcess(record[1:], createdProcess.ID, store)
+		err = createAttachDetachProcess(record[1:], store)
 	case "Delay":
-		err = createDelayProcess(record[1:], createdProcess.ID, store)
+		err = createDelayProcess(record[1:], store)
 	case "Piercing":
-		err = createPiercingProcess(record[1:], createdProcess.ID, store)
+		err = createPiercingProcess(record[1:], store)
 	case "TipOperation":
-		err = createTipOperationProcess(record[1:], createdProcess.ID, store)
+		err = createTipOperationProcess(record[1:], store)
 	case "TipDocking":
-		err = createTipDockingProcess(record[1:], createdProcess.ID, store)
+		err = createTipDockingProcess(record[1:], store)
 	case "Shaking":
-		err = createShakingProcess(record[1:], createdProcess.ID, store)
+		err = createShakingProcess(record[1:], store)
 	case "Heating":
-		err = createHeatingProcess(record[1:], createdProcess.ID, store)
+		err = createHeatingProcess(record[1:], store)
 	default:
 		err = fmt.Errorf("unknown process found in csv!: %v ", record[0])
 	}
@@ -167,8 +152,8 @@ func createProcesses(record []string, store Storer) (err error) {
 }
 
 // WARN: DB changes will also need to be reflected in below functions!
-func createAspireDispenseProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside aspire dispense create Process. Record: ", record, ". ProcessID:", processID)
+func createAspireDispenseProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside aspire dispense create Process. Record: ", record)
 
 	//  record[0] is Category
 	if len(record[0]) != 2 {
@@ -177,10 +162,7 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 		return
 	}
 
-	a := AspireDispense{
-		ProcessID: processID,
-	}
-
+	a := AspireDispense{}
 	switch {
 	case strings.EqualFold(strings.TrimSpace(record[0]), "WS"):
 		a.Category = WS
@@ -260,7 +242,7 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 		return
 	}
 
-	createdProcess, err := store.CreateAspireDispense(context.Background(), a)
+	createdProcess, err := store.CreateAspireDispense(context.Background(), a, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -271,16 +253,15 @@ func createAspireDispenseProcess(record []string, processID uuid.UUID, store Sto
 	return nil
 }
 
-func createAttachDetachProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside attach detach create Process. Record: ", record, ". ProcessID:", processID)
+func createAttachDetachProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside attach detach create Process. Record: ", record)
 	a := AttachDetach{
 		Operation: record[0],
-		ProcessID: processID,
 		// TODO: Remove this hardcoding in future when magnet_operation_subtype will be used
 		OperationType: "lysis",
 	}
 
-	createdProcess, err := store.CreateAttachDetach(context.Background(), a)
+	createdProcess, err := store.CreateAttachDetach(context.Background(), a, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -291,12 +272,10 @@ func createAttachDetachProcess(record []string, processID uuid.UUID, store Store
 	return nil
 }
 
-func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside delay create Process. Record: ", record, ". ProcessID:", processID)
+func createDelayProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside delay create Process. Record: ", record)
 
-	d := Delay{
-		ProcessID: processID,
-	}
+	d := Delay{}
 	if delay, err := strconv.ParseInt(record[0], 10, 64); err != nil {
 		logger.Errorln(err, record[0])
 		return err
@@ -304,7 +283,7 @@ func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err
 		d.DelayTime = delay
 	}
 
-	createdProcess, err := store.CreateDelay(context.Background(), d)
+	createdProcess, err := store.CreateDelay(context.Background(), d, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -314,12 +293,11 @@ func createDelayProcess(record []string, processID uuid.UUID, store Storer) (err
 	return nil
 }
 
-func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside piercing create Process. Record: ", record, ". ProcessID:", processID)
+func createPiercingProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside piercing create Process. Record: ", record)
 
 	p := Piercing{
-		ProcessID: processID,
-		Discard:   at_discard_box,
+		Discard: at_discard_box,
 	}
 
 	// record[0] is CartridgeType
@@ -347,7 +325,7 @@ func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (
 
 	logger.Debugln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
 
-	createdProcess, err := store.CreatePiercing(context.Background(), p)
+	createdProcess, err := store.CreatePiercing(context.Background(), p, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -358,12 +336,10 @@ func createPiercingProcess(record []string, processID uuid.UUID, store Storer) (
 	return nil
 }
 
-func createTipOperationProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside tip operation create Process. Record: ", record, ". ProcessID:", processID)
+func createTipOperationProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside tip operation create Process. Record: ", record)
 
-	t := TipOperation{
-		ProcessID: processID,
-	}
+	t := TipOperation{}
 
 	t.Type = TipOps(record[0])
 	if t.Type == PickupTip {
@@ -373,7 +349,7 @@ func createTipOperationProcess(record []string, processID uuid.UUID, store Store
 		}
 	}
 
-	createdProcess, err := store.CreateTipOperation(context.Background(), t)
+	createdProcess, err := store.CreateTipOperation(context.Background(), t, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -384,12 +360,10 @@ func createTipOperationProcess(record []string, processID uuid.UUID, store Store
 	return nil
 }
 
-func createTipDockingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside tip docking create Process. Record: ", record, ". ProcessID:", processID)
+func createTipDockingProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside tip docking create Process. Record: ", record)
 
-	t := TipDock{
-		ProcessID: processID,
-	}
+	t := TipDock{}
 
 	t.Type = record[0]
 	if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil {
@@ -397,7 +371,7 @@ func createTipDockingProcess(record []string, processID uuid.UUID, store Storer)
 		return err
 	}
 
-	createdProcess, err := store.CreateTipDocking(context.Background(), t)
+	createdProcess, err := store.CreateTipDocking(context.Background(), t, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -408,12 +382,10 @@ func createTipDockingProcess(record []string, processID uuid.UUID, store Storer)
 	return nil
 }
 
-func createShakingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside shaking create Process. Record: ", record, ". ProcessID:", processID)
+func createShakingProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside shaking create Process. Record: ", record)
 
-	s := Shaker{
-		ProcessID: processID,
-	}
+	s := Shaker{}
 
 	if s.WithTemp, err = strconv.ParseBool(record[0]); err != nil {
 		logger.Errorln(err, record[0])
@@ -457,7 +429,7 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 		s.Time2 = time2
 	}
 
-	createdProcess, err := store.CreateShaking(context.Background(), s)
+	createdProcess, err := store.CreateShaking(context.Background(), s, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -468,12 +440,10 @@ func createShakingProcess(record []string, processID uuid.UUID, store Storer) (e
 	return nil
 }
 
-func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (err error) {
-	logger.Info("Inside heating create Process. Record: ", record, ". ProcessID:", processID)
+func createHeatingProcess(record []string, store Storer) (err error) {
+	logger.Info("Inside heating create Process. Record: ", record)
 
-	h := Heating{
-		ProcessID: processID,
-	}
+	h := Heating{}
 
 	// Current Temperature is accurate only to 1 decimal point
 	// While sending it to PLC  we need to multiply by 10
@@ -495,7 +465,7 @@ func createHeatingProcess(record []string, processID uuid.UUID, store Storer) (e
 		h.Duration = time1
 	}
 
-	createdProcess, err := store.CreateHeating(context.Background(), h)
+	createdProcess, err := store.CreateHeating(context.Background(), h, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return

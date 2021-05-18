@@ -7,43 +7,18 @@ import {
 } from "components/modals/OperatorLoginModal/state";
 import OperatorLoginModal from "components/modals/OperatorLoginModal";
 
-// import { operatorLoginInitiated } from "action-creators/operatorLoginModalActionCreators";
 import { login } from "../action-creators/loginActionCreators";
-import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router";
-import { ROUTES } from "../appConstants";
+import { useDispatch } from "react-redux";
 
 const OperatorLoginModalContainer = (props) => {
-    const {
-        operatorLoginModalOpen,
-        toggleOperatorLoginModal,
-        deckName,
-    } = props;
+    const { operatorLoginModalOpen, toggleOperatorLoginModal, deckName } =
+        props;
 
-    const {
-        SET_EMAIL,
-        SET_PASSWORD,
-        SET_EMAIL_INVALID,
-        SET_PASSWORD_INVALID,
-    } = authDataStateActions;
+    const { SET_EMAIL, SET_PASSWORD, SET_EMAIL_INVALID, SET_PASSWORD_INVALID } =
+        authDataStateActions;
 
-    const dispatch = useDispatch();
-    // const operatorLoginModalReducer = useSelector(
-    //     (state) => state.operatorLoginModalReducer
-    // );
-    // const { isOperatorLoggedIn, error, msg } = operatorLoginModalReducer.toJS();
-
-    // const operatorLoginModalReducer = useSelector((state) => state.operatorLoginModalReducer);
-    // const { isOperatorLoggedIn, error } = operatorLoginModalReducer.toJS();
-
-    const loginReducer = useSelector((state) => state.loginReducer);
-    const loginReducerData = loginReducer.toJS();
-    let activeDeckObj =
-        loginReducerData &&
-        loginReducerData.decks.find((deck) => deck.isActive);
-    let { isLoggedIn, error } = activeDeckObj ? activeDeckObj : {};
-    const [authData, setAuthData] = useReducer(reducer, initialState);
-
+  const dispatch = useDispatch();
+  const [authData, setAuthData] = useReducer(reducer, initialState);
 
     //change local state value of email
     const handleEmailChange = (event) => {
@@ -66,7 +41,6 @@ const OperatorLoginModalContainer = (props) => {
     const handleLoginButtonClick = () => {
         const emailValue = authData.email.value; //emailValue example => username@role.com
         const password = authData.password.value;
-        // dispatch(operatorLoginInitiated({email:email, password: password, deckName: deckName, role: "admin"}));
         let role = emailValue
             ? emailValue.split("@").pop().split(".")[0]
             : undefined;
@@ -74,19 +48,6 @@ const OperatorLoginModalContainer = (props) => {
 
         dispatch(login({ email, password, deckName, role }));
     };
-
-    // dispatch(
-    //     operatorLoginInitiated({
-    //         email: email,
-    //         password: password,
-    //         deckName: deckName,
-    //         role: "admin",
-    //     })
-    // );
-
-    if (isLoggedIn && !error) {
-        return <Redirect to={`/${ROUTES.recipeListing}`} />;
-    }
 
     return (
         <OperatorLoginModal

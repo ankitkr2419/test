@@ -82,7 +82,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 
 	// TODO: Check if adding && !d.isCompletionBitSet() is suited below
 	// completion bit shouldn't be set or it means run was already completed
-	
+
 	if !d.isTimerInProgress() {
 		response, err = d.readExecutedPulses()
 		if err != nil {
@@ -136,6 +136,17 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 	logger.Infoln("aborting the operation....")
 
+	if d.isUVLightInProgress() {
+		//  Switch off UV Light
+		response, err = d.switchOffUVLight()
+		if err != nil {
+			logger.Errorln("From deck ", d.name, err)
+			return "", err
+		}
+		d.setAborted()
+		return "ABORT UV LIGHT SUCCESS", nil
+	}
+
 	homed.Store(d.name, false)
 
 	logger.Infoln("switching motor off....")
@@ -148,13 +159,6 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	response, err = d.switchOffHeater()
 	if err != nil {
 		logger.Errorln("From deck ", d.name, err)
-		return "", err
-	}
-
-	//  Switch off UV Light
-	response, err = d.switchOffUVLight()
-	if err != nil {
-		fmt.Println("From deck ", d.name, err)
 		return "", err
 	}
 

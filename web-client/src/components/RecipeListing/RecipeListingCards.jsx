@@ -15,6 +15,7 @@ const RecipeListingCards = (props) => {
         returnRecipeDetails,
         toggleRunRecipesModal,
         handlePublishModalClick,
+        handleEditRecipe,
     } = props;
 
     return (
@@ -49,6 +50,9 @@ const RecipeListingCards = (props) => {
                                     }
                                     handlePublishModalClick={(recipeId) =>
                                         handlePublishModalClick(recipeId)
+                                    }
+                                    handleEditRecipe={() =>
+                                        handleEditRecipe(recipe)
                                     }
                                 />
                             </Col>

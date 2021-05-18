@@ -62,6 +62,8 @@ var (
 	ProcessIDInvalidError   = fmt.Errorf("error process id is invalid")
 	ProcessDuplicationError = fmt.Errorf("error creating duplicate process record")
 	ProcessTypeInvalid      = fmt.Errorf("error process type is wrong")
+	ProcessesRearrangeError = fmt.Errorf("error rearranging processes")
+	ProcessesDecodeSeqError = fmt.Errorf("error while decoding process sequence data")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 
@@ -69,6 +71,32 @@ var (
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
 
 	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
+
+	//user
+	UserDecodeError         = fmt.Errorf("error decoding user record")
+	UserDeckLoginError      = fmt.Errorf("error login in deck")
+	UserInvalidError        = fmt.Errorf("error invalid user")
+	UserAuthError           = fmt.Errorf("error in storing user authentication data")
+	UserTokenEncodeError    = fmt.Errorf("error in fetching token")
+	UserMarshallingError    = fmt.Errorf("error in marshalling token")
+	UserInsertError         = fmt.Errorf("error in inserting user")
+	UserAuthDataFetchError  = fmt.Errorf("error in authenticating user")
+	UserAuthDataDeleteError = fmt.Errorf("error in deleting authenticated user data")
+	UserInvalidDeckError    = fmt.Errorf("error invalid deck")
+
+	//user authenticate
+	UserUnauthorised            = fmt.Errorf("error user unauthorised")
+	UserTokenEmptyError         = fmt.Errorf("error empty token")
+	UserTokenDecodeError        = fmt.Errorf("error in decoding token")
+	UserTokenRoleEmptyError     = fmt.Errorf("error failed to fetch role")
+	UserTokenDeckError          = fmt.Errorf("error failed to fetch deck")
+	UserTokenInvalidRoleError   = fmt.Errorf("error invalid role")
+	UserTokenCrossDeckError     = fmt.Errorf("error wrong token for deck")
+	UserTokenLoggedOutDeckError = fmt.Errorf("error already logged out ")
+	UserTokenUsernameError      = fmt.Errorf("error username not in token ")
+	UserTokenAuthIdError        = fmt.Errorf("error auth_id not in token ")
+	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
+	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
 )
 
 // Special errors which are in []byte format

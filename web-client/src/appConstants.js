@@ -58,6 +58,8 @@ export const ROUTES = {
   splashScreen: "splashscreen",
   recipeListing: "recipe-listing",
   labware: "labware",
+  processListing: "process-listing",
+  selectProcess: "select-process",
 };
 
 export const API_ENDPOINTS = {
@@ -69,8 +71,13 @@ export const API_ENDPOINTS = {
   discardDeck: "discard-box/cleanup",
   restoreDeck: "restore-deck",
   recipeListing: "recipes",
+  saveAndUpdateRecipes: "recipes",
   discardTipAndHoming: "discard-tip-and-home",
   cleanUp: "uv",
+  tipsTubes: "tips-tubes",
+  cartridge: "cartridges",
+  tubes: "tube",
+  tips: "tip",
   stepRun: "step-run",
   runNextStep: "run-next-step",
 };
@@ -82,7 +89,7 @@ export const MODAL_MESSAGE = {
   abortConfirmation: "Are you sure you want to abort now?",
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",
-  publishConfirmation: "Are you sure you want to Publish this recipe?"
+  publishConfirmation: "Are you sure you want to Publish this recipe?",
 };
 
 export const MODAL_BTN = {
@@ -114,7 +121,7 @@ export const DECKCARD_BTN = {
     pause: "pause",
     done: "done",
     resume: "resume",
-    next: "next"
+    next: "next",
   },
 };
 
@@ -144,77 +151,67 @@ export const LABWARE_ITEMS_NAME = [
   "Deck Position 4",
 ];
 
-export const LABWARE_TIPS_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_1_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_2_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_3_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_DECK_POS_4_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_CARTRIDGE_1_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
-export const LABWARE_CARTRIDGE_2_OPTIONS = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-  { value: "option4", label: "Option 4" },
-  { value: "option5", label: "Option 5" },
-];
-
 // do not change the order!
 export const LABWARE_INITIAL_STATE = {
-  tips: { tipPosition1: null, tipPosition2: null, tipPosition3: null },
-  tipPiercing: { position1: false, position2: false },
-  deckPosition1: { tubeType: null },
-  deckPosition2: { tubeType: null },
-  cartridge1: { cartridgeType: null },
-  deckPosition3: { tubeType: null },
-  cartridge2: { cartridgeType: null },
-  deckPosition4: { tubeType: null },
+  tips: {
+    isTicked: false,
+    processDetails: {
+      tipPosition1: { id: null, label: null },
+      tipPosition2: { id: null, label: null },
+      tipPosition3: { id: null, label: null },
+    },
+  },
+  tipPiercing: {
+    isTicked: false,
+    processDetails: { position1: { id: null }, position2: { id: null } },
+  },
+  deckPosition1: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
+  deckPosition2: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
+  cartridge1: {
+    isTicked: false,
+    processDetails: { cartridgeType: { id: null, label: null } },
+  },
+  deckPosition3: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
+  cartridge2: {
+    isTicked: false,
+    processDetails: { cartridgeType: { id: null, label: null } },
+  },
+  deckPosition4: {
+    isTicked: false,
+    processDetails: { tubeType: { id: null, label: null } },
+  },
 };
+
 export const RUN_RECIPE_TYPE = {
   CONTINUOUS_RUN: 0,
   STEP_RUN: 1,
-}
+};
+
+export const LABWARE_NAME = {
+  tips: "Tips",
+  tipPosition1: "Tip Position 1",
+  tipPosition2: "Tip Position 2",
+  tipPosition3: "Tip Position 3",
+  tipPiercing: "Tip Piercing",
+  position1: "Position 1",
+  position2: "Position 2",
+  deckPosition1: "Deck Position 1",
+  deckPosition2: "Deck Position 2",
+  deckPosition3: "Deck Position 3",
+  deckPosition4: "Deck Position 4",
+  cartridge1: "Cartridge 1",
+  cartridge2: "Cartridge 2",
+  cartridgeType: "Cartridge Type",
+};
 
 /**
  * get process icon_name associated with processType
@@ -222,44 +219,44 @@ export const RUN_RECIPE_TYPE = {
 export const PROCESS_ICON_CONSTANTS = [
   //if processType not found, use default process icon
   {
-    processType: 'default',
-    iconName: 'process'
+    processType: "default",
+    iconName: "process",
   },
 
   //other icons:
   {
-    processType: 'Piercing',
-    iconName: 'piercing'
+    processType: "Piercing",
+    iconName: "piercing",
   },
   {
-    processType: 'AspireDispense',
-    iconName: 'aspire-dispense'
+    processType: "AspireDispense",
+    iconName: "aspire-dispense",
   },
   {
-    processType:  'Heating',
-    iconName: 'heating'
+    processType: "Heating",
+    iconName: "heating",
   },
   {
-    processType: 'Shaking', 
-    iconName: 'shaking'
+    processType: "Shaking",
+    iconName: "shaking",
   },
   {
-    processType: 'Delay',
-    iconName: 'delay'
+    processType: "Delay",
+    iconName: "delay",
   },
   /**TODO:
    * following icons not available in fonts.scss
    */
   {
-    processType: 'TipOperation',
-    iconName: ''
+    processType: "TipOperation",
+    iconName: "",
   },
   {
-    processType: 'TipDocking',
-    iconName: ''
+    processType: "TipDocking",
+    iconName: "",
   },
   {
-    processType: 'AttachDetach',
-    iconName: ''
+    processType: "AttachDetach",
+    iconName: "",
   },
-]
+];

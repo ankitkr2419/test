@@ -28,7 +28,7 @@ func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
 			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":%v,"deck":"%v"}`,response, deck)))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":%v,"deck":"%v"}`, response, deck)))
 			rw.WriteHeader(http.StatusOK)
 		}
 	})
@@ -55,7 +55,7 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 		} else {
 			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":%v,"deck":"%v"}`,response, deck)))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":%v,"deck":"%v"}`, response, deck)))
 			rw.WriteHeader(http.StatusOK)
 		}
 	})

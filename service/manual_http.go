@@ -67,7 +67,7 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			response += " Manual Movements in Progress/Done"
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, m.Deck)))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`, response, m.Deck)))
 			logger.Infoln(response)
 		}
 	})
@@ -95,7 +95,7 @@ func pauseHandler(deps Dependencies) http.HandlerFunc {
 		} else {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, deck)))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`, response, deck)))
 			logger.Infoln(response)
 		}
 	})
@@ -124,7 +124,7 @@ func resumeHandler(deps Dependencies) http.HandlerFunc {
 		} else {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, deck)))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`, response, deck)))
 			logger.Infoln(response)
 		}
 	})
@@ -154,7 +154,7 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 		} else {
 			rw.Header().Add("Content-Type", "application/json")
 			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`,response, deck)))
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`, response, deck)))
 			logger.Infoln(response)
 		}
 	})

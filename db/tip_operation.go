@@ -40,7 +40,7 @@ type TipOperation struct {
 	ID        uuid.UUID `db:"id" json:"id"`
 	Type      TipOps    `db:"type" json:"type" validate:"required"`
 	Position  int64     `db:"position" json:"position"`
-	ProcessID uuid.UUID `db:"process_id" json:"process_id" validate:"required"`
+	ProcessID uuid.UUID `db:"process_id" json:"process_id"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -63,46 +63,59 @@ func (s *pgStore) ListTipOperation(ctx context.Context) (dbTipOperation []TipOpe
 	return
 }
 
-func (s *pgStore) CreateTipOperation(ctx context.Context, to TipOperation) (createdTO TipOperation, err error) {
+func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recipeID uuid.UUID) (createdAD TipOperation, err error) {
 	var tx *sql.Tx
-
-	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, to.ProcessID, "TipOperation", to)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.TipOperationUpdateNameError)
-		return
-	}
-
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
 		logger.WithField("err:", err.Error()).Errorln(responses.TipOperationInitiateDBTxError)
-		return TipOperation{}, err
+		return
 	}
 
-	createdTO, err = s.createTipOperation(ctx, to, tx)
-	// failures are already logged
-	// Commit the transaction else won't be able to Show
-
-	// End the transaction in defer call
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			logger.Errorln(responses.TipOperationCreateError)
 			return
 		}
 		tx.Commit()
-		createdTO, err = s.ShowTipOperation(ctx, createdTO.ProcessID)
+		createdAD, err = s.ShowTipOperation(ctx, createdAD.ProcessID)
 		if err != nil {
-			logger.Infoln("Error Creating Tip Operation process")
+			logger.Errorln(responses.TipOperationFetchError)
 			return
 		}
-		logger.Infoln("Created Tip Operation Process: ", createdTO)
+		logger.Infoln(responses.TipOperationCreateSuccess, createdAD)
 		return
 	}()
 
+	// Get highest sequence number
+	// NOTE: failure already logged in internal calls
+
+	highestSeqNum, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		return
+	}
+	
+	process, err := s.processOperation(ctx, name, TipOperationProcess, ad, Process{})
+	if err != nil {
+		return
+	}
+	// process has only a valid name
+	process.SequenceNumber = highestSeqNum + 1
+	process.Type = string(TipOperationProcess)
+	process.RecipeID = recipeID
+
+	// create the process
+	process, err = s.createProcess(ctx, tx, process)
+	if err != nil {
+		return
+	}
+
+	ad.ProcessID = process.ID
+	createdAD, err = s.createTipOperation(ctx, tx, ad)
 	return
 }
 
-func (s *pgStore) createTipOperation(ctx context.Context, to TipOperation, tx *sql.Tx) (createdTipOperation TipOperation, err error) {
+func (s *pgStore) createTipOperation(ctx context.Context, tx *sql.Tx, to TipOperation) (createdTipOperation TipOperation, err error) {
 
 	var lastInsertID uuid.UUID
 

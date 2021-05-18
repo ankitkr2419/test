@@ -123,7 +123,6 @@ const RecipeListingComponent = (props) => {
         })
       );
       setTrayDiscardModal(!trayDiscardModal);
-      dispatch(loginReset(deckName));
       setNextModal(true);
     }
   };
@@ -157,6 +156,19 @@ const RecipeListingComponent = (props) => {
   const fileteredRecipeData = recipeData.filter((recipeObj) =>
     recipeObj.name.toLowerCase().includes(searchRecipeText.toLowerCase())
   );
+
+  const handleEditRecipe = (recipe) => {
+    let recipeId = recipe?.id;
+    if(!recipeId) {
+      console.error('recipeId not found');
+      return;
+    }
+
+    //TODO: save recipe in reducer to edit
+
+    //go to processList page of recipe
+    history.push(ROUTES.processListing);
+  }
 
   const getLogoutTextBody = () => {
     return `Are you sure you want to sign out of ${isAdmin ? "Admin" : "Operator"} role?`
@@ -271,6 +283,9 @@ const RecipeListingComponent = (props) => {
               }
               handlePublishModalClick={(recipeId) =>
                 handlePublishModalClick(recipeId)
+              }
+              handleEditRecipe={(recipe) => 
+                handleEditRecipe(recipe)
               }
             />
           )}

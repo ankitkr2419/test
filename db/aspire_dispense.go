@@ -78,7 +78,7 @@ type AspireDispense struct {
 	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
 	DispenseNoOfCycles   int64         `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
 	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
-	ProcessID            uuid.UUID     `db:"process_id" json:"process_id" validate:"required"`
+	ProcessID            uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt            time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -101,46 +101,60 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 	return
 }
 
-func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (createdAD AspireDispense, err error) {
+
+func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, recipeID uuid.UUID) (createdAD AspireDispense, err error) {
 	var tx *sql.Tx
-
-	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, ad.ProcessID, "AspireDispense", ad)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
-		return
-	}
-
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
 		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseInitiateDBTxError)
-		return AspireDispense{}, err
+		return
 	}
 
-	createdAD, err = s.createAspireDispense(ctx, ad, tx)
-	// failures are already logged
-	// Commit the transaction else won't be able to Show
-
-	// End the transaction in defer call
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			logger.Errorln(responses.AspireDispenseCreateError)
 			return
 		}
 		tx.Commit()
 		createdAD, err = s.ShowAspireDispense(ctx, createdAD.ProcessID)
 		if err != nil {
-			logger.Infoln("Error Creating AspireDispense process")
+			logger.Errorln(responses.AspireDispenseFetchError)
 			return
 		}
-		logger.Infoln("Created AspireDispense Process: ", createdAD)
+		logger.Infoln(responses.AspireDispenseCreateSuccess, createdAD)
 		return
 	}()
 
+	// Get highest sequence number
+	// NOTE: failure already logged in internal calls
+
+	highestSeqNum, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		return
+	}
+	
+	process, err := s.processOperation(ctx, name, AspireDispenseProcess, ad, Process{})
+	if err != nil {
+		return
+	}
+	// process has only a valid name
+	process.SequenceNumber = highestSeqNum + 1
+	process.Type = string(AspireDispenseProcess)
+	process.RecipeID = recipeID
+
+	// create the process
+	process, err = s.createProcess(ctx, tx, process)
+	if err != nil {
+		return
+	}
+
+	ad.ProcessID = process.ID
+	createdAD, err = s.createAspireDispense(ctx, tx, ad)
 	return
 }
 
-func (s *pgStore) createAspireDispense(ctx context.Context, ad AspireDispense, tx *sql.Tx) (a AspireDispense, err error) {
+func (s *pgStore) createAspireDispense(ctx context.Context, tx *sql.Tx, ad AspireDispense) (a AspireDispense, err error) {
 
 	var lastInsertID uuid.UUID
 

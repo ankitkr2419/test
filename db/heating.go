@@ -15,7 +15,7 @@ type Heating struct {
 	Temperature float64   `json:"temperature" db:"temperature" validate:"required,gte=20,lte=120"`
 	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
 	Duration    int64     `json:"duration" db:"duration" validate:"required,gte=10,lte=3660"`
-	ProcessID   uuid.UUID `json:"process_id" db:"process_id" validate:"required"`
+	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -50,47 +50,59 @@ func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heatin
 	return
 
 }
-
-func (s *pgStore) CreateHeating(ctx context.Context, h Heating) (createdH Heating, err error) {
+func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.UUID) (createdAD Heating, err error) {
 	var tx *sql.Tx
-
-	//update the process name before record creation
-	err = s.UpdateProcessName(ctx, h.ProcessID, "Heating", h)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.HeatingUpdateNameError)
-		return
-	}
-
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
 		logger.WithField("err:", err.Error()).Errorln(responses.HeatingInitiateDBTxError)
-		return Heating{}, err
+		return
 	}
 
-	createdH, err = s.createHeating(ctx, h, tx)
-	// failures are already logged
-	// Commit the transaction else won't be able to Show
-
-	// End the transaction in defer call
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			logger.Errorln(responses.HeatingCreateError)
 			return
 		}
 		tx.Commit()
-		createdH, err = s.ShowHeating(ctx, createdH.ProcessID)
+		createdAD, err = s.ShowHeating(ctx, createdAD.ProcessID)
 		if err != nil {
-			logger.Infoln("Error Creating Heating process")
+			logger.Errorln(responses.HeatingFetchError)
 			return
 		}
-		logger.Infoln("Created Heating Process: ", createdH)
+		logger.Infoln(responses.HeatingCreateSuccess, createdAD)
 		return
 	}()
 
+	// Get highest sequence number
+	// NOTE: failure already logged in internal calls
+
+	highestSeqNum, err := s.getProcessCount(ctx, tx, recipeID)
+	if err != nil {
+		return
+	}
+	
+	process, err := s.processOperation(ctx, name, HeatingProcess, ad, Process{})
+	if err != nil {
+		return
+	}
+	// process has only a valid name
+	process.SequenceNumber = highestSeqNum + 1
+	process.Type = string(HeatingProcess)
+	process.RecipeID = recipeID
+
+	// create the process
+	process, err = s.createProcess(ctx, tx, process)
+	if err != nil {
+		return
+	}
+
+	ad.ProcessID = process.ID
+	createdAD, err = s.createHeating(ctx, tx, ad)
 	return
 }
 
-func (s *pgStore) createHeating(ctx context.Context, h Heating, tx *sql.Tx) (createdH Heating, err error) {
+func (s *pgStore) createHeating(ctx context.Context, tx *sql.Tx, h Heating) (createdH Heating, err error) {
 
 	var lastInsertID uuid.UUID
 

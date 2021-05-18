@@ -3,7 +3,7 @@ import { FormGroup, Label, FormError, Select } from "core-components";
 import { CommmonTubeFields } from './CommmonTubeFields';
 
 const TubeSelection = (props) => {
-  const { handleOptionChange, options } = props;
+  const { handleOptionChange, options, value } = props;
   return (
     <>
       <CommmonTubeFields>
@@ -17,6 +17,7 @@ const TubeSelection = (props) => {
               placeholder="Select Option"
               className=""
               size="sm"
+              value={value}
               options={options}
               onChange={handleOptionChange}
             />
