@@ -1,14 +1,16 @@
 package service
 
 import (
+	"encoding/json"
+	"github.com/google/uuid"
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"mylab/cpagent/responses"
 	"github.com/stretchr/testify/suite"
+	"mylab/cpagent/responses"
 )
 
 // Define the suite, and absorb the built-in basic suite
@@ -30,6 +32,7 @@ func TestRunRecipeTestSuite(t *testing.T) {
 var invalidDeck = "I"
 var runStepWise = false
 var invalidUUID = "not-a-uuid"
+var recipeID, _ = uuid.NewUUID()
 
 func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
 
@@ -37,14 +40,14 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
-		"/run/"+ recipeUUID+ "/" + deckB,
-		nil,
+		"/run/"+recipeUUID.String()+"/"+deckB,
+		"",
 		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
 	)
 
-	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: deck}
+	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: deckB}
 
-	output := json.Marshal(msg)
+	output, _ := json.Marshal(msg)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
@@ -58,8 +61,8 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
-		"/run/"+ invalidUUID+ "/" + deckB,
-		nil,
+		"/run/"+invalidUUID+"/"+deckB,
+		"",
 		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
 	)
 
@@ -67,7 +70,7 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 
 	errObj := ErrObj{Err: err.Error(), Deck: deckB}
 
-	output := json.Marshal(errObj)
+	output, _ := json.Marshal(errObj)
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
@@ -75,23 +78,29 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
+//
+// NOTE: This test case can be used in login/logout/homing handler
+//
+
+/*
 func (suite *ProcessHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 
 	suite.dbMock.On("runRecipe", mock.Anything, mock.Anything, deckB, runStepWise, recipeID).Return("Success", nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
-		"/run/"+ recipeUUID+ "/" + invalidDeck,
-		nil,
+		"/run/"+ recipeUUID.String()+ "/" + invalidDeck,
+		"",
 		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
 	)
 
 	errObj := ErrObj{Err: responses.DeckNameInvalid.Error(), Deck: invalidDeck}
 
-	output := json.Marshal(msg)
+	output, _ := json.Marshal(errObj)
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
+*/
