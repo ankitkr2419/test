@@ -1,1 +1,1 @@
-DROP TABLE template_targets;
+DROP TABLE IF EXISTS template_targets;
