@@ -2,33 +2,26 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 
-import { Row, Col, Card, CardBody } from "core-components";
-import { ButtonBar, ImageIcon, Text, Icon, MlModal } from "shared-components";
-import { TabContent, TabPane, Nav } from "reactstrap";
-
+import { Card, CardBody } from "core-components";
+import { ButtonBar, MlModal } from "shared-components";
 import AppFooter from "components/AppFooter";
-import labwarePlate from "assets/images/labware-plate.png";
+
 import {
   LABWARE_INITIAL_STATE,
   DECKNAME,
   MODAL_BTN,
   ROUTES,
 } from "appConstants";
-import {
-  getSideBarNavItems,
-  getTipsAtPosition,
-  getTipPiercingAtPosition,
-  getPreviewInfo,
-  updateAllTicks,
-  getFieldAtPosition,
-} from "./HelperFunctions";
-import { LabwareBox, PageBody, ProcessSetting } from "./Styles";
+import { updateAllTicks } from "./updateAllTicks";
+import { LabwareBox, PageBody } from "./Styles";
 import {
   updateRecipeActionInitiated,
   updateRecipeActionReset,
 } from "action-creators/saveNewRecipeActionCreators";
 import { Redirect, useHistory } from "react-router";
-import { getRequestBody, getOptions } from "./functions";
+import { getRequestBody } from "./functions";
+import Preview from "./Preview";
+import SelectProcesses from "./SelectProcesses";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
@@ -76,7 +69,6 @@ const LabWareComponent = (props) => {
 
   const handleSaveBtn = () => {
     const requestBody = getRequestBody(newRecipeName, formik.values);
-
     dispatch(
       updateRecipeActionInitiated({
         requestBody: requestBody,
@@ -86,9 +78,7 @@ const LabWareComponent = (props) => {
     );
   };
 
-  const toggle = (tab) => {
-    if (activeTab !== tab) setActiveTab(tab);
-  };
+  const toggle = (tab) => activeTab !== tab && setActiveTab(tab);
 
   const handleSuccessBtn = () => {
     setShowConfirmModal(!showConfirmModal);
@@ -116,177 +106,22 @@ const LabWareComponent = (props) => {
               <CardBody className="p-0 overflow-hidden">
                 {/* Preview Body */}
                 {preview ? (
-                  <div className="w-100 h-100 preview-box">
-                    <Row>
-                      <Col
-                        md={12}
-                        className="d-flex align-items-center font-weight-bold text-center top-heading"
-                      >
-                        Preview
-                      </Col>
-                    </Row>
-                    <div className="d-flex justify-content-between">
-                      <div className="labware-selection-info w-100">
-                        <Text className="setting-info font-weight-bold selected-positions">
-                          Selected Positions
-                        </Text>
-                        <ul className="list-unstyled">
-                          {getPreviewInfo(formik)}
-                        </ul>
-                      </div>
-
-                      <div className="img-box">
-                        <ProcessSetting>
-                          <div className="tips-info">
-                            <ul className="list-unstyled tip-position active">
-                              {formik.values.tips.processDetails.tipPosition1
-                                .id && (
-                                <li className="highlighted tip-position-1"></li>
-                              )}
-                              {formik.values.tips.processDetails.tipPosition2
-                                .id && (
-                                <li className="highlighted tip-position-2"></li>
-                              )}
-                              {formik.values.tips.processDetails.tipPosition3
-                                .id && (
-                                <li className="highlighted tip-position-3"></li>
-                              )}
-                            </ul>
-                          </div>
-
-                          <div className="piercing-info">
-                            <ul className="list-unstyled piercing-position active">
-                              {formik.values.tipPiercing.processDetails
-                                .position1.id && (
-                                <li className="highlighted piercing-position-1"></li>
-                              )}
-                              {formik.values.tipPiercing.processDetails
-                                .position2.id && (
-                                <li className="highlighted piercing-position-2"></li>
-                              )}
-                            </ul>
-                          </div>
-
-                          <div className="deck-position-info">
-                            <ul className="list-unstyled deck-position active">
-                              {formik.values.deckPosition1.processDetails
-                                .tubeType.id && (
-                                <li className="highlighted deck-position-1 active" />
-                              )}
-                              {formik.values.deckPosition2.processDetails
-                                .tubeType.id && (
-                                <li className="highlighted deck-position-2 active" />
-                              )}
-                              {formik.values.deckPosition3.processDetails
-                                .tubeType.id && (
-                                <li className="highlighted deck-position-3 active" />
-                              )}
-                              {formik.values.deckPosition4.processDetails
-                                .tubeType.id && (
-                                <li className="highlighted deck-position-4 active" />
-                              )}
-                            </ul>
-                          </div>
-
-                          <div className="cartridge-position-info">
-                            <ul className="list-unstyled cartridge-position active">
-                              {formik.values.cartridge1.processDetails
-                                .cartridgeType.id && (
-                                <li className="highlighted cartridge-position-1 active" />
-                              )}
-                              {formik.values.cartridge2.processDetails
-                                .cartridgeType.id && (
-                                <li className="highlighted cartridge-position-2 active" />
-                              )}
-                            </ul>
-                          </div>
-
-                          <ImageIcon
-                            src={labwarePlate}
-                            alt="Labware Plate"
-                            className=""
-                          />
-                        </ProcessSetting>
-                      </div>
-                    </div>
-                  </div>
+                  <Preview formik={formik} />
                 ) : (
-                  // Select Process
-                  <div className="d-flex">
-                    <Nav tabs className="d-flex flex-column border-0 side-bar">
-                      <Text className="d-flex justify-content-center align-items-center px-3 pt-3 pb-3 mb-0 font-weight-bold text-white">
-                        <Icon name="setting" size={18} />
-                        <Text Tag="span" className="ml-2">
-                          Settings{" "}
-                        </Text>
-                      </Text>
-                      {getSideBarNavItems(formik, activeTab, toggle)}
-                    </Nav>
-
-                    <TabContent activeTab={activeTab} className="flex-grow-1">
-                      <TabPane tabId="1">
-                        {getOptions(1, 3, tipsAndTubesOptions) &&
-                          getTipsAtPosition(
-                            1,
-                            formik,
-                            getOptions(1, 3, tipsAndTubesOptions)
-                          )}
-                      </TabPane>
-                      <TabPane tabId="2">
-                        {getTipPiercingAtPosition(1, formik)}
-                      </TabPane>
-                      <TabPane tabId="3">
-                        {getFieldAtPosition(
-                          1,
-                          formik,
-                          tubesOptions,
-                          "deckPosition"
-                        )}
-                      </TabPane>
-                      <TabPane tabId="4">
-                        {getFieldAtPosition(
-                          2,
-                          formik,
-                          tubesOptions,
-                          "deckPosition"
-                        )}
-                      </TabPane>
-                      <TabPane tabId="5">
-                        {getFieldAtPosition(
-                          1,
-                          formik,
-                          cartridgeOptions,
-                          "cartridge"
-                        )}
-                      </TabPane>
-                      <TabPane tabId="6">
-                        {getFieldAtPosition(
-                          3,
-                          formik,
-                          tubesOptions,
-                          "deckPosition"
-                        )}
-                      </TabPane>
-                      <TabPane tabId="7">
-                        {getFieldAtPosition(
-                          2,
-                          formik,
-                          cartridgeOptions,
-                          "cartridge"
-                        )}
-                      </TabPane>
-                      <TabPane tabId="8">
-                        {getFieldAtPosition(
-                          4,
-                          formik,
-                          tubesOptions,
-                          "deckPosition"
-                        )}
-                      </TabPane>
-                    </TabContent>
-                  </div>
+                  // { /* Select Process */ }
+                  <SelectProcesses
+                    activeTab={activeTab}
+                    toggle={toggle}
+                    formik={formik}
+                    tubesOptions={tubesOptions}
+                    tipsOptions={tipsOptions}
+                    tipsAndTubesOptions={tipsAndTubesOptions}
+                    cartridgeOptions={cartridgeOptions}
+                  />
                 )}
               </CardBody>
+
+              {/* Bottom Button Bar */}
               <div className="bottom-btn-bar">
                 {preview ? (
                   <ButtonBar
@@ -313,7 +148,5 @@ const LabWareComponent = (props) => {
     </>
   );
 };
-
-LabWareComponent.propTypes = {};
 
 export default React.memo(LabWareComponent);
