@@ -3,9 +3,9 @@ import {
   pauseCleanUpAction,
   resumeCleanUpAction,
   abortCleanUpAction,
-  setCleanUpHoursAction,
-  setCleanUpMinsAction,
-  setCleanUpSecsAction,
+  cleanUpHourActions,
+  cleanUpMinsActions,
+  cleanUpSecsActions,
   setShowCleanUpAction,
 } from "actions/cleanUpActions";
 import { DECKCARD_BTN, DECKNAME } from "appConstants";
@@ -489,7 +489,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
         decks: dockAfterAbortReset,
       };
 
-    case setCleanUpHoursAction.setHours:
+    case cleanUpHourActions.setHours:
       let deckNameToSetHours = action.payload.params.deckName;
       let newHours = parseInt(action.payload.params.hours);
 
@@ -508,7 +508,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
         decks: dockAfterHoursSet,
       };
 
-    case setCleanUpMinsAction.setMins:
+    case cleanUpMinsActions.setMins:
       let deckNameToSetMins = action.payload.params.deckName;
       let newMins = parseInt(action.payload.params.mins);
 
@@ -527,7 +527,8 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
         decks: dockAfterMinsSet,
       };
 
-    case setCleanUpSecsAction.setSecs:
+    case cleanUpSecsActions.setSecs:
+
       let deckNameToSetSecs = action.payload.params.deckName;
       let newSecs = parseInt(action.payload.params.secs);
 
