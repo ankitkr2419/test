@@ -20,7 +20,8 @@ const Preview = (props) => {
           <Text>
             {LEN > 1 && (
               <Text Tag="span" className="font-weight-bold">
-                {LABWARE_NAME[nestedKey]} :{" "}
+                {LABWARE_NAME[nestedKey]}
+                {key !== "tipPiercing" && ": "}
               </Text>
             )}
             <Text Tag="span" className={LEN === 1 ? "font-weight-bold" : ""}>

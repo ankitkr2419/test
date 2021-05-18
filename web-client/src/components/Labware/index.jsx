@@ -28,6 +28,13 @@ const LabWareComponent = (props) => {
   const [preview, setPreview] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const recipeDetailsReducer = useSelector(
+    (state) => state.updateRecipeDetailsReducer
+  );
+
+  const isSuccess = recipeDetailsReducer.isSuccess;
+
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -41,12 +48,7 @@ const LabWareComponent = (props) => {
       setShowConfirmModal(!showConfirmModal);
       dispatch(updateRecipeActionReset());
     }
-  });
-
-  const loginReducer = useSelector((state) => state.loginReducer);
-  const recipeDetailsReducer = useSelector(
-    (state) => state.updateRecipeDetailsReducer
-  );
+  }, [isSuccess]);
 
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
@@ -64,8 +66,6 @@ const LabWareComponent = (props) => {
     recipeDetailsReducer.decks[deckIndex].cartridgeOptions;
   const newRecipeName =
     recipeDetailsReducer.decks[deckIndex].recipeDetails.name;
-
-  const isSuccess = recipeDetailsReducer.isSuccess;
 
   const handleSaveBtn = () => {
     const requestBody = getRequestBody(newRecipeName, formik.values);
