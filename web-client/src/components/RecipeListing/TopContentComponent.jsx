@@ -102,7 +102,6 @@ const TopContentComponent = (props) => {
                                 size={32}
                                 className="text-white"
                             />
-                            {/* <HeadingTitle Tag="h5" className="text-white font-weight-bold ml-3 mb-0">Select a Recipe for Deck B</HeadingTitle> */}
                             <div className="d-flex flex-column">
                                 <Text className="text-white mb-0">Recipe</Text>
                                 <HeadingTitle
