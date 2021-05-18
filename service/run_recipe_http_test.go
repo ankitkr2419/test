@@ -1,12 +1,10 @@
 package service
 
 import (
-	// "fmt"
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
 
-	// "github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"mylab/cpagent/responses"
@@ -29,8 +27,7 @@ func TestRunRecipeTestSuite(t *testing.T) {
 	suite.Run(t, new(RunRecipeHandlerTestSuite))
 }
 
-var deckB = "B"
-var invalidDeck ="I"
+var invalidDeck = "I"
 var runStepWise = false
 var invalidUUID = "not-a-uuid"
 

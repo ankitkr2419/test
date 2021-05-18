@@ -19,8 +19,6 @@ import (
 func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var err error
-
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
@@ -31,21 +29,11 @@ func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 			return
 		}
 
-		switch deck {
-		case "A", "B":
-			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
-			logger.Infoln(responses.RecipeRunInProgress)
-			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RecipeRunInProgress, Deck: deck})
-			return
-		default:
-			err = responses.DeckNameInvalid
-		}
+		go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
+		logger.Infoln(responses.RecipeRunInProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RecipeRunInProgress, Deck: deck})
+		return
 
-		if err != nil {
-			logger.Errorln(err)
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: deck})
-			return
-		}
 	})
 }
 
@@ -57,30 +45,19 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
-		switch deck {
-		case "A", "B":
-			// If runNext is set means this API is called at wrong time
-			if runNext[deck] {
-				err = responses.StepRunNotInProgressError
-				logger.Errorln(err)
-				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: deck})
-				return
-			}
-
-			populateNextStepChan(deck)
-			logger.Infoln(responses.NextStepRunInProgress)
-			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.NextStepRunInProgress, Deck: deck})
-			return
-
-		default:
-			err = responses.DeckNameInvalid
-		}
-
-		if err != nil {
+		// If runNext is set means this API is called at wrong time
+		if runNext[deck] {
+			err = responses.StepRunNotInProgressError
 			logger.Errorln(err)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: deck})
 			return
 		}
+
+		populateNextStepChan(deck)
+		logger.Infoln(responses.NextStepRunInProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.NextStepRunInProgress, Deck: deck})
+		return
+
 	})
 }
 
