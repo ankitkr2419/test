@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import ProcessListComponent from "components/ProcessListing";
-import { changeProcessSequences } from "components/ProcessListing/helper";
+import {
+    changeProcessSequences,
+    sortProcessListBySequence,
+} from "components/ProcessListing/helper";
 
 const ProcessListingContainer = (props) => {
-    //TODO: fetch dynamic process list from recipeId, also add isOpen field
-    /**isOpen: represents that process menu should be open or not and its independently handled for each process
-     *          also this field does not come from api, so adding isOepn:false by default
+    /*TODO: 1) fetch dynamic process list from recipeId, also add isOpen field
+     * 2) while storing process list in state, it should be sorted by sequence
      */
     const [recipeDetails, setRecipeDetails] = useState({
         name: "test",
@@ -13,6 +15,8 @@ const ProcessListingContainer = (props) => {
         updated_at: "2021-04-29T11:52:11.171692Z",
     });
 
+    /**isOpen: represents that process menu should be open or not and its independently handled for each process
+               also this field does not come from api, so adding isOepn:false by default*/
     const [processList, setProcessList] = useState([
         {
             id: "a5d058e3-7ce3-4a42-b2da-690e47139612",
@@ -70,7 +74,8 @@ const ProcessListingContainer = (props) => {
             draggedProcessId,
             droppedProcessId
         );
-        setProcessList(arr);
+        let sortedArr = sortProcessListBySequence(arr);
+        setProcessList(sortedArr);
 
         //reset drag-drop (move)
         handleDraggedProcessId(null);

@@ -27,11 +27,12 @@ export const changeProcessSequences = (array, idOne, idTwo) => {
                   isOpen: false,
               };
     });
+    return sequenceExchangedArray;
+};
 
-    //sort using sequence number
-    const sortedArray = sequenceExchangedArray.sort((a, b) => {
+export const sortProcessListBySequence = (array) => {
+    const sortedArray = array.sort((a, b) => {
         return a.sequence_num - b.sequence_num;
     });
-
     return sortedArray;
 };
