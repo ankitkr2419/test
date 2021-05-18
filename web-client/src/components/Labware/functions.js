@@ -4,39 +4,17 @@ export const getRequestBody = (recipeName, formikState) => {
   const requestBody = {
     name: recipeName,
     description: "",
-    pos_1: formikState.tips.processDetails.tipPosition1.id
-      ? formikState.tips.processDetails.tipPosition1.id
-      : 0,
-    pos_2: formikState.tips.processDetails.tipPosition2.id
-      ? formikState.tips.processDetails.tipPosition2.id
-      : 0,
-    pos_3: formikState.tips.processDetails.tipPosition3.id
-      ? formikState.tips.processDetails.tipPosition3.id
-      : 0,
-    pos_4: formikState.tipPiercing.processDetails.position1.id
-      ? formikState.tipPiercing.processDetails.position1.id
-      : 0,
-    pos_5: formikState.tipPiercing.processDetails.position2.id
-      ? formikState.tipPiercing.processDetails.position2.id
-      : 0,
-    pos_6: formikState.deckPosition1.processDetails.tubeType.id
-      ? formikState.deckPosition1.processDetails.tubeType.id
-      : 0,
-    pos_7: formikState.deckPosition2.processDetails.tubeType.id
-      ? formikState.deckPosition2.processDetails.tubeType.id
-      : 0,
-    pos_cartridge_1: formikState.cartridge1.processDetails.cartridgeType.id
-      ? formikState.cartridge1.processDetails.cartridgeType.id
-      : 0,
-    pos_9: formikState.deckPosition3.processDetails.tubeType.id
-      ? formikState.deckPosition3.processDetails.tubeType.id
-      : 0,
-    pos_cartridge_2: formikState.cartridge2.processDetails.cartridgeType.id
-      ? formikState.cartridge2.processDetails.cartridgeType.id
-      : 0,
-    pos_11: formikState.deckPosition4.processDetails.tubeType.id
-      ? formikState.deckPosition4.processDetails.tubeType.id
-      : 0,
+    pos_1: formikState.tips.processDetails.tipPosition1.id,
+    pos_2: formikState.tips.processDetails.tipPosition2.id,
+    pos_3: formikState.tips.processDetails.tipPosition3.id,
+    pos_4: formikState.tipPiercing.processDetails.position1.id,
+    pos_5: formikState.tipPiercing.processDetails.position2.id,
+    pos_6: formikState.deckPosition1.processDetails.tubeType.id,
+    pos_7: formikState.deckPosition2.processDetails.tubeType.id,
+    pos_cartridge_1: formikState.cartridge1.processDetails.cartridgeType.id,
+    pos_9: formikState.deckPosition3.processDetails.tubeType.id,
+    pos_cartridge_2: formikState.cartridge2.processDetails.cartridgeType.id,
+    pos_11: formikState.deckPosition4.processDetails.tubeType.id,
   };
 
   return requestBody;

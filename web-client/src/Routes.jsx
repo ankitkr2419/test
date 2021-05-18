@@ -13,10 +13,11 @@ import LandingPageContainer from "containers/LandingPageContainer";
 import RecipeListingContainer from "containers/RecipeListingContainer";
 import AllSetContainer from "containers/AllSetContainer";
 import LabwareContainer from "containers/LabwareContainer";
-import ProcessListingContainer from "containers/ProcessListingContainer"
-import { ROOT_URL_PATH, ROUTES } from "./appConstants";
+import { ROOT_URL_PATH } from "./appConstants";
 import SelectProcessContainer from "containers/SelectProcessContainer";
 import PiercingContainer from "containers/PiercingContainer";
+import TipPickupContainer from "containers/TipPickupContainer";
+import AspireDispenseContainer from "containers/AspireDispenseContainer";
 
 export const routeDefinitions = [
   {
@@ -121,18 +122,18 @@ export const routeDefinitions = [
       //   component: TipDiscardContainer,
       //   key: 18,
       // },
-      // {
-      //   path: `${ROOT_URL_PATH}aspire-dispense`,
-      //   exact: true,
-      //   component: AspireDispenseContainer,
-      //   key: 19,
-      // },
-      // {
-      //   path: `${ROOT_URL_PATH}tip-pickup`,
-      //   exact: true,
-      //   component: TipPickupContainer,
-      //   key: 20,
-      // },
+      {
+        path: `${ROOT_URL_PATH}aspire-dispense`,
+        exact: true,
+        component: AspireDispenseContainer,
+        key: 19,
+      },
+      {
+        path: `${ROOT_URL_PATH}tip-pickup`,
+        exact: true,
+        component: TipPickupContainer,
+        key: 20,
+      },
       // {
       //   path: `${ROOT_URL_PATH}delay`,
       //   exact: true,

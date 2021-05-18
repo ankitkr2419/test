@@ -89,6 +89,7 @@ export const API_ENDPOINTS = {
   tips: "tip",
   stepRun: "step-run",
   runNextStep: "run-next-step",
+  tipOperation: "tip-operation",
 };
 
 export const MODAL_MESSAGE = {
@@ -296,4 +297,11 @@ export const SELECT_PROCESS_PROPS = [
     processName: "Tip Position",
     route: ROUTES.tipPosition,
   },
+];
+
+export const ASPIRE_DISPENSE_SIDEBAR_LABELS = [
+  "Cartridge 1",
+  "Cartridge 2",
+  "Shaker",
+  "Deck Position",
 ];

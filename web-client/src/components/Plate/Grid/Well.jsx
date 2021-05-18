@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import styled from 'styled-components';
 
-const Well = ({
-	id,
-	className,
-	status,
-	isRunning,
-	isSelected,
-	taskInitials,
-	onClickHandler,
-	isDisabled,
-}) => {
+const Well = (props) => {
+	const {
+		id,
+		className,
+		status,
+		isRunning,
+		isSelected,
+		taskInitials,
+		onClickHandler,
+		isDisabled,
+	} = props;
 	const wellClassnames = classNames(className, {
 		running: isRunning,
 		selected: isSelected,
@@ -23,10 +24,10 @@ const Well = ({
 			id={id}
 			isRunning={isRunning}
 			isSelected={isSelected}
+			isDisabled={isDisabled}
 			status={status}
 			className={wellClassnames}
 			onClick={onClickHandler}
-			isDisabled={isDisabled}
 		>
 			{taskInitials}
 		</StyledWell>
@@ -104,7 +105,7 @@ const StyledWell = styled.div`
 `;
 
 Well.propTypes = {
-	id: PropTypes.string,
+	id: PropTypes.number,
 	className: PropTypes.string,
 	status: PropTypes.string,
 	taskInitials: PropTypes.string,
@@ -115,7 +116,6 @@ Well.propTypes = {
 };
 
 Well.defaultProps = {
-	id: '',
 	className: '',
 	status: '',
 	taskInitials: '',

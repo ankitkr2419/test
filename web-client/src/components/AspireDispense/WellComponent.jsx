@@ -33,28 +33,18 @@ export const WellComponent = (props) => {
                 return (
                   <>
                     <Well
+                      key={wellObj.id}
                       id={wellObj.id}
                       isRunning={wellObj.isRunning}
                       isSelected={wellObj.isSelected}
                       isDisabled={wellObj.isDisabled}
-                      className="well"
+                      className={`well ${wellObj.footerText}`}
                       onClickHandler={() => wellClickHandler(wellObj.id, wellObj.type)}
                     />
                   </>
                 );
               })}
           </div>
-          <Coordinate direction="horizontal" className="px-0 mx-0 well-no">
-            {wellsObjArray &&
-              wellsObjArray.map((wellObj, index) => {
-                return (
-                  <CoordinateItem
-                    key={wellObj.id}
-                    coordinateValue={`${wellObj.footerText}`}
-                  />
-                );
-              })}
-          </Coordinate>
         </Col>
       </FormGroup>
     </div>

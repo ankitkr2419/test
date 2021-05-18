@@ -35,6 +35,7 @@ export const ProcessOuterBox = styled.div`
 		background:none;
 		border:none;
 		box-shadow:none;
+		height: inherit;
 	}
 	.process-card{
 		border-radius:9px;

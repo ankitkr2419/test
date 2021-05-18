@@ -95,7 +95,7 @@ export function* callApi(actions) {
       token
     },
   } = actions;
-
+  
   // request url formation
   const fetchUrl = getRequestUrl(reqPath, params);
   try {

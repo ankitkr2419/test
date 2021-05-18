@@ -29,6 +29,7 @@ import {
 } from "action-creators/saveNewRecipeActionCreators";
 import { Redirect, useHistory } from "react-router";
 import { getRequestBody, getOptions } from "./functions";
+// import { Preview } from "./Preview";
 
 const LabWareComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
@@ -42,7 +43,6 @@ const LabWareComponent = (props) => {
     initialValues: LABWARE_INITIAL_STATE,
     enableReinitialize: true,
   });
-
 
   const loginReducer = useSelector((state) => state.loginReducer);
   const recipeDetailsReducer = useSelector(
@@ -133,6 +133,7 @@ const LabWareComponent = (props) => {
                         </Text>
                         <ul className="list-unstyled">
                           {getPreviewInfo(formik)}
+                          {/* {formik.values && <Preview recipeData={formik.values} />} */}
                         </ul>
                       </div>
 

@@ -1,20 +1,18 @@
 import React from "react";
 
-import { Row, Card, CardBody, Col } from "core-components";
-import { ButtonBar, ButtonIcon, Text } from "shared-components";
+import { Row, Card, CardBody } from "core-components";
+import { ButtonBar } from "shared-components";
 
 import AppFooter from "components/AppFooter";
 import Process from "./Process";
 import { HeadingTitle, PageBody, ProcessOuterBox, TopContent } from "./Style";
-import { useHistory } from "react-router";
-import { ROUTES, SELECT_PROCESS_PROPS } from "appConstants";
+import { SELECT_PROCESS_PROPS } from "appConstants";
 
 const SelectProcessPageComponent = () => {
-  
   return (
     <>
-      <PageBody>
-        <ProcessOuterBox>
+      <PageBody className="h-100">
+        <ProcessOuterBox className="h-100">
           <div className="process-content select-process-bg">
             <TopContent className="d-flex justify-content-between align-items-center my-3 py-4">
               <div className="d-flex flex-column py-1">
