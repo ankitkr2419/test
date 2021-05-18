@@ -27,6 +27,14 @@ const ProcessCard = (props) => {
         handleChangeSequenceTo(processId);
     };
 
+    const getClassNameForMoveButton = () => {
+        return `border-gray text-primary ml-2 ${
+            draggedProcessId && draggedProcessId === processId
+                ? "selected-button"
+                : ""
+        }`;
+    };
+
     return (
         <div className="position-relative mb-3">
             <InnerBox>
@@ -71,7 +79,7 @@ const ProcessCard = (props) => {
                                     <ButtonIcon
                                         size={24}
                                         name="move"
-                                        className="border-gray text-primary ml-2"
+                                        className={getClassNameForMoveButton()}
                                         onClick={handleProcessMoveClick}
                                     />
                                     <ButtonIcon

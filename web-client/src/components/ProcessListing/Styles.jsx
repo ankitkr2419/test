@@ -9,6 +9,10 @@ export const StyledProcessListing = styled.div`
         .recipe-listing-cards {
             height: 30.75rem;
         }
+        .selected-button {
+            color: #fff !important;
+            background: #aedbd5;
+        }
     }
 `;
 
