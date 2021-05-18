@@ -9,6 +9,7 @@ import {
   setShowCleanUpAction,
 } from "actions/cleanUpActions";
 import { DECKCARD_BTN, DECKNAME } from "appConstants";
+import { getUpdatedDecks } from "utils/helpers";
 
 export const initialState = {
   decks: [
@@ -66,19 +67,19 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterRunInit = state.decks.map((deckObj) => {
-        return deckObj.name === deckInitiateName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckInitiateName
-              ),
-              isLoading: true,
-              isCleanUpActionInProgress: false,
-              isCleanUpActionCompleted: false,
-              showCleanUp: true,
-            }
-          : deckObj;
-      });
+      const changesForCleanUpMatched = {
+        isLoading: true,
+        isCleanUpActionInProgress: false,
+        isCleanUpActionCompleted: false,
+        showCleanUp: true,
+      };
+
+      const dockAfterRunInit = getUpdatedDecks(
+        state,
+        deckInitiateName,
+        changesForCleanUpMatched
+      );
+
       return {
         ...state,
         decks: dockAfterRunInit,
@@ -88,19 +89,19 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckSuccessName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterRunSuccess = state.decks.map((deckObj) => {
-        return deckObj.name === deckSuccessName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckSuccessName
-              ),
-              leftActionBtn: DECKCARD_BTN.text.pauseUv,
-              rightActionBtn: DECKCARD_BTN.text.abort,
-              isLoading: false,
-              runCleanUpError: false,
-            }
-          : deckObj;
-      });
+      const changesForCleanUpSuccessMatched = {
+        leftActionBtn: DECKCARD_BTN.text.pauseUv,
+        rightActionBtn: DECKCARD_BTN.text.abort,
+        isLoading: false,
+        runCleanUpError: false,
+      };
+
+      const dockAfterRunSuccess = getUpdatedDecks(
+        state,
+        deckSuccessName,
+        changesForCleanUpSuccessMatched
+      );
+
       return {
         ...state,
         decks: dockAfterRunSuccess,
@@ -110,17 +111,17 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckFailureName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterRunFailure = state.decks.map((deckObj) => {
-        return deckObj.name === deckFailureName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckFailureName
-              ),
-              isLoading: false,
-              runCleanUpError: true,
-            }
-          : deckObj;
-      });
+      const changesForCleanUpFailureMatched = {
+        isLoading: false,
+        runCleanUpError: true,
+      };
+
+      const dockAfterRunFailure = getUpdatedDecks(
+        state,
+        deckFailureName,
+        changesForCleanUpFailureMatched
+      );
+
       return {
         ...state,
         decks: dockAfterRunFailure,
@@ -132,26 +133,26 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterRunReset = state.decks.map((deckObj) => {
-        return deckObj.name === deckResetName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckResetName
-              ),
-              cleanUpData: null,
-              hours: 0,
-              mins: 0,
-              secs: 0,
-              progress: 0,
-              runCleanUpError: null,
-              leftActionBtn: DECKCARD_BTN.text.startUv,
-              rightActionBtn: DECKCARD_BTN.text.cancel,
-              leftActionBtnDisabled: false,
-              rightActionBtnDisabled: false,
-              showCleanUp: false,
-            }
-          : deckObj;
-      });
+      const changesForCleanUpResetMatched = {
+        cleanUpData: null,
+        hours: 0,
+        mins: 0,
+        secs: 0,
+        progress: 0,
+        runCleanUpError: null,
+        leftActionBtn: DECKCARD_BTN.text.startUv,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+        leftActionBtnDisabled: false,
+        rightActionBtnDisabled: false,
+        showCleanUp: false,
+      };
+
+      const dockAfterRunReset = getUpdatedDecks(
+        state,
+        deckResetName,
+        changesForCleanUpResetMatched
+      );
+
       return {
         ...state,
         decks: dockAfterRunReset,
@@ -165,19 +166,19 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckInProgressName =
         deckNameCheck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterProgress = state.decks.map((deckObj) => {
-        return deckObj.name === deckInProgressName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckInProgressName
-              ),
-              isLoading: false,
-              isCleanUpActionCompleted: false,
-              isCleanUpActionInProgress: true,
-              cleanUpData: action.payload.cleanUpActionInProgress,
-            }
-          : deckObj;
-      });
+      const changesForRunCleanUpProgressMatched = {
+        isLoading: false,
+        isCleanUpActionCompleted: false,
+        isCleanUpActionInProgress: true,
+        cleanUpData: action.payload.cleanUpActionInProgress,
+      };
+
+      const dockAfterProgress = getUpdatedDecks(
+        state,
+        deckInProgressName,
+        changesForRunCleanUpProgressMatched
+      );
+
       return {
         ...state,
         decks: dockAfterProgress,
@@ -193,22 +194,21 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterProgressCompleted = state.decks.map((deckObj) => {
-        return deckObj.name === deckInCompleteResponse
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckInCompleteResponse
-              ),
-              isLoading: false,
-              isCleanUpActionCompleted: true,
-              isCleanUpActionInProgress: false,
-              leftActionBtn: DECKCARD_BTN.text.done,
-              rightActionBtn: DECKCARD_BTN.text.cancel,
-              rightActionBtnDisabled: true,
-            }
-          : deckObj;
-      });
+      const changesForRunCleanUpCompletedMatched = {
+        isLoading: false,
+        isCleanUpActionCompleted: true,
+        isCleanUpActionInProgress: false,
+        leftActionBtn: DECKCARD_BTN.text.done,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+        rightActionBtnDisabled: true,
+      };
+
+      const dockAfterProgressCompleted = getUpdatedDecks(
+        state,
+        progressEndDeck,
+        changesForRunCleanUpCompletedMatched
+      );
+
       return {
         ...state,
         decks: dockAfterProgressCompleted,
@@ -220,17 +220,15 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterPauseInit = state.decks.map((deckObj) => {
-        return deckObj.name === deckPauseInitiateName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckPauseInitiateName
-              ),
-              isLoading: true,
-            }
-          : deckObj;
-      });
+      const cleanUpPauseInitMatchedChanges = {
+        isLoading: true,
+      };
+      const dockAfterPauseInit = getUpdatedDecks(
+        state,
+        deckPauseInitiateName,
+        cleanUpPauseInitMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterPauseInit,
@@ -240,19 +238,18 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckPauseSuccessName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterPauseSuccess = state.decks.map((deckObj) => {
-        return deckObj.name === deckPauseSuccessName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckPauseSuccessName
-              ),
-              isLoading: false,
-              pauseCleanUpError: false,
-              leftActionBtn: DECKCARD_BTN.text.resumeUv,
-              rightActionBtn: DECKCARD_BTN.text.abort,
-            }
-          : deckObj;
-      });
+      const cleanUpPauseSuccessMatchedChanges = {
+        isLoading: false,
+        pauseCleanUpError: false,
+        leftActionBtn: DECKCARD_BTN.text.resumeUv,
+        rightActionBtn: DECKCARD_BTN.text.abort,
+      };
+      const dockAfterPauseSuccess = getUpdatedDecks(
+        state,
+        deckPauseSuccessName,
+        cleanUpPauseSuccessMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterPauseSuccess,
@@ -262,17 +259,17 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckPauseFailureName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterPauseFailure = state.decks.map((deckObj) => {
-        return deckObj.name === deckPauseFailureName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckPauseFailureName
-              ),
-              isLoading: false,
-              pauseCleanUpError: true,
-            }
-          : deckObj;
-      });
+      const cleanUpPauseFailureMatchedChanges = {
+        isLoading: false,
+        pauseCleanUpError: true,
+      };
+
+      const dockAfterPauseFailure = getUpdatedDecks(
+        state,
+        deckPauseFailureName,
+        cleanUpPauseFailureMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterPauseFailure,
@@ -284,18 +281,17 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterPauseReset = state.decks.map((deckObj) => {
-        return deckObj.name === deckPauseResetName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckPauseResetName
-              ),
-              pauseCleanUpError: null,
-              leftActionBtn: DECKCARD_BTN.text.startUv,
-              rightActionBtn: DECKCARD_BTN.text.cancel,
-            }
-          : deckObj;
-      });
+      const cleanUpPauseResetMatchedChanges = {
+        pauseCleanUpError: null,
+        leftActionBtn: DECKCARD_BTN.text.startUv,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+      };
+
+      const dockAfterPauseReset = getUpdatedDecks(
+        state,
+        deckPauseResetName,
+        cleanUpPauseResetMatchedChanges
+      );
       return {
         ...state,
         decks: dockAfterPauseReset,
@@ -307,17 +303,16 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterResumeInit = state.decks.map((deckObj) => {
-        return deckObj.name === deckResumeInitiateName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckResumeInitiateName
-              ),
-              isLoading: true,
-            }
-          : deckObj;
-      });
+      const cleanUpResumeInitMatchedChanges = {
+        isLoading: true,
+      };
+
+      const dockAfterResumeInit = getUpdatedDecks(
+        state,
+        deckResumeInitiateName,
+        cleanUpResumeInitMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterResumeInit,
@@ -327,20 +322,19 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckResumeSuccessName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterResumeSuccess = state.decks.map((deckObj) => {
-        return deckObj.name === deckResumeSuccessName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckResumeSuccessName
-              ),
-              isLoading: false,
-              resumeCleanUpError: false,
-              leftActionBtn: DECKCARD_BTN.text.pauseUv,
-              rightActionBtn: DECKCARD_BTN.text.abort,
-            }
-          : deckObj;
-      });
+      const cleanUpResumeSuccessMatchedChanges = {
+        isLoading: false,
+        resumeCleanUpError: false,
+        leftActionBtn: DECKCARD_BTN.text.pauseUv,
+        rightActionBtn: DECKCARD_BTN.text.abort,
+      };
+
+      const dockAfterResumeSuccess = getUpdatedDecks(
+        state,
+        deckResumeSuccessName,
+        cleanUpResumeSuccessMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterResumeSuccess,
@@ -350,18 +344,17 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckResumeFailureName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterResumeFailure = state.decks.map((deckObj) => {
-        return deckObj.name === deckResumeFailureName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckResumeFailureName
-              ),
-              isLoading: false,
-              resumeCleanUpError: true,
-            }
-          : deckObj;
-      });
+      const cleanUpResumeFailureMatchedChanges = {
+        isLoading: false,
+        resumeCleanUpError: true,
+      };
+
+      const dockAfterResumeFailure = getUpdatedDecks(
+        state,
+        deckResumeFailureName,
+        cleanUpResumeFailureMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterResumeFailure,
@@ -373,18 +366,18 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterResumeReset = state.decks.map((deckObj) => {
-        return deckObj.name === deckResumeResetName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckResumeResetName
-              ),
-              resumeCleanUpError: null,
-              leftActionBtn: DECKCARD_BTN.text.startUv,
-              rightActionBtn: DECKCARD_BTN.text.cancel,
-            }
-          : deckObj;
-      });
+      const cleanUpResumeResetMatchedChanges = {
+        resumeCleanUpError: null,
+        leftActionBtn: DECKCARD_BTN.text.startUv,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+      };
+
+      const dockAfterResumeReset = getUpdatedDecks(
+        state,
+        deckResumeResetName,
+        cleanUpResumeResetMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterResumeReset,
@@ -396,17 +389,16 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterAbortInit = state.decks.map((deckObj) => {
-        return deckObj.name === deckAbortInitiateName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckAbortInitiateName
-              ),
-              isLoading: true,
-            }
-          : deckObj;
-      });
+      const cleanUpAbortInitMatchedChanges = {
+        isLoading: true,
+      };
+
+      const dockAfterAbortInit = getUpdatedDecks(
+        state,
+        deckAbortInitiateName,
+        cleanUpAbortInitMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterAbortInit,
@@ -416,26 +408,25 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckAbortSuccessName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterAbortSuccess = state.decks.map((deckObj) => {
-        return deckObj.name === deckAbortSuccessName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckAbortSuccessName
-              ),
+      const cleanUpAbortSuccessMatchedChanges = {
+        showCleanUp: false,
+        isLoading: false,
+        abortCleanUpError: false,
+        leftActionBtn: DECKCARD_BTN.text.startUv,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+        hours: 0,
+        mins: 0,
+        secs: 0,
+        progress: 0,
+        cleanUpData: null,
+      };
 
-              showCleanUp: false,
-              isLoading: false,
-              abortCleanUpError: false,
-              leftActionBtn: DECKCARD_BTN.text.startUv,
-              rightActionBtn: DECKCARD_BTN.text.cancel,
-              hours: 0,
-              mins: 0,
-              secs: 0,
-              progress: 0,
-              cleanUpData: null,
-            }
-          : deckObj;
-      });
+      const dockAfterAbortSuccess = getUpdatedDecks(
+        state,
+        deckAbortSuccessName,
+        cleanUpAbortSuccessMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterAbortSuccess,
@@ -445,17 +436,17 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       const deckAbortFailureName =
         action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-      let dockAfterAbortFailure = state.decks.map((deckObj) => {
-        return deckObj.name === deckAbortFailureName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckAbortFailureName
-              ),
-              isLoading: false,
-              abortCleanUpError: true,
-            }
-          : deckObj;
-      });
+      const cleanUpAbortFailureMatchedChanges = {
+        isLoading: false,
+        abortCleanUpError: true,
+      };
+
+      const dockAfterAbortFailure = getUpdatedDecks(
+        state,
+        deckAbortFailureName,
+        cleanUpAbortFailureMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterAbortFailure,
@@ -467,23 +458,23 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
           ? DECKNAME.DeckA
           : DECKNAME.DeckB;
 
-      let dockAfterAbortReset = state.decks.map((deckObj) => {
-        return deckObj.name === deckAbortResetName
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckAbortResetName
-              ),
-              abortCleanUpError: null,
-              leftActionBtn: DECKCARD_BTN.text.startUv,
-              rightActionBtn: DECKCARD_BTN.text.cancel,
-              hours: 0,
-              mins: 0,
-              secs: 0,
-              progress: 0,
-              cleanUpData: null,
-            }
-          : deckObj;
-      });
+      const cleanUpAbortResetMatchedChanges = {
+        abortCleanUpError: null,
+        leftActionBtn: DECKCARD_BTN.text.startUv,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+        hours: 0,
+        mins: 0,
+        secs: 0,
+        progress: 0,
+        cleanUpData: null,
+      };
+
+      const dockAfterAbortReset = getUpdatedDecks(
+        state,
+        deckAbortResetName,
+        cleanUpAbortResetMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterAbortReset,
@@ -493,16 +484,16 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       let deckNameToSetHours = action.payload.params.deckName;
       let newHours = parseInt(action.payload.params.hours);
 
-      let dockAfterHoursSet = state.decks.map((deckObj) => {
-        return deckObj.name === deckNameToSetHours
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckNameToSetHours
-              ),
-              hours: newHours,
-            }
-          : deckObj;
-      });
+      const cleanUpHoursMatchedChanges = {
+        hours: newHours,
+      };
+
+      const dockAfterHoursSet = getUpdatedDecks(
+        state,
+        deckNameToSetHours,
+        cleanUpHoursMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterHoursSet,
@@ -512,36 +503,35 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
       let deckNameToSetMins = action.payload.params.deckName;
       let newMins = parseInt(action.payload.params.mins);
 
-      let dockAfterMinsSet = state.decks.map((deckObj) => {
-        return deckObj.name === deckNameToSetMins
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckNameToSetMins
-              ),
-              mins: newMins,
-            }
-          : deckObj;
-      });
+      const cleanUpMinsMatchedChanges = {
+        mins: newMins,
+      };
+
+      const dockAfterMinsSet = getUpdatedDecks(
+        state,
+        deckNameToSetMins,
+        cleanUpMinsMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterMinsSet,
       };
 
     case cleanUpSecsActions.setSecs:
-
       let deckNameToSetSecs = action.payload.params.deckName;
       let newSecs = parseInt(action.payload.params.secs);
 
-      let dockAfterSecsSet = state.decks.map((deckObj) => {
-        return deckObj.name === deckNameToSetSecs
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) => initialDeckObj.name === deckNameToSetSecs
-              ),
-              secs: newSecs,
-            }
-          : deckObj;
-      });
+      const cleanUpSecsMatchedChanges = {
+        secs: newSecs,
+      };
+
+      const dockAfterSecsSet = getUpdatedDecks(
+        state,
+        deckNameToSetSecs,
+        cleanUpSecsMatchedChanges
+      );
+
       return {
         ...state,
         decks: dockAfterSecsSet,
@@ -549,17 +539,17 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
     case setShowCleanUpAction.setShowCleanUp:
       let deckNameToShowCleanUp = action.payload.params.deckName;
-      let dockAfterShowCleanUp = state.decks.map((deckObj) => {
-        return deckObj.name === deckNameToShowCleanUp
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckNameToShowCleanUp
-              ),
-              showCleanUp: true,
-            }
-          : deckObj;
-      });
+
+      const cleanUpSetShowChanges = {
+        showCleanUp: true,
+      };
+
+      const dockAfterShowCleanUp = getUpdatedDecks(
+        state,
+        deckNameToShowCleanUp,
+        cleanUpSetShowChanges
+      );
+
       return {
         ...state,
         decks: dockAfterShowCleanUp,
@@ -567,17 +557,17 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
     case setShowCleanUpAction.resetShowCleanUp:
       let deckNameToHideCleanUp = action.payload.params.deckName;
-      let dockAfterHideCleanUp = state.decks.map((deckObj) => {
-        return deckObj.name === deckNameToHideCleanUp
-          ? {
-              ...state.decks.find(
-                (initialDeckObj) =>
-                  initialDeckObj.name === deckNameToHideCleanUp
-              ),
-              showCleanUp: false,
-            }
-          : deckObj;
-      });
+
+      const cleanUpSetHideChanges = {
+        showCleanUp: false,
+      };
+
+      const dockAfterHideCleanUp = getUpdatedDecks(
+        state,
+        deckNameToHideCleanUp,
+        cleanUpSetHideChanges
+      );
+
       return {
         ...state,
         decks: dockAfterHideCleanUp,
