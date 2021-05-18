@@ -10,7 +10,7 @@ build:
 	echo "building go code"
 	GOARCH=amd64 GOOS=linux
 	go build -v -ldflags=" \
-	-X 'main.Version=v1.2.1' \
+	-X 'main.Version=v1.2.121' \
 	-X 'main.User=$(shell id -u -n)' \
 	-X 'main.BuiltOn=$(shell date)' \
 	-X 'main.CommitID=$(shell git rev-list -1 HEAD)' \
