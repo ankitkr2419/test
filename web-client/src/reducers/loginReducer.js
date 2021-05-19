@@ -1,5 +1,5 @@
 import { fromJS } from "immutable";
-import loginActions from "actions/loginActions";
+import loginActions, { logoutActions } from "actions/loginActions";
 import { DECKNAME, USER_ROLES } from "../appConstants";
 import { getUpdatedDecks } from "utils/helpers";
 
@@ -27,6 +27,7 @@ const initialStateOfDecks = () => {
 };
 
 const loginInitialState = fromJS({
+  tempDeckName: "",
   isLoading: false,
   isPlateRoute: false,
   isTemplateRoute: false,
@@ -41,7 +42,7 @@ export const loginReducer = (state = loginInitialState, action) => {
       const changesInLoginInitMatchedDeck = {
         error: false,
         msg: "",
-        isError: false,
+        error: false,
         isActive: true,
       };
       const changesInLoginInitUnMatchedDeck = {
@@ -167,19 +168,60 @@ export const loginReducer = (state = loginInitialState, action) => {
     case loginActions.setIsTemplateRoute:
       return state.setIn(["isTemplateRoute"], action.payload.isTemplateRoute);
 
+    // login reset
     case loginActions.loginReset:
       let deckShouldLogout = action.payload.deckName;
 
       let newDecksAfterLogout = getUpdatedDecks(
         state,
         deckShouldLogout,
-        { isLoggedIn: false, token: "" },
+        { error: null, isLoggedIn: false, token: "" },
         {},
         true
       );
 
       return state.merge({
         decks: newDecksAfterLogout,
+      });
+
+    //logout init
+    case logoutActions.logoutActionInitiated:
+      state.tempDeckName = action.payload.deckName;
+      return state;
+
+    //logout success
+    case logoutActions.logoutActionSuccess:
+      let newdeckStateAferLogoutSuccess = getUpdatedDecks(
+        state,
+        state.tempDeckName,
+        { error: false, isLoggedIn: false, token: "" },
+        {},
+        true
+      );
+
+      return state.merge({
+        tempDeckName: "",
+        decks: newdeckStateAferLogoutSuccess,
+      });
+
+    //logout fail
+    case logoutActions.logoutActionFailure:
+      let errorMsg = action.payload.error?.msg
+        ? action.payload.error.msg
+        : "Something went wrong!";
+
+      let newDeckStateAfterLogoutFail = getUpdatedDecks(
+        state,
+        state.toJS().deckName,
+        { error: true, msg: errorMsg, token: "" },
+        {},
+        true
+      );
+
+      return state.merge({
+        tempDeckName: "",
+        isLoading: false,
+        decks: newDeckStateAfterLogoutFail,
       });
 
     default:
