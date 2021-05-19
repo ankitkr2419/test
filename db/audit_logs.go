@@ -43,13 +43,13 @@ type AuditLog struct {
 }
 
 const (
-	auditLogsInsertQuery = `INSERT INTO audit_logs(
+	auditLogsInsertQuery = `INSERT INTO audit_logs (
 		username,
 		activity_type,
 		state_type,
 		operation_type,
 		deck,
-		description,
+		description
 	) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`
 
 	auditLogsSelectQuery = `SELECT * FROM audit_logs`
