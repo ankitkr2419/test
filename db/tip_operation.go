@@ -43,7 +43,7 @@ const (
 )
 
 type TipOperation struct {
-	ID       uuid.UUID `db:"id" json:"id"`
+	ID        uuid.UUID `db:"id" json:"id"`
 	Type      TipOps    `db:"type" json:"type" validate:"required"`
 	Position  int64     `db:"position" json:"position,omitempty"`
 	Discard   Discard   `db:"discard" json:"discard,omitempty"`
@@ -101,15 +101,15 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 	if err != nil {
 		return
 	}
-	
+
 	var opsType ProcessType
-	if ad.Type == PickupTip{
+	if ad.Type == PickupTip {
 		opsType = TipPickupProcess
-	} else{
+	} else {
 		opsType = TipDiscardProcess
 	}
 
-	process, err := s.processOperation(ctx, name, opsType , ad, Process{})
+	process, err := s.processOperation(ctx, name, opsType, ad, Process{})
 	if err != nil {
 		return
 	}
@@ -132,6 +132,9 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 func (s *pgStore) createTipOperation(ctx context.Context, tx *sql.Tx, to TipOperation) (createdTipOperation TipOperation, err error) {
 
 	var lastInsertID uuid.UUID
+
+	// TODO: Remove this default Discard for tip operation whenever support for at_pickup_passing added
+	to.Discard = at_discard_box
 
 	err = tx.QueryRow(
 		createTipOperationQuery,
