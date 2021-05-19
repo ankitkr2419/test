@@ -103,6 +103,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if err != nil {
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.ErrorState, db.ExecuteOperation, deck, err.Error())
 		}
 		resetStepRunInProgress(deck)
 	}()
@@ -165,6 +166,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			setRunNext(deck)
 			logger.Infoln("Next process is in progress")
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(p.Type, string(db.InitialisedState)))
 
 		switch p.Type {
 		case "AspireDispense":
@@ -291,6 +293,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(p.Type, string(db.CompletedState)))
+
 	}
 
 	plength := len(processes)

@@ -30,7 +30,7 @@ func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 		deck := vars["deck"]
 		switch deck {
 		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "DiscardBoxCleanup")
+			response, err = singleDeckOperation(req.Context(), deps, deck, "DiscardBoxCleanup")
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}
@@ -63,7 +63,7 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 		deck := vars["deck"]
 		switch deck {
 		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "RestoreDeck")
+			response, err = singleDeckOperation(req.Context(), deps, deck, "RestoreDeck")
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}

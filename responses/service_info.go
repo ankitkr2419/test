@@ -1,5 +1,7 @@
 package responses
 
+import "fmt"
+
 var (
 	PiercingCreateSuccess        = "piercing record created successfully"
 	PiercingFetchSuccess         = "piercing record fetched successfully"
@@ -119,3 +121,8 @@ var (
 	RearrangeProcessInitialisedState = "rearrange process initialised"
 	RearrangeProcessCompletedState   = "rearrange process completed"
 )
+
+func GetMachineOperationMessage(operation string, state string) (message string) {
+
+	return fmt.Sprintf("operation %s %s", operation, state)
+}
