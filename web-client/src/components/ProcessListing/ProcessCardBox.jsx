@@ -46,7 +46,8 @@ export const ProcessCardBox = styled.div`
     .drop-badge {
         background-color: #b2dad1;
         border-radius: 0.875rem;
-        width: 8.75rem;
+        width: 9rem;
         height: 1.688rem;
+        line-height: 1.688rem;
     }
 `;
