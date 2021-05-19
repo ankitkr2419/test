@@ -43,10 +43,10 @@ const (
 )
 
 type TipOperation struct {
-	ID        uuid.UUID `db:"id" json:"id"`
+	ID       uuid.UUID `db:"id" json:"id"`
 	Type      TipOps    `db:"type" json:"type" validate:"required"`
-	Position  int64     `db:"position" json:"position"`
-	Discard   Discard   `db:"discard" json:"discard"`
+	Position  int64     `db:"position" json:"position,omitempty"`
+	Discard   Discard   `db:"discard" json:"discard,omitempty"`
 	ProcessID uuid.UUID `db:"process_id" json:"process_id"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
@@ -102,13 +102,20 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 		return
 	}
 	
-	process, err := s.processOperation(ctx, name, TipOperationProcess, ad, Process{})
+	var opsType ProcessType
+	if ad.Type == PickupTip{
+		opsType = TipPickupProcess
+	} else{
+		opsType = TipDiscardProcess
+	}
+
+	process, err := s.processOperation(ctx, name, opsType , ad, Process{})
 	if err != nil {
 		return
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(TipOperationProcess)
+	process.Type = opsType
 	process.RecipeID = recipeID
 
 	// create the process

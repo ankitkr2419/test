@@ -19,7 +19,7 @@ const (
 	DelayProcess          ProcessType = "Delay"
 	PiercingProcess       ProcessType = "Piercing"
 	TipDockingProcess     ProcessType = "TipDocking"
-	TipPickupProcess      ProcessType = "TipPickUp"
+	TipPickupProcess      ProcessType = "TipPickup"
 	TipDiscardProcess     ProcessType = "TipDiscard"
 	ShakingProcess        ProcessType = "Shaking"
 	HeatingProcess        ProcessType = "Heating"
