@@ -49,7 +49,7 @@ const RecipeListingComponent = (props) => {
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
   const isLoggedIn = activeDeckObj.isLoggedIn;
-  const error = activeDeckObj.isError;
+  const error = activeDeckObj.error;
 
   const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
   const dispatch = useDispatch();
