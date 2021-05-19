@@ -548,3 +548,4 @@ func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (er
 	args := m.Called(ctx, userAuth)
 	return args.Error(0)
 }
+
