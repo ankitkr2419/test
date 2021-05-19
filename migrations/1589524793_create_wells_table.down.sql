@@ -1,1 +1,1 @@
-DROP TABLE wells;
+DROP TABLE IF EXISTS wells;

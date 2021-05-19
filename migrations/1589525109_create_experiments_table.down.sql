@@ -1,1 +1,1 @@
-DROP TABLE experiments;
+DROP TABLE IF EXISTS experiments;

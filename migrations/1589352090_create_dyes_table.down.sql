@@ -1,1 +1,1 @@
-DROP TABLE dyes;
+DROP TABLE IF EXISTS dyes;
