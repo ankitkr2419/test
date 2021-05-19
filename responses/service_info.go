@@ -1,6 +1,8 @@
 package responses
 
 var (
+	Pong = "pong"
+	
 	PiercingCreateSuccess = "piercing record created successfully"
 	PiercingFetchSuccess  = "piercing record fetched successfully"
 	PiercingUpdateSuccess = "piercing record updated successfully"
