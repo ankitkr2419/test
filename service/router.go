@@ -79,7 +79,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/recipes/{id}", authenticate(showRecipeHandler(deps), deps)).Methods(http.MethodGet)
 	router.HandleFunc("/recipes/{id}", authenticate(deleteRecipeHandler(deps), deps, admin, engineer)).Methods(http.MethodDelete)
 	router.HandleFunc("/recipes/{id}", authenticate(updateRecipeHandler(deps), deps, admin, engineer)).Methods(http.MethodPut)
-	router.HandleFunc("/recipes/{id}/publish", publishRecipeHandler(deps)).Methods(http.MethodPost)
+	router.HandleFunc("/recipes/{id}/{publish:[a-z]*}", publishRecipeHandler(deps)).Methods(http.MethodPost)
 	router.HandleFunc("/processes", authenticate(createProcessHandler(deps), deps, admin, engineer)).Methods(http.MethodPost)
 	router.HandleFunc("/recipe/{id}/processes", listProcessesHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/duplicate-process/{process_id}", duplicateProcessHandler(deps)).Methods(http.MethodGet)
@@ -115,6 +115,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}", authenticate(listTipsTubesHandler(deps), deps)).Methods(http.MethodGet)
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps)).Methods(http.MethodGet)
 	router.HandleFunc("/logout/{deck:[A-B]?}", authenticate(logoutUserHandler(deps), deps)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	return
 }

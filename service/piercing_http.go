@@ -32,7 +32,7 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 
 		valid, respBytes := validate(pobj)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln( responses.PiercingValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.PiercingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
