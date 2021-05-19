@@ -8,7 +8,7 @@ const initialStateOfDecks = () => {
     {
       name: DECKNAME.DeckA,
       isLoggedIn: false,
-      error: false,
+      error: null,
       msg: "",
       isAdmin: false,
       isActive: true,
@@ -17,7 +17,7 @@ const initialStateOfDecks = () => {
     {
       name: DECKNAME.DeckB,
       isLoggedIn: false,
-      error: false,
+      error: null,
       msg: "",
       isAdmin: false,
       isActive: false,
@@ -168,13 +168,14 @@ export const loginReducer = (state = loginInitialState, action) => {
     case loginActions.setIsTemplateRoute:
       return state.setIn(["isTemplateRoute"], action.payload.isTemplateRoute);
 
+    // login reset
     case loginActions.loginReset:
       let deckShouldLogout = action.payload.deckName;
 
       let newDecksAfterLogout = getUpdatedDecks(
         state,
         deckShouldLogout,
-        { isLoggedIn: false, token: "" },
+        { error: null, isLoggedIn: false, token: "" },
         {},
         true
       );

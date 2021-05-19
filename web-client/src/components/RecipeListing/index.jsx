@@ -48,6 +48,9 @@ const RecipeListingComponent = (props) => {
   const activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
+  const isLoggedIn = activeDeckObj.isLoggedIn;
+  const error = activeDeckObj.isError;
+
   const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -62,7 +65,11 @@ const RecipeListingComponent = (props) => {
 
   useEffect(() => {
     setSearchRecipeText("");
-  }, [deckName]);
+
+    if (!error && !isLoggedIn) {
+      history.push(ROUTES.landing);
+    }
+  }, [error, isLoggedIn]);
 
   const onSearchRecipeTextChanged = (e) => {
     const value = e.target.value;
@@ -79,7 +86,6 @@ const RecipeListingComponent = (props) => {
     // dispatch(loginReset(deckName));
     let token = activeDeckObj.token;
     dispatch(logoutInitiated({ deckName: deckName, token: token }));
-    history.push(ROUTES.landing);
   };
 
   const toggleLogoutModalVisibility = () => {
