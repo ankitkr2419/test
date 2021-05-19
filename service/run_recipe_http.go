@@ -49,7 +49,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 		if runNext[deck] {
 			err = responses.StepRunNotInProgressError
 			logger.Errorln(err)
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: deck})
+			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: err.Error(), Deck: deck})
 			return
 		}
 
@@ -93,8 +93,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
-
-		return "", err
+		return
 	}
 
 	var currentCartridgeID int64

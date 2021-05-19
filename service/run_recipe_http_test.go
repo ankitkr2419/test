@@ -32,11 +32,10 @@ func TestRunRecipeTestSuite(t *testing.T) {
 var invalidDeck = "I"
 var runStepWise = false
 var invalidUUID = "not-a-uuid"
-var recipeID, _ = uuid.NewUUID()
+var recipeID = uuid.New()
 
+// Run Recipe Continuously Test cases
 func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
-
-	suite.dbMock.On("runRecipe", mock.Anything, mock.Anything, deckB, runStepWise, recipeID).Return("Success", nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
@@ -56,8 +55,6 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
 }
 
 func (suite *ProcessHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
-
-	suite.dbMock.On("runRecipe", mock.Anything, mock.Anything, deckB, runStepWise, recipeID).Return("Success", nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
@@ -104,3 +101,94 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 */
+
+// Step Run Test cases
+func (suite *ProcessHandlerTestSuite) TestStepRunRecipeSuccess() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/step-run/{id}/{deck:[A-B]}",
+		"/step-run/"+recipeUUID.String()+"/"+deckB,
+		"",
+		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
+	)
+
+	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: deckB}
+
+	output, _ := json.Marshal(msg)
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/step-run/{id}/{deck:[A-B]}",
+		"/step-run/"+invalidUUID+"/"+deckB,
+		"",
+		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
+	)
+
+	_, err := uuid.Parse(invalidUUID)
+
+	errObj := ErrObj{Err: err.Error(), Deck: deckB}
+
+	output, _ := json.Marshal(errObj)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+
+
+func (suite *ProcessHandlerTestSuite) TestRunNextStepSuccess() {
+
+	runNext[deckB] = false
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/run-next-step/{deck:[A-B]}",
+		"/run-next-step/"+deckB,
+		"",
+		runNextStepHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	go func(){
+		// drain nextStep channel
+		<-nextStep[deckB]
+	}()
+
+	msg := MsgObj{Msg: responses.NextStepRunInProgress, Deck: deckB}
+
+	output, _ := json.Marshal(msg)
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+
+	suite.dbMock.AssertNotCalled(suite.T(), "populateNextStepChan", mock.Anything )
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestRunNextStepFailure() {
+
+	runNext[deckB] = true
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/run-next-step/{deck:[A-B]}",
+		"/run-next-step/"+deckB,
+		"",
+		runNextStepHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	errObj := ErrObj{Err: responses.StepRunNotInProgressError.Error(), Deck: deckB}
+
+	output, _ := json.Marshal(errObj)
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
