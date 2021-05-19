@@ -92,9 +92,11 @@ export const getUpdatedDecks = (
   state,
   deckName,
   changesInMatchedDeck,
-  changesInUnMatchedDeck = {}
+  changesInUnMatchedDeck = {},
+  isLoginReducer = false
 ) => {
-  const array = state.decks.map((deckObj) => {
+  const arrayOfDecks = isLoginReducer ? state.toJS().decks : state.decks;
+  const array = arrayOfDecks.map((deckObj) => {
     return deckObj.name === deckName
       ? {
           ...deckObj,
