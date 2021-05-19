@@ -225,79 +225,95 @@ export const LABWARE_NAME = {
   cartridgeType: "Cartridge Type",
 };
 
-/**
- * get process icon_name associated with processType
- * */
-export const PROCESS_ICON_CONSTANTS = [
-  //if processType not found, use default process icon
-  {
-    processType: "default",
-    iconName: "process",
-  },
-
-  //other icons:
-  {
-    processType: "Piercing",
-    iconName: "piercing",
-  },
-  {
-    processType: "AspireDispense",
-    iconName: "aspire-dispense",
-  },
-  {
-    processType: "Heating",
-    iconName: "heating",
-  },
-  {
-    processType: "Shaking",
-    iconName: "shaking",
-  },
-  {
-    processType: "Delay",
-    iconName: "delay",
-  },
-  /**TODO:
-   * following icons not available in fonts.scss
-   */
-  {
-    processType: "TipOperation",
-    iconName: "",
-  },
-  {
-    processType: "TipDocking",
-    iconName: "",
-  },
-  {
-    processType: "AttachDetach",
-    iconName: "",
-  },
-];
+//delete this @Ankush
+export const PROCESS_ICON_CONSTANTS = {};
 
 export const SELECT_PROCESS_PROPS = [
-  { iconName: "piercing", processName: "Piercing", route: ROUTES.piercing },
+  //if processType not found, use default process icon
+  {
+    processName: "Process Name",
+    processType: "default",
+    iconName: "process",
+    route: "",
+  },
+
+  // process properties
+  {
+    iconName: "piercing",
+    processType: "Piercing",
+    processName: "Piercing",
+    route: ROUTES.piercing,
+  },
   {
     iconName: "tip-pickup",
+    processType: "TipPickup", //may change
     processName: "Tip Pickup",
     route: ROUTES.tipPickup,
   },
   {
     iconName: "aspire-dispense",
+    processType: "AspireDispense",
     processName: "Aspire & Dispense",
     route: ROUTES.aspireDispense,
   },
-  { iconName: "shaking", processName: "Shaking", route: ROUTES.shaking },
-  { iconName: "heating", processName: "Heating", route: ROUTES.heating },
-  { iconName: "magnet", processName: "Magnet", route: ROUTES.magnet },
+  {
+    iconName: "shaking",
+    processType: "Shaking",
+    processName: "Shaking",
+    route: ROUTES.shaking,
+  },
+  {
+    iconName: "heating",
+    processType: "Heating",
+    processName: "Heating",
+    route: ROUTES.heating,
+  },
+  {
+    iconName: "magnet",
+    processType: "Magnet",
+    processName: "Magnet",
+    route: ROUTES.magnet,
+  },
   {
     iconName: "tip-discard",
+    processType: "TipDiscard", //may change
     processName: "Tip Discard",
     route: ROUTES.tipDiscard,
   },
-  { iconName: "delay", processName: "Delay", route: ROUTES.delay },
+  {
+    iconName: "delay",
+    processType: "Delay",
+    processName: "Delay",
+    route: ROUTES.delay,
+  },
   {
     iconName: "tip-position",
+    processType: "TipPosition", //may change
     processName: "Tip Position",
     route: ROUTES.tipPosition,
+  },
+
+  /**TODO:
+   * Following icons not available in fonts.scss.
+   * Routes will be added at a later point of time.
+   */
+  {
+    processName: "Tip Operation",
+    processType: "TipOperation",
+    iconName: "",
+    route: "",
+  },
+  {
+    processName: "Tip Docking",
+    processType: "TipDocking",
+    iconName: "",
+    route: "",
+  },
+  {
+    processName: "Attach Detach",
+    processType: "AttachDetach",
+    iconName: "",
+    route: "",
   },
 ];
 
