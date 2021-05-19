@@ -40,9 +40,9 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 	err = s.db.Get(&ad, getAttachDetachQuery, processID)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AttachDetachCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.AttachDetachCompletedState)
 		}
 	}()
 	if err != nil {
@@ -66,7 +66,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recip
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.AttachDetachCreateError)
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -76,7 +76,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recip
 			return
 		}
 		logger.Infoln(responses.AttachDetachCreateSuccess, createdAD)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.AttachDetachCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.AttachDetachCompletedState)
 		return
 	}()
 
@@ -140,9 +140,9 @@ func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err e
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AttachDetachCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AttachDetachCompletedState)
 		}
 	}()
 	if err != nil {

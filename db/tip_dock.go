@@ -43,9 +43,9 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 	err = s.db.Get(&td, getTipDockQuery, pid)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.TipDockingCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.TipDockingCompletedState)
 		}
 	}()
 	if err != nil {
@@ -69,7 +69,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.TipDockingCreateError)
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -79,7 +79,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 			return
 		}
 		logger.Infoln(responses.TipDockingCreateSuccess, createdAD)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.TipDockingCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.TipDockingCompletedState)
 		return
 	}()
 
@@ -145,9 +145,9 @@ func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipDockingCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.TipDockingCompletedState)
 		}
 	}()
 	if err != nil {

@@ -47,9 +47,9 @@ func (s *pgStore) ShowProcess(ctx context.Context, id uuid.UUID) (dbProcess Proc
 	err = s.db.Get(&dbProcess, getProcessQuery, id)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.ProcessCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.ProcessCompletedState)
 		}
 	}()
 	if err != nil {
@@ -65,9 +65,9 @@ func (s *pgStore) ListProcesses(ctx context.Context, id uuid.UUID) (dbProcess []
 	err = s.db.Select(&dbProcess, selectProcessQuery, id)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.ProcessListCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.ProcessListCompletedState)
 		}
 	}()
 	if err != nil {
@@ -96,13 +96,13 @@ func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess 
 	defer func() {
 		if err != nil {
 			tx.Rollback()
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
 		createdProcess, err = s.ShowProcess(ctx, createdProcess.ID)
 		logger.Infoln("Created Process: ", createdProcess)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.ProcessCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.ProcessCompletedState)
 		return
 	}()
 
@@ -115,9 +115,9 @@ func (s *pgStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
 	_, err = s.db.Exec(deleteProcessQuery, id)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, DeleteOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, DeleteOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, DeleteOperation, "", responses.ProcessCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, DeleteOperation, "", responses.ProcessCompletedState)
 		}
 	}()
 	if err != nil {
@@ -139,9 +139,9 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.ProcessCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.ProcessCompletedState)
 		}
 	}()
 	if err != nil {
@@ -160,9 +160,9 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 	parent, err = s.ShowProcess(ctx, processID)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.DuplicateProcessCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.DuplicateProcessCompletedState)
 		}
 	}()
 
@@ -212,7 +212,7 @@ func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, se
 		// 6. end transaction
 		if err != nil {
 			tx.Rollback()
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -222,7 +222,7 @@ func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, se
 			logger.Errorln(responses.ProcessRearrangeDBError, processes)
 		}
 		logger.Infoln(responses.ProcessRearrangeSuccess)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.RearrangeProcessCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.RearrangeProcessCompletedState)
 		return
 	}()
 

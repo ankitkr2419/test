@@ -56,9 +56,9 @@ func (s *pgStore) ShowPiercing(ctx context.Context, processID uuid.UUID) (dbPier
 	err = s.db.Get(&dbPiercing, getPiercingQuery, processID)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.PiercingCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.PiercingCompletedState)
 		}
 	}()
 	if err != nil {
@@ -74,9 +74,9 @@ func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err 
 	err = s.db.Select(&dbPiercing, selectPiercingQuery)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.PiercingListCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.PiercingListCompletedState)
 		}
 	}()
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.PiercingCreateError)
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -110,7 +110,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid
 			return
 		}
 		logger.Infoln(responses.PiercingCreateSuccess, createdAD)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.PiercingCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.PiercingCompletedState)
 		return
 	}()
 
@@ -176,9 +176,9 @@ func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.PiercingCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.PiercingCompletedState)
 		}
 	}()
 

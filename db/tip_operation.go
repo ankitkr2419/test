@@ -52,9 +52,9 @@ func (s *pgStore) ShowTipOperation(ctx context.Context, id uuid.UUID) (dbTipOper
 	err = s.db.Get(&dbTipOperation, getTipOperationQuery, id)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.TipOperationCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.TipOperationCompletedState)
 		}
 	}()
 	if err != nil {
@@ -87,7 +87,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.TipOperationCreateError)
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -97,7 +97,7 @@ func (s *pgStore) CreateTipOperation(ctx context.Context, ad TipOperation, recip
 			return
 		}
 		logger.Infoln(responses.TipOperationCreateSuccess, createdAD)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.TipOperationCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.TipOperationCompletedState)
 		return
 	}()
 
@@ -170,9 +170,9 @@ func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err e
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipOperationCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.TipOperationCompletedState)
 		}
 	}()
 

@@ -37,9 +37,9 @@ func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err
 	err = s.db.Get(&delay, getDelayQuery, id)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.DelayCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.DelayCompletedState)
 		}
 	}()
 	if err != nil {
@@ -63,7 +63,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID)
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.DelayCreateError)
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -73,7 +73,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID)
 			return
 		}
 		logger.Infoln(responses.DelayCreateSuccess, createdAD)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.DelayCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.DelayCompletedState)
 		return
 	}()
 
@@ -118,9 +118,9 @@ func (s *pgStore) createDelay(ctx context.Context, tx *sql.Tx, d Delay) (created
 
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.DelayCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.DelayCompletedState)
 		}
 	}()
 

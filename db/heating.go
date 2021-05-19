@@ -47,9 +47,9 @@ func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heatin
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.HeatingCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.HeatingCompletedState)
 		}
 	}()
 	if err != nil {
@@ -73,7 +73,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.U
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.HeatingCreateError)
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -83,7 +83,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.U
 			return
 		}
 		logger.Infoln(responses.HeatingCreateSuccess, createdAD)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.HeatingCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.HeatingCompletedState)
 		return
 	}()
 
@@ -149,9 +149,9 @@ func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.HeatingCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.HeatingCompletedState)
 		}
 	}()
 	if err != nil {

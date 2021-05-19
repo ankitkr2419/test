@@ -92,9 +92,9 @@ func (s *pgStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (dbAspir
 	//logging error if there is any otherwise logging success
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.AspireDispenseCompletedState)
 		}
 	}()
 
@@ -115,9 +115,9 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 	//logging error if there is any otherwise logging success
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseListCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.AspireDispenseListCompletedState)
 		}
 	}()
 
@@ -143,7 +143,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.AspireDispenseCreateError)
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -153,7 +153,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 			return
 		}
 		logger.Infoln(responses.AspireDispenseCreateSuccess, createdAD)
-		go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.AspireDispenseCompletedState)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.AspireDispenseCompletedState)
 		return
 	}()
 
@@ -248,9 +248,9 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 	//logging error if there is any otherwise logging success
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AspireDispenseCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AspireDispenseCompletedState)
 		}
 	}()
 

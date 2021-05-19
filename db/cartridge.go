@@ -67,9 +67,9 @@ func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge, c
 	)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.CartridgeCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.CartridgeCompletedState)
 		}
 	}()
 	if err != nil {
@@ -122,9 +122,9 @@ func (s *pgStore) ListCartridges(ctx context.Context) (cartridge []Cartridge, er
 	err = s.db.Select(&cartridge, selectAllCartridgeQuery)
 	defer func() {
 		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
 		} else {
-			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.CartridgeListCompletedState)
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.CartridgeListCompletedState)
 		}
 	}()
 	if err != nil {
