@@ -84,7 +84,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(TipDockingProcess)
+	process.Type = TipDockingProcess
 	process.RecipeID = recipeID
 
 	// create the process

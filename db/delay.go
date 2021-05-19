@@ -80,7 +80,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID)
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(DelayProcess)
+	process.Type = DelayProcess
 	process.RecipeID = recipeID
 
 	// create the process
