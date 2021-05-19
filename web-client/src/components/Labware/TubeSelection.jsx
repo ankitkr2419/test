@@ -1,6 +1,6 @@
 import React from "react";
 import { FormGroup, Label, FormError, Select } from "core-components";
-import { CommmonTubeFields } from './CommmonTubeFields';
+import { CommmonTubeFields } from "./CommmonTubeFields";
 
 const TubeSelection = (props) => {
   const { handleOptionChange, options, value } = props;

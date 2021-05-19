@@ -13,7 +13,8 @@ import LandingPageContainer from "containers/LandingPageContainer";
 import RecipeListingContainer from "containers/RecipeListingContainer";
 import AllSetContainer from "containers/AllSetContainer";
 import LabwareContainer from "containers/LabwareContainer";
-import { ROOT_URL_PATH } from "./appConstants";
+import ProcessListingContainer from "containers/ProcessListingContainer";
+import { ROOT_URL_PATH, ROUTES } from "./appConstants";
 import SelectProcessContainer from "containers/SelectProcessContainer";
 import PiercingContainer from "containers/PiercingContainer";
 import TipPickupContainer from "containers/TipPickupContainer";
@@ -84,7 +85,7 @@ export const routeDefinitions = [
         path: `${ROOT_URL_PATH}select-process`,
         exact: true,
         component: SelectProcessContainer,
-        key: 12,
+        key: 18,
       },
       {
         path: `${ROOT_URL_PATH}piercing`,

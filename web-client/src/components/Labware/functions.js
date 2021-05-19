@@ -1,5 +1,3 @@
-//this will be changed to null values instead of 0 in future
-//after backend gets fixed.
 export const getRequestBody = (recipeName, formikState) => {
   const requestBody = {
     name: recipeName,
@@ -48,6 +46,8 @@ export const getOptionsForTubesAndCartridges = (options, position) => {
         };
       }
     });
+    return optionsObj.filter((item) => item);
+  } else {
+    return null;
   }
-  return optionsObj.filter((item) => item);
 };

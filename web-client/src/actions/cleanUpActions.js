@@ -30,17 +30,17 @@ export const abortCleanUpAction = {
   abortCleanUpReset: "ABORT_CLEAN_UP_RESET",
 };
 
-export const setCleanUpHoursAction = {
+export const cleanUpHourActions = {
   setHours: "SET_HOURS",
   resetHours: "RESET_HOURS",
 };
 
-export const setCleanUpMinsAction = {
+export const cleanUpMinsActions = {
   setMins: "SET_MINS",
   resetMins: "RESET_MINS",
 };
 
-export const setCleanUpSecsAction = {
+export const cleanUpSecsActions = {
   setSecs: "SET_SECS",
   resetSecs: "RESET_SECS",
 };

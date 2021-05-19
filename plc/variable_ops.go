@@ -48,7 +48,6 @@ func (d *Compact32Deck) resetTipDiscardInProgress() {
 	tipDiscardInProgress.Store(d.name, false)
 }
 
-
 func (d *Compact32Deck) setAborted() {
 	aborted.Store(d.name, true)
 }
