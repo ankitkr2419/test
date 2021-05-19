@@ -59,7 +59,6 @@ const LabWareComponent = (props) => {
 
   const tipsOptions = recipeDetailsReducer.tipsOptions;
   const tubesOptions = recipeDetailsReducer.tubesOptions;
-  const tipsAndTubesOptions = recipeDetailsReducer.tipsAndTubesOptions;
   const cartridgeOptions = recipeDetailsReducer.cartridgeOptions;
   const newRecipeName = recipeDetailsReducer.recipeDetails.name;
 
@@ -111,7 +110,6 @@ const LabWareComponent = (props) => {
                     formik={formik}
                     tubesOptions={tubesOptions}
                     tipsOptions={tipsOptions}
-                    tipsAndTubesOptions={tipsAndTubesOptions}
                     cartridgeOptions={cartridgeOptions}
                   />
                 )}
