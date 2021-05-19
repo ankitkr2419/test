@@ -80,6 +80,8 @@ export const API_ENDPOINTS = {
   tips: "tip",
   stepRun: "step-run",
   runNextStep: "run-next-step",
+  login: "login",
+  logout: "logout",
 };
 
 export const MODAL_MESSAGE = {

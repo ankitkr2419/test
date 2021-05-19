@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { VideoCard } from "shared-components";
 import MlModal from "shared-components/MlModal";
 import TimeModal from "components/modals/TimeModal";
@@ -7,7 +7,10 @@ import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeC
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
 import { DECKNAME, MODAL_BTN, ROUTES, MODAL_MESSAGE } from "appConstants";
-import { loginReset } from "action-creators/loginActionCreators";
+import {
+  loginReset,
+  logoutInitiated,
+} from "action-creators/loginActionCreators";
 import {
   cleanUpHours,
   cleanUpMins,
@@ -40,6 +43,11 @@ const RecipeListingComponent = (props) => {
     runRecipeType,
   } = props;
 
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  const activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+
   const [isLogoutModalVisible, setLogoutModalVisibility] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -67,7 +75,10 @@ const RecipeListingComponent = (props) => {
 
   const onLogoutClicked = () => {
     toggleLogoutModalVisibility();
-    dispatch(loginReset(deckName));
+    //logout api
+    // dispatch(loginReset(deckName));
+    let token = activeDeckObj.token;
+    dispatch(logoutInitiated({ deckName: deckName, token: token }));
     history.push(ROUTES.landing);
   };
 

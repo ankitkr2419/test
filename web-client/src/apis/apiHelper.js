@@ -135,17 +135,3 @@ export function* callApi(actions) {
 export function* fetchResponseSaga() {
   yield takeEvery(fetchAction.fetchResponse, callApi);
 }
-
-// export const getResponse = async (reqPath, method = 'GET', params = null, body = null) => {
-// 	// request url formation
-// 	const fetchUrl = getRequestUrl(reqPath, params);
-// 	const fetchOptions = {
-// 		method,
-// 		headers: defaultHeaders(),
-// 		body: body && JSON.stringify(body),
-// 	};
-
-// 	const response = await fetch(fetchUrl, fetchOptions);
-// 	return response.json();
-
-// };
