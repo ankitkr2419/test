@@ -8,7 +8,7 @@ const initialStateOfDecks = () => {
     {
       name: DECKNAME.DeckA,
       isLoggedIn: false,
-      error: null,
+      error: false,
       msg: "",
       isAdmin: false,
       isActive: true,
@@ -17,7 +17,7 @@ const initialStateOfDecks = () => {
     {
       name: DECKNAME.DeckB,
       isLoggedIn: false,
-      error: null,
+      error: false,
       msg: "",
       isAdmin: false,
       isActive: false,
