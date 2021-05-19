@@ -163,7 +163,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		}
 
 		switch p.Type {
-		case "AspireDispense":
+		case db.AspireDispenseProcess:
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -181,7 +181,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "Heating":
+		case db.HeatingProcess:
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
 			fmt.Printf("heat object %v", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
@@ -191,7 +191,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(ht)
 
-		case "Shaking":
+		case db.ShakingProcess:
 			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -204,7 +204,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(sha)
 
-		case "Piercing":
+		case db.PiercingProcess:
 			pi, err := deps.Store.ShowPiercing(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -222,7 +222,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "AttachDetach":
+		case db.AttachDetachProcess:
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
 			fmt.Printf("attach detach record %v \n", ad)
 			if err != nil {
@@ -233,7 +233,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "TipOperation":
+		case db.TipDiscardProcess, db.TipPickupProcess:
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -260,7 +260,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentTip = db.TipsTubes{}
 
 			}
-		case "TipDocking":
+		case db.TipDockingProcess:
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -275,7 +275,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			if err != nil {
 				return "", err
 			}
-		case "Delay":
+		case db.DelayProcess:
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -336,7 +336,7 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	return 0, err
 }
 
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName, processType string) {
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName string, processType db.ProcessType) {
 	// percentage calculation for each process
 
 	progress := float64(((currentStep - 1) * 100) / processLength)
