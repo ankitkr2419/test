@@ -39,12 +39,12 @@ var testShakingRecord = db.Shaker{
 
 func (suite *ShakingHandlerTestSuite) TestCreateShakingSuccess() {
 
-	suite.dbMock.On("CreateShaking", mock.Anything, testShakingRecord).Return(testShakingRecord, nil)
+	suite.dbMock.On("CreateShaking", mock.Anything, mock.Anything, mock.Anything).Return(testShakingRecord, nil)
 
 	body, _ := json.Marshal(testShakingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/shaking",
-		"/shaking",
+		"/shaking/{recipe_id}",
+		"/shaking/"+recipeUUID.String(),
 		string(body),
 		createShakingHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -57,12 +57,12 @@ func (suite *ShakingHandlerTestSuite) TestCreateShakingSuccess() {
 
 func (suite *ShakingHandlerTestSuite) TestCreateShakingFailure() {
 
-	suite.dbMock.On("CreateShaking", mock.Anything, testShakingRecord).Return(testShakingRecord, responses.ShakingCreateError)
+	suite.dbMock.On("CreateShaking", mock.Anything, mock.Anything, recipeUUID).Return(db.Shaker{}, responses.ShakingCreateError)
 
 	body, _ := json.Marshal(testShakingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/shaking",
-		"/shaking",
+		"/shaking/{recipe_id}",
+		"/shaking/"+recipeUUID.String(),
 		string(body),
 		createShakingHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -115,7 +115,7 @@ func (suite *ShakingHandlerTestSuite) TestShowShakingFailure() {
 
 func (suite *ShakingHandlerTestSuite) TestUpdateShakingSuccess() {
 
-	suite.dbMock.On("UpdateShaking", mock.Anything, testShakingRecord).Return(nil)
+	suite.dbMock.On("UpdateShaking", mock.Anything, mock.Anything).Return(nil)
 
 	body, _ := json.Marshal(testShakingRecord)
 
@@ -136,7 +136,7 @@ func (suite *ShakingHandlerTestSuite) TestUpdateShakingSuccess() {
 
 func (suite *ShakingHandlerTestSuite) TestUpdateShakingFailure() {
 
-	suite.dbMock.On("UpdateShaking", mock.Anything, testShakingRecord).Return(responses.ShakingUpdateError)
+	suite.dbMock.On("UpdateShaking", mock.Anything, mock.Anything).Return(responses.ShakingUpdateError)
 
 	body, _ := json.Marshal(testShakingRecord)
 

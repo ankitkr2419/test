@@ -43,6 +43,7 @@ var testProcessRecord = db.Process{
 	SequenceNumber: 1,
 	RecipeID:       recipeUUID,
 }
+
 var listProcesses = []db.Process{
 	testProcessRecord,
 }
