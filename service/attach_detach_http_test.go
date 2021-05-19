@@ -192,7 +192,7 @@ func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachFailure() {
 func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachInvalidUUID() {
 
 	body, _ := json.Marshal(testAttachDetachRecord)
-	recorder := makeHTTPCall(http.MethodPost,
+	recorder := makeHTTPCall(http.MethodPut,
 		"/attach-detach/{recipe_id}",
 		"/attach-detach/"+invalidUUID,
 		string(body),
