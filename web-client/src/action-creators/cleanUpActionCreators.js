@@ -3,9 +3,9 @@ import {
   pauseCleanUpAction,
   resumeCleanUpAction,
   abortCleanUpAction,
-  setCleanUpHoursAction,
-  setCleanUpMinsAction,
-  setCleanUpSecsAction,
+  cleanUpHourActions,
+  cleanUpMinsActions,
+  cleanUpSecsActions,
   setShowCleanUpAction,
 } from "actions/cleanUpActions";
 
@@ -127,18 +127,18 @@ export const abortCleanUpActionReset = () => ({
   payload: {},
 });
 
-export const setCleanUpHours = (params) => ({
-  type: setCleanUpHoursAction.setHours,
+export const cleanUpHours = (params) => ({
+  type: cleanUpHourActions.setHours,
   payload: { params },
 });
 
-export const setCleanUpMins = (params) => ({
-  type: setCleanUpMinsAction.setMins,
+export const cleanUpMins = (params) => ({
+  type: cleanUpMinsActions.setMins,
   payload: { params },
 });
 
-export const setCleanUpSecs = (params) => ({
-  type: setCleanUpSecsAction.setSecs,
+export const cleanUpSecs = (params) => ({
+  type: cleanUpSecsActions.setSecs,
   payload: { params },
 });
 
