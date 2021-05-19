@@ -115,15 +115,3 @@ export const getTipsActionReset = (params) => ({
   type: getTipsAction.getTipsReset,
   payload: params,
 });
-
-
-// //create/edit recipe detials
-// export const updateRecipe = (payload) => ({
-//     type: saveNewRecipeActions.updateRecipe,
-//     payload
-// });
-
-// //clear all data
-// export const resetRecipe = () => ({
-//     type: saveNewRecipeActions.resetRecipe
-// })

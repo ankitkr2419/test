@@ -4,7 +4,7 @@ import { CommmonTubeFields } from "./CommmonTubeFields";
 import { ImageIcon } from "shared-components";
 import { ProcessSetting } from "./Styles";
 
-const HeaderAndLabel = (props) => {
+const LabelAndDropDown = (props) => {
   const {
     isDeck,
     handleOptionChange,
@@ -15,12 +15,10 @@ const HeaderAndLabel = (props) => {
     typeValue,
   } = props;
 
-  const headerText =
-    isDeck === "deckPosition" ? "Select Deck" : "Select Cartridge";
+  const headerText = isDeck ? "Select Deck" : "Select Cartridge";
+  const label = isDeck ? "Tube Type" : "Cartridge Type";
+  const type = isDeck ? "deck" : "cartridge";
 
-  const label = isDeck === "deckPosition" ? "Tube Type" : "Cartridge Type";
-
-  const type = isDeck === "deckPosition" ? "deck" : "cartridge";
   return (
     <>
       <CommmonTubeFields>
@@ -65,6 +63,6 @@ const HeaderAndLabel = (props) => {
   );
 };
 
-HeaderAndLabel.propTypes = {};
+LabelAndDropDown.propTypes = {};
 
-export default React.memo(HeaderAndLabel);
+export default React.memo(LabelAndDropDown);

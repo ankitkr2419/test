@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import {  VideoCard } from "shared-components";
+import { VideoCard } from "shared-components";
 import MlModal from "shared-components/MlModal";
 import TimeModal from "components/modals/TimeModal";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
@@ -9,9 +9,9 @@ import { useHistory } from "react-router-dom";
 import { DECKNAME, MODAL_BTN, ROUTES, MODAL_MESSAGE } from "appConstants";
 import { loginReset } from "action-creators/loginActionCreators";
 import {
-  setCleanUpHours,
-  setCleanUpMins,
-  setCleanUpSecs,
+  cleanUpHours,
+  cleanUpMins,
+  cleanUpSecs,
   setShowCleanUp,
 } from "action-creators/cleanUpActionCreators";
 import TrayDiscardModal from "components/modals/TrayDiscardModal";
@@ -49,8 +49,8 @@ const RecipeListingComponent = (props) => {
   const [nextModal, setNextModal] = useState(true);
   const [addNewRecipesModal, setAddNewRecipesModal] = useState(false);
   const [searchRecipeText, setSearchRecipeText] = useState("");
-  const [recipeIdToPublish, setRecipeIdToPublish] = useState("")
-  const [publishModal, setPublishModal] = useState(false)
+  const [recipeIdToPublish, setRecipeIdToPublish] = useState("");
+  const [publishModal, setPublishModal] = useState(false);
 
   useEffect(() => {
     setSearchRecipeText("");
@@ -85,22 +85,22 @@ const RecipeListingComponent = (props) => {
   };
 
   const togglePublishModal = () => {
-    setPublishModal(!publishModal)
-  }
+    setPublishModal(!publishModal);
+  };
 
   const handlePublishModalClick = (recipeId) => {
-    setRecipeIdToPublish(recipeId)
-    if(recipeId)
-      togglePublishModal();
-  }
+    setRecipeIdToPublish(recipeId);
+    if (recipeId) togglePublishModal();
+  };
 
   const handlePublishConfirmation = () => {
     togglePublishModal();
-    if(recipeIdToPublish)
-      dispatch(publishRecipeInitiated({recipeId: recipeIdToPublish, deckName}))
-    else 
-      console.error('recipeId not found!');
-  }
+    if (recipeIdToPublish)
+      dispatch(
+        publishRecipeInitiated({ recipeId: recipeIdToPublish, deckName })
+      );
+    else console.error("recipeId not found!");
+  };
 
   const handleSuccessBtn = () => {
     if (nextModal) {
@@ -136,20 +136,11 @@ const RecipeListingComponent = (props) => {
     let name = event.target.name;
 
     if (name === "hours") {
-      dispatch(
-        setCleanUpHours({
-          deckName: deckName,
-          hours: event.target.value,
-        })
-      );
+      dispatch(cleanUpHours({ deckName: deckName, hours: event.target.value }));
     } else if (name === "minutes") {
-      dispatch(
-        setCleanUpMins({ deckName: deckName, mins: event.target.value })
-      );
+      dispatch(cleanUpMins({ deckName: deckName, mins: event.target.value }));
     } else if (name === "seconds") {
-      dispatch(
-        setCleanUpSecs({ deckName: deckName, secs: event.target.value })
-      );
+      dispatch(cleanUpSecs({ deckName: deckName, secs: event.target.value }));
     }
   };
 
@@ -159,8 +150,8 @@ const RecipeListingComponent = (props) => {
 
   const handleEditRecipe = (recipe) => {
     let recipeId = recipe?.id;
-    if(!recipeId) {
-      console.error('recipeId not found');
+    if (!recipeId) {
+      console.error("recipeId not found");
       return;
     }
 
@@ -168,11 +159,13 @@ const RecipeListingComponent = (props) => {
 
     //go to processList page of recipe
     history.push(ROUTES.processListing);
-  }
+  };
 
   const getLogoutTextBody = () => {
-    return `Are you sure you want to sign out of ${isAdmin ? "Admin" : "Operator"} role?`
-  }
+    return `Are you sure you want to sign out of ${
+      isAdmin ? "Admin" : "Operator"
+    } role?`;
+  };
 
   return (
     <>
@@ -238,19 +231,19 @@ const RecipeListingComponent = (props) => {
 
         {/** publish confirmation modal */}
         {publishModal && (
-        <MlModal
-          isOpen={publishModal}
-          textHead={deckName}
-          textBody={MODAL_MESSAGE.publishConfirmation}
-          handleSuccessBtn={handlePublishConfirmation}
-          handleCrossBtn={togglePublishModal}
-          successBtn={MODAL_BTN.yes}
-          failureBtn={MODAL_BTN.no}
-        />
+          <MlModal
+            isOpen={publishModal}
+            textHead={deckName}
+            textBody={MODAL_MESSAGE.publishConfirmation}
+            handleSuccessBtn={handlePublishConfirmation}
+            handleCrossBtn={togglePublishModal}
+            successBtn={MODAL_BTN.yes}
+            failureBtn={MODAL_BTN.no}
+          />
         )}
 
         {/** Sub - Menu above recipe listings (like addNewRecipe/ cleanUp/ etc) */}
-        <TopContentComponent 
+        <TopContentComponent
           isProcessInProgress={isProcessInProgress}
           onLogoutClicked={onLogoutClicked}
           deckName={deckName}
@@ -264,29 +257,25 @@ const RecipeListingComponent = (props) => {
         {/**
          * Show Video if some process is going on, like runRecipe
          * else show Recipe list
-         * 
+         *
          * RecipeListingCards: pagination, searchRecipe, recipeList, etc
          */}
         <>
           {isProcessInProgress ? (
             <VideoCard />
           ) : (
-            <RecipeListingCards 
+            <RecipeListingCards
               isAdmin={isAdmin}
               searchRecipeText={searchRecipeText}
               onSearchRecipeTextChanged={onSearchRecipeTextChanged}
               fileteredRecipeData={fileteredRecipeData}
               handleCarousalModal={handleCarousalModal}
               returnRecipeDetails={returnRecipeDetails}
-              toggleRunRecipesModal={
-                toggleRunRecipesModal
-              }
+              toggleRunRecipesModal={toggleRunRecipesModal}
               handlePublishModalClick={(recipeId) =>
                 handlePublishModalClick(recipeId)
               }
-              handleEditRecipe={(recipe) => 
-                handleEditRecipe(recipe)
-              }
+              handleEditRecipe={(recipe) => handleEditRecipe(recipe)}
             />
           )}
         </>
