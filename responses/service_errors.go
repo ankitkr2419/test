@@ -52,6 +52,7 @@ var (
 	TipOperationCreateError     = fmt.Errorf("error creating tip operation record")
 	TipOperationFetchError      = fmt.Errorf("error fetching tip operation record")
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
+	TipOperationConvertError    = fmt.Errorf("error converting tip operation to its specific type")
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 

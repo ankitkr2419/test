@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"mylab/cpagent/responses"
 	"os"
 	"strconv"
 	"strings"
@@ -79,7 +80,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 
 	// 1.2.1 is the currently supported version
 	if strings.TrimSpace(record[1]) != version {
-		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v",record[1], version)
+		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v", record[1], version)
 		logger.Errorln(err)
 		return err
 	}
@@ -346,8 +347,9 @@ func createTipOperationProcess(record []string, store Storer) (err error) {
 			logger.Errorln(err, record[1])
 			return err
 		}
-	} else {
-		t.Discard = at_discard_box
+	} else if t.Type != DiscardTip {
+		err = responses.TipOperationTypeInvalid
+		return err
 	}
 
 	createdProcess, err := store.CreateTipOperation(context.Background(), t, createdRecipe.ID)
