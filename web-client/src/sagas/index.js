@@ -42,6 +42,7 @@ import { restoreDeckSaga } from "./restoreDeckSaga";
 import { discardDeckSaga } from "./discardDeckSaga";
 import { cleanUpSaga } from "./cleanUpSaga";
 import { saveNewRecipeSaga } from './saveNewRecipeSaga'
+import { processSaga } from './processSaga';
 
 const allSagas = [
   createTemplateSaga(),
@@ -76,6 +77,7 @@ const allSagas = [
   discardDeckSaga(),
 	cleanUpSaga(),
   saveNewRecipeSaga(),
+  processSaga(),
 ];
 
 export default function* rootSaga() {

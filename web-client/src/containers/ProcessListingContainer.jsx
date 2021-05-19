@@ -1,57 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import ProcessListComponent from "components/ProcessListing";
 import {
     changeProcessSequences,
     sortProcessListBySequence,
 } from "components/ProcessListing/helper";
+import { processListInitiated } from "action-creators/processActionCreators";
+import { Loader } from "shared-components";
 
 const ProcessListingContainer = (props) => {
-    /*TODO: 1) fetch dynamic process list from recipeId, also add isOpen field
-     * 2) while storing process list in state, it should be sorted by sequence
-     */
+    /*TODO: 1) get recipe details from reducer*/
     const [recipeDetails, setRecipeDetails] = useState({
+        id: "8b5cd741-b6f7-443e-8e8b-5f1f1772d052",
         name: "test",
         created_at: "2021-04-29T11:52:11.171692Z",
         updated_at: "2021-04-29T11:52:11.171692Z",
     });
 
-    /**isOpen: represents that process menu should be open or not and its independently handled for each process
-               also this field does not come from api, so adding isOepn:false by default*/
-    const [processList, setProcessList] = useState([
-        {
-            id: "a5d058e3-7ce3-4a42-b2da-690e47139612",
-            name: "AD-WW-c1-1-2",
-            type: "AspireDispense",
-            recipe_id: "6b7fcfa2-8337-4d79-829a-e9bd486a2de4",
-            sequence_num: 1,
-            created_at: "2021-03-11T17:34:16.507414Z",
-            updated_at: "2021-03-11T17:34:16.507414Z",
-            isOpen: false,
-        },
-        {
-            id: "4fa5c4e3-699c-47bb-ac7a-b26d04efaeb5",
-            name: "AD-WS-c1-1",
-            type: "AspireDispense",
-            recipe_id: "6b7fcfa2-8337-4d79-829a-e9bd486a2de4",
-            sequence_num: 2,
-            created_at: "2021-03-11T17:34:16.555738Z",
-            updated_at: "2021-03-11T17:34:16.555738Z",
-            isOpen: false,
-        },
-        {
-            id: "fb88bada-ced7-4fa2-b845-4bb91e74341e",
-            name: "AD-SW-c1-2",
-            type: "AspireDispense",
-            recipe_id: "6b7fcfa2-8337-4d79-829a-e9bd486a2de4",
-            sequence_num: 3,
-            created_at: "2021-03-11T17:34:16.580361Z",
-            updated_at: "2021-03-11T17:34:16.580361Z",
-            isOpen: false,
-        },
-    ]);
+    const [processList, setProcessList] = useState([]);
 
-    //if we have processId, means user selected this process to change its sequence
+    //if we have draggedProcessId, means user selected this process to change its sequence (move)
     const [draggedProcessId, setDraggedProcessId] = useState(null);
+
+    const dispatch = useDispatch();
+    const processListReducer = useSelector(
+        (state) => state.processListReducer
+    ).toJS();
+    const { isLoading, error } = processListReducer;
+
+    /**Get process list of a recipe */
+    useEffect(() => {
+        const recipeId = recipeDetails.id;
+        if (recipeId) {
+            dispatch(processListInitiated({ recipeId }));
+        }
+    }, [recipeDetails.id]);
+
+    /** => store processList in local state (needed for change sequence and other local changes)
+        => isOpen: represents that process menu should be open or not and its independently handled for each process
+        => isOpen not coming from api, so adding default value */
+    useEffect(() => {
+        if (!isLoading && !error) {
+            const list = processListReducer.processList?.map((obj) => ({
+                ...obj,
+                isOpen: false,
+            }));
+            setProcessList(list);
+        }
+    }, [isLoading, error]);
 
     //toggle isOpen field of process object to toggle process menu
     const toggleIsOpen = (processId) => {
@@ -63,9 +59,15 @@ const ProcessListingContainer = (props) => {
         setProcessList(newProcessList);
     };
 
-    /**setting this id will let us know that this process is dragged(move), to toggle process menu for drop operations */
+    /** purpose=> setting draggedProcessId will let us know that this process is dragged(move), to toggle process menu for drop operations */
     const handleDraggedProcessId = (processId) => {
-        setDraggedProcessId(processId);
+        //if draggedProcessId not found then store it, else clear old one
+        draggedProcessId
+            ? setDraggedProcessId(null)
+            : setDraggedProcessId(processId);
+
+        //if processId not found, means 'move' operation already done, no need to toggle
+        processId && toggleIsOpen(processId);
     };
 
     const handleChangeSequenceTo = (droppedProcessId) => {
@@ -82,14 +84,17 @@ const ProcessListingContainer = (props) => {
     };
 
     return (
-        <ProcessListComponent
-            recipeDetails={recipeDetails}
-            processList={processList}
-            toggleIsOpen={toggleIsOpen}
-            draggedProcessId={draggedProcessId}
-            setDraggedProcessId={handleDraggedProcessId}
-            handleChangeSequenceTo={handleChangeSequenceTo}
-        />
+        <>
+            {isLoading && <Loader />}
+            <ProcessListComponent
+                recipeDetails={recipeDetails}
+                processList={processList}
+                toggleIsOpen={toggleIsOpen}
+                draggedProcessId={draggedProcessId}
+                setDraggedProcessId={handleDraggedProcessId}
+                handleChangeSequenceTo={handleChangeSequenceTo}
+            />
+        </>
     );
 };
 

@@ -82,6 +82,7 @@ export const API_ENDPOINTS = {
   runNextStep: "run-next-step",
   login: "login",
   logout: "logout",
+  recipe: "recipe",
 };
 
 export const MODAL_MESSAGE = {

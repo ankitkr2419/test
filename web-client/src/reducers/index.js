@@ -48,6 +48,7 @@ import { restoreDeckReducer } from "reducers/restoreDeckReducer";
 import { discardDeckReducer } from "reducers/discardDeckReducer";
 import { cleanUpReducer } from "reducers/cleanUpReducer";
 import { updateRecipeDetailsReducer } from "reducers/updateRecipeDetailsReducer";
+import { processListReducer } from "reducers/processListReducer";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -86,6 +87,7 @@ const rootReducer = combineReducers({
   discardTipAndHomingReducer,
   cleanUpReducer,
   updateRecipeDetailsReducer,
+  processListReducer,
 });
 
 export default rootReducer;
