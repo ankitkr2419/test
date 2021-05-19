@@ -57,7 +57,6 @@ export const getSideBarNavItems = (formik, activeTab, toggle) => {
       </NavItem>
     );
   });
-  console.log(navItems);
   return navItems;
 };
 
