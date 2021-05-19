@@ -75,6 +75,24 @@ func (suite *ShakingHandlerTestSuite) TestCreateShakingFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
+func (suite *ShakingHandlerTestSuite) TestCreateShakingInvalidUUID() {
+
+	body, _ := json.Marshal(testShakingRecord)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/shaking/{recipe_id}",
+		"/shaking/"+invalidUUID,
+		string(body),
+		createShakingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.RecipeIDInvalidError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
 func (suite *ShakingHandlerTestSuite) TestShowShakingSuccess() {
 
 	suite.dbMock.On("ShowShaking", mock.Anything, testProcessUUID).Return(testShakingRecord, nil)
@@ -93,6 +111,25 @@ func (suite *ShakingHandlerTestSuite) TestShowShakingSuccess() {
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
+
+
+func (suite *ShakingHandlerTestSuite) TestShowShakingInvalidUUID() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/shaking/{id}",
+		"/shaking/"+invalidUUID,
+		"",
+		showShakingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
 
 func (suite *ShakingHandlerTestSuite) TestShowShakingFailure() {
 
@@ -129,6 +166,25 @@ func (suite *ShakingHandlerTestSuite) TestUpdateShakingSuccess() {
 	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ShakingHandlerTestSuite) TestUpdateShakingInvalidUUID() {
+
+	body, _ := json.Marshal(testShakingRecord)
+
+	recorder := makeHTTPCall(http.MethodPut,
+		"/shaking/{id}",
+		"/shaking/"+invalidUUID,
+		string(body),
+		updateShakingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
