@@ -225,11 +225,10 @@ export const LABWARE_NAME = {
   cartridgeType: "Cartridge Type",
 };
 
-//delete this @Ankush
 export const PROCESS_ICON_CONSTANTS = {};
 
 export const SELECT_PROCESS_PROPS = [
-  //if processType not found, use default process icon
+  // if processType not found, use default process icon
   {
     processName: "Process Name",
     processType: "default",
@@ -246,7 +245,7 @@ export const SELECT_PROCESS_PROPS = [
   },
   {
     iconName: "tip-pickup",
-    processType: "TipPickup", //may change
+    processType: "TipPickup",
     processName: "Tip Pickup",
     route: ROUTES.tipPickup,
   },
@@ -270,13 +269,13 @@ export const SELECT_PROCESS_PROPS = [
   },
   {
     iconName: "magnet",
-    processType: "Magnet",
+    processType: "AttachDetach",
     processName: "Magnet",
     route: ROUTES.magnet,
   },
   {
     iconName: "tip-discard",
-    processType: "TipDiscard", //may change
+    processType: "TipDiscard",
     processName: "Tip Discard",
     route: ROUTES.tipDiscard,
   },
@@ -288,32 +287,9 @@ export const SELECT_PROCESS_PROPS = [
   },
   {
     iconName: "tip-position",
-    processType: "TipPosition", //may change
+    processType: "TipDocking",
     processName: "Tip Position",
     route: ROUTES.tipPosition,
-  },
-
-  /**TODO:
-   * Following icons not available in fonts.scss.
-   * Routes will be added at a later point of time.
-   */
-  {
-    processName: "Tip Operation",
-    processType: "TipOperation",
-    iconName: "",
-    route: "",
-  },
-  {
-    processName: "Tip Docking",
-    processType: "TipDocking",
-    iconName: "",
-    route: "",
-  },
-  {
-    processName: "Attach Detach",
-    processType: "AttachDetach",
-    iconName: "",
-    route: "",
   },
 ];
 
