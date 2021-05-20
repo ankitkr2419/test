@@ -20,12 +20,12 @@ func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 		_, err = singleDeckOperation(deps, deck, "DiscardBoxCleanup")
 		if err != nil {
 			logger.Errorln(err.Error())
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error(), Deck: deck})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DiscardBoxMoveError.Error(), Deck: deck})
 			return
 		}
 
 		logger.Infoln(responses.DiscardBoxMovedSuccess)
-		responseCodeAndMsg(rw, http.StatusInternalServerError, MsgObj{Msg: responses.DiscardBoxMovedSuccess, Deck: deck})
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.DiscardBoxMovedSuccess, Deck: deck})
 		return
 	})
 }
@@ -41,12 +41,12 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 		_, err = singleDeckOperation(deps, deck, "RestoreDeck")
 		if err != nil {
 			logger.Errorln(err.Error())
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error(), Deck: deck})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RestoreDeckError.Error(), Deck: deck})
 			return
 		}
 
 		logger.Infoln(responses.RestoreDeckSuccess)
-		responseCodeAndMsg(rw, http.StatusInternalServerError, MsgObj{Msg: responses.RestoreDeckSuccess, Deck: deck})
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RestoreDeckSuccess, Deck: deck})
 		return
 	})
 }
