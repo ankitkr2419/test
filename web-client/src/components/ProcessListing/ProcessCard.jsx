@@ -13,13 +13,11 @@ const ProcessCard = (props) => {
         draggedProcessId,
         setDraggedProcessId,
         handleChangeSequenceTo,
+        handleProcessMove,
     } = props;
 
     const handleProcessMoveClick = () => {
         setDraggedProcessId(processId);
-    };
-    const handleCloseDropClick = () => {
-        setDraggedProcessId(null);
     };
 
     //when selected, previously selected process and this process will get sequence_number swapped.
@@ -58,8 +56,8 @@ const ProcessCard = (props) => {
                                     top={0}
                                     right={0}
                                     size={36}
-                                    name="cross"
-                                    onClick={handleCloseDropClick}
+                                    name="angle-down"//"cross"
+                                    onClick={toggleIsOpen}
                                     className="border-0"
                                 />
                             </div>
@@ -70,11 +68,13 @@ const ProcessCard = (props) => {
                                         size={14}
                                         name="up"
                                         className="border-gray text-primary"
+                                        onClick={() => handleProcessMove("up")}
                                     />
                                     <ButtonIcon
                                         size={14}
                                         name="down"
                                         className="border-gray text-primary ml-2"
+                                        onClick={() => handleProcessMove("down")}
                                     />
                                     <ButtonIcon
                                         size={24}

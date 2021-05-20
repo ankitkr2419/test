@@ -115,7 +115,6 @@ const TopContentComponent = (props) => {
                     </div>
                     <div className="d-flex justify-content-center align-items-center">
                         <div className="d-flex flex-column text-right">
-                            {/* TODO: Add dynamic dates */}
                             {createdAt ? (
                                 <Text className="text-white mb-0">
                                     Created on: {moment(createdAt).format("DD-MM-YYYY")}

@@ -49,5 +49,6 @@ export const ProcessCardBox = styled.div`
         width: 9rem;
         height: 1.688rem;
         line-height: 1.688rem;
+        cursor: pointer;
     }
 `;

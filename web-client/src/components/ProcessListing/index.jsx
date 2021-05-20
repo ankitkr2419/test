@@ -1,7 +1,7 @@
 import React from "react";
 import { StyledProcessListing } from "./Styles";
 import { useSelector } from "react-redux";
-import { Redirect } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { ROUTES } from "appConstants";
 import TopContentComponent from "components/RecipeListing/TopContentComponent";
 import ProcessListingCards from "./ProcessListingCards";
@@ -15,11 +15,12 @@ const ProcessListComponent = (props) => {
         draggedProcessId,
         setDraggedProcessId,
         handleChangeSequenceTo,
+        handleProcessMove,
     } = props;
 
-    /**
-     * get active login deck data
-     */
+    const history = useHistory();
+
+    /**get active login deck data*/
     const loginReducer = useSelector((state) => state.loginReducer);
     const loginReducerData = loginReducer.toJS();
     let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
@@ -32,7 +33,7 @@ const ProcessListComponent = (props) => {
     }
 
     const handleAddProcessClick = () => {
-        //TODO: redirect to select a process
+        history.push(ROUTES.selectProcess);
     };
 
     const handleFinishClick = () => {
@@ -57,6 +58,7 @@ const ProcessListComponent = (props) => {
                     draggedProcessId={draggedProcessId}
                     setDraggedProcessId={setDraggedProcessId}
                     handleChangeSequenceTo={handleChangeSequenceTo}
+                    handleProcessMove={handleProcessMove}
                 />
 
                 {/* Action buttons (add process, finish)*/}

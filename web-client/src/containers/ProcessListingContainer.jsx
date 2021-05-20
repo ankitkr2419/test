@@ -7,6 +7,7 @@ import {
 } from "components/ProcessListing/helper";
 import { processListInitiated } from "action-creators/processActionCreators";
 import { Loader } from "shared-components";
+import { toast } from "react-toastify";
 
 const ProcessListingContainer = (props) => {
     /*TODO: 1) get recipe details from reducer*/
@@ -70,7 +71,40 @@ const ProcessListingContainer = (props) => {
         processId && toggleIsOpen(processId);
     };
 
+    //move
     const handleChangeSequenceTo = (droppedProcessId) => {
+        moveProcessAndSave(draggedProcessId, droppedProcessId);
+
+        //reset drag-drop (move)
+        handleDraggedProcessId(null);
+    };
+
+    //up or down
+    const handleProcessMove = (processId, sequenceNumber, direction) => {
+        const dropProcess = processList.find((obj) => {
+            return direction === "up"
+                ? obj.sequence_num === sequenceNumber - 1
+                : obj.sequence_num === sequenceNumber + 1;
+        });
+
+        const droppedProcessId = dropProcess?.id;
+
+        if (!droppedProcessId) {
+            toast.error(
+                direction === "up"
+                    ? "We can not move first process up"
+                    : "We can not move last process down"
+            );
+            //hide menu
+            toggleIsOpen(processId);
+            return;
+        }
+
+        moveProcessAndSave(processId, droppedProcessId);
+    };
+
+    //common method for up/down/move operations
+    const moveProcessAndSave = (draggedProcessId, droppedProcessId) => {
         let arr = changeProcessSequences(
             processList,
             draggedProcessId,
@@ -78,9 +112,7 @@ const ProcessListingContainer = (props) => {
         );
         let sortedArr = sortProcessListBySequence(arr);
         setProcessList(sortedArr);
-
-        //reset drag-drop (move)
-        handleDraggedProcessId(null);
+        toast.success("Process Moved");
     };
 
     return (
@@ -91,8 +123,9 @@ const ProcessListingContainer = (props) => {
                 processList={processList}
                 toggleIsOpen={toggleIsOpen}
                 draggedProcessId={draggedProcessId}
-                setDraggedProcessId={handleDraggedProcessId}
-                handleChangeSequenceTo={handleChangeSequenceTo}
+                setDraggedProcessId={handleDraggedProcessId} //move dragged
+                handleChangeSequenceTo={handleChangeSequenceTo} //move dropped
+                handleProcessMove={handleProcessMove} //up and down
             />
         </>
     );

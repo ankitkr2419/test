@@ -13,6 +13,26 @@ export const StyledProcessListing = styled.div`
             color: #fff !important;
             background: #aedbd5;
         }
+        
+        //TODO: remove if not needed 
+        //for 2nd solution
+        .box {//added with dhanraj
+            max-height: 400px;
+            flex: 1;
+            margin: 0 -15px;
+        }
+        .box > div {//added with dhanraj
+            margin: 0 7.5px;
+            margin-bottom: 15px;
+        }
+
+        //TODO: remove if not needed
+        //3rd solution
+        .card-columns>.card {
+            height: 50px;
+            padding: 1rem;
+            text-align:center;
+        }
     }
 `;
 
