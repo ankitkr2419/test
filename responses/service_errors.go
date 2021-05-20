@@ -109,6 +109,9 @@ var (
 	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
 
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
+
+	DiscardBoxMoveError = fmt.Errorf("error discard box moving was unsuccessful")
+	RestoreDeckError = fmt.Errorf("error restore deck was unsuccessful")
 )
 
 // Special errors which are in []byte format
