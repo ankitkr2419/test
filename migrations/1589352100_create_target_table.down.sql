@@ -1,1 +1,1 @@
-DROP TABLE targets;
+DROP TABLE IF EXISTS targets;

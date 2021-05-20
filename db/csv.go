@@ -79,7 +79,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 
 	// 1.2.1 is the currently supported version
 	if strings.TrimSpace(record[1]) != version {
-		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v", version)
+		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v",record[1], version)
 		logger.Errorln(err)
 		return err
 	}
@@ -296,9 +296,7 @@ func createDelayProcess(record []string, store Storer) (err error) {
 func createPiercingProcess(record []string, store Storer) (err error) {
 	logger.Info("Inside piercing create Process. Record: ", record)
 
-	p := Piercing{
-		Discard: at_discard_box,
-	}
+	p := Piercing{}
 
 	// record[0] is CartridgeType
 	switch record[0] {
@@ -336,6 +334,7 @@ func createPiercingProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
+// TODO: Implement Discard at_pickup_passing for tip operation whenever feature added
 func createTipOperationProcess(record []string, store Storer) (err error) {
 	logger.Info("Inside tip operation create Process. Record: ", record)
 
@@ -347,6 +346,8 @@ func createTipOperationProcess(record []string, store Storer) (err error) {
 			logger.Errorln(err, record[1])
 			return err
 		}
+	} else {
+		t.Discard = at_discard_box
 	}
 
 	createdProcess, err := store.CreateTipOperation(context.Background(), t, createdRecipe.ID)
