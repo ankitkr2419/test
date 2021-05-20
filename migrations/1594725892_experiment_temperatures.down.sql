@@ -1,1 +1,1 @@
-DROP TABLE experiment_temperatures;
+DROP TABLE IF EXISTS experiment_temperatures;

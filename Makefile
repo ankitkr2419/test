@@ -13,3 +13,6 @@ zip:
 	echo "zip created successfully"
 
 build-and-zip: build zip
+
+migrate:
+	utils/db-migrate.sh

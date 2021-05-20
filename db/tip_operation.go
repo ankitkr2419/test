@@ -11,10 +11,14 @@ import (
 )
 
 type TipOps string
+type Discard string
 
 const (
 	PickupTip  TipOps = "pickup"
 	DiscardTip TipOps = "discard"
+
+	at_pickup_passing Discard = "at_pickup_passing"
+	at_discard_box    Discard = "at_discard_box"
 )
 
 const (
@@ -28,18 +32,21 @@ const (
 	createTipOperationQuery = `INSERT INTO tip_operation (
 						type,
 						position,
+						discard,
 						process_id)
-						VALUES ($1, $2, $3) RETURNING id`
+						VALUES ($1, $2, $3, $4) RETURNING id`
 	updateTipOperationQuery = `UPDATE tip_operation SET (
 						type,
 						position,
-						updated_at) = ($1, $2, $3) WHERE process_id = $4`
+						discard,
+						updated_at) = ($1, $2, $3, $4) WHERE process_id = $5`
 )
 
 type TipOperation struct {
 	ID        uuid.UUID `db:"id" json:"id"`
 	Type      TipOps    `db:"type" json:"type" validate:"required"`
 	Position  int64     `db:"position" json:"position"`
+	Discard   Discard   `db:"discard" json:"discard"`
 	ProcessID uuid.UUID `db:"process_id" json:"process_id"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
@@ -123,6 +130,7 @@ func (s *pgStore) createTipOperation(ctx context.Context, tx *sql.Tx, to TipOper
 		createTipOperationQuery,
 		to.Type,
 		to.Position,
+		to.Discard,
 		to.ProcessID,
 	).Scan(&lastInsertID)
 
@@ -149,6 +157,7 @@ func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err e
 		updateTipOperationQuery,
 		t.Type,
 		t.Position,
+		t.Discard,
 		time.Now(),
 		t.ProcessID,
 	)

@@ -1,1 +1,1 @@
-DROP TABLE well_targets;
+DROP TABLE IF EXISTS well_targets;
