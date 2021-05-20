@@ -18,6 +18,7 @@ import tipPickupProcessGraphics from "assets/images/tip-pickup-process-graphics.
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TipPickupBox, TopContent } from "./Style";
 import { saveTipPickupInitiated } from "action-creators/processesActionCreators";
+import { TEST_RECIPE_ID, TEST_TOKEN } from "appConstants";
 
 const TipPickupComponent = (props) => {
   const dispatch = useDispatch();
@@ -39,9 +40,9 @@ const TipPickupComponent = (props) => {
     const tipPosition = formik.values.tipPosition;
     dispatch(
       saveTipPickupInitiated({
-        recipeID: "28585f66-8aa7-4e55-bff9-d0fb0240a147", //temp
+        recipeID: TEST_RECIPE_ID, //For testing, will be removed later.
         position: tipPosition,
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjEyNjE5MzMsInN1YiI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiZGVjayI6IkEiLCJhdXRoX2lkIjoiNjA2MDY0MWItOGFkOC00M2Y0LTg4NzYtZTEyNjI0OWZmNTA0In0.U5_sNsaV_0ZiPRiOMAKNZckwA4a3EnEL2KQ1Wdeqpso", //temp
+        token: TEST_TOKEN, //For testing, will be removed later.
       })
     );
   };

@@ -9,6 +9,9 @@ import classnames from "classnames";
 import { PageBody, PiercingBox, TopContent } from "./Style";
 import { WellComponent } from "./WellComponent";
 import HeightModal from "components/modals/HeightModal";
+import { useDispatch } from "react-redux";
+import { savePiercingInitiated } from "action-creators/processesActionCreators";
+import { TEST_RECIPE_ID, TEST_TOKEN } from "appConstants";
 
 const extractionWells = [
   { id: 1, type: 0, label: "1", footerText: "", isDisabled: false, isSelected: false },
@@ -29,9 +32,11 @@ const pcrWells = [
 ];
 
 const PiercingComponent = (props) => {
-  const [activeTab, setActiveTab] = useState("1");
+  const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
+
+  const dispatch = useDispatch();
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
@@ -42,10 +47,12 @@ const PiercingComponent = (props) => {
     // here type : extractionWellsArray and 1 for pcrObjArray
     const wellsObjArray = type === 0 ? extractionWells : pcrWells;
     wellsObjArray.map((obj) => {
-      obj.isDisabled = !(obj.id === currentWellObj.id);
-      obj.isSelected = obj.id === currentWellObj.id;
-      obj.footerText =
-        obj.id === currentWellObj.id ? `Height: ${height}mm` : "";
+      // obj.isDisabled = !(obj.id === currentWellObj.id);
+      if (!obj.isSelected) {
+        obj.isSelected = obj.id === currentWellObj.id;
+        obj.footerText =
+          obj.id === currentWellObj.id ? `Height: ${height}mm` : "";
+      }
       return obj;
     });
   };
@@ -60,6 +67,23 @@ const PiercingComponent = (props) => {
       }
     });
     setCurrentWellObj(currentWellObj);
+  };
+
+  const handleSaveBtn = () => {
+    const type = parseInt(activeTab);
+    const wellsObjArray = type === 0 ? extractionWells : pcrWells;
+    const cartridgeWells = wellsObjArray
+      .filter((obj) => obj.isSelected)
+      .map((obj) => obj.id);
+
+    const requestBody = {
+      type: type,
+      cartridgeWells: cartridgeWells,
+      recipeID: TEST_RECIPE_ID,
+      token: TEST_TOKEN,
+    };
+
+    dispatch(savePiercingInitiated(requestBody));
   };
 
   return (
@@ -95,29 +119,29 @@ const PiercingComponent = (props) => {
                 >
                   <NavItem className="text-center flex-fill px-2 pt-2">
                     <NavLink
-                      className={classnames({ active: activeTab === "1" })}
-                      onClick={() => toggle("1")}
+                      className={classnames({ active: activeTab === "0" })}
+                      onClick={() => toggle("0")}
                     >
                       Extraction
                     </NavLink>
                   </NavItem>
                   <NavItem className="text-center flex-fill px-2 pt-2">
                     <NavLink
-                      className={classnames({ active: activeTab === "2" })}
-                      onClick={() => toggle("2")}
+                      className={classnames({ active: activeTab === "1" })}
+                      onClick={() => toggle("1")}
                     >
                       PCR
                     </NavLink>
                   </NavItem>
                 </Nav>
                 <TabContent activeTab={activeTab} className="p-5">
-                  <TabPane tabId="1">
+                  <TabPane tabId="0">
                     <WellComponent
                       wellsObjArray={extractionWells}
                       wellClickHandler={wellClickHandler}
                     />
                   </TabPane>
-                  <TabPane tabId="2">
+                  <TabPane tabId="1">
                     <WellComponent
                       wellsObjArray={pcrWells}
                       wellClickHandler={wellClickHandler}
@@ -126,12 +150,7 @@ const PiercingComponent = (props) => {
                 </TabContent>
               </CardBody>
             </Card>
-            <ButtonBar
-              rightBtnLabel="Save"
-              handleRightBtn={() => {
-                console.log("API Call!");
-              }}
-            />
+            <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
           </div>
         </PiercingBox>
         <AppFooter />

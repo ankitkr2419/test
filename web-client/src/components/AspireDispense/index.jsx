@@ -22,10 +22,13 @@ const dispenseCart2Wells = getArray(8, 1);
 const AspireDispenseComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
+  const [selectedTab, setSelectedTab] = useState();
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
+
+  const handleWellClick = () => {};
 
   return (
     <>

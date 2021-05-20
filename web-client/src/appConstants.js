@@ -92,6 +92,7 @@ export const API_ENDPOINTS = {
   tipOperation: "tip-operation",
   login: "login",
   logout: "logout",
+  piercing: "piercing",
 };
 
 export const MODAL_MESSAGE = {
@@ -299,3 +300,9 @@ export const ASPIRE_DISPENSE_SIDEBAR_LABELS = [
   "Shaker",
   "Deck Position",
 ];
+
+// for testing, will be removed
+export const TEST_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjE0MjMwMTIsInN1YiI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiZGVjayI6IkEiLCJhdXRoX2lkIjoiOWFjYTYxMWMtODJkZS00MzJkLWIxNGQtMWQwZjM2MmQ3OTYyIn0.5xvpGAhljqk2cKrmfIEJvmFwHm0bVuNZUEXG2zs9nF0";
+
+export const TEST_RECIPE_ID = "28585f66-8aa7-4e55-bff9-d0fb0240a147";

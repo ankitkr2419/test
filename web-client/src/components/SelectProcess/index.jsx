@@ -29,11 +29,13 @@ const SelectProcessPageComponent = () => {
                 <Row className="row-small-gutter">
                   {SELECT_PROCESS_PROPS.map((propObj) => {
                     return (
-                      <Process
-                        iconName={propObj.iconName}
-                        processName={propObj.processName}
-                        route={propObj.route}
-                      />
+                      propObj.route && (
+                        <Process
+                          iconName={propObj.iconName}
+                          processName={propObj.processName}
+                          route={propObj.route}
+                        />
+                      )
                     );
                   })}
                 </Row>
