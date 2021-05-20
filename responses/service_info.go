@@ -44,7 +44,7 @@ var (
 	SafeToUpgrade          = "safe to upgrade the cpagent version"
 	TempSettingBothDeckRun = "temporary setting both deck run in progress"
 	ResettingBothDeckRun   = "resetting both deck run in progress"
-	
+
 	RecipeCreateSuccess    = "Recipe record created successfully"
 	RecipeFetchSuccess     = "Recipe record fetched successfully"
 	RecipeListFetchSuccess = "Recipe list fetched successfully"
@@ -52,4 +52,9 @@ var (
 	RecipeDeleteSuccess    = "Recipe record deleted successfully"
 	RecipePublishSuccess   = "Recipe published successfully"
 	RecipeUnPublishSuccess = "Recipe unpublished successfully"
+
+	DiscardBoxMovedSuccess = "Discard box moved to cleanup position successful"
+	RestoreDeckSuccess     = "Restore Deck successful"
+
+	UVCleanupProgress = "uv light clean up in progress"
 )
