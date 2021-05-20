@@ -65,14 +65,12 @@ type Recipe struct {
 	UpdatedAt          time.Time `db:"updated_at" json:"updated_at"`
 }
 
-
 func (s *pgStore) ShowRecipe(ctx context.Context, id uuid.UUID) (dbRecipe Recipe, err error) {
 	err = s.db.Get(&dbRecipe, getRecipeQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching recipe")
 		return
 	}
-	
 	return
 }
 
@@ -82,7 +80,6 @@ func (s *pgStore) ListRecipes(ctx context.Context) (dbRecipe []Recipe, err error
 		logger.WithField("err", err.Error()).Error("Error fetching recipes")
 		return
 	}
-
 	return
 }
 
@@ -114,7 +111,6 @@ func (s *pgStore) CreateRecipe(ctx context.Context, r Recipe) (createdRecipe Rec
 		logger.WithField("err", err.Error()).Error("Error in getting Recipe")
 		return
 	}
-
 	return
 }
 
