@@ -129,4 +129,4 @@ MlModal.defaultProps = {
   isProgressBarVisible: false,
 };
 
-export default MlModal;
+export default React.memo(MlModal);

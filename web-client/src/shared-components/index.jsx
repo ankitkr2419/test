@@ -1,5 +1,6 @@
 import ButtonGroup from "./ButtonGroup";
 import ButtonIcon from "./ButtonIcon";
+import ButtonBar from "./ButtonBar";
 import Center from "./Center";
 import GraphCard from "./GraphCard";
 import Icon from "./Icon";
@@ -22,6 +23,7 @@ import MlModal from "./MlModal";
 export {
   ButtonGroup,
   ButtonIcon,
+  ButtonBar,
   Center,
   GraphCard,
   Icon,

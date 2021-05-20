@@ -1,7 +1,6 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { 
 	Modal, 
 	ModalBody, 
@@ -15,18 +14,7 @@ import {
 	Col,
 } from 'core-components';
 import { Center, Text, ButtonIcon } from 'shared-components';
-
-//For Operator Login Form
-const OperatorLoginForm = styled.div`
-.has-border-left{
-	.form-control{
-		border-left:7px solid #F38220;
-	}
-}
-.link{
-	color:#3C70FF;
-}
-`;
+import { OperatorLoginForm } from './OperatorLoginForm';
 
 
 const OperatorLoginModal = (props) => {
@@ -141,4 +129,4 @@ OperatorLoginModal.defaultProps = {
 	isOpen: false,
 };
 
-export default OperatorLoginModal;
+export default React.memo(OperatorLoginModal);
