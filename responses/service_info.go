@@ -1,6 +1,8 @@
 package responses
 
 var (
+	Pong = "pong"
+	
 	PiercingCreateSuccess = "piercing record created successfully"
 	PiercingFetchSuccess  = "piercing record fetched successfully"
 	PiercingUpdateSuccess = "piercing record updated successfully"
@@ -41,6 +43,13 @@ var (
 
 	ProcessesRearrangeSuccess = "rearranging processes success"
 
+	RecipeRunInProgress   = "recipe run is in progress"
+	NextStepRunInProgress = "next step run is in progress"
+	NextStepWillRun       = "next step will be run"
+	StepRunWillAbort      = "step run will be aborted"
+	WaitingRunNextProcess = "waiting to run next process"
+	NextProcessInProgress = "next process is in progress"
+	
 	SafeToUpgrade          = "safe to upgrade the cpagent version"
 	TempSettingBothDeckRun = "temporary setting both deck run in progress"
 	ResettingBothDeckRun   = "resetting both deck run in progress"
