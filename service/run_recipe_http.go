@@ -145,7 +145,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			setRunNext(deck)
 			logger.Infoln(responses.NextProcessInProgress)
 		}
-		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(p.Type, string(db.InitialisedState)))
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.InitialisedState)))
 
 		switch p.Type {
 		case db.AspireDispenseProcess:
@@ -272,7 +272,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 
 		}
-		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(p.Type, string(db.CompletedState)))
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.CompletedState)))
 
 	}
 
