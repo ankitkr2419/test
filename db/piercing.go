@@ -118,7 +118,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(PiercingProcess)
+	process.Type = PiercingProcess
 	process.RecipeID = recipeID
 
 	// create the process

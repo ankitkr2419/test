@@ -94,7 +94,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recip
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(AttachDetachProcess)
+	process.Type = AttachDetachProcess
 	process.RecipeID = recipeID
 
 	// create the process

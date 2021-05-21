@@ -101,7 +101,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.U
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(HeatingProcess)
+	process.Type = HeatingProcess
 	process.RecipeID = recipeID
 
 	// create the process

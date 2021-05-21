@@ -171,7 +171,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(AspireDispenseProcess)
+	process.Type = AspireDispenseProcess
 	process.RecipeID = recipeID
 
 	// create the process

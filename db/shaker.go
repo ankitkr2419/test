@@ -115,7 +115,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, ad Shaker, recipeID uuid.UU
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(ShakingProcess)
+	process.Type = ShakingProcess
 	process.RecipeID = recipeID
 
 	// create the process

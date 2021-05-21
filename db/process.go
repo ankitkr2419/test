@@ -32,13 +32,13 @@ const (
 )
 
 type Process struct {
-	ID             uuid.UUID `db:"id" json:"id"`
-	Name           string    `db:"name" json:"name"`
-	Type           string    `db:"type" json:"type"`
-	RecipeID       uuid.UUID `db:"recipe_id" json:"recipe_id"`
-	SequenceNumber int64     `db:"sequence_num" json:"sequence_num"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt      time.Time `db:"updated_at" json:"updated_at"`
+	ID             uuid.UUID   `db:"id" json:"id"`
+	Name           string      `db:"name" json:"name"`
+	Type           ProcessType `db:"type" json:"type"`
+	RecipeID       uuid.UUID   `db:"recipe_id" json:"recipe_id"`
+	SequenceNumber int64       `db:"sequence_num" json:"sequence_num"`
+	CreatedAt      time.Time   `db:"created_at" json:"created_at"`
+	UpdatedAt      time.Time   `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) ShowProcess(ctx context.Context, id uuid.UUID) (dbProcess Process, err error) {
@@ -173,7 +173,7 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 
 	var p interface{}
 	// pass empty interface, just to use same method
-	duplicateP, err = s.processOperation(ctx, duplicate, ProcessName(parent.Type), p, parent)
+	duplicateP, err = s.processOperation(ctx, duplicate, parent.Type, p, parent)
 	if err != nil {
 		// failure already logged
 		return

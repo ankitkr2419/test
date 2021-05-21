@@ -22,6 +22,7 @@ var (
 	TipOperationDBFetchError         = fmt.Errorf("error in fetching tip operation from db")
 	TipOperationDBCreateError        = fmt.Errorf("Error creating tip operation in db")
 	TipOperationDuplicateCreateError = fmt.Errorf("Error creating duplicate tip operation in db")
+	TipOperationTypeInvalid          = fmt.Errorf("error tip operation type is invalid")
 
 	TipDockingUpdateNameError      = fmt.Errorf("error in updating tip docking process name in db")
 	TipDockingInitiateDBTxError    = fmt.Errorf("error while initiating database transaction for tip docking")
