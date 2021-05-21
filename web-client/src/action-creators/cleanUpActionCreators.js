@@ -3,6 +3,10 @@ import {
   pauseCleanUpAction,
   resumeCleanUpAction,
   abortCleanUpAction,
+  cleanUpHourActions,
+  cleanUpMinsActions,
+  cleanUpSecsActions,
+  setShowCleanUpAction,
 } from "actions/cleanUpActions";
 
 export const runCleanUpActionInitiated = (params) => ({
@@ -26,9 +30,9 @@ export const runCleanUpActionFailed = (serverErrors) => ({
   },
 });
 
-export const runCleanUpActionReset = () => ({
+export const runCleanUpActionReset = (params) => ({
   type: runCleanUpAction.runCleanUpReset,
-  payload: {},
+  payload: { params },
 });
 
 export const runCleanUpActionInProgress = (cleanUpActionInProgress) => ({
@@ -121,4 +125,29 @@ export const abortCleanUpActionFailed = (serverErrors) => ({
 export const abortCleanUpActionReset = () => ({
   type: abortCleanUpAction.abortCleanUpReset,
   payload: {},
+});
+
+export const cleanUpHours = (params) => ({
+  type: cleanUpHourActions.setHours,
+  payload: { params },
+});
+
+export const cleanUpMins = (params) => ({
+  type: cleanUpMinsActions.setMins,
+  payload: { params },
+});
+
+export const cleanUpSecs = (params) => ({
+  type: cleanUpSecsActions.setSecs,
+  payload: { params },
+});
+
+export const setShowCleanUp = (params) => ({
+  type: setShowCleanUpAction.setShowCleanUp,
+  payload: { params },
+});
+
+export const resetShowCleanUp = (params) => ({
+  type: setShowCleanUpAction.resetShowCleanUp,
+  payload: { params },
 });

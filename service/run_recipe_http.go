@@ -6,18 +6,34 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 
 	"github.com/gorilla/mux"
 )
 
 func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.RunRecipeInitialisedState)
+
+		var err error
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.DelayCompletedState)
+
+			}
+
+		}()
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
@@ -67,6 +83,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if err != nil {
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.ErrorState, db.ExecuteOperation, deck, err.Error())
 		}
 		resetStepRunInProgress(deck)
 	}()
@@ -128,9 +145,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			setRunNext(deck)
 			logger.Infoln(responses.NextProcessInProgress)
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.InitialisedState)))
 
 		switch p.Type {
-		case "AspireDispense":
+		case db.AspireDispenseProcess:
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -148,7 +166,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "Heating":
+		case db.HeatingProcess:
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
 			fmt.Printf("heat object %v", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
@@ -158,7 +176,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(ht)
 
-		case "Shaking":
+		case db.ShakingProcess:
 			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -171,7 +189,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(sha)
 
-		case "Piercing":
+		case db.PiercingProcess:
 			pi, err := deps.Store.ShowPiercing(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -189,7 +207,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "AttachDetach":
+		case db.AttachDetachProcess:
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
 			fmt.Printf("attach detach record %v \n", ad)
 			if err != nil {
@@ -200,7 +218,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "TipOperation":
+		case db.TipDiscardProcess, db.TipPickupProcess:
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -227,7 +245,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentTip = db.TipsTubes{}
 
 			}
-		case "TipDocking":
+		case db.TipDockingProcess:
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -242,7 +260,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			if err != nil {
 				return "", err
 			}
-		case "Delay":
+		case db.DelayProcess:
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -254,6 +272,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.CompletedState)))
+
 	}
 
 	plength := len(processes)
@@ -308,7 +328,8 @@ func populateNextStepChan(deck string) {
 	nextStep[deck] <- struct{}{}
 }
 
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName, processType string) {
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName string, processType db.ProcessType) {
+
 	// percentage calculation for each process
 
 	progress := float64(((currentStep - 1) * 100) / processLength)

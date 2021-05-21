@@ -54,4 +54,4 @@ const TipDiscardModal = (props) => {
   );
 };
 
-export default TipDiscardModal;
+export default React.memo(TipDiscardModal);

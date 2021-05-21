@@ -87,13 +87,15 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 			vars := mux.Vars(req)
 			deck := vars["deck"]
 
-			_, err := getUserAuth(token, deck, deps, roles...)
+			user, err := getUserAuth(token, deck, deps, roles...)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
 				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: err.Error()})
 				return
 			}
-			next(res, req)
+			ctx := context.WithValue(req.Context(), contextKeyUsername, user.Username)
+			ctx = context.WithValue(ctx, contextKeyUserAuthID, user.AuthID)
+			next(res, req.WithContext(ctx))
 
 		} else {
 			logger.WithField("err", "TOKEN EMPTY").Error(responses.UserTokenEmptyError)

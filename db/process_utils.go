@@ -10,23 +10,23 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-type ProcessName string
+type ProcessType string
 type processOperation string
 
-const(
-	AspireDispenseProcess ProcessName = "AspireDispense"
-	AttachDetachProcess ProcessName = "AttachDetach"
-	DelayProcess ProcessName = "Delay"
-	PiercingProcess ProcessName = "Piercing"
-	TipDockingProcess ProcessName = "TipDocking"
-	TipOperationProcess ProcessName = "TipOperation"
-	ShakingProcess ProcessName = "Shaking"
-	HeatingProcess ProcessName = "Heating"
+const (
+	AspireDispenseProcess ProcessType = "AspireDispense"
+	AttachDetachProcess   ProcessType = "AttachDetach"
+	DelayProcess          ProcessType = "Delay"
+	PiercingProcess       ProcessType = "Piercing"
+	TipDockingProcess     ProcessType = "TipDocking"
+	TipPickupProcess      ProcessType = "TipPickup"
+	TipDiscardProcess     ProcessType = "TipDiscard"
+	ShakingProcess        ProcessType = "Shaking"
+	HeatingProcess        ProcessType = "Heating"
 )
 
-
-const(
-	name processOperation = "name"
+const (
+	name      processOperation = "name"
 	duplicate processOperation = "duplicate"
 )
 
@@ -36,8 +36,6 @@ const (
 	subtractProcessSequenceQuery = `UPDATE processes SET sequence_num = (sequence_num - $1) WHERE recipe_id = $2;`
 	rearrangeSequenceQuery       = `UPDATE processes SET sequence_num = $1 WHERE id = $2`
 )
-
-
 
 func (s *pgStore) createProcess(ctx context.Context, tx *sql.Tx, p Process) (cp Process, err error) {
 
@@ -60,7 +58,7 @@ func (s *pgStore) createProcess(ctx context.Context, tx *sql.Tx, p Process) (cp 
 	return p, err
 }
 
-func (s *pgStore) updateProcessName(ctx context.Context, tx *sql.Tx, id uuid.UUID, processType ProcessName, process interface{}) (err error) {
+func (s *pgStore) updateProcessName(ctx context.Context, tx *sql.Tx, id uuid.UUID, processType ProcessType, process interface{}) (err error) {
 	// pass Process{} just to keep dame method call
 	processWithName, err := s.processOperation(ctx, name, processType, process, Process{})
 	if err != nil {
@@ -131,7 +129,7 @@ func (s *pgStore) subtractFromSequence(ctx context.Context, tx *sql.Tx, recipeID
 	return
 }
 
-func (s *pgStore) processOperation(ctx context.Context, operation processOperation, processType ProcessName, process interface{}, parent Process) (pr Process, err error) {
+func (s *pgStore) processOperation(ctx context.Context, operation processOperation, processType ProcessType, process interface{}, parent Process) (pr Process, err error) {
 
 	var tx *sql.Tx
 
@@ -189,7 +187,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 	}()
 
 	switch processType {
-	case "Piercing":
+	case PiercingProcess:
 		var pi Piercing
 		if operation == name {
 			pi = process.(Piercing)
@@ -214,11 +212,11 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 		logger.Infoln("Piercing Process Duplication in Progress => ", pi)
 		return
 
-	case "TipOperation":
+	case TipDiscardProcess, TipPickupProcess:
 		var to TipOperation
 		if operation == name {
 			to = process.(TipOperation)
-			pr.Name = fmt.Sprintf("Tip_Operation_%s", to.Type)
+			pr.Name = string(processType)
 			return
 		}
 
@@ -239,7 +237,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 		logger.Infoln("Tip Operation Process Duplication in Progress => ", to)
 		return
 
-	case "TipDocking":
+	case TipDockingProcess:
 		var td TipDock
 		if operation == name {
 			td = process.(TipDock)
@@ -264,7 +262,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 		logger.Infoln("Tip Docking Process Duplication in Progress  => ", td)
 		return
 
-	case "AspireDispense":
+	case AspireDispenseProcess:
 		var ad AspireDispense
 		if operation == name {
 			ad = process.(AspireDispense)
@@ -289,7 +287,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 		logger.Infoln("Aspire Dispense Process Duplication in Progress  => ", ad)
 		return
 
-	case "Heating":
+	case HeatingProcess:
 		var ht Heating
 		if operation == name {
 			pr.Name = "Heating"
@@ -313,7 +311,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 		logger.Infoln("Heating Process Duplication in Progress  => ", ht)
 		return
 
-	case "Shaking":
+	case ShakingProcess:
 		var sk Shaker
 		if operation == name {
 			sk = process.(Shaker)
@@ -342,7 +340,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 		logger.Infoln("Shaking Process Duplication in Progress  => ", sk)
 		return
 
-	case "AttachDetach":
+	case AttachDetachProcess:
 		var ad AttachDetach
 		if operation == name {
 			ad = process.(AttachDetach)
@@ -367,7 +365,7 @@ func (s *pgStore) processOperation(ctx context.Context, operation processOperati
 		logger.Infoln("AttachDetach Process Duplication in Progress  => ", ad)
 		return
 
-	case "Delay":
+	case DelayProcess:
 		var dl Delay
 		if operation == name {
 			pr.Name = "Delay"

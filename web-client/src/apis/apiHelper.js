@@ -2,6 +2,7 @@ import { takeEvery, put } from "redux-saga/effects";
 
 import fetchAction from "actions/fetchActions";
 import { API_HOST_URL, API_HOST_VERSION } from "appConstants";
+import { toast } from "react-toastify";
 
 /**
  * getQueryString with form query string from given object
@@ -35,10 +36,16 @@ const getRequestUrl = (reqPath, params) => {
   return `/${reqPath}${queryParams}`;
 };
 
-const defaultHeaders = () => ({
-  "Content-Type": "application/json",
-  // API_HOST_VERSION is api version is also configured from .env(constants.js)
-  Accept: `application/${API_HOST_VERSION}`,
+const defaultHeaders = (token) => (token ? 
+  {
+    "Content-Type": "application/json",
+    // API_HOST_VERSION is api version is also configured from .env(constants.js)
+    Accept: `application/${API_HOST_VERSION}`,
+    Authorization: `Bearer ${token}`
+  }: {
+    "Content-Type": "application/json",
+    // API_HOST_VERSION is api version is also configured from .env(constants.js)
+    Accept: `application/${API_HOST_VERSION}`,
 });
 
 // Rest success status check
@@ -83,6 +90,9 @@ export function* callApi(actions) {
       failureAction,
       method = "GET",
       params = null,
+      showPopupSuccessMessage = false,
+      showPopupFailureMessage = false,
+      token
     },
   } = actions;
 
@@ -91,7 +101,7 @@ export function* callApi(actions) {
   try {
     const fetchOptions = {
       method,
-      headers: defaultHeaders(),
+      headers: defaultHeaders(token),
       body: body && JSON.stringify(body),
     };
 
@@ -106,8 +116,14 @@ export function* callApi(actions) {
 
     if (response.ok) {
       yield put(dispatcherHelper(successAction, parsedResponse));
+      if(showPopupSuccessMessage && parsedResponse?.msg){
+        toast.success(parsedResponse.msg)
+      }
     } else {
       yield put(dispatcherHelper(failureAction, parsedResponse, true));
+      if(showPopupFailureMessage && parsedResponse?.msg){
+        toast.error(parsedResponse.msg)
+      }
     }
   } catch (error) {
     throw error;
@@ -119,17 +135,3 @@ export function* callApi(actions) {
 export function* fetchResponseSaga() {
   yield takeEvery(fetchAction.fetchResponse, callApi);
 }
-
-// export const getResponse = async (reqPath, method = 'GET', params = null, body = null) => {
-// 	// request url formation
-// 	const fetchUrl = getRequestUrl(reqPath, params);
-// 	const fetchOptions = {
-// 		method,
-// 		headers: defaultHeaders(),
-// 		body: body && JSON.stringify(body),
-// 	};
-
-// 	const response = await fetch(fetchUrl, fetchOptions);
-// 	return response.json();
-
-// };

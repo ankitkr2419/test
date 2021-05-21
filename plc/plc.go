@@ -3,7 +3,6 @@ package plc
 import (
 	"github.com/google/uuid"
 	"mylab/cpagent/db"
-
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
@@ -61,13 +60,13 @@ type WSError struct {
 	Deck    string `json:"deck"`
 }
 type OperationDetails struct {
-	Message        string    `json:"message"`
-	CurrentStep    int       `json:"current_step,omitempty"`
-	TotalProcesses int       `json:"total_processes,omitempty"`
-	RecipeID       uuid.UUID `json:"recipe_id,omitempty"`
-	RemainingTime  int64     `json:"remaining_time,omitempty"`
-	ProcessName    string    `json:"process_name,omitempty"`
-	ProcessType    string    `json:"process_type,omitempty"`
+	Message        string         `json:"message"`
+	CurrentStep    int            `json:"current_step,omitempty"`
+	TotalProcesses int            `json:"total_processes,omitempty"`
+	RecipeID       uuid.UUID      `json:"recipe_id,omitempty"`
+	RemainingTime  int64          `json:"remaining_time,omitempty"`
+	ProcessName    string         `json:"process_name,omitempty"`
+	ProcessType    db.ProcessType `json:"process_type,omitempty"`
 }
 
 type Compact32Deck struct {

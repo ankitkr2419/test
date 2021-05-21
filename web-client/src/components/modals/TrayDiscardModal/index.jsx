@@ -1,33 +1,20 @@
 import React, { useState } from "react";
 
 import PropTypes from "prop-types";
-import styled from "styled-components";
 import { Modal, ModalBody, Button, CheckBox } from "core-components";
 import { Center, Text, ButtonIcon, ImageIcon } from "shared-components";
 import alertIcon from "assets/images/alertIcon.svg";
 import collectAndEmptyTrayImage from "assets/images/collect-and-empty-tray.jpg";
 import doneThumbsUpImage from "assets/images/done-thumbs-up-image.svg";
-//For Tray Discard Modal
-// Need to toggle this class for gray scale effect
-const TrayDiscardSection = styled.div`
-  .status-box {
-    &.gray-scale-box {
-      filter: grayscale(1);
-    }
-  }
-`;
-const DiscardTrayBox = styled.div`
-  .btn-discard-tray {
-    width: 10rem;
-  }
-`;
+import {TrayDiscardSection, DiscardTrayBox} from './Style'
+
 const TrayDiscardModal = (props) => {
   const {
     trayDiscardModal,
     toggleTrayDiscardModal,
     deckName,
     handleSuccessBtn,
-    switchModalContent,
+    nextModal,
   } = props;
 
   const [enableContent, setEnableContent] = useState(false);
@@ -57,7 +44,7 @@ const TrayDiscardModal = (props) => {
 
             <TrayDiscardSection className="gray-scale-box d-flex justify-content-center align-items-center">
               <Center className="mt-4">
-                {switchModalContent ? (
+                {nextModal ? (
                   <>
                     <ImageIcon
                       src={alertIcon}
@@ -128,14 +115,14 @@ const TrayDiscardModal = (props) => {
 TrayDiscardModal.propTypes = {
   //confirmationText: PropTypes.string,
   isOpen: PropTypes.bool,
-  switchModalContent: PropTypes.bool,
+  nextModal: PropTypes.bool,
   confirmationClickHandler: PropTypes.func,
 };
 
 TrayDiscardModal.defaultProps = {
   //confirmationText: 'Are you sure you want to Exit?',
-  switchModalContent: true,
+  nextModal: true,
   isOpen: false,
 };
 
-export default TrayDiscardModal;
+export default React.memo(TrayDiscardModal);

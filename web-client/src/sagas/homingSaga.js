@@ -22,6 +22,8 @@ export function* homingAction() {
         reqPath: API_ENDPOINTS.homing,
         successAction: homingActionSuccess,
         failureAction: homingActionFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -46,6 +48,8 @@ export function* deckHoming(actions) {
         reqPath: `${API_ENDPOINTS.homing}/${deckName}`,
         successAction: deckHomingActionSuccess,
         failureAction: deckHomingActionFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -74,6 +78,8 @@ export function* discardTipAndHoming(actions) {
         reqPath: `${API_ENDPOINTS.discardTipAndHoming}/${discardTip}/${deckName}`,
         successAction: discardTipAndHomingActionSuccess,
         failureAction: discardTipAndHomingActionFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
