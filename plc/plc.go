@@ -2,6 +2,8 @@ package plc
 
 import (
 	"github.com/google/uuid"
+	"mylab/cpagent/db"
+
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
@@ -85,6 +87,31 @@ type Compact32Driver interface {
 	ReadHoldingRegisters(address, quantity uint16) (results []byte, err error)
 	ReadSingleRegister(address uint16) (value uint16, err error)
 	WriteSingleCoil(address, value uint16) (err error)
+}
+
+type Extraction interface {
+	AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
+	AttachDetach(ad db.AttachDetach) (response string, err error)
+	DiscardBoxCleanup() (response string, err error)
+	RestoreDeck() (response string, err error)
+	UVLight(uvTime string) (response string, err error)
+	AddDelay(delay db.Delay) (response string, err error)
+	DiscardTipAndHome(discard bool) (response string, err error)
+	Heating(ht db.Heating) (response string, err error)
+	Homing() (response string, err error)
+	ManualMovement(motorNum, direction, pulses uint16) (response string, err error)
+	Resume() (response string, err error)
+	Pause() (response string, err error)
+	Abort() (response string, err error)
+	Reset() (ack bool)
+	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
+	Shaking(shakerData db.Shaker) (response string, err error)
+	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
+	SetRunInProgress()
+	ResetRunInProgress()
+	IsMachineHomed() bool
+	IsRunInProgress() bool
+	TipOperation(to db.TipOperation) (response string, err error)
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {
