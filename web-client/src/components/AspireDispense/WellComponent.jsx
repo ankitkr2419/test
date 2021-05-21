@@ -31,17 +31,17 @@ export const WellComponent = (props) => {
             {wellsObjArray &&
               wellsObjArray.map((wellObj, index) => {
                 return (
-                  <>
-                    <Well
-                      key={wellObj.id}
-                      id={wellObj.id}
-                      isRunning={wellObj.isRunning}
-                      isSelected={wellObj.isSelected}
-                      isDisabled={wellObj.isDisabled}
-                      className={`well ${wellObj.footerText}`}
-                      onClickHandler={() => wellClickHandler(wellObj.id, wellObj.type)}
-                    />
-                  </>
+                  <Well
+                    key={wellObj.id}
+                    id={wellObj.id}
+                    isRunning={wellObj.isRunning}
+                    isSelected={wellObj.isSelected}
+                    // isDisabled={wellObj.isDisabled}
+                    className={`well ${wellObj.footerText}`}
+                    onClickHandler={() =>
+                      wellClickHandler(wellObj.id, wellObj.type)
+                    }
+                  />
                 );
               })}
           </div>
@@ -54,7 +54,6 @@ export const WellComponent = (props) => {
 WellComponent.propTypes = {
   isSelected: PropTypes.bool,
   isRunning: PropTypes.bool,
-  onClickHandler: PropTypes.func.isRequired,
   isDisabled: PropTypes.bool,
 };
 

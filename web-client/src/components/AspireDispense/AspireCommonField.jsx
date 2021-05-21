@@ -5,6 +5,10 @@ import { Text, Icon } from "shared-components";
 import { CommmonFields } from "./Style";
 
 const AspireCommonField = (props) => {
+  const { formik } = props;
+  const mixingVolume = formik.values.aspire.mixingVolume;
+  const nCyclesDisabled = mixingVolume === null || mixingVolume === "";
+
   return (
     <>
       <CommmonFields>
@@ -19,6 +23,9 @@ const AspireCommonField = (props) => {
               id="aspire-height"
               placeholder="Type here"
               className="aspire-input-field"
+              onChange={(e) => {
+                formik.setFieldValue(`aspire.aspireHeight`, e.target.value);
+              }}
             />
             <Text Tag="span" className="height-icon-box">
               <Icon name="height" size={20} />
@@ -37,10 +44,18 @@ const AspireCommonField = (props) => {
               name="mixing-volume"
               id="mixing-volume"
               placeholder="Type here"
+              onChange={(e) => {
+                formik.setFieldValue(`aspire.mixingVolume`, e.target.value);
+              }}
             />
             <FormError>Incorrect Mixing Volume</FormError>
           </div>
-          <Text Tag="span" className="d-flex align-items-center disabled ml-4">
+          <Text
+            Tag="span"
+            className={`d-flex align-items-center ${
+              nCyclesDisabled ? "disabled" : ""
+            } ml-4`}
+          >
             <Label for="no-of-cycles" className="px-0 label-name">
               No. Of Cycles
             </Label>
@@ -50,6 +65,9 @@ const AspireCommonField = (props) => {
                 name="no-of-cycles"
                 id="no-of-cycles"
                 placeholder=""
+                onChange={(e) => {
+                  formik.setFieldValue(`aspire.nCycles`, e.target.value);
+                }}
               />
               <FormError>Incorrect No. Of Cycles</FormError>
             </Text>
@@ -66,6 +84,9 @@ const AspireCommonField = (props) => {
               name="aspire-volume"
               id="aspire-volume"
               placeholder="Type here"
+              onChange={(e) => {
+                formik.setFieldValue(`aspire.aspireVolume`, e.target.value);
+              }}
             />
             <FormError>Incorrect Aspire Volume</FormError>
           </div>
@@ -81,6 +102,9 @@ const AspireCommonField = (props) => {
               name="air-volume"
               id="air-volume"
               placeholder="Type here"
+              onChange={(e) => {
+                formik.setFieldValue(`aspire.airVolume`, e.target.value);
+              }}
             />
             <FormError>Incorrect Air Volume</FormError>
           </div>

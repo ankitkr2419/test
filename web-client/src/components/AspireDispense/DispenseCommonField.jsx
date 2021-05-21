@@ -5,6 +5,10 @@ import { Text, Icon } from "shared-components";
 import { CommmonFields } from "./Style";
 
 const DispenseCommonField = (props) => {
+  const { formik } = props;
+  const mixingVolume = formik.values.dispense.mixingVolume;
+  const nCyclesDisabled = mixingVolume === null || mixingVolume === "";
+
   return (
     <CommmonFields>
       <FormGroup className="d-flex align-items-center mb-2">
@@ -18,6 +22,9 @@ const DispenseCommonField = (props) => {
             id="dispense-height"
             placeholder="Type here"
             className="dispense-input-field"
+            onChange={(e) => {
+              formik.setFieldValue(`dispense.dispenseHeight`, e.target.value);
+            }}
           />
           <Text Tag="span" className="height-icon-box">
             <Icon name="height" size={20} />
@@ -36,11 +43,19 @@ const DispenseCommonField = (props) => {
             name="mixing-volume"
             id="mixing-volume"
             placeholder="Type here"
+            onChange={(e) => {
+              formik.setFieldValue(`dispense.mixingVolume`, e.target.value);
+            }}
           />
           <FormError>Incorrect Mixing Volume</FormError>
         </div>
 
-        <Text Tag="span" className="d-flex align-items-center disabled ml-4">
+        <Text
+          Tag="span"
+          className={`d-flex align-items-center ${
+            nCyclesDisabled ? "disabled" : ""
+          } ml-4`}
+        >
           <Label for="no-of-cycles" className="px-0 label-name">
             No. Of Cycles
           </Label>
@@ -50,6 +65,9 @@ const DispenseCommonField = (props) => {
               name="no-of-cycles"
               id="no-of-cycles"
               placeholder=""
+              onChange={(e) => {
+                formik.setFieldValue(`dispense.nCycles`, e.target.value);
+              }}
             />
             <FormError>Incorrect No. Of Cycles</FormError>
           </Text>

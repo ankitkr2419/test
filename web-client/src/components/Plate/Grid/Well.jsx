@@ -22,9 +22,9 @@ const Well = (props) => {
   return (
     <StyledWell
       id={id}
-      isRunning={isRunning}
+      // isRunning={isDisabled}
       isSelected={isSelected}
-      isDisabled={isDisabled}
+      // isDisabled={isDisabled}
       status={status}
       className={wellClassnames}
       onClick={onClickHandler}
