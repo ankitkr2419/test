@@ -38,12 +38,12 @@ var testHeatingRecord = db.Heating{
 
 func (suite *HeatingHandlerTestSuite) TestCreateHeatingSuccess() {
 
-	suite.dbMock.On("CreateHeating", mock.Anything, testHeatingRecord).Return(testHeatingRecord, nil)
+	suite.dbMock.On("CreateHeating", mock.Anything, mock.Anything, recipeUUID).Return(testHeatingRecord, nil)
 
 	body, _ := json.Marshal(testHeatingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/heating",
-		"/heating",
+		"/heating/{recipe_id}",
+		"/heating/"+recipeUUID.String(),
 		string(body),
 		createHeatingHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -56,12 +56,12 @@ func (suite *HeatingHandlerTestSuite) TestCreateHeatingSuccess() {
 
 func (suite *HeatingHandlerTestSuite) TestCreateHeatingFailure() {
 
-	suite.dbMock.On("CreateHeating", mock.Anything, testHeatingRecord).Return(db.Heating{}, responses.HeatingCreateError)
+	suite.dbMock.On("CreateHeating", mock.Anything, mock.Anything, recipeUUID).Return(db.Heating{}, responses.HeatingCreateError)
 
 	body, _ := json.Marshal(testHeatingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/heating",
-		"/heating",
+		"/heating/{recipe_id}",
+		"/heating/"+recipeUUID.String(),
 		string(body),
 		createHeatingHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -150,6 +150,59 @@ func (suite *HeatingHandlerTestSuite) TestUpdateHeatingFailure() {
 	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *HeatingHandlerTestSuite) TestCreateHeatingInvalidUUID() {
+
+	body, _ := json.Marshal(testHeatingRecord)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/heating/{recipe_id}",
+		"/heating/"+invalidUUID,
+		string(body),
+		createHeatingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.RecipeIDInvalidError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *HeatingHandlerTestSuite) TestShowHeatingInvalidUUID() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/heating/{recipe_id}",
+		"/heating/"+invalidUUID,
+		"",
+		showHeatingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *HeatingHandlerTestSuite) TestUpdateHeatingInvalidUUID() {
+
+	body, _ := json.Marshal(testHeatingRecord)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/heating/{recipe_id}",
+		"/heating/"+invalidUUID,
+		string(body),
+		updateHeatingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())

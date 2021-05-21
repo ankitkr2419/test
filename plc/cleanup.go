@@ -7,6 +7,7 @@ import (
 	"mylab/cpagent/db"
 	"strconv"
 	"strings"
+	"mylab/cpagent/responses"
 	"time"
 
 	logger "github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ import (
 func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 
 	if !d.IsMachineHomed() {
-		err = fmt.Errorf("Please home the machine first!")
+		err = responses.PleaseHomeMachineError
 		return
 	}
 
@@ -59,7 +60,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 
 	if !d.IsMachineHomed() {
-		err = fmt.Errorf("Please home the machine first!")
+		err = responses.PleaseHomeMachineError
 		return
 	}
 
@@ -118,7 +119,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	}()
 
 	if !d.IsMachineHomed() {
-		err = fmt.Errorf("Please home the machine first!")
+		err = responses.PleaseHomeMachineError
 		return
 	}
 

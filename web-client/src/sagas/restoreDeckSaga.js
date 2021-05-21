@@ -20,6 +20,8 @@ export function* restoreDeck(actions) {
         reqPath: `${API_ENDPOINTS.restoreDeck}/${deckName}`,
         successAction: restoreDeckSuccess,
         failureAction: restoreDeckFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {

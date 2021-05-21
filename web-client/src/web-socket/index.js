@@ -8,7 +8,7 @@ import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from "appConstants";
 import { updateWellThroughSocket } from "action-creators/wellActionCreators";
 import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 import { experimentedCompleted } from "action-creators/runExperimentActionCreators";
-import { showErrorModal } from "action-creators/modalActionCreators";
+// import { showErrorModal } from "action-creators/modalActionCreators";
 import { temperatureDataSucceeded } from "action-creators/temperatureGraphActionCreators";
 import {
   homingActionInProgress,
@@ -59,14 +59,21 @@ export const connectSocket = (dispatch) => {
           dispatch(homingActionInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
-          toast.success("Homing Successfull");
+          let parsedData = JSON.parse(data);
+          let homingSuccessMsg = 
+            parsedData && 
+            parsedData.operation_details && 
+            parsedData.operation_details.message 
+              ? parsedData.operation_details.message 
+              : "Homing Successfull" 
+          toast.success(homingSuccessMsg)
           dispatch(homingActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
-          dispatch(runRecipeInProgress(data));
+          dispatch(runRecipeInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeSuccess:
-          dispatch(runRecipeInCompleted(data));
+          dispatch(runRecipeInCompleted(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.uvLightProgress:
           dispatch(runCleanUpActionInProgress(data));
@@ -89,6 +96,13 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
           // dispatch(showErrorModal(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:
+          let parsedErrorData = JSON.parse(data);
+          let errorMessage = parsedErrorData.message;
+          if(errorMessage) {
+           toast.error(errorMessage)
+          }
           break;
         default:
           break;

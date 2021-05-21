@@ -74,6 +74,12 @@ And thus your DB_URI should look this way
 DB_URI: "postgresql://(username):(password)@localhost:5432/cpagentdb?sslmode=disable"
 You need to set username and password
 
+NOTE: If you are working on backend then below credentials are highly recommended as these replicate actual machine
+
+username: postgres
+password: password
+dbname: cpagentdb
+
 ### 6. Set config.yml
 Inside conf directory, create a clone file from config.yml.default and name it as config.yml. And let it be. 
 
@@ -107,7 +113,13 @@ Please refer README inside web-client directory if you are facing any issue and 
 # Run
 DEPENDENCY: Make sure that cpagent binary is built
 
-## 1. If there are changes in Migration/DB schema files 
+## When there are changes in Migration/DB schema files 
+
+Only if below make command doesn't work then go for individual statements
+`
+$ make migrate
+`
+
 
 Please drop the cpagentdb database.
 
@@ -129,7 +141,9 @@ CREATE DATABASE cpagentdb;
 
 You may close the connection to database
 
-## 2. Run the migrations, make sure your PWD is same as this README's.
+## Run the migrations, 
+
+make sure your PWD is same as this README's.
 
 If you have changed your branch which has differnt DB schema, please goto Step 1
 

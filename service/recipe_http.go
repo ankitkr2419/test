@@ -246,7 +246,7 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 		case "unpublish":
 			publishFlag = false
 		default:
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidUrlArgument.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UrlArgumentInvalid.Error()})
 			return
 		}
 
