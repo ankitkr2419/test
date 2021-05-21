@@ -42,7 +42,16 @@ type Process struct {
 }
 
 func (s *pgStore) ShowProcess(ctx context.Context, id uuid.UUID) (dbProcess Process, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.ProcessInitialisedState)
+
 	err = s.db.Get(&dbProcess, getProcessQuery, id)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.ProcessCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.ProcessDBFetchError)
 		return
@@ -51,7 +60,16 @@ func (s *pgStore) ShowProcess(ctx context.Context, id uuid.UUID) (dbProcess Proc
 }
 
 func (s *pgStore) ListProcesses(ctx context.Context, id uuid.UUID) (dbProcess []Process, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.ProcessListInitialisedState)
+
 	err = s.db.Select(&dbProcess, selectProcessQuery, id)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.ProcessListCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching process")
 		return
@@ -60,6 +78,8 @@ func (s *pgStore) ListProcesses(ctx context.Context, id uuid.UUID) (dbProcess []
 }
 
 func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess Process, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.ProcessInitialisedState)
+
 	var tx *sql.Tx
 
 	tx, err = s.db.BeginTx(ctx, nil)
@@ -76,11 +96,13 @@ func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess 
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
 		createdProcess, err = s.ShowProcess(ctx, createdProcess.ID)
 		logger.Infoln("Created Process: ", createdProcess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.ProcessCompletedState)
 		return
 	}()
 
@@ -88,7 +110,16 @@ func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess 
 }
 
 func (s *pgStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.ProcessInitialisedState)
+
 	_, err = s.db.Exec(deleteProcessQuery, id)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, DeleteOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, DeleteOperation, "", responses.ProcessCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error deleting process")
 		return
@@ -97,6 +128,8 @@ func (s *pgStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
 }
 
 func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.ProcessInitialisedState)
+
 	_, err = s.db.Exec(
 		updateProcessQuery,
 		p.Name,
@@ -104,6 +137,13 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 		time.Now(),
 		p.ID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.ProcessCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating process")
 		return
@@ -112,11 +152,20 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 }
 
 func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (duplicateP Process, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.DuplicateProcessInitialisedState)
 
 	var parent Process
 
 	// if parent process exists only then create duplicate process
 	parent, err = s.ShowProcess(ctx, processID)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.DuplicateProcessCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
 		return
@@ -147,6 +196,8 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 // 7. list processes
 //
 func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, sequenceArr []ProcessSequence) (processes []Process, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.RearrangeProcessInitialisedState)
+
 	var tx *sql.Tx
 
 	// 1. initiate transaction
@@ -161,6 +212,7 @@ func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, se
 		// 6. end transaction
 		if err != nil {
 			tx.Rollback()
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -170,6 +222,7 @@ func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, se
 			logger.Errorln(responses.ProcessRearrangeDBError, processes)
 		}
 		logger.Infoln(responses.ProcessRearrangeSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.RearrangeProcessCompletedState)
 		return
 	}()
 

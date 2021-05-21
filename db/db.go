@@ -68,7 +68,7 @@ type Storer interface {
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
-	ListCartridges() ([]Cartridge, error)
+	ListCartridges(ctx context.Context) ([]Cartridge, error)
 	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
 	ShowTipOperation(context.Context, uuid.UUID) (TipOperation, error)
@@ -113,4 +113,7 @@ type Storer interface {
 	InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error)
 	ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error)
 	DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error)
+	InsertAuditLog(ctx context.Context, al AuditLog) (err error)
+	ShowAuditLog(ctx context.Context) (al AuditLog, err error)
+	AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error)
 }

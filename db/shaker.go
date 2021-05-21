@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"database/sql"
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 type Shaker struct {
@@ -50,11 +51,19 @@ const (
 )
 
 func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker Shaker, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.ShakingInitialisedState)
 
 	err = s.db.Get(&shaker,
 		getShakerQuery,
 		shakerID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.ShakingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.ShakingDBFetchError)
 		return
@@ -64,6 +73,8 @@ func (s *pgStore) ShowShaking(ctx context.Context, shakerID uuid.UUID) (shaker S
 }
 
 func (s *pgStore) CreateShaking(ctx context.Context, ad Shaker, recipeID uuid.UUID) (createdAD Shaker, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.ShakingInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -75,6 +86,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, ad Shaker, recipeID uuid.UU
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.ShakingCreateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -84,6 +96,8 @@ func (s *pgStore) CreateShaking(ctx context.Context, ad Shaker, recipeID uuid.UU
 			return
 		}
 		logger.Infoln(responses.ShakingCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.ShakingCompletedState)
+
 		return
 	}()
 
@@ -94,7 +108,7 @@ func (s *pgStore) CreateShaking(ctx context.Context, ad Shaker, recipeID uuid.UU
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, ShakingProcess, ad, Process{})
 	if err != nil {
 		return
@@ -141,6 +155,8 @@ func (s *pgStore) createShaking(ctx context.Context, tx *sql.Tx, sh Shaker) (cre
 }
 
 func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.ShakingInitialisedState)
+
 	_, err = s.db.Exec(
 		updateShakingQuery,
 		sh.WithTemp,
@@ -153,6 +169,13 @@ func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
 		time.Now(),
 		sh.ProcessID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.ShakingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating shaking")
 		return

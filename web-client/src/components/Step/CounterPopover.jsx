@@ -11,13 +11,9 @@ import {
 	FormGroup,
 } from 'core-components';
 import { ButtonIcon, Text, Icon } from 'shared-components';
-import styled from 'styled-components';
 import { validateRepeatCount } from 'components/Stage/stageHelper';
 import { MIN_REPEAT_COUNT, MAX_REPEAT_COUNT } from 'components/Stage/stageConstants';
-
-const StyledCounterPopover = styled.div`
-	display: flex;
-`;
+import { StyledCounterPopover } from './StyledCounterPopover';
 
 const CounterPopover = (props) => {
 	const {

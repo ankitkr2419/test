@@ -6,18 +6,34 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 
 	"github.com/gorilla/mux"
 )
 
 func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.RunRecipeInitialisedState)
+
+		var err error
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.DelayCompletedState)
+
+			}
+
+		}()
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
@@ -67,6 +83,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if err != nil {
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.ErrorState, db.ExecuteOperation, deck, err.Error())
 		}
 		resetStepRunInProgress(deck)
 	}()
@@ -128,6 +145,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			setRunNext(deck)
 			logger.Infoln(responses.NextProcessInProgress)
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(p.Type, string(db.InitialisedState)))
 
 		switch p.Type {
 		case db.AspireDispenseProcess:
@@ -254,6 +272,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(p.Type, string(db.CompletedState)))
+
 	}
 
 	plength := len(processes)

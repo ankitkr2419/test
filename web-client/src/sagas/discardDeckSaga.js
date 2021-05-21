@@ -18,7 +18,9 @@ export function* discardDeck(actions){
         body: null,
         reqPath: `${API_ENDPOINTS.discardDeck}/${deckName}`,
         successAction: discardDeckSuccess,
-        failureAction: discardDeckFailed
+        failureAction: discardDeckFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
@@ -38,7 +40,9 @@ export function* discardTip(actions){
         body: null,
         reqPath: `/discard-tip-and-home/true/${deckName}`, /**static api route**/
         successAction: discardTipSuccess,
-        failureAction: discardTipFailed
+        failureAction: discardTipFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {

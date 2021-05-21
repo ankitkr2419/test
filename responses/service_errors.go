@@ -54,6 +54,11 @@ var (
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
 	TipOperationConvertError    = fmt.Errorf("error converting tip operation to its specific type")
 
+	TipTubeDecodeError    = fmt.Errorf("error decoding tip tube record")
+	TipTubeCreateError    = fmt.Errorf("error creating tip tube record")
+	TipTubeFetchError     = fmt.Errorf("error fetching tip tube record")
+	TipTubeArgumentsError = fmt.Errorf("error invalid tip tube arguments")
+
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
 	ProcessValidationError  = fmt.Errorf("error validating process record")
@@ -117,7 +122,15 @@ var (
 	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
 	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
 
+	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
+	AuditLogCreateError = fmt.Errorf("error failed saving log")
+
+	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
+
+	WrongDeckError = fmt.Errorf("error invalid deck name")
+
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
+	DiscardBoolOptionError        = fmt.Errorf("Invalid boolean value for tip discard option")
 )
 
 // Special errors which are in []byte format
