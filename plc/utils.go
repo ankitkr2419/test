@@ -1,10 +1,12 @@
 package plc
 
 import (
+	"context"
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
 	"sync"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 type DeckNumber struct {
@@ -260,7 +262,12 @@ func selectAllTipsTubes(store db.Storer) (err error) {
 }
 
 func selectAllCartridges(store db.Storer) (err error) {
-	allCartridges, err := store.ListCartridges()
+
+	// here passing context since we need username and as when the binary runs the
+	// first time there is no login information hence setting username as main.
+	ctx := context.WithValue(context.Background(), db.ContextKeyUsername, "main")
+
+	allCartridges, err := store.ListCartridges(ctx)
 	if err != nil {
 		return
 	}

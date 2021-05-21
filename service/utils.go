@@ -15,6 +15,9 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+const contextKeyUsername = "username"
+const contextKeyUserAuthID = "auth_id"
+
 const (
 	hold  = "hold"
 	cycle = "cycle"
@@ -191,20 +194,34 @@ func MD5Hash(s string) string {
 
 func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Create a default supervisor
-	u := db.User{
+	supervisor := db.User{
 		Username: "supervisor",
 		Password: MD5Hash("supervisor"),
 		Role:     "supervisor",
 	}
 
 	// Add Default supervisor user to DB
-	err = s.InsertUser(context.Background(), u)
+	err = s.InsertUser(context.Background(), supervisor)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Default User failed")
 		return
 	}
 
-	logger.Info("Default user added")
+	// Create a default main user
+	mainUser := db.User{
+		Username: "main",
+		Password: MD5Hash("main"),
+		Role:     "admin",
+	}
+
+	// Add Default main user to DB
+	err = s.InsertUser(context.Background(), mainUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		return
+	}
+
+	logger.Info("Default users added")
 
 	loadUtils()
 	return nil
