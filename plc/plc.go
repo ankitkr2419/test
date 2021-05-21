@@ -103,7 +103,6 @@ type Extraction interface {
 	Resume() (response string, err error)
 	Pause() (response string, err error)
 	Abort() (response string, err error)
-	Reset() (ack bool)
 	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
 	Shaking(shakerData db.Shaker) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
