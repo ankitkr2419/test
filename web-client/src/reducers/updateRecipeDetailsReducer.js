@@ -6,44 +6,6 @@ import {
   getTubesAction,
   getTipsAction,
 } from "actions/saveNewRecipeActions";
-// import { fromJS } from "immutable";
-
-//  Old init state
-
-// const initialState = {
-//   tempDeckName: "",
-//   isLoading: null,
-//   error: null,
-//   isSuccess: null,
-//   decks: [
-//     {
-//       name: DECKNAME.DeckA,
-//       recipeDetails: {
-//         name: "",
-//       },
-//       recipeOptions: null,
-//       tubesOptions: null,
-//       tipsOptions: null,
-//       cartridgeOptions: null,
-//       isSaved: false,
-//       errorInSaving: false,
-//       token: "",
-//     },
-//     {
-//       name: DECKNAME.DeckB,
-//       recipeDetails: {
-//         name: "",
-//       },
-//       recipeOptions: null,
-//       tubesOptions: null,
-//       tipsOptions: null,
-//       cartrideOptions: null,
-//       isSaved: false,
-//       errorInSaving: false,
-//       token: "",
-//     },
-//   ],
-// };
 
 const initialState = {
   tempDeckName: "",
@@ -51,6 +13,7 @@ const initialState = {
   error: null,
   isSuccess: null,
   recipeDetails: {
+    id: "",
     name: "",
     deckName: "",
   },
@@ -84,7 +47,16 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
       };
 
     case saveNewRecipeAction.updateRecipeSuccess:
-      return { ...state, isLoading: false, error: false, isSuccess: true };
+      return {
+        ...state,
+        recipeDetails: {
+          ...state.recipeDetails,
+          id: actions.payload.response.id,
+        },
+        isLoading: false,
+        error: false,
+        isSuccess: true,
+      };
 
     case saveNewRecipeAction.updateRecipeFailure:
       return {

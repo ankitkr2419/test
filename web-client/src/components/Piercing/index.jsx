@@ -9,7 +9,7 @@ import classnames from "classnames";
 import { PageBody, PiercingBox, TopContent } from "./Style";
 import { WellComponent } from "./WellComponent";
 import HeightModal from "components/modals/HeightModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { savePiercingInitiated } from "action-creators/processesActionCreators";
 import { TEST_RECIPE_ID, TEST_TOKEN } from "appConstants";
 
@@ -35,6 +35,12 @@ const PiercingComponent = (props) => {
   const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
+
+  const recipeDetailsReducer = useSelector(
+    (state) => state.updateRecipeDetailsReducer
+  );
+  const recipeID = recipeDetailsReducer.recipeDetails.id;
+  const token = recipeDetailsReducer.token;
 
   const dispatch = useDispatch();
 
@@ -79,8 +85,8 @@ const PiercingComponent = (props) => {
     const requestBody = {
       type: type,
       cartridgeWells: cartridgeWells,
-      recipeID: TEST_RECIPE_ID,
-      token: TEST_TOKEN,
+      recipeID: recipeID,
+      token: token,//TEST_TOKEN,
     };
 
     dispatch(savePiercingInitiated(requestBody));

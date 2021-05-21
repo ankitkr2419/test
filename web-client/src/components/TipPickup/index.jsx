@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormik } from "formik";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
 import {
@@ -24,6 +24,12 @@ const TipPickupComponent = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const recipeDetailsReducer = useSelector(
+    (state) => state.updateRecipeDetailsReducer
+  );
+  const recipeID = recipeDetailsReducer.recipeDetails.id;
+  const token = recipeDetailsReducer.token;
+
   const taskOptions = [
     { value: "1", label: "1" },
     { value: "2", label: "2" },
@@ -40,9 +46,9 @@ const TipPickupComponent = (props) => {
     const tipPosition = formik.values.tipPosition;
     dispatch(
       saveTipPickupInitiated({
-        recipeID: TEST_RECIPE_ID, //For testing, will be removed later.
+        recipeID: recipeID, //TEST_RECIPE_ID, //For testing, will be removed later.
         position: tipPosition,
-        token: TEST_TOKEN, //For testing, will be removed later.
+        token: token, //TEST_TOKEN, //For testing, will be removed later.
       })
     );
   };

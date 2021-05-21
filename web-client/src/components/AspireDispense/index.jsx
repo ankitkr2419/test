@@ -13,6 +13,7 @@ import { ASPIRE_DISPENSE_SIDEBAR_LABELS } from "appConstants";
 import { WellComponent } from "./WellComponent";
 import { getArray } from "./functions";
 import CommonDeckPosition from "./CommonDeckPosition";
+import { useSelector } from "react-redux";
 
 const aspireCart1Wells = getArray(8, 0);
 const aspireCart2Wells = getArray(8, 0);
@@ -22,13 +23,24 @@ const dispenseCart2Wells = getArray(8, 1);
 const AspireDispenseComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
-  const [selectedTab, setSelectedTab] = useState();
+  const [selectedTab, setSelectedTab] = useState(false);
+
+  const recipeDetailsReducer = useSelector(
+    (state) => state.updateRecipeDetailsReducer
+  );
+  const recipeID = recipeDetailsReducer.recipeDetails.id;
+  const token = recipeDetailsReducer.token;
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
 
   const handleWellClick = () => {};
+
+  const handleTabElementChange = (e) => {
+    !selectedTab && setSelectedTab(activeTab);
+    console.log("Selected Tab: ", selectedTab);
+  };
 
   return (
     <>
@@ -73,6 +85,9 @@ const AspireDispenseComponent = (props) => {
                           onClick={() => {
                             toggle(`${index + 1}`);
                           }}
+                          disabled={
+                            selectedTab && !(`${index + 1}` === selectedTab)
+                          }
                         >
                           {label}
                         </NavLink>
@@ -98,13 +113,16 @@ const AspireDispenseComponent = (props) => {
                       </Text>
                     </Text>
 
-                    <TabPane tabId={"1"}>
+                    <TabPane
+                      tabId={"1"}
+                      onChange={(e) => handleTabElementChange(e)}
+                    >
                       <>
                         <WellComponent
                           wellsObjArray={
                             isAspire ? aspireCart1Wells : dispenseCart1Wells
                           }
-                          // wellClickHandler={}
+                          wellClickHandler={handleWellClick}
                         />
                         {isAspire ? (
                           <AspireCommonField />
@@ -114,13 +132,16 @@ const AspireDispenseComponent = (props) => {
                       </>
                     </TabPane>
 
-                    <TabPane tabId="2">
+                    <TabPane
+                      tabId="2"
+                      onChange={(e) => handleTabElementChange(e)}
+                    >
                       <>
                         <WellComponent
                           wellsObjArray={
                             isAspire ? aspireCart2Wells : dispenseCart2Wells
                           }
-                          // wellClickHandler={}
+                          wellClickHandler={handleWellClick}
                         />
                         {isAspire ? (
                           <AspireCommonField />
@@ -130,7 +151,10 @@ const AspireDispenseComponent = (props) => {
                       </>
                     </TabPane>
 
-                    <TabPane tabId="3">
+                    <TabPane
+                      tabId="3"
+                      onChange={(e) => handleTabElementChange(e)}
+                    >
                       {isAspire ? (
                         <div className="py-3">
                           <AspireCommonField />
@@ -140,7 +164,10 @@ const AspireDispenseComponent = (props) => {
                       )}
                     </TabPane>
 
-                    <TabPane tabId="4">
+                    <TabPane
+                      tabId="4"
+                      onChange={(e) => handleTabElementChange(e)}
+                    >
                       <div className="mb-4 border-bottom-line">
                         <CommonDeckPosition />
                         {isAspire ? (
@@ -162,7 +189,6 @@ const AspireDispenseComponent = (props) => {
             />
           </div>
         </AspireDispenseBox>
-        {/* <AppFooter /> */}
       </PageBody>
     </>
   );
