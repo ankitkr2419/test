@@ -32,7 +32,6 @@ var testPiercingRecord = db.Piercing{
 	ID:             testUUID,
 	Type:           db.Cartridge1,
 	CartridgeWells: []int64{1, 2},
-	Discard:        "at_pickup_passing",
 	ProcessID:      testProcessUUID,
 }
 

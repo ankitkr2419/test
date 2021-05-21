@@ -61,7 +61,7 @@ func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupFailure() {
 		discardBoxCleanupHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	err := ErrObj{Err: responses.DiscardBoxMoveError, Deck: deck}
+	err := ErrObj{Err: responses.DiscardBoxMoveError.Error(), Deck: deck}
 	body, _ := json.Marshal(err)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
@@ -103,7 +103,7 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckFailure() {
 		restoreDeckHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	err := ErrObj{Err: responses.RestoreDeckError, Deck: deck}
+	err := ErrObj{Err: responses.RestoreDeckError.Error(), Deck: deck}
 	body, _ := json.Marshal(err)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
