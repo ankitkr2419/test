@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"time"
 
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 type Heating struct {
@@ -37,12 +38,20 @@ const (
 )
 
 func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heating, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.HeatingInitialisedState)
 
 	// get heating record
 	err = s.db.Get(&heating,
 		getHeatingQuery,
 		id,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.HeatingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.HeatingDBFetchError)
 		return
@@ -51,6 +60,8 @@ func (s *pgStore) ShowHeating(ctx context.Context, id uuid.UUID) (heating Heatin
 
 }
 func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.UUID) (createdAD Heating, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.HeatingInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -62,6 +73,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.U
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.HeatingCreateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -71,6 +83,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.U
 			return
 		}
 		logger.Infoln(responses.HeatingCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.HeatingCompletedState)
 		return
 	}()
 
@@ -81,7 +94,7 @@ func (s *pgStore) CreateHeating(ctx context.Context, ad Heating, recipeID uuid.U
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, HeatingProcess, ad, Process{})
 	if err != nil {
 		return
@@ -124,6 +137,8 @@ func (s *pgStore) createHeating(ctx context.Context, tx *sql.Tx, h Heating) (cre
 }
 
 func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.HeatingInitialisedState)
+
 	_, err = s.db.Exec(
 		updateHeatingQuery,
 		ht.Temperature,
@@ -132,6 +147,13 @@ func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 		time.Now(),
 		ht.ProcessID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.HeatingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating heating")
 		return

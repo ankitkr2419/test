@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"time"
 
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 type Delay struct {
@@ -30,11 +31,17 @@ const (
 )
 
 func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.DelayInitialisedState)
+
 	// get delay record
-	err = s.db.Get(&delay,
-		getDelayQuery,
-		id,
-	)
+	err = s.db.Get(&delay, getDelayQuery, id)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.DelayCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.DelayDBFetchError)
 		return
@@ -43,6 +50,8 @@ func (s *pgStore) ShowDelay(ctx context.Context, id uuid.UUID) (delay Delay, err
 }
 
 func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID) (createdAD Delay, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.DelayInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -54,6 +63,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID)
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.DelayCreateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -63,6 +73,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID)
 			return
 		}
 		logger.Infoln(responses.DelayCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.DelayCompletedState)
 		return
 	}()
 
@@ -73,7 +84,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID)
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, DelayProcess, ad, Process{})
 	if err != nil {
 		return
@@ -95,6 +106,7 @@ func (s *pgStore) CreateDelay(ctx context.Context, ad Delay, recipeID uuid.UUID)
 }
 
 func (s *pgStore) createDelay(ctx context.Context, tx *sql.Tx, d Delay) (createdD Delay, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.DelayInitialisedState)
 
 	var lastInsertID uuid.UUID
 
@@ -103,6 +115,14 @@ func (s *pgStore) createDelay(ctx context.Context, tx *sql.Tx, d Delay) (created
 		d.DelayTime,
 		d.ProcessID,
 	).Scan(&lastInsertID)
+
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.DelayCompletedState)
+		}
+	}()
 
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.DelayDBCreateError)

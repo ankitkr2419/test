@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"time"
 
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 const (
@@ -40,7 +41,16 @@ type Piercing struct {
 }
 
 func (s *pgStore) ShowPiercing(ctx context.Context, processID uuid.UUID) (dbPiercing Piercing, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.PiercingInitialisedState)
+
 	err = s.db.Get(&dbPiercing, getPiercingQuery, processID)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.PiercingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.PiercingDBFetchError)
 		return
@@ -49,7 +59,16 @@ func (s *pgStore) ShowPiercing(ctx context.Context, processID uuid.UUID) (dbPier
 }
 
 func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.PiercingListInitialisedState)
+
 	err = s.db.Select(&dbPiercing, selectPiercingQuery)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.PiercingListCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching piercing")
 		return
@@ -58,6 +77,8 @@ func (s *pgStore) ListPiercing(ctx context.Context) (dbPiercing []Piercing, err 
 }
 
 func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid.UUID) (createdAD Piercing, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.PiercingInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -69,6 +90,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.PiercingCreateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -78,6 +100,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid
 			return
 		}
 		logger.Infoln(responses.PiercingCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.PiercingCompletedState)
 		return
 	}()
 
@@ -88,7 +111,7 @@ func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, PiercingProcess, ad, Process{})
 	if err != nil {
 		return
@@ -130,6 +153,8 @@ func (s *pgStore) createPiercing(ctx context.Context, tx *sql.Tx, pi Piercing) (
 }
 
 func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.PiercingInitialisedState)
+
 	_, err = s.db.Exec(
 		updatePiercingQuery,
 		p.Type,
@@ -137,6 +162,14 @@ func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 		time.Now(),
 		p.ProcessID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.PiercingCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating piercing")
 		return

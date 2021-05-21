@@ -54,20 +54,34 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/wells/{id}", showWellHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/wells/{id}", deleteWellHandler(deps)).Methods(http.MethodDelete).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{experiment_id}/run", runExperimentHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+
+	//Websocket router
 	router.HandleFunc("/monitor", wsHandler(deps))
+
 	router.HandleFunc("/experiments/{experiment_id}/stop", stopExperimentHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/activewells", listActiveWellsHandler()).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{id}/emission", getResultHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{id}/temperature", getTemperatureHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	//usercreate
+	router.HandleFunc("/users", authenticate(createUserHandler(deps), deps, supervisor, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	//userlogin
 	router.HandleFunc("/login/{deck:[A-B]?}", validateUserHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	//userlogout
+	router.HandleFunc("/logout/{deck:[A-B]?}", authenticate(logoutUserHandler(deps), deps)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+
 	router.HandleFunc("/motor", createMotorHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/consumable-distance", authenticate(createConsumableDistanceHandler(deps), deps, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tiptube", authenticate(createTipTubeHandler(deps), deps, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+
+	//homing
 	router.HandleFunc("/homing/{deck:[A-B]?}", homingHandler(deps)).Methods(http.MethodGet)
+	//manual
 	router.HandleFunc("/manual", authenticate(manualHandler(deps), deps, engineer)).Methods(http.MethodPost)
 	router.HandleFunc("/pause/{deck:[A-B]}", pauseHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/resume/{deck:[A-B]}", resumeHandler(deps)).Methods(http.MethodGet)
 	router.HandleFunc("/abort/{deck:[A-B]}", abortHandler(deps)).Methods(http.MethodGet)
+
+	//processes CRUD
 	router.HandleFunc("/piercing/{recipe_id}", authenticate(createPiercingHandler(deps), deps, admin, engineer)).Methods(http.MethodPost)
 	router.HandleFunc("/piercing/{id}", authenticate(showPiercingHandler(deps), deps)).Methods(http.MethodGet)
 	router.HandleFunc("/piercing/{id}", authenticate(updatePiercingHandler(deps), deps, admin, engineer)).Methods(http.MethodPut)
