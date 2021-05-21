@@ -1,9 +1,12 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"reflect"
 	"time"
@@ -25,10 +28,10 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			fmt.Println("At both deck!!!")
 			msg = "homing in progress for both decks"
 			plc.SetBothDeckHomingInProgress()
-			go bothDeckOperation(deps, "Homing")
+			go bothDeckOperation(req.Context(), deps, "Homing")
 		case "A", "B":
 			msg = "homing in progress for single deck"
-			go singleDeckOperation(deps, deck, "Homing")
+			go singleDeckOperation(req.Context(), deps, deck, "Homing")
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}
@@ -47,17 +50,17 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func bothDeckOperation(deps Dependencies, operation string) (response string, err error) {
+func bothDeckOperation(ctx context.Context, deps Dependencies, operation string) (response string, err error) {
 	defer plc.ResetBothDeckHomingInProgress()
 
 	var deckAResponse, deckBResponse string
 	var deckAErr, deckBErr error
 
 	go func() {
-		deckAResponse, deckAErr = singleDeckOperation(deps, "A", operation)
+		deckAResponse, deckAErr = singleDeckOperation(ctx, deps, "A", operation)
 	}()
 	go func() {
-		deckBResponse, deckBErr = singleDeckOperation(deps, "B", operation)
+		deckBResponse, deckBErr = singleDeckOperation(ctx, deps, "B", operation)
 	}()
 
 	for {
@@ -95,11 +98,17 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 
 }
 
-func singleDeckOperation(deps Dependencies, deck, operation string) (response string, err error) {
+func singleDeckOperation(ctx context.Context, deps Dependencies, deck, operation string) (response string, err error) {
+
+	go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(operation, string(db.InitialisedState)))
+
 	defer func() {
 		if err != nil {
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.ErrorState, db.ExecuteOperation, deck, err.Error())
+		} else {
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(operation, string(db.CompletedState)))
 		}
 	}()
 
@@ -131,6 +140,5 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 			abortStepRun[deck] <- struct{}{}
 		}
 	}
-
 	return
 }

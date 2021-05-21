@@ -52,6 +52,12 @@ var (
 	TipOperationCreateError     = fmt.Errorf("error creating tip operation record")
 	TipOperationFetchError      = fmt.Errorf("error fetching tip operation record")
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
+	TipOperationConvertError    = fmt.Errorf("error converting tip operation to its specific type")
+
+	TipTubeDecodeError    = fmt.Errorf("error decoding tip tube record")
+	TipTubeCreateError    = fmt.Errorf("error creating tip tube record")
+	TipTubeFetchError     = fmt.Errorf("error fetching tip tube record")
+	TipTubeArgumentsError = fmt.Errorf("error invalid tip tube arguments")
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
@@ -79,8 +85,16 @@ var (
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
 
-	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
-	InvalidUrlArgument          = fmt.Errorf("error invalid url argument")
+	SimulatorReservedDelayError = fmt.Errorf("error delay is allowed only for simulator")
+
+	StepRunNotInProgressError  = fmt.Errorf("error step run is not in progress")
+	StepRunAborted             = fmt.Errorf("error step run aborted")
+	DeckNameInvalid            = fmt.Errorf("error deck name is invalid")
+	PleaseHomeMachineError     = fmt.Errorf("error please home the machine first")
+	PreviousRunInProgressError = fmt.Errorf("error previous run already in progress... wait or abort it")
+	PickupPositionInvalid      = fmt.Errorf("position is invalid to pickup the tip")
+	WebsocketMarshallingError  = fmt.Errorf("error in marshalling web socket data")
+	UrlArgumentInvalid         = fmt.Errorf("error invalid url argument")
 
 	//user
 	UserDecodeError         = fmt.Errorf("error decoding user record")
@@ -108,7 +122,15 @@ var (
 	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
 	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
 
+	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
+	AuditLogCreateError = fmt.Errorf("error failed saving log")
+
+	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
+
+	WrongDeckError = fmt.Errorf("error invalid deck name")
+
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
+	DiscardBoolOptionError        = fmt.Errorf("Invalid boolean value for tip discard option")
 )
 
 // Special errors which are in []byte format

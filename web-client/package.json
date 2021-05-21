@@ -9,6 +9,7 @@
     "bootstrap": "^4.5.0",
     "chart.js": "^2.9.3",
     "classnames": "^2.2.6",
+    "formik": "^2.2.6",
     "immutable": "^4.0.0-rc.12",
     "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",

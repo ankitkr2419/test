@@ -215,8 +215,9 @@ func setupCartridges(s Storer) (err error) {
 	cartridgesList := makeCartridgeList(cartridgesConfig)
 	wellsList := makeCartridgeWellsList(wellsConfig)
 
+	ctx := context.WithValue(context.Background(), ContextKeyUsername, "main")
 	// add distances to DB
-	err = s.InsertCartridge(context.Background(), cartridgesList, wellsList)
+	err = s.InsertCartridge(ctx, cartridgesList, wellsList)
 	if err != nil {
 		return
 	}

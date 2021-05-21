@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"time"
 
@@ -18,35 +19,37 @@ import (
 func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.RunRecipeInitialisedState)
+
 		var err error
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.DelayCompletedState)
+
+			}
+
+		}()
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
 		recipeID, err := parseUUID(vars["id"])
 		if err != nil {
-			fmt.Fprintf(rw, err.Error())
-			rw.WriteHeader(http.StatusBadRequest)
+			logger.Errorln(err)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: deck})
 			return
 		}
 
-		switch deck {
-		case "A", "B":
-			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
-			rw.WriteHeader(http.StatusOK)
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"recipe run is in progress", "deck": "%v"}`, deck)))
+		go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
+		logger.Infoln(responses.RecipeRunInProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RecipeRunInProgress, Deck: deck})
+		return
 
-		default:
-			err = fmt.Errorf("Check your deck name")
-		}
-
-		if err != nil {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"msg":"check your deck name"}`))
-			logger.Errorln(err.Error())
-		}
 	})
 }
 
@@ -58,36 +61,19 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
-		switch deck {
-		case "A", "B":
-			// If runNext is set means this API is called at wrong time
-			if runNext[deck] {
-				rw.WriteHeader(http.StatusBadRequest)
-				rw.Header().Add("Content-Type", "application/json")
-				rw.Write([]byte(fmt.Sprintf(`{"msg":"check if the step-run is in progress", "deck": "%v"}`, deck)))
-				return
-			}
-
-			logger.Infoln("Populating the nextStep channel for deck", deck)
-			nextStep[deck] <- struct{}{}
-
-			rw.WriteHeader(http.StatusOK)
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"next step run is in progress", "deck":"%v"}`, deck)))
+		// If runNext is set means this API is called at wrong time
+		if runNext[deck] {
+			err = responses.StepRunNotInProgressError
+			logger.Errorln(err)
+			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: err.Error(), Deck: deck})
 			return
-
-		default:
-			err = fmt.Errorf("Check your deck name")
 		}
 
-		if err != nil {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"msg":"check your deck name"}`))
-
-			logger.Errorln(err.Error())
-		}
+		populateNextStepChan(deck)
+		logger.Infoln(responses.NextStepRunInProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.NextStepRunInProgress, Deck: deck})
 		return
+
 	})
 }
 
@@ -97,18 +83,18 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if err != nil {
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.ErrorState, db.ExecuteOperation, deck, err.Error())
 		}
 		resetStepRunInProgress(deck)
 	}()
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
-		err = fmt.Errorf("Please home the machine first!")
+		err = responses.PleaseHomeMachineError
 		return
 	}
 
 	if deps.PlcDeck[deck].IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-
+		err = responses.PreviousRunInProgressError
 		return
 	}
 
@@ -124,8 +110,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
-
-		return "", err
+		return
 	}
 
 	var currentCartridgeID int64
@@ -140,8 +125,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	if runStepWise {
 		setStepRunInProgress(deck)
-		logger.Infoln("Populating the nextStep channel for 1st process for deck", deck)
-		nextStep[deck] <- struct{}{}
+		populateNextStepChan(deck)
 	}
 
 	for i, p := range processes {
@@ -151,7 +135,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 		if runStepWise {
 
-			logger.Infoln("Waiting to run next process")
+			logger.Infoln(responses.WaitingRunNextProcess)
 			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
 			err = checkForAbortOrNext(deck)
@@ -159,11 +143,12 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return
 			}
 			setRunNext(deck)
-			logger.Infoln("Next process is in progress")
+			logger.Infoln(responses.NextProcessInProgress)
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.InitialisedState)))
 
 		switch p.Type {
-		case "AspireDispense":
+		case db.AspireDispenseProcess:
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -181,7 +166,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "Heating":
+		case db.HeatingProcess:
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
 			fmt.Printf("heat object %v", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
@@ -191,7 +176,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(ht)
 
-		case "Shaking":
+		case db.ShakingProcess:
 			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -204,7 +189,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(sha)
 
-		case "Piercing":
+		case db.PiercingProcess:
 			pi, err := deps.Store.ShowPiercing(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -222,7 +207,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "AttachDetach":
+		case db.AttachDetachProcess:
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
 			fmt.Printf("attach detach record %v \n", ad)
 			if err != nil {
@@ -233,7 +218,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "TipOperation":
+		case db.TipDiscardProcess, db.TipPickupProcess:
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -260,7 +245,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentTip = db.TipsTubes{}
 
 			}
-		case "TipDocking":
+		case db.TipDockingProcess:
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -275,7 +260,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			if err != nil {
 				return "", err
 			}
-		case "Delay":
+		case db.DelayProcess:
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -287,6 +272,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.CompletedState)))
+
 	}
 
 	plength := len(processes)
@@ -306,7 +293,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	}
 	wsData, err := json.Marshal(successWsData)
 	if err != nil {
-		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
 		return
 	}
 	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v", string(wsData))
@@ -332,11 +319,17 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 	case 3:
 		return recipe.Position3, nil
 	}
-	err = fmt.Errorf("position is invalid to pickup the tip")
+	err = responses.PickupPositionInvalid
 	return 0, err
 }
 
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName, processType string) {
+func populateNextStepChan(deck string) {
+	logger.Infoln("Populating the nextStep channel for deck", deck)
+	nextStep[deck] <- struct{}{}
+}
+
+func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName string, processType db.ProcessType) {
+
 	// percentage calculation for each process
 
 	progress := float64(((currentStep - 1) * 100) / processLength)
@@ -362,7 +355,7 @@ func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLengt
 
 	wsData, err := json.Marshal(wsProgressOperation)
 	if err != nil {
-		logger.Errorf("error in marshalling web socket data %v", err.Error())
+		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
 	}
 	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
 
@@ -374,11 +367,11 @@ func checkForAbortOrNext(deck string) (err error) {
 		time.Sleep(200 * time.Millisecond)
 		select {
 		case <-nextStep[deck]:
-			logger.Infoln("Next Step will be Run")
+			logger.Infoln(responses.NextStepWillRun)
 			return nil
 		case <-abortStepRun[deck]:
-			logger.Infoln("Step Run will be Aborted")
-			return fmt.Errorf("step run aborted")
+			logger.Infoln(responses.StepRunWillAbort)
+			return responses.StepRunAborted
 		}
 	}
 }

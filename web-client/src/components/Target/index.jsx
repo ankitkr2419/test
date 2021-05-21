@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import {
 	Button, CheckBox, Select, Input,
 } from 'core-components';
@@ -15,11 +14,7 @@ import { covertToSelectOption } from 'utils/helpers';
 import TargetHeader from './TargetHeader';
 import { checkIfIdPresentInList, validateThreshold } from './targetHelper';
 import { MIN_THRESHOLD, MAX_THRESHOLD } from './targetConstants';
-
-const TargetActions = styled.div`
-  justify-content: space-between;
-  padding: 39px 48px 37px 16px;
-`;
+import { TargetActions } from './Style';
 
 const TargetComponent = (props) => {
 	const {
