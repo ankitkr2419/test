@@ -18,6 +18,7 @@ const version = "1.2.1"
 
 var sequenceNumber int64 = 0
 var createdRecipe Recipe
+var csvCtx context.Context = context.WithValue(context.Background(), ContextKeyUsername, "main")
 
 // done will help us clean up
 var done bool
@@ -55,7 +56,7 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 	}
 
 	// Create Recipe
-	createdRecipe, err = store.CreateRecipe(context.Background(), r)
+	createdRecipe, err = store.CreateRecipe(csvCtx, r)
 	if err != nil {
 		logger.Errorln("Couldn't insert recipe entry", err)
 		return
@@ -243,7 +244,7 @@ func createAspireDispenseProcess(record []string, store Storer) (err error) {
 		return
 	}
 
-	createdProcess, err := store.CreateAspireDispense(context.Background(), a, createdRecipe.ID)
+	createdProcess, err := store.CreateAspireDispense(csvCtx, a, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -262,7 +263,7 @@ func createAttachDetachProcess(record []string, store Storer) (err error) {
 		OperationType: "lysis",
 	}
 
-	createdProcess, err := store.CreateAttachDetach(context.Background(), a, createdRecipe.ID)
+	createdProcess, err := store.CreateAttachDetach(csvCtx, a, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -284,7 +285,7 @@ func createDelayProcess(record []string, store Storer) (err error) {
 		d.DelayTime = delay
 	}
 
-	createdProcess, err := store.CreateDelay(context.Background(), d, createdRecipe.ID)
+	createdProcess, err := store.CreateDelay(csvCtx, d, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -324,7 +325,7 @@ func createPiercingProcess(record []string, store Storer) (err error) {
 
 	logger.Debugln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
 
-	createdProcess, err := store.CreatePiercing(context.Background(), p, createdRecipe.ID)
+	createdProcess, err := store.CreatePiercing(csvCtx, p, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -352,7 +353,7 @@ func createTipOperationProcess(record []string, store Storer) (err error) {
 		return err
 	}
 
-	createdProcess, err := store.CreateTipOperation(context.Background(), t, createdRecipe.ID)
+	createdProcess, err := store.CreateTipOperation(csvCtx, t, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -374,7 +375,7 @@ func createTipDockingProcess(record []string, store Storer) (err error) {
 		return err
 	}
 
-	createdProcess, err := store.CreateTipDocking(context.Background(), t, createdRecipe.ID)
+	createdProcess, err := store.CreateTipDocking(csvCtx, t, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -432,7 +433,7 @@ func createShakingProcess(record []string, store Storer) (err error) {
 		s.Time2 = time2
 	}
 
-	createdProcess, err := store.CreateShaking(context.Background(), s, createdRecipe.ID)
+	createdProcess, err := store.CreateShaking(csvCtx, s, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -468,7 +469,7 @@ func createHeatingProcess(record []string, store Storer) (err error) {
 		h.Duration = time1
 	}
 
-	createdProcess, err := store.CreateHeating(context.Background(), h, createdRecipe.ID)
+	createdProcess, err := store.CreateHeating(csvCtx, h, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -481,7 +482,7 @@ func createHeatingProcess(record []string, store Storer) (err error) {
 
 func clearFailedRecipe(store Storer) {
 	if !done {
-		err := store.DeleteRecipe(context.Background(), createdRecipe.ID)
+		err := store.DeleteRecipe(csvCtx, createdRecipe.ID)
 		if err != nil {
 			logger.Warnln("Couldn't cleanUp the partial recipe with ID: ", createdRecipe.ID)
 			return
