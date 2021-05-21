@@ -7,10 +7,7 @@ import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeC
 import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
 import { DECKNAME, MODAL_BTN, ROUTES, MODAL_MESSAGE } from "appConstants";
-import {
-  loginReset,
-  logoutInitiated,
-} from "action-creators/loginActionCreators";
+import { logoutInitiated } from "action-creators/loginActionCreators";
 import {
   cleanUpHours,
   cleanUpMins,
@@ -69,7 +66,7 @@ const RecipeListingComponent = (props) => {
     if (!error && !isLoggedIn) {
       history.push(ROUTES.landing);
     }
-  }, [error, isLoggedIn]);
+  }, [error, isLoggedIn, history]);
 
   const onSearchRecipeTextChanged = (e) => {
     const value = e.target.value;
