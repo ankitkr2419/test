@@ -34,7 +34,7 @@ const ProcessCard = (props) => {
     };
 
     return (
-        <div className="position-relative mb-3">
+        <div className="position-relative">
             <InnerBox>
                 <ProcessCardBox
                     className={`d-flex justify-content-around flex-column bg-white ${

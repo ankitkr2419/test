@@ -42,11 +42,11 @@ const ProcessListingCards = (props) => {
                 </div>
 
                 {/** Process List */}
-                <Row className="pt-5">
+                <div className="d-flex flex-column flex-wrap box py-4">
                     {processList?.length > 0 ? (
                         processList.map((processObj) => {
                             return (
-                                <Col md={4} key={processObj.id}>
+                                <div key={processObj.id}>
                                     <ProcessCard
                                         processId={processObj.id}
                                         processName={processObj.name}
@@ -72,67 +72,13 @@ const ProcessListingCards = (props) => {
                                             )
                                         }
                                     />
-                                </Col>
-                            );
-                        })
-                    ) : (
-                        <h4>No processes to show!</h4>
-                    )}
-                </Row>
-
-                {/**TODO: remove this after testing
-                 *  - following is new UI alternative to process list,
-                 *  and this need to try out with UI team */}
-                {/*<div className="d-flex flex-column flex-wrap box pt-5">
-                    {processList?.length > 0 ? (
-                        processList.map((processObj) => {
-                            return (
-                                <div key={processObj.id}>
-                                    <ProcessCard
-                                        processId={processObj.id}
-                                        processName={processObj.name}
-                                        processIconName={getProcessIconName(
-                                            processObj.type
-                                        )}
-                                        isOpen={processObj.isOpen}
-                                        toggleIsOpen={() =>
-                                            toggleIsOpen(processObj.id)
-                                        }
-                                    
-                                    />
                                 </div>
                             );
                         })
                     ) : (
                         <h4>No processes to show!</h4>
                     )}
-                </div>*/}
-
-                {/**3rd solution */}
-                {/*<div className="card-columns box">
-                    {processList?.length > 0 ? (
-                        processList.map((processObj) => {
-                            return (
-                                <div className="card" key={processObj.id}>
-                                    <ProcessCard
-                                        processId={processObj.id}
-                                        processName={processObj.name}
-                                        processIconName={getProcessIconName(
-                                            processObj.type
-                                        )}
-                                        isOpen={processObj.isOpen}
-                                        toggleIsOpen={() =>
-                                            toggleIsOpen(processObj.id)
-                                        }
-                                        
-                                    />
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <h4>No processes to show!</h4>
-                    )}
-                    </div>*/}
+                </div>
             </CardBody>
         </Card>
     );

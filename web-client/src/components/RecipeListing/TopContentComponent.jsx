@@ -25,8 +25,14 @@ const TopContentComponent = (props) => {
      * prop: isProcessListingPage: true  means ProcessListing Page
      */
 
+    const classNameTopContent = () => {
+        return `d-flex justify-content-between align-items-center mx-5 ${
+            isProcessListingPage ? "process-listing-changes" : ""
+        }`;
+    };
+
     return (
-        <TopContent className="d-flex justify-content-between align-items-center mx-5">
+        <TopContent className={classNameTopContent()}>
             {/* Top content for RecipeListing page */}
             {isProcessInProgress || isProcessListingPage ? null : (
                 <div className="d-flex align-items-center">
