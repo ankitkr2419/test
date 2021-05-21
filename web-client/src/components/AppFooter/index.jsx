@@ -484,13 +484,13 @@ const AppFooter = (props) => {
       case "leftActionBtnDisabled":
         return (
           recipeReducerData.leftActionBtnDisabled ||
-          recipeReducerData.leftActionBtnDisabled
+          cleanUpReducerData.leftActionBtnDisabled
         );
 
       case "rightActionBtnDisabled":
         return (
           recipeReducerData.rightActionBtnDisabled ||
-          recipeReducerData.rightActionBtnDisabled
+          cleanUpReducerData.rightActionBtnDisabled
         );
 
       case "processName":
