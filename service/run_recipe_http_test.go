@@ -17,7 +17,6 @@ import (
 // functionality from testify - including assertion methods.
 type RunRecipeHandlerTestSuite struct {
 	suite.Suite
-
 	dbMock *db.DBMockStore
 }
 
@@ -26,6 +25,7 @@ func (suite *RunRecipeHandlerTestSuite) SetupTest() {
 }
 
 func TestRunRecipeTestSuite(t *testing.T) {
+	loadUtils()
 	suite.Run(t, new(RunRecipeHandlerTestSuite))
 }
 
@@ -35,7 +35,7 @@ var invalidUUID = "not-a-uuid"
 var recipeID = uuid.New()
 
 // Run Recipe Continuously Test cases
-func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
+func (suite *RunRecipeHandlerTestSuite) TestRunRecipeSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
@@ -54,7 +54,7 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *ProcessHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
@@ -80,7 +80,7 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 //
 
 /*
-func (suite *ProcessHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 
 	suite.dbMock.On("runRecipe", mock.Anything, mock.Anything, deckB, runStepWise, recipeID).Return("Success", nil)
 
@@ -103,7 +103,7 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 */
 
 // Step Run Test cases
-func (suite *ProcessHandlerTestSuite) TestStepRunRecipeSuccess() {
+func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/step-run/{id}/{deck:[A-B]}",
@@ -122,7 +122,7 @@ func (suite *ProcessHandlerTestSuite) TestStepRunRecipeSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *ProcessHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/step-run/{id}/{deck:[A-B]}",
@@ -145,7 +145,7 @@ func (suite *ProcessHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 
 
 
-func (suite *ProcessHandlerTestSuite) TestRunNextStepSuccess() {
+func (suite *RunRecipeHandlerTestSuite) TestRunNextStepSuccess() {
 
 	runNext[deckB] = false
 
@@ -172,7 +172,7 @@ func (suite *ProcessHandlerTestSuite) TestRunNextStepSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *ProcessHandlerTestSuite) TestRunNextStepFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestRunNextStepFailure() {
 
 	runNext[deckB] = true
 
