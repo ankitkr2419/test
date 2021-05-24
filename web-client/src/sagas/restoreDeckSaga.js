@@ -7,7 +7,7 @@ import { restoreDeckFailed as restoreDeckFailure } from "action-creators/restore
 export function* restoreDeck(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { restoreDeckSuccess, restoreDeckFailed } = restoreDeckActions;
@@ -22,6 +22,7 @@ export function* restoreDeck(actions) {
         failureAction: restoreDeckFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
