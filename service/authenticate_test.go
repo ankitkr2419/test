@@ -1,12 +1,16 @@
 package service
 
 import (
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"net/http"
 	"reflect"
 	"testing"
 
+	logger "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -64,17 +68,80 @@ func (suite *AuthenticateTestSuite) TestDecodeTokenWithoutDeck() {
 	assert.NotEqual(suite.T(), deck, "")
 }
 
-// func (suite *AuthenticateTestSuite) TestAuthenticateSuccess() {
-// 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
+func (suite *AuthenticateTestSuite) TestAuthenticateSuccess() {
+	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
+	deps := Dependencies{Store: suite.dbMock}
+	token, _ := EncodeToken("test", testUUID, "tester", deckA, map[string]string{})
+	recorder := makeHTTPCallWithHeader(
+		http.MethodPost,
+		"/test/authenticate",
+		"/test/authenticate",
+		"",
+		map[string]string{"Authorization": "Bearer " + token},
+		authenticate(testHandlerFunc(deps), deps),
+	)
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 
-// 	deps := Dependencies{Store: suite.dbMock}
-// 	authenticate(testHandlerFunc(), deps)
+}
 
-// }
+func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleSuccess() {
+	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
+	deps := Dependencies{Store: suite.dbMock}
+	token, _ := EncodeToken("test", testUUID, "admin", deckA, map[string]string{})
+	recorder := makeHTTPCallWithHeader(
+		http.MethodPost,
+		"/test/authenticate",
+		"/test/authenticate",
+		"",
+		map[string]string{"Authorization": "Bearer " + token},
+		authenticate(testHandlerFunc(deps), deps, admin),
+	)
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 
-// func testHandlerFunc() http.HandlerFunc {
-// 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-// 		logger.Println("test handler function")
+}
 
-// 	})
-// }
+func (suite *AuthenticateTestSuite) TestAuthenticateWithDeckSuccess() {
+
+	deps := Dependencies{Store: suite.dbMock}
+	token, _ := EncodeToken("test", testUUID, "admin", deckA, map[string]string{})
+	recorder := makeHTTPCallWithHeader(
+		http.MethodPost,
+		"/test/authenticate/{deck:[A-B]?}",
+		"/test/authenticate/B",
+		"",
+		map[string]string{"Authorization": "Bearer " + token},
+		authenticate(testHandlerFunc(deps), deps, admin),
+	)
+
+	output := fmt.Sprintf(`{"err":"error wrong token for deck"}`)
+	assert.Equal(suite.T(), http.StatusUnauthorized, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+
+}
+
+func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleFailed() {
+
+	deps := Dependencies{Store: suite.dbMock}
+	token, _ := EncodeToken("test", testUUID, "tester", deckA, map[string]string{})
+	recorder := makeHTTPCallWithHeader(
+		http.MethodPost,
+		"/test/authenticate",
+		"/test/authenticate",
+		"",
+		map[string]string{"Authorization": "Bearer " + token},
+		authenticate(testHandlerFunc(deps), deps, admin),
+	)
+	output := fmt.Sprintf(`{"err":"error invalid role"}`)
+	assert.Equal(suite.T(), http.StatusUnauthorized, recorder.Code)
+	assert.Equal(suite.T(), output, recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+
+}
+
+func testHandlerFunc(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		logger.Println("test handler function")
+		rw.WriteHeader(http.StatusOK)
+	})
+}
