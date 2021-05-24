@@ -42,7 +42,6 @@ export const loginReducer = (state = loginInitialState, action) => {
       const changesInLoginInitMatchedDeck = {
         error: false,
         msg: "",
-        error: false,
         isActive: true,
       };
       const changesInLoginInitUnMatchedDeck = {

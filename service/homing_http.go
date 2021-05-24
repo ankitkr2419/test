@@ -23,15 +23,17 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
+		ctx := context.WithValue(req.Context(), contextKeyUsername, "main")
+
 		switch deck {
 		case "":
 			fmt.Println("At both deck!!!")
 			msg = "homing in progress for both decks"
 			plc.SetBothDeckHomingInProgress()
-			go bothDeckOperation(req.Context(), deps, "Homing")
+			go bothDeckOperation(ctx, deps, "Homing")
 		case "A", "B":
 			msg = "homing in progress for single deck"
-			go singleDeckOperation(req.Context(), deps, deck, "Homing")
+			go singleDeckOperation(ctx, deps, deck, "Homing")
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}

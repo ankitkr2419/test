@@ -10,8 +10,9 @@ import (
 	"mylab/cpagent/plc/compact32"
 	"mylab/cpagent/plc/simulator"
 
-	"github.com/goburrow/modbus"
 	"mylab/cpagent/responses"
+
+	"github.com/goburrow/modbus"
 
 	"mylab/cpagent/service"
 	"net/http"
@@ -168,6 +169,12 @@ func startApp(plcName string, test bool) (err error) {
 
 	go monitorForPLCTimeout(&deps, exit)
 
+	err = service.LoadAllServiceFuncs(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.ServiceAllLoadError)
+		return
+	}
+
 	err = db.LoadAllDBSetups(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.DBAllSetupError)
@@ -177,12 +184,6 @@ func startApp(plcName string, test bool) (err error) {
 	err = plc.LoadAllPLCFuncs(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.PLCAllLoadError)
-		return
-	}
-
-	err = service.LoadAllServiceFuncs(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.ServiceAllLoadError)
 		return
 	}
 
