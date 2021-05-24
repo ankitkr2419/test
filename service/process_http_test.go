@@ -33,10 +33,21 @@ func TestProcessTestSuite(t *testing.T) {
 var testUUID = uuid.New()
 var testProcessUUID = uuid.New()
 var recipeUUID = uuid.New()
+var testSequenceArr = []db.ProcessSequence{
+	db.ProcessSequence{
+		ID:             uuid.New(),
+		SequenceNumber: 1,
+	},
+	db.ProcessSequence{
+		ID:             uuid.New(),
+		SequenceNumber: 2,
+	},
+}
 
 const testName = "testName"
 const testType = db.ProcessType("testType")
 const sequenceNumber int64 = 1
+const invalidBody = "invalid-e-body"
 
 var testProcessRecord = db.Process{
 	ID:             testUUID,
@@ -80,7 +91,7 @@ func (suite *ProcessHandlerTestSuite) TestCreateProcessFailure() {
 		string(body),
 		createProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
-	
+
 	err := ErrObj{Err: responses.ProcessCreateError.Error()}
 
 	output, _ := json.Marshal(err)
@@ -119,7 +130,7 @@ func (suite *ProcessHandlerTestSuite) TestListProcessUUIDParseError() {
 		"",
 		listProcessesHandler(Dependencies{Store: suite.dbMock}),
 	)
-	
+
 	err := ErrObj{Err: responses.UUIDParseError.Error()}
 
 	output, _ := json.Marshal(err)
@@ -176,7 +187,7 @@ func (suite *ProcessHandlerTestSuite) TestShowProcessUUIDParseError() {
 		"",
 		showProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output, _ := json.Marshal(ErrObj{Err:responses.UUIDParseError.Error()})
+	output, _ := json.Marshal(ErrObj{Err: responses.UUIDParseError.Error()})
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -194,7 +205,7 @@ func (suite *ProcessHandlerTestSuite) TestShowProcessFailure() {
 		"",
 		showProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output, _ := json.Marshal(ErrObj{Err:responses.ProcessFetchError.Error()})
+	output, _ := json.Marshal(ErrObj{Err: responses.ProcessFetchError.Error()})
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -215,7 +226,7 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessSuccess() {
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output, _ := json.Marshal(MsgObj{Msg:responses.ProcessUpdateSuccess})
+	output, _ := json.Marshal(MsgObj{Msg: responses.ProcessUpdateSuccess})
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -234,7 +245,7 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessUUIDParseError() {
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output, _ := json.Marshal(ErrObj{Err:responses.UUIDParseError.Error()})
+	output, _ := json.Marshal(ErrObj{Err: responses.UUIDParseError.Error()})
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -255,7 +266,7 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessFailure() {
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output, _ := json.Marshal(ErrObj{Err:responses.ProcessUpdateError.Error()})
+	output, _ := json.Marshal(ErrObj{Err: responses.ProcessUpdateError.Error()})
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -274,10 +285,10 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessSuccess() {
 		deleteProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output, _ := json.Marshal(MsgObj{Msg:responses.ProcessDeleteSuccess})
+	output, _ := json.Marshal(MsgObj{Msg: responses.ProcessDeleteSuccess})
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), string(output) , recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -293,7 +304,7 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessFailure() {
 		deleteProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output, _ := json.Marshal(ErrObj{Err:responses.ProcessDeleteError.Error()})
+	output, _ := json.Marshal(ErrObj{Err: responses.ProcessDeleteError.Error()})
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -310,7 +321,7 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessUUIDParseError() {
 		deleteProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output, _ := json.Marshal(ErrObj{Err:responses.UUIDParseError.Error()})
+	output, _ := json.Marshal(ErrObj{Err: responses.UUIDParseError.Error()})
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -318,3 +329,140 @@ func (suite *ProcessHandlerTestSuite) TestDeleteProcessUUIDParseError() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
+func (suite *ProcessHandlerTestSuite) TestDuplicateProcessSuccess() {
+
+	duplicateRecord := testProcessRecord
+	duplicateRecord.ID = uuid.New()
+
+	suite.dbMock.On("DuplicateProcess", mock.Anything, testUUID).Return(duplicateRecord, nil)
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/duplicate-process/{process_id}",
+		"/duplicate-process/"+testUUID.String(),
+		"",
+		duplicateProcessHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	body, _ := json.Marshal(duplicateRecord)
+
+	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestDuplicateProcessFailure() {
+
+	suite.dbMock.On("DuplicateProcess", mock.Anything, testUUID).Return(db.Process{}, responses.ProcessDuplicationError)
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/duplicate-process/{process_id}",
+		"/duplicate-process/"+testUUID.String(),
+		"",
+		duplicateProcessHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	err := ErrObj{Err: responses.ProcessDuplicationError.Error()}
+
+	output, _ := json.Marshal(err)
+
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestDuplicateProcessIDInvalidError() {
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/duplicate-process/{process_id}",
+		"/duplicate-process/"+invalidUUID,
+		"",
+		duplicateProcessHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	output, _ := json.Marshal(ErrObj{Err: responses.ProcessIDInvalidError.Error()})
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestRearrangeProcessesSuccess() {
+
+	body, _ := json.Marshal(testSequenceArr)
+
+	suite.dbMock.On("RearrangeProcesses", mock.Anything, testUUID, testSequenceArr).Return(listProcesses, nil)
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/rearrange-processes/{recipe_id}",
+		"/rearrange-processes/"+testUUID.String(),
+		string(body),
+		rearrangeProcessesHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	output, _ := json.Marshal(listProcesses)
+
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestRearrangeProcessFailure() {
+
+	body, _ := json.Marshal(testSequenceArr)
+
+	suite.dbMock.On("RearrangeProcesses", mock.Anything, testUUID, testSequenceArr).Return([]db.Process{}, responses.ProcessesRearrangeError)
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/rearrange-processes/{recipe_id}",
+		"/rearrange-processes/"+testUUID.String(),
+		string(body),
+		rearrangeProcessesHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	output, _ := json.Marshal(ErrObj{Err: responses.ProcessesRearrangeError.Error()})
+
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestDecodeRearrangeProcessFailure() {
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/rearrange-processes/{recipe_id}",
+		"/rearrange-processes/"+testUUID.String(),
+		invalidBody,
+		rearrangeProcessesHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	err := ErrObj{Err: responses.ProcessesDecodeSeqError.Error()}
+
+	output, _ := json.Marshal(err)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ProcessHandlerTestSuite) TestRearrangeRecipeIDInvalidError() {
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/rearrange-processes/{recipe_id}",
+		"/rearrange-processes/"+invalidUUID,
+		"",
+		rearrangeProcessesHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	output, _ := json.Marshal(ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}

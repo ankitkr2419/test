@@ -179,6 +179,7 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.RecipeIDInvalidError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
 		}
 
 		var sequenceArr []db.ProcessSequence
