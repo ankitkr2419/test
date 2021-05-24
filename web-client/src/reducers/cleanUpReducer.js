@@ -205,7 +205,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
       const dockAfterProgressCompleted = getUpdatedDecks(
         state,
-        progressEndDeck,
+        deckInCompleteResponse,
         changesForRunCleanUpCompletedMatched
       );
 

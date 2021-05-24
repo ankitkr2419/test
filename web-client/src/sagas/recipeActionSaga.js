@@ -23,7 +23,7 @@ import { toast } from "react-toastify";
 export function* runRecipe(actions) {
   const {
     payload: {
-      params: { recipeId, deckName },
+      params: { recipeId, deckName, token },
     },
   } = actions;
   const { runRecipeSuccess, runRecipeFailed } = runRecipeAction;
@@ -40,6 +40,7 @@ export function* runRecipe(actions) {
         failureAction: runRecipeFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -51,7 +52,7 @@ export function* runRecipe(actions) {
 export function* resumeRecipe(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { resumeRecipeSuccess, resumeRecipeFailed } = resumeRecipeAction;
@@ -68,6 +69,7 @@ export function* resumeRecipe(actions) {
         failureAction: resumeRecipeFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -79,7 +81,7 @@ export function* resumeRecipe(actions) {
 export function* abortRecipe(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
 
@@ -97,6 +99,7 @@ export function* abortRecipe(actions) {
         failureAction: abortRecipeFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -108,7 +111,7 @@ export function* abortRecipe(actions) {
 export function* pauseRecipe(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { pauseRecipeSuccess, pauseRecipeFailed } = pauseRecipeAction;
@@ -125,6 +128,7 @@ export function* pauseRecipe(actions) {
         failureAction: pauseRecipeFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -162,7 +166,7 @@ export function* recipeListing(actions) {
 export function* stepRunRecipe(actions) {
   const {
     payload: {
-      params: { recipeId, deckName },
+      params: { recipeId, deckName, token },
     },
   } = actions;
   const { runRecipeSuccess, runRecipeFailed } = runRecipeAction;
@@ -179,6 +183,7 @@ export function* stepRunRecipe(actions) {
         failureAction: runRecipeFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -190,7 +195,7 @@ export function* stepRunRecipe(actions) {
 export function* nextStepRunRecipe(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { runRecipeSuccess, runRecipeFailed } = runRecipeAction;
@@ -205,6 +210,7 @@ export function* nextStepRunRecipe(actions) {
         failureAction: runRecipeFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -217,7 +223,7 @@ export function* nextStepRunRecipe(actions) {
 export function* publishRecipe(actions) {
   const {
     payload: {
-      params: { recipeId },
+      params: { recipeId, token },
     },
   } = actions;
   const { publishRecipeSuccess, publishRecipeFailed } = publishRecipeAction;
@@ -232,6 +238,7 @@ export function* publishRecipe(actions) {
         failureAction: publishRecipeFailed,
         showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {

@@ -12,7 +12,23 @@ import (
 
 func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeListInitialisedState)
+
 		list, err := deps.Store.ListRecipes(req.Context())
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeListCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeListFetchError.Error()})
 			logger.WithField("err", err.Error()).Error(responses.RecipeListFetchError)
@@ -26,8 +42,23 @@ func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 
 func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.RecipeInitialisedState)
+
 		var recipe db.Recipe
 		err := json.NewDecoder(req.Body).Decode(&recipe)
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.RecipeCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.RecipeDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeDecodeError.Error()})
@@ -57,9 +88,23 @@ func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.RecipeInitialisedState)
+
 		vars := mux.Vars(req)
 
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.RecipeCompletedState)
+
+			}
+
+		}()
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
@@ -81,8 +126,22 @@ func showRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.DeleteOperation, "", responses.RecipeInitialisedState)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.DeleteOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.DeleteOperation, "", responses.RecipeCompletedState)
+
+			}
+
+		}()
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
@@ -102,8 +161,22 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipeInitialisedState)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipeCompletedState)
+
+			}
+
+		}()
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
@@ -140,10 +213,25 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 
 func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipePublishedState)
+
 		var publishFlag bool
 		var successMsg string
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipePublishedState)
+
+			}
+
+		}()
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
@@ -158,7 +246,7 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 		case "unpublish":
 			publishFlag = false
 		default:
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidUrlArgument.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UrlArgumentInvalid.Error()})
 			return
 		}
 

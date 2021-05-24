@@ -36,12 +36,12 @@ var testDelayRecord = db.Delay{
 
 func (suite *DelayHandlerTestSuite) TestCreateDelaySuccess() {
 
-	suite.dbMock.On("CreateDelay", mock.Anything, testDelayRecord).Return(testDelayRecord, nil)
+	suite.dbMock.On("CreateDelay", mock.Anything, mock.Anything, recipeUUID).Return(testDelayRecord, nil)
 
 	body, _ := json.Marshal(testDelayRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/delay",
-		"/delay",
+		"/delay/{recipe_id}",
+		"/delay/"+recipeUUID.String(),
 		string(body),
 		createDelayHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -54,12 +54,12 @@ func (suite *DelayHandlerTestSuite) TestCreateDelaySuccess() {
 
 func (suite *DelayHandlerTestSuite) TestCreateDelayFailure() {
 
-	suite.dbMock.On("CreateDelay", mock.Anything, testDelayRecord).Return(db.Delay{}, responses.DelayCreateError)
+	suite.dbMock.On("CreateDelay", mock.Anything, mock.Anything, recipeUUID).Return(db.Delay{}, responses.DelayCreateError)
 
 	body, _ := json.Marshal(testDelayRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/delay",
-		"/delay",
+		"/delay/{recipe_id}",
+		"/delay/"+recipeUUID.String(),
 		string(body),
 		createDelayHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -67,6 +67,24 @@ func (suite *DelayHandlerTestSuite) TestCreateDelayFailure() {
 	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *DelayHandlerTestSuite) TestCreateDelayInvalidUUID() {
+
+	body, _ := json.Marshal(testDelayRecord)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/delay/{recipe_id}",
+		"/delay/"+invalidUUID,
+		string(body),
+		createDelayHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.RecipeIDInvalidError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
@@ -110,6 +128,24 @@ func (suite *DelayHandlerTestSuite) TestShowDelayFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
+
+func (suite *DelayHandlerTestSuite) TestShowDelayInvalidUUID() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/delay/{recipe_id}",
+		"/delay/"+invalidUUID,
+		"",
+		showDelayHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
 func (suite *DelayHandlerTestSuite) TestUpdateDelaySuccess() {
 
 	suite.dbMock.On("UpdateDelay", mock.Anything, testDelayRecord).Return(nil)
@@ -148,6 +184,25 @@ func (suite *DelayHandlerTestSuite) TestUpdateDelayFailure() {
 	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+
+func (suite *DelayHandlerTestSuite) TestUpdateDelayInvalidUUID() {
+
+	body, _ := json.Marshal(testDelayRecord)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/delay/{recipe_id}",
+		"/delay/"+invalidUUID,
+		string(body),
+		updateDelayHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())

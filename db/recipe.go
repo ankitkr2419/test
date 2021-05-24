@@ -46,8 +46,6 @@ const (
 						updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE id = $14`
 )
 
-// Recipe struct for version 1.2
-/*
 type Recipe struct {
 	ID                 uuid.UUID `db:"id" json:"id"`
 	Name               string    `db:"name" json:"name"`
@@ -66,29 +64,6 @@ type Recipe struct {
 	CreatedAt          time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt          time.Time `db:"updated_at" json:"updated_at"`
 }
-*/
-
-// Recipe struct compensated for v1.3 to 1.2 conversion
-type Recipe struct {
-	ID                 uuid.UUID `db:"id" json:"id"`
-	Name               string    `db:"name" json:"name"`
-	Description        string    `db:"description" json:"description"`
-	Position1          int64     `db:"pos_1" json:"pos_1"`
-	Position2          int64     `db:"pos_2" json:"pos_2"`
-	DumPos1            int64     `json:"pos_3"`
-	Position3          int64     `db:"pos_3" json:"pos_4"`
-	DumPos2            int64     `json:"pos_5"`
-	Position4          int64     `db:"pos_4" json:"pos_6"`
-	Position5          int64     `db:"pos_5" json:"pos_7"`
-	Cartridge1Position int64     `db:"pos_cartridge_1" json:"pos_cartridge_1"`
-	Position7          int64     `db:"pos_7" json:"pos_9"`
-	Cartridge2Position int64     `db:"pos_cartridge_2" json:"pos_cartridge_2"`
-	Position9          int64     `db:"pos_9" json:"pos_11"`
-	ProcessCount       int64     `db:"process_count" json:"process_count"`
-	IsPublished        bool      `db:"is_published" json:"is_published"`
-	CreatedAt          time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt          time.Time `db:"updated_at" json:"updated_at"`
-}
 
 func (s *pgStore) ShowRecipe(ctx context.Context, id uuid.UUID) (dbRecipe Recipe, err error) {
 	err = s.db.Get(&dbRecipe, getRecipeQuery, id)
@@ -96,9 +71,6 @@ func (s *pgStore) ShowRecipe(ctx context.Context, id uuid.UUID) (dbRecipe Recipe
 		logger.WithField("err", err.Error()).Error("Error fetching recipe")
 		return
 	}
-	
-	dbRecipe.DumPos1 = 2
-	dbRecipe.DumPos2 = 3
 	return
 }
 
@@ -107,11 +79,6 @@ func (s *pgStore) ListRecipes(ctx context.Context) (dbRecipe []Recipe, err error
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching recipes")
 		return
-	}
-
-	for i:= range dbRecipe{
-		dbRecipe[i].DumPos1 = 2
-		dbRecipe[i].DumPos2 = 3
 	}
 	return
 }
@@ -144,9 +111,6 @@ func (s *pgStore) CreateRecipe(ctx context.Context, r Recipe) (createdRecipe Rec
 		logger.WithField("err", err.Error()).Error("Error in getting Recipe")
 		return
 	}
-
-	createdRecipe.DumPos1 = 2
-	createdRecipe.DumPos2 = 3
 	return
 }
 
