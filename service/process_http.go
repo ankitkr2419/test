@@ -114,7 +114,7 @@ func updateProcessHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -122,28 +122,29 @@ func updateProcessHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&process)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding process data")
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(process)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.ProcessValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
 		process.ID = id
+
 		err = deps.Store.UpdateProcess(req.Context(), process)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update process")
+			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessUpdateError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.ProcessUpdateError)
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"process updated successfully"}`))
+		logger.Infoln(responses.ProcessUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ProcessUpdateSuccess})
 	})
 }
 
@@ -161,7 +162,7 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 		process, err := deps.Store.DuplicateProcess(req.Context(), processID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.ProcessDuplicationError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessDuplicationError.Error()})
+			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessDuplicationError.Error()})
 			return
 		}
 
@@ -194,7 +195,7 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
 		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ProcessesRearrangeError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessesRearrangeError.Error()})
+			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessesRearrangeError.Error()})
 			return
 		}
 
