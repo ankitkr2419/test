@@ -380,7 +380,7 @@ func (m *DBMockStore) ShowProcess(ctx context.Context, id uuid.UUID) (p Process,
 }
 
 func (m *DBMockStore) ListProcesses(ctx context.Context, id uuid.UUID) (p []Process, err error) {
-	args := m.Called(ctx)
+	args := m.Called(ctx, id)
 	return args.Get(0).([]Process), args.Error(1)
 }
 
