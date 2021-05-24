@@ -309,8 +309,8 @@ func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []Ca
 	return args.Error(1)
 }
 
-func (m *DBMockStore) ListCartridges() (c []Cartridge, err error) {
-	args := m.Called(c)
+func (m *DBMockStore) ListCartridges(ctx context.Context) (c []Cartridge, err error) {
+	args := m.Called(ctx)
 	return args.Get(0).([]Cartridge), args.Error(1)
 }
 
@@ -546,6 +546,22 @@ func (m *DBMockStore) ShowUserAuth(ctx context.Context, username string, authID 
 
 func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error){
 	args := m.Called(ctx, userAuth)
+	return args.Error(0)
+}
+
+
+func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error){
+	args := m.Called(ctx, al)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error){
+	args := m.Called(ctx)
+	return args.Get(0).(AuditLog), args.Error(1)
+}
+
+func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error){
+	args := m.Called(ctx, activity, state, oprType, deck, description)
 	return args.Error(0)
 }
 
