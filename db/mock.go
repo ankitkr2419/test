@@ -301,7 +301,7 @@ func (m *DBMockStore) InsertConsumableDistance(ctx context.Context, c []Consumab
 
 func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err error) {
 	args := m.Called(ctx, t)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []CartridgeWells) (err error) {
