@@ -5,7 +5,7 @@ import { processListActions } from "actions/processActions";
 
 export function* fetchProcessList(actions) {
     const {
-        payload: { recipeId },
+        payload: { recipeId, token },
     } = actions;
     const { processListSuccess, processListFailure } = processListActions;
 
@@ -18,6 +18,7 @@ export function* fetchProcessList(actions) {
                 successAction: processListSuccess,
                 failureAction: processListFailure,
                 showPopupFailureMessage: true,
+                token,
             },
         });
     } catch (error) {

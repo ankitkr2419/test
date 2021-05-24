@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 const ProcessListingContainer = (props) => {
     /*TODO: 1) get recipe details from reducer*/
     const [recipeDetails, setRecipeDetails] = useState({
-        id: "8b5cd741-b6f7-443e-8e8b-5f1f1772d052",
+        id: "91ea456e-fc0c-4d93-9d00-42302fbe5464",
         name: "test",
         created_at: "2021-04-29T11:52:11.171692Z",
         updated_at: "2021-04-29T11:52:11.171692Z",
@@ -29,11 +29,17 @@ const ProcessListingContainer = (props) => {
     ).toJS();
     const { isLoading, error } = processListReducer;
 
+    /**get active login deck data*/
+    const loginReducer = useSelector((state) => state.loginReducer);
+    const loginReducerData = loginReducer.toJS();
+    let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+
     /**Get process list of a recipe */
     useEffect(() => {
         const recipeId = recipeDetails.id;
+        const token = activeDeckObj.token;
         if (recipeId) {
-            dispatch(processListInitiated({ recipeId }));
+            dispatch(processListInitiated({ recipeId, token }));
         }
     }, [recipeDetails.id]);
 
