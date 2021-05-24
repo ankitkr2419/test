@@ -75,7 +75,7 @@ func (suite *UserHandlerTestSuite) TestValidateUsersFail() {
 		validateUserHandler(Dependencies{Store: suite.dbMock}),
 	)
 	output := fmt.Sprintf(`{"msg":"Invalid User"}`)
-	assert.Equal(suite.T(), http.StatusExpectationFailed, recorder.Code)
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }

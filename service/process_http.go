@@ -24,7 +24,7 @@ func listProcessesHandler(deps Dependencies) http.HandlerFunc {
 		list, err := deps.Store.ListProcesses(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ProcessFetchError)
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessFetchError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
 			return
 		}
 
@@ -78,7 +78,7 @@ func showProcessHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowProcess(req.Context(), id)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessFetchError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
 			logger.WithField("err", err.Error()).Errorln(responses.ProcessFetchError)
 			return
 		}
@@ -99,7 +99,7 @@ func deleteProcessHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.DeleteProcess(req.Context(), id)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessDeleteError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessDeleteError.Error()})
 			logger.WithField("err", err.Error()).Error(responses.ProcessDeleteError)
 			return
 		}
@@ -138,7 +138,7 @@ func updateProcessHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.UpdateProcess(req.Context(), process)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessUpdateError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessUpdateError.Error()})
 			logger.WithField("err", err.Error()).Error(responses.ProcessUpdateError)
 			return
 		}
@@ -162,7 +162,7 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 		process, err := deps.Store.DuplicateProcess(req.Context(), processID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.ProcessDuplicationError)
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessDuplicationError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessDuplicationError.Error()})
 			return
 		}
 
@@ -195,7 +195,7 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
 		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ProcessesRearrangeError)
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.ProcessesRearrangeError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessesRearrangeError.Error()})
 			return
 		}
 

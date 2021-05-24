@@ -201,7 +201,7 @@ func (suite *RunRecipeHandlerTestSuite) TestRunNextStepFailure() {
 
 	output, _ := json.Marshal(errObj)
 
-	assert.Equal(suite.T(), http.StatusExpectationFailed, recorder.Code)
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
