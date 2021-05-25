@@ -95,6 +95,7 @@ export const API_ENDPOINTS = {
   piercing: "piercing",
   aspireDispense: "aspire-dispense",
   shaking: "shaking",
+  heating: "heating",
   recipe: "recipe",
 };
 

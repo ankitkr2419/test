@@ -21,3 +21,9 @@ export const shakingAction = {
   saveShakingSuccess: "SAVE_SHAKING_SUCCESS",
   saveShakingFailed: "SAVE_SHAKING_FAILED",
 };
+
+export const heatingAction = {
+  saveHeatingInitiated: "SAVE_HEATING_INITIATED",
+  saveHeatingSuccess: "SAVE_HEATING_SUCCESS",
+  saveHeatingFailed: "SAVE_HEATING_FAILED",
+};

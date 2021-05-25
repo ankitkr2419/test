@@ -1,5 +1,6 @@
 import {
   aspireDispenseAction,
+  heatingAction,
   piercingAction,
   shakingAction,
   tipPickupAction,
@@ -62,5 +63,21 @@ export const saveShakingSuccess = (response) => ({
 
 export const saveShakingFailure = (error) => ({
   type: shakingAction.saveShakingFailed,
+  payload: error,
+});
+
+//heating
+export const saveHeatingInitiated = (params) => ({
+  type: heatingAction.saveHeatingInitiated,
+  payload: params,
+});
+
+export const saveHeatingSuccess = (response) => ({
+  type: heatingAction.saveHeatingSuccess,
+  payload: response,
+});
+
+export const saveHeatingFailure = (error) => ({
+  type: heatingAction.saveHeatingFailed,
   payload: error,
 });

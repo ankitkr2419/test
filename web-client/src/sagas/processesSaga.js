@@ -2,6 +2,7 @@ import { takeEvery, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
 import {
   aspireDispenseAction,
+  heatingAction,
   piercingAction,
   shakingAction,
   tipPickupAction,
@@ -108,6 +109,29 @@ export function* shaking(actions) {
   }
 }
 
+export function* heating(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveHeatingSuccess, saveHeatingFailed } = heatingAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.heating}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveHeatingSuccess,
+        failureAction: saveHeatingFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveHeatingFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
@@ -116,4 +140,5 @@ export function* processesSaga() {
     aspireDispense
   );
   yield takeEvery(shakingAction.saveShakingInitiated, shaking);
+  yield takeEvery(heatingAction.saveHeatingInitiated, heating);
 }
