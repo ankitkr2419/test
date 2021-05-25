@@ -15,3 +15,9 @@ export const aspireDispenseAction = {
   saveAspireDispenseSuccess: "SAVE_ASPIRE_DISPENSE_SUCCESS",
   saveAspireDispenseFailed: "SAVE_ASPIRE_DISPENSE_FAILED",
 };
+
+export const heatingAction = {
+  saveHeatingInitiated: "SAVE_HEATING_INITIATED",
+  saveHeatingSuccess: "SAVE_HEATING_SUCCESS",
+  saveHeatingFailed: "SAVE_HEATING_FAILED",
+};

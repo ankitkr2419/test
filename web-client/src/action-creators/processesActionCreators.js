@@ -1,5 +1,6 @@
 import {
   aspireDispenseAction,
+  heatingAction,
   piercingAction,
   tipPickupAction,
 } from "actions/processesActions";
@@ -46,5 +47,21 @@ export const saveTipPickupSuccess = (response) => ({
 
 export const saveTipPickupFailure = (error) => ({
   type: tipPickupAction.saveTipPickUpFailed,
+  payload: error,
+});
+
+//heating
+export const saveHeatingInitiated = (params) => ({
+  type: heatingAction.saveHeatingInitiated,
+  payload: params,
+});
+
+export const saveHeatingSuccess = (response) => ({
+  type: heatingAction.saveHeatingSuccess,
+  payload: response,
+});
+
+export const saveHeatingFailure = (error) => ({
+  type: heatingAction.saveHeatingFailed,
   payload: error,
 });
