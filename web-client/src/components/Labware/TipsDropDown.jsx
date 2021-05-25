@@ -7,8 +7,8 @@ import { ProcessSetting } from "./Styles";
 import { getOptions } from "./functions";
 
 const TipsDropdown = (props) => {
-  const { formik, tipsOptions } = props;
-  const options = getOptions(1, 3, tipsOptions);
+  const { formik, tipsOptions, allowedPositions } = props;
+  const options = getOptions(tipsOptions, allowedPositions);
 
   const tips = formik.values.tips;
   const tipPosition1Value = tips.processDetails.tipPosition1.id;
@@ -21,7 +21,7 @@ const TipsDropdown = (props) => {
     return Object.keys(tipPositions).map((tipPosition, i) => {
       let id = tipPosition.id;
       //match the id of option with current tipPosition ID
-      let index = options.map((item) => item.value).indexOf(id);
+      let index = options && options.map((item) => item.value).indexOf(id);
 
       return (
         options && (
