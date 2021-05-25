@@ -83,7 +83,7 @@ func pauseHandler(deps Dependencies) http.HandlerFunc {
 		deck := vars["deck"]
 		switch deck {
 		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "Pause")
+			response, err = singleDeckOperation(req.Context(), deps, deck, "Pause")
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}
@@ -112,7 +112,7 @@ func resumeHandler(deps Dependencies) http.HandlerFunc {
 		switch deck {
 		case "":
 		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "Resume")
+			response, err = singleDeckOperation(req.Context(), deps, deck, "Resume")
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}
@@ -142,7 +142,7 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 		fmt.Println("Inside ABORT... value of deck:", deck, len(deck))
 		switch deck {
 		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "Abort")
+			response, err = singleDeckOperation(req.Context(), deps, deck, "Abort")
 		default:
 			err = fmt.Errorf("Check your deck name")
 		}

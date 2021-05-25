@@ -17,7 +17,7 @@ import {
 export function* runUVCleaning(actions) {
   const {
     payload: {
-      params: { time, deckName },
+      params: { time, deckName, token },
     },
   } = actions;
   const { runCleanUpSuccess, runCleanUpFailed } = runCleanUpAction;
@@ -32,6 +32,7 @@ export function* runUVCleaning(actions) {
         failureAction: runCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -43,7 +44,7 @@ export function* runUVCleaning(actions) {
 export function* pauseUVCleaning(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { pauseCleanUpSuccess, pauseCleanUpFailed } = pauseCleanUpAction;
@@ -58,6 +59,7 @@ export function* pauseUVCleaning(actions) {
         failureAction: pauseCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -69,7 +71,7 @@ export function* pauseUVCleaning(actions) {
 export function* resumeUVCleaning(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { resumeCleanUpSuccess, resumeCleanUpFailed } = resumeCleanUpAction;
@@ -84,6 +86,7 @@ export function* resumeUVCleaning(actions) {
         failureAction: resumeCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -95,7 +98,7 @@ export function* resumeUVCleaning(actions) {
 export function* abortUVCleaning(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { abortCleanUpSuccess, abortCleanUpFailed } = abortCleanUpAction;
@@ -110,6 +113,7 @@ export function* abortUVCleaning(actions) {
         failureAction: abortCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {

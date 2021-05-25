@@ -94,6 +94,7 @@ export const API_ENDPOINTS = {
   logout: "logout",
   piercing: "piercing",
   aspireDispense: "aspire-dispense",
+  recipe: "recipe",
 };
 
 export const MODAL_MESSAGE = {
@@ -104,6 +105,7 @@ export const MODAL_MESSAGE = {
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",
   publishConfirmation: "Are you sure you want to Publish this recipe?",
+  unpublishConfirmation: "Are you sure you want to Unpublish this recipe?",
 };
 
 export const MODAL_BTN = {
