@@ -11,14 +11,7 @@ import classnames from "classnames";
 import { disabledTab, toggler } from "./functions";
 
 const AspireDispenseTabsContent = (props) => {
-  const {
-    formik,
-    isAspire,
-    toggle,
-    activeTab,
-    handleTabElementChange,
-    wellClickHandler,
-  } = props;
+  const { formik, isAspire, toggle, activeTab, wellClickHandler } = props;
 
   const disabledTabObj = isAspire ? disabledTab.aspire : disabledTab.dispense;
 
@@ -70,7 +63,7 @@ const AspireDispenseTabsContent = (props) => {
           </Text>
         </Text>
 
-        <TabPane tabId={"1"} onChange={(e) => handleTabElementChange(e)}>
+        <TabPane tabId={"1"}>
           <>
             <WellComponent
               wellsObjArray={
@@ -88,7 +81,7 @@ const AspireDispenseTabsContent = (props) => {
           </>
         </TabPane>
 
-        <TabPane tabId="2" onChange={(e) => handleTabElementChange(e)}>
+        <TabPane tabId="2">
           <>
             <WellComponent
               wellsObjArray={
@@ -106,7 +99,7 @@ const AspireDispenseTabsContent = (props) => {
           </>
         </TabPane>
 
-        <TabPane tabId="3" onChange={(e) => handleTabElementChange(e)}>
+        <TabPane tabId="3">
           {isAspire ? (
             <div className="py-3">
               <AspireCommonField formik={formik} currentTab={activeTab} />
@@ -116,7 +109,7 @@ const AspireDispenseTabsContent = (props) => {
           )}
         </TabPane>
 
-        <TabPane tabId="4" onChange={(e) => handleTabElementChange(e)}>
+        <TabPane tabId="4">
           <div className="mb-4 border-bottom-line">
             <CommonDeckPosition
               formik={formik}

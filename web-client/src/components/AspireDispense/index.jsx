@@ -117,7 +117,6 @@ const AspireDispenseComponent = (props) => {
                   isAspire={isAspire}
                   toggle={toggle}
                   activeTab={activeTab}
-                  handleTabElementChange={handleTabElementChange}
                   wellClickHandler={wellClickHandler}
                 />
               </CardBody>
@@ -126,7 +125,7 @@ const AspireDispenseComponent = (props) => {
               leftBtnLabel={isAspire ? null : "Modify"}
               rightBtnLabel={isAspire ? "Next" : "Save"}
               handleLeftBtn={() =>
-                isAspire ? handleTabElementChange : setIsAspire(!isAspire)
+                isAspire ? null : setIsAspire(!isAspire)
               }
               handleRightBtn={() =>
                 isAspire ? setIsAspire(!isAspire) : handleSaveBtn()
