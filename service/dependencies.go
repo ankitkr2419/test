@@ -8,7 +8,7 @@ import (
 type Dependencies struct {
 	Store   db.Storer
 	Plc     plc.Driver
-	PlcDeck map[string]*plc.Compact32Deck
+	PlcDeck map[string]plc.Extraction
 	ExitCh  <-chan error
 	WsErrCh chan error
 	WsMsgCh chan string

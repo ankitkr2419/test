@@ -548,15 +548,19 @@ func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (er
 	args := m.Called(ctx, userAuth)
 	return args.Error(0)
 }
-func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error) {
-	args := m.Called(ctx, activity, state, oprType, deck, description)
-	return args.Error(0)
-}
-func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error) {
+
+func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error){
 	args := m.Called(ctx, al)
 	return args.Error(0)
 }
-func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error) {
+
+func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error){
 	args := m.Called(ctx)
 	return args.Get(0).(AuditLog), args.Error(1)
 }
+
+func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error){
+	args := m.Called(ctx, activity, state, oprType, deck, description)
+	return args.Error(0)
+}
+
