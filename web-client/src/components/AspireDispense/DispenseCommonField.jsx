@@ -3,9 +3,10 @@ import React from "react";
 import { FormGroup, Label, Input, FormError } from "core-components";
 import { Text, Icon } from "shared-components";
 import { CommmonFields } from "./Style";
+import { setFormikField } from "./functions";
 
 const DispenseCommonField = (props) => {
-  const { formik } = props;
+  const { formik, currentTab } = props;
   const mixingVolume = formik.values.dispense.mixingVolume;
   const nCyclesDisabled = mixingVolume === null || mixingVolume === "";
 
@@ -18,13 +19,19 @@ const DispenseCommonField = (props) => {
         <div className="d-flex flex-column input-field position-relative">
           <Input
             type="text"
-            name="dispense-height"
+            name="dispenseHeight"
             id="dispense-height"
             placeholder="Type here"
             className="dispense-input-field"
-            onChange={(e) => {
-              formik.setFieldValue(`dispense.dispenseHeight`, e.target.value);
-            }}
+            onChange={(e) =>
+              setFormikField(
+                formik,
+                false,
+                currentTab,
+                e.target.name,
+                e.target.value
+              )
+            }
           />
           <Text Tag="span" className="height-icon-box">
             <Icon name="height" size={20} />
@@ -40,12 +47,18 @@ const DispenseCommonField = (props) => {
         <div className="d-flex flex-column input-field">
           <Input
             type="text"
-            name="mixing-volume"
+            name="mixingVolume"
             id="mixing-volume"
             placeholder="Type here"
-            onChange={(e) => {
-              formik.setFieldValue(`dispense.mixingVolume`, e.target.value);
-            }}
+            onChange={(e) =>
+              setFormikField(
+                formik,
+                false,
+                currentTab,
+                e.target.name,
+                e.target.value
+              )
+            }
           />
           <FormError>Incorrect Mixing Volume</FormError>
         </div>
@@ -62,17 +75,27 @@ const DispenseCommonField = (props) => {
           <Text Tag="span" className="d-flex flex-column cycle-input">
             <Input
               type="text"
-              name="no-of-cycles"
+              name="nCycles"
               id="no-of-cycles"
               placeholder=""
-              onChange={(e) => {
-                formik.setFieldValue(`dispense.nCycles`, e.target.value);
-              }}
+              onChange={(e) =>
+                setFormikField(
+                  formik,
+                  false,
+                  currentTab,
+                  e.target.name,
+                  e.target.value
+                )
+              }
             />
             <FormError>Incorrect No. Of Cycles</FormError>
           </Text>
         </Text>
       </FormGroup>
+
+      {/* 
+            {can be used in future. Not sure. Will delete later!} 
+      */}
 
       {/* <FormGroup className="d-flex align-items-center mb-2">
         <Label for="dispense-volume" className="px-0 label-name">

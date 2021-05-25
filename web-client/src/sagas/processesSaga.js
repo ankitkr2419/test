@@ -1,6 +1,10 @@
 import { takeEvery, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
-import { piercingAction, tipPickupAction } from "actions/processesActions";
+import {
+  aspireDispenseAction,
+  piercingAction,
+  tipPickupAction,
+} from "actions/processesActions";
 import {} from "action-creators/processesActionCreators";
 import { API_ENDPOINTS, HTTP_METHODS } from "../appConstants";
 
@@ -56,7 +60,35 @@ export function* tipPickUp(actions) {
   }
 }
 
+export function* aspireDispense(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveAspireDispenseSuccess, saveAspireDispenseFailed } =
+    aspireDispenseAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.aspireDispense}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveAspireDispenseSuccess,
+        failureAction: saveAspireDispenseFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveAspireDispenseFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
+  yield takeEvery(
+    aspireDispenseAction.saveAspireDispenseInitiated,
+    aspireDispense
+  );
 }

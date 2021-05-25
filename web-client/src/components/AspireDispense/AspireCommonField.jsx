@@ -3,9 +3,10 @@ import React from "react";
 import { FormGroup, Label, Input, FormError } from "core-components";
 import { Text, Icon } from "shared-components";
 import { CommmonFields } from "./Style";
+import { setFormikField } from "./functions";
 
 const AspireCommonField = (props) => {
-  const { formik } = props;
+  const { formik, currentTab } = props;
   const mixingVolume = formik.values.aspire.mixingVolume;
   const nCyclesDisabled = mixingVolume === null || mixingVolume === "";
 
@@ -19,13 +20,19 @@ const AspireCommonField = (props) => {
           <div className="d-flex flex-column input-field position-relative">
             <Input
               type="text"
-              name="aspire-height"
+              name="aspireHeight"
               id="aspire-height"
               placeholder="Type here"
               className="aspire-input-field"
-              onChange={(e) => {
-                formik.setFieldValue(`aspire.aspireHeight`, e.target.value);
-              }}
+              onChange={(e) =>
+                setFormikField(
+                  formik,
+                  true,
+                  currentTab,
+                  e.target.name,
+                  e.target.value
+                )
+              }
             />
             <Text Tag="span" className="height-icon-box">
               <Icon name="height" size={20} />
@@ -41,12 +48,18 @@ const AspireCommonField = (props) => {
           <div className="d-flex flex-column input-field">
             <Input
               type="text"
-              name="mixing-volume"
+              name="mixingVolume"
               id="mixing-volume"
               placeholder="Type here"
-              onChange={(e) => {
-                formik.setFieldValue(`aspire.mixingVolume`, e.target.value);
-              }}
+              onChange={(e) =>
+                setFormikField(
+                  formik,
+                  true,
+                  currentTab,
+                  e.target.name,
+                  e.target.value
+                )
+              }
             />
             <FormError>Incorrect Mixing Volume</FormError>
           </div>
@@ -62,12 +75,18 @@ const AspireCommonField = (props) => {
             <Text Tag="span" className="d-flex flex-column cycle-input">
               <Input
                 type="text"
-                name="no-of-cycles"
+                name="nCycles"
                 id="no-of-cycles"
                 placeholder=""
-                onChange={(e) => {
-                  formik.setFieldValue(`aspire.nCycles`, e.target.value);
-                }}
+                onChange={(e) =>
+                  setFormikField(
+                    formik,
+                    true,
+                    currentTab,
+                    e.target.name,
+                    e.target.value
+                  )
+                }
               />
               <FormError>Incorrect No. Of Cycles</FormError>
             </Text>
@@ -81,12 +100,18 @@ const AspireCommonField = (props) => {
           <div className="d-flex flex-column input-field">
             <Input
               type="text"
-              name="aspire-volume"
+              name="aspireVolume"
               id="aspire-volume"
               placeholder="Type here"
-              onChange={(e) => {
-                formik.setFieldValue(`aspire.aspireVolume`, e.target.value);
-              }}
+              onChange={(e) =>
+                setFormikField(
+                  formik,
+                  true,
+                  currentTab,
+                  e.target.name,
+                  e.target.value
+                )
+              }
             />
             <FormError>Incorrect Aspire Volume</FormError>
           </div>
@@ -99,12 +124,18 @@ const AspireCommonField = (props) => {
           <div className="d-flex flex-column input-field">
             <Input
               type="text"
-              name="air-volume"
+              name="airVolume"
               id="air-volume"
               placeholder="Type here"
-              onChange={(e) => {
-                formik.setFieldValue(`aspire.airVolume`, e.target.value);
-              }}
+              onChange={(e) =>
+                setFormikField(
+                  formik,
+                  true,
+                  currentTab,
+                  e.target.name,
+                  e.target.value
+                )
+              }
             />
             <FormError>Incorrect Air Volume</FormError>
           </div>

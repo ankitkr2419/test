@@ -8,7 +8,7 @@ import CommonDeckPosition from "./CommonDeckPosition";
 import { ASPIRE_DISPENSE_SIDEBAR_LABELS } from "appConstants";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
-import { toggler } from "./functions";
+import { disabledTab, toggler } from "./functions";
 
 const AspireDispenseTabsContent = (props) => {
   const {
@@ -19,6 +19,8 @@ const AspireDispenseTabsContent = (props) => {
     handleTabElementChange,
     wellClickHandler,
   } = props;
+
+  const disabledTabObj = isAspire ? disabledTab.aspire : disabledTab.dispense;
 
   return (
     <div className="d-flex">
@@ -34,21 +36,24 @@ const AspireDispenseTabsContent = (props) => {
           </Text>
         </Text>
 
-        {ASPIRE_DISPENSE_SIDEBAR_LABELS.map((label, index) => (
-          <NavItem key={index}>
-            <NavLink
-              className={classnames({
-                active: activeTab === `${index + 1}`,
-              })}
-              onClick={() => {
-                toggle(`${index + 1}`);
-              }}
-              disabled={toggler(isAspire, activeTab)}
-            >
-              {label}
-            </NavLink>
-          </NavItem>
-        ))}
+        {ASPIRE_DISPENSE_SIDEBAR_LABELS.map((label, index) => {
+          let key = Object.keys(disabledTabObj)[index];
+          return (
+            <NavItem key={index}>
+              <NavLink
+                className={classnames({
+                  active: activeTab === `${index + 1}`,
+                })}
+                onClick={() => {
+                  toggle(`${index + 1}`);
+                }}
+                disabled={disabledTabObj[key]}
+              >
+                {label}
+              </NavLink>
+            </NavItem>
+          );
+        })}
       </Nav>
 
       <TabContent activeTab={activeTab} className="flex-grow-1">
@@ -76,9 +81,9 @@ const AspireDispenseTabsContent = (props) => {
               wellClickHandler={wellClickHandler}
             />
             {isAspire ? (
-              <AspireCommonField formik={formik} />
+              <AspireCommonField formik={formik} currentTab={activeTab} />
             ) : (
-              <DispenseCommonField formik={formik} />
+              <DispenseCommonField formik={formik} currentTab={activeTab} />
             )}
           </>
         </TabPane>
@@ -94,9 +99,9 @@ const AspireDispenseTabsContent = (props) => {
               wellClickHandler={wellClickHandler}
             />
             {isAspire ? (
-              <AspireCommonField formik={formik} />
+              <AspireCommonField formik={formik} currentTab={activeTab} />
             ) : (
-              <DispenseCommonField formik={formik} />
+              <DispenseCommonField formik={formik} currentTab={activeTab} />
             )}
           </>
         </TabPane>
@@ -104,10 +109,10 @@ const AspireDispenseTabsContent = (props) => {
         <TabPane tabId="3" onChange={(e) => handleTabElementChange(e)}>
           {isAspire ? (
             <div className="py-3">
-              <AspireCommonField formik={formik} />
+              <AspireCommonField formik={formik} currentTab={activeTab} />
             </div>
           ) : (
-            <DispenseCommonField formik={formik} />
+            <DispenseCommonField formik={formik} currentTab={activeTab} />
           )}
         </TabPane>
 
@@ -115,12 +120,13 @@ const AspireDispenseTabsContent = (props) => {
           <div className="mb-4 border-bottom-line">
             <CommonDeckPosition
               formik={formik}
-              type={isAspire ? "aspire" : "dispense"}
+              isAspire={isAspire}
+              currentTab={activeTab}
             />
             {isAspire ? (
-              <AspireCommonField formik={formik} />
+              <AspireCommonField formik={formik} currentTab={activeTab} />
             ) : (
-              <DispenseCommonField formik={formik} />
+              <DispenseCommonField formik={formik} currentTab={activeTab} />
             )}
           </div>
         </TabPane>

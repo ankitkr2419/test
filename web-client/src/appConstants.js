@@ -93,6 +93,7 @@ export const API_ENDPOINTS = {
   login: "login",
   logout: "logout",
   piercing: "piercing",
+  aspireDispense: "aspire-dispense",
 };
 
 export const MODAL_MESSAGE = {

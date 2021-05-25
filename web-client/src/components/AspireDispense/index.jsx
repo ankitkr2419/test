@@ -1,19 +1,23 @@
 import React, { useState } from "react";
 
 import { Card, CardBody } from "core-components";
-import { ButtonIcon } from "shared-components";
+import { ButtonBar, ButtonIcon } from "shared-components";
 
 import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
 import { getFormikInitialState } from "./functions";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
+import { setFormikField } from "./functions";
+import { saveAspireDispenseInitiated } from "action-creators/processesActionCreators";
 
 const AspireDispenseComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
+
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: getFormikInitialState(),
@@ -44,22 +48,47 @@ const AspireDispenseComponent = (props) => {
     }
 
     wellsObjArray.forEach((wellObj, index) => {
-      formik.setFieldValue(
-        `${
-          isAspire ? "aspire" : "dispense"
-        }.cartridge${activeTab}Wells.${index}.isSelected`,
+      setFormikField(
+        formik,
+        isAspire,
+        activeTab,
+        `cartridge${activeTab}Wells.${index}.isSelected`,
         wellObj.id === id
-      );
-      formik.setFieldValue(
-        `${
-          isAspire ? "aspire" : "dispense"
-        }.cartridge${activeTab}Wells.${index}.isDisabled`,
-        !(wellObj.id === id)
       );
     });
   };
 
+  const handleSaveBtn = () => {
+    const aspire = formik.values.aspire;
+    const dispense = formik.values.dispense;
+
+    //will be completed after clarification of APIs
+    const body = {
+      // category: //find out category
+      // cartridge_type:
+      // source_position:
+      aspire_height: aspire.aspireHeight,
+      aspire_mixing_volumne: aspire.mixingVolume,
+      aspire_no_of_cycles: aspire.nCycles,
+      aspire_volume: aspire.aspireVolume,
+      aspire_air_volume: aspire.airVolume,
+      dispense_height: dispense.dispenseHeight,
+      dispense_mixing_volume: dispense.mixingVolume,
+      dispense_no_of_cycles: dispense.nCycles,
+      // destination_position: find cartridge
+    };
+
+    const requestBody = {
+      body: body,
+      recipeID: recipeID,
+      token: token,
+    };
+
+    dispatch(saveAspireDispenseInitiated(requestBody));
+  };
+
   const handleTabElementChange = () => {};
+  // console.log(formik.values.dispense);
 
   return (
     <>
@@ -93,12 +122,16 @@ const AspireDispenseComponent = (props) => {
                 />
               </CardBody>
             </Card>
-            {/* <ButtonBar
+            <ButtonBar
+              leftBtnLabel={isAspire ? null : "Modify"}
               rightBtnLabel={isAspire ? "Next" : "Save"}
-              handleRightBtn={() => {
-                setIsAspire(!isAspire);
-              }}
-            /> */}
+              handleLeftBtn={() =>
+                isAspire ? handleTabElementChange : setIsAspire(!isAspire)
+              }
+              handleRightBtn={() =>
+                isAspire ? setIsAspire(!isAspire) : handleSaveBtn()
+              }
+            />
           </div>
         </AspireDispenseBox>
       </PageBody>
