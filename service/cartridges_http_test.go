@@ -37,6 +37,7 @@ var testCartridgeObj = db.Cartridge{
 
 func (suite *CartridgesHandlerTestSuite) TestListCartridgesSuccess() {
 	suite.dbMock.On("ListCartridges", mock.Anything, mock.Anything).Return([]db.Cartridge{testCartridgeObj}, nil)
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/cartridges/",
@@ -53,6 +54,7 @@ func (suite *CartridgesHandlerTestSuite) TestListCartridgesSuccess() {
 
 func (suite *CartridgesHandlerTestSuite) TestListCartridgesFailure() {
 	suite.dbMock.On("ListCartridges", mock.Anything, mock.Anything).Return([]db.Cartridge{}, errors.New("failed to fetch cartridge"))
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/cartridges/",

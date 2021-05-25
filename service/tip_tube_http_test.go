@@ -23,6 +23,8 @@ type TipTubeHandlerTestSuite struct {
 
 func (suite *TipTubeHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestTipTubeTestSuite(t *testing.T) {

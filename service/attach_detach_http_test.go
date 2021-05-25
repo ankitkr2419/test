@@ -22,6 +22,7 @@ type AttachDetachHandlerTestSuite struct {
 
 func (suite *AttachDetachHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestAttachDetachTestSuite(t *testing.T) {
@@ -38,7 +39,6 @@ var testAttachDetachRecord = db.AttachDetach{
 func (suite *AttachDetachHandlerTestSuite) TestCreateAttachDetachSuccess() {
 
 	suite.dbMock.On("CreateAttachDetach", mock.Anything, mock.Anything, recipeUUID).Return(testAttachDetachRecord, nil)
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -57,7 +57,6 @@ func (suite *AttachDetachHandlerTestSuite) TestCreateAttachDetachSuccess() {
 func (suite *AttachDetachHandlerTestSuite) TestCreateAttachDetachFailure() {
 
 	suite.dbMock.On("CreateAttachDetach", mock.Anything, mock.Anything, recipeUUID).Return(db.AttachDetach{}, responses.AttachDetachCreateError)
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -76,7 +75,6 @@ func (suite *AttachDetachHandlerTestSuite) TestCreateAttachDetachFailure() {
 }
 
 func (suite *AttachDetachHandlerTestSuite) TestCreateAttachDetachInvalidUUID() {
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -97,7 +95,6 @@ func (suite *AttachDetachHandlerTestSuite) TestCreateAttachDetachInvalidUUID() {
 func (suite *AttachDetachHandlerTestSuite) TestShowAttachDetachSuccess() {
 
 	suite.dbMock.On("ShowAttachDetach", mock.Anything, testProcessUUID).Return(testAttachDetachRecord, nil)
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/attach-detach/{id}",
@@ -117,7 +114,6 @@ func (suite *AttachDetachHandlerTestSuite) TestShowAttachDetachSuccess() {
 func (suite *AttachDetachHandlerTestSuite) TestShowAttachDetachFailure() {
 
 	suite.dbMock.On("ShowAttachDetach", mock.Anything, testProcessUUID).Return(db.AttachDetach{}, responses.AttachDetachFetchError)
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/attach-detach/{id}",
@@ -135,7 +131,6 @@ func (suite *AttachDetachHandlerTestSuite) TestShowAttachDetachFailure() {
 }
 
 func (suite *AttachDetachHandlerTestSuite) TestShowAttachDetachInvalidUUID() {
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/attach-detach/{recipe_id}",
@@ -155,7 +150,6 @@ func (suite *AttachDetachHandlerTestSuite) TestShowAttachDetachInvalidUUID() {
 func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachSuccess() {
 
 	suite.dbMock.On("UpdateAttachDetach", mock.Anything, testAttachDetachRecord).Return(nil)
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 
@@ -177,7 +171,6 @@ func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachSuccess() {
 func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachFailure() {
 
 	suite.dbMock.On("UpdateAttachDetach", mock.Anything, testAttachDetachRecord).Return(responses.AttachDetachUpdateError)
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 
@@ -198,7 +191,6 @@ func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachFailure() {
 }
 
 func (suite *AttachDetachHandlerTestSuite) TestUpdateAttachDetachInvalidUUID() {
-	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	body, _ := json.Marshal(testAttachDetachRecord)
 	recorder := makeHTTPCall(http.MethodPut,

@@ -23,6 +23,8 @@ type ProcessHandlerTestSuite struct {
 
 func (suite *ProcessHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestProcessTestSuite(t *testing.T) {
