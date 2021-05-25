@@ -4,16 +4,14 @@ import (
 	rice "github.com/GeertJohan/go.rice"
 
 	"flag"
+	"fmt"
+	"github.com/goburrow/modbus"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/plc/compact32"
 	"mylab/cpagent/plc/simulator"
-
 	"mylab/cpagent/responses"
-
-	"github.com/goburrow/modbus"
-
 	"mylab/cpagent/service"
 	"net/http"
 	"os"
@@ -25,6 +23,9 @@ import (
 	"github.com/urfave/cli"
 	"github.com/urfave/negroni"
 )
+
+// variables for Binary Build info
+var Version, User, Machine, CommitID, Branch, BuiltOn string
 
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
@@ -108,6 +109,13 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				return db.ImportCSV(c.String("recipename"), c.String("csv"))
+			},
+		},
+		{
+			Name:  "version",
+			Usage: "version",
+			Action: func(c *cli.Context) {
+				printBinaryInfo()
 			},
 		},
 	}
@@ -231,4 +239,8 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			time.Sleep(5 * time.Second)
 		}
 	}
+}
+
+func printBinaryInfo() {
+	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n", Version, User, Machine, Branch, CommitID, BuiltOn)
 }
