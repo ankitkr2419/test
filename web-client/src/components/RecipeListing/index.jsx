@@ -108,15 +108,17 @@ const RecipeListingComponent = (props) => {
   };
 
   const handlePublishConfirmation = () => {
+    let token = activeDeckObj.token;
     togglePublishModal();
     if (recipeIdToPublish)
       dispatch(
-        publishRecipeInitiated({ recipeId: recipeIdToPublish, deckName })
+        publishRecipeInitiated({ recipeId: recipeIdToPublish, deckName, token })
       );
     else console.error("recipeId not found!");
   };
 
   const handleSuccessBtn = () => {
+    const token = activeDeckObj.token;
     if (nextModal) {
       dispatch(
         discardDeckInitiated({
@@ -124,6 +126,7 @@ const RecipeListingComponent = (props) => {
             deckName === DECKNAME.DeckA
               ? DECKNAME.DeckAShort
               : DECKNAME.DeckBShort,
+          token
         })
       );
       setNextModal(!nextModal);
@@ -134,6 +137,7 @@ const RecipeListingComponent = (props) => {
             deckName === DECKNAME.DeckA
               ? DECKNAME.DeckAShort
               : DECKNAME.DeckBShort,
+              token
         })
       );
       setTrayDiscardModal(!trayDiscardModal);
