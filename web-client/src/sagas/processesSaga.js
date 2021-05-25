@@ -93,7 +93,7 @@ export function* shaking(actions) {
     yield call(callApi, {
       payload: {
         body: body,
-        reqPath: `${API_ENDPOINTS.aspireDispense}/${recipeID}`,
+        reqPath: `${API_ENDPOINTS.shaking}/${recipeID}`,
         method: HTTP_METHODS.POST,
         successAction: saveShakingSuccess,
         failureAction: saveShakingFailed,

@@ -9,13 +9,43 @@ import classnames from "classnames";
 import ShakingProcess from "./ShakingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TopContent, ShakingBox } from "./Style";
+import { useFormik } from "formik";
+import { isDisabled, getFormikInitialState, getRequestBody } from "./functions";
+import { useDispatch, useSelector } from "react-redux";
+import { saveShakingInitiated } from "action-creators/processesActionCreators";
+import { toast } from "react-toastify";
 
 const ShakingComponent = (props) => {
-  const [activeTab, setActiveTab] = useState("1");
-  const withHeating = useState(true);
+  const [activeTab, setActiveTab] = useState("2");
+  const dispatch = useDispatch();
+
+  const formik = useFormik({
+    initialValues: getFormikInitialState(),
+  });
+
+  const recipeDetailsReducer = useSelector(
+    (state) => state.updateRecipeDetailsReducer
+  );
+  const recipeID = recipeDetailsReducer.recipeDetails.id;
+  const token = recipeDetailsReducer.token;
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
+  };
+
+  const handleSaveBtn = () => {
+    const body = getRequestBody(formik);
+    if (body) {
+      const requestBody = {
+        body: body,
+        recipeID: recipeID,
+        token: token,
+      };
+      dispatch(saveShakingInitiated(requestBody));
+    } else {
+      //error
+      toast.error("Invalid time");
+    }
   };
 
   return (
@@ -48,6 +78,7 @@ const ShakingComponent = (props) => {
                       onClick={() => {
                         toggle("1");
                       }}
+                      disabled={isDisabled.withoutHeating}
                     >
                       Without heating
                     </NavLink>
@@ -58,6 +89,7 @@ const ShakingComponent = (props) => {
                       onClick={() => {
                         toggle("2");
                       }}
+                      disabled={isDisabled.withHeating}
                     >
                       With heating
                     </NavLink>
@@ -65,15 +97,24 @@ const ShakingComponent = (props) => {
                 </Nav>
                 <TabContent activeTab={activeTab} className="p-5">
                   <TabPane tabId="1">
-                    <ShakingProcess />
+                    <ShakingProcess
+                      formik={formik}
+                      activeTab={activeTab}
+                      disabled={true}
+                    />
                   </TabPane>
                   <TabPane tabId="2">
-                    <ShakingProcess temperature={true} />
+                    <ShakingProcess
+                      formik={formik}
+                      activeTab={activeTab}
+                      temperature={true}
+                      disabled={true}
+                    />
                   </TabPane>
                 </TabContent>
               </CardBody>
             </Card>
-            <ButtonBar rightBtnLabel="Save" />
+            <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
           </div>
         </ShakingBox>
       </PageBody>
