@@ -187,8 +187,8 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckSuccess() {
 
 	//first need to login to test logout
 	userLogin.Store(deckA, true)
-
-	testTokenA := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjE1NzkxNzYsInN1YiI6InRlc3QiLCJyb2xlIjoiYWRtaW4iLCJkZWNrIjoiQSIsImF1dGhfaWQiOiJhMzQ5MDQ5Mi04YmVmLTRhYzktYWRlMy0zNzM1YTAwMzZjYmQifQ.fRsr1yRh5Z_0PZN8pbDRWvEc01Gq68A-HmHRq1LQQHg"
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, deckA, map[string]string{})
+	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
@@ -208,7 +208,8 @@ func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckSuccess() {
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
-	testTokenA := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjE1NzkxNzYsInN1YiI6InRlc3QiLCJyb2xlIjoiYWRtaW4iLCJkZWNrIjoiIiwiYXV0aF9pZCI6ImEzNDkwNDkyLThiZWYtNGFjOS1hZGUzLTM3MzVhMDAzNmNiZCJ9.9WvosI98rsik6lyTc37ffdA-NjqYeGixSZahc_ERDtk"
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, "", map[string]string{})
+	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
@@ -230,7 +231,8 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
 	//first need to login to test logout
 	userLogin.Store(deckA, true)
 
-	testTokenA := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjE1NzkxNzYsInN1YiI6InRlc3QiLCJyb2xlIjoiYWRtaW4iLCJkZWNrIjoiQSIsImF1dGhfaWQiOiJhMzQ5MDQ5Mi04YmVmLTRhYzktYWRlMy0zNzM1YTAwMzZjYmQifQ.fRsr1yRh5Z_0PZN8pbDRWvEc01Gq68A-HmHRq1LQQHg"
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, deckA, map[string]string{})
+	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
@@ -255,7 +257,8 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckDeleteFailure() {
 	//first need to login to test logout
 	userLogin.Store(deckA, true)
 
-	testTokenA := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjE1NzkxNzYsInN1YiI6InRlc3QiLCJyb2xlIjoiYWRtaW4iLCJkZWNrIjoiQSIsImF1dGhfaWQiOiJhMzQ5MDQ5Mi04YmVmLTRhYzktYWRlMy0zNzM1YTAwMzZjYmQifQ.fRsr1yRh5Z_0PZN8pbDRWvEc01Gq68A-HmHRq1LQQHg"
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, deckA, map[string]string{})
+	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
