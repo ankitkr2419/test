@@ -65,7 +65,7 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 		if runNext[deck] {
 			err = responses.StepRunNotInProgressError
 			logger.Errorln(err)
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: err.Error(), Deck: deck})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error(), Deck: deck})
 			return
 		}
 

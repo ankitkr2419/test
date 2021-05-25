@@ -128,6 +128,11 @@ var (
 
 	ProcessInitialisedState          = "process initialised"
 	ProcessCompletedState            = "process completed"
+	ProcessesFetchSuccess			 = "processes fetch success"
+	ProcessFetchSuccess				 = "process fetch success"
+	ProcessDeleteSuccess			 = "process delete success"
+	ProcessCreateSuccess			 = "process create success"
+	ProcessUpdateSuccess			 = "process updated successfully"
 	ProcessListInitialisedState      = "process list initialised"
 	ProcessListCompletedState        = "process list completed"
 	DuplicateProcessInitialisedState = "duplicate process initialised"

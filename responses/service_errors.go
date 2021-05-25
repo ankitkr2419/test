@@ -70,6 +70,8 @@ var (
 	ProcessTypeInvalid      = fmt.Errorf("error process type is wrong")
 	ProcessesRearrangeError = fmt.Errorf("error rearranging processes")
 	ProcessesDecodeSeqError = fmt.Errorf("error while decoding process sequence data")
+	ProcessDeleteError      = fmt.Errorf("error deleting process record")
+	ProcessUpdateError      = fmt.Errorf("error updating process record")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 

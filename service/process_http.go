@@ -16,26 +16,20 @@ func listProcessesHandler(deps Dependencies) http.HandlerFunc {
 
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			logger.WithField("err", err.Error()).Errorln(responses.UUIDParseError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
 		list, err := deps.Store.ListProcesses(req.Context(), id)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusNotFound)
-			return
-		}
-		respBytes, err := json.Marshal(list)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling process data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
 			return
 		}
 
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.ProcessesFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, list)
 	})
 }
 
@@ -45,13 +39,14 @@ func createProcessHandler(deps Dependencies) http.HandlerFunc {
 		var process db.Process
 		err := json.NewDecoder(req.Body).Decode(&process)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding process data")
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(process)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.ProcessValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
@@ -59,21 +54,13 @@ func createProcessHandler(deps Dependencies) http.HandlerFunc {
 		var createdTemp db.Process
 		createdTemp, err = deps.Store.CreateProcess(req.Context(), process)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create process")
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessCreateError.Error()})
 			return
 		}
 
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling process data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.ProcessCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, createdTemp)
 	})
 }
 
@@ -83,7 +70,7 @@ func showProcessHandler(deps Dependencies) http.HandlerFunc {
 
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -91,21 +78,13 @@ func showProcessHandler(deps Dependencies) http.HandlerFunc {
 
 		latestT, err = deps.Store.ShowProcess(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error show process")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(latestT)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling process data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.ProcessFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, latestT)
 	})
 }
 
@@ -114,20 +93,19 @@ func deleteProcessHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
 		err = deps.Store.DeleteProcess(req.Context(), id)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error while deleting process")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessDeleteError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.ProcessDeleteError)
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"process deleted successfully"}`))
+		logger.Infoln(responses.ProcessDeleteSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ProcessDeleteSuccess})
 	})
 }
 
@@ -136,7 +114,7 @@ func updateProcessHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
 		}
 
@@ -144,28 +122,29 @@ func updateProcessHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&process)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding process data")
+			logger.WithField("err", err.Error()).Errorln(responses.ProcessDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ProcessDecodeError.Error()})
 			return
 		}
 
 		valid, respBytes := validate(process)
 		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.ProcessValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
 		process.ID = id
+
 		err = deps.Store.UpdateProcess(req.Context(), process)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error update process")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessUpdateError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.ProcessUpdateError)
 			return
 		}
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"process updated successfully"}`))
+		logger.Infoln(responses.ProcessUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ProcessUpdateSuccess})
 	})
 }
 
@@ -200,6 +179,7 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.RecipeIDInvalidError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
 		}
 
 		var sequenceArr []db.ProcessSequence
