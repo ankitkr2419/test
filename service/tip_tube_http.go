@@ -85,7 +85,6 @@ func listTipsTubesHandler(deps Dependencies) http.HandlerFunc {
 				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipTubeFetchError.Error()})
 				logger.WithField("err", err.Error()).Error(responses.TipTubeFetchError)
 				return
-				return
 			}
 		default:
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipTubeArgumentsError.Error()})
