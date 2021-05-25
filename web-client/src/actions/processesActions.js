@@ -15,3 +15,9 @@ export const aspireDispenseAction = {
   saveAspireDispenseSuccess: "SAVE_ASPIRE_DISPENSE_SUCCESS",
   saveAspireDispenseFailed: "SAVE_ASPIRE_DISPENSE_FAILED",
 };
+
+export const shakingAction = {
+  saveShakingInitiated: "SAVE_SHAKING_INITIATED",
+  saveShakingSuccess: "SAVE_SHAKING_SUCCESS",
+  saveShakingFailed: "SAVE_SHAKING_FAILED",
+};

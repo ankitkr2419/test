@@ -3,6 +3,7 @@ import { callApi } from "apis/apiHelper";
 import {
   aspireDispenseAction,
   piercingAction,
+  shakingAction,
   tipPickupAction,
 } from "actions/processesActions";
 import {} from "action-creators/processesActionCreators";
@@ -84,6 +85,29 @@ export function* aspireDispense(actions) {
   }
 }
 
+export function* shaking(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveShakingSuccess, saveShakingFailed } = shakingAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.aspireDispense}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveShakingSuccess,
+        failureAction: saveShakingFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveShakingFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
@@ -91,4 +115,5 @@ export function* processesSaga() {
     aspireDispenseAction.saveAspireDispenseInitiated,
     aspireDispense
   );
+  yield takeEvery(shakingAction.saveShakingInitiated, shaking);
 }

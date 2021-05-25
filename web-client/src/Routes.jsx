@@ -19,6 +19,7 @@ import SelectProcessContainer from "containers/SelectProcessContainer";
 import PiercingContainer from "containers/PiercingContainer";
 import TipPickupContainer from "containers/TipPickupContainer";
 import AspireDispenseContainer from "containers/AspireDispenseContainer";
+import ShakingContainer from "containers/ShakingContainer";
 
 export const routeDefinitions = [
   {
@@ -93,12 +94,12 @@ export const routeDefinitions = [
         component: PiercingContainer,
         key: 13,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}shaking`,
-      //   exact: true,
-      //   component: ShakingContainer,
-      //   key: 14,
-      // },
+      {
+        path: `${ROOT_URL_PATH}shaking`,
+        exact: true,
+        component: ShakingContainer,
+        key: 14,
+      },
       // {
       //   path: `${ROOT_URL_PATH}heating`,
       //   exact: true,
