@@ -135,6 +135,12 @@ export const routeDefinitions = [
         component: TipPickupContainer,
         key: 20,
       },
+      {
+        path: `${ROOT_URL_PATH}${ROUTES.processListing}`,
+        exact: true,
+        component: ProcessListingContainer,
+        key: 22,
+      },
       // {
       //   path: `${ROOT_URL_PATH}delay`,
       //   exact: true,
