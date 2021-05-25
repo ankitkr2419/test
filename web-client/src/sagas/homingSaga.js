@@ -35,7 +35,7 @@ export function* homingAction() {
 export function* deckHoming(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { deckHomingActionSuccess, deckHomingActionFailed } = deckHomingActions;
@@ -50,6 +50,7 @@ export function* deckHoming(actions) {
         failureAction: deckHomingActionFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -62,7 +63,7 @@ export function* discardTipAndHoming(actions) {
 
   const {
     payload: {
-      params: { discardTip, deckName },
+      params: { discardTip, deckName, token },
     },
   } = actions;
   const {
@@ -80,6 +81,7 @@ export function* discardTipAndHoming(actions) {
         failureAction: discardTipAndHomingActionFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {

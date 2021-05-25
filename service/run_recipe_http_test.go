@@ -2,15 +2,17 @@ package service
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
 
+	"github.com/google/uuid"
+
+	"mylab/cpagent/responses"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"mylab/cpagent/responses"
 )
 
 // Define the suite, and absorb the built-in basic suite
@@ -23,6 +25,7 @@ type RunRecipeHandlerTestSuite struct {
 
 func (suite *RunRecipeHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestRunRecipeTestSuite(t *testing.T) {
@@ -31,11 +34,10 @@ func TestRunRecipeTestSuite(t *testing.T) {
 
 var invalidDeck = "I"
 var runStepWise = false
-var invalidUUID = "not-a-uuid"
 var recipeID = uuid.New()
 
 // Run Recipe Continuously Test cases
-func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
+func (suite *RunRecipeHandlerTestSuite) TestRunRecipeSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
@@ -54,7 +56,7 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *ProcessHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
@@ -103,7 +105,7 @@ func (suite *ProcessHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 */
 
 // Step Run Test cases
-func (suite *ProcessHandlerTestSuite) TestStepRunRecipeSuccess() {
+func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/step-run/{id}/{deck:[A-B]}",
@@ -122,7 +124,7 @@ func (suite *ProcessHandlerTestSuite) TestStepRunRecipeSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *ProcessHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/step-run/{id}/{deck:[A-B]}",
@@ -143,9 +145,7 @@ func (suite *ProcessHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-
-
-func (suite *ProcessHandlerTestSuite) TestRunNextStepSuccess() {
+func (suite *RunRecipeHandlerTestSuite) TestRunNextStepSuccess() {
 
 	runNext[deckB] = false
 
@@ -156,7 +156,7 @@ func (suite *ProcessHandlerTestSuite) TestRunNextStepSuccess() {
 		runNextStepHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	go func(){
+	go func() {
 		// drain nextStep channel
 		<-nextStep[deckB]
 	}()
@@ -168,11 +168,11 @@ func (suite *ProcessHandlerTestSuite) TestRunNextStepSuccess() {
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 
-	suite.dbMock.AssertNotCalled(suite.T(), "populateNextStepChan", mock.Anything )
+	suite.dbMock.AssertNotCalled(suite.T(), "populateNextStepChan", mock.Anything)
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *ProcessHandlerTestSuite) TestRunNextStepFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestRunNextStepFailure() {
 
 	runNext[deckB] = true
 

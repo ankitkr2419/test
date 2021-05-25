@@ -22,6 +22,7 @@ type DelayHandlerTestSuite struct {
 
 func (suite *DelayHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestDelayTestSuite(t *testing.T) {
@@ -128,7 +129,6 @@ func (suite *DelayHandlerTestSuite) TestShowDelayFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-
 func (suite *DelayHandlerTestSuite) TestShowDelayInvalidUUID() {
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -188,7 +188,6 @@ func (suite *DelayHandlerTestSuite) TestUpdateDelayFailure() {
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-
 
 func (suite *DelayHandlerTestSuite) TestUpdateDelayInvalidUUID() {
 

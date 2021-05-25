@@ -281,7 +281,7 @@ func (m *DBMockStore) InsertUser(ctx context.Context, u User) (err error) {
 
 func (m *DBMockStore) ValidateUser(ctx context.Context, u User) (err error) {
 	args := m.Called(ctx, u)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) CheckIfICTargetAdded(ctx context.Context, id uuid.UUID) (WarnResponse, error) {
@@ -301,7 +301,7 @@ func (m *DBMockStore) InsertConsumableDistance(ctx context.Context, c []Consumab
 
 func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err error) {
 	args := m.Called(ctx, t)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []CartridgeWells) (err error) {
@@ -309,8 +309,8 @@ func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []Ca
 	return args.Error(1)
 }
 
-func (m *DBMockStore) ListCartridges() (c []Cartridge, err error) {
-	args := m.Called(c)
+func (m *DBMockStore) ListCartridges(ctx context.Context) (c []Cartridge, err error) {
+	args := m.Called(ctx)
 	return args.Get(0).([]Cartridge), args.Error(1)
 }
 
@@ -534,18 +534,29 @@ func (m *DBMockStore) UpdateTipOperation(ctx context.Context, t TipOperation) (e
 	return args.Error(0)
 }
 
-func (m *DBMockStore) InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error){
+func (m *DBMockStore) InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error) {
 	args := m.Called(ctx, username)
 	return args.Get(0).(uuid.UUID), args.Error(1)
 }
 
-func (m *DBMockStore) ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error){
+func (m *DBMockStore) ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error) {
 	args := m.Called(ctx, username, authID)
 	return args.Get(0).(UserAuth), args.Error(1)
 }
 
-func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error){
+func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error) {
 	args := m.Called(ctx, userAuth)
 	return args.Error(0)
 }
-
+func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error) {
+	args := m.Called(ctx, activity, state, oprType, deck, description)
+	return args.Error(0)
+}
+func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error) {
+	args := m.Called(ctx, al)
+	return args.Error(0)
+}
+func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).(AuditLog), args.Error(1)
+}
