@@ -52,20 +52,20 @@ func (suite *AuthenticateTestSuite) TestDecodeTokenWithDeck() {
 	deck, ok := flag["deck"].(string)
 
 	assert.NotEqual(suite.T(), flag, nil)
-	assert.NotEqual(suite.T(), ok, false)
+	assert.Equal(suite.T(), ok, true)
 	assert.Equal(suite.T(), deck, deckA)
 
 }
 
 func (suite *AuthenticateTestSuite) TestDecodeTokenWithoutDeck() {
-	token, _ := EncodeToken("test", testUUID, "tester", deckA, map[string]string{})
+	token, _ := EncodeToken("test", testUUID, "tester", "", map[string]string{})
 	flag, _ := decodeToken(token)
 
 	deck, ok := flag["deck"].(string)
 
 	assert.NotEqual(suite.T(), flag, nil)
-	assert.NotEqual(suite.T(), ok, false)
-	assert.NotEqual(suite.T(), deck, "")
+	assert.Equal(suite.T(), ok, true)
+	assert.Equal(suite.T(), deck, "")
 }
 
 func (suite *AuthenticateTestSuite) TestAuthenticateSuccess() {
@@ -81,6 +81,7 @@ func (suite *AuthenticateTestSuite) TestAuthenticateSuccess() {
 		authenticate(testHandlerFunc(deps), deps),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	suite.dbMock.AssertExpectations(suite.T())
 
 }
 
