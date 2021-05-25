@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import HeatingComponent from 'components/Heating';
+import HeatingComponent from "components/Heating";
 
 const HeatingContainer = (props) => {
-	return <HeatingComponent />;
+  return <HeatingComponent />;
 };
 
 HeatingContainer.propTypes = {};
