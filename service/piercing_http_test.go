@@ -22,6 +22,8 @@ type PiercingHandlerTestSuite struct {
 
 func (suite *PiercingHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestPiercingTestSuite(t *testing.T) {
@@ -153,7 +155,6 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingFailure() {
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-
 
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingInvalidUUID() {
 

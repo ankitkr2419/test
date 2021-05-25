@@ -3,14 +3,17 @@ package service
 import (
 	"mylab/cpagent/plc"
 	"encoding/json"
-	"github.com/google/uuid"
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
 
+	"github.com/google/uuid"
+
+	"mylab/cpagent/responses"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"mylab/cpagent/responses"
+	"github.com/stretchr/testify/mock"
 )
 
 // Define the suite, and absorb the built-in basic suite
@@ -29,6 +32,7 @@ func (suite *RunRecipeHandlerTestSuite) SetupTest() {
 		"A":driverA,
 		"B":driverB,
 	}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestRunRecipeTestSuite(t *testing.T) {
@@ -38,7 +42,6 @@ func TestRunRecipeTestSuite(t *testing.T) {
 
 var invalidDeck = "I"
 var runStepWise = false
-var invalidUUID = "not-a-uuid"
 var recipeID = uuid.New()
 
 // Run Recipe Continuously Test cases
@@ -46,10 +49,10 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeSuccess() {
 
 	deck := deckB
 
-	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsMachineHomed").Return(true).Once()
-	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
-	suite.plcDeck[deck].(*plc.PLCMockStore).On("SetRunInProgress").Return().Once()
-	suite.plcDeck[deck].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Once()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsMachineHomed").Return(true).Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
 
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -158,8 +161,6 @@ func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-
-
 func (suite *RunRecipeHandlerTestSuite) TestRunNextStepSuccess() {
 
 	runNext[deckB] = false
@@ -171,7 +172,7 @@ func (suite *RunRecipeHandlerTestSuite) TestRunNextStepSuccess() {
 		runNextStepHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	go func(){
+	go func() {
 		// drain nextStep channel
 		<-nextStep[deckB]
 	}()
