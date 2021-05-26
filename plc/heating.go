@@ -114,7 +114,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		logger.Infoln("not follow temperature")
 		go d.monitorTemperature(shaker, ht.Temperature, false, stopMonitor)
 		defer d.stopMonitorTemperature(stopMonitor)
-		response, err = d.AddDelay(delay)
+		response, err = d.AddDelay(delay, false)
 		if err != nil {
 			return
 		}
@@ -140,7 +140,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	}
 
 	// After monitoring add delay of specified time period.
-	response, err = d.AddDelay(delay)
+	response, err = d.AddDelay(delay, false)
 	if err != nil {
 		logger.Errorln("error in adding delay ", err.Error())
 		return
@@ -249,7 +249,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 				}
 				setTemp2 = float64(binary.BigEndian.Uint16(results)) / 10
 				logger.Infoln("temp 2 reading", setTemp2)
-				response, err = d.AddDelay(delay)
+				response, err = d.AddDelay(delay, false)
 				if err != nil {
 					logger.Errorln("Error failed to add delay in monitor temperature \n", err)
 					return "", err
