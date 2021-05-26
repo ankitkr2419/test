@@ -229,8 +229,6 @@ export const LABWARE_NAME = {
   cartridgeType: "Cartridge Type",
 };
 
-export const PROCESS_ICON_CONSTANTS = {};
-
 export const SELECT_PROCESS_PROPS = [
   // if processType not found, use default process icon
   {
