@@ -61,10 +61,11 @@ type WSError struct {
 }
 type OperationDetails struct {
 	Message        string         `json:"message"`
-	CurrentStep    int            `json:"current_step,omitempty"`
-	TotalProcesses int            `json:"total_processes,omitempty"`
+	CurrentStep    int64          `json:"current_step,omitempty"`
+	TotalProcesses int64          `json:"total_processes,omitempty"`
 	RecipeID       uuid.UUID      `json:"recipe_id,omitempty"`
 	RemainingTime  int64          `json:"remaining_time,omitempty"`
+	TotalTime  	   int64          `json:"total_time,omitempty"`
 	ProcessName    string         `json:"process_name,omitempty"`
 	ProcessType    db.ProcessType `json:"process_type,omitempty"`
 }
@@ -94,7 +95,7 @@ type Extraction interface {
 	DiscardBoxCleanup() (response string, err error)
 	RestoreDeck() (response string, err error)
 	UVLight(uvTime string) (response string, err error)
-	AddDelay(delay db.Delay) (response string, err error)
+	AddDelay(delay db.Delay, runRecipe bool) (response string, err error)
 	DiscardTipAndHome(discard bool) (response string, err error)
 	Heating(ht db.Heating) (response string, err error)
 	Homing() (response string, err error)
@@ -110,6 +111,8 @@ type Extraction interface {
 	IsMachineHomed() bool
 	IsRunInProgress() bool
 	TipOperation(to db.TipOperation) (response string, err error)
+	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
+	SetCurrentProcess(step int64)
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {
