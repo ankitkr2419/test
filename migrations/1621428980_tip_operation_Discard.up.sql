@@ -1,0 +1,1 @@
+ALTER TYPE process_type RENAME VALUE 'TipOperation' TO 'TipDiscard';
