@@ -2,6 +2,7 @@ import { takeEvery, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
 import {
   aspireDispenseAction,
+  magnetAction,
   piercingAction,
   tipPickupAction,
 } from "actions/processesActions";
@@ -84,6 +85,29 @@ export function* aspireDispense(actions) {
   }
 }
 
+export function* magnet(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveMagnetSuccess, saveMagnetFailed } = magnetAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.magnet}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveMagnetSuccess,
+        failureAction: saveMagnetFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveMagnetFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
@@ -91,4 +115,5 @@ export function* processesSaga() {
     aspireDispenseAction.saveAspireDispenseInitiated,
     aspireDispense
   );
+  yield takeEvery(magnetAction.saveMagnetInitiated, magnet);
 }
