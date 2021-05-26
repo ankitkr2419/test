@@ -1,9 +1,9 @@
 package service
 
 import (
-	"mylab/cpagent/plc"
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"net/http"
 	"testing"
 
@@ -12,15 +12,15 @@ import (
 	"mylab/cpagent/responses"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 )
 
 // Define the suite, and absorb the built-in basic suite
 // functionality from testify - including assertion methods.
 type RunRecipeHandlerTestSuite struct {
 	suite.Suite
-	dbMock *db.DBMockStore
+	dbMock  *db.DBMockStore
 	plcDeck map[string]plc.Extraction
 }
 
@@ -29,8 +29,8 @@ func (suite *RunRecipeHandlerTestSuite) SetupTest() {
 	driverA := &plc.PLCMockStore{}
 	driverB := &plc.PLCMockStore{}
 	suite.plcDeck = map[string]plc.Extraction{
-		"A":driverA,
-		"B":driverB,
+		"A": driverA,
+		"B": driverB,
 	}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
@@ -53,7 +53,6 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeSuccess() {
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Maybe()
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
-
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
