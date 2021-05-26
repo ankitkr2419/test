@@ -1,6 +1,7 @@
 package service
 
 import (
+	"mylab/cpagent/plc"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"net/http"
@@ -11,24 +12,31 @@ import (
 	"mylab/cpagent/responses"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/mock"
 )
 
 // Define the suite, and absorb the built-in basic suite
 // functionality from testify - including assertion methods.
 type RunRecipeHandlerTestSuite struct {
 	suite.Suite
-
 	dbMock *db.DBMockStore
+	plcDeck map[string]plc.Extraction
 }
 
 func (suite *RunRecipeHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	driverA := &plc.PLCMockStore{}
+	driverB := &plc.PLCMockStore{}
+	suite.plcDeck = map[string]plc.Extraction{
+		"A":driverA,
+		"B":driverB,
+	}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestRunRecipeTestSuite(t *testing.T) {
+	loadUtils()
 	suite.Run(t, new(RunRecipeHandlerTestSuite))
 }
 
@@ -39,19 +47,27 @@ var recipeID = uuid.New()
 // Run Recipe Continuously Test cases
 func (suite *RunRecipeHandlerTestSuite) TestRunRecipeSuccess() {
 
+	deck := deckB
+
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsMachineHomed").Return(true).Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
+
+
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
-		"/run/"+recipeUUID.String()+"/"+deckB,
+		"/run/"+recipeUUID.String()+"/"+deck,
 		"",
-		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
+		runRecipeHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}, false),
 	)
 
-	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: deckB}
+	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: deck}
 
 	output, _ := json.Marshal(msg)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -72,7 +88,7 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 	output, _ := json.Marshal(errObj)
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -82,7 +98,7 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 //
 
 /*
-func (suite *ProcessHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
+func (suite *RunRecipeHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 
 	suite.dbMock.On("runRecipe", mock.Anything, mock.Anything, deckB, runStepWise, recipeID).Return("Success", nil)
 
@@ -111,7 +127,7 @@ func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeSuccess() {
 		"/step-run/{id}/{deck:[A-B]}",
 		"/step-run/"+recipeUUID.String()+"/"+deckB,
 		"",
-		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
+		runRecipeHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}, false),
 	)
 
 	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: deckB}
@@ -119,7 +135,7 @@ func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeSuccess() {
 	output, _ := json.Marshal(msg)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -140,7 +156,7 @@ func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 	output, _ := json.Marshal(errObj)
 
 	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -166,9 +182,8 @@ func (suite *RunRecipeHandlerTestSuite) TestRunNextStepSuccess() {
 	output, _ := json.Marshal(msg)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
-	suite.dbMock.AssertNotCalled(suite.T(), "populateNextStepChan", mock.Anything)
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
@@ -187,8 +202,8 @@ func (suite *RunRecipeHandlerTestSuite) TestRunNextStepFailure() {
 
 	output, _ := json.Marshal(errObj)
 
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

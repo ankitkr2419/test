@@ -380,7 +380,7 @@ func (m *DBMockStore) ShowProcess(ctx context.Context, id uuid.UUID) (p Process,
 }
 
 func (m *DBMockStore) ListProcesses(ctx context.Context, id uuid.UUID) (p []Process, err error) {
-	args := m.Called(ctx)
+	args := m.Called(ctx, id)
 	return args.Get(0).([]Process), args.Error(1)
 }
 
@@ -548,14 +548,12 @@ func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (er
 	args := m.Called(ctx, userAuth)
 	return args.Error(0)
 }
-func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error) {
-	args := m.Called(ctx, activity, state, oprType, deck, description)
-	return args.Error(0)
-}
+
 func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error) {
 	args := m.Called(ctx, al)
 	return args.Error(0)
 }
+
 func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error) {
 	args := m.Called(ctx)
 	return args.Get(0).(AuditLog), args.Error(1)
@@ -564,4 +562,8 @@ func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error)
 func (m *DBMockStore) ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error) {
 	args := m.Called(ctx, ttype, position)
 	return args.Get(0).([]TipsTubes), args.Error(1)
+}
+func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error) {
+	args := m.Called(ctx, activity, state, oprType, deck, description)
+	return args.Error(0)
 }
