@@ -12,3 +12,10 @@ export const duplicateProcessActions = {
     duplicateProcessFailure: "DUPLICATE_PROCESS_FAILURE",
     duplicateProcessReset: "DUPLICATE_PROCESS_RESET",
 }
+
+export const fetchProcessDataActions = {
+    fetchProcessDataInitiated: "FETCH_PROCESS_DATA_INITIATED",
+    fetchProcessDataSuccess: "FETCH_PROCESS_DATA_SUCCESS",
+    fetchProcessDataFailure: "FETCH_PROCESS_DATA_FAILURE",
+    fetchProcessDataReset: "FETCH_PROCESS_DATA_RESET" 
+}

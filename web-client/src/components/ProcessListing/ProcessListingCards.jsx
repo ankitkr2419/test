@@ -14,6 +14,7 @@ const ProcessListingCards = (props) => {
         handleChangeSequenceTo,
         handleProcessMove,
         createDuplicateProcess,
+        handleEditProcess,
     } = props;
 
     const getProcessIconName = (processType) => {
@@ -73,6 +74,7 @@ const ProcessListingCards = (props) => {
                                             )
                                         }
                                         createDuplicateProcess={createDuplicateProcess}
+                                        handleEditProcess={() => handleEditProcess(processObj)}
                                     />
                                 </div>
                             );

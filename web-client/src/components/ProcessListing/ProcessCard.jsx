@@ -15,6 +15,7 @@ const ProcessCard = (props) => {
         handleChangeSequenceTo,
         handleProcessMove,
         createDuplicateProcess,
+        handleEditProcess,
     } = props;
 
     const handleProcessMoveClick = () => {
@@ -101,6 +102,7 @@ const ProcessCard = (props) => {
                                         size={14}
                                         name="edit-pencil"
                                         className="border-gray text-primary ml-2"
+                                        onClick={handleEditProcess}
                                     />
                                     <ButtonIcon
                                         size={24}

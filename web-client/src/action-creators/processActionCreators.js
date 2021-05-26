@@ -1,4 +1,4 @@
-import { processListActions, duplicateProcessActions } from "actions/processActions";
+import { processListActions, duplicateProcessActions, fetchProcessDataActions } from "actions/processActions";
 
 export const processListInitiated = (params) => ({
     type: processListActions.processListInitiated,
@@ -33,3 +33,21 @@ export const duplicateProcessReset = () => ({
     payload: {}
 });
 
+export const fetchProcessDataInitiated = (params) => ({
+    type: fetchProcessDataActions.fetchProcessDataInitiated,
+    payload: {
+        ...params
+    }
+});
+
+export const fetchProcessDataFail = (params) => ({
+    type: fetchProcessDataActions.fetchProcessDataFailure,
+    payload: {
+        ...params
+    }
+});
+
+export const fetchProcessDataReset = () => ({
+    type: fetchProcessDataActions.fetchProcessDataReset,
+    payload: {}
+})

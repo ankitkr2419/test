@@ -1,11 +1,19 @@
 import { takeEvery, put, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
-import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
+import {
+    API_ENDPOINTS,
+    HTTP_METHODS,
+    SELECT_PROCESS_PROPS,
+} from "appConstants";
 import {
     processListActions,
     duplicateProcessActions,
+    fetchProcessDataActions,
 } from "actions/processActions";
-import { duplicateProcessFail } from "action-creators/processActionCreators";
+import {
+    duplicateProcessFail,
+    fetchProcessDataFail,
+} from "action-creators/processActionCreators";
 export function* fetchProcessList(actions) {
     const {
         payload: { recipeId, token },
@@ -55,10 +63,50 @@ export function* duplicateProcess(actions) {
     }
 }
 
+/**
+ * Generalized method to get process data | apiEndpoint is dynamic depend upon processType
+ */
+export function* fetchProcessData(actions) {
+    const {
+        payload: { processId, type, token },
+    } = actions;
+    const { fetchProcessDataSuccess, fetchProcessDataFailure } =
+        fetchProcessDataActions;
+
+    //get apiEndPoint depend on processType
+    const obj = SELECT_PROCESS_PROPS.find((obj) => obj.processType === type);
+    const apiEndPoint = obj?.apiEndpoint;
+    if (!apiEndPoint) {
+        console.error("api endpoint not found!");
+        return;
+    }
+
+    try {
+        yield call(callApi, {
+            payload: {
+                method: HTTP_METHODS.GET,
+                body: null,
+                reqPath: `${apiEndPoint}/${processId}`,
+                successAction: fetchProcessDataSuccess,
+                failureAction: fetchProcessDataFailure,
+                showPopupFailureMessage: true,
+                token,
+            },
+        });
+    } catch (error) {
+        console.error("Error in fetching process data", error);
+        yield put(fetchProcessDataFail({ error }));
+    }
+}
+
 export function* processSaga() {
     yield takeEvery(processListActions.processListInitiated, fetchProcessList);
     yield takeEvery(
         duplicateProcessActions.duplicateProcessInitiated,
         duplicateProcess
+    );
+    yield takeEvery(
+        fetchProcessDataActions.fetchProcessDataInitiated,
+        fetchProcessData
     );
 }

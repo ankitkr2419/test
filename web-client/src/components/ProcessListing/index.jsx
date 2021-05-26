@@ -17,6 +17,7 @@ const ProcessListComponent = (props) => {
         handleChangeSequenceTo,
         handleProcessMove,
         createDuplicateProcess,
+        handleEditProcess,
     } = props;
 
     const history = useHistory();
@@ -62,6 +63,7 @@ const ProcessListComponent = (props) => {
                     handleChangeSequenceTo={handleChangeSequenceTo}
                     handleProcessMove={handleProcessMove}
                     createDuplicateProcess={createDuplicateProcess}
+                    handleEditProcess={handleEditProcess}
                 />
 
                 {/* Action buttons (add process, finish)*/}
