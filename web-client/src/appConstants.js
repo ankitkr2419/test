@@ -95,6 +95,7 @@ export const API_ENDPOINTS = {
   piercing: "piercing",
   aspireDispense: "aspire-dispense",
   recipe: "recipe",
+  tipDiscard: "tip-operation",
 };
 
 export const MODAL_MESSAGE = {

@@ -15,3 +15,9 @@ export const aspireDispenseAction = {
   saveAspireDispenseSuccess: "SAVE_ASPIRE_DISPENSE_SUCCESS",
   saveAspireDispenseFailed: "SAVE_ASPIRE_DISPENSE_FAILED",
 };
+
+export const tipDiscardAction = {
+  saveTipDiscardInitiated: "SAVE_TIP_DISCARD_INITIATED",
+  saveTipDiscardSuccess: "SAVE_TIP_DISCARD_SUCCESS",
+  saveTipDiscardFailed: "SAVE_TIP_DISCARD_FAILED",
+};

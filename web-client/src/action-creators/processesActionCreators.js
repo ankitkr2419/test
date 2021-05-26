@@ -1,6 +1,7 @@
 import {
   aspireDispenseAction,
   piercingAction,
+  tipDiscardAction,
   tipPickupAction,
 } from "actions/processesActions";
 
@@ -46,5 +47,21 @@ export const saveTipPickupSuccess = (response) => ({
 
 export const saveTipPickupFailure = (error) => ({
   type: tipPickupAction.saveTipPickUpFailed,
+  payload: error,
+});
+
+//tip-discard
+export const saveTipDiscardInitiated = (params) => ({
+  type: tipDiscardAction.saveTipDiscardInitiated,
+  payload: params,
+});
+
+export const saveTipDiscardSuccess = (response) => ({
+  type: tipDiscardAction.saveTipDiscardSuccess,
+  payload: response,
+});
+
+export const saveTipDiscardFailure = (error) => ({
+  type: tipDiscardAction.saveTipDiscardFailed,
   payload: error,
 });
