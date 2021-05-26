@@ -16,6 +16,7 @@ const ProcessListComponent = (props) => {
         setDraggedProcessId,
         handleChangeSequenceTo,
         handleProcessMove,
+        createDuplicateProcess,
     } = props;
 
     const history = useHistory();
@@ -38,6 +39,7 @@ const ProcessListComponent = (props) => {
 
     const handleFinishClick = () => {
         //TODO: required api calls
+        history.push(ROUTES.recipeListing);
     };
 
     return (
@@ -59,6 +61,7 @@ const ProcessListComponent = (props) => {
                     setDraggedProcessId={setDraggedProcessId}
                     handleChangeSequenceTo={handleChangeSequenceTo}
                     handleProcessMove={handleProcessMove}
+                    createDuplicateProcess={createDuplicateProcess}
                 />
 
                 {/* Action buttons (add process, finish)*/}

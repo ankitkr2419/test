@@ -1,10 +1,14 @@
 import { fromJS } from "immutable";
-import { processListActions } from "actions/processActions";
+import {
+    processListActions,
+    duplicateProcessActions,
+} from "actions/processActions";
 
 const processListInitialState = fromJS({
     isLoading: false,
     error: null,
     processList: [],
+    tempDuplicateProcess: null,
 });
 
 export const processListReducer = (state = processListInitialState, action) => {
@@ -31,6 +35,41 @@ export const processListReducer = (state = processListInitialState, action) => {
                 processList: [],
                 error: null,
             });
+
+        case duplicateProcessActions.duplicateProcessInitiated:
+            return state.merge({
+                isLoading: true,
+                error: null,
+                tempDuplicateProcess: null,
+            });
+
+        //TODO: remove
+        // case duplicateProcessActions.duplicateProcessSuccess:
+        //     const newProcessObj = action.payload.response;
+        //     return state.merge({
+        //         isLoading: false,
+        //         error: null,
+        //         processList: [...state.toJS().processList, newProcessObj],
+        //     });
+        case duplicateProcessActions.duplicateProcessSuccess:
+            const newProcessObj = action.payload.response;
+            return state.merge({
+                isLoading: false,
+                error: null,
+                tempDuplicateProcess: newProcessObj
+            });
+
+        case duplicateProcessActions.duplicateProcessFailure:
+            return state.merge({
+                isLoading: false,
+                error: true,
+                tempDuplicateProcess: null,
+            });
+
+        case duplicateProcessActions.duplicateProcessReset:
+            return state.merge({
+                tempDuplicateProcess: null,
+            })
         default:
             return state;
     }

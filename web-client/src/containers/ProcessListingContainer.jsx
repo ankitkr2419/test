@@ -5,7 +5,11 @@ import {
     changeProcessSequences,
     sortProcessListBySequence,
 } from "components/ProcessListing/helper";
-import { processListInitiated } from "action-creators/processActionCreators";
+import {
+    processListInitiated,
+    duplicateProcessInitiated,
+    duplicateProcessReset,
+} from "action-creators/processActionCreators";
 import { Loader } from "shared-components";
 import { toast } from "react-toastify";
 
@@ -55,6 +59,19 @@ const ProcessListingContainer = (props) => {
             setProcessList(list);
         }
     }, [isLoading, error]);
+
+    //when duplicate process created, store it in temp state of processList
+    useEffect(() => {
+        if (processListReducer.tempDuplicateProcess) {
+            const arr = [
+                ...processList.map((obj) => ({ ...obj, isOpen: false })),//hide all process menu
+                { ...processListReducer.tempDuplicateProcess, isOpen: false },//add isOpen to new process
+            ];
+            let sortedArr = sortProcessListBySequence(arr);
+            setProcessList(sortedArr);
+            dispatch(duplicateProcessReset());
+        }
+    }, [processListReducer.tempDuplicateProcess]);
 
     //toggle isOpen field of process object to toggle process menu
     const toggleIsOpen = (processId) => {
@@ -121,6 +138,11 @@ const ProcessListingContainer = (props) => {
         toast.success("Process Moved");
     };
 
+    const createDuplicateProcess = (processId) => {
+        const token = activeDeckObj.token;
+        dispatch(duplicateProcessInitiated({ processId, token }));
+    };
+
     return (
         <>
             {isLoading && <Loader />}
@@ -132,6 +154,7 @@ const ProcessListingContainer = (props) => {
                 setDraggedProcessId={handleDraggedProcessId} //move dragged
                 handleChangeSequenceTo={handleChangeSequenceTo} //move dropped
                 handleProcessMove={handleProcessMove} //up and down
+                createDuplicateProcess={createDuplicateProcess}
             />
         </>
     );

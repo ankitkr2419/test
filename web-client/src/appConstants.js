@@ -83,6 +83,7 @@ export const API_ENDPOINTS = {
   login: "login",
   logout: "logout",
   recipe: "recipe",
+  duplicateProcess: "duplicate-process",
 };
 
 export const MODAL_MESSAGE = {

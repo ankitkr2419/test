@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardBody, Row, Col } from "core-components";
+import { Card, CardBody } from "core-components";
 import PaginationBox from "shared-components/PaginationBox";
 import { Text } from "shared-components";
 import ProcessCard from "./ProcessCard";
@@ -13,6 +13,7 @@ const ProcessListingCards = (props) => {
         setDraggedProcessId,
         handleChangeSequenceTo,
         handleProcessMove,
+        createDuplicateProcess,
     } = props;
 
     const getProcessIconName = (processType) => {
@@ -30,7 +31,7 @@ const ProcessListingCards = (props) => {
 
     return (
         <Card className="recipe-listing-cards">
-            <CardBody className="p-5">
+            <CardBody className="p-5" style={{overflow: "scroll"}}>{/**TODO: remove style tag */}
                 <div className="d-flex justify-content-between align-items-center">
                     <Text Tag="span" className="recipe-name">
                         Total Processes: {processList?.length || 0}
@@ -71,6 +72,7 @@ const ProcessListingCards = (props) => {
                                                 direction
                                             )
                                         }
+                                        createDuplicateProcess={createDuplicateProcess}
                                     />
                                 </div>
                             );

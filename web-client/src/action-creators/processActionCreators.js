@@ -1,4 +1,4 @@
-import { processListActions } from "actions/processActions";
+import { processListActions, duplicateProcessActions } from "actions/processActions";
 
 export const processListInitiated = (params) => ({
     type: processListActions.processListInitiated,
@@ -7,4 +7,22 @@ export const processListInitiated = (params) => ({
     }
 });
 
+export const duplicateProcessInitiated = (params) => ({
+    type: duplicateProcessActions.duplicateProcessInitiated,
+    payload: {
+        ...params,
+    }
+});
+
+export const duplicateProcessFail = (params) => ({
+    type: duplicateProcessActions.duplicateProcessFailure,
+    payload: {
+        ...params,
+    }
+});
+
+export const duplicateProcessReset = () => ({
+    type: duplicateProcessActions.duplicateProcessReset,
+    payload: {}
+});
 
