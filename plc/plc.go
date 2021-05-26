@@ -59,15 +59,22 @@ type WSError struct {
 	Message string `json:"message"`
 	Deck    string `json:"deck"`
 }
+
 type OperationDetails struct {
 	Message        string         `json:"message"`
 	CurrentStep    int64          `json:"current_step,omitempty"`
 	TotalProcesses int64          `json:"total_processes,omitempty"`
 	RecipeID       uuid.UUID      `json:"recipe_id,omitempty"`
-	RemainingTime  int64          `json:"remaining_time,omitempty"`
-	TotalTime  	   int64          `json:"total_time,omitempty"`
+	RemainingTime  *TimeHMS        `json:"remaining_time,omitempty"`
+	TotalTime      *TimeHMS        `json:"total_time,omitempty"`
 	ProcessName    string         `json:"process_name,omitempty"`
 	ProcessType    db.ProcessType `json:"process_type,omitempty"`
+}
+
+type TimeHMS struct {
+	Hours   uint8 `json:"hours"`
+	Minutes uint8 `json:"minutes"`
+	Seconds uint8 `json:"seconds"`
 }
 
 type Compact32Deck struct {

@@ -152,8 +152,8 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 		Deck:     d.name,
 		Status:   string(ops),
 		OperationDetails: OperationDetails{
-			RemainingTime: opRemainingTime,
-			TotalTime:     delayTime,
+			RemainingTime: convertToHMS(opRemainingTime),
+			TotalTime:     convertToHMS(delayTime),
 		},
 	}
 
@@ -191,4 +191,13 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 	d.WsMsgCh <- fmt.Sprintf("%v_%v", ops, string(wsData))
 
 	return
+}
+
+func convertToHMS(secs int64) (*TimeHMS){
+	var t TimeHMS 
+	t.Hours = uint8(secs/(60 * 60))
+	t.Minutes = uint8(secs/60 - int64(t.Hours)*60)
+	t.Seconds = uint8(secs % 60)
+	logger.Infoln("Converted time: ", t)
+	return &t
 }
