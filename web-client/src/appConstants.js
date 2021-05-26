@@ -95,6 +95,7 @@ export const API_ENDPOINTS = {
   piercing: "piercing",
   aspireDispense: "aspire-dispense",
   recipe: "recipe",
+  delay: "delay",
 };
 
 export const MODAL_MESSAGE = {

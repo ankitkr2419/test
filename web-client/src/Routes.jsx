@@ -19,6 +19,7 @@ import SelectProcessContainer from "containers/SelectProcessContainer";
 import PiercingContainer from "containers/PiercingContainer";
 import TipPickupContainer from "containers/TipPickupContainer";
 import AspireDispenseContainer from "containers/AspireDispenseContainer";
+import DelayContainer from "containers/DelayContainer";
 
 export const routeDefinitions = [
   {
@@ -141,12 +142,12 @@ export const routeDefinitions = [
         component: ProcessListingContainer,
         key: 22,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}delay`,
-      //   exact: true,
-      //   component: DelayContainer,
-      //   key: 21,
-      // },
+      {
+        path: `${ROOT_URL_PATH}delay`,
+        exact: true,
+        component: DelayContainer,
+        key: 21,
+      },
     ],
   },
 ];
