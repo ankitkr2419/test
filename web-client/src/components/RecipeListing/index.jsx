@@ -22,6 +22,7 @@ import RunRecipesModal from "components/modals/RunRecipesModal";
 import { publishRecipeInitiated } from "action-creators/recipeActionCreators";
 import TopContentComponent from "./TopContentComponent";
 import RecipeListingCards from "./RecipeListingCards";
+import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
 
 const RecipeListingComponent = (props) => {
   const {
@@ -175,8 +176,12 @@ const RecipeListingComponent = (props) => {
       return;
     }
 
-    //TODO: save recipe in reducer to edit
-
+    dispatch(
+      saveNewRecipe({
+        recipeDetails: recipe
+      })
+    );
+    
     //go to processList page of recipe
     history.push(ROUTES.processListing);
   };

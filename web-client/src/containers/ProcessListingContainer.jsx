@@ -8,22 +8,12 @@ import {
 import {
     processListInitiated,
     duplicateProcessInitiated,
-    duplicateProcessReset,
+    setProcessList,
 } from "action-creators/processActionCreators";
 import { Loader } from "shared-components";
 import { toast } from "react-toastify";
 
 const ProcessListingContainer = (props) => {
-    /*TODO: 1) get recipe details from reducer*/
-    const [recipeDetails, setRecipeDetails] = useState({
-        id: "91ea456e-fc0c-4d93-9d00-42302fbe5464",
-        name: "test",
-        created_at: "2021-04-29T11:52:11.171692Z",
-        updated_at: "2021-04-29T11:52:11.171692Z",
-    });
-
-    const [processList, setProcessList] = useState([]);
-
     //if we have draggedProcessId, means user selected this process to change its sequence (move)
     const [draggedProcessId, setDraggedProcessId] = useState(null);
 
@@ -31,12 +21,18 @@ const ProcessListingContainer = (props) => {
     const processListReducer = useSelector(
         (state) => state.processListReducer
     ).toJS();
-    const { isLoading, error } = processListReducer;
+    const { isLoading, processList } = processListReducer;
 
     /**get active login deck data*/
     const loginReducer = useSelector((state) => state.loginReducer);
     const loginReducerData = loginReducer.toJS();
     let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+
+    /**get recipeDetails */
+    const recipeDetailsReducer = useSelector(
+        (state) => state.updateRecipeDetailsReducer
+    );
+    const recipeDetails = recipeDetailsReducer.recipeDetails;
 
     /**Get process list of a recipe */
     useEffect(() => {
@@ -47,32 +43,6 @@ const ProcessListingContainer = (props) => {
         }
     }, [recipeDetails.id]);
 
-    /** => store processList in local state (needed for change sequence and other local changes)
-        => isOpen: represents that process menu should be open or not and its independently handled for each process
-        => isOpen not coming from api, so adding default value */
-    useEffect(() => {
-        if (!isLoading && !error) {
-            const list = processListReducer.processList?.map((obj) => ({
-                ...obj,
-                isOpen: false,
-            }));
-            setProcessList(list);
-        }
-    }, [isLoading, error]);
-
-    //when duplicate process created, store it in temp state of processList
-    useEffect(() => {
-        if (processListReducer.tempDuplicateProcess) {
-            const arr = [
-                ...processList.map((obj) => ({ ...obj, isOpen: false })),//hide all process menu
-                { ...processListReducer.tempDuplicateProcess, isOpen: false },//add isOpen to new process
-            ];
-            let sortedArr = sortProcessListBySequence(arr);
-            setProcessList(sortedArr);
-            dispatch(duplicateProcessReset());
-        }
-    }, [processListReducer.tempDuplicateProcess]);
-
     //toggle isOpen field of process object to toggle process menu
     const toggleIsOpen = (processId) => {
         const newProcessList = processList.map((processObj) => {
@@ -80,7 +50,7 @@ const ProcessListingContainer = (props) => {
                 ? { ...processObj, isOpen: !processObj.isOpen }
                 : processObj;
         });
-        setProcessList(newProcessList);
+        dispatch(setProcessList({ processList: newProcessList }));
     };
 
     /** purpose=> setting draggedProcessId will let us know that this process is dragged(move), to toggle process menu for drop operations */
@@ -134,8 +104,7 @@ const ProcessListingContainer = (props) => {
             droppedProcessId
         );
         let sortedArr = sortProcessListBySequence(arr);
-        setProcessList(sortedArr);
-        toast.success("Process Moved");
+        dispatch(setProcessList({ processList: sortedArr }));
     };
 
     const createDuplicateProcess = (processId) => {

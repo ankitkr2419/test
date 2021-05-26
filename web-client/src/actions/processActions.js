@@ -3,6 +3,7 @@ export const processListActions = {
     processListSuccess: "PROCESS_LIST_SUCCESS",
     processListFailure: "PROCESS_LIST_FAILURE",
     processListReset: "PROCESS_LIST_RESET",
+    setProcessList: "SET_PROCESS_LIST"//set updated list
 };
 
 export const duplicateProcessActions = {

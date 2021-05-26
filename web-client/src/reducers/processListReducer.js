@@ -3,12 +3,11 @@ import {
     processListActions,
     duplicateProcessActions,
 } from "actions/processActions";
-
+import { resetIsOpenInProcessList } from "components/ProcessListing/helper";
 const processListInitialState = fromJS({
     isLoading: false,
     error: null,
     processList: [],
-    tempDuplicateProcess: null,
 });
 
 export const processListReducer = (state = processListInitialState, action) => {
@@ -19,9 +18,10 @@ export const processListReducer = (state = processListInitialState, action) => {
                 error: null,
             });
         case processListActions.processListSuccess:
+            const list = resetIsOpenInProcessList(action.payload?.response);
             return state.merge({
                 isLoading: false,
-                processList: action.payload?.response,
+                processList: list,
                 error: null,
             });
         case processListActions.processListFailure:
@@ -36,40 +36,39 @@ export const processListReducer = (state = processListInitialState, action) => {
                 error: null,
             });
 
+        //if we want to set new processList
+        case processListActions.setProcessList:
+            return state.merge({
+                processList: action.payload.processList,
+            });
         case duplicateProcessActions.duplicateProcessInitiated:
             return state.merge({
                 isLoading: true,
                 error: null,
-                tempDuplicateProcess: null,
             });
 
-        //TODO: remove
-        // case duplicateProcessActions.duplicateProcessSuccess:
-        //     const newProcessObj = action.payload.response;
-        //     return state.merge({
-        //         isLoading: false,
-        //         error: null,
-        //         processList: [...state.toJS().processList, newProcessObj],
-        //     });
         case duplicateProcessActions.duplicateProcessSuccess:
-            const newProcessObj = action.payload.response;
+            const newProcessList = [...state.toJS().processList, action.payload.response];
+            
+            //add isOpen to new process and reset isOpen for old processes
+            const processListAfterIsOpenReset = resetIsOpenInProcessList(newProcessList);
+            
             return state.merge({
                 isLoading: false,
                 error: null,
-                tempDuplicateProcess: newProcessObj
+                processList: processListAfterIsOpenReset,
             });
-
+            
         case duplicateProcessActions.duplicateProcessFailure:
             return state.merge({
                 isLoading: false,
                 error: true,
-                tempDuplicateProcess: null,
             });
 
         case duplicateProcessActions.duplicateProcessReset:
             return state.merge({
-                tempDuplicateProcess: null,
-            })
+                error: null,
+            });
         default:
             return state;
     }

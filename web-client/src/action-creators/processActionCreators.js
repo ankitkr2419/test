@@ -7,6 +7,13 @@ export const processListInitiated = (params) => ({
     }
 });
 
+export const setProcessList = (params) => ({
+    type: processListActions.setProcessList,
+    payload: {
+        ...params,
+    }
+});
+
 export const duplicateProcessInitiated = (params) => ({
     type: duplicateProcessActions.duplicateProcessInitiated,
     payload: {
