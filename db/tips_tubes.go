@@ -92,7 +92,10 @@ func (s *pgStore) ListTipsTubesByPosition(ctx context.Context, ttype string, pos
 	} else {
 		err = s.db.Select(&tt, getTipsTubesBytypeQuery, ttype)
 	}
-
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
+		return
+	}
 	//return only those record which are allowed for the position
 	for _, v := range tt {
 		for _, allowedPos := range v.AllowedPositions {
@@ -101,11 +104,6 @@ func (s *pgStore) ListTipsTubesByPosition(ctx context.Context, ttype string, pos
 				break
 			}
 		}
-	}
-
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
-		return
 	}
 	return
 }
