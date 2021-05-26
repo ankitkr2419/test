@@ -3,7 +3,7 @@ import { Card, CardBody, Row, Col } from "core-components";
 import PaginationBox from "shared-components/PaginationBox";
 import { Text } from "shared-components";
 import ProcessCard from "./ProcessCard";
-import { PROCESS_ICON_CONSTANTS } from "appConstants";
+import { SELECT_PROCESS_PROPS } from "appConstants";
 
 const ProcessListingCards = (props) => {
     let {
@@ -16,13 +16,13 @@ const ProcessListingCards = (props) => {
     } = props;
 
     const getProcessIconName = (processType) => {
-        let obj = PROCESS_ICON_CONSTANTS.find(
+        let obj = SELECT_PROCESS_PROPS.find(
             (obj) => obj.processType === processType
         );
 
         let iconName = obj?.iconName
             ? obj.iconName
-            : PROCESS_ICON_CONSTANTS.find(
+            : SELECT_PROCESS_PROPS.find(
                   (obj) => obj.processType === "default"
               ).iconName;
         return iconName;
