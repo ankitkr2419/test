@@ -54,10 +54,21 @@ func (p *PLCMockStore) UVLight(uvTime string) (response string, err error) {
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) AddDelay(delay db.Delay) (response string, err error) {
-	args := p.Called(delay)
+func (p *PLCMockStore) AddDelay(delay db.Delay, runRecipe bool) (response string, err error) {
+	args := p.Called(delay, runRecipe)
 	return args.Get(0).(string), args.Error(1)
 }
+
+func (p *PLCMockStore) SetCurrentProcess(step int64) {
+	_ = p.Called(step)
+	return
+}
+
+func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error){
+	args := p.Called(recipe, processes)
+	return args.Error(0)
+}
+
 
 func (p *PLCMockStore) DiscardTipAndHome(discard bool) (response string, err error) {
 	args := p.Called(discard)
