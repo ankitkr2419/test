@@ -97,6 +97,7 @@ export const API_ENDPOINTS = {
   shaking: "shaking",
   heating: "heating",
   recipe: "recipe",
+  tipDiscard: "tip-operation",
   duplicateProcess: "duplicate-process",
   heating: "heating",
   shaking: "shaking",

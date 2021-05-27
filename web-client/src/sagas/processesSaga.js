@@ -7,11 +7,13 @@ import {
   delayAction,
   piercingAction,
   shakingAction,
+  tipDiscardAction,
   tipPickupAction,
 } from "actions/processesActions";
 import {} from "action-creators/processesActionCreators";
 import { API_ENDPOINTS, HTTP_METHODS } from "../appConstants";
 
+//piercing
 export function* piercing(actions) {
   const { type, cartridgeWells, recipeID, token } = actions.payload;
 
@@ -38,6 +40,7 @@ export function* piercing(actions) {
   }
 }
 
+//tip-pickup
 export function* tipPickUp(actions) {
   const { position, recipeID, token } = actions.payload;
 
@@ -64,6 +67,7 @@ export function* tipPickUp(actions) {
   }
 }
 
+//aspire-dispense
 export function* aspireDispense(actions) {
   const { body, recipeID, token } = actions.payload;
 
@@ -88,6 +92,7 @@ export function* aspireDispense(actions) {
   }
 }
 
+//heating
 export function* heating(actions) {
   const { body, recipeID, token } = actions.payload;
 
@@ -108,6 +113,30 @@ export function* heating(actions) {
   } catch (error) {
     console.log("error while login: ", error);
     saveHeatingFailed(error);
+  }
+}
+
+//tip-discard
+export function* tipDiscard(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveTipDiscardSuccess, saveTipDiscardFailed } = tipDiscardAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.tipDiscard}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveTipDiscardSuccess,
+        failureAction: saveTipDiscardFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveTipDiscardFailed(error);
   }
 }
 
@@ -135,6 +164,7 @@ export function* magnet(actions) {
   }
 }
 
+//delay
 export function* delay(actions) {
   const { body, recipeID, token } = actions.payload;
 
@@ -158,6 +188,7 @@ export function* delay(actions) {
   }
 }
 
+//shaking
 export function* shaking(actions) {
   const { body, recipeID, token } = actions.payload;
 
@@ -184,12 +215,10 @@ export function* shaking(actions) {
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
-  yield takeEvery(
-    aspireDispenseAction.saveAspireDispenseInitiated,
-    aspireDispense
-  );
+  yield takeEvery(aspireDispenseAction.saveAspireDispenseInitiated, aspireDispense);
   yield takeEvery(shakingAction.saveShakingInitiated, shaking);
   yield takeEvery(heatingAction.saveHeatingInitiated, heating);
   yield takeEvery(magnetAction.saveMagnetInitiated, magnet);
   yield takeEvery(delayAction.saveDelayInitiated, delay);
+  yield takeEvery(tipDiscardAction.saveTipDiscardInitiated, tipDiscard);
 }

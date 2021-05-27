@@ -39,3 +39,9 @@ export const delayAction = {
   saveDelaySuccess: "SAVE_DELAY_SUCCESS",
   saveDelayFailed: "SAVE_DELAY_FAILED",
 };
+
+export const tipDiscardAction = {
+  saveTipDiscardInitiated: "SAVE_TIP_DISCARD_INITIATED",
+  saveTipDiscardSuccess: "SAVE_TIP_DISCARD_SUCCESS",
+  saveTipDiscardFailed: "SAVE_TIP_DISCARD_FAILED",
+};

@@ -23,6 +23,7 @@ import ShakingContainer from "containers/ShakingContainer";
 import HeatingContainer from "containers/HeatingContainer";
 import MagnetContainer from "containers/MagnetContainer";
 import DelayContainer from "containers/DelayContainer";
+import TipDiscardContainer from "containers/TipDiscardContainer";
 
 export const routeDefinitions = [
   {
@@ -121,12 +122,12 @@ export const routeDefinitions = [
         component: MagnetContainer,
         key: 17,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}tip-discard`,
-      //   exact: true,
-      //   component: TipDiscardContainer,
-      //   key: 18,
-      // },
+      {
+        path: `${ROOT_URL_PATH}tip-discard`,
+        exact: true,
+        component: TipDiscardContainer,
+        key: 18,
+      },
       {
         path: `${ROOT_URL_PATH}aspire-dispense`,
         exact: true,
