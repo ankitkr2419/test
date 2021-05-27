@@ -1,7 +1,8 @@
 package service
 
-/*
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
@@ -22,53 +23,104 @@ type TipTubeHandlerTestSuite struct {
 
 func (suite *TipTubeHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestTipTubeTestSuite(t *testing.T) {
 	suite.Run(t, new(TipTubeHandlerTestSuite))
 }
 
-func (suite *TipTubeHandlerTestSuite) TestCreateTipTubeSuccess() {
-	suite.dbMock.On("InsertTipsTubes", mock.Anything, mock.Anything).Return(db.TipsTubes{
-		LabwareID: 1, ConsumabledistanceID: 103, Name: "piercing_tip", Volume: 700.11, Height: 93.11,
-	}, nil)
+var testTTObj = db.TipsTubes{
+	ID:               1,
+	Name:             "testTip",
+	Type:             "test",
+	AllowedPositions: []int64{1, 2},
+	Volume:           2,
+	Height:           1.1,
+}
 
-	body := fmt.Sprintf(`{"labware_id":1,"consumable_distance_id":103,"name":"piercing_tip","volume":700.11,"height":93.11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+func (suite *TipTubeHandlerTestSuite) TestCreateTipTubeSuccess() {
+	suite.dbMock.On("InsertTipsTubes", mock.Anything, mock.Anything).Return(nil)
+
+	body, _ := json.Marshal(testTTObj)
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/tiptube",
 		"/tiptube",
-		body,
+		string(body),
 		createTipTubeHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"labware_id":1,"consumable_distance_id":103,"name":"piercing_tip","volume":700.11,"height":93.11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
-
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *TipTubeHandlerTestSuite) TestCreateTipTubeFailure() {
-	suite.dbMock.On("InsertTipsTubes", mock.Anything, mock.Anything).Return(db.TipsTubes{
-		LabwareID: 1, ConsumabledistanceID: 103, Name: "piercing_tip", Volume: 700.11, Height: 93.11,
-	}, nil)
+	suite.dbMock.On("InsertTipsTubes", mock.Anything, mock.Anything).Return(errors.New("failed to insert tip tube"))
 
-	body := fmt.Sprintf(`{"labware_id":1,"consumable_distance_id":103,"name":"piercing_tip","volume":700.11,"height":93.11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	body, _ := json.Marshal(testTTObj)
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/tiptube",
 		"/tiptube",
-		body,
+		string(body),
 		createTipTubeHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"labware_id":1,"consumable_distance_id":103,"name":"piercing_tip","volume":600.11,"height":93.11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
-
-	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.NotEqual(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.NotEqual(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-*/
+
+func (suite *TipTubeHandlerTestSuite) TestListTipTubeSuccess() {
+	suite.dbMock.On("ListTipsTubes", mock.Anything, mock.Anything).Return([]db.TipsTubes{testTTObj}, nil)
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/tiptube/{tiptube:[a-z]*}",
+		"/tiptube/tip",
+		"",
+		listTipsTubesHandler(Dependencies{Store: suite.dbMock}),
+	)
+	body, _ := json.Marshal([]db.TipsTubes{testTTObj})
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TipTubeHandlerTestSuite) TestListTipTubeFailure() {
+	suite.dbMock.On("ListTipsTubes", mock.Anything, mock.Anything).Return([]db.TipsTubes{}, errors.New("failed to fetch tips tubes"))
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/tiptube/{tiptube:[a-z]*}",
+		"/tiptube/tip",
+		"",
+		listTipsTubesHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := fmt.Sprintf(`{"err":"error fetching tip tube record"}`)
+
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TipTubeHandlerTestSuite) TestListTipTubeInvalidInput() {
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/tiptube/{tiptube:[a-z]*}",
+		"/tiptube/tp",
+		"",
+		listTipsTubesHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := fmt.Sprintf(`{"err":"error invalid tip tube arguments"}`)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}

@@ -13,7 +13,7 @@ func safeToUpgradeHandler(deps Dependencies) http.HandlerFunc {
 
 		if deps.PlcDeck[deckA].IsRunInProgress() || deps.PlcDeck[deckB].IsRunInProgress() {
 			logger.Errorln(responses.RunInProgressForSomeDeckError)
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.RunInProgressForSomeDeckError.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RunInProgressForSomeDeckError.Error()})
 			return
 		}
 

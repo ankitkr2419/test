@@ -41,7 +41,7 @@ NOTE: Even if you have npm installed you need to follow this step
 
 Go inside web-client directory
 ```
-npm install
+$ npm install
 ```
 
 ### 4. Install yarn
@@ -101,10 +101,10 @@ If master branch build fails then we must have messed pretty bad, please contact
 # For Building with GUI Support
 Run the below command in the same PWD and a binary should be created
 NOTE: This will create binary for linux platform with amd64 architecture,
-in case your's is different please change build-binary's line number 9 accordingly.
+in case your's is different please change MakeFile's build command accordingly.
 
 ```
-make build
+$ make build
 ```
 
 Please refer README inside web-client directory if you are facing any issue and then escalate it to us.
@@ -131,12 +131,12 @@ Type your password
 
 And then drop your database by typing
 ```
-DROP DATABASE cpagentdb;
+$ DROP DATABASE cpagentdb;
 ```
 
 Recreate the database
 ```
-CREATE DATABASE cpagentdb;
+$ CREATE DATABASE cpagentdb;
 ```
 
 You may close the connection to database
@@ -166,7 +166,7 @@ Congrats if your setup runs, else feel free to contact us.
 After a successfull latest build from master, type the below command in below format to import a Recipe from CSV
 
 ```
-./cpagent import --recipename name_of_the_recipe --csv PATH_TO_CSV
+$ ./cpagent import --recipename name_of_the_recipe --csv PATH_TO_CSV
 ```
 
 name_of_the_recipe is name without spaces. These underscores will be replaced by space.
@@ -174,17 +174,17 @@ PATH_TO_CSV contains name of the csv along its extension.
 
 E.g
 ```
-./cpagent import --recipename covidExtract --csv /home/josh/Downloads/CER.csv
+$ ./cpagent import --recipename covidExtract --csv /home/josh/Downloads/CER.csv
 ```
 
 # Create Zipped Artifact
 ```
-make zip
+$ make zip
 ```
 
-# Create Zipped Artifact after Building the Binary
+# Create Build and then a Zipped Artifact
 ```
-make build-and-zip
+$ make build-and-zip
 ```
 
 ### Testing
@@ -198,9 +198,9 @@ $ make test
 
 For PostgreSQL use following commands
 ```
-./cpagent start --plc simulator
-./cpagent migrate
-./cpagent create_migration filename
+$ ./cpagent start --plc simulator
+$ ./cpagent migrate
+$ ./cpagent create_migration filename
 ```
 
 ### RICE
