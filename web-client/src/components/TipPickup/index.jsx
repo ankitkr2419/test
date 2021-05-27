@@ -13,7 +13,6 @@ import {
 } from "core-components";
 import { ButtonIcon, ButtonBar, ImageIcon } from "shared-components";
 
-import AppFooter from "components/AppFooter";
 import tipPickupProcessGraphics from "assets/images/tip-pickup-process-graphics.svg";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TipPickupBox, TopContent } from "./Style";
@@ -107,7 +106,6 @@ const TipPickupComponent = (props) => {
             <ButtonBar rightBtnLabel="Save" handleRightBtn={handleRightBtn} />
           </div>
         </TipPickupBox>
-        <AppFooter />
       </PageBody>
     </>
   );

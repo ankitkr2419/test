@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar, TopHeading } from "shared-components";
 
-import AppFooter from "components/AppFooter";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 import { PageBody, PiercingBox, TopContent } from "./Style";
@@ -159,7 +158,6 @@ const PiercingComponent = (props) => {
             <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
           </div>
         </PiercingBox>
-        <AppFooter />
       </PageBody>
     </>
   );
