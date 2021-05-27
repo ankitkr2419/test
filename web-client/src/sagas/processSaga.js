@@ -1,4 +1,4 @@
-import { takeEvery, put, call } from "redux-saga/effects";
+import { takeEvery, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
 import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import { processListActions } from "actions/processActions";

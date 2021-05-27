@@ -4,7 +4,6 @@ import { useFormik } from "formik";
 
 import { Card, CardBody } from "core-components";
 import { ButtonBar, MlModal } from "shared-components";
-import AppFooter from "components/AppFooter";
 
 import {
   LABWARE_INITIAL_STATE,
@@ -136,7 +135,6 @@ const LabWareComponent = (props) => {
               </div>
             </Card>
           </div>
-          <AppFooter />
         </LabwareBox>
       </PageBody>
     </>

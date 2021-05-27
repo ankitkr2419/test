@@ -8,12 +8,16 @@ import CommonDeckPosition from "./CommonDeckPosition";
 import { ASPIRE_DISPENSE_SIDEBAR_LABELS } from "appConstants";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
-import { disabledTab, toggler } from "./functions";
+import { disabledTab, getCategoryLabel } from "./functions";
 
 const AspireDispenseTabsContent = (props) => {
   const { formik, isAspire, toggle, activeTab, wellClickHandler } = props;
 
   const disabledTabObj = isAspire ? disabledTab.aspire : disabledTab.dispense;
+  const aspireCategoryLabel = formik.values.aspire.selectedCategory
+    ? getCategoryLabel(formik.values.aspire.selectedCategory)
+    : getCategoryLabel(activeTab);
+  const dispenseCategoryLabel = getCategoryLabel(activeTab);
 
   return (
     <div className="d-flex">
@@ -53,11 +57,11 @@ const AspireDispenseTabsContent = (props) => {
         <Text className="d-flex justify-content-end align-items-center bg-white flex-fill mb-0 tab-content-top-heading">
           <Text Tag="span" className="">
             <Icon className="" name={"upward-magnet"} size={19} />
-            {"Aspire Target: Cartridge 1: Well no. 3 "}
+            {`Aspire Target: ${aspireCategoryLabel}: Well no. 3 `}
             {!isAspire && (
               <>
                 <Icon className="" name={"downward-magnet"} size={19} />
-                Dispense Target: Cartridge 1: Well no. 3
+                {`Dispense Target: ${dispenseCategoryLabel}: Well no. 3`}
               </>
             )}
           </Text>
