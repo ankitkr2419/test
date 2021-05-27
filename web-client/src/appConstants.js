@@ -96,6 +96,12 @@ export const API_ENDPOINTS = {
   aspireDispense: "aspire-dispense",
   recipe: "recipe",
   tipDiscard: "tip-operation",
+  duplicateProcess: "duplicate-process",
+  heating: "heating",
+  shaking: "shaking",
+  attachDetach: "attach-detach",
+  tipDocking: "tip-docking",
+  delay: "delay",
 };
 
 export const MODAL_MESSAGE = {
@@ -237,6 +243,7 @@ export const SELECT_PROCESS_PROPS = [
     processType: "default",
     iconName: "process",
     route: "",
+    apiEndpoint: null,
   },
 
   // process properties
@@ -245,54 +252,63 @@ export const SELECT_PROCESS_PROPS = [
     processType: "Piercing",
     processName: "Piercing",
     route: ROUTES.piercing,
+    apiEndpoint: API_ENDPOINTS.piercing,
   },
   {
     iconName: "tip-pickup",
     processType: "TipPickup",
     processName: "Tip Pickup",
     route: ROUTES.tipPickup,
+    apiEndpoint: API_ENDPOINTS.tipOperation,
   },
   {
     iconName: "aspire-dispense",
     processType: "AspireDispense",
     processName: "Aspire & Dispense",
     route: ROUTES.aspireDispense,
+    apiEndpoint: API_ENDPOINTS.aspireDispense,
   },
   {
     iconName: "shaking",
     processType: "Shaking",
     processName: "Shaking",
     route: ROUTES.shaking,
+    apiEndpoint: API_ENDPOINTS.shaking,
   },
   {
     iconName: "heating",
     processType: "Heating",
     processName: "Heating",
     route: ROUTES.heating,
+    apiEndpoint: API_ENDPOINTS.heating,
   },
   {
     iconName: "magnet",
     processType: "AttachDetach",
     processName: "Magnet",
     route: ROUTES.magnet,
+    apiEndpoint: API_ENDPOINTS.attachDetach,
   },
   {
     iconName: "tip-discard",
     processType: "TipDiscard",
     processName: "Tip Discard",
     route: ROUTES.tipDiscard,
+    apiEndpoint: API_ENDPOINTS.tipOperation,
   },
   {
     iconName: "delay",
     processType: "Delay",
     processName: "Delay",
     route: ROUTES.delay,
+    apiEndpoint: API_ENDPOINTS.delay,
   },
   {
     iconName: "tip-position",
     processType: "TipDocking",
     processName: "Tip Position",
     route: ROUTES.tipPosition,
+    apiEndpoint: API_ENDPOINTS.tipDocking
   },
 ];
 

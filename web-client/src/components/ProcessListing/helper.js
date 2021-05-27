@@ -36,3 +36,8 @@ export const sortProcessListBySequence = (array) => {
     });
     return sortedArray;
 };
+
+//add or set isOpen: false to process-list objects
+export const resetIsOpenInProcessList = (list) => {
+    return list.map((obj) => ({...obj, isOpen: false}))
+}
