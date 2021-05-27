@@ -104,6 +104,7 @@ export const API_ENDPOINTS = {
   tipDocking: "tip-docking",
   delay: "delay",
   magnet: "attach-detach",
+  delay: "delay",
 };
 
 export const MODAL_MESSAGE = {

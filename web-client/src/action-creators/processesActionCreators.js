@@ -2,6 +2,7 @@ import {
   aspireDispenseAction,
   heatingAction,
   magnetAction,
+  delayAction,
   piercingAction,
   shakingAction,
   tipPickupAction,
@@ -95,5 +96,20 @@ export const saveMagnetSuccess = (response) => ({
 
 export const saveMagnetFailure = (error) => ({
   type: magnetAction.saveMagnetFailed,
+  payload: error,
+});
+//delay
+export const saveDelayInitiated = (params) => ({
+  type: delayAction.saveDelayInitiated,
+  payload: params,
+});
+
+export const saveDelaySuccess = (response) => ({
+  type: delayAction.saveDelaySuccess,
+  payload: response,
+});
+
+export const saveDelayFailure = (error) => ({
+  type: delayAction.saveDelayFailed,
   payload: error,
 });

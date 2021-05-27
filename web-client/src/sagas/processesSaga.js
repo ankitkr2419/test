@@ -4,6 +4,7 @@ import {
   aspireDispenseAction,
   heatingAction,
   magnetAction,
+  delayAction,
   piercingAction,
   shakingAction,
   tipPickupAction,
@@ -87,29 +88,6 @@ export function* aspireDispense(actions) {
   }
 }
 
-export function* shaking(actions) {
-  const { body, recipeID, token } = actions.payload;
-
-  const { saveShakingSuccess, saveShakingFailed } = shakingAction;
-  try {
-    yield call(callApi, {
-      payload: {
-        body: body,
-        reqPath: `${API_ENDPOINTS.shaking}/${recipeID}`,
-        method: HTTP_METHODS.POST,
-        successAction: saveShakingSuccess,
-        failureAction: saveShakingFailed,
-        showPopupSuccessMessage: true,
-        showPopupFailureMessage: true,
-        token: token,
-      },
-    });
-  } catch (error) {
-    console.log("error while login: ", error);
-    saveShakingFailed(error);
-  }
-}
-
 export function* heating(actions) {
   const { body, recipeID, token } = actions.payload;
 
@@ -133,6 +111,7 @@ export function* heating(actions) {
   }
 }
 
+//magnet
 export function* magnet(actions) {
   const { body, recipeID, token } = actions.payload;
 
@@ -156,6 +135,52 @@ export function* magnet(actions) {
   }
 }
 
+export function* delay(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveDelaySuccess, saveDelayFailed } = delayAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.delay}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveDelaySuccess,
+        failureAction: saveDelayFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveDelayFailed(error);
+  }
+}
+
+export function* shaking(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveShakingSuccess, saveShakingFailed } = shakingAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.shaking}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveShakingSuccess,
+        failureAction: saveShakingFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveShakingFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
@@ -166,4 +191,5 @@ export function* processesSaga() {
   yield takeEvery(shakingAction.saveShakingInitiated, shaking);
   yield takeEvery(heatingAction.saveHeatingInitiated, heating);
   yield takeEvery(magnetAction.saveMagnetInitiated, magnet);
+  yield takeEvery(delayAction.saveDelayInitiated, delay);
 }
