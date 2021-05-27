@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Row, Col, Card, CardBody } from "core-components";
+import { Row, Col } from "core-components";
 import { Text } from "shared-components";
 import { LABWARE_NAME } from "appConstants";
 import PreviewImage from "./PreviewImage";

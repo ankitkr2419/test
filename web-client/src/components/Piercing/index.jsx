@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar, TopHeading } from "shared-components";
 
-import AppFooter from "components/AppFooter";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 import { PageBody, PiercingBox, TopContent } from "./Style";
@@ -11,31 +10,19 @@ import { WellComponent } from "./WellComponent";
 import HeightModal from "components/modals/HeightModal";
 import { useDispatch, useSelector } from "react-redux";
 import { savePiercingInitiated } from "action-creators/processesActionCreators";
-import { TEST_RECIPE_ID, TEST_TOKEN } from "appConstants";
+import { ROUTES } from "appConstants";
+import { Redirect } from "react-router";
+import { getWellsInitialArray } from "./functions";
 
-const extractionWells = [
-  { id: 1, type: 0, label: "1", footerText: "", isDisabled: false, isSelected: false },
-  { id: 2, type: 0, label: "2", footerText: "", isDisabled: false, isSelected: false },
-  { id: 3, type: 0, label: "3", footerText: "", isDisabled: false, isSelected: false },
-  { id: 4, type: 0, label: "4", footerText: "", isDisabled: false, isSelected: false },
-  { id: 5, type: 0, label: "5", footerText: "", isDisabled: false, isSelected: false },
-  { id: 6, type: 0, label: "6", footerText: "", isDisabled: false, isSelected: false },
-  { id: 7, type: 0, label: "7", footerText: "", isDisabled: false, isSelected: false },
-  { id: 8, type: 0, label: "8", footerText: "", isDisabled: false, isSelected: false },
-];
-
-const pcrWells = [
-  { id: 1, type: 1, label: "1", footerText: "", isDisabled: false, isSelected: false },
-  { id: 2, type: 1, label: "2", footerText: "", isDisabled: false, isSelected: false },
-  { id: 3, type: 1, label: "3", footerText: "", isDisabled: false, isSelected: false },
-  { id: 4, type: 1, label: "4", footerText: "", isDisabled: false, isSelected: false },
-];
+const extractionWells = getWellsInitialArray(8, 0);
+const pcrWells = getWellsInitialArray(4, 1);
 
 const PiercingComponent = (props) => {
   const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
 
+  const loginReducer = useSelector((state) => state.loginReducer);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
@@ -65,7 +52,7 @@ const PiercingComponent = (props) => {
 
   const wellClickHandler = (id, type) => {
     setShowHieghtModal(!showHeightModal);
-    // here type : extractionWellsArray and 1 for pcrObjArray
+    // here type = 0 for extractionWellsArray, and type = 1 for pcrObjArray
     const wellsObjArray = type === 0 ? extractionWells : pcrWells;
     const currentWellObj = wellsObjArray.find((wellObj) => {
       if (wellObj.id === id) {
@@ -86,11 +73,15 @@ const PiercingComponent = (props) => {
       type: type,
       cartridgeWells: cartridgeWells,
       recipeID: recipeID,
-      token: token,//TEST_TOKEN,
+      token: token,
     };
-
     dispatch(savePiercingInitiated(requestBody));
   };
+
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
 
   return (
     <>
@@ -159,7 +150,6 @@ const PiercingComponent = (props) => {
             <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
           </div>
         </PiercingBox>
-        <AppFooter />
       </PageBody>
     </>
   );
@@ -167,4 +157,4 @@ const PiercingComponent = (props) => {
 
 PiercingComponent.propTypes = {};
 
-export default PiercingComponent;
+export default React.memo(PiercingComponent);

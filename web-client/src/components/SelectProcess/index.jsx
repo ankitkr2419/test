@@ -3,7 +3,6 @@ import React from "react";
 import { Row, Card, CardBody } from "core-components";
 import { ButtonBar } from "shared-components";
 
-import AppFooter from "components/AppFooter";
 import Process from "./Process";
 import { HeadingTitle, PageBody, ProcessOuterBox, TopContent } from "./Style";
 import { SELECT_PROCESS_PROPS } from "appConstants";
@@ -44,7 +43,6 @@ const SelectProcessPageComponent = () => {
             <ButtonBar />
           </div>
         </ProcessOuterBox>
-        <AppFooter />
       </PageBody>
     </>
   );

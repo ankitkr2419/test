@@ -1,16 +1,21 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useFormik } from "formik";
+import { ROUTES } from "appConstants";
+import { Redirect } from "react-router";
 
 import { Card, CardBody } from "core-components";
 import { ButtonBar, ButtonIcon } from "shared-components";
 
 import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
-import { getFormikInitialState } from "./functions";
-
-import { useDispatch, useSelector } from "react-redux";
-import { useFormik } from "formik";
+import {
+  setFormikField,
+  getCategoryName,
+  getPosition,
+  getFormikInitialState,
+} from "./functions";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
-import { setFormikField } from "./functions";
 import { saveAspireDispenseInitiated } from "action-creators/processesActionCreators";
 
 const AspireDispenseComponent = (props) => {
@@ -23,6 +28,7 @@ const AspireDispenseComponent = (props) => {
     initialValues: getFormikInitialState(),
   });
 
+  const loginReducer = useSelector((state) => state.loginReducer);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
@@ -58,15 +64,30 @@ const AspireDispenseComponent = (props) => {
     });
   };
 
+  const handleNextBtn = () => {
+    //sets the selected category, and this is used in API call further.
+    formik.setFieldValue("aspire.selectedCategory", activeTab);
+    setIsAspire(!isAspire);
+  };
+
   const handleSaveBtn = () => {
     const aspire = formik.values.aspire;
     const dispense = formik.values.dispense;
 
-    //will be completed after clarification of APIs
+    /** Aspire category is maintained using formik.
+     *  Dispense category is directly maintained using 'activeTab' state.
+     */
+
+    const aspireSelectedTabName = getCategoryName(aspire.selectedCategory);
+    const dispenseSelectedTabName = getCategoryName(activeTab);
+
+    const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
+    const dispenseWells = dispense[`cartridge${activeTab}Wells`];
+
     const body = {
-      // category: //find out category
-      // cartridge_type:
-      // source_position:
+      category: `${aspireSelectedTabName}_to_${dispenseSelectedTabName}`,
+      cartridge_type: `cartridge_${activeTab}`,
+      source_position: getPosition(aspireWells),
       aspire_height: aspire.aspireHeight,
       aspire_mixing_volumne: aspire.mixingVolume,
       aspire_no_of_cycles: aspire.nCycles,
@@ -75,9 +96,8 @@ const AspireDispenseComponent = (props) => {
       dispense_height: dispense.dispenseHeight,
       dispense_mixing_volume: dispense.mixingVolume,
       dispense_no_of_cycles: dispense.nCycles,
-      // destination_position: find cartridge
+      destination_position: getPosition(dispenseWells),
     };
-
     const requestBody = {
       body: body,
       recipeID: recipeID,
@@ -87,8 +107,10 @@ const AspireDispenseComponent = (props) => {
     dispatch(saveAspireDispenseInitiated(requestBody));
   };
 
-  const handleTabElementChange = () => {};
-  // console.log(formik.values.dispense);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
 
   return (
     <>
@@ -102,7 +124,6 @@ const AspireDispenseComponent = (props) => {
                     size={60}
                     name="aspire-dispense"
                     className="text-primary bg-white border-gray"
-                    // onClick={toggleExportDataModal}
                     onClick={() => setIsAspire(!isAspire)}
                   />
                   <TopHeading titleHeading="Aspire & Dispense" />
@@ -124,11 +145,9 @@ const AspireDispenseComponent = (props) => {
             <ButtonBar
               leftBtnLabel={isAspire ? null : "Modify"}
               rightBtnLabel={isAspire ? "Next" : "Save"}
-              handleLeftBtn={() =>
-                isAspire ? null : setIsAspire(!isAspire)
-              }
+              handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
               handleRightBtn={() =>
-                isAspire ? setIsAspire(!isAspire) : handleSaveBtn()
+                isAspire ? handleNextBtn() : handleSaveBtn()
               }
             />
           </div>

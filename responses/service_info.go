@@ -3,7 +3,6 @@ package responses
 import "fmt"
 
 var (
-
 	Pong = "pong"
 
 	PiercingCreateSuccess        = "piercing record created successfully"
@@ -91,14 +90,14 @@ var (
 	RecipeListInitialisedState = "recipe list initialised"
 	RecipeListCompletedState   = "recipe list Completed"
 
-	RunRecipeProgress      = "next step run is in progress"
+	RunRecipeProgress     = "next step run is in progress"
 	RecipeRunInProgress   = "recipe run is in progress"
 	NextStepRunInProgress = "next step run is in progress"
 	NextStepWillRun       = "next step will be run"
 	StepRunWillAbort      = "step run will be aborted"
 	WaitingRunNextProcess = "waiting to run next process"
 	NextProcessInProgress = "next process is in progress"
-	
+
 	SafeToUpgrade          = "safe to upgrade the cpagent version"
 	TempSettingBothDeckRun = "temporary setting both deck run in progress"
 	ResettingBothDeckRun   = "resetting both deck run in progress"
@@ -110,6 +109,11 @@ var (
 	RecipeDeleteSuccess    = "Recipe record deleted successfully"
 	RecipePublishSuccess   = "Recipe published successfully"
 	RecipeUnPublishSuccess = "Recipe unpublished successfully"
+
+	DiscardBoxMovedSuccess = "Discard box moved to cleanup position successful"
+	RestoreDeckSuccess     = "Restore Deck successful"
+
+	UVCleanupProgress = "uv light clean up in progress"
 
 	DiscardBoxInitialisedState     = "discard box operation initialised"
 	DiscardBoxCompletedState       = "discard box operation completed"
@@ -124,6 +128,11 @@ var (
 
 	ProcessInitialisedState          = "process initialised"
 	ProcessCompletedState            = "process completed"
+	ProcessesFetchSuccess			 = "processes fetch success"
+	ProcessFetchSuccess				 = "process fetch success"
+	ProcessDeleteSuccess			 = "process delete success"
+	ProcessCreateSuccess			 = "process create success"
+	ProcessUpdateSuccess			 = "process updated successfully"
 	ProcessListInitialisedState      = "process list initialised"
 	ProcessListCompletedState        = "process list completed"
 	DuplicateProcessInitialisedState = "duplicate process initialised"

@@ -4,16 +4,14 @@ import (
 	rice "github.com/GeertJohan/go.rice"
 
 	"flag"
+	"fmt"
+	"github.com/goburrow/modbus"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/plc/compact32"
 	"mylab/cpagent/plc/simulator"
-
 	"mylab/cpagent/responses"
-
-	"github.com/goburrow/modbus"
-
 	"mylab/cpagent/service"
 	"net/http"
 	"os"
@@ -25,6 +23,9 @@ import (
 	"github.com/urfave/cli"
 	"github.com/urfave/negroni"
 )
+
+// variables for Binary Build info
+var Version, User, Machine, CommitID, Branch, BuiltOn string
 
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
@@ -110,6 +111,13 @@ func main() {
 				return db.ImportCSV(c.String("recipename"), c.String("csv"))
 			},
 		},
+		{
+			Name:  "version",
+			Usage: "version",
+			Action: func(c *cli.Context) {
+				printBinaryInfo()
+			},
+		},
 	}
 
 	if err := cliApp.Run(os.Args); err != nil {
@@ -121,8 +129,8 @@ func startApp(plcName string, test bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
 	var handler *modbus.RTUClientHandler
-	var driverDeckA *plc.Compact32Deck
-	var driverDeckB *plc.Compact32Deck
+	var driverDeckA plc.Extraction
+	var driverDeckB plc.Extraction
 
 	if plcName != "simulator" && plcName != "compact32" {
 		logger.Errorln(responses.UnsupportedPLCError)
@@ -153,7 +161,7 @@ func startApp(plcName string, test bool) (err error) {
 		return
 	}
 
-	plcDeckMap := map[string]*plc.Compact32Deck{
+	plcDeckMap := map[string]plc.Extraction{
 		"A": driverDeckA,
 		"B": driverDeckB,
 	}
@@ -222,7 +230,7 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			logger.Errorln(err)
 			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
 			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
-			plcDeckMap := map[string]*plc.Compact32Deck{
+			plcDeckMap := map[string]plc.Extraction{
 				"A": driverDeckA,
 				"B": driverDeckB,
 			}
@@ -231,4 +239,8 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			time.Sleep(5 * time.Second)
 		}
 	}
+}
+
+func printBinaryInfo() {
+	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n", Version, User, Machine, Branch, CommitID, BuiltOn)
 }
