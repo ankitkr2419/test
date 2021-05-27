@@ -11,6 +11,8 @@ import { getFormikInitialState, getRequestBody } from "./functions";
 import { PageBody, HeatingBox, TopContent } from "./Style";
 import { saveHeatingInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";
+import { Redirect } from "react-router";
+import { ROUTES } from "appConstants";
 
 const HeatingComponent = (props) => {
   const dispatch = useDispatch();
@@ -19,6 +21,7 @@ const HeatingComponent = (props) => {
     initialValues: getFormikInitialState(),
   });
 
+  const loginReducer = useSelector((state) => state.loginReducer);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
@@ -39,6 +42,13 @@ const HeatingComponent = (props) => {
       toast.error("Invalid time");
     }
   };
+
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   return (
     <>

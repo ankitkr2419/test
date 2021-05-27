@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar } from "shared-components";
 
-import AppFooter from "components/AppFooter";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 import ShakingProcess from "./ShakingProcess";
@@ -14,6 +13,8 @@ import { isDisabled, getFormikInitialState, getRequestBody } from "./functions";
 import { useDispatch, useSelector } from "react-redux";
 import { saveShakingInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";
+import { Redirect } from "react-router";
+import { ROUTES } from "appConstants";
 
 const ShakingComponent = (props) => {
   const [activeTab, setActiveTab] = useState("2");
@@ -23,6 +24,7 @@ const ShakingComponent = (props) => {
     initialValues: getFormikInitialState(),
   });
 
+  const loginReducer = useSelector((state) => state.loginReducer);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
@@ -47,6 +49,13 @@ const ShakingComponent = (props) => {
       toast.error("Invalid time");
     }
   };
+
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   return (
     <>
