@@ -22,6 +22,8 @@ type TipOperationHandlerTestSuite struct {
 
 func (suite *TipOperationHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestTipOperationTestSuite(t *testing.T) {
@@ -42,7 +44,7 @@ func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationSuccess() {
 	body, _ := json.Marshal(testTipOperationRecord)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/tip-operation/{recipe_id}",
-		"/tip-operation/"+ recipeUUID.String(),
+		"/tip-operation/"+recipeUUID.String(),
 		string(body),
 		createTipOperationHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -60,7 +62,7 @@ func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationFailure() {
 	body, _ := json.Marshal(testTipOperationRecord)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/tip-operation/{recipe_id}",
-		"/tip-operation/"+ recipeUUID.String(),
+		"/tip-operation/"+recipeUUID.String(),
 		string(body),
 		createTipOperationHandler(Dependencies{Store: suite.dbMock}),
 	)

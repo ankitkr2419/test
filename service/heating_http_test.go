@@ -22,6 +22,8 @@ type HeatingHandlerTestSuite struct {
 
 func (suite *HeatingHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestHeatingTestSuite(t *testing.T) {

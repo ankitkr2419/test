@@ -22,6 +22,8 @@ type TipDockHandlerTestSuite struct {
 
 func (suite *TipDockHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestTipDockTestSuite(t *testing.T) {
