@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyledProcessListing } from "./Styles";
 import { useSelector } from "react-redux";
 import { Redirect, useHistory } from "react-router";
-import { ROUTES } from "appConstants";
+import { ROUTES, MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import TopContentComponent from "components/RecipeListing/TopContentComponent";
 import ProcessListingCards from "./ProcessListingCards";
 import { ButtonBar } from "shared-components";
+import MlModal from "shared-components/MlModal";
 
 const ProcessListComponent = (props) => {
     let {
@@ -18,15 +19,18 @@ const ProcessListComponent = (props) => {
         handleProcessMove,
         createDuplicateProcess,
         handleEditProcess,
+        onFinishConfirmation,
+        handleAddProcessClick,
     } = props;
 
+    const [finishModal, setFinishModal] = useState(false);
     const history = useHistory();
 
     /**get active login deck data*/
     const loginReducer = useSelector((state) => state.loginReducer);
     const loginReducerData = loginReducer.toJS();
     let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-
+    let deckName = activeDeckObj.name;
     /**
      * if user is not logged in, go to landing page
      */
@@ -34,13 +38,12 @@ const ProcessListComponent = (props) => {
         return <Redirect to={`/${ROUTES.landing}`} />;
     }
 
-    const handleAddProcessClick = () => {
-        history.push(ROUTES.selectProcess);
+    const toggleFinishModal = () => {
+        setFinishModal(!finishModal);
     };
-
-    const handleFinishClick = () => {
-        //TODO: required api calls
-        history.push(ROUTES.recipeListing);
+    const onFinishConfirmationClick = () => {
+        toggleFinishModal();
+        onFinishConfirmation();
     };
 
     return (
@@ -71,8 +74,21 @@ const ProcessListComponent = (props) => {
                     leftBtnLabel="Add Process"
                     rightBtnLabel="Finish"
                     handleLeftBtn={handleAddProcessClick}
-                    handleRightBtn={handleFinishClick}
+                    handleRightBtn={toggleFinishModal}
                 />
+
+                {/**finish confirmation modal */}
+                {finishModal && (
+                    <MlModal
+                        isOpen={finishModal}
+                        textHead={deckName}
+                        textBody={`${MODAL_MESSAGE.finishProcessListConfirmation}${recipeDetails.name}`}
+                        handleSuccessBtn={onFinishConfirmationClick}
+                        handleCrossBtn={toggleFinishModal}
+                        successBtn={MODAL_BTN.yes}
+                        failureBtn={MODAL_BTN.no}
+                    />
+                )}
             </div>
         </StyledProcessListing>
     );

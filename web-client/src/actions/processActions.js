@@ -19,3 +19,10 @@ export const fetchProcessDataActions = {
     fetchProcessDataFailure: "FETCH_PROCESS_DATA_FAILURE",
     fetchProcessDataReset: "FETCH_PROCESS_DATA_RESET" 
 }
+
+export const sequenceActions = {
+    sequenceInitiated: "SEQUENCE_INITIATED",
+    sequenceSuccess: "SEQUENCE_SUCCESS",
+    sequenceFailure: "SEQUENCE_FAILURE",
+    sequenceReset: "SEQUENCE_RESET",
+}

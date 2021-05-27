@@ -101,6 +101,7 @@ export const API_ENDPOINTS = {
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
+  rearrangeProcesses: "rearrange-processes",
 };
 
 export const MODAL_MESSAGE = {
@@ -112,6 +113,7 @@ export const MODAL_MESSAGE = {
   uvSuccess: "UV Clean Up was successful",
   publishConfirmation: "Are you sure you want to Publish this recipe?",
   unpublishConfirmation: "Are you sure you want to Unpublish this recipe?",
+  finishProcessListConfirmation: "Are you sure you want to save changes to "
 };
 
 export const MODAL_BTN = {

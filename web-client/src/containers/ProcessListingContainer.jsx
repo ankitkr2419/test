@@ -11,22 +11,28 @@ import {
     setProcessList,
     fetchProcessDataInitiated,
     fetchProcessDataReset,
+    sequenceInitiated,
+    sequenceReset,
 } from "action-creators/processActionCreators";
 import { Loader } from "shared-components";
 import { toast } from "react-toastify";
-import { SELECT_PROCESS_PROPS } from "appConstants";
+import { SELECT_PROCESS_PROPS, ROUTES } from "appConstants";
 import { useHistory } from "react-router";
 
 const ProcessListingContainer = (props) => {
     //if we have draggedProcessId, means user selected this process to change its sequence (move)
     const [draggedProcessId, setDraggedProcessId] = useState(null);
 
+    //these fields tells us what to do next after sequence api success
+    const [isFinish, setIsFinish] = useState(false);
+    const [isAddProcess, setIsAddProcess] = useState(false);
+
     const dispatch = useDispatch();
     const history = useHistory();
     const processListReducer = useSelector(
         (state) => state.processListReducer
     ).toJS();
-    const { isLoading, processList } = processListReducer;
+    const { isLoading, processList, error, sequenceError } = processListReducer;
 
     /**get active login deck data*/
     const loginReducer = useSelector((state) => state.loginReducer);
@@ -48,10 +54,22 @@ const ProcessListingContainer = (props) => {
         }
     }, [recipeDetails.id]);
 
-    /**clear edit process reducer */
+    /**clear edit process reducer/ clear sequence data in reducer */
     useEffect(() => {
-        dispatch(fetchProcessDataReset())
-    }, [])
+        dispatch(fetchProcessDataReset());
+        dispatch(sequenceReset());
+    }, []);
+
+    /** after sequence api success  */
+    useEffect(() => {
+        if (sequenceError === false) {
+            if (isFinish) {
+                history.push(ROUTES.recipeListing);
+            } else if (isAddProcess) {
+                history.push(ROUTES.selectProcess);
+            }
+        }
+    }, [sequenceError]);
 
     //toggle isOpen field of process object to toggle process menu
     const toggleIsOpen = (processId) => {
@@ -141,6 +159,35 @@ const ProcessListingContainer = (props) => {
         history.push(routePath);
     };
 
+    /** before finish/addProcess redirection, sequence api should be called and this redirection is handled in useeffect*/
+    const onFinishConfirmation = () => {
+        setIsFinish(true);
+        setIsAddProcess(false);
+        callSequenceApi();
+    };
+
+    const handleAddProcessClick = () => {
+        setIsAddProcess(true);
+        setIsFinish(false);
+        callSequenceApi();
+    };
+
+    const callSequenceApi = () => {
+        const token = activeDeckObj.token;
+        //convert to required format and call api
+        const newSequenceArray = processList.map((obj) => ({
+            process_id: obj.id,
+            sequence_num: obj.sequence_num,
+        }));
+        dispatch(
+            sequenceInitiated({
+                recipeId: recipeDetails?.id,
+                processList: newSequenceArray,
+                token,
+            })
+        );
+    };
+
     return (
         <>
             {isLoading && <Loader />}
@@ -154,6 +201,8 @@ const ProcessListingContainer = (props) => {
                 handleProcessMove={handleProcessMove} //up and down
                 createDuplicateProcess={createDuplicateProcess} //copy
                 handleEditProcess={handleEditProcess} //edit
+                onFinishConfirmation={onFinishConfirmation} //finish
+                handleAddProcessClick={handleAddProcessClick} //add process
             />
         </>
     );
