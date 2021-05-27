@@ -21,6 +21,7 @@ import TipPickupContainer from "containers/TipPickupContainer";
 import AspireDispenseContainer from "containers/AspireDispenseContainer";
 import ShakingContainer from "containers/ShakingContainer";
 import HeatingContainer from "containers/HeatingContainer";
+import MagnetContainer from "containers/MagnetContainer";
 
 export const routeDefinitions = [
   {
@@ -113,12 +114,12 @@ export const routeDefinitions = [
       //   component: TipPositionContainer,
       //   key: 16,
       // },
-      // {
-      //   path: `${ROOT_URL_PATH}magnet`,
-      //   exact: true,
-      //   component: MagnetContainer,
-      //   key: 17,
-      // },
+      {
+        path: `${ROOT_URL_PATH}magnet`,
+        exact: true,
+        component: MagnetContainer,
+        key: 17,
+      },
       // {
       //   path: `${ROOT_URL_PATH}tip-discard`,
       //   exact: true,

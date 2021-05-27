@@ -27,3 +27,9 @@ export const heatingAction = {
   saveHeatingSuccess: "SAVE_HEATING_SUCCESS",
   saveHeatingFailed: "SAVE_HEATING_FAILED",
 };
+
+export const magnetAction = {
+  saveMagnetInitiated: "SAVE_MAGNET_INITIATED",
+  saveMagnetSuccess: "SAVE_MAGNET_SUCCESS",
+  saveMagnetFailed: "SAVE_MAGNET_FAILED",
+};

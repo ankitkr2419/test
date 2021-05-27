@@ -103,6 +103,7 @@ export const API_ENDPOINTS = {
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
+  magnet: "attach-detach",
 };
 
 export const MODAL_MESSAGE = {

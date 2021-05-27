@@ -1,6 +1,7 @@
 import {
   aspireDispenseAction,
   heatingAction,
+  magnetAction,
   piercingAction,
   shakingAction,
   tipPickupAction,
@@ -79,5 +80,20 @@ export const saveHeatingSuccess = (response) => ({
 
 export const saveHeatingFailure = (error) => ({
   type: heatingAction.saveHeatingFailed,
+  payload: error,
+});
+//magnet
+export const saveMagnetInitiated = (params) => ({
+  type: magnetAction.saveMagnetInitiated,
+  payload: params,
+});
+
+export const saveMagnetSuccess = (response) => ({
+  type: magnetAction.saveMagnetSuccess,
+  payload: response,
+});
+
+export const saveMagnetFailure = (error) => ({
+  type: magnetAction.saveMagnetFailed,
   payload: error,
 });
