@@ -52,7 +52,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			if err.Error() == "Record Not Found" {
 				logger.WithField("err", err.Error()).Error(responses.UserInvalidError)
-				responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.UserInvalidError.Error()})
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserInvalidError.Error()})
 				return
 			}
 			rw.WriteHeader(http.StatusInternalServerError)

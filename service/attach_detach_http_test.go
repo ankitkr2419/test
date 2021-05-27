@@ -22,6 +22,7 @@ type AttachDetachHandlerTestSuite struct {
 
 func (suite *AttachDetachHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestAttachDetachTestSuite(t *testing.T) {

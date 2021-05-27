@@ -98,7 +98,7 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 
 // Compact32 Driver for Deck A
 // TODO: Use test to Configure the Deck Operations
-func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) (*plc.Compact32Deck, *modbus.RTUClientHandler) {
+func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) (plc.Extraction, *modbus.RTUClientHandler) {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler.BaudRate = 9600
@@ -124,7 +124,7 @@ func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan 
 	return &C32, handler
 }
 
-func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) *plc.Compact32Deck {
+func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) plc.Extraction {
 	/* Modbus RTU/ASCII */
 	handler2 := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
 	handler2.BaudRate = 9600

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -14,7 +13,6 @@ func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.DiscardBoxInitialisedState)
 
-		var response string
 		var err error
 
 		// for logging error if there is any otherwise logging success
@@ -28,20 +26,17 @@ func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		switch deck {
-		case "A", "B":
-			response, err = singleDeckOperation(req.Context(), deps, deck, "DiscardBoxCleanup")
-		default:
-			err = fmt.Errorf("Check your deck name")
+
+		_, err = singleDeckOperation(req.Context(), deps, deck, "DiscardBoxCleanup")
+		if err != nil {
+			logger.Errorln(err.Error())
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DiscardBoxMoveError.Error(), Deck: deck})
+			return
 		}
 
-		if err != nil {
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
-			logger.WithField("err", err.Error()).Error(responses.WrongDeckError)
-		} else {
-			logger.Infoln(response)
-			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: response, Deck: deck})
-		}
+		logger.Infoln(responses.DiscardBoxMovedSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.DiscardBoxMovedSuccess, Deck: deck})
+		return
 	})
 }
 
@@ -49,7 +44,6 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.RestoreDeckInitialisedState)
 
-		var response string
 		var err error
 		// for logging error if there is any otherwise logging success
 		defer func() {
@@ -61,20 +55,17 @@ func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 		}()
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		switch deck {
-		case "A", "B":
-			response, err = singleDeckOperation(req.Context(), deps, deck, "RestoreDeck")
-		default:
-			err = fmt.Errorf("Check your deck name")
+
+		_, err = singleDeckOperation(req.Context(), deps, deck, "RestoreDeck")
+		if err != nil {
+			logger.Errorln(err.Error())
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RestoreDeckError.Error(), Deck: deck})
+			return
 		}
 
-		if err != nil {
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
-			logger.WithField("err", err.Error()).Error(responses.WrongDeckError)
-		} else {
-			logger.Infoln(response)
-			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: response, Deck: deck})
-		}
+		logger.Infoln(responses.RestoreDeckSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RestoreDeckSuccess, Deck: deck})
+		return
 	})
 }
 
@@ -97,16 +88,9 @@ func uvLightHandler(deps Dependencies) http.HandlerFunc {
 			}
 		}()
 
-		switch deck {
-		case "A", "B":
-			logger.Infoln(responses.UvCleanUpSuccess)
-			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UvCleanUpSuccess, Deck: deck})
-			go deps.PlcDeck[deck].UVLight(uvTime)
-		default:
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
-			logger.WithField("err", err.Error()).Error(err)
-			deps.WsErrCh <- err
-		}
-
+		go deps.PlcDeck[deck].UVLight(uvTime)
+		logger.Infoln(responses.UVCleanupProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UVCleanupProgress, Deck: deck})
+		return
 	})
 }

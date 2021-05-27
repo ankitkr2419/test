@@ -4,7 +4,7 @@ import (
 	"mylab/cpagent/plc"
 )
 
-func NewExtractionSimulator(wsMsgch chan string, wsErrch chan error, exit chan error, deck string) *plc.Compact32Deck {
+func NewExtractionSimulator(wsMsgch chan string, wsErrch chan error, exit chan error, deck string) plc.Extraction {
 	s := plc.Compact32Deck{}
 	s.WsMsgCh = wsMsgch
 
