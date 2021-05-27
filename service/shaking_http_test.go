@@ -22,6 +22,7 @@ type ShakingHandlerTestSuite struct {
 
 func (suite *ShakingHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestShakingTestSuite(t *testing.T) {
@@ -112,7 +113,6 @@ func (suite *ShakingHandlerTestSuite) TestShowShakingSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-
 func (suite *ShakingHandlerTestSuite) TestShowShakingInvalidUUID() {
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -129,7 +129,6 @@ func (suite *ShakingHandlerTestSuite) TestShowShakingInvalidUUID() {
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-
 
 func (suite *ShakingHandlerTestSuite) TestShowShakingFailure() {
 

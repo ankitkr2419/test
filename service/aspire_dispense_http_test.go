@@ -22,11 +22,14 @@ type AspireDispenseHandlerTestSuite struct {
 
 func (suite *AspireDispenseHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestAspireDispenseTestSuite(t *testing.T) {
 	suite.Run(t, new(AspireDispenseHandlerTestSuite))
 }
+
+var invalidUUID = "not-a-uuid"
 
 var testAspireDispenseRecord = db.AspireDispense{
 	ID:                   testUUID,
@@ -102,7 +105,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseFailure() {
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseSuccess() {
-
 	suite.dbMock.On("ShowAspireDispense", mock.Anything, testProcessUUID).Return(testAspireDispenseRecord, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -121,7 +123,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseSuccess() {
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseFailure() {
-
 	suite.dbMock.On("ShowAspireDispense", mock.Anything, testProcessUUID).Return(db.AspireDispense{}, responses.AspireDispenseFetchError)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -138,7 +139,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseFailure() {
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-
 
 func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseInvalidUUID() {
 
@@ -158,7 +158,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseInvalidUUID()
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
-
 	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
@@ -179,7 +178,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
-
 	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(responses.AspireDispenseUpdateError)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
@@ -199,7 +197,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseInvalidUUID() {
 

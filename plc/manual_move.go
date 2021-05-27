@@ -232,7 +232,3 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 	return "RESUMED with pulses.", nil
 }
 
-func (d *Compact32Deck) Reset() (ack bool) {
-	aborted.Store(d.name, false)
-	return true
-}

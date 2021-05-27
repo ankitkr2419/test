@@ -6,6 +6,7 @@ import (
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
+	"mylab/cpagent/responses"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -22,6 +23,8 @@ type RecipeHandlerTestSuite struct {
 
 func (suite *RecipeHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestRecipeTestSuite(t *testing.T) {
@@ -170,8 +173,10 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
 		updateRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
 
+	output, _ := json.Marshal(MsgObj{Msg: responses.RecipeUpdateSuccess})
+
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"recipe updated successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

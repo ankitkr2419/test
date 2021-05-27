@@ -70,6 +70,8 @@ var (
 	ProcessTypeInvalid      = fmt.Errorf("error process type is wrong")
 	ProcessesRearrangeError = fmt.Errorf("error rearranging processes")
 	ProcessesDecodeSeqError = fmt.Errorf("error while decoding process sequence data")
+	ProcessDeleteError      = fmt.Errorf("error deleting process record")
+	ProcessUpdateError      = fmt.Errorf("error updating process record")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 
@@ -130,7 +132,10 @@ var (
 	WrongDeckError = fmt.Errorf("error invalid deck name")
 
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
-	DiscardBoolOptionError        = fmt.Errorf("Invalid boolean value for tip discard option")
+
+	DiscardBoxMoveError    = fmt.Errorf("error discard box moving was unsuccessful")
+	RestoreDeckError       = fmt.Errorf("error restore deck was unsuccessful")
+	DiscardBoolOptionError = fmt.Errorf("Invalid boolean value for tip discard option")
 )
 
 // Special errors which are in []byte format
