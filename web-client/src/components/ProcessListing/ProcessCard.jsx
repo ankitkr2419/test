@@ -16,6 +16,7 @@ const ProcessCard = (props) => {
         handleProcessMove,
         createDuplicateProcess,
         handleEditProcess,
+        handleDeleteProcess,
     } = props;
 
     const handleProcessMoveClick = () => {
@@ -108,6 +109,7 @@ const ProcessCard = (props) => {
                                         size={24}
                                         name="minus-1"
                                         className="border-gray text-primary ml-2"
+                                        onClick={handleDeleteProcess}
                                     />
                                 </div>
                             </div>

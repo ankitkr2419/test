@@ -26,3 +26,9 @@ export const sequenceActions = {
     sequenceFailure: "SEQUENCE_FAILURE",
     sequenceReset: "SEQUENCE_RESET",
 }
+
+export const deleteProcessActions = {
+    deleteProcessInitiated: "DELETE_PROCESS_INITIATED",
+    deleteProcessSuccess: "DELETE_PROCESS_SUCCESS",
+    deleteProcessFailure: "DELETE_PROCESS_FAILURE",
+}

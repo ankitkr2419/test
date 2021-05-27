@@ -13,6 +13,7 @@ import {
     fetchProcessDataReset,
     sequenceInitiated,
     sequenceReset,
+    deleteProcessInitiated,
 } from "action-creators/processActionCreators";
 import { Loader } from "shared-components";
 import { toast } from "react-toastify";
@@ -188,6 +189,11 @@ const ProcessListingContainer = (props) => {
         );
     };
 
+    const handleDeleteProcess = (processId) => {
+        const token = activeDeckObj.token;
+        dispatch(deleteProcessInitiated({ processId, token }));
+    };
+
     return (
         <>
             {isLoading && <Loader />}
@@ -203,6 +209,7 @@ const ProcessListingContainer = (props) => {
                 handleEditProcess={handleEditProcess} //edit
                 onFinishConfirmation={onFinishConfirmation} //finish
                 handleAddProcessClick={handleAddProcessClick} //add process
+                handleDeleteProcess={handleDeleteProcess} //delete process
             />
         </>
     );

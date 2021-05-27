@@ -10,11 +10,13 @@ import {
     duplicateProcessActions,
     fetchProcessDataActions,
     sequenceActions,
+    deleteProcessActions,
 } from "actions/processActions";
 import {
     duplicateProcessFail,
     fetchProcessDataFail,
     sequenceFail,
+    deleteProcessFail,
 } from "action-creators/processActionCreators";
 export function* fetchProcessList(actions) {
     const {
@@ -126,6 +128,31 @@ export function* changeSequence(actions) {
     }
 }
 
+export function* deleteProcess(actions) {
+    const {
+        payload: { processId, token },
+    } = actions;
+    const { deleteProcessSuccess, deleteProcessFailure } = deleteProcessActions;
+
+    try {
+        yield call(callApi, {
+            payload: {
+                method: HTTP_METHODS.DELETE,
+                body: null,
+                reqPath: `${API_ENDPOINTS.processes}/${processId}`,
+                successAction: deleteProcessSuccess,
+                failureAction: deleteProcessFailure,
+                showPopupSuccessMessage: true,
+                showPopupFailureMessage: true,
+                token,
+            },
+        });
+    } catch (error) {
+        console.error("Error in delete process", error);
+        yield put(deleteProcessFail({ error }));
+    }
+}
+
 export function* processSaga() {
     yield takeEvery(processListActions.processListInitiated, fetchProcessList);
     yield takeEvery(
@@ -137,4 +164,5 @@ export function* processSaga() {
         fetchProcessData
     );
     yield takeEvery(sequenceActions.sequenceInitiated, changeSequence);
+    yield takeEvery(deleteProcessActions.deleteProcessInitiated, deleteProcess);
 }

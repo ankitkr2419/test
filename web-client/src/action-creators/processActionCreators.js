@@ -3,6 +3,7 @@ import {
     duplicateProcessActions,
     fetchProcessDataActions,
     sequenceActions,
+    deleteProcessActions,
 } from "actions/processActions";
 
 export const processListInitiated = (params) => ({
@@ -75,3 +76,19 @@ export const sequenceReset = () => ({
     type: sequenceActions.sequenceReset,
     payload: {},
 });
+
+export const deleteProcessInitiated = (params) => ({
+    type: deleteProcessActions.deleteProcessInitiated,
+    payload: {
+        ...params,
+    },
+});
+
+export const deleteProcessFail = (params) => ({
+    type: deleteProcessActions.deleteProcessFailure,
+    payload: {
+        ...params,
+    },
+});
+
+

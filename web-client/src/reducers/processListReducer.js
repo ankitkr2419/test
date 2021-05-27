@@ -3,13 +3,18 @@ import {
     processListActions,
     duplicateProcessActions,
     sequenceActions,
+    deleteProcessActions,
 } from "actions/processActions";
-import { resetIsOpenInProcessList } from "components/ProcessListing/helper";
+import {
+    resetIsOpenInProcessList,
+    handleDeleteProcess,
+} from "components/ProcessListing/helper";
 const processListInitialState = fromJS({
     isLoading: false,
     error: null,
     sequenceError: null,
     processList: [],
+    tempProcessId: "",
 });
 
 export const processListReducer = (state = processListInitialState, action) => {
@@ -98,6 +103,27 @@ export const processListReducer = (state = processListInitialState, action) => {
         case sequenceActions.sequenceReset:
             return state.merge({
                 sequenceError: null,
+            });
+        case deleteProcessActions.deleteProcessInitiated:
+            return state.merge({
+                isLoading: true,
+                tempProcessId: action.payload.processId,
+            });
+        case deleteProcessActions.deleteProcessSuccess:
+            const { tempProcessId, processList } = state.toJS();
+            const newProcessListDelete = handleDeleteProcess(
+                processList,
+                tempProcessId
+            );
+
+            return state.merge({
+                isLoading: false,
+                processList: newProcessListDelete,
+            });
+        case deleteProcessActions.deleteProcessFailure:
+            return state.merge({
+                isLoading: false,
+                error: true,
             });
         default:
             return state;
