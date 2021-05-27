@@ -12,7 +12,7 @@ const Well = (props) => {
     isSelected,
     taskInitials,
     onClickHandler,
-    isDisabled,
+    // isDisabled,
   } = props;
   const wellClassnames = classNames(className, {
     running: isRunning,
