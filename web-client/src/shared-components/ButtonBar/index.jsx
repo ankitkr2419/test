@@ -4,7 +4,6 @@ import { Icon } from "shared-components";
 import { Button } from "core-components";
 import { ButtonBarBox, PrevBtn } from "./Styles";
 import { useHistory } from "react-router";
-import { ROUTES } from "appConstants";
 
 const ButtonBar = (props) => {
   const { leftBtnLabel, rightBtnLabel, handleLeftBtn, handleRightBtn } = props;
