@@ -58,3 +58,24 @@ func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeSuccess() {
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
+
+func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeDeckBFailure() {
+	// Deck A will return false
+	suite.plcDeck[deckA].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
+	// Deck B will return true
+	suite.plcDeck[deckB].(*plc.PLCMockStore).On("IsRunInProgress").Return(true).Once()
+	
+	recorder := makeHTTPCall(http.MethodGet,
+		"/safe-to-upgrade",
+		"/safe-to-upgrade",
+		"",
+		safeToUpgradeHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+	)
+
+	output, _ := json.Marshal(ErrObj{Err: responses.RunInProgressForSomeDeckError.Error()})
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
