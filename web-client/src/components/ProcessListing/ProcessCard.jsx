@@ -124,7 +124,12 @@ const ProcessCard = (props) => {
                             name={processIconName}
                             className="border-gray text-primary"
                         />
-                        <Text Tag="label" className="mb-0">
+                        <Text
+                            Tag="label"
+                            className={`mb-0 ${
+                                isOpen ? "font-weight-bold" : ""
+                            }`}
+                        >
                             {processName}
                         </Text>
                     </div>

@@ -7,6 +7,7 @@ import TopContentComponent from "components/RecipeListing/TopContentComponent";
 import ProcessListingCards from "./ProcessListingCards";
 import { ButtonBar } from "shared-components";
 import MlModal from "shared-components/MlModal";
+import { useHistory } from "react-router";
 
 const ProcessListComponent = (props) => {
     let {
@@ -27,6 +28,8 @@ const ProcessListComponent = (props) => {
     const [finishModal, setFinishModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleteProcessId, setDeleteProcessId] = useState(null);
+
+    const history = useHistory();
 
     /**get active login deck data*/
     const loginReducer = useSelector((state) => state.loginReducer);
@@ -62,6 +65,10 @@ const ProcessListComponent = (props) => {
         handleDeleteProcess(deleteProcessId);
     };
 
+    const handleBackToRecipeList = () => {
+        history.push(ROUTES.recipeListing);
+    }
+
     return (
         <StyledProcessListing>
             <div className="landing-content px-2">
@@ -71,6 +78,7 @@ const ProcessListComponent = (props) => {
                     recipeName={recipeDetails.name}
                     createdAt={recipeDetails.created_at}
                     updatedAt={recipeDetails.updated_at}
+                    processListBackButtonHandler={handleBackToRecipeList}
                 />
 
                 {/** ProcessListingCards: pagination/ process list */}
