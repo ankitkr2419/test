@@ -165,9 +165,9 @@ const RecipeListingComponent = (props) => {
     }
   };
 
-  const fileteredRecipeData = recipeData.filter((recipeObj) =>
+  const fileteredRecipeData = recipeData ? recipeData.filter((recipeObj) =>
     recipeObj.name.toLowerCase().includes(searchRecipeText.toLowerCase())
-  );
+  ): []
 
   const handleEditRecipe = (recipe) => {
     let recipeId = recipe?.id;
