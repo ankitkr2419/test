@@ -10,4 +10,5 @@ var (
 	DBAllSetupError     = fmt.Errorf("error loading DB Setups failed")
 	PLCAllLoadError     = fmt.Errorf("error loading PLC Functions failed")
 	ServiceAllLoadError = fmt.Errorf("error loading Service Functions failed")
+	WriteToFileError    = fmt.Errorf("failed to write output to log file")
 )
