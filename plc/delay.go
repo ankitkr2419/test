@@ -42,6 +42,10 @@ func (d *Compact32Deck) AddDelay(delay db.Delay, recipeRun bool) (response strin
 	// set the timer in progress variable to specify that it is not a motor operation.
 	d.setTimerInProgress()
 	defer d.resetTimerInProgress()
+	if recipeRun {
+		// Calling in defer cause this will need to get executed despite failure
+		defer d.resetRunRecipeData()
+	}
 
 skipToStartTimer:
 	// start the timer
@@ -127,13 +131,17 @@ func (d *Compact32Deck) RunRecipeWebsocketData(recipe db.Recipe, processes []db.
 		return responses.ProcessesAbsentError
 	}
 
-	d.SetCurrentProcess(0)
-	// TODO: Call Delay
+	d.SetCurrentProcessNumber(0)
 	go d.AddDelay(db.Delay{DelayTime: recipe.TotalTime}, true)
 	return
 }
 
-// func(d *Compact32Deck) sendWSData(recipeID uuid.UUID, processLength, currentStep int, processName string, processType db.ProcessType) {
+func (d *Compact32Deck) resetRunRecipeData() {
+	deckRecipe[d.name] = db.Recipe{}
+	deckProcesses[d.name] = []db.Process{}
+	d.SetCurrentProcessNumber(0)
+}
+
 func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTime int64, ops WebsocketOperation) (err error) {
 	var wsProgressOp WSData
 	var wsData []byte
@@ -193,9 +201,9 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 	return
 }
 
-func convertToHMS(secs int64) (*TimeHMS){
-	var t TimeHMS 
-	t.Hours = uint8(secs/(60 * 60))
+func convertToHMS(secs int64) *TimeHMS {
+	var t TimeHMS
+	t.Hours = uint8(secs / (60 * 60))
 	t.Minutes = uint8(secs/60 - int64(t.Hours)*60)
 	t.Seconds = uint8(secs % 60)
 	logger.Infoln("Converted time: ", t)
