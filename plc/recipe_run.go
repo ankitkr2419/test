@@ -8,9 +8,11 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func (d *Compact32Deck) CheckIfRecipeOrProcessSafeForCRUDs(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
+func CheckIfRecipeOrProcessSafeForUDs(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
 	if recipeID != nil {
-		if *recipeID == deckRecipe[d.name].ID {
+		// for deck A or deck B
+		if (deckRecipe[deckA] != db.Recipe{} && *recipeID == deckRecipe[deckA].ID) ||
+			(deckRecipe[deckB] != db.Recipe{} && *recipeID == deckRecipe[deckB].ID) {
 			logger.Errorln(responses.RecipeUnsafeForCRUDError)
 			return responses.RecipeUnsafeForCRUDError
 		}
@@ -18,12 +20,35 @@ func (d *Compact32Deck) CheckIfRecipeOrProcessSafeForCRUDs(recipeID *uuid.UUID, 
 	}
 
 	if processID != nil {
-		for _, process := range deckProcesses[d.name] {
-			if *processID == process.ID {
-				logger.Errorln(responses.ProcessUnsafeForCRUDError)
-				return responses.ProcessUnsafeForCRUDError
-			}
+
+		deckAcurrentProcess := getCurrentProcessNumber(deckA)
+		deckBcurrentProcess := getCurrentProcessNumber(deckB)
+
+		switch {
+		// no process running on both deck
+		case deckAcurrentProcess == -1 && deckBcurrentProcess == -1:
+			return
+
+		// process running on deck B only
+		case deckAcurrentProcess == -1 && len(deckProcesses[deckB]) != 0 && *processID == deckProcesses[deckB][deckBcurrentProcess].ID:
+			logger.Errorln(responses.ProcessUnsafeForCRUDError)
+			return responses.ProcessUnsafeForCRUDError
+
+		// process running on deck A only
+		case deckAcurrentProcess == -1 && len(deckProcesses[deckA]) != 0 && *processID == deckProcesses[deckA][deckAcurrentProcess].ID:
+			logger.Errorln(responses.ProcessUnsafeForCRUDError)
+			return responses.ProcessUnsafeForCRUDError
+
+			// process running on both decks
+		case (len(deckProcesses[deckA]) != 0 && *processID == deckProcesses[deckA][deckAcurrentProcess].ID) ||
+			(len(deckProcesses[deckB]) != 0 && *processID == deckProcesses[deckB][deckBcurrentProcess].ID):
+			logger.Errorln(responses.ProcessUnsafeForCRUDError)
+			return responses.ProcessUnsafeForCRUDError
+
+		default:
+			return responses.InvalidPLCRunRecipeData
 		}
+
 		logger.Infoln(responses.ProcessSafeForCRUD)
 	}
 
@@ -46,6 +71,6 @@ func (d *Compact32Deck) RunRecipeWebsocketData(recipe db.Recipe, processes []db.
 func (d *Compact32Deck) resetRunRecipeData() {
 	deckRecipe[d.name] = db.Recipe{}
 	deckProcesses[d.name] = []db.Process{}
-	d.SetCurrentProcessNumber(0)
+	d.SetCurrentProcessNumber(-1)
 	logger.Infoln(responses.ResetRunRecipeDataSuccess)
 }

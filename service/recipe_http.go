@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -147,6 +148,8 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		plc.CheckIfRecipeOrProcessSafeForUDs(&id, nil)
+
 		err = deps.Store.DeleteRecipe(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.RecipeDeleteError)
@@ -159,6 +162,8 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+// NOTE: no need to call CheckIfRecipeOrProcessSafeForCRUDs
+//  as before run itself complete recipe data is stored
 func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
