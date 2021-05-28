@@ -9,22 +9,20 @@ import {
   shakingAction,
   tipDiscardAction,
   tipPickupAction,
+  processAction,
 } from "actions/processesActions";
 import {} from "action-creators/processesActionCreators";
 import { API_ENDPOINTS, HTTP_METHODS } from "../appConstants";
 
 //piercing
 export function* piercing(actions) {
-  const { type, cartridgeWells, recipeID, token } = actions.payload;
+  const { body, recipeID, token } = actions.payload;
 
   const { savePiercingSuccess, savePiercingFailed } = piercingAction;
   try {
     yield call(callApi, {
       payload: {
-        body: {
-          type: `cartridge_${type + 1}`,
-          cartridge_wells: cartridgeWells,
-        },
+        body: body,
         reqPath: `${API_ENDPOINTS.piercing}/${recipeID}`,
         method: HTTP_METHODS.POST,
         successAction: savePiercingSuccess,
@@ -168,15 +166,18 @@ export function* magnet(actions) {
 export function* delay(actions) {
   const { body, recipeID, token } = actions.payload;
 
-  const { saveDelaySuccess, saveDelayFailed } = delayAction;
+  // const { saveDelaySuccess, saveDelayFailed } = delayAction;
+  const { saveProcessSuccess, saveProcessFailed } = processAction;
   try {
     yield call(callApi, {
       payload: {
         body: body,
         reqPath: `${API_ENDPOINTS.delay}/${recipeID}`,
         method: HTTP_METHODS.POST,
-        successAction: saveDelaySuccess,
-        failureAction: saveDelayFailed,
+        // successAction: saveDelaySuccess,
+        // failureAction: saveDelayFailed,
+        successAction: saveProcessSuccess,
+        failureAction: saveProcessFailed,
         showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token: token,
@@ -184,7 +185,8 @@ export function* delay(actions) {
     });
   } catch (error) {
     console.log("error while login: ", error);
-    saveDelayFailed(error);
+    // saveDelayFailed(error);
+    saveProcessFailed(error);
   }
 }
 
@@ -212,13 +214,41 @@ export function* shaking(actions) {
   }
 }
 
+export function* saveProcess(actions) {
+  const { body, id, token, api, method } = actions.payload;
+
+  const { saveProcessSuccess, saveProcessFailed } = processAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${api}/${id}`,
+        method: method ? method : HTTP_METHODS.POST,
+        successAction: saveProcessSuccess,
+        failureAction: saveProcessFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveProcessFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
-  yield takeEvery(aspireDispenseAction.saveAspireDispenseInitiated, aspireDispense);
+  yield takeEvery(
+    aspireDispenseAction.saveAspireDispenseInitiated,
+    aspireDispense
+  );
   yield takeEvery(shakingAction.saveShakingInitiated, shaking);
   yield takeEvery(heatingAction.saveHeatingInitiated, heating);
   yield takeEvery(magnetAction.saveMagnetInitiated, magnet);
   yield takeEvery(delayAction.saveDelayInitiated, delay);
   yield takeEvery(tipDiscardAction.saveTipDiscardInitiated, tipDiscard);
+
+  yield takeEvery(processAction.saveProcessInitiated, saveProcess);
 }

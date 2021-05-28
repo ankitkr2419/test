@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   Card,
@@ -13,27 +13,47 @@ import { ButtonIcon, ButtonBar, ImageIcon } from "shared-components";
 import delayProcessGraphics from "assets/images/delay-process-graphics.svg";
 import TopHeading from "shared-components/TopHeading";
 import { DelayBox, PageBody, TopContent } from "./Style";
-import { Redirect } from "react-router";
+import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { ROUTES } from "appConstants";
-import { saveDelayInitiated } from "action-creators/processesActionCreators";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
+import { saveProcessInitiated } from "action-creators/processesActionCreators";
 
 const DelayComponent = (props) => {
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  const editReducer = useSelector((state) => state.editProcessReducer);
+  const editReducerData = editReducer.toJS();
 
+  let hours = 0;
+  let mins = 0;
+  if (editReducerData?.delay_time) {
+    const delay = editReducerData.delay_time;
+    hours = Math.floor(delay / 3600);
+    mins = Math.floor((delay % 3600) / 60);
+  }
+
+  const processesReducer = useSelector((state) => state.processesReducer);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const formik = useFormik({
-    initialValues: { hours: 0, mins: 0 },
+    initialValues: { hours: hours, mins: mins },
+    enableReinitialize: true,
   });
+
+  const errorInAPICall = processesReducer.error;
+  useEffect(() => {
+    if (errorInAPICall === false) history.push(ROUTES.processListing);
+  }, [errorInAPICall]);
 
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
   const recipeID = recipeDetailsReducer.recipeDetails.id;
-  const token = recipeDetailsReducer.token;
+  const token = activeDeckObj.token;
 
   const saveBtnHandler = () => {
     const hours = parseInt(formik.values.hours);
@@ -42,16 +62,18 @@ const DelayComponent = (props) => {
 
     const requestBody = {
       body: { delay_time: time },
-      recipeID: recipeID,
+      id: editReducerData?.process_id ? editReducerData.process_id : recipeID,
       token: token,
+      api: API_ENDPOINTS.delay,
+      method: editReducerData?.process_id
+        ? HTTP_METHODS.PUT
+        : HTTP_METHODS.POST,
     };
-    dispatch(saveDelayInitiated(requestBody));
+    dispatch(saveProcessInitiated(requestBody));
   };
 
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   if (!activeDeckObj.isLoggedIn) {
-    return <Redirect to={`/${ROUTES.landing}`} />;
+    // return <Redirect to={`/${ROUTES.landing}`} />;
   }
 
   return (
@@ -84,6 +106,7 @@ const DelayComponent = (props) => {
                         name="hours"
                         id="hours"
                         placeholder="Type here"
+                        value={formik.values.hours}
                         onChange={(e) =>
                           formik.setFieldValue("hours", e.target.value)
                         }
@@ -103,6 +126,7 @@ const DelayComponent = (props) => {
                         name="minutes"
                         id="minutes"
                         placeholder="Type here"
+                        value={formik.values.mins}
                         onChange={(e) =>
                           formik.setFieldValue("mins", e.target.value)
                         }
@@ -132,6 +156,4 @@ const DelayComponent = (props) => {
   );
 };
 
-DelayComponent.propTypes = {};
-
-export default DelayComponent;
+export default React.memo(DelayComponent);

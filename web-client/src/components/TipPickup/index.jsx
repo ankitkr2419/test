@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -15,19 +15,26 @@ import { ButtonIcon, ButtonBar, ImageIcon } from "shared-components";
 import tipPickupProcessGraphics from "assets/images/tip-pickup-process-graphics.svg";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TipPickupBox, TopContent } from "./Style";
-import { saveTipPickupInitiated } from "action-creators/processesActionCreators";
-import { Redirect } from "react-router";
-import { ROUTES } from "appConstants";
+import { saveProcessInitiated } from "action-creators/processesActionCreators";
+import { Redirect, useHistory } from "react-router";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 
 const TipPickupComponent = (props) => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
+  const editReducer = useSelector((state) => state.editProcessReducer);
+  const editReducerData = editReducer.toJS();
+  const processesReducer = useSelector((state) => state.processesReducer);
   const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
   const recipeID = recipeDetailsReducer.recipeDetails.id;
-  const token = recipeDetailsReducer.token;
+  const token = activeDeckObj.token;
 
   const taskOptions = [
     { value: "1", label: "1" },
@@ -38,24 +45,36 @@ const TipPickupComponent = (props) => {
   ];
 
   const formik = useFormik({
-    initialValues: { tipPosition: null },
+    initialValues: {
+      tipPosition: editReducerData?.position ? editReducerData.position : null,
+    },
+    enableReinitialize: true,
   });
+
+  const errorInAPICall = processesReducer.error;
+  useEffect(() => {
+    if (errorInAPICall === false) {
+      history.push(ROUTES.processListing);
+    }
+  }, [errorInAPICall]);
 
   const handleRightBtn = () => {
     const tipPosition = formik.values.tipPosition;
-    dispatch(
-      saveTipPickupInitiated({
-        recipeID: recipeID,
-        position: tipPosition,
-        token: token,
-      })
-    );
+    const requestBody = {
+      body: { position: parseInt(tipPosition), type: "pickup" },
+      id: editReducerData?.process_id ? editReducerData.process_id : recipeID,
+      token: token,
+      api: API_ENDPOINTS.tipOperation,
+      method: editReducerData?.process_id
+        ? HTTP_METHODS.PUT
+        : HTTP_METHODS.POST,
+    };
+    dispatch(saveProcessInitiated(requestBody));
   };
 
-  const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   return (
     <>
@@ -87,6 +106,7 @@ const TipPickupComponent = (props) => {
                         className=""
                         size="sm"
                         options={taskOptions}
+                        value={taskOptions[formik.values.tipPosition - 1]}
                         onChange={(e) =>
                           formik.setFieldValue("tipPosition", e.value)
                         }

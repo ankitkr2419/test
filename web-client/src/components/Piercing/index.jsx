@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar, TopHeading } from "shared-components";
@@ -9,51 +9,66 @@ import { PageBody, PiercingBox, TopContent } from "./Style";
 import { WellComponent } from "./WellComponent";
 import HeightModal from "components/modals/HeightModal";
 import { useDispatch, useSelector } from "react-redux";
-import { savePiercingInitiated } from "action-creators/processesActionCreators";
-import { ROUTES } from "appConstants";
-import { Redirect } from "react-router";
-import { getWellsInitialArray } from "./functions";
+import { saveProcessInitiated } from "action-creators/processesActionCreators";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
+import { Redirect, useHistory } from "react-router";
+import { getWellsInitialArray, updatedWellsArray } from "./functions";
 
-const extractionWells = getWellsInitialArray(8, 0);
-const pcrWells = getWellsInitialArray(4, 1);
+let extractionWells = getWellsInitialArray(8, 0);
+let pcrWells = getWellsInitialArray(4, 1);
 
 const PiercingComponent = (props) => {
+  const dispatch = useDispatch();
+  const history = useHistory();
   const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
 
   const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
-  const recipeID = recipeDetailsReducer.recipeDetails.id;
-  const token = recipeDetailsReducer.token;
+  const processesReducer = useSelector((state) => state.processesReducer);
+  const editReducer = useSelector((state) => state.editProcessReducer);
+  const editReducerData = editReducer.toJS();
 
-  const dispatch = useDispatch();
+  if (editReducerData?.cartridge_wells) {
+    extractionWells = updatedWellsArray(extractionWells, editReducerData);
+    pcrWells = updatedWellsArray(pcrWells, editReducerData);
+  }
+
+  const recipeID = recipeDetailsReducer.recipeDetails.id;
+  const token = activeDeckObj.token;
+
+  const errorInAPICall = processesReducer.error;
+  useEffect(() => {
+    if (errorInAPICall === false) {
+      history.push(ROUTES.processListing);
+    }
+  }, [errorInAPICall]);
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
 
+  //modal 'okay' btn
   const handleSuccessBtn = (height, type) => {
     setShowHieghtModal(!showHeightModal);
-    // here type : extractionWellsArray and 1 for pcrObjArray
     const wellsObjArray = type === 0 ? extractionWells : pcrWells;
     wellsObjArray.map((obj) => {
-      // obj.isDisabled = !(obj.id === currentWellObj.id);
       if (!obj.isSelected) {
         obj.isSelected = obj.id === currentWellObj.id;
-        obj.footerText =
-          obj.id === currentWellObj.id ? `Height: ${height}mm` : "";
+        // obj.footerText = obj.id === currentWellObj.id ? `Height: ${height}mm` : ""; //may be used in future
       }
       return obj;
     });
   };
 
   const wellClickHandler = (id, type) => {
-    setShowHieghtModal(!showHeightModal);
-    // here type = 0 for extractionWellsArray, and type = 1 for pcrObjArray
-    const wellsObjArray = type === 0 ? extractionWells : pcrWells;
+    setShowHieghtModal(!showHeightModal);    const wellsObjArray = type === 0 ? extractionWells : pcrWells;
     const currentWellObj = wellsObjArray.find((wellObj) => {
       if (wellObj.id === id) {
         return wellObj;
@@ -69,19 +84,25 @@ const PiercingComponent = (props) => {
       .filter((obj) => obj.isSelected)
       .map((obj) => obj.id);
 
-    const requestBody = {
-      type: type,
-      cartridgeWells: cartridgeWells,
-      recipeID: recipeID,
-      token: token,
+    const body = {
+      type: `cartridge_${type + 1}`,
+      cartridge_wells: cartridgeWells,
     };
-    dispatch(savePiercingInitiated(requestBody));
+    const requestBody = {
+      body: body,
+      id: editReducerData?.process_id ? editReducerData.process_id : recipeID,
+      api: API_ENDPOINTS.piercing,
+      token: token,
+      method: editReducerData?.process_id
+        ? HTTP_METHODS.PUT
+        : HTTP_METHODS.POST,
+    };
+    dispatch(saveProcessInitiated(requestBody));
   };
 
-  const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   return (
     <>

@@ -99,13 +99,10 @@ export const API_ENDPOINTS = {
   recipe: "recipe",
   tipDiscard: "tip-operation",
   duplicateProcess: "duplicate-process",
-  heating: "heating",
-  shaking: "shaking",
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
   magnet: "attach-detach",
-  delay: "delay",
 };
 
 export const MODAL_MESSAGE = {
@@ -312,7 +309,7 @@ export const SELECT_PROCESS_PROPS = [
     processType: "TipDocking",
     processName: "Tip Position",
     route: ROUTES.tipPosition,
-    apiEndpoint: API_ENDPOINTS.tipDocking
+    apiEndpoint: API_ENDPOINTS.tipDocking,
   },
 ];
 

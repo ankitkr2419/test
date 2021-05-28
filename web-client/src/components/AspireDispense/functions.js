@@ -1,3 +1,36 @@
+export const getRequestBody = (activeTab, aspire, dispense) => {
+  const aspireSelectedTabName = getCategoryName(aspire.selectedCategory);
+  const dispenseSelectedTabName = getCategoryName(activeTab);
+
+  /** Aspire category is maintained using formik.
+   *  Dispense category is directly maintained using 'activeTab' state.
+   */
+
+  const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
+  const dispenseWells = dispense[`cartridge${activeTab}Wells`];
+
+  return {
+    category: `${aspireSelectedTabName}_to_${dispenseSelectedTabName}`,
+    cartridge_type: `cartridge_${activeTab}`,
+    source_position: getPosition(aspireWells),
+    aspire_height: parseFloat(aspire.aspireHeight ? aspire.aspireHeight : 0),
+    aspire_mixing_volume: parseFloat(
+      aspire.mixingVolume ? aspire.mixingVolume : 0
+    ),
+    aspire_no_of_cycles: parseFloat(aspire.nCycles ? aspire.nCycles : 0),
+    aspire_volume: parseFloat(aspire.aspireVolume ? aspire.aspireVolume : 0),
+    aspire_air_volume: parseFloat(aspire.airVolume ? aspire.airVolume : 0),
+    dispense_height: parseFloat(
+      dispense.dispenseHeight ? dispense.dispenseHeight : 0
+    ),
+    dispense_mixing_volume: parseFloat(
+      dispense.mixingVolume ? dispense.mixingVolume : 0
+    ),
+    dispense_no_of_cycles: parseFloat(dispense.nCycles ? dispense.nCycles : 0),
+    destination_position: getPosition(dispenseWells),
+  };
+};
+
 export const getCategoryLabel = (tabID) => {
   switch (tabID) {
     case "1":
@@ -34,41 +67,69 @@ export const getPosition = (wells) => {
 };
 
 // footerText can be: "aspire-from" or "selected"
-export const getArray = (length, type) => {
+export const getArray = (length, type, selectedPosition = null) => {
   const array = [];
+
   for (let i = 0; i < length; i++) {
+    let isSelected = false;
+    if (selectedPosition && i + 1 === selectedPosition) {
+      isSelected = true;
+    }
     array.push({
       id: i + 1,
       type: type,
       label: `${i + 1}`,
       footerText: "",
-      isSelected: false,
+      isSelected: isSelected,
       isDisabled: false,
     });
   }
   return array;
 };
 
-export const getFormikInitialState = () => {
+export const getFormikInitialState = (editReducer = null) => {
+  let type;
+  if (editReducer?.process_id) {
+    type = editReducer.cartridge_type;
+  }
+
   return {
     aspire: {
-      cartridge1Wells: getArray(8, 0),
-      cartridge2Wells: getArray(8, 0),
-      deckPosition: null,
-      aspireHeight: null,
-      mixingVolume: null,
-      aspireVolume: null,
-      airVolume: null,
-      nCycles: null,
+      cartridge1Wells:
+        type === "cartridge_1"
+          ? getArray(8, 0, editReducer.source_position)
+          : getArray(8, 0),
+      cartridge2Wells:
+        type === "cartridge_2"
+          ? getArray(8, 0, editReducer.source_position)
+          : getArray(8, 0),
+      deckPosition: "",
+      aspireHeight: editReducer?.aspire_height ? editReducer.aspire_height : "",
+      mixingVolume: editReducer?.aspire_mixing_volume
+        ? editReducer.aspire_mixing_volume
+        : "",
+      aspireVolume: editReducer?.aspire_volume ? editReducer.aspire_volume : "",
+      airVolume: editReducer?.aspire_air_volume
+        ? editReducer.aspire_air_volume
+        : "",
+      nCycles: editReducer?.aspire_no_of_cycles
+        ? editReducer.aspire_no_of_cycles
+        : "",
       selectedCategory: "",
     },
     dispense: {
-      cartridge1Wells: getArray(8, 0),
-      cartridge2Wells: getArray(8, 0),
-      deckPosition: null,
-      dispenseHeight: null,
-      mixingVolume: null,
-      nCycles: null,
+      cartridge1Wells: getArray(8, 0, editReducer.destination_position),
+      cartridge2Wells: getArray(8, 0, editReducer.destination_position),
+      deckPosition: "",
+      dispenseHeight: editReducer?.dispense_height
+        ? editReducer.dispense_height
+        : "",
+      mixingVolume: editReducer?.dispense_mixing_volume
+        ? editReducer.dispense_mixing_volume
+        : "",
+      nCycles: editReducer?.dispense_no_of_cycles
+        ? editReducer.dispense_no_of_cycles
+        : "",
     },
   };
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Card, CardBody, Radio } from "core-components";
 import { ButtonIcon, ButtonBar, ImageIcon, Text } from "shared-components";
@@ -10,20 +10,33 @@ import longDownArrow from "assets/images/long-down-arrow.svg";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TipDiscardBox, TopContent } from "./Style";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router";
-import { ROUTES } from "appConstants";
-import { saveTipDiscardInitiated } from "action-creators/processesActionCreators";
+import { useHistory } from "react-router";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
+import { saveProcessInitiated } from "action-creators/processesActionCreators";
 
 const TipDiscardComponent = (props) => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
+  const editReducer = useSelector((state) => state.editProcessReducer);
+  const editReducerData = editReducer.toJS();
+  const processesReducer = useSelector((state) => state.processesReducer);
   const loginReducer = useSelector((state) => state.loginReducer);
-
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
   const recipeID = recipeDetailsReducer.recipeDetails.id;
-  const token = recipeDetailsReducer.token;
+  const token = activeDeckObj.token;
+
+  const errorInAPICall = processesReducer.error;
+  useEffect(() => {
+    if (errorInAPICall === false) {
+      history.push(ROUTES.processListing);
+    }
+  }, [errorInAPICall]);
 
   //this API call is not completed from backend.
   //It will be added in future.
@@ -35,19 +48,19 @@ const TipDiscardComponent = (props) => {
     };
     const requestBody = {
       body: body,
-      recipeID: recipeID,
+      id: editReducerData?.process_id ? editReducerData.process_id : recipeID,
       token: token,
+      api: API_ENDPOINTS.tipDiscard,
+      method: editReducerData?.process_id
+        ? HTTP_METHODS.PUT
+        : HTTP_METHODS.POST,
     };
-
-    dispatch(saveTipDiscardInitiated(requestBody));
+    dispatch(saveProcessInitiated(requestBody));
   };
 
-  const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  if (!activeDeckObj.isLoggedIn) {
-    return <Redirect to={`/${ROUTES.landing}`} />;
-  }
+  // if (!activeDeckObj.isLoggedIn) {
+  //   return <Redirect to={`/${ROUTES.landing}`} />;
+  // }
 
   return (
     <>

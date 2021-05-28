@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
@@ -9,20 +9,42 @@ import { ButtonIcon, ButtonBar, ImageIcon, Icon } from "shared-components";
 import magnetProcessGraphics from "assets/images/magnet-process-graphics.svg";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, MagnetBox, TopContent } from "./Style";
-import { saveMagnetInitiated } from "action-creators/processesActionCreators";
-import { Redirect } from "react-router";
-import { ROUTES } from "appConstants";
+import { saveProcessInitiated } from "action-creators/processesActionCreators";
+import { useHistory } from "react-router";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 
 const MagnetComponent = (props) => {
-  const [isAttach, setIsAttach] = useState(null);
   const dispatch = useDispatch();
+  const history = useHistory();
+  const [isAttach, setIsAttach] = useState(false);
 
+  const editReducer = useSelector((state) => state.editProcessReducer);
+  const editReducerData = editReducer.toJS();
+  const processesReducer = useSelector((state) => state.processesReducer);
   const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
+
   const recipeID = recipeDetailsReducer.recipeDetails.id;
-  const token = recipeDetailsReducer.token;
+  const token = activeDeckObj.token;
+
+  const isAttachFromAPI = editReducerData?.operation;
+  useEffect(() => {
+    if (editReducerData?.operation) {
+      setIsAttach(isAttachFromAPI === "attach");
+    }
+  }, [isAttachFromAPI]);
+
+  const errorInAPICall = processesReducer.error;
+  useEffect(() => {
+    if (errorInAPICall === false) {
+      history.push(ROUTES.processListing);
+    }
+  }, [errorInAPICall, isAttachFromAPI]);
 
   const saveBtnHandler = () => {
     const body = {
@@ -31,17 +53,18 @@ const MagnetComponent = (props) => {
     };
     const requestBody = {
       body: body,
-      recipeID: recipeID,
+      id: editReducerData?.process_id ? editReducerData.process_id : recipeID,
       token: token,
+      api: API_ENDPOINTS.magnet,
+      method: editReducerData?.process_id
+        ? HTTP_METHODS.PUT
+        : HTTP_METHODS.POST,
     };
-    dispatch(saveMagnetInitiated(requestBody));
+    dispatch(saveProcessInitiated(requestBody));
   };
 
-  const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   if (!activeDeckObj.isLoggedIn) {
-    return <Redirect to={`/${ROUTES.landing}`} />;
+    // return <Redirect to={`/${ROUTES.landing}`} />;
   }
 
   return (
@@ -70,7 +93,8 @@ const MagnetComponent = (props) => {
                       name="magnet-action"
                       label="Attach"
                       className=""
-                      onClick={() => setIsAttach(true)}
+                      checked={isAttach}
+                      onClick={() => setIsAttach(!isAttach)}
                     />
                     <div className="d-flex justify-content-center align-items-center flex-column animated-attach-icon">
                       <Icon name="upward-magnet" size={35} />
@@ -82,8 +106,8 @@ const MagnetComponent = (props) => {
                       id="detach"
                       name="magnet-action"
                       label="Detach"
-                      className=""
-                      onClick={() => setIsAttach(false)}
+                      checked={!isAttach}
+                      onClick={() => setIsAttach(!isAttach)}
                     />
                     <div className="d-flex justify-content-center align-items-center flex-column animated-detach-icon">
                       <Icon name="upward-magnet" size={35} />
