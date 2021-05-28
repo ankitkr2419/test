@@ -1,7 +1,6 @@
 package plc
 
 import (
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"mylab/cpagent/db"
 )
@@ -67,11 +66,6 @@ func (p *PLCMockStore) SetCurrentProcessNumber(step int64) {
 
 func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error){
 	args := p.Called(recipe, processes)
-	return args.Error(0)
-}
-
-func (p *PLCMockStore) CheckIfRecipeOrProcessInRun(id *uuid.UUID, process *uuid.UUID) (err error){
-	args := p.Called(id, process)
 	return args.Error(0)
 }
 
