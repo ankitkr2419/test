@@ -285,8 +285,8 @@ func (d *Compact32Deck) getHomingPercent() float64 {
 	}
 }
 
-func (d *Compact32Deck) getCurrentProcess() int64 {
-	if temp, ok := currentProcess.Load(d.name); !ok {
+func getCurrentProcessNumber(deck string) int64 {
+	if temp, ok := currentProcess.Load(deck); !ok {
 		logger.Errorln("currentProcess isn't loaded!")
 		return -1
 	} else {

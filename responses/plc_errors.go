@@ -9,6 +9,6 @@ var (
 
 	InvalidOperationWebsocket = fmt.Errorf("invalid operation selected for websocket")
 
-	RecipeUnsafeForCRUDError  = fmt.Errorf("recipe is unsafe for CRUDs as its run is in Progress")
-	ProcessUnsafeForCRUDError = fmt.Errorf("process is unsafe for CRUDs as its run is in Progress")
+	RecipeUnsafeForCRUDError  = fmt.Errorf("recipe is unsafe for CRUDs as its run is in progress")
+	ProcessUnsafeForCRUDError = fmt.Errorf("process is unsafe for CRUDs as its run is in progress")
 )
