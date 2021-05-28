@@ -92,7 +92,7 @@ func (suite *Compact32DriverTestSuite) TestConfigureRunStaging() {
 
 	suite.C32.writeStageData(HOLDING_STAGE, p)
 
-	assert.Equal(suite.T(), suite.driver.LastAddress, MODBUS["D"][101])
+	assert.Equal(suite.T(), suite.driver.LastAddress, plc.MODBUS["D"][101])
 	// Expected []Bytes: [2 141 3 85 3 182 0 0 0 21 0 22 0 20 0 0 0 5 0 3 0 5 0 0]
 	//                    ----- ---- ----- --- ---- ---- ---- --- --- --- --- ---
 	/*
@@ -133,7 +133,7 @@ func (suite *Compact32DriverTestSuite) TestConfigureRunSuccess() {
 
 	suite.C32.ConfigureRun(p)
 
-	assert.Equal(suite.T(), suite.driver.LastAddress, MODBUS["D"][113]) // cycling stage
+	assert.Equal(suite.T(), suite.driver.LastAddress, plc.MODBUS["D"][113]) // cycling stage
 
 	// Expected []Bytes: [[2 38 2 138 2 238 3 82 3 182 0 0 0 20 0 20 0 20 0 20 0 20 0 0 0 5 0 5 0 5 0 5 0 5 0 0]
 	//                     ---- ----- ----- ---- ----- --- ---- ---- ---- ---- ---- --- --- --- --- --- --- ---
@@ -151,24 +151,24 @@ func (suite *Compact32DriverTestSuite) TestConfigureRunSuccess() {
 }
 
 func (suite *Compact32DriverTestSuite) TestMonitorCycleNotComplete() {
-	suite.driver.On("ReadSingleRegister", MODBUS["D"][133]).Return(
+	suite.driver.On("ReadSingleRegister", plc.MODBUS["D"][133]).Return(
 		uint16(32), // cycle counter
 		nil,
 	)
 
-	suite.driver.On("ReadSingleRegister", MODBUS["D"][132]).Return(
+	suite.driver.On("ReadSingleRegister", plc.MODBUS["D"][132]).Return(
 		uint16(655), // PV Temperature
 		nil,
 	)
-	suite.driver.On("ReadSingleRegister", MODBUS["D"][135]).Return(
+	suite.driver.On("ReadSingleRegister", plc.MODBUS["D"][135]).Return(
 		uint16(953), // Lid Temperature
 		nil,
 	)
-	suite.driver.On("ReadSingleCoil", MODBUS["M"][107]).Return(
+	suite.driver.On("ReadSingleCoil", plc.MODBUS["M"][107]).Return(
 		uint16(0x00), // Cycle complete
 		nil,
 	)
-	suite.driver.On("WriteSingleCoil", MODBUS["M"][106], OFF).Return(
+	suite.driver.On("WriteSingleCoil", plc.MODBUS["M"][106], plc.OFF).Return(
 		nil,
 	)
 	suite.driver.On("ReadHoldingRegisters", mock.Anything, mock.Anything).Return(
@@ -196,24 +196,24 @@ func (suite *Compact32DriverTestSuite) TestMonitorCycleNotComplete() {
 }
 
 func (suite *Compact32DriverTestSuite) TestMonitorEmissionSuccess() {
-	suite.driver.On("ReadSingleRegister", MODBUS["D"][133]).Return(
+	suite.driver.On("ReadSingleRegister", plc.MODBUS["D"][133]).Return(
 		uint16(32), // cycle counter
 		nil,
 	)
 
-	suite.driver.On("ReadSingleRegister", MODBUS["D"][132]).Return(
+	suite.driver.On("ReadSingleRegister", plc.MODBUS["D"][132]).Return(
 		uint16(655), // PV Temperature
 		nil,
 	)
-	suite.driver.On("ReadSingleRegister", MODBUS["D"][135]).Return(
+	suite.driver.On("ReadSingleRegister", plc.MODBUS["D"][135]).Return(
 		uint16(953), // Lid Temperature
 		nil,
 	)
-	suite.driver.On("ReadSingleCoil", MODBUS["M"][107]).Return(
+	suite.driver.On("ReadSingleCoil", plc.MODBUS["M"][107]).Return(
 		uint16(0xFF00), // Cycle complete
 		nil,
 	)
-	suite.driver.On("WriteSingleCoil", MODBUS["M"][106], OFF).Return(
+	suite.driver.On("WriteSingleCoil", plc.MODBUS["M"][106], plc.OFF).Return(
 		nil,
 	)
 	suite.driver.On("ReadHoldingRegisters", mock.Anything, mock.Anything).Return(
