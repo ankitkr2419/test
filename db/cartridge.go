@@ -24,7 +24,7 @@ const (
 							volume)
 							VALUES %s `
 	onConflictDoNothing     = `ON CONFLICT DO NOTHING;`
-	selectAllCartridgeQuery = `SELECT c.*, count(cw.id) as wells FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id GROUP BY c.id`
+	selectAllCartridgeQuery = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id GROUP BY c.id`
 	selectAllCartridgeWellsQuery = `SELECT *
 							FROM cartridge_wells`
 )
@@ -40,7 +40,7 @@ type Cartridge struct {
 	ID          int64         `db:"id" json:"id"`
 	Type        CartridgeType `db:"type" json:"type"`
 	Description string        `db:"description" json:"description"`
-	Wells 		int64		  `db:"wells" json:"wells"`
+	WellsCount	int64		  `db:"wells_count" json:"wells_count"`
 	CreatedAt   time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time     `db:"updated_at" json:"updated_at"`
 }
