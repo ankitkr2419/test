@@ -130,7 +130,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	err = deps.PlcDeck[deck].RunRecipeWebsocketData(recipe, processes)
 	for i, p := range processes {
 
-		deps.PlcDeck[deck].SetCurrentProcess(int64(i))
+		deps.PlcDeck[deck].SetCurrentProcessNumber(int64(i))
 
 		if runStepWise {
 

@@ -119,7 +119,7 @@ type Extraction interface {
 	IsRunInProgress() bool
 	TipOperation(to db.TipOperation) (response string, err error)
 	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
-	SetCurrentProcess(step int64)
+	SetCurrentProcessNumber(step int64)
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {
