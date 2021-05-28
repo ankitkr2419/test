@@ -116,6 +116,7 @@ export const MODAL_MESSAGE = {
   unpublishConfirmation: "Are you sure you want to Unpublish this recipe?",
   finishProcessListConfirmation: "Are you sure you want to save changes to ",
   deleteProcessConfirmation: "Are you sure you want to delete this process?",
+  deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
 };
 
 export const MODAL_BTN = {

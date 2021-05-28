@@ -19,7 +19,7 @@ import { discardDeckInitiated } from "action-creators/discardDeckActionCreators"
 import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators";
 import AddNewRecipesModal from "components/modals/AddNewRecipesModal";
 import RunRecipesModal from "components/modals/RunRecipesModal";
-import { publishRecipeInitiated } from "action-creators/recipeActionCreators";
+import { publishRecipeInitiated, deleteRecipeInitiated } from "action-creators/recipeActionCreators";
 import TopContentComponent from "./TopContentComponent";
 import RecipeListingCards from "./RecipeListingCards";
 import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
@@ -192,6 +192,11 @@ const RecipeListingComponent = (props) => {
     } role?`;
   };
 
+  const handleDeleteRecipe = (recipeId) => {
+    let token = activeDeckObj.token;
+    dispatch(deleteRecipeInitiated({ recipeId, token, deckName }))
+  }
+
   return (
     <>
       <div className="landing-content px-2">
@@ -291,6 +296,7 @@ const RecipeListingComponent = (props) => {
           ) : (
             <RecipeListingCards
               isAdmin={isAdmin}
+              deckName={deckName}
               searchRecipeText={searchRecipeText}
               onSearchRecipeTextChanged={onSearchRecipeTextChanged}
               fileteredRecipeData={fileteredRecipeData}
@@ -301,6 +307,7 @@ const RecipeListingComponent = (props) => {
                 handlePublishModalClick(recipeId, isPublished)
               }
               handleEditRecipe={(recipe) => handleEditRecipe(recipe)}
+              handleDeleteRecipe={handleDeleteRecipe}
             />
           )}
         </>

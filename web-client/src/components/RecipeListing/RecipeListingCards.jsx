@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Card, CardBody, Row, Col } from "core-components";
 import SearchBox from "shared-components/SearchBox";
 import PaginationBox from "shared-components/PaginationBox";
 import RecipeCard from "components/RecipeListing/RecipeCard";
+import MlModal from "shared-components/MlModal";
+import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 
 const RecipeListingCards = (props) => {
     const {
         isAdmin,
+        deckName,
         searchRecipeText,
         onSearchRecipeTextChanged,
         fileteredRecipeData,
@@ -16,7 +19,25 @@ const RecipeListingCards = (props) => {
         toggleRunRecipesModal,
         handlePublishModalClick,
         handleEditRecipe,
+        handleDeleteRecipe,
     } = props;
+
+    const [deleteRecipeId, setDeleteRecipeId] = useState(null);
+    const [deleteModal, setDeleteModal] = useState(false);
+
+    const handleDeleteRecipeClick = (id) => {
+        setDeleteRecipeId(id);
+        toggleDeleteModal();
+    };
+
+    const toggleDeleteModal = () => {
+        setDeleteModal(!deleteModal);
+    };
+
+    const onDeleteRecipeConfirmed = () => {
+        toggleDeleteModal();
+        handleDeleteRecipe(deleteRecipeId);
+    };
 
     return (
         <Card className="recipe-listing-cards">
@@ -33,6 +54,18 @@ const RecipeListingCards = (props) => {
                     </div>
                 </div>
 
+                {deleteModal && (
+                    <MlModal
+                        isOpen={deleteModal}
+                        textHead={deckName}
+                        textBody={MODAL_MESSAGE.deleteRecipeConfirmation}
+                        handleSuccessBtn={onDeleteRecipeConfirmed}
+                        handleCrossBtn={toggleDeleteModal}
+                        successBtn={MODAL_BTN.yes}
+                        failureBtn={MODAL_BTN.no}
+                    />
+                )}
+
                 <Row>
                     {fileteredRecipeData?.length ? (
                         fileteredRecipeData.map((recipe, index) => (
@@ -48,11 +81,20 @@ const RecipeListingCards = (props) => {
                                     toggleRunRecipesModal={
                                         toggleRunRecipesModal
                                     }
-                                    handlePublishModalClick={(recipeId, isPublished) =>
-                                        handlePublishModalClick(recipeId, isPublished)
+                                    handlePublishModalClick={(
+                                        recipeId,
+                                        isPublished
+                                    ) =>
+                                        handlePublishModalClick(
+                                            recipeId,
+                                            isPublished
+                                        )
                                     }
                                     handleEditRecipe={() =>
                                         handleEditRecipe(recipe)
+                                    }
+                                    handleDeleteRecipe={() =>
+                                        handleDeleteRecipeClick(recipe.id)
                                     }
                                 />
                             </Col>

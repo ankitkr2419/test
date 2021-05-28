@@ -111,34 +111,53 @@ export const getUpdatedDecks = (
 };
 
 /**returns deckArray
- * if we want recipeList changes, pass changes required and recipeId and this method will return new deckArray
+ * => if we want recipeList changes, pass changes required and recipeId and this method will return new deckArray
+ * => if we want to delete a recipe from a list, pass isDeleteRecipe:true
  */
 export const getUpdatedDecksAfterRecipeListChanged = (
   state,
   deckName,
   recipeId,
   changesInMatchedRecipe,
-  changesInUnMatchedRecipe
+  changesInUnMatchedRecipe,
+  isDeleteRecipe=false,
 ) => {
   const arrayOfDecks = state.decks;
 
-  const array = arrayOfDecks.map((deckObj) => {
-    return deckObj.name === deckName
-      ? {
-          ...deckObj,
-          allRecipeData: deckObj.allRecipeData.map((recipeObj) => {
-            return recipeObj.id === recipeId 
-              ? {
-                ...recipeObj,
-                ...changesInMatchedRecipe
-              } : {
-                ...recipeObj,
-                ...changesInUnMatchedRecipe
-              }
-          })
-          
-        }
-      : deckObj
-  });
+  let array = [];
+
+  if(isDeleteRecipe) {
+    //delete recipe
+    array = arrayOfDecks.map((deckObj) => {
+      return deckObj.name === deckName
+        ? {
+            ...deckObj,
+            allRecipeData: deckObj.allRecipeData.filter((recipeObj) => recipeObj.id !== recipeId)
+          }
+        : deckObj
+    });
+
+  }else {
+    //update recipe data
+    array = arrayOfDecks.map((deckObj) => {
+      return deckObj.name === deckName
+        ? {
+            ...deckObj,
+            allRecipeData: deckObj.allRecipeData.map((recipeObj) => {
+              return recipeObj.id === recipeId 
+                ? {
+                  ...recipeObj,
+                  ...changesInMatchedRecipe
+                } : {
+                  ...recipeObj,
+                  ...changesInUnMatchedRecipe
+                }
+            })
+            
+          }
+        : deckObj
+    });
+  }
+  
   return array;
 }
