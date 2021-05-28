@@ -13,7 +13,7 @@ import { ButtonIcon, ButtonBar, ImageIcon } from "shared-components";
 import delayProcessGraphics from "assets/images/delay-process-graphics.svg";
 import TopHeading from "shared-components/TopHeading";
 import { DelayBox, PageBody, TopContent } from "./Style";
-import { useHistory } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
@@ -73,7 +73,7 @@ const DelayComponent = (props) => {
   };
 
   if (!activeDeckObj.isLoggedIn) {
-    // return <Redirect to={`/${ROUTES.landing}`} />;
+    return <Redirect to={`/${ROUTES.landing}`} />;
   }
 
   return (

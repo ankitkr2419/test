@@ -10,7 +10,7 @@ import magnetProcessGraphics from "assets/images/magnet-process-graphics.svg";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, MagnetBox, TopContent } from "./Style";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
-import { useHistory } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 
 const MagnetComponent = (props) => {
@@ -64,7 +64,7 @@ const MagnetComponent = (props) => {
   };
 
   if (!activeDeckObj.isLoggedIn) {
-    // return <Redirect to={`/${ROUTES.landing}`} />;
+    return <Redirect to={`/${ROUTES.landing}`} />;
   }
 
   return (

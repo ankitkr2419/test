@@ -10,7 +10,7 @@ import longDownArrow from "assets/images/long-down-arrow.svg";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TipDiscardBox, TopContent } from "./Style";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 
@@ -58,9 +58,9 @@ const TipDiscardComponent = (props) => {
     dispatch(saveProcessInitiated(requestBody));
   };
 
-  // if (!activeDeckObj.isLoggedIn) {
-  //   return <Redirect to={`/${ROUTES.landing}`} />;
-  // }
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
 
   return (
     <>
