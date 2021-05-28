@@ -134,7 +134,10 @@ export const getUpdatedDecksAfterRecipeListChanged = (
             ...deckObj,
             allRecipeData: deckObj.allRecipeData.filter((recipeObj) => recipeObj.id !== recipeId)
           }
-        : deckObj
+        : {//it should get deleted from both decks!
+          ...deckObj,
+          allRecipeData: deckObj.allRecipeData.filter((recipeObj) => recipeObj.id !== recipeId)
+        }
     });
 
   }else {
