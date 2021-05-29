@@ -7,7 +7,6 @@ import {
   getTipsActionInitiated,
   getTubesActionInitiated,
 } from "action-creators/saveNewRecipeActionCreators";
-import { TEST_TOKEN } from "appConstants";
 
 const LabwareContainer = (props) => {
   const dispatch = useDispatch();

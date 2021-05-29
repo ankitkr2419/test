@@ -11,8 +11,8 @@ import { WellComponent } from "./WellComponent";
 import HeightModal from "components/modals/HeightModal";
 import { useDispatch, useSelector } from "react-redux";
 import { savePiercingInitiated } from "action-creators/processesActionCreators";
-import { TEST_RECIPE_ID, TEST_TOKEN } from "appConstants";
 
+//Below arrays are updated in future PRs
 const extractionWells = [
   { id: 1, type: 0, label: "1", footerText: "", isDisabled: false, isSelected: false },
   { id: 2, type: 0, label: "2", footerText: "", isDisabled: false, isSelected: false },
