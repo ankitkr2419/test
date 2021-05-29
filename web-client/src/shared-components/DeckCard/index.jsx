@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import PropTypes from "prop-types";
-import { Text, Icon } from "shared-components";
+import { Text, ProcessRemaining } from "shared-components";
 import { Button } from "core-components";
 import ActionButton from "./ActionButton";
 import { DECKCARD_BTN, SELECT_PROCESS_PROPS } from "appConstants";
@@ -10,6 +10,7 @@ import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer"
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveDeck } from "action-creators/loginActionCreators";
 import { DeckCardBox, CardOverlay } from "./Styles";
+import CommonTimerFields from "./CommonTimerFields";
 
 const DeckCard = (props) => {
   const {
@@ -35,6 +36,8 @@ const DeckCard = (props) => {
     processName,
     processType,
   } = props;
+
+  console.log(hours, mins, secs);
 
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -68,7 +71,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.run}
             icon={DECKCARD_BTN.icon.run}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.pause:
@@ -77,7 +79,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.pause}
             icon={DECKCARD_BTN.icon.pause}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.resume:
@@ -86,7 +87,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.resume}
             icon={DECKCARD_BTN.icon.resume}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.done:
@@ -95,7 +95,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.done}
             icon={DECKCARD_BTN.icon.done}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.startUv:
@@ -104,7 +103,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.startUv}
             icon={DECKCARD_BTN.icon.run}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.pauseUv:
@@ -113,7 +111,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.pauseUv}
             icon={DECKCARD_BTN.icon.pause}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.resumeUv:
@@ -122,7 +119,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.resumeUv}
             icon={DECKCARD_BTN.icon.resume}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.next:
@@ -131,7 +127,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.next}
             icon={DECKCARD_BTN.icon.next}
             disabled={leftActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       default:
@@ -147,7 +142,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.cancel}
             icon={DECKCARD_BTN.icon.cancel}
             disabled={rightActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       case DECKCARD_BTN.text.abort:
@@ -156,7 +150,6 @@ const DeckCard = (props) => {
             label={DECKCARD_BTN.text.abort}
             icon={DECKCARD_BTN.icon.abort}
             disabled={rightActionBtnDisabled}
-            showCardOverLay={showCardOverLay}
           />
         );
       default:
@@ -174,11 +167,21 @@ const DeckCard = (props) => {
   };
 
   const showCardOverLay = () => {
-    return (
+    console.log(
+      "isAnotherDeckLoggedIn: ",
+      isAnotherDeckLoggedIn,
+      "\nloginBtn: ",
+      loginBtn,
+      "\nisActiveDeck: ",
+      isActiveDeck
+    );
+    const x =
       (isAnotherDeckLoggedIn && loginBtn && !isActiveDeck) ||
       (isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck) ||
-      (!isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck)
-    );
+      (!isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck);
+
+    console.log("X: ", x);
+    return x;
   };
 
   const isProcessRunning = () => {
@@ -186,24 +189,6 @@ const DeckCard = (props) => {
       recipeActionReducerForDeck.showProcess ||
       cleanUpReducerForDeck.showCleanUp
     );
-  };
-
-  /* get icon by process type
-   * if process type not found use 'default'
-   * if process type found but icon not found, use 'default'
-   */
-  const getIconName = () => {
-    let processTypeText = processType ? processType : "default";
-
-    let obj = SELECT_PROCESS_PROPS.find(
-      (obj) => obj.processType === processTypeText
-    );
-
-    let iconName = obj?.iconName
-      ? obj.iconName
-      : SELECT_PROCESS_PROPS.find((obj) => obj.processType === "default")
-          .iconName;
-    return iconName;
   };
 
   return (
@@ -232,8 +217,16 @@ const DeckCard = (props) => {
             : { background: '#fff url("/images/deck-card-bg.svg") no-repeat' }
         }
       >
+        {showProcess && (
+          <ProcessRemaining
+            processType={processType}
+            processNumber={processNumber}
+            processTotal={processTotal}
+          />
+        )}
         <div className="d-flex justify-content-between align-items-center">
           <div className="d-none1">
+            {/* PROCESSES */}
             {showProcess && (
               <>
                 <div
@@ -257,41 +250,16 @@ const DeckCard = (props) => {
                   {getRightActionBtn(rightActionBtn)}
                 </div>
 
-                <div className="marquee">
-                  <Text
-                    Tag="h5"
-                    size={18}
-                    className="mb-2 font-weight-bold recipe-name"
-                  >
-                    {recipeName}
-                  </Text>
-                  <Text Tag="label" className="mb-1 d-flex align-items-center">
-                    <Icon
-                      name={getIconName()}
-                      size={19}
-                      className="text-primary"
-                    />
-                    <Text
-                      Tag="span"
-                      className="process-count-label font-weight-bold ml-2"
-                    >
-                      {" "}
-                      {processNumber}
-                      <Text
-                        Tag="span"
-                        className="process-total-count font-weight-bold"
-                      >
-                        /{processTotal}{" "}
-                      </Text>{" "}
-                    </Text>
-                    <Text Tag="span" className="ml-1 process-remaining">
-                      {processName ? processName : "Processes remaining"}
-                    </Text>
-                  </Text>
-                </div>
+                <CommonTimerFields
+                  recipeName={recipeName}
+                  hours={hours}
+                  mins={mins}
+                  secs={secs}
+                />
               </>
             )}
 
+            {/* {CLEAN-UP (UV)} */}
             {showCleanUp && (
               <>
                 <div className="resume-button" onClick={handleLeftAction}>
@@ -301,34 +269,12 @@ const DeckCard = (props) => {
                   {getRightActionBtn(rightActionBtn)}
                 </div>
 
-                <div className="d-none1">
-                  <Text
-                    Tag="h5"
-                    size={18}
-                    className="mb-2 font-weight-bold recipe-name"
-                  >
-                    {recipeName}
-                  </Text>
-                  <Text Tag="label" className="mb-1 d-flex align-items-center">
-                    <Icon name="timer" size={19} className="text-primary" />
-                    <Text
-                      Tag="span"
-                      className="hour-label font-weight-bold ml-2"
-                    >
-                      {" "}
-                      {hours} Hr{" "}
-                    </Text>
-                    <Text
-                      Tag="span"
-                      className="min-label ml-2 font-weight-bold"
-                    >
-                      {mins} min {secs} sec
-                    </Text>
-                    <Text Tag="span" className="ml-1 mt-1 process-remaining">
-                      remaining
-                    </Text>
-                  </Text>
-                </div>
+                <CommonTimerFields
+                  recipeName={processName}
+                  hours={hours}
+                  mins={mins}
+                  secs={secs}
+                />
               </>
             )}
           </div>
@@ -359,7 +305,7 @@ const DeckCard = (props) => {
           <Progress
             value={progressPercentComplete}
             className={
-              showProcess ? "custom-progress-bar" : "mt-3 custom-progress-bar"
+              showProcess ? "custom-progress-bar" : "custom-progress-bar"
             }
           />
         )}
