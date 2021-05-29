@@ -37,8 +37,6 @@ const DeckCard = (props) => {
     processType,
   } = props;
 
-  console.log(hours, mins, secs);
-
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
   const dispatch = useDispatch();
 
