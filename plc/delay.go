@@ -4,10 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 
 	logger "github.com/sirupsen/logrus"
 
 	"time"
+)
+
+type WebsocketOperation string
+
+const (
+	uvlightProgress WebsocketOperation = "PROGRESS_UVLIGHT"
+	recipeProgress  WebsocketOperation = "PROGRESS_RECIPE"
+	uvlightSuccess  WebsocketOperation = "SUCCESS_UVLIGHT"
+	recipeSuccess   WebsocketOperation = "SUCCESS_RECIPE"
 )
 
 /*AddDelay :
@@ -23,11 +33,10 @@ import (
 8. At last when the timer is done then it would return success.
 
 */
-func (d *Compact32Deck) AddDelay(delay db.Delay) (response string, err error) {
+func (d *Compact32Deck) AddDelay(delay db.Delay, recipeRun bool) (response string, err error) {
 	var t *time.Timer
 
 	var timeElapsedVar int64 = 0
-	var progress int64 = 0
 	timeElapsed := &timeElapsedVar
 
 	// set the timer in progress variable to specify that it is not a motor operation.
@@ -36,17 +45,31 @@ func (d *Compact32Deck) AddDelay(delay db.Delay) (response string, err error) {
 
 skipToStartTimer:
 	// start the timer
-	t = time.NewTimer(time.Duration(delay.DelayTime) * time.Second)
+	t = time.NewTimer(time.Duration(delay.DelayTime-*timeElapsed) * time.Second)
 	time1 := time.Now()
 	for {
 		select {
 		// wait for the timer to finish
 		case n := <-t.C:
 			logger.Infoln("delay time over ", n)
+			if d.isUVLightInProgress() {
+				// Send 100 % Progress
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
+				// Send Success
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightSuccess)
+				d.ResetRunInProgress()
+			}
+			if recipeRun {
+				// Send 100 % Progress
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
+				// Send Success
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeSuccess)
+				d.ResetRunInProgress()
+			}
 			return "SUCCESS", nil
 		default:
-			// delay of 300 ms for checking the delay over time to avoid too much loop
-			time.Sleep(time.Millisecond * 300)
+			// delay of 500 ms for checking the delay over time to avoid too much loop
+			time.Sleep(time.Millisecond * 500)
 			if d.isMachineInAbortedState() {
 				t.Stop()
 				if d.isUVLightInProgress() {
@@ -55,27 +78,12 @@ skipToStartTimer:
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
 			}
+			// When UV Light is in progress nothing else is so no special handling below
 			if d.isUVLightInProgress() {
-				uvtime := time.Now()
-				uvTimePassed := int64(uvtime.Sub(time1).Seconds()) + *timeElapsed
-				uvRemainingTime := delay.DelayTime - uvTimePassed
-				progress = (uvTimePassed * 100) / delay.DelayTime
-				wsProgressOperation := WSData{
-					Progress: float64(progress),
-					Deck:     d.name,
-					Status:   "PROGRESS_UVLIGHT",
-					OperationDetails: OperationDetails{
-						Message:       fmt.Sprintf("progress_uvLight_uv light cleanup in progress for deck %s ", d.name),
-						RemainingTime: uvRemainingTime,
-					},
-				}
-
-				wsData, err := json.Marshal(wsProgressOperation)
-				if err != nil {
-					logger.Errorf("error in marshalling web socket data %v", err.Error())
-					d.WsErrCh <- err
-				}
-				d.WsMsgCh <- fmt.Sprintf("progress_uvLight_%v", string(wsData))
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
+			}
+			if recipeRun {
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
 			}
 			// if paused then
 			// when timer was paused go again to timer start
@@ -86,11 +94,8 @@ skipToStartTimer:
 			if wasTimerPaused {
 				goto skipToStartTimer
 			}
-
 		}
-
 	}
-
 }
 
 func (d *Compact32Deck) checkPausedState(t *time.Timer, time1 time.Time, delay int64, timeElapsed *int64) (response string, wasTimerPaused bool, err error) {
@@ -111,10 +116,88 @@ func (d *Compact32Deck) checkPausedState(t *time.Timer, time1 time.Time, delay i
 
 		// else wait for the process to be resumed
 		response, err = d.waitUntilResumed(d.name)
-		if err != nil {
-			return
-		}
-
 	}
 	return
+}
+
+func (d *Compact32Deck) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error) {
+	deckRecipe[d.name] = recipe
+	deckProcesses[d.name] = processes
+	if recipe.ProcessCount == 0 {
+		return responses.ProcessesAbsentError
+	}
+
+	d.SetCurrentProcess(0)
+	// TODO: Call Delay
+	go d.AddDelay(db.Delay{DelayTime: recipe.TotalTime}, true)
+	return
+}
+
+// func(d *Compact32Deck) sendWSData(recipeID uuid.UUID, processLength, currentStep int, processName string, processType db.ProcessType) {
+func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTime int64, ops WebsocketOperation) (err error) {
+	var wsProgressOp WSData
+	var wsData []byte
+
+	opTime := time.Now()
+	opTimePassed := int64(opTime.Sub(time1).Seconds()) + *timeElapsed
+	opRemainingTime := delayTime - opTimePassed
+	if opTimePassed > delayTime {
+		opTimePassed = delayTime
+		opRemainingTime = 0
+	}
+	progress := (opTimePassed * 100) / delayTime
+
+	wsProgressOp = WSData{
+		Progress: float64(progress),
+		Deck:     d.name,
+		Status:   string(ops),
+		OperationDetails: OperationDetails{
+			RemainingTime: convertToHMS(opRemainingTime),
+			TotalTime:     convertToHMS(delayTime),
+		},
+	}
+
+	switch ops {
+	case uvlightProgress:
+		wsProgressOp.OperationDetails.Message = fmt.Sprintf("uv light cleanup in progress for deck %s ", d.name)
+	case uvlightSuccess:
+		wsProgressOp.OperationDetails.Message = fmt.Sprintf("successfully completed UV Light clean up for deck %v", d.name)
+	case recipeProgress:
+		currentStep := d.getCurrentProcess()
+
+		wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v in progress", currentStep+1, d.name)
+		wsProgressOp.OperationDetails.CurrentStep = currentStep + 1
+		wsProgressOp.OperationDetails.RecipeID = deckRecipe[d.name].ID
+		wsProgressOp.OperationDetails.TotalProcesses = deckRecipe[d.name].ProcessCount
+		wsProgressOp.OperationDetails.ProcessName = deckProcesses[d.name][currentStep].Name
+		wsProgressOp.OperationDetails.ProcessType = deckProcesses[d.name][currentStep].Type
+
+	case recipeSuccess:
+		wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v completed", deckRecipe[d.name].ProcessCount, d.name)
+		wsProgressOp.OperationDetails.CurrentStep = deckRecipe[d.name].ProcessCount
+		wsProgressOp.OperationDetails.RecipeID = deckRecipe[d.name].ID
+		wsProgressOp.OperationDetails.TotalProcesses = deckRecipe[d.name].ProcessCount
+
+	default:
+		return responses.InvalidOperationWebsocket
+	}
+
+	wsData, err = json.Marshal(wsProgressOp)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
+		d.WsErrCh <- err
+		return err
+	}
+	d.WsMsgCh <- fmt.Sprintf("%v_%v", ops, string(wsData))
+
+	return
+}
+
+func convertToHMS(secs int64) (*TimeHMS){
+	var t TimeHMS 
+	t.Hours = uint8(secs/(60 * 60))
+	t.Minutes = uint8(secs/60 - int64(t.Hours)*60)
+	t.Seconds = uint8(secs % 60)
+	logger.Infoln("Converted time: ", t)
+	return &t
 }
