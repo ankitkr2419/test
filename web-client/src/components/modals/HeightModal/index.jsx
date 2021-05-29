@@ -36,95 +36,93 @@ const HeightModal = (props) => {
   };
 
   return (
-    <>
-      <Modal isOpen={isOpen} centered className="set-height-modal">
-        <ModalBody className="p-0">
-          <div className="top-heading pt-3">
-            <Text size="16" className="text-center font-weight-bold">
-              Set Height for Well Number {wellObj.label}
-            </Text>
-            <ButtonIcon
-              position="absolute"
-              placement="right"
-              top={16}
-              right={16}
-              size={36}
-              name="cross"
-              onClick={handleCrossBtn}
-              className="border-0"
-            />
-          </div>
-          <div className="d-flex justify-content-center align-items-center flex-column mt-4">
-            <div className="slider-box d-flex align-items-center justify-content-center">
-              <div className="slider-outter-box text-center bg-white">
-                <div className="deck-level-box">
-                  {/* <div className="deck-level-inner"></div> */}
-                  <Slider
-                    min={1}
-                    max={10}
-                    vertical
-                    onChange={onChange}
-                    value={typeof InputValue === "number" ? InputValue : 0}
-                  />
-                </div>
+    <Modal isOpen={isOpen} centered className="set-height-modal">
+      <ModalBody className="p-0">
+        <div className="top-heading pt-3">
+          <Text size="16" className="text-center font-weight-bold">
+            Set Height for Well Number {wellObj.label}
+          </Text>
+          <ButtonIcon
+            position="absolute"
+            placement="right"
+            top={16}
+            right={16}
+            size={36}
+            name="cross"
+            onClick={handleCrossBtn}
+            className="border-0"
+          />
+        </div>
+        <div className="d-flex justify-content-center align-items-center flex-column mt-4">
+          <div className="slider-box d-flex align-items-center justify-content-center">
+            <div className="slider-outter-box text-center bg-white">
+              <div className="deck-level-box">
+                {/* <div className="deck-level-inner"></div> */}
+                <Slider
+                  min={1}
+                  max={10}
+                  vertical
+                  onChange={onChange}
+                  value={typeof InputValue === "number" ? InputValue : 0}
+                />
               </div>
             </div>
-            <FormGroup className="d-flex align-items-center justify-content-center mt-3 flex-column">
-              <Label className="text-center w-100">
-                <Text Tag="span" className="height-label">
-                  Enter Height
-                </Text>
-                <Text Tag="span" className="height-unit">
-                  {" "}
-                  (in cm)
-                </Text>
-              </Label>
-              <Text className="d-flex justify-content-center align-items-center number mb-2">
-                <Text
-                  Tag="span"
-                  className="minus"
-                  onClick={() => changeInputValOnClick(-1)}
-                >
-                  <Icon name="minus-1" size="18" />
-                </Text>
-                <Input
-                  type="text"
-                  value={InputValue}
-                  onChange={(e) => changeInputValOnEdit(e.target.value)}
-                />
-                <Text
-                  Tag="span"
-                  className="plus"
-                  onClick={() => changeInputValOnClick(1)}
-                >
-                  <Icon name="plus-2" size="18" />
-                </Text>
+          </div>
+          <FormGroup className="d-flex align-items-center justify-content-center mt-3 flex-column">
+            <Label className="text-center w-100">
+              <Text Tag="span" className="height-label">
+                Enter Height
               </Text>
-              {/* <InputNumber
+              <Text Tag="span" className="height-unit">
+                {" "}
+                (in cm)
+              </Text>
+            </Label>
+            <Text className="d-flex justify-content-center align-items-center number mb-2">
+              <Text
+                Tag="span"
+                className="minus"
+                onClick={() => changeInputValOnClick(-1)}
+              >
+                <Icon name="minus-1" size="18" />
+              </Text>
+              <Input
+                type="text"
+                value={InputValue}
+                onChange={(e) => changeInputValOnEdit(e.target.value)}
+              />
+              <Text
+                Tag="span"
+                className="plus"
+                onClick={() => changeInputValOnClick(1)}
+              >
+                <Icon name="plus-2" size="18" />
+              </Text>
+            </Text>
+            {/* <InputNumber
                 min={1}
                 max={10}
                 value={InputValue}
                 onChange={onChange}
                 placeholder="Enter Height"
               /> */}
-              <Label for="height" className="text-center w-100 gray-text">
-                * You can add values from x to y
-              </Label>
-              <FormError>Incorrect height</FormError>
-            </FormGroup>
-            <Center className="mb-4">
-              <Button
-                color="primary"
-                className="mb-1"
-                onClick={() => handleSuccessBtn(InputValue, wellObj.type)}
-              >
-                Done
-              </Button>
-            </Center>
-          </div>
-        </ModalBody>
-      </Modal>
-    </>
+            <Label for="height" className="text-center w-100 gray-text">
+              * You can add values from x to y
+            </Label>
+            <FormError>Incorrect height</FormError>
+          </FormGroup>
+          <Center className="mb-4">
+            <Button
+              color="primary"
+              className="mb-1"
+              onClick={() => handleSuccessBtn(InputValue, wellObj.type)}
+            >
+              Done
+            </Button>
+          </Center>
+        </div>
+      </ModalBody>
+    </Modal>
   );
 };
 
