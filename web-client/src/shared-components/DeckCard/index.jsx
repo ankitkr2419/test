@@ -167,21 +167,11 @@ const DeckCard = (props) => {
   };
 
   const showCardOverLay = () => {
-    console.log(
-      "isAnotherDeckLoggedIn: ",
-      isAnotherDeckLoggedIn,
-      "\nloginBtn: ",
-      loginBtn,
-      "\nisActiveDeck: ",
-      isActiveDeck
-    );
-    const x =
+    return (
       (isAnotherDeckLoggedIn && loginBtn && !isActiveDeck) ||
       (isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck) ||
-      (!isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck);
-
-    console.log("X: ", x);
-    return x;
+      (!isAnotherDeckLoggedIn && !loginBtn && !isActiveDeck)
+    );
   };
 
   const isProcessRunning = () => {
