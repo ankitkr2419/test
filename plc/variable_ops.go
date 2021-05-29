@@ -84,7 +84,7 @@ func (d *Compact32Deck) setHomingPercent(percent float64) {
 	homingPercent.Store(d.name, percent)
 }
 
-func (d *Compact32Deck) SetCurrentProcess(step int64) {
+func (d *Compact32Deck) SetCurrentProcessNumber(step int64) {
 	currentProcess.Store(d.name, step)
 }
 

@@ -59,7 +59,7 @@ func (p *PLCMockStore) AddDelay(delay db.Delay, runRecipe bool) (response string
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) SetCurrentProcess(step int64) {
+func (p *PLCMockStore) SetCurrentProcessNumber(step int64) {
 	_ = p.Called(step)
 	return
 }
