@@ -31,7 +31,7 @@ const pcrWells = [
   { id: 4, type: 1, label: "4", footerText: "", isDisabled: false, isSelected: false },
 ];
 
-const PiercingComponent = (props) => {
+const PiercingComponent = () => {
   const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
@@ -164,7 +164,5 @@ const PiercingComponent = (props) => {
     </>
   );
 };
-
-PiercingComponent.propTypes = {};
 
 export default PiercingComponent;

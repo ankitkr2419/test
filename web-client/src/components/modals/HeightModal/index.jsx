@@ -22,16 +22,14 @@ const HeightModal = (props) => {
 
   const onChange = (value) => setInputValue(value);
 
-  const changeInputValOnClick = (value) => {
-    let newValue = InputValue + value;
+  const changeInputValue = (value, type) => {
+    //type=0 means click and type=1 means edit
+    let newValue = parseInt(value);
+    if (type === 0) {
+      newValue = InputValue + value;
+    }
     if (newValue < 11 && newValue > 0) {
       setInputValue(newValue);
-    }
-  };
-
-  const changeInputValOnEdit = (value) => {
-    if (value < 11 && value > 0) {
-      setInputValue(parseInt(value));
     }
   };
 
@@ -82,19 +80,19 @@ const HeightModal = (props) => {
               <Text
                 Tag="span"
                 className="minus"
-                onClick={() => changeInputValOnClick(-1)}
+                onClick={() => changeInputValue(-1, 0)}
               >
                 <Icon name="minus-1" size="18" />
               </Text>
               <Input
                 type="text"
                 value={InputValue}
-                onChange={(e) => changeInputValOnEdit(e.target.value)}
+                onChange={(e) => changeInputValue(e.target.value, 1)}
               />
               <Text
                 Tag="span"
                 className="plus"
-                onClick={() => changeInputValOnClick(1)}
+                onClick={() => changeInputValue(1, 0)}
               >
                 <Icon name="plus-2" size="18" />
               </Text>
