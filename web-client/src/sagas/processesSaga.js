@@ -3,6 +3,7 @@ import { callApi } from "apis/apiHelper";
 import {
   aspireDispenseAction,
   magnetAction,
+  delayAction,
   piercingAction,
   tipPickupAction,
 } from "actions/processesActions";
@@ -107,6 +108,28 @@ export function* magnet(actions) {
     saveMagnetFailed(error);
   }
 }
+export function* delay(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveDelaySuccess, saveDelayFailed } = delayAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.delay}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveDelaySuccess,
+        failureAction: saveDelayFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveDelayFailed(error);
+  }
+}
 
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
@@ -116,4 +139,5 @@ export function* processesSaga() {
     aspireDispense
   );
   yield takeEvery(magnetAction.saveMagnetInitiated, magnet);
+  yield takeEvery(delayAction.saveDelayInitiated, delay);
 }

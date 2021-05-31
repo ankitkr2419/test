@@ -7,6 +7,7 @@ import {
   recipeListingAction,
   saveRecipeDataAction,
   publishRecipeAction,
+  deleteRecipeAction,
 } from "actions/recipeActions";
 import { DECKCARD_BTN, DECKNAME, RUN_RECIPE_TYPE } from "appConstants";
 import { getUpdatedDecks, getUpdatedDecksAfterRecipeListChanged } from "utils/helpers";
@@ -428,7 +429,36 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         tempRecipeId: "",
         tempIsPublished: "",
         isLoading: false
-      }  
+      } 
+      
+    case deleteRecipeAction.deleteRecipeInitiated: 
+      return {
+        ...state,
+        tempDeckName: action.payload.params.deckName,
+        tempRecipeId: action.payload.params.recipeId,
+      }
+
+    case deleteRecipeAction.deleteRecipeSuccess:
+      const newDecksAfterDeleteRecipe = getUpdatedDecksAfterRecipeListChanged(
+        state,
+        state.tempDeckName,
+        state.tempRecipeId,
+        {},//changes in matched
+        {},//changes in unmatched
+        true,//isDeleteRecipe
+      )
+      return {
+        ...state,
+        tempDeckName: "",
+        tempRecipeId: "",
+        decks: newDecksAfterDeleteRecipe,
+      };
+    case deleteRecipeAction.deleteRecipeFailure:
+      return {
+        ...state,
+        tempDeckName: "",
+        tempRecipeId: "",
+      }
 
     default:
       return state;
