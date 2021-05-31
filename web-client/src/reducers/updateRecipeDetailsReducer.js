@@ -1,4 +1,3 @@
-import { DECKNAME } from "appConstants";
 import {
   saveNewRecipeAction,
   getTipsAndTubesAction,
@@ -37,7 +36,6 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
 
     //updating new recipe : init
     case saveNewRecipeAction.updateRecipeInitiated:
-      const deckName = actions.payload.deckName;
       const token = actions.payload.token;
 
       return {

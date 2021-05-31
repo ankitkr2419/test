@@ -1,22 +1,22 @@
 /**returns array with exchanged sequence number of processes (with: indexOne, indexTwo) and sorted by sequence number */
-export const changeProcessSequences = (array, idOne, idTwo) => {
+export const changeProcessSequences = (array, sequenceProcessIdOne, sequenceProcessIdTwo) => {
     const processOfIndexOne = {
-        ...array.find((pOne) => pOne.id === idOne),
+        ...array.find((pOne) => pOne.id === sequenceProcessIdOne),
     };
     const processOfIndexTwo = {
-        ...array.find((pTwo) => pTwo.id === idTwo),
+        ...array.find((pTwo) => pTwo.id === sequenceProcessIdTwo),
     };
 
-    //change sequence logic: take process object of idOne and sequence number of idTwo (vice-versa)
+    //change sequence logic: take process object of sequenceProcessIdOne and sequence number of sequenceProcessIdTwo (vice-versa)
     //for all objects, change isOpen: false to hide processMenu
     const sequenceExchangedArray = array.map((obj) => {
-        return obj.id === idOne
+        return obj.id === sequenceProcessIdOne
             ? {
                   ...processOfIndexTwo,
                   sequence_num: processOfIndexOne.sequence_num,
                   isOpen: false,
               }
-            : obj.id === idTwo
+            : obj.id === sequenceProcessIdTwo
             ? {
                   ...processOfIndexOne,
                   sequence_num: processOfIndexTwo.sequence_num,

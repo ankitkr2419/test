@@ -69,7 +69,7 @@ const ProcessListingCards = (props) => {
         }
     });
 
-    const getProcessIconName = (processType) => {
+    const getProcessIconName = useCallback((processType) => {
         let obj = SELECT_PROCESS_PROPS.find(
             (obj) => obj.processType === processType
         );
@@ -79,7 +79,7 @@ const ProcessListingCards = (props) => {
             : SELECT_PROCESS_PROPS.find((obj) => obj.processType === "default")
                   .iconName;
         return iconName;
-    };
+    });
 
     return (
         <Card className="recipe-listing-cards">

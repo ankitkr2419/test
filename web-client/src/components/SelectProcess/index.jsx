@@ -10,43 +10,41 @@ import { SELECT_PROCESS_PROPS } from "appConstants";
 
 const SelectProcessPageComponent = () => {
   return (
-    <>
-      <PageBody className="h-100">
-        <ProcessOuterBox className="h-100">
-          <div className="process-content select-process-bg">
-            <TopContent className="d-flex justify-content-between align-items-center my-3 py-4">
-              <div className="d-flex flex-column py-1">
-                <HeadingTitle
-                  Tag="h5"
-                  className="text-primary font-weight-bold mb-0"
-                >
-                  Select a process
-                </HeadingTitle>
-              </div>
-            </TopContent>
-            <Card className="process-content-box">
-              <CardBody className="p-0">
-                <Row className="row-small-gutter">
-                  {SELECT_PROCESS_PROPS.map((propObj) => {
-                    return (
-                      propObj.route && (
-                        <Process
-                          iconName={propObj.iconName}
-                          processName={propObj.processName}
-                          route={propObj.route}
-                        />
-                      )
-                    );
-                  })}
-                </Row>
-              </CardBody>
-            </Card>
-            <ButtonBar />
-          </div>
-        </ProcessOuterBox>
-        <AppFooter />
-      </PageBody>
-    </>
+    <PageBody className="h-100">
+      <ProcessOuterBox className="h-100">
+        <div className="process-content select-process-bg">
+          <TopContent className="d-flex justify-content-between align-items-center my-3 py-4">
+            <div className="d-flex flex-column py-1">
+              <HeadingTitle
+                Tag="h5"
+                className="text-primary font-weight-bold mb-0"
+              >
+                Select a process
+              </HeadingTitle>
+            </div>
+          </TopContent>
+          <Card className="process-content-box">
+            <CardBody className="p-0">
+              <Row className="row-small-gutter">
+                {SELECT_PROCESS_PROPS.map((propObj) => {
+                  return (
+                    propObj.route && (
+                      <Process
+                        iconName={propObj.iconName}
+                        processName={propObj.processName}
+                        route={propObj.route}
+                      />
+                    )
+                  );
+                })}
+              </Row>
+            </CardBody>
+          </Card>
+          <ButtonBar />
+        </div>
+      </ProcessOuterBox>
+      <AppFooter />
+    </PageBody>
   );
 };
 

@@ -8,7 +8,7 @@ import CommonDeckPosition from "./CommonDeckPosition";
 import { ASPIRE_DISPENSE_SIDEBAR_LABELS } from "appConstants";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
-import { disabledTab, toggler } from "./functions";
+import { disabledTab } from "./functions";
 
 const AspireDispenseTabsContent = (props) => {
   const { formik, isAspire, toggle, activeTab, wellClickHandler } = props;
@@ -64,39 +64,35 @@ const AspireDispenseTabsContent = (props) => {
         </Text>
 
         <TabPane tabId={"1"}>
-          <>
-            <WellComponent
-              wellsObjArray={
-                isAspire
-                  ? formik.values.aspire.cartridge1Wells
-                  : formik.values.dispense.cartridge1Wells
-              }
-              wellClickHandler={wellClickHandler}
-            />
-            {isAspire ? (
-              <AspireCommonField formik={formik} currentTab={activeTab} />
-            ) : (
-              <DispenseCommonField formik={formik} currentTab={activeTab} />
-            )}
-          </>
+          <WellComponent
+            wellsObjArray={
+              isAspire
+                ? formik.values.aspire.cartridge1Wells
+                : formik.values.dispense.cartridge1Wells
+            }
+            wellClickHandler={wellClickHandler}
+          />
+          {isAspire ? (
+            <AspireCommonField formik={formik} currentTab={activeTab} />
+          ) : (
+            <DispenseCommonField formik={formik} currentTab={activeTab} />
+          )}
         </TabPane>
 
         <TabPane tabId="2">
-          <>
-            <WellComponent
-              wellsObjArray={
-                isAspire
-                  ? formik.values.aspire.cartridge2Wells
-                  : formik.values.dispense.cartridge2Wells
-              }
-              wellClickHandler={wellClickHandler}
-            />
-            {isAspire ? (
-              <AspireCommonField formik={formik} currentTab={activeTab} />
-            ) : (
-              <DispenseCommonField formik={formik} currentTab={activeTab} />
-            )}
-          </>
+          <WellComponent
+            wellsObjArray={
+              isAspire
+                ? formik.values.aspire.cartridge2Wells
+                : formik.values.dispense.cartridge2Wells
+            }
+            wellClickHandler={wellClickHandler}
+          />
+          {isAspire ? (
+            <AspireCommonField formik={formik} currentTab={activeTab} />
+          ) : (
+            <DispenseCommonField formik={formik} currentTab={activeTab} />
+          )}
         </TabPane>
 
         <TabPane tabId="3">
