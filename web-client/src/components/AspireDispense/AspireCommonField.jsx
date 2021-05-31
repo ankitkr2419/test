@@ -23,6 +23,7 @@ const AspireCommonField = (props) => {
             id="aspire-height"
             placeholder="Type here"
             className="aspire-input-field"
+            value={formik.values.aspire.aspireHeight}
             onChange={(e) =>
               setFormikField(
                 formik,
@@ -50,6 +51,7 @@ const AspireCommonField = (props) => {
             name="mixingVolume"
             id="mixing-volume"
             placeholder="Type here"
+            value={formik.values.aspire.mixingVolume}
             onChange={(e) =>
               setFormikField(
                 formik,
@@ -77,6 +79,7 @@ const AspireCommonField = (props) => {
               name="nCycles"
               id="no-of-cycles"
               placeholder=""
+              value={formik.values.aspire.nCycles}
               onChange={(e) =>
                 setFormikField(
                   formik,
@@ -102,6 +105,7 @@ const AspireCommonField = (props) => {
             name="aspireVolume"
             id="aspire-volume"
             placeholder="Type here"
+            value={formik.values.aspire.aspireVolume}
             onChange={(e) =>
               setFormikField(
                 formik,
@@ -126,6 +130,7 @@ const AspireCommonField = (props) => {
             name="airVolume"
             id="air-volume"
             placeholder="Type here"
+            value={formik.values.aspire.airVolume}
             onChange={(e) =>
               setFormikField(
                 formik,
