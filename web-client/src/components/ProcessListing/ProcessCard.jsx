@@ -16,6 +16,7 @@ const ProcessCard = (props) => {
         handleProcessMove,
         createDuplicateProcess,
         handleEditProcess,
+        handleDeleteProcess,
     } = props;
 
     const handleProcessMoveClick = () => {
@@ -108,6 +109,7 @@ const ProcessCard = (props) => {
                                         size={24}
                                         name="minus-1"
                                         className="border-gray text-primary ml-2"
+                                        onClick={handleDeleteProcess}
                                     />
                                 </div>
                             </div>
@@ -122,7 +124,12 @@ const ProcessCard = (props) => {
                             name={processIconName}
                             className="border-gray text-primary"
                         />
-                        <Text Tag="label" className="mb-0">
+                        <Text
+                            Tag="label"
+                            className={`mb-0 ${
+                                isOpen ? "font-weight-bold" : ""
+                            }`}
+                        >
                             {processName}
                         </Text>
                     </div>
