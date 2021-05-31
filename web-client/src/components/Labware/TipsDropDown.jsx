@@ -1,8 +1,8 @@
 import React from "react";
 
 import labwareTips from "assets/images/labware-plate-tips.png";
-import { Icon, ImageIcon, Text } from "shared-components";
-import { FormGroup, Label, FormError, Select, CheckBox } from "core-components";
+import { ImageIcon } from "shared-components";
+import { FormGroup, Label, FormError, Select } from "core-components";
 import { ProcessSetting } from "./Styles";
 import { getOptions } from "./functions";
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Card, CardBody } from "core-components";
 import PaginationBox from "shared-components/PaginationBox";
 import { Text } from "shared-components";
@@ -18,7 +18,7 @@ const ProcessListingCards = (props) => {
         handleDeleteProcess,
     } = props;
 
-    const getProcessIconName = (processType) => {
+    const getProcessIconName = useCallback((processType) => {
         let obj = SELECT_PROCESS_PROPS.find(
             (obj) => obj.processType === processType
         );
@@ -29,7 +29,7 @@ const ProcessListingCards = (props) => {
                   (obj) => obj.processType === "default"
               ).iconName;
         return iconName;
-    };
+    });
 
     return (
         <Card className="recipe-listing-cards">
