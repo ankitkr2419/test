@@ -10,6 +10,7 @@ import { getActiveLoadedWellFlag } from 'selectors/activeWellSelector';
 import { connectSocket } from 'web-socket';
 import ModalContainer from './ModalContainer';
 import { useLocation } from 'react-router-dom'
+import AppFooter from 'components/AppFooter';
 
 /**
  * AppLayoutContainer Will contain routes(content), headers, sub-headers, notification etc.
@@ -63,6 +64,7 @@ const AppLayoutContainer = (props) => {
 					))}
 				</Switch>
 			</section>
+			{location.pathname === '/splashscreen' ? null : <AppFooter /> }
 		</Router>
 	);
 };

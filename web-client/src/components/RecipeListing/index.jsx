@@ -22,6 +22,7 @@ import RunRecipesModal from "components/modals/RunRecipesModal";
 import { publishRecipeInitiated } from "action-creators/recipeActionCreators";
 import TopContentComponent from "./TopContentComponent";
 import RecipeListingCards from "./RecipeListingCards";
+import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
 
 const RecipeListingComponent = (props) => {
   const {
@@ -58,6 +59,7 @@ const RecipeListingComponent = (props) => {
   const [addNewRecipesModal, setAddNewRecipesModal] = useState(false);
   const [searchRecipeText, setSearchRecipeText] = useState("");
   const [recipeIdToPublish, setRecipeIdToPublish] = useState("");
+  const [isPublished, setIsPublished] = useState(false);//tells that selected recipe is published/unpublished
   const [publishModal, setPublishModal] = useState(false);
 
   useEffect(() => {
@@ -102,8 +104,9 @@ const RecipeListingComponent = (props) => {
     setPublishModal(!publishModal);
   };
 
-  const handlePublishModalClick = (recipeId) => {
+  const handlePublishModalClick = (recipeId, isPublished) => {
     setRecipeIdToPublish(recipeId);
+    setIsPublished(isPublished)
     if (recipeId) togglePublishModal();
   };
 
@@ -112,7 +115,7 @@ const RecipeListingComponent = (props) => {
     togglePublishModal();
     if (recipeIdToPublish)
       dispatch(
-        publishRecipeInitiated({ recipeId: recipeIdToPublish, deckName, token })
+        publishRecipeInitiated({ recipeId: recipeIdToPublish, isPublished, deckName, token })
       );
     else console.error("recipeId not found!");
   };
@@ -173,8 +176,12 @@ const RecipeListingComponent = (props) => {
       return;
     }
 
-    //TODO: save recipe in reducer to edit
-
+    dispatch(
+      saveNewRecipe({
+        recipeDetails: recipe
+      })
+    );
+    
     //go to processList page of recipe
     history.push(ROUTES.processListing);
   };
@@ -247,12 +254,12 @@ const RecipeListingComponent = (props) => {
           />
         )}
 
-        {/** publish confirmation modal */}
+        {/** publish/unpublish confirmation modal */}
         {publishModal && (
           <MlModal
             isOpen={publishModal}
             textHead={deckName}
-            textBody={MODAL_MESSAGE.publishConfirmation}
+            textBody={isPublished ? MODAL_MESSAGE.unpublishConfirmation : MODAL_MESSAGE.publishConfirmation}
             handleSuccessBtn={handlePublishConfirmation}
             handleCrossBtn={togglePublishModal}
             successBtn={MODAL_BTN.yes}
@@ -290,8 +297,8 @@ const RecipeListingComponent = (props) => {
               handleCarousalModal={handleCarousalModal}
               returnRecipeDetails={returnRecipeDetails}
               toggleRunRecipesModal={toggleRunRecipesModal}
-              handlePublishModalClick={(recipeId) =>
-                handlePublishModalClick(recipeId)
+              handlePublishModalClick={(recipeId, isPublished) =>
+                handlePublishModalClick(recipeId, isPublished)
               }
               handleEditRecipe={(recipe) => handleEditRecipe(recipe)}
             />
