@@ -94,14 +94,19 @@ export const API_ENDPOINTS = {
   logout: "logout",
   piercing: "piercing",
   aspireDispense: "aspire-dispense",
+  shaking: "shaking",
+  heating: "heating",
   recipe: "recipe",
   tipDiscard: "tip-operation",
+  magnet: "attach-detach",
   duplicateProcess: "duplicate-process",
   heating: "heating",
   shaking: "shaking",
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
+  rearrangeProcesses: "rearrange-processes",
+  processes: "processes",
 };
 
 export const MODAL_MESSAGE = {
@@ -113,6 +118,9 @@ export const MODAL_MESSAGE = {
   uvSuccess: "UV Clean Up was successful",
   publishConfirmation: "Are you sure you want to Publish this recipe?",
   unpublishConfirmation: "Are you sure you want to Unpublish this recipe?",
+  finishProcessListConfirmation: "Are you sure you want to save changes to ",
+  deleteProcessConfirmation: "Are you sure you want to delete this process?",
+  deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
 };
 
 export const MODAL_BTN = {
