@@ -11,7 +11,7 @@ export const ButtonBarBox = styled.div`
     box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.06);
     position: absolute;
     right: 0;
-    // bottom: 3rem;
+    bottom: 0rem;
     top: 29rem;
     > button {
         width: 160px;

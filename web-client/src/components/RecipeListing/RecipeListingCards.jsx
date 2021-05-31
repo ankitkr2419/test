@@ -48,8 +48,8 @@ const RecipeListingCards = (props) => {
                                     toggleRunRecipesModal={
                                         toggleRunRecipesModal
                                     }
-                                    handlePublishModalClick={(recipeId) =>
-                                        handlePublishModalClick(recipeId)
+                                    handlePublishModalClick={(recipeId, isPublished) =>
+                                        handlePublishModalClick(recipeId, isPublished)
                                     }
                                     handleEditRecipe={() =>
                                         handleEditRecipe(recipe)
