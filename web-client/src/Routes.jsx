@@ -16,6 +16,14 @@ import LabwareContainer from "containers/LabwareContainer";
 import ProcessListingContainer from "containers/ProcessListingContainer";
 import { ROOT_URL_PATH, ROUTES } from "./appConstants";
 import SelectProcessContainer from "containers/SelectProcessContainer";
+import PiercingContainer from "containers/PiercingContainer";
+import TipPickupContainer from "containers/TipPickupContainer";
+import AspireDispenseContainer from "containers/AspireDispenseContainer";
+import TipDiscardContainer from "containers/TipDiscardContainer";
+import ShakingContainer from "containers/ShakingContainer";
+import HeatingContainer from "containers/HeatingContainer";
+import MagnetContainer from "containers/MagnetContainer";
+import DelayContainer from "containers/DelayContainer";
 
 export const routeDefinitions = [
   {
@@ -67,10 +75,16 @@ export const routeDefinitions = [
         key: 9,
       },
       {
+        path: `${ROOT_URL_PATH}labware`,
+        exact: true,
+        component: LabwareContainer,
+        key: 10,
+      },
+      {
         path: `${ROOT_URL_PATH}all-set`,
         exact: true,
         component: AllSetContainer,
-        key: 10,
+        key: 11,
       },
       {
         path: `${ROOT_URL_PATH}select-process`,
@@ -79,16 +93,64 @@ export const routeDefinitions = [
         key: 18,
       },
       {
-        path: `${ROOT_URL_PATH}labware`,
+        path: `${ROOT_URL_PATH}piercing`,
         exact: true,
-        component: LabwareContainer,
-        key: 21,
+        component: PiercingContainer,
+        key: 13,
+      },
+      {
+        path: `${ROOT_URL_PATH}shaking`,
+        exact: true,
+        component: ShakingContainer,
+        key: 14,
+      },
+      {
+        path: `${ROOT_URL_PATH}heating`,
+        exact: true,
+        component: HeatingContainer,
+        key: 15,
+      },
+      // {
+      //   path: `${ROOT_URL_PATH}tip-position`,
+      //   exact: true,
+      //   component: TipPositionContainer,
+      //   key: 16,
+      // },
+      {
+        path: `${ROOT_URL_PATH}tip-discard`,
+        exact: true,
+        component: TipDiscardContainer,
+        key: 18,
+      },
+      {
+        path: `${ROOT_URL_PATH}magnet`,
+        exact: true,
+        component: MagnetContainer,
+        key: 17,
+      },
+      {
+        path: `${ROOT_URL_PATH}aspire-dispense`,
+        exact: true,
+        component: AspireDispenseContainer,
+        key: 19,
+      },
+      {
+        path: `${ROOT_URL_PATH}tip-pickup`,
+        exact: true,
+        component: TipPickupContainer,
+        key: 20,
       },
       {
         path: `${ROOT_URL_PATH}${ROUTES.processListing}`,
         exact: true,
         component: ProcessListingContainer,
         key: 22,
+      },
+      {
+        path: `${ROOT_URL_PATH}delay`,
+        exact: true,
+        component: DelayContainer,
+        key: 21,
       },
     ],
   },

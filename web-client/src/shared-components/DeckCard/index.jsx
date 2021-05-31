@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Text, Icon } from "shared-components";
 import { Button } from "core-components";
 import ActionButton from "./ActionButton";
-import { DECKCARD_BTN, PROCESS_ICON_CONSTANTS } from "appConstants";
+import { DECKCARD_BTN, SELECT_PROCESS_PROPS } from "appConstants";
 import { Progress } from "reactstrap";
 import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer";
 import { useDispatch, useSelector } from "react-redux";
@@ -195,13 +195,13 @@ const DeckCard = (props) => {
   const getIconName = () => {
     let processTypeText = processType ? processType : "default";
 
-    let obj = PROCESS_ICON_CONSTANTS.find(
+    let obj = SELECT_PROCESS_PROPS.find(
       (obj) => obj.processType === processTypeText
     );
 
     let iconName = obj?.iconName
       ? obj.iconName
-      : PROCESS_ICON_CONSTANTS.find((obj) => obj.processType === "default")
+      : SELECT_PROCESS_PROPS.find((obj) => obj.processType === "default")
           .iconName;
     return iconName;
   };

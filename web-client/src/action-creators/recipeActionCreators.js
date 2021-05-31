@@ -6,7 +6,8 @@ import {
   recipeListingAction,
   saveRecipeDataAction,
   stepRunRecipeAction,
-  publishRecipeAction
+  publishRecipeAction,
+  deleteRecipeAction,
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
@@ -198,6 +199,13 @@ export const nextStepRunRecipeInitiated = (params) => ({
 
 export const publishRecipeInitiated = (params) => ({
   type: publishRecipeAction.publishRecipeInitiated,
+  payload: {
+    params,
+  },
+})
+
+export const deleteRecipeInitiated = (params) => ({
+  type: deleteRecipeAction.deleteRecipeInitiated,
   payload: {
     params,
   },

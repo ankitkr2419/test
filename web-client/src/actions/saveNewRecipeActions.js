@@ -21,10 +21,10 @@ export const getTipsAction = {
 };
 
 export const getTubesAction = {
-  getTubesInitiated: "GET_TIPS_OPTIONS_INITIATED",
-  getTubesSuccess: "GET_TIPS_OPTIONS_SUCCESS",
-  getTubesFailure: "GET_TIPS_OPTIONS_FAILED",
-  getTubesReset: "GET_TIPS_OPTIONS_RESET",
+  getTubesInitiated: "GET_TUBES_OPTIONS_INITIATED",
+  getTubesSuccess: "GET_TUBES_OPTIONS_SUCCESS",
+  getTubesFailure: "GET_TUBES_OPTIONS_FAILED",
+  getTubesReset: "GET_TUBES_OPTIONS_RESET",
 };
 
 export const getCartridgeAction = {

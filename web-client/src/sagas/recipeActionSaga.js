@@ -7,7 +7,8 @@ import {
   abortRecipeAction,
   recipeListingAction,
   stepRunRecipeAction,
-  publishRecipeAction
+  publishRecipeAction,
+  deleteRecipeAction,
 } from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
 import {
@@ -223,19 +224,49 @@ export function* nextStepRunRecipe(actions) {
 export function* publishRecipe(actions) {
   const {
     payload: {
-      params: { recipeId, token },
+      params: { recipeId, token, isPublished },
     },
   } = actions;
   const { publishRecipeSuccess, publishRecipeFailed } = publishRecipeAction;
+
+  /**isPublished: true means we should call unpublish api
+   * isPublished: false means we should call publish api
+   */
 
   try {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.POST,
         body: null,
-        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}/publish`,
+        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}/${isPublished ? "unpublish" : "publish"}`,
         successAction: publishRecipeSuccess,
         failureAction: publishRecipeFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
+      },
+    });
+  } catch (error) {
+    console.error("Error in publish recipe", error);
+  }
+}
+
+export function* deleteRecipe(actions) {
+  const {
+    payload: {
+      params: { recipeId, token },
+    },
+  } = actions;
+  const { deleteRecipeSuccess, deleteRecipeFailure } = deleteRecipeAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.DELETE,
+        body: null,
+        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}`,
+        successAction: deleteRecipeSuccess,
+        failureAction: deleteRecipeFailure,
         showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token
@@ -255,4 +286,5 @@ export function* recipeActionSaga() {
   yield takeEvery(stepRunRecipeAction.stepRunRecipeInitiated, stepRunRecipe);
   yield takeEvery(stepRunRecipeAction.nextStepRunRecipeInitiated, nextStepRunRecipe);
   yield takeEvery(publishRecipeAction.publishRecipeInitiated, publishRecipe);
+  yield takeEvery(deleteRecipeAction.deleteRecipeInitiated, deleteRecipe);
 }
