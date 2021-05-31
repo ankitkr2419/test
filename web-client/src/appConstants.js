@@ -308,7 +308,7 @@ export const SELECT_PROCESS_PROPS = [
     processType: "TipDocking",
     processName: "Tip Position",
     route: ROUTES.tipPosition,
-    apiEndpoint: API_ENDPOINTS.tipDocking
+    apiEndpoint: API_ENDPOINTS.tipDocking,
   },
 ];
 
@@ -338,3 +338,25 @@ export const ASPIRE_DISPENSE_DECK_POS_OPTNS = [
   { value: "10", label: "10" },
   { value: "11", label: "11" },
 ];
+
+export const TIP_PICKUP_PROCESS_OPTIONS = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+];
+
+export const CATEGORY_NAME = {
+  1: "well",
+  2: "well",
+  3: "shaker",
+  4: "deck",
+};
+
+export const CATEGORY_LABEL = {
+  1: "Category 1",
+  2: "Category 2",
+  3: "Shaker",
+  4: "Deck Position",
+};

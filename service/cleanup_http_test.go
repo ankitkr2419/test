@@ -41,7 +41,7 @@ func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupSuccess() {
 	)
 
 	msg := MsgObj{Msg: responses.DiscardBoxMovedSuccess, Deck: deck}
-	body, _ := json.Marshal(msg) 
+	body, _ := json.Marshal(msg)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), string(body), recorder.Body.String())
@@ -83,7 +83,7 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckSuccess() {
 	)
 
 	msg := MsgObj{Msg: responses.RestoreDeckSuccess, Deck: deck}
-	body, _ := json.Marshal(msg) 
+	body, _ := json.Marshal(msg)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), string(body), recorder.Body.String())
@@ -112,7 +112,6 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-
 func (suite *CleanupHandlerTestSuite) TestUVCleanupSuccess() {
 
 	deck := deckB
@@ -127,7 +126,7 @@ func (suite *CleanupHandlerTestSuite) TestUVCleanupSuccess() {
 	)
 
 	msg := MsgObj{Msg: responses.UVCleanupProgress, Deck: deck}
-	body, _ := json.Marshal(msg) 
+	body, _ := json.Marshal(msg)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	assert.Equal(suite.T(), string(body), recorder.Body.String())

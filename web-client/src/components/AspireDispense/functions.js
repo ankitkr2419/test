@@ -1,5 +1,9 @@
-// footerText can be: "aspire-from" or "selected"
+export const getPosition = (wells) => {
+  const selectedWell = wells.find((wellObj) => wellObj.isSelected);
+  return selectedWell.id;
+};
 
+// footerText can be: "aspire-from" or "selected"
 export const getArray = (length, type) => {
   const array = [];
   for (let i = 0; i < length; i++) {
@@ -26,6 +30,7 @@ export const getFormikInitialState = () => {
       aspireVolume: null,
       airVolume: null,
       nCycles: null,
+      selectedCategory: "",
     },
     dispense: {
       cartridge1Wells: getArray(8, 0),
@@ -53,21 +58,8 @@ export const disabledTab = {
   },
 };
 
-const getCurrentTabName = (currentTab) => {
-  switch (currentTab) {
-    case "1":
-      return "cartridge1";
-    case "2":
-      return "cartridge2";
-    case "3":
-      return "shaker";
-    case "4":
-      return "deckPosition";
-  }
-};
-
 //return true if any value is filled or updated, else returns false
-//this will check for all keys but currentKey
+//this will check for all keys except currentKey
 const checkIsFilled = (formikData, isAspire, currentKey) => {
   let isFilled = false;
 
@@ -77,7 +69,7 @@ const checkIsFilled = (formikData, isAspire, currentKey) => {
     //if cartridge1 is selected in Aspire, cart2 will be discarded in dispense
     const aspireOrDispense = !isAspire ? "aspire" : "dispense";
     const disabledTabInNextPage =
-      currentKey === "cartridge1Wells" ? "cartridge1" : "cartridge2";
+      currentKey === "cartridge1Wells" ? "cartridge2" : "cartridge1";
 
     disabledTab[aspireOrDispense][disabledTabInNextPage] = true;
   } else {
@@ -105,8 +97,14 @@ export const toggler = (
   fieldName,
   fieldValue
 ) => {
-  const currentTabName = getCurrentTabName(currentTab);
+  const tabNames = {
+    1: "cartridge1",
+    2: "cartridge2",
+    3: "shaker",
+    4: "deckPosition",
+  };
 
+  const currentTabName = tabNames[currentTab];
   const aspireOrDispense = isAspire ? disabledTab.aspire : disabledTab.dispense;
 
   if (fieldValue) {

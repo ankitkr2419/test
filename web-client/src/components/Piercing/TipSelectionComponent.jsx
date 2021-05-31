@@ -17,9 +17,6 @@ export const TipSelectionComponent = (props) => {
               placeholder="Select Tip"
               className=""
               size="sm"
-            //   options={taskOptions}
-            //   value={task}
-            //   onChange={handleTaskChange}
             />
           </Col>
         </FormGroup>

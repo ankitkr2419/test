@@ -4,7 +4,6 @@ import { VideoCard } from "shared-components";
 import MlModal from "shared-components/MlModal";
 import TimeModal from "components/modals/TimeModal";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
-import AppFooter from "components/AppFooter";
 import { useHistory } from "react-router-dom";
 import { DECKNAME, MODAL_BTN, ROUTES, MODAL_MESSAGE } from "appConstants";
 import { logoutInitiated } from "action-creators/loginActionCreators";
@@ -59,7 +58,7 @@ const RecipeListingComponent = (props) => {
   const [addNewRecipesModal, setAddNewRecipesModal] = useState(false);
   const [searchRecipeText, setSearchRecipeText] = useState("");
   const [recipeIdToPublish, setRecipeIdToPublish] = useState("");
-  const [isPublished, setIsPublished] = useState(false);//tells that selected recipe is published/unpublished
+  const [isPublished, setIsPublished] = useState(false); //tells that selected recipe is published/unpublished
   const [publishModal, setPublishModal] = useState(false);
 
   useEffect(() => {
@@ -106,7 +105,7 @@ const RecipeListingComponent = (props) => {
 
   const handlePublishModalClick = (recipeId, isPublished) => {
     setRecipeIdToPublish(recipeId);
-    setIsPublished(isPublished)
+    setIsPublished(isPublished);
     if (recipeId) togglePublishModal();
   };
 
@@ -115,7 +114,12 @@ const RecipeListingComponent = (props) => {
     togglePublishModal();
     if (recipeIdToPublish)
       dispatch(
-        publishRecipeInitiated({ recipeId: recipeIdToPublish, isPublished, deckName, token })
+        publishRecipeInitiated({
+          recipeId: recipeIdToPublish,
+          isPublished,
+          deckName,
+          token,
+        })
       );
     else console.error("recipeId not found!");
   };
@@ -129,7 +133,7 @@ const RecipeListingComponent = (props) => {
             deckName === DECKNAME.DeckA
               ? DECKNAME.DeckAShort
               : DECKNAME.DeckBShort,
-          token
+          token,
         })
       );
       setNextModal(!nextModal);
@@ -140,7 +144,7 @@ const RecipeListingComponent = (props) => {
             deckName === DECKNAME.DeckA
               ? DECKNAME.DeckAShort
               : DECKNAME.DeckBShort,
-              token
+          token,
         })
       );
       setTrayDiscardModal(!trayDiscardModal);
@@ -259,7 +263,11 @@ const RecipeListingComponent = (props) => {
           <MlModal
             isOpen={publishModal}
             textHead={deckName}
-            textBody={isPublished ? MODAL_MESSAGE.unpublishConfirmation : MODAL_MESSAGE.publishConfirmation}
+            textBody={
+              isPublished
+                ? MODAL_MESSAGE.unpublishConfirmation
+                : MODAL_MESSAGE.publishConfirmation
+            }
             handleSuccessBtn={handlePublishConfirmation}
             handleCrossBtn={togglePublishModal}
             successBtn={MODAL_BTN.yes}
@@ -305,7 +313,6 @@ const RecipeListingComponent = (props) => {
           )}
         </>
       </div>
-      <AppFooter />
     </>
   );
 };
