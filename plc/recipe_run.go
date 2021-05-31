@@ -8,31 +8,33 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func CheckIfRecipeOrProcessSafeForDelete(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
+func CheckIfRecipeOrProcessSafeForCUDs(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
 	if recipeID != nil {
 		// for deck A or deck B
 		if (deckRecipe[deckA] != db.Recipe{} && *recipeID == deckRecipe[deckA].ID) ||
 			(deckRecipe[deckB] != db.Recipe{} && *recipeID == deckRecipe[deckB].ID) {
-			logger.Errorln(responses.RecipeUnsafeForCRUDError)
-			return responses.RecipeUnsafeForCRUDError
+			logger.Errorln(responses.RecipeUnsafeForCUDError)
+			return responses.RecipeUnsafeForCUDError
 		}
-		logger.Infoln(responses.RecipeSafeForCRUD)
+		logger.Infoln(responses.RecipeSafeForCUD)
 	}
 
 	if processID != nil {
 		// for deck A
 		for _, pr := range deckProcesses[deckA] {
 			if pr.ID == *processID {
-				return responses.ProcessUnsafeForCRUDError
+				logger.Errorln(responses.RecipeUnsafeForCUDError)
+				return responses.ProcessUnsafeForCUDError
 			}
 		}
 		// for deck B
 		for _, pr := range deckProcesses[deckB] {
 			if pr.ID == *processID {
-				return responses.ProcessUnsafeForCRUDError
+				logger.Errorln(responses.RecipeUnsafeForCUDError)
+				return responses.ProcessUnsafeForCUDError
 			}
 		}
-		logger.Infoln(responses.ProcessSafeForCRUD)
+		logger.Infoln(responses.ProcessSafeForCUD)
 	}
 
 	return
