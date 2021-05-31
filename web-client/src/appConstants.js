@@ -96,6 +96,12 @@ export const API_ENDPOINTS = {
   aspireDispense: "aspire-dispense",
   recipe: "recipe",
   magnet: "attach-detach",
+  duplicateProcess: "duplicate-process",
+  heating: "heating",
+  shaking: "shaking",
+  attachDetach: "attach-detach",
+  tipDocking: "tip-docking",
+  delay: "delay",
 };
 
 export const MODAL_MESSAGE = {
@@ -237,6 +243,7 @@ export const SELECT_PROCESS_PROPS = [
     processType: "default",
     iconName: "process",
     route: "",
+    apiEndpoint: null,
   },
 
   // process properties
@@ -245,54 +252,63 @@ export const SELECT_PROCESS_PROPS = [
     processType: "Piercing",
     processName: "Piercing",
     route: ROUTES.piercing,
+    apiEndpoint: API_ENDPOINTS.piercing,
   },
   {
     iconName: "tip-pickup",
     processType: "TipPickup",
     processName: "Tip Pickup",
     route: ROUTES.tipPickup,
+    apiEndpoint: API_ENDPOINTS.tipOperation,
   },
   {
     iconName: "aspire-dispense",
     processType: "AspireDispense",
     processName: "Aspire & Dispense",
     route: ROUTES.aspireDispense,
+    apiEndpoint: API_ENDPOINTS.aspireDispense,
   },
   {
     iconName: "shaking",
     processType: "Shaking",
     processName: "Shaking",
     route: ROUTES.shaking,
+    apiEndpoint: API_ENDPOINTS.shaking,
   },
   {
     iconName: "heating",
     processType: "Heating",
     processName: "Heating",
     route: ROUTES.heating,
+    apiEndpoint: API_ENDPOINTS.heating,
   },
   {
     iconName: "magnet",
     processType: "AttachDetach",
     processName: "Magnet",
     route: ROUTES.magnet,
+    apiEndpoint: API_ENDPOINTS.attachDetach,
   },
   {
     iconName: "tip-discard",
     processType: "TipDiscard",
     processName: "Tip Discard",
     route: ROUTES.tipDiscard,
+    apiEndpoint: API_ENDPOINTS.tipOperation,
   },
   {
     iconName: "delay",
     processType: "Delay",
     processName: "Delay",
     route: ROUTES.delay,
+    apiEndpoint: API_ENDPOINTS.delay,
   },
   {
     iconName: "tip-position",
     processType: "TipDocking",
     processName: "Tip Position",
     route: ROUTES.tipPosition,
+    apiEndpoint: API_ENDPOINTS.tipDocking,
   },
 ];
 
@@ -322,3 +338,25 @@ export const ASPIRE_DISPENSE_DECK_POS_OPTNS = [
   { value: "10", label: "10" },
   { value: "11", label: "11" },
 ];
+
+export const TIP_PICKUP_PROCESS_OPTIONS = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+];
+
+export const CATEGORY_NAME = {
+  1: "well",
+  2: "well",
+  3: "shaker",
+  4: "deck",
+};
+
+export const CATEGORY_LABEL = {
+  1: "Category 1",
+  2: "Category 2",
+  3: "Shaker",
+  4: "Deck Position",
+};

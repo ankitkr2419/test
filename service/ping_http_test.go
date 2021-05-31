@@ -20,8 +20,7 @@ func TestPingTestSuite(t *testing.T) {
 	suite.Run(t, new(PingHandlerTestSuite))
 }
 
-
-func (suite *PingHandlerTestSuite) TestPingSuccess(){
+func (suite *PingHandlerTestSuite) TestPingSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/ping",

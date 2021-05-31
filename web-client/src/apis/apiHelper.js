@@ -121,8 +121,8 @@ export function* callApi(actions) {
       }
     } else {
       yield put(dispatcherHelper(failureAction, parsedResponse, true));
-      if(showPopupFailureMessage && parsedResponse?.msg){
-        toast.error(parsedResponse.msg)
+      if(showPopupFailureMessage && parsedResponse?.err){
+        toast.error(parsedResponse.err)
       }
     }
   } catch (error) {

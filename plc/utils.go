@@ -74,13 +74,15 @@ const (
 	OutDeck
 )
 
+var deckRecipe map[string]db.Recipe
+var deckProcesses map[string][]db.Process
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
 
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
-var homingPercent sync.Map
+var homingPercent, currentProcess sync.Map
 
 // variable map Registers to keep track of machine related variables.
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
@@ -114,9 +116,21 @@ func loadUtils() {
 	homed.Store("A", false)
 	homed.Store("B", false)
 
+	deckRecipe = map[string]db.Recipe{
+		"A": db.Recipe{},
+		"B": db.Recipe{},
+	}
+
+	deckProcesses = map[string][]db.Process{
+		"A": []db.Process{},
+		"B": []db.Process{},
+	}
+
 	BothDeckHomingInProgress = false
 	homingPercent.Store("A", float64(0))
 	homingPercent.Store("B", float64(0))
+	currentProcess.Store("A", int(0))
+	currentProcess.Store("B", int(0))
 
 	motorNumReg.Store("A", uint16(0))
 	motorNumReg.Store("B", uint16(0))

@@ -14,6 +14,8 @@ const ProcessCard = (props) => {
         setDraggedProcessId,
         handleChangeSequenceTo,
         handleProcessMove,
+        createDuplicateProcess,
+        handleEditProcess,
     } = props;
 
     const handleProcessMoveClick = () => {
@@ -23,6 +25,10 @@ const ProcessCard = (props) => {
     //when selected, previously selected process and this process will get sequence_number swapped.
     const handleDropHere = () => {
         handleChangeSequenceTo(processId);
+    };
+
+    const handleDuplicateProcessClick = () => {
+        createDuplicateProcess(processId);
     };
 
     const getClassNameForMoveButton = () => {
@@ -56,7 +62,7 @@ const ProcessCard = (props) => {
                                     top={0}
                                     right={0}
                                     size={36}
-                                    name="angle-down"//"cross"
+                                    name="angle-down" //"cross"
                                     onClick={toggleIsOpen}
                                     className="border-0"
                                 />
@@ -74,7 +80,9 @@ const ProcessCard = (props) => {
                                         size={14}
                                         name="down"
                                         className="border-gray text-primary ml-2"
-                                        onClick={() => handleProcessMove("down")}
+                                        onClick={() =>
+                                            handleProcessMove("down")
+                                        }
                                     />
                                     <ButtonIcon
                                         size={24}
@@ -86,6 +94,7 @@ const ProcessCard = (props) => {
                                         size={14}
                                         name="copy"
                                         className="border-gray text-primary ml-2"
+                                        onClick={handleDuplicateProcessClick}
                                     />
                                 </div>
                                 <div className="d-flex more-action">
@@ -93,6 +102,7 @@ const ProcessCard = (props) => {
                                         size={14}
                                         name="edit-pencil"
                                         className="border-gray text-primary ml-2"
+                                        onClick={handleEditProcess}
                                     />
                                     <ButtonIcon
                                         size={24}

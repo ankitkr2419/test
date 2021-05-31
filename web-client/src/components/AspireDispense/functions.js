@@ -1,33 +1,3 @@
-export const getCategoryLabel = (tabID) => {
-  switch (tabID) {
-    case "1":
-      return "Category 1";
-    case "2":
-      return "Category 2";
-    case "3":
-      return "Shaker";
-    case "4":
-      return "Deck Position";
-    default:
-      return;
-  }
-};
-
-export const getCategoryName = (tabID) => {
-  switch (tabID) {
-    case "1":
-      return "well";
-    case "2":
-      return "well";
-    case "3":
-      return "shaker";
-    case "4":
-      return "deck";
-    default:
-      return;
-  }
-};
-
 export const getPosition = (wells) => {
   const selectedWell = wells.find((wellObj) => wellObj.isSelected);
   return selectedWell.id;
@@ -88,21 +58,6 @@ export const disabledTab = {
   },
 };
 
-const getCurrentTabName = (currentTab) => {
-  switch (currentTab) {
-    case "1":
-      return "cartridge1";
-    case "2":
-      return "cartridge2";
-    case "3":
-      return "shaker";
-    case "4":
-      return "deckPosition";
-    default:
-      return;
-  }
-};
-
 //return true if any value is filled or updated, else returns false
 //this will check for all keys except currentKey
 const checkIsFilled = (formikData, isAspire, currentKey) => {
@@ -142,8 +97,14 @@ export const toggler = (
   fieldName,
   fieldValue
 ) => {
-  const currentTabName = getCurrentTabName(currentTab);
+  const tabNames = {
+    1: "cartridge1",
+    2: "cartridge2",
+    3: "shaker",
+    4: "deckPosition",
+  };
 
+  const currentTabName = tabNames[currentTab];
   const aspireOrDispense = isAspire ? disabledTab.aspire : disabledTab.dispense;
 
   if (fieldValue) {

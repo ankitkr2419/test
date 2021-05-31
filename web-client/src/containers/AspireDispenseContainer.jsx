@@ -1,11 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import AspireDispenseComponent from 'components/AspireDispense';
+import AspireDispenseComponent from "components/AspireDispense";
 
-const AspireDispenseContainer = (props) => {
-	return <AspireDispenseComponent />;
+const AspireDispenseContainer = () => {
+  return <AspireDispenseComponent />;
 };
-
-AspireDispenseContainer.propTypes = {};
 
 export default AspireDispenseContainer;
