@@ -12,7 +12,6 @@ const Well = (props) => {
     isSelected,
     taskInitials,
     onClickHandler,
-    isDisabled,
   } = props;
   const wellClassnames = classNames(className, {
     running: isRunning,

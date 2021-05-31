@@ -7,9 +7,8 @@ import {
   getTipsActionInitiated,
   getTubesActionInitiated,
 } from "action-creators/saveNewRecipeActionCreators";
-import { TEST_TOKEN } from "appConstants";
 
-const LabwareContainer = (props) => {
+const LabwareContainer = () => {
   const dispatch = useDispatch();
 
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -24,10 +23,8 @@ const LabwareContainer = (props) => {
     dispatch(getCartridgeActionInitiated(params));
     dispatch(getTipsActionInitiated(params));
     dispatch(getTubesActionInitiated(params));
-  }, [dispatch]);
+  }, [dispatch, params]);
   return <LabWareComponent />;
 };
-
-LabwareContainer.propTypes = {};
 
 export default LabwareContainer;

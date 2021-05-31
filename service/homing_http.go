@@ -130,7 +130,7 @@ func singleDeckOperation(ctx context.Context, deps Dependencies, deck, operation
 	}
 
 	response = result[0].String()
-	if len(response) > 0 {
+	if len(result) == 2 {
 		errRes := result[1].Interface()
 		if errRes != nil {
 			fmt.Println(errRes)

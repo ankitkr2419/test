@@ -189,10 +189,9 @@ func (s *pgStore) DuplicateProcess(ctx context.Context, processID uuid.UUID) (du
 // 1. initiate transaction
 // 2. get count of processes of recipeID
 // 3. if count is equal to len of sequenceArr, only then proceed
-// 4. update each process by that sequence num + HSN in separate private method
-// 5. subtract HSN from sequence num of process
+// 4. update each process by that sequence num + highNum in separate private method
+// 5. subtract highNum from sequence num of process
 // 6. end transaction
-//
 // 7. list processes
 //
 func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, sequenceArr []ProcessSequence) (processes []Process, err error) {
@@ -242,13 +241,13 @@ func (s *pgStore) RearrangeProcesses(ctx context.Context, recipeID uuid.UUID, se
 		return
 	}
 
-	// 4. update each process by that sequence num + HSN in separate private method
-	err = s.rearrangeProcessSequence(ctx, tx, sequenceArr, processCount)
+	// 4. update each process by that sequence num + highNum in separate private method
+	err = s.rearrangeProcessSequence(ctx, tx, sequenceArr)
 	if err != nil {
 		return
 	}
 
-	// 5. subtract HSN from sequence num of process
-	err = s.subtractFromSequence(ctx, tx, recipeID, processCount)
+	// 5. subtract highNum from sequence num of process
+	err = s.subtractFromSequence(ctx, tx, recipeID)
 	return
 }

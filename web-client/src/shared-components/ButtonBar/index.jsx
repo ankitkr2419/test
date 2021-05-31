@@ -4,7 +4,6 @@ import { Icon } from "shared-components";
 import { Button } from "core-components";
 import { ButtonBarBox, PrevBtn } from "./Styles";
 import { useHistory } from "react-router";
-import { ROUTES } from "appConstants";
 
 const ButtonBar = (props) => {
   const { leftBtnLabel, rightBtnLabel, handleLeftBtn, handleRightBtn } = props;
@@ -15,7 +14,7 @@ const ButtonBar = (props) => {
   };
 
   return (
-    <ButtonBarBox className="bg-dark d-flex justify-content-start align-items-center mt-5">
+    <ButtonBarBox className="d-flex justify-content-start align-items-center mt-5">
       <PrevBtn onClick={handleBackBtn}>
         <Icon name="angle-left" size={30} />
       </PrevBtn>
