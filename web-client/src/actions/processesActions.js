@@ -16,6 +16,11 @@ export const aspireDispenseAction = {
   saveAspireDispenseFailed: "SAVE_ASPIRE_DISPENSE_FAILED",
 };
 
+export const magnetAction = {
+  saveMagnetInitiated: "SAVE_MAGNET_INITIATED",
+  saveMagnetSuccess: "SAVE_MAGNET_SUCCESS",
+  saveMagnetFailed: "SAVE_MAGNET_FAILED",
+};
 export const delayAction = {
   saveDelayInitiated: "SAVE_DELAY_INITIATED",
   saveDelaySuccess: "SAVE_DELAY_SUCCESS",

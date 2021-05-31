@@ -1,5 +1,6 @@
 import {
   aspireDispenseAction,
+  magnetAction,
   delayAction,
   piercingAction,
   tipPickupAction,
@@ -47,6 +48,22 @@ export const saveTipPickupSuccess = (response) => ({
 
 export const saveTipPickupFailure = (error) => ({
   type: tipPickupAction.saveTipPickUpFailed,
+  payload: error,
+});
+
+//magnet
+export const saveMagnetInitiated = (params) => ({
+  type: magnetAction.saveMagnetInitiated,
+  payload: params,
+});
+
+export const saveMagnetSuccess = (response) => ({
+  type: magnetAction.saveMagnetSuccess,
+  payload: response,
+});
+
+export const saveMagnetFailure = (error) => ({
+  type: magnetAction.saveMagnetFailed,
   payload: error,
 });
 
