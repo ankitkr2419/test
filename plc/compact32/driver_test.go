@@ -17,13 +17,13 @@ import (
 // functionality from testify - including assertion methods.
 type Compact32DriverTestSuite struct {
 	suite.Suite
-	driver *MockCompact32Driver
+	driver *plc.MockCompact32Driver
 	C32    *Compact32
 }
 
 func (suite *Compact32DriverTestSuite) SetupTest() {
 	logger.SetLevel(logger.TraceLevel)
-	suite.driver = &MockCompact32Driver{}
+	suite.driver = &plc.MockCompact32Driver{}
 
 	suite.C32 = &Compact32{
 		Driver: suite.driver,
