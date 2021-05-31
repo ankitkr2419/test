@@ -98,10 +98,10 @@ func deleteProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = plc.CheckIfRecipeOrProcessSafeForDelete(nil, &id)
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: responses.ProcessInProgressError.Error()})
-			logger.WithField("err", err.Error()).Error(responses.ProcessInProgressError)
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, deleteC))
 			return
 		}
 
@@ -167,6 +167,13 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &processID)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, duplicateC))
+			return
+		}
+
 		process, err := deps.Store.DuplicateProcess(req.Context(), processID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.ProcessDuplicationError)
@@ -200,6 +207,13 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		logger.Infoln("Sequence Array: ", sequenceArr)
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(recipeC, rearrangeC))
+			return
+		}
 
 		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
 		if err != nil {
