@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
-	"mylab/cpagent/responses"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

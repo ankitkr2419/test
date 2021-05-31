@@ -60,6 +60,15 @@ export const ROUTES = {
   labware: "labware",
   processListing: "process-listing",
   selectProcess: "select-process",
+  piercing: "piercing",
+  tipPickup: "tip-pickup",
+  aspireDispense: "aspire-dispense",
+  shaking: "shaking",
+  heating: "heating",
+  magnet: "magnet",
+  tipDiscard: "tip-discard",
+  delay: "delay",
+  tipPosition: "tip-position",
 };
 
 export const API_ENDPOINTS = {
@@ -80,8 +89,18 @@ export const API_ENDPOINTS = {
   tips: "tip",
   stepRun: "step-run",
   runNextStep: "run-next-step",
+  tipOperation: "tip-operation",
   login: "login",
   logout: "logout",
+  piercing: "piercing",
+  aspireDispense: "aspire-dispense",
+  recipe: "recipe",
+  duplicateProcess: "duplicate-process",
+  heating: "heating",
+  shaking: "shaking",
+  attachDetach: "attach-detach",
+  tipDocking: "tip-docking",
+  delay: "delay",
 };
 
 export const MODAL_MESSAGE = {
@@ -92,6 +111,7 @@ export const MODAL_MESSAGE = {
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",
   publishConfirmation: "Are you sure you want to Publish this recipe?",
+  unpublishConfirmation: "Are you sure you want to Unpublish this recipe?",
 };
 
 export const MODAL_BTN = {
@@ -215,50 +235,113 @@ export const LABWARE_NAME = {
   cartridgeType: "Cartridge Type",
 };
 
-/**
- * get process icon_name associated with processType
- * */
-export const PROCESS_ICON_CONSTANTS = [
-  //if processType not found, use default process icon
+export const SELECT_PROCESS_PROPS = [
+  // if processType not found, use default process icon
   {
+    processName: "Process Name",
     processType: "default",
     iconName: "process",
+    route: "",
+    apiEndpoint: null,
   },
 
-  //other icons:
+  // process properties
   {
-    processType: "Piercing",
     iconName: "piercing",
+    processType: "Piercing",
+    processName: "Piercing",
+    route: ROUTES.piercing,
+    apiEndpoint: API_ENDPOINTS.piercing,
   },
   {
-    processType: "AspireDispense",
+    iconName: "tip-pickup",
+    processType: "TipPickup",
+    processName: "Tip Pickup",
+    route: ROUTES.tipPickup,
+    apiEndpoint: API_ENDPOINTS.tipOperation,
+  },
+  {
     iconName: "aspire-dispense",
+    processType: "AspireDispense",
+    processName: "Aspire & Dispense",
+    route: ROUTES.aspireDispense,
+    apiEndpoint: API_ENDPOINTS.aspireDispense,
   },
   {
-    processType: "Heating",
-    iconName: "heating",
-  },
-  {
-    processType: "Shaking",
     iconName: "shaking",
+    processType: "Shaking",
+    processName: "Shaking",
+    route: ROUTES.shaking,
+    apiEndpoint: API_ENDPOINTS.shaking,
   },
   {
-    processType: "Delay",
-    iconName: "delay",
-  },
-  /**TODO:
-   * following icons not available in fonts.scss
-   */
-  {
-    processType: "TipOperation",
-    iconName: "",
+    iconName: "heating",
+    processType: "Heating",
+    processName: "Heating",
+    route: ROUTES.heating,
+    apiEndpoint: API_ENDPOINTS.heating,
   },
   {
-    processType: "TipDocking",
-    iconName: "",
-  },
-  {
+    iconName: "magnet",
     processType: "AttachDetach",
-    iconName: "",
+    processName: "Magnet",
+    route: ROUTES.magnet,
+    apiEndpoint: API_ENDPOINTS.attachDetach,
   },
+  {
+    iconName: "tip-discard",
+    processType: "TipDiscard",
+    processName: "Tip Discard",
+    route: ROUTES.tipDiscard,
+    apiEndpoint: API_ENDPOINTS.tipOperation,
+  },
+  {
+    iconName: "delay",
+    processType: "Delay",
+    processName: "Delay",
+    route: ROUTES.delay,
+    apiEndpoint: API_ENDPOINTS.delay,
+  },
+  {
+    iconName: "tip-position",
+    processType: "TipDocking",
+    processName: "Tip Position",
+    route: ROUTES.tipPosition,
+    apiEndpoint: API_ENDPOINTS.tipDocking,
+  },
+];
+
+export const ASPIRE_DISPENSE_SIDEBAR_LABELS = [
+  "Cartridge 1",
+  "Cartridge 2",
+  "Shaker",
+  "Deck Position",
+];
+
+// for testing, will be removed
+export const TEST_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjE0MjMwMTIsInN1YiI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiZGVjayI6IkEiLCJhdXRoX2lkIjoiOWFjYTYxMWMtODJkZS00MzJkLWIxNGQtMWQwZjM2MmQ3OTYyIn0.5xvpGAhljqk2cKrmfIEJvmFwHm0bVuNZUEXG2zs9nF0";
+
+export const TEST_RECIPE_ID = "28585f66-8aa7-4e55-bff9-d0fb0240a147";
+
+export const ASPIRE_DISPENSE_DECK_POS_OPTNS = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+  { value: "6", label: "6" },
+  { value: "7", label: "7" },
+  { value: "8", label: "8" },
+  { value: "9", label: "9" },
+  { value: "10", label: "10" },
+  { value: "11", label: "11" },
+];
+
+export const TIP_PICKUP_PROCESS_OPTIONS = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
 ];
