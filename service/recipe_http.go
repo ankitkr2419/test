@@ -148,7 +148,12 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		plc.CheckIfRecipeOrProcessSafeForUDs(&id, nil)
+		err = plc.CheckIfRecipeOrProcessSafeForDelete(&id, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: responses.RecipeInProgressError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.RecipeInProgressError)
+			return
+		}
 
 		err = deps.Store.DeleteRecipe(req.Context(), id)
 		if err != nil {
