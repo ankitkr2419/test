@@ -30,6 +30,9 @@ const (
 	duplicate processOperation = "duplicate"
 )
 
+// const for rearrange process sequence updation 
+const highNum = 10000
+
 const (
 	updateProcessNameQuery       = `UPDATE processes SET name = $1 WHERE id = $2;`
 	getProcessCountQuery         = `SELECT count(*) FROM processes WHERE recipe_id = $1;`
@@ -93,12 +96,12 @@ func (s *pgStore) getProcessCount(ctx context.Context, tx *sql.Tx, recipeID uuid
 	return
 }
 
-func (s *pgStore) rearrangeProcessSequence(ctx context.Context, tx *sql.Tx, sequenceArr []ProcessSequence, processCount int64) (err error) {
+func (s *pgStore) rearrangeProcessSequence(ctx context.Context, tx *sql.Tx, sequenceArr []ProcessSequence) (err error) {
 
 	for _, pr := range sequenceArr {
 		_, err = tx.Exec(
 			rearrangeSequenceQuery,
-			pr.SequenceNumber+processCount,
+			pr.SequenceNumber+highNum,
 			pr.ID,
 		)
 
@@ -108,15 +111,15 @@ func (s *pgStore) rearrangeProcessSequence(ctx context.Context, tx *sql.Tx, sequ
 		}
 	}
 
-	logger.Infoln(responses.ProcessRearrangeDBSuccess, processCount)
+	logger.Infoln(responses.ProcessRearrangeDBSuccess)
 	return
 }
 
 //  subtract processCount from sequence num of process
-func (s *pgStore) subtractFromSequence(ctx context.Context, tx *sql.Tx, recipeID uuid.UUID, processCount int64) (err error) {
+func (s *pgStore) subtractFromSequence(ctx context.Context, tx *sql.Tx, recipeID uuid.UUID) (err error) {
 	_, err = tx.Query(
 		subtractProcessSequenceQuery,
-		processCount,
+		highNum,
 		recipeID,
 	)
 
@@ -125,7 +128,7 @@ func (s *pgStore) subtractFromSequence(ctx context.Context, tx *sql.Tx, recipeID
 		return
 	}
 
-	logger.Infoln(responses.ProcessSubtractSuccess, processCount)
+	logger.Infoln(responses.ProcessSubtractSuccess, highNum)
 	return
 }
 

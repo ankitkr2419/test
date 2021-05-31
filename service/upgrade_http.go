@@ -29,13 +29,13 @@ func safeToUpgradeHandler(deps Dependencies) http.HandlerFunc {
 // set Run in Progress for dur seconds for both the decks
 func temporarySetRunInProgress(deps Dependencies, dur time.Duration) {
 	logger.Infoln(responses.TempSettingBothDeckRun)
-	
+
 	deps.PlcDeck[deckA].SetRunInProgress()
 	defer deps.PlcDeck[deckA].ResetRunInProgress()
 	deps.PlcDeck[deckB].SetRunInProgress()
 	defer deps.PlcDeck[deckB].ResetRunInProgress()
 
 	time.Sleep(dur * time.Second)
-	
+
 	logger.Infoln(responses.ResettingBothDeckRun)
 }

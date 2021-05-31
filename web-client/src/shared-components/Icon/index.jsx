@@ -7,6 +7,7 @@ const StyledIcon = styled.i`
 	font-size: ${(props) => props.size}px;
 	line-height: 1;
 	vertical-align: middle;
+	cursor: pointer;
 `;
 
 //* Important: Refer "_fonts.scss" for icon names
