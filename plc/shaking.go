@@ -149,7 +149,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	delay := db.Delay{
 		DelayTime: shakerData.Time1,
 	}
-	response, err = d.AddDelay(delay)
+	response, err = d.AddDelay(delay, false)
 	if err != nil {
 		fmt.Println("err adding delay: ", err)
 		return "", err
@@ -177,7 +177,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 		//wait for time 2 duration
 		delay.DelayTime = shakerData.Time2
-		response, err = d.AddDelay(delay)
+		response, err = d.AddDelay(delay, false)
 		if err != nil {
 			logger.Errorln("err adding delay: ", err)
 			return "", err

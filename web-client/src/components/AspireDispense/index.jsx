@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { ROUTES } from "appConstants";
+import { CATEGORY_NAME, ROUTES } from "appConstants";
 import { Redirect } from "react-router";
 
 import { Card, CardBody } from "core-components";
@@ -11,7 +11,6 @@ import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
 import {
   setFormikField,
-  getCategoryName,
   getPosition,
   getFormikInitialState,
 } from "./functions";
@@ -78,8 +77,8 @@ const AspireDispenseComponent = (props) => {
      *  Dispense category is directly maintained using 'activeTab' state.
      */
 
-    const aspireSelectedTabName = getCategoryName(aspire.selectedCategory);
-    const dispenseSelectedTabName = getCategoryName(activeTab);
+    const aspireSelectedTabName = CATEGORY_NAME(aspire.selectedCategory);
+    const dispenseSelectedTabName = CATEGORY_NAME(activeTab);
 
     const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
     const dispenseWells = dispense[`cartridge${activeTab}Wells`];
@@ -107,53 +106,46 @@ const AspireDispenseComponent = (props) => {
     dispatch(saveAspireDispenseInitiated(requestBody));
   };
 
-  const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
-
   return (
-    <>
-      <PageBody>
-        <AspireDispenseBox>
-          <div className="process-content process-aspire-dispense px-2">
-            <TopContent className="d-flex justify-content-between align-items-center mx-5">
-              <div className="d-flex flex-column">
-                <div className="d-flex align-items-center frame-icon">
-                  <ButtonIcon
-                    size={60}
-                    name="aspire-dispense"
-                    className="text-primary bg-white border-gray"
-                    onClick={() => setIsAspire(!isAspire)}
-                  />
-                  <TopHeading titleHeading="Aspire & Dispense" />
-                </div>
-              </div>
-            </TopContent>
-
-            <Card>
-              <CardBody className="p-0 overflow-hidden">
-                <AspireDispenseTabsContent
-                  formik={formik}
-                  isAspire={isAspire}
-                  toggle={toggle}
-                  activeTab={activeTab}
-                  wellClickHandler={wellClickHandler}
+    <PageBody>
+      <AspireDispenseBox>
+        <div className="process-content process-aspire-dispense px-2">
+          <TopContent className="d-flex justify-content-between align-items-center mx-5">
+            <div className="d-flex flex-column">
+              <div className="d-flex align-items-center frame-icon">
+                <ButtonIcon
+                  size={60}
+                  name="aspire-dispense"
+                  className="text-primary bg-white border-gray"
+                  onClick={() => setIsAspire(!isAspire)}
                 />
-              </CardBody>
-            </Card>
-            <ButtonBar
-              leftBtnLabel={isAspire ? null : "Modify"}
-              rightBtnLabel={isAspire ? "Next" : "Save"}
-              handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
-              handleRightBtn={() =>
-                isAspire ? handleNextBtn() : handleSaveBtn()
-              }
-            />
-          </div>
-        </AspireDispenseBox>
-      </PageBody>
-    </>
+                <TopHeading titleHeading="Aspire & Dispense" />
+              </div>
+            </div>
+          </TopContent>
+
+          <Card>
+            <CardBody className="p-0 overflow-hidden">
+              <AspireDispenseTabsContent
+                formik={formik}
+                isAspire={isAspire}
+                toggle={toggle}
+                activeTab={activeTab}
+                wellClickHandler={wellClickHandler}
+              />
+            </CardBody>
+          </Card>
+          <ButtonBar
+            leftBtnLabel={isAspire ? null : "Modify"}
+            rightBtnLabel={isAspire ? "Next" : "Save"}
+            handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
+            handleRightBtn={() =>
+              isAspire ? handleNextBtn() : handleSaveBtn()
+            }
+          />
+        </div>
+      </AspireDispenseBox>
+    </PageBody>
   );
 };
 

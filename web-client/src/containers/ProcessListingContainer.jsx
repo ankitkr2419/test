@@ -5,34 +5,39 @@ import {
     changeProcessSequences,
     sortProcessListBySequence,
 } from "components/ProcessListing/helper";
-import { processListInitiated } from "action-creators/processActionCreators";
+import {
+    processListInitiated,
+    duplicateProcessInitiated,
+    setProcessList,
+    fetchProcessDataInitiated,
+    fetchProcessDataReset,
+} from "action-creators/processActionCreators";
 import { Loader } from "shared-components";
 import { toast } from "react-toastify";
+import { SELECT_PROCESS_PROPS } from "appConstants";
+import { useHistory } from "react-router";
 
 const ProcessListingContainer = (props) => {
-    /*TODO: 1) get recipe details from reducer*/
-    const [recipeDetails, setRecipeDetails] = useState({
-        id: "91ea456e-fc0c-4d93-9d00-42302fbe5464",
-        name: "test",
-        created_at: "2021-04-29T11:52:11.171692Z",
-        updated_at: "2021-04-29T11:52:11.171692Z",
-    });
-
-    const [processList, setProcessList] = useState([]);
-
     //if we have draggedProcessId, means user selected this process to change its sequence (move)
     const [draggedProcessId, setDraggedProcessId] = useState(null);
 
     const dispatch = useDispatch();
+    const history = useHistory();
     const processListReducer = useSelector(
         (state) => state.processListReducer
     ).toJS();
-    const { isLoading, error } = processListReducer;
+    const { isLoading, processList } = processListReducer;
 
     /**get active login deck data*/
     const loginReducer = useSelector((state) => state.loginReducer);
     const loginReducerData = loginReducer.toJS();
     let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+
+    /**get recipeDetails */
+    const recipeDetailsReducer = useSelector(
+        (state) => state.updateRecipeDetailsReducer
+    );
+    const recipeDetails = recipeDetailsReducer.recipeDetails;
 
     /**Get process list of a recipe */
     useEffect(() => {
@@ -43,18 +48,10 @@ const ProcessListingContainer = (props) => {
         }
     }, [recipeDetails.id]);
 
-    /** => store processList in local state (needed for change sequence and other local changes)
-        => isOpen: represents that process menu should be open or not and its independently handled for each process
-        => isOpen not coming from api, so adding default value */
+    /**clear edit process reducer */
     useEffect(() => {
-        if (!isLoading && !error) {
-            const list = processListReducer.processList?.map((obj) => ({
-                ...obj,
-                isOpen: false,
-            }));
-            setProcessList(list);
-        }
-    }, [isLoading, error]);
+        dispatch(fetchProcessDataReset())
+    }, [])
 
     //toggle isOpen field of process object to toggle process menu
     const toggleIsOpen = (processId) => {
@@ -63,7 +60,7 @@ const ProcessListingContainer = (props) => {
                 ? { ...processObj, isOpen: !processObj.isOpen }
                 : processObj;
         });
-        setProcessList(newProcessList);
+        dispatch(setProcessList({ processList: newProcessList }));
     };
 
     /** purpose=> setting draggedProcessId will let us know that this process is dragged(move), to toggle process menu for drop operations */
@@ -117,8 +114,31 @@ const ProcessListingContainer = (props) => {
             droppedProcessId
         );
         let sortedArr = sortProcessListBySequence(arr);
-        setProcessList(sortedArr);
-        toast.success("Process Moved");
+        dispatch(setProcessList({ processList: sortedArr }));
+    };
+
+    const createDuplicateProcess = (processId) => {
+        const token = activeDeckObj.token;
+        dispatch(duplicateProcessInitiated({ processId, token }));
+    };
+
+    const handleEditProcess = (processObj) => {
+        const processType = processObj.type;
+        const token = activeDeckObj.token;
+        //fetch process data, store in reducer
+        dispatch(
+            fetchProcessDataInitiated({
+                processId: processObj.id,
+                type: processType,
+                token,
+            })
+        );
+        //redirect to edit process depend on processType
+        const routePathObj = SELECT_PROCESS_PROPS.find(
+            (obj) => obj.processType === processType
+        );
+        const routePath = routePathObj?.route;
+        history.push(routePath);
     };
 
     return (
@@ -132,6 +152,8 @@ const ProcessListingContainer = (props) => {
                 setDraggedProcessId={handleDraggedProcessId} //move dragged
                 handleChangeSequenceTo={handleChangeSequenceTo} //move dropped
                 handleProcessMove={handleProcessMove} //up and down
+                createDuplicateProcess={createDuplicateProcess} //copy
+                handleEditProcess={handleEditProcess} //edit
             />
         </>
     );
