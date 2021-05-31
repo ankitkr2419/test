@@ -179,6 +179,9 @@ func (s *pgStore) DeleteTipOperation(ctx context.Context, id uuid.UUID) (err err
 func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipOperationInitialisedState)
 
+	// TODO: Remove this default Discard for tip operation whenever support for at_pickup_passing added
+	t.Discard = at_discard_box
+
 	_, err = s.db.Exec(
 		updateTipOperationQuery,
 		t.Type,
