@@ -36,3 +36,17 @@ export const initialPaginationStateProcessList = {
   from: 0,
   to: 0,
 };
+
+
+//for recipeListing page
+export const initialPaginationStateRecipeList = {
+    page: 1,
+    perPageItems: 8, //fixed
+    prevPage: null,
+    nextPage: null,
+    total: 0,
+    list: [],
+    from: 0,
+    to: 0,
+  };
+  
