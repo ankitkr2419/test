@@ -72,6 +72,7 @@ var (
 	ProcessesDecodeSeqError = fmt.Errorf("error while decoding process sequence data")
 	ProcessDeleteError      = fmt.Errorf("error deleting process record")
 	ProcessUpdateError      = fmt.Errorf("error updating process record")
+	ProcessInProgressError  = fmt.Errorf("process is in progress, so not allowed to delete")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 
@@ -83,6 +84,7 @@ var (
 	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
 	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
 	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
+	RecipeInProgressError = fmt.Errorf("recipe is in progress, so not allowed to delete")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
