@@ -33,21 +33,6 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
   };
 };
 
-export const getCategoryLabel = (tabID) => {
-  switch (tabID) {
-    case "1":
-      return "Category 1";
-    case "2":
-      return "Category 2";
-    case "3":
-      return "Shaker";
-    case "4":
-      return "Deck Position";
-    default:
-      return;
-  }
-};
-
 export const getPosition = (wells) => {
   const selectedWell = wells.find((wellObj) => wellObj.isSelected);
   return selectedWell.id;

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { CATEGORY_NAME, ROUTES } from "appConstants";
-import { Redirect } from "react-router";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
+import { Redirect, useHistory } from "react-router";
 
 import { Card, CardBody } from "core-components";
 import { ButtonBar, ButtonIcon } from "shared-components";
@@ -11,7 +11,6 @@ import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
 import {
   setFormikField,
-  getPosition,
   getFormikInitialState,
   getRequestBody,
 } from "./functions";

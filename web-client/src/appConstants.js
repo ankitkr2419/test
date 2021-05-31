@@ -103,7 +103,6 @@ export const API_ENDPOINTS = {
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
-  magnet: "attach-detach",
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
 };
