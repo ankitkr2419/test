@@ -59,11 +59,11 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 					sendTemperature(deps, rw, c)
 
-				} else if msgs[0] == "progress" {
+				} else if strings.EqualFold(msgs[0], "progress") {
 
 					monitorOperation(deps, rw, c, msgs)
 
-				} else if msgs[0] == "success" {
+				} else if strings.EqualFold(msgs[0], "success") {
 
 					successOperation(deps, rw, c, msgs)
 				}
