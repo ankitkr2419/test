@@ -39,7 +39,7 @@ func main() {
 
 	// logging output to file and console
 	var filename = "utils/output_log.txt"
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0755)
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
 	if err != nil {
 		logger.Errorln(responses.WriteToFileError)
 	}
