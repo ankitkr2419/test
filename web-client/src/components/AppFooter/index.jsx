@@ -29,6 +29,7 @@ import {
 import { MlModal } from "shared-components";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 import { discardTipAndHomingActionInitiated } from "action-creators/homingActionCreators";
+import { getTime } from "./functions";
 
 const AppFooter = (props) => {
   const dispatch = useDispatch();
@@ -471,6 +472,21 @@ const AppFooter = (props) => {
           ? recipeReducerData.recipeData.processCount
           : null;
 
+      case "hours":
+        return loggedInDeck
+          ? getTime("hours", recipeReducerData, cleanUpReducerData)
+          : 0;
+
+      case "mins":
+        return loggedInDeck
+          ? getTime("minutes", recipeReducerData, cleanUpReducerData)
+          : 0;
+
+      case "secs":
+        return loggedInDeck
+          ? getTime("seconds", recipeReducerData, cleanUpReducerData)
+          : 0;
+
       case "leftActionBtn":
         return loggedInDeck
           ? recipeReducerData.showProcess
@@ -600,9 +616,9 @@ const AppFooter = (props) => {
         showProcess={
           isDeckALoggedIn ? recipeActionReducerForDeckA.showProcess : false
         }
-        hours={cleanUpReducerForDeckA.hours}
-        mins={cleanUpReducerForDeckA.mins}
-        secs={cleanUpReducerForDeckA.secs}
+        hours={getPropsValue("hours", DECKNAME.DeckA)}
+        mins={getPropsValue("mins", DECKNAME.DeckA)}
+        secs={getPropsValue("secs", DECKNAME.DeckA)}
         progressPercentComplete={getPropsValue(
           "progressPercentComplete",
           DECKNAME.DeckA
@@ -638,9 +654,9 @@ const AppFooter = (props) => {
         showProcess={
           isDeckBLoggedIn ? recipeActionReducerForDeckB.showProcess : false
         }
-        hours={cleanUpReducerForDeckB.hours}
-        mins={cleanUpReducerForDeckB.mins}
-        secs={cleanUpReducerForDeckB.secs}
+        hours={getPropsValue("hours", DECKNAME.DeckB)}
+        mins={getPropsValue("mins", DECKNAME.DeckB)}
+        secs={getPropsValue("secs", DECKNAME.DeckB)}
         progressPercentComplete={getPropsValue(
           "progressPercentComplete",
           DECKNAME.DeckB

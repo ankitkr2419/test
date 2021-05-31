@@ -258,7 +258,7 @@ const DeckCard = (props) => {
                 </div>
 
                 <CommonTimerFields
-                  recipeName={processName}
+                  recipeName={"Clean Up"}
                   hours={hours}
                   mins={mins}
                   secs={secs}
