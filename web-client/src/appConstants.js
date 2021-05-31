@@ -94,6 +94,8 @@ export const API_ENDPOINTS = {
   logout: "logout",
   piercing: "piercing",
   aspireDispense: "aspire-dispense",
+  shaking: "shaking",
+  heating: "heating",
   recipe: "recipe",
   magnet: "attach-detach",
   duplicateProcess: "duplicate-process",

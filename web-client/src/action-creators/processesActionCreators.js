@@ -1,8 +1,10 @@
 import {
   aspireDispenseAction,
+  heatingAction,
   magnetAction,
   delayAction,
   piercingAction,
+  shakingAction,
   tipPickupAction,
 } from "actions/processesActions";
 
@@ -48,6 +50,37 @@ export const saveTipPickupSuccess = (response) => ({
 
 export const saveTipPickupFailure = (error) => ({
   type: tipPickupAction.saveTipPickUpFailed,
+  payload: error,
+});
+
+export const saveShakingInitiated = (params) => ({
+  type: shakingAction.saveShakingInitiated,
+  payload: params,
+});
+
+export const saveShakingSuccess = (response) => ({
+  type: shakingAction.saveShakingSuccess,
+  payload: response,
+});
+
+export const saveShakingFailure = (error) => ({
+  type: shakingAction.saveShakingFailed,
+  payload: error,
+});
+
+//heating
+export const saveHeatingInitiated = (params) => ({
+  type: heatingAction.saveHeatingInitiated,
+  payload: params,
+});
+
+export const saveHeatingSuccess = (response) => ({
+  type: heatingAction.saveHeatingSuccess,
+  payload: response,
+});
+
+export const saveHeatingFailure = (error) => ({
+  type: heatingAction.saveHeatingFailed,
   payload: error,
 });
 

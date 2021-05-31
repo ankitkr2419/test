@@ -16,11 +16,24 @@ export const aspireDispenseAction = {
   saveAspireDispenseFailed: "SAVE_ASPIRE_DISPENSE_FAILED",
 };
 
+export const shakingAction = {
+  saveShakingInitiated: "SAVE_SHAKING_INITIATED",
+  saveShakingSuccess: "SAVE_SHAKING_SUCCESS",
+  saveShakingFailed: "SAVE_SHAKING_FAILED",
+};
+
+export const heatingAction = {
+  saveHeatingInitiated: "SAVE_HEATING_INITIATED",
+  saveHeatingSuccess: "SAVE_HEATING_SUCCESS",
+  saveHeatingFailed: "SAVE_HEATING_FAILED",
+};
+
 export const magnetAction = {
   saveMagnetInitiated: "SAVE_MAGNET_INITIATED",
   saveMagnetSuccess: "SAVE_MAGNET_SUCCESS",
   saveMagnetFailed: "SAVE_MAGNET_FAILED",
 };
+
 export const delayAction = {
   saveDelayInitiated: "SAVE_DELAY_INITIATED",
   saveDelaySuccess: "SAVE_DELAY_SUCCESS",
