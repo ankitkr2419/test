@@ -19,6 +19,9 @@ import ImageIcon from "./ImageIcon";
 import Loader from "./Loader";
 import VideoCard from "./VideoCard";
 import MlModal from "./MlModal";
+import TopHeading from "./TopHeading";
+import TemperatureInfo from "./TemperatureInfo";
+import TimeInfo from "./TimeInfo";
 
 export {
   ButtonGroup,
@@ -39,6 +42,7 @@ export {
   TargetListHeader,
   TargetListItem,
   Text,
+  TopHeading,
   StyledUl,
   StyledLi,
   CustomButton,
@@ -46,4 +50,6 @@ export {
   Loader,
   VideoCard,
   MlModal,
+  TimeInfo,
+  TemperatureInfo,
 };

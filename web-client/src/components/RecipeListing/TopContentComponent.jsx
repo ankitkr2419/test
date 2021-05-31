@@ -1,8 +1,9 @@
 import React from "react";
 import { TopContent } from "./TopContent";
 import { HeadingTitle } from "./HeadingTitle";
-import { Icon, ButtonIcon } from "shared-components";
+import { Icon, ButtonIcon, Text } from "shared-components";
 import { Button } from "core-components";
+import moment from "moment";
 
 const TopContentComponent = (props) => {
     const {
@@ -14,11 +15,27 @@ const TopContentComponent = (props) => {
         toggleTimeModal,
         toggleTrayDiscardModal,
         toggleLogoutModalVisibility,
+        isProcessListingPage,
+        recipeName,
+        createdAt,
+        updatedAt,
+        processListBackButtonHandler,
     } = props;
+    /**
+     * prop: isProcessListingPage: false/undefined  means RecipeListing Page (default)
+     * prop: isProcessListingPage: true  means ProcessListing Page
+     */
+
+    const classNameTopContent = () => {
+        return `d-flex justify-content-between align-items-center mx-5 ${
+            isProcessListingPage ? "process-listing-changes" : ""
+        }`;
+    };
 
     return (
-        <TopContent className="d-flex justify-content-between align-items-center mx-5">
-            {isProcessInProgress ? null : (
+        <TopContent className={classNameTopContent()}>
+            {/* Top content for RecipeListing page */}
+            {isProcessInProgress || isProcessListingPage ? null : (
                 <div className="d-flex align-items-center">
                     <div
                         style={{ cursor: "pointer" }}
@@ -39,7 +56,7 @@ const TopContentComponent = (props) => {
                 </div>
             )}
 
-            {isProcessInProgress ? null : (
+            {isProcessInProgress || isProcessListingPage ? null : (
                 <div className="d-flex align-items-center ml-auto">
                     {isAdmin ? (
                         <Button
@@ -81,6 +98,49 @@ const TopContentComponent = (props) => {
                     />
                 </div>
             )}
+
+            {/* Top content for ProcessListing page */}
+            {isProcessListingPage ? (
+                <>
+                    <div className="d-flex flex-column">
+                        <div className="d-flex align-items-center">
+                            <div
+                                style={{ cursor: "pointer" }}
+                                onClick={processListBackButtonHandler}
+                            >
+                                <Icon
+                                    name="angle-left"
+                                    size={32}
+                                    className="text-white"
+                                />
+                            </div>
+                            <div className="d-flex flex-column">
+                                <Text className="text-white mb-0">Recipe</Text>
+                                <HeadingTitle
+                                    Tag="h5"
+                                    className="text-white font-weight-bold mb-0"
+                                >
+                                    {recipeName}
+                                </HeadingTitle>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="d-flex justify-content-center align-items-center">
+                        <div className="d-flex flex-column text-right">
+                            {createdAt ? (
+                                <Text className="text-white mb-0">
+                                    Created on: {moment(createdAt).format("DD-MM-YYYY")}
+                                </Text>
+                            ) : null}
+                            {updatedAt ? (
+                                <Text className="text-white mb-0">
+                                    Modified on: {moment(updatedAt).format("DD-MM-YYYY")}
+                                </Text>
+                            ) : null}
+                        </div>
+                    </div>
+                </>
+            ) : null}
         </TopContent>
     );
 };
