@@ -11,6 +11,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+
 func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
@@ -148,10 +149,10 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = plc.CheckIfRecipeOrProcessSafeForDelete(&id, nil)
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&id, nil)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: responses.RecipeInProgressError.Error()})
-			logger.WithField("err", err.Error()).Error(responses.RecipeInProgressError)
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Errorln(responses.DefineCUDNotAllowedError(recipeC, deleteC))
 			return
 		}
 
@@ -205,6 +206,13 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.RecipeValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&id, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(recipeC, updateC))
 			return
 		}
 
