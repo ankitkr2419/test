@@ -23,7 +23,7 @@ const LabwareContainer = () => {
     dispatch(getCartridgeActionInitiated(params));
     dispatch(getTipsActionInitiated(params));
     dispatch(getTubesActionInitiated(params));
-  }, [dispatch]);
+  }, [dispatch, params]);
   return <LabWareComponent />;
 };
 

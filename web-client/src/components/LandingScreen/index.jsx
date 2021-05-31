@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AppFooter from "components/AppFooter";
 import { VideoCard, MlModal } from "shared-components";
 
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
@@ -35,7 +34,6 @@ const LandingScreenComponent = (props) => {
           isProgressBarVisible={isProgressBarVisible}
         />
       </div>
-      <AppFooter />
     </LandingScreen>
   );
 };

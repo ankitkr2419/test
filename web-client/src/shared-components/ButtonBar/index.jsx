@@ -14,7 +14,7 @@ const ButtonBar = (props) => {
   };
 
   return (
-    <ButtonBarBox className="bg-dark d-flex justify-content-start align-items-center mt-5">
+    <ButtonBarBox className="d-flex justify-content-start align-items-center mt-5">
       <PrevBtn onClick={handleBackBtn}>
         <Icon name="angle-left" size={30} />
       </PrevBtn>
