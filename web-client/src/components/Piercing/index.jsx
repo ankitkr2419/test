@@ -176,6 +176,4 @@ const PiercingComponent = (props) => {
   );
 };
 
-PiercingComponent.propTypes = {};
-
 export default React.memo(PiercingComponent);

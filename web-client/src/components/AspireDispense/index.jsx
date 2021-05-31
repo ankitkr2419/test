@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
-import { Redirect, useHistory } from "react-router";
+import { CATEGORY_NAME, ROUTES } from "appConstants";
+import { Redirect } from "react-router";
 
 import { Card, CardBody } from "core-components";
 import { ButtonBar, ButtonIcon } from "shared-components";
@@ -11,6 +11,7 @@ import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
 import {
   setFormikField,
+  getPosition,
   getFormikInitialState,
   getRequestBody,
 } from "./functions";
@@ -105,47 +106,45 @@ const AspireDispenseComponent = (props) => {
   if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
 
   return (
-    <>
-      <PageBody>
-        <AspireDispenseBox>
-          <div className="process-content process-aspire-dispense px-2">
-            <TopContent className="d-flex justify-content-between align-items-center mx-5">
-              <div className="d-flex flex-column">
-                <div className="d-flex align-items-center frame-icon">
-                  <ButtonIcon
-                    size={60}
-                    name="aspire-dispense"
-                    className="text-primary bg-white border-gray"
-                    onClick={() => setIsAspire(!isAspire)}
-                  />
-                  <TopHeading titleHeading="Aspire & Dispense" />
-                </div>
-              </div>
-            </TopContent>
-
-            <Card>
-              <CardBody className="p-0 overflow-hidden">
-                <AspireDispenseTabsContent
-                  formik={formik}
-                  isAspire={isAspire}
-                  toggle={toggle}
-                  activeTab={activeTab}
-                  wellClickHandler={wellClickHandler}
+    <PageBody>
+      <AspireDispenseBox>
+        <div className="process-content process-aspire-dispense px-2">
+          <TopContent className="d-flex justify-content-between align-items-center mx-5">
+            <div className="d-flex flex-column">
+              <div className="d-flex align-items-center frame-icon">
+                <ButtonIcon
+                  size={60}
+                  name="aspire-dispense"
+                  className="text-primary bg-white border-gray"
+                  onClick={() => setIsAspire(!isAspire)}
                 />
-              </CardBody>
-            </Card>
-            <ButtonBar
-              leftBtnLabel={isAspire ? null : "Modify"}
-              rightBtnLabel={isAspire ? "Next" : "Save"}
-              handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
-              handleRightBtn={() =>
-                isAspire ? handleNextBtn() : handleSaveBtn()
-              }
-            />
-          </div>
-        </AspireDispenseBox>
-      </PageBody>
-    </>
+                <TopHeading titleHeading="Aspire & Dispense" />
+              </div>
+            </div>
+          </TopContent>
+
+          <Card>
+            <CardBody className="p-0 overflow-hidden">
+              <AspireDispenseTabsContent
+                formik={formik}
+                isAspire={isAspire}
+                toggle={toggle}
+                activeTab={activeTab}
+                wellClickHandler={wellClickHandler}
+              />
+            </CardBody>
+          </Card>
+          <ButtonBar
+            leftBtnLabel={isAspire ? null : "Modify"}
+            rightBtnLabel={isAspire ? "Next" : "Save"}
+            handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
+            handleRightBtn={() =>
+              isAspire ? handleNextBtn() : handleSaveBtn()
+            }
+          />
+        </div>
+      </AspireDispenseBox>
+    </PageBody>
   );
 };
 

@@ -98,11 +98,14 @@ export const API_ENDPOINTS = {
   heating: "heating",
   recipe: "recipe",
   tipDiscard: "tip-operation",
+  magnet: "attach-detach",
   duplicateProcess: "duplicate-process",
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
   magnet: "attach-detach",
+  rearrangeProcesses: "rearrange-processes",
+  processes: "processes",
 };
 
 export const MODAL_MESSAGE = {
@@ -114,6 +117,9 @@ export const MODAL_MESSAGE = {
   uvSuccess: "UV Clean Up was successful",
   publishConfirmation: "Are you sure you want to Publish this recipe?",
   unpublishConfirmation: "Are you sure you want to Unpublish this recipe?",
+  finishProcessListConfirmation: "Are you sure you want to save changes to ",
+  deleteProcessConfirmation: "Are you sure you want to delete this process?",
+  deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
 };
 
 export const MODAL_BTN = {
@@ -339,3 +345,25 @@ export const ASPIRE_DISPENSE_DECK_POS_OPTNS = [
   { value: "10", label: "10" },
   { value: "11", label: "11" },
 ];
+
+export const TIP_PICKUP_PROCESS_OPTIONS = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+];
+
+export const CATEGORY_NAME = {
+  1: "well",
+  2: "well",
+  3: "shaker",
+  4: "deck",
+};
+
+export const CATEGORY_LABEL = {
+  1: "Category 1",
+  2: "Category 2",
+  3: "Shaker",
+  4: "Deck Position",
+};

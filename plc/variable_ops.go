@@ -84,6 +84,10 @@ func (d *Compact32Deck) setHomingPercent(percent float64) {
 	homingPercent.Store(d.name, percent)
 }
 
+func (d *Compact32Deck) SetCurrentProcessNumber(step int64) {
+	currentProcess.Store(d.name, step)
+}
+
 func (d *Compact32Deck) IsMachineHomed() bool {
 	if temp, ok := homed.Load(d.name); !ok {
 		logger.Errorln("homed isn't loaded!")
@@ -278,6 +282,15 @@ func (d *Compact32Deck) getHomingPercent() float64 {
 		return -1
 	} else {
 		return temp.(float64)
+	}
+}
+
+func (d *Compact32Deck) getCurrentProcess() int64 {
+	if temp, ok := currentProcess.Load(d.name); !ok {
+		logger.Errorln("currentProcess isn't loaded!")
+		return -1
+	} else {
+		return temp.(int64)
 	}
 }
 

@@ -61,6 +61,7 @@ type Recipe struct {
 	Position9          int64     `db:"pos_9" json:"pos_9"`
 	ProcessCount       int64     `db:"process_count" json:"process_count"`
 	IsPublished        bool      `db:"is_published" json:"is_published"`
+	TotalTime          int64     `db:"total_time" json:"total_time"`
 	CreatedAt          time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt          time.Time `db:"updated_at" json:"updated_at"`
 }

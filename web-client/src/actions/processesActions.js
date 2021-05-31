@@ -16,6 +16,12 @@ export const aspireDispenseAction = {
   saveAspireDispenseFailed: "SAVE_ASPIRE_DISPENSE_FAILED",
 };
 
+export const tipDiscardAction = {
+  saveTipDiscardInitiated: "SAVE_TIP_DISCARD_INITIATED",
+  saveTipDiscardSuccess: "SAVE_TIP_DISCARD_SUCCESS",
+  saveTipDiscardFailed: "SAVE_TIP_DISCARD_FAILED",
+};
+
 export const shakingAction = {
   saveShakingInitiated: "SAVE_SHAKING_INITIATED",
   saveShakingSuccess: "SAVE_SHAKING_SUCCESS",
@@ -38,12 +44,6 @@ export const delayAction = {
   saveDelayInitiated: "SAVE_DELAY_INITIATED",
   saveDelaySuccess: "SAVE_DELAY_SUCCESS",
   saveDelayFailed: "SAVE_DELAY_FAILED",
-};
-
-export const tipDiscardAction = {
-  saveTipDiscardInitiated: "SAVE_TIP_DISCARD_INITIATED",
-  saveTipDiscardSuccess: "SAVE_TIP_DISCARD_SUCCESS",
-  saveTipDiscardFailed: "SAVE_TIP_DISCARD_FAILED",
 };
 
 export const processAction = {

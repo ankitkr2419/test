@@ -2,10 +2,8 @@ import React from 'react';
 
 import TipPickupComponent from 'components/TipPickup';
 
-const TipPickupContainer = (props) => {
+const TipPickupContainer = () => {
 	return <TipPickupComponent />;
 };
-
-TipPickupContainer.propTypes = {};
 
 export default TipPickupContainer;

@@ -31,18 +31,16 @@ export const WellComponent = (props) => {
             {wellsObjArray &&
               wellsObjArray.map((wellObj, index) => {
                 return (
-                  <>
-                    <Well
-                      id={wellObj.id}
-                      isRunning={wellObj.isRunning}
-                      isSelected={wellObj.isSelected}
-                      isDisabled={wellObj.isDisabled}
-                      className="well"
-                      onClickHandler={() =>
-                        wellClickHandler(wellObj.id, wellObj.type)
-                      }
-                    />
-                  </>
+                  <Well
+                    id={wellObj.id}
+                    isRunning={wellObj.isRunning}
+                    isSelected={wellObj.isSelected}
+                    isDisabled={wellObj.isDisabled}
+                    className="well"
+                    onClickHandler={() =>
+                      wellClickHandler(wellObj.id, wellObj.type)
+                    }
+                  />
                 );
               })}
           </div>
