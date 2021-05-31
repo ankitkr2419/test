@@ -3,7 +3,7 @@ import React from "react";
 import { Text, Icon } from "shared-components";
 
 const CommonTimerFields = (props) => {
-  const { recipeName, hours, mins, secs } = props;
+  const { recipeName, remainingTime, totalTime } = props;
 
   return (
     <div className="d-none1">
@@ -14,10 +14,12 @@ const CommonTimerFields = (props) => {
         <Icon name="timer" size={19} className="text-primary" />
         <Text Tag="span" className="hour-label font-weight-bold ml-2">
           {" "}
-          {hours} Hr{" "}
+          {/* {hours} Hr{" "} {mins} min {secs} sec */}
+          {totalTime}
         </Text>
         <Text Tag="span" className="min-label ml-2 font-weight-bold">
-          {mins} min {secs} sec
+          {/* {mins} min {secs} sec */}
+          {remainingTime}
         </Text>
         <Text Tag="span" className="ml-1">
           remaining

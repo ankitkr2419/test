@@ -18,9 +18,8 @@ const DeckCard = (props) => {
     recipeName,
     processNumber,
     processTotal,
-    hours,
-    mins,
-    secs,
+    remainingTime,
+    totalTime,
     loginBtn,
     showProcess,
     showCleanUp,
@@ -207,6 +206,7 @@ const DeckCard = (props) => {
       >
         {showProcess && (
           <ProcessRemaining
+            processName={processName}
             processType={processType}
             processNumber={processNumber}
             processTotal={processTotal}
@@ -240,9 +240,8 @@ const DeckCard = (props) => {
 
                 <CommonTimerFields
                   recipeName={recipeName}
-                  hours={hours}
-                  mins={mins}
-                  secs={secs}
+                  remainingTime={remainingTime}
+                  totalTime={totalTime}
                 />
               </>
             )}
@@ -259,9 +258,8 @@ const DeckCard = (props) => {
 
                 <CommonTimerFields
                   recipeName={"Clean Up"}
-                  hours={hours}
-                  mins={mins}
-                  secs={secs}
+                  remainingTime={remainingTime}
+                  totalTime={totalTime}
                 />
               </>
             )}

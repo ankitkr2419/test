@@ -27,7 +27,7 @@ const ProecssRemainingBox = styled.div`
   }
 `;
 const ProcessRemaining = (props) => {
-  const { processType, processNumber, processTotal } = props;
+  const { processName, processType, processNumber, processTotal } = props;
   return (
     <ProecssRemainingBox>
       <Text Tag="label" className="d-flex align-items-center px-3 py-2 mb-0">
@@ -46,7 +46,7 @@ const ProcessRemaining = (props) => {
           </Text>
         </Text>
         <Text Tag="span" className="min-label ml-2 font-weight-bold">
-          Processes done
+          {processName}
         </Text>
       </Text>
     </ProecssRemainingBox>
@@ -55,10 +55,12 @@ const ProcessRemaining = (props) => {
 
 ProcessRemaining.propTypes = {
   isUserLoggedIn: PropTypes.bool,
+  processName: PropTypes.string,
 };
 
 ProcessRemaining.defaultProps = {
   isUserLoggedIn: false,
+  processName: "Process Done",
 };
 
 export default ProcessRemaining;
