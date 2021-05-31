@@ -6,6 +6,7 @@ import {
   magnetAction,
   delayAction,
   piercingAction,
+  tipDiscardAction,
   shakingAction,
   tipPickupAction,
 } from "actions/processesActions";
@@ -85,6 +86,29 @@ export function* aspireDispense(actions) {
   } catch (error) {
     console.log("error while login: ", error);
     saveAspireDispenseFailed(error);
+  }
+}
+
+export function* tipDiscard(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveTipDiscardSuccess, saveTipDiscardFailed } = tipDiscardAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.tipDiscard}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveTipDiscardSuccess,
+        failureAction: saveTipDiscardFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveTipDiscardFailed(error);
   }
 }
 
@@ -187,6 +211,7 @@ export function* processesSaga() {
     aspireDispenseAction.saveAspireDispenseInitiated,
     aspireDispense
   );
+  yield takeEvery(tipDiscardAction.saveTipDiscardInitiated, tipDiscard);
   yield takeEvery(shakingAction.saveShakingInitiated, shaking);
   yield takeEvery(heatingAction.saveHeatingInitiated, heating);
   yield takeEvery(magnetAction.saveMagnetInitiated, magnet);

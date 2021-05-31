@@ -19,6 +19,7 @@ import SelectProcessContainer from "containers/SelectProcessContainer";
 import PiercingContainer from "containers/PiercingContainer";
 import TipPickupContainer from "containers/TipPickupContainer";
 import AspireDispenseContainer from "containers/AspireDispenseContainer";
+import TipDiscardContainer from "containers/TipDiscardContainer";
 import ShakingContainer from "containers/ShakingContainer";
 import HeatingContainer from "containers/HeatingContainer";
 import MagnetContainer from "containers/MagnetContainer";
@@ -116,17 +117,17 @@ export const routeDefinitions = [
       //   key: 16,
       // },
       {
+        path: `${ROOT_URL_PATH}tip-discard`,
+        exact: true,
+        component: TipDiscardContainer,
+        key: 18,
+      },
+      {
         path: `${ROOT_URL_PATH}magnet`,
         exact: true,
         component: MagnetContainer,
         key: 17,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}tip-discard`,
-      //   exact: true,
-      //   component: TipDiscardContainer,
-      //   key: 18,
-      // },
       {
         path: `${ROOT_URL_PATH}aspire-dispense`,
         exact: true,
