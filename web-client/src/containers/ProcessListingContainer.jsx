@@ -17,6 +17,7 @@ import { Loader } from "shared-components";
 import { toast } from "react-toastify";
 import { SELECT_PROCESS_PROPS } from "appConstants";
 import { useHistory } from "react-router";
+import { deckBlockInitiated } from "action-creators/loginActionCreators";
 
 const ProcessListingContainer = (props) => {
   //if we have draggedProcessId, means user selected this process to change its sequence (move)
@@ -39,6 +40,11 @@ const ProcessListingContainer = (props) => {
     (state) => state.updateRecipeDetailsReducer
   );
   const recipeDetails = recipeDetailsReducer.recipeDetails;
+
+  /**another deck must be blocked**/
+  useEffect(() => {
+    dispatch(deckBlockInitiated());
+  }, []);
 
   /**Get process list of a recipe */
   useEffect(() => {

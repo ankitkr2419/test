@@ -30,7 +30,7 @@ import { MlModal } from "shared-components";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 import { discardTipAndHomingActionInitiated } from "action-creators/homingActionCreators";
 
-const AppFooter = (props) => {
+const AppFooter = () => {
   const dispatch = useDispatch();
 
   const [confirmAbortModal, setConfirmAbortModal] = useState(false);
@@ -663,7 +663,6 @@ const AppFooter = (props) => {
   );
 };
 
-AppFooter.propTypes = {};
 
 AppFooter.defaultProps = {
   loginBtn: false,
