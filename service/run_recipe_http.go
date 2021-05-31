@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -128,10 +127,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		populateNextStepChan(deck)
 	}
 
+	err = deps.PlcDeck[deck].RunRecipeWebsocketData(recipe, processes)
 	for i, p := range processes {
 
-		// TODO : percentage calculation from inside the process.
-		sendWSData(deps, deck, recipeID, len(processes), i+1, p.Name, p.Type)
+		deps.PlcDeck[deck].SetCurrentProcessNumber(int64(i))
 
 		if runStepWise {
 
@@ -266,7 +265,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 			fmt.Print(delay)
-			response, err = deps.PlcDeck[deck].AddDelay(delay)
+			response, err = deps.PlcDeck[deck].AddDelay(delay, false)
 			if err != nil {
 				return "", err
 			}
@@ -276,30 +275,15 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	}
 
-	plength := len(processes)
-	sendWSData(deps, deck, recipeID, plength, plength+1, processes[plength-1].Name, processes[plength-1].Type)
-
-	// send websocket success data
-	successWsData := plc.WSData{
-		Progress: 100,
-		Deck:     deck,
-		Status:   "SUCCESS_RECIPE",
-		OperationDetails: plc.OperationDetails{
-			Message:        fmt.Sprintf("successfully completed recipe %v for deck %v", recipeID, deck),
-			CurrentStep:    len(processes),
-			RecipeID:       recipeID,
-			TotalProcesses: len(processes),
-		},
+	for {
+		if deps.PlcDeck[deck].IsRunInProgress() {
+			time.Sleep(200 * time.Millisecond)
+		} else {
+			break
+		}
 	}
-	wsData, err := json.Marshal(successWsData)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
-		return
-	}
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v", string(wsData))
 
 	// Home the machine
-	deps.PlcDeck[deck].ResetRunInProgress()
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
 		return
@@ -326,40 +310,6 @@ func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err
 func populateNextStepChan(deck string) {
 	logger.Infoln("Populating the nextStep channel for deck", deck)
 	nextStep[deck] <- struct{}{}
-}
-
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName string, processType db.ProcessType) {
-
-	// percentage calculation for each process
-
-	progress := float64(((currentStep - 1) * 100) / processLength)
-
-	wsProgressOperation := plc.WSData{
-		Progress: progress,
-		Deck:     deck,
-		Status:   "PROGRESS_RECIPE",
-		OperationDetails: plc.OperationDetails{
-			Message:        fmt.Sprintf("process %v for deck %v in progress", currentStep, deck),
-			CurrentStep:    currentStep,
-			RecipeID:       recipeID,
-			TotalProcesses: processLength,
-			ProcessName:    processName,
-			ProcessType:    processType,
-		},
-	}
-
-	if processLength < currentStep {
-		wsProgressOperation.OperationDetails.Message = fmt.Sprintf("process %v for deck %v completed", processLength, deck)
-		wsProgressOperation.OperationDetails.CurrentStep = processLength
-	}
-
-	wsData, err := json.Marshal(wsProgressOperation)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
-	}
-	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
-
-	return
 }
 
 func checkForAbortOrNext(deck string) (err error) {
