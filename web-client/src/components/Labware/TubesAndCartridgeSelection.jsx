@@ -1,5 +1,5 @@
 import React from "react";
-import { getOptionsForTubesAndCartridges } from "./functions";
+import { getOptions } from "./functions";
 import labwareDeckPosition1 from "assets/images/labware-plate-deck-position-1.png";
 import labwareDeckPosition2 from "assets/images/labware-plate-deck-position-2.png";
 import labwareDeckPosition3 from "assets/images/labware-plate-deck-position-3.png";
@@ -17,20 +17,16 @@ const deckImages = [
 const cartridgeImages = [labwareCartridePosition1, labwareCartridePosition2];
 
 const TubeAndCartridgeSelection = (props) => {
-  const { formik, position, allOptions, isDeck } = props;
+  const { formik, position, allOptions, allowedPositions, isDeck } = props;
 
   const recipeData = formik.values;
   const images = isDeck ? deckImages : cartridgeImages;
   const key = isDeck ? "deckPosition" : "cartridge";
 
-  // id in response from backend starts from 4 for tubes and
-  // starts with 1 for catridge.
-  const n = isDeck ? 3 : 0;
-
   const type = isDeck ? "tubeType" : "cartridgeType";
 
   // gets options array is desired format i.e. {value: "abc", label: "xyz"}
-  const options = getOptionsForTubesAndCartridges(allOptions, position + n);
+  const options = getOptions(allOptions, allowedPositions);
   const selectedOptionID =
     recipeData[`${key}${position}`].processDetails[type].id;
   const index =
