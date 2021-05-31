@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { ROUTES } from "appConstants";
+import { CATEGORY_NAME, ROUTES } from "appConstants";
 import { Redirect } from "react-router";
 
 import { Card, CardBody } from "core-components";
@@ -11,7 +11,6 @@ import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
 import {
   setFormikField,
-  getCategoryName,
   getPosition,
   getFormikInitialState,
 } from "./functions";
@@ -78,8 +77,8 @@ const AspireDispenseComponent = (props) => {
      *  Dispense category is directly maintained using 'activeTab' state.
      */
 
-    const aspireSelectedTabName = getCategoryName(aspire.selectedCategory);
-    const dispenseSelectedTabName = getCategoryName(activeTab);
+    const aspireSelectedTabName = CATEGORY_NAME(aspire.selectedCategory);
+    const dispenseSelectedTabName = CATEGORY_NAME(activeTab);
 
     const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
     const dispenseWells = dispense[`cartridge${activeTab}Wells`];
