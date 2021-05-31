@@ -109,3 +109,36 @@ export const getUpdatedDecks = (
   });
   return array;
 };
+
+/**returns deckArray
+ * if we want recipeList changes, pass changes required and recipeId and this method will return new deckArray
+ */
+export const getUpdatedDecksAfterRecipeListChanged = (
+  state,
+  deckName,
+  recipeId,
+  changesInMatchedRecipe,
+  changesInUnMatchedRecipe
+) => {
+  const arrayOfDecks = state.decks;
+
+  const array = arrayOfDecks.map((deckObj) => {
+    return deckObj.name === deckName
+      ? {
+          ...deckObj,
+          allRecipeData: deckObj.allRecipeData.map((recipeObj) => {
+            return recipeObj.id === recipeId 
+              ? {
+                ...recipeObj,
+                ...changesInMatchedRecipe
+              } : {
+                ...recipeObj,
+                ...changesInUnMatchedRecipe
+              }
+          })
+          
+        }
+      : deckObj
+  });
+  return array;
+}

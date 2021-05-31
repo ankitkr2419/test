@@ -1,0 +1,187 @@
+@import '../../../assets/scss/core';
+
+.set-height-modal {
+  max-width: 44.25rem;
+
+  .top-heading {
+    border-bottom: 1px solid $gray-90;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.06);
+    background-color: $gray-98;
+    border-radius: 2.25rem 2.25rem 0 0;
+  }
+
+  .slider-box {
+    border: 1px solid rgba(178, 218, 209, 0.30);
+    background-color: $gray-98;
+    border-radius: 2.25rem;
+    padding: 1rem 1.5rem;
+    width: 80%;
+    margin: 0 auto;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 64%;
+      left: 50%;
+      transform: translate(-50%, -64%);
+      width: 419px;
+      height: 1px;
+      background: rgb(250, 250, 250);
+      background: linear-gradient(-90deg, rgba(250, 250, 250, 1) 0%, rgba(243, 130, 32, 1) 50%, rgba(250, 250, 250, 1) 100%);
+      z-index: 0;
+    }
+
+    &::after {
+      content: "Deck Level";
+      position: absolute;
+      top: 52%;
+      left: 28%;
+      width: 83px;
+      font-weight: bold;
+    }
+  }
+
+  .slider-outter-box {
+    width: 4.25rem;
+    border-radius: 1rem;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+    opacity: 0.9;
+    z-index: 1;
+    position: relative;
+
+    &::before{
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom:34%;
+      width: 100%;
+      height: 1px;
+      background: url('/images/dashed-line.svg');
+      background-size: contain;
+    }
+
+    .ant-slider-rail {
+      background: rgba(74, 104, 230, 0.12);
+      z-index: 1;
+      border-radius: 3px;
+    }
+
+    .ant-slider-rail,
+    .ant-slider-track,
+    .ant-slider-step {
+      width: 6px;
+    }
+
+    .ant-slider-track {
+      background: #4B62C2;
+    }
+
+    .deck-level-box {
+      display: inline-block;
+      height: 12.5rem;
+      margin-bottom: 0.625rem;
+
+      .deck-level-inner {
+        background: rgb(178, 218, 209);
+        background: linear-gradient(-90deg, rgba(178, 218, 209, 1) 0%, rgba(206, 255, 244, 1) 100%);
+        width: 3.875rem;
+        height: 4rem;
+        border-radius: 0 0 0.75rem 0.75rem;
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+      }
+
+      .ant-slider-handle {
+        position: absolute;
+        margin-top: 0px;
+        background: url(/images/pin.svg) no-repeat;
+        border-radius: inherit;
+        background-size: contain;
+        border: none;
+        width: 2.75rem;
+        height: 1.875rem;
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+  .ant-input-number {
+    width: 14.125rem;
+    height: 2.25rem;
+    display: block;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid $gray-90;
+    border-radius: 0.5rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    .ant-input-number-input {
+      height: inherit;
+    }
+  }
+
+  .gray-text {
+    color: #AFAFAF;
+  }
+
+  .height-label {
+    color: #58595B;
+    font-size: 14px;
+  }
+
+  .height-unit {
+    color: #717171;
+    font-size: 10px;
+  }
+
+  .minus,
+  .plus {
+    width: 45px;
+    height: 45px;
+    background: #FAFAFA;
+    padding: 8px 5px 8px 5px;
+    border: 1px solid #D2D2D2;
+    text-align: center;
+    cursor: pointer;
+    color: #2D47B7;
+  }
+
+  .minus {
+    border-radius: 12px 0 0 12px;
+  }
+
+  .plus {
+    border-radius: 0 12px 12px 0;
+  }
+
+  input {
+    height: 45px;
+    width: 100px;
+    text-align: center;
+    font-size: 20px;
+    line-height: 28px;
+    border: 1px solid #D2D2D2;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+
+    &:focus {
+      box-shadow: none;
+      outline: 0;
+      border-color: #D2D2D2;
+    }
+  }
+}

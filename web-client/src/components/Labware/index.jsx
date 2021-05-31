@@ -57,15 +57,10 @@ const LabWareComponent = (props) => {
     return <Redirect to={`/${ROUTES.landing}`} />;
   }
 
-  const deckIndex = activeDeckObj.name === DECKNAME.DeckA ? 0 : 1;
-  const tubesOptions = recipeDetailsReducer.decks[deckIndex].tubesOptions;
-  const tipsOptions = recipeDetailsReducer.decks[deckIndex].tipsOptions;
-  const tipsAndTubesOptions =
-    recipeDetailsReducer.decks[deckIndex].recipeOptions;
-  const cartridgeOptions =
-    recipeDetailsReducer.decks[deckIndex].cartridgeOptions;
-  const newRecipeName =
-    recipeDetailsReducer.decks[deckIndex].recipeDetails.name;
+  const tipsOptions = recipeDetailsReducer.tipsOptions;
+  const tubesOptions = recipeDetailsReducer.tubesOptions;
+  const cartridgeOptions = recipeDetailsReducer.cartridgeOptions;
+  const newRecipeName = recipeDetailsReducer.recipeDetails.name;
 
   const handleSaveBtn = () => {
     const requestBody = getRequestBody(newRecipeName, formik.values);
@@ -115,7 +110,6 @@ const LabWareComponent = (props) => {
                     formik={formik}
                     tubesOptions={tubesOptions}
                     tipsOptions={tipsOptions}
-                    tipsAndTubesOptions={tipsAndTubesOptions}
                     cartridgeOptions={cartridgeOptions}
                   />
                 )}

@@ -2,13 +2,20 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Icon } from "shared-components";
 import { Button } from "core-components";
-import { ButtonBarBox, PrevBtn } from './Styles';
+import { ButtonBarBox, PrevBtn } from "./Styles";
+import { useHistory } from "react-router";
 
 const ButtonBar = (props) => {
   const { leftBtnLabel, rightBtnLabel, handleLeftBtn, handleRightBtn } = props;
+  const history = useHistory();
+
+  const handleBackBtn = () => {
+    history.goBack();
+  };
+
   return (
-    <ButtonBarBox className="d-flex justify-content-start align-items-center mt-5">
-      <PrevBtn>
+    <ButtonBarBox className="bg-dark d-flex justify-content-start align-items-center mt-5">
+      <PrevBtn onClick={handleBackBtn}>
         <Icon name="angle-left" size={30} />
       </PrevBtn>
 

@@ -135,6 +135,4 @@ const RecipeListingContainer = (props) => {
   );
 };
 
-RecipeListingContainer.propTypes = {};
-
 export default RecipeListingContainer;
