@@ -15,7 +15,6 @@ const SelectProcesses = (props) => {
     activeTab,
     tubesOptions,
     tipsOptions,
-    tipsAndTubesOptions,
     cartridgeOptions,
   } = props;
   return (
@@ -36,7 +35,11 @@ const SelectProcesses = (props) => {
 
       <TabContent activeTab={activeTab} className="flex-grow-1">
         <TabPane tabId="1">
-          <TipsDropDown formik={formik} tipsOptions={tipsAndTubesOptions} />
+          <TipsDropDown
+            formik={formik}
+            allowedPositions={[1, 2, 3]}
+            tipsOptions={tipsOptions}
+          />
         </TabPane>
         <TabPane tabId="2">
           <TipPiercingCheckbox formik={formik} />
@@ -46,6 +49,7 @@ const SelectProcesses = (props) => {
             formik={formik}
             isDeck={true}
             position={1}
+            allowedPositions={[4]}
             allOptions={tubesOptions}
           />
         </TabPane>
@@ -54,6 +58,7 @@ const SelectProcesses = (props) => {
             formik={formik}
             isDeck={true}
             position={2}
+            allowedPositions={[5]}
             allOptions={tubesOptions}
           />
         </TabPane>
@@ -62,6 +67,7 @@ const SelectProcesses = (props) => {
             formik={formik}
             isDeck={false}
             position={1}
+            allowedPositions={[1]}
             allOptions={cartridgeOptions}
           />
         </TabPane>
@@ -70,6 +76,7 @@ const SelectProcesses = (props) => {
             formik={formik}
             isDeck={true}
             position={3}
+            allowedPositions={[6]}
             allOptions={tubesOptions}
           />
         </TabPane>
@@ -78,6 +85,7 @@ const SelectProcesses = (props) => {
             formik={formik}
             isDeck={false}
             position={2}
+            allowedPositions={[2]}
             allOptions={cartridgeOptions}
           />
         </TabPane>
@@ -86,6 +94,7 @@ const SelectProcesses = (props) => {
             formik={formik}
             isDeck={true}
             position={4}
+            allowedPositions={[7]}
             allOptions={tubesOptions}
           />
         </TabPane>

@@ -31,8 +31,6 @@ const (
 						WHERE process_id = $1`
 	selectAspireDispenseQuery = `SELECT *
 						FROM aspire_dispense`
-	deleteAspireDispenseQuery = `DELETE FROM processes
-						WHERE id = $1`
 	createAspireDispenseQuery = `INSERT INTO aspire_dispense (
 						category,
 						cartridge_type,
@@ -215,15 +213,6 @@ func (s *pgStore) createAspireDispense(ctx context.Context, tx *sql.Tx, ad Aspir
 	return ad, err
 }
 
-func (s *pgStore) DeleteAspireDispense(ctx context.Context, id uuid.UUID) (err error) {
-	_, err = s.db.Exec(deleteAspireDispenseQuery, id)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error deleting aspire dispense")
-		return
-	}
-	return
-}
-
 func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (err error) {
 	// logging initialised db operation
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AspireDispenseInitialisedState)
@@ -243,7 +232,7 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 		ad.DispenseNoOfCycles,
 		ad.DestinationPosition,
 		time.Now(),
-		ad.ID,
+		ad.ProcessID,
 	)
 	//logging error if there is any otherwise logging success
 	defer func() {
