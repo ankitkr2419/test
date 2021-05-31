@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -94,6 +95,13 @@ func deleteProcessHandler(deps Dependencies) http.HandlerFunc {
 		id, err := parseUUID(vars["id"])
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
+			return
+		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForDelete(nil, &id)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: responses.ProcessInProgressError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.ProcessInProgressError)
 			return
 		}
 
