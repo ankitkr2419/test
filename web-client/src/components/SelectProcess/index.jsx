@@ -4,7 +4,6 @@ import { Redirect } from "react-router";
 import { useSelector } from "react-redux";
 
 import { Row, Card, CardBody } from "core-components";
-import { ButtonBar } from "shared-components";
 import Process from "./Process";
 import { HeadingTitle, PageBody, ProcessOuterBox, TopContent } from "./Style";
 import { ROUTES, SELECT_PROCESS_PROPS } from "appConstants";
@@ -49,7 +48,6 @@ const SelectProcessPageComponent = () => {
               </Row>
             </CardBody>
           </Card>
-          <ButtonBar />
         </div>
       </ProcessOuterBox>
     </PageBody>
