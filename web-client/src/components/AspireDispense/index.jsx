@@ -118,7 +118,6 @@ const AspireDispenseComponent = (props) => {
                   size={60}
                   name="aspire-dispense"
                   className="text-primary bg-white border-gray"
-                  // onClick={toggleExportDataModal}
                   onClick={() => setIsAspire(!isAspire)}
                 />
                 <TopHeading titleHeading="Aspire & Dispense" />
@@ -142,7 +141,7 @@ const AspireDispenseComponent = (props) => {
             rightBtnLabel={isAspire ? "Next" : "Save"}
             handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
             handleRightBtn={() =>
-              isAspire ? setIsAspire(!isAspire) : handleSaveBtn()
+              isAspire ? handleNextBtn() : handleSaveBtn()
             }
           />
         </div>
