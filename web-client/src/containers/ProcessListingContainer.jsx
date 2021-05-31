@@ -43,7 +43,7 @@ const ProcessListingContainer = (props) => {
 
   /**another deck must be blocked**/
   useEffect(() => {
-    dispatch(deckBlockInitiated());
+    dispatch(deckBlockInitiated({ deckName: activeDeckObj.name }));
   }, []);
 
   /**Get process list of a recipe */

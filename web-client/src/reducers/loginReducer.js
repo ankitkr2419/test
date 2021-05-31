@@ -232,7 +232,7 @@ export const loginReducer = (state = loginInitialState, action) => {
     case deckBlockActions.deckBlockInitiated:
       let newDeckStateAfterDeckBlocked = getUpdatedDecks(
         state,
-        state.toJS().deckName,
+        action.payload.deckName,
         { isDeckBlocked: true },
         {},
         true
@@ -245,7 +245,7 @@ export const loginReducer = (state = loginInitialState, action) => {
     case deckBlockActions.deckBlockReset:
       let newDeckStateAfterDeckReset = getUpdatedDecks(
         state,
-        state.toJS().deckName,
+        action.payload.deckName,
         { isDeckBlocked: false },
         {},
         true

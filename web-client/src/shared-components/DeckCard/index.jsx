@@ -47,8 +47,6 @@ const DeckCard = (props) => {
   let activeDeckName = activeDeckObj && activeDeckObj.name;
   const isDeckBlocked = activeDeckObj && activeDeckObj.isDeckBlocked;
 
-  console.log("isDeckBlocked: ", isDeckBlocked);
-
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   let recipeActionReducerForDeck = recipeActionReducer.decks.find(
     (deckObj) => deckObj.name === deckName
@@ -171,7 +169,7 @@ const DeckCard = (props) => {
   const setCurrentDeckActive = () => {
     /** one cannot switch between deck while adding/editing processes.*/
     if (isDeckBlocked) {
-      toast.warning("Deck cannot be switched while adding/editing processes!");
+      toast.warning("Decks cannot be switched while adding/editing processes!");
       return;
     }
     /**

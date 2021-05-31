@@ -22,7 +22,7 @@ const LabwareContainer = (props) => {
   const params = { deckName: currentDeckName, token: token };
 
   useEffect(() => {
-    dispatch(deckBlockInitiated());
+    dispatch(deckBlockInitiated({ deckName: activeDeckObj.name }));
   }, [dispatch]);
 
   useEffect(() => {

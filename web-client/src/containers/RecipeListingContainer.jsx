@@ -60,7 +60,7 @@ const RecipeListingContainer = (props) => {
   /** Blocked deck must be unblocked */
   useEffect(() => {
     if (activeDeckObj?.isDeckBlocked) {
-      dispatch(deckBlockReset());
+      dispatch(deckBlockReset({ deckName: activeDeckObj.name }));
     }
   }, [activeDeckObj.isDeckBlocked]);
 

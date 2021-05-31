@@ -67,10 +67,12 @@ export const logoutFailure = (error) => ({
 });
 
 //log out action-creators
-export const deckBlockInitiated = () => ({
+export const deckBlockInitiated = (deckName) => ({
   type: deckBlockActions.deckBlockInitiated,
+  payload: deckName,
 });
 
-export const deckBlockReset = () => ({
+export const deckBlockReset = (deckName) => ({
   type: deckBlockActions.deckBlockReset,
+  payload: deckName,
 });
