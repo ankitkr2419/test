@@ -39,5 +39,21 @@ export const sortProcessListBySequence = (array) => {
 
 //add or set isOpen: false to process-list objects
 export const resetIsOpenInProcessList = (list) => {
-    return list.map((obj) => ({...obj, isOpen: false}))
-}
+    return list.map((obj) => ({ ...obj, isOpen: false }));
+};
+
+//will return processList array after deleting process with processId
+//it will also re-arrange sequences as per index value
+export const handleDeleteProcess = (processList, processId) => {
+    const processListAfterDeleted = processList.filter(
+        (obj) => obj.id !== processId
+    );
+
+    const rearrangedSequenceArr = processListAfterDeleted.map((obj, index) => {
+        return {
+            ...obj,
+            sequence_num: index + 1,
+        };
+    });
+    return rearrangedSequenceArr;
+};

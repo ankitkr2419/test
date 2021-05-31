@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyledProcessListing } from "./Styles";
 import { useSelector } from "react-redux";
-import { Redirect, useHistory } from "react-router";
-import { ROUTES } from "appConstants";
+import { Redirect } from "react-router";
+import { ROUTES, MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import TopContentComponent from "components/RecipeListing/TopContentComponent";
 import ProcessListingCards from "./ProcessListingCards";
 import { ButtonBar } from "shared-components";
+import MlModal from "shared-components/MlModal";
+import { useHistory } from "react-router";
 
 const ProcessListComponent = (props) => {
     let {
@@ -18,7 +20,14 @@ const ProcessListComponent = (props) => {
         handleProcessMove,
         createDuplicateProcess,
         handleEditProcess,
+        onFinishConfirmation,
+        handleAddProcessClick,
+        handleDeleteProcess,
     } = props;
+
+    const [finishModal, setFinishModal] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [deleteProcessId, setDeleteProcessId] = useState(null);
 
     const history = useHistory();
 
@@ -26,7 +35,7 @@ const ProcessListComponent = (props) => {
     const loginReducer = useSelector((state) => state.loginReducer);
     const loginReducerData = loginReducer.toJS();
     let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-
+    let deckName = activeDeckObj.name;
     /**
      * if user is not logged in, go to landing page
      */
@@ -34,14 +43,31 @@ const ProcessListComponent = (props) => {
         return <Redirect to={`/${ROUTES.landing}`} />;
     }
 
-    const handleAddProcessClick = () => {
-        history.push(ROUTES.selectProcess);
+    const toggleFinishModal = () => {
+        setFinishModal(!finishModal);
+    };
+    const onFinishConfirmationClick = () => {
+        toggleFinishModal();
+        onFinishConfirmation();
     };
 
-    const handleFinishClick = () => {
-        //TODO: required api calls
-        history.push(ROUTES.recipeListing);
+    const handleDeleteProcessClick = (processId) => {
+        setDeleteProcessId(processId);
+        toggleDeleteModal();
     };
+
+    const toggleDeleteModal = () => {
+        setDeleteModal(!deleteModal);
+    };
+
+    const onConfirmedDeleteProcess = () => {
+        toggleDeleteModal();
+        handleDeleteProcess(deleteProcessId);
+    };
+
+    const handleBackToRecipeList = () => {
+        history.push(ROUTES.recipeListing);
+    }
 
     return (
         <StyledProcessListing>
@@ -52,6 +78,7 @@ const ProcessListComponent = (props) => {
                     recipeName={recipeDetails.name}
                     createdAt={recipeDetails.created_at}
                     updatedAt={recipeDetails.updated_at}
+                    processListBackButtonHandler={handleBackToRecipeList}
                 />
 
                 {/** ProcessListingCards: pagination/ process list */}
@@ -64,6 +91,7 @@ const ProcessListComponent = (props) => {
                     handleProcessMove={handleProcessMove}
                     createDuplicateProcess={createDuplicateProcess}
                     handleEditProcess={handleEditProcess}
+                    handleDeleteProcess={handleDeleteProcessClick}
                 />
 
                 {/* Action buttons (add process, finish)*/}
@@ -71,8 +99,34 @@ const ProcessListComponent = (props) => {
                     leftBtnLabel="Add Process"
                     rightBtnLabel="Finish"
                     handleLeftBtn={handleAddProcessClick}
-                    handleRightBtn={handleFinishClick}
+                    handleRightBtn={toggleFinishModal}
                 />
+
+                {/**finish confirmation modal */}
+                {finishModal && (
+                    <MlModal
+                        isOpen={finishModal}
+                        textHead={deckName}
+                        textBody={`${MODAL_MESSAGE.finishProcessListConfirmation}${recipeDetails.name}`}
+                        handleSuccessBtn={onFinishConfirmationClick}
+                        handleCrossBtn={toggleFinishModal}
+                        successBtn={MODAL_BTN.yes}
+                        failureBtn={MODAL_BTN.no}
+                    />
+                )}
+
+                {/**delete confirmation modal */}
+                {deleteModal && (
+                    <MlModal
+                        isOpen={deleteModal}
+                        textHead={deckName}
+                        textBody={MODAL_MESSAGE.deleteProcessConfirmation}
+                        handleSuccessBtn={onConfirmedDeleteProcess}
+                        handleCrossBtn={toggleDeleteModal}
+                        successBtn={MODAL_BTN.yes}
+                        failureBtn={MODAL_BTN.no}
+                    />
+                )}
             </div>
         </StyledProcessListing>
     );
