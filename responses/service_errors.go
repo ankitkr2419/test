@@ -72,7 +72,6 @@ var (
 	ProcessesDecodeSeqError = fmt.Errorf("error while decoding process sequence data")
 	ProcessDeleteError      = fmt.Errorf("error deleting process record")
 	ProcessUpdateError      = fmt.Errorf("error updating process record")
-	ProcessInProgressError  = fmt.Errorf("process is in progress, so not allowed to delete")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 
@@ -84,7 +83,6 @@ var (
 	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
 	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
 	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
-	RecipeInProgressError = fmt.Errorf("recipe is in progress, so not allowed to delete")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
@@ -138,9 +136,17 @@ var (
 	DiscardBoxMoveError    = fmt.Errorf("error discard box moving was unsuccessful")
 	RestoreDeckError       = fmt.Errorf("error restore deck was unsuccessful")
 	DiscardBoolOptionError = fmt.Errorf("Invalid boolean value for tip discard option")
+
+	CUDNotAllowedError  = "this %v is in progress, so not allowed to %v"
+
 )
 
 // Special errors which are in []byte format
 var (
 	DataMarshallingError = []byte(`error marshalling data`)
 )
+
+func DefineCUDNotAllowedError(processOrRecipe string, operation string) (err error) {
+	msg := fmt.Sprintf(CUDNotAllowedError, processOrRecipe, operation)
+	return fmt.Errorf(msg)
+}
