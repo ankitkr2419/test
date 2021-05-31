@@ -8,7 +8,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func CheckIfRecipeOrProcessSafeForUDs(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
+func CheckIfRecipeOrProcessSafeForDelete(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
 	if recipeID != nil {
 		// for deck A or deck B
 		if (deckRecipe[deckA] != db.Recipe{} && *recipeID == deckRecipe[deckA].ID) ||
@@ -20,35 +20,18 @@ func CheckIfRecipeOrProcessSafeForUDs(recipeID *uuid.UUID, processID *uuid.UUID)
 	}
 
 	if processID != nil {
-
-		deckAcurrentProcess := getCurrentProcessNumber(deckA)
-		deckBcurrentProcess := getCurrentProcessNumber(deckB)
-
-		switch {
-		// no process running on both deck
-		case deckAcurrentProcess == -1 && deckBcurrentProcess == -1:
-			return
-
-		// process running on deck B only
-		case deckAcurrentProcess == -1 && len(deckProcesses[deckB]) != 0 && *processID == deckProcesses[deckB][deckBcurrentProcess].ID:
-			logger.Errorln(responses.ProcessUnsafeForCRUDError)
-			return responses.ProcessUnsafeForCRUDError
-
-		// process running on deck A only
-		case deckAcurrentProcess == -1 && len(deckProcesses[deckA]) != 0 && *processID == deckProcesses[deckA][deckAcurrentProcess].ID:
-			logger.Errorln(responses.ProcessUnsafeForCRUDError)
-			return responses.ProcessUnsafeForCRUDError
-
-			// process running on both decks
-		case (len(deckProcesses[deckA]) != 0 && *processID == deckProcesses[deckA][deckAcurrentProcess].ID) ||
-			(len(deckProcesses[deckB]) != 0 && *processID == deckProcesses[deckB][deckBcurrentProcess].ID):
-			logger.Errorln(responses.ProcessUnsafeForCRUDError)
-			return responses.ProcessUnsafeForCRUDError
-
-		default:
-			return responses.InvalidPLCRunRecipeData
+		// for deck A
+		for _, pr := range deckProcesses[deckA] {
+			if pr.ID == *processID {
+				return responses.ProcessUnsafeForCRUDError
+			}
 		}
-
+		// for deck B
+		for _, pr := range deckProcesses[deckB] {
+			if pr.ID == *processID {
+				return responses.ProcessUnsafeForCRUDError
+			}
+		}
 		logger.Infoln(responses.ProcessSafeForCRUD)
 	}
 
