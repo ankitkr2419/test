@@ -223,17 +223,21 @@ export function* nextStepRunRecipe(actions) {
 export function* publishRecipe(actions) {
   const {
     payload: {
-      params: { recipeId, token },
+      params: { recipeId, token, isPublished },
     },
   } = actions;
   const { publishRecipeSuccess, publishRecipeFailed } = publishRecipeAction;
+
+  /**isPublished: true means we should call unpublish api
+   * isPublished: false means we should call publish api
+   */
 
   try {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.POST,
         body: null,
-        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}/publish`,
+        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}/${isPublished ? "unpublish" : "publish"}`,
         successAction: publishRecipeSuccess,
         failureAction: publishRecipeFailed,
         showPopupSuccessMessage: true,

@@ -6,13 +6,16 @@ import {
   abortRecipeAction,
   recipeListingAction,
   saveRecipeDataAction,
+  publishRecipeAction,
 } from "actions/recipeActions";
 import { DECKCARD_BTN, DECKNAME, RUN_RECIPE_TYPE } from "appConstants";
-import { getUpdatedDecks } from "utils/helpers";
+import { getUpdatedDecks, getUpdatedDecksAfterRecipeListChanged } from "utils/helpers";
 
 export const initialState = {
   // recipeData: [], //all recipe data
   tempDeckName: "", //used for fetch recipe list
+  tempRecipeId: "", 
+  tempIsPublished: "",
   decks: [
     {
       name: DECKNAME.DeckA,
@@ -387,6 +390,45 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         decks: newDecksAfterLoggedOut,
       };
+
+    case publishRecipeAction.publishRecipeInitiated: 
+      return {
+        ...state,
+        tempDeckName: action.payload.params.deckName,
+        tempRecipeId: action.payload.params.recipeId,
+        tempIsPublished: action.payload.params.isPublished,
+        isLoading: true,
+      };
+
+    case publishRecipeAction.publishRecipeSuccess:
+      const changesInMatchedRecipe = {
+        is_published: !state.tempIsPublished
+      }
+
+      const newDecksAfterPublishSuccess = getUpdatedDecksAfterRecipeListChanged(
+        state,
+        state.tempDeckName,
+        state.tempRecipeId,
+        changesInMatchedRecipe
+      )
+
+      return {
+        ...state,
+        tempDeckName:"",
+        tempRecipeId: "",
+        tempIsPublished: "",
+        isLoading: false,
+        decks: newDecksAfterPublishSuccess,
+      }
+
+    case publishRecipeAction.publishRecipeFailed: 
+      return {
+        ...state,
+        tempDeckName: "",
+        tempRecipeId: "",
+        tempIsPublished: "",
+        isLoading: false
+      }  
 
     default:
       return state;

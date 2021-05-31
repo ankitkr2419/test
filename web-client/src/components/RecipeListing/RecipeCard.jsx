@@ -64,20 +64,20 @@ const RecipeCard = (props) => {
                 <ButtonIcon
                   size={14}
                   name="play"
-                  className="border-gray text-primary"
+                  className="border-gray text-primary mr-2"
                   onClick={handleRunRecipeByAdmin}
                 />
                 <ButtonIcon
                   size={14}
                   name="edit-pencil"
-                  className="border-gray text-primary"
+                  className="border-gray text-primary mr-2"
                   onClick={handleEditRecipe}
                 />
                 <ButtonIcon
                   size={14}
-                  name="publish"
-                  className="border-gray text-primary"
-                  onClick={() => handlePublishModalClick(recipeId)}
+                  name={isPublished ? 'published' : `publish`}
+                  className={`border-gray ${isPublished ? "published-icon text-white bg-primary": "text-primary"}`}
+                  onClick={() => handlePublishModalClick(recipeId, isPublished)}
                 />
               </div>
               <ButtonIcon

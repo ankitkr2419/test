@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS recipes DROP COLUMN total_time;

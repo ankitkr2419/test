@@ -1,49 +1,37 @@
-import React from 'react';
+import React from "react";
 
-import { 
-	Col
-} from 'core-components';
-import {
-	ButtonIcon,
-	Text
-} from 'shared-components';
+import { Col } from "core-components";
+import { ButtonIcon, Text } from "shared-components";
 
-import styled from 'styled-components';
+import { ProcessInnerBox } from "./Style";
+import { useHistory } from "react-router";
 
-const ProcessBox = styled.div`
-margin-bottom:14px;
-.process-card{
-    border-radius:9px;
-    border:1px solid #CCCCCC;
-    padding:29px 34px;
-    height:108px;
-    .process-name{
-        font-size:18px;
-        line-height:21px;
-        color: #666666;
-    }
-}
-`;
+const Process = (props) => {
+  const { iconName, processName, route } = props;
+  const history = useHistory();
 
-
-const Process = ({iconName, processName}) => {
-	return (
-        <Col md={4}>
-            <ProcessBox>
-                <div className="process-card bg-white d-flex align-items-center frame-icon">
-                    <ButtonIcon
-                        size={51}
-                        name={iconName}
-                        className="border-dark-gray text-primary"
-                        //onClick={toggleExportDataModal}
-                    />
-                    <Text Tag="span" className="ml-2 process-name">
-                        {processName}
-                    </Text>
-                </div>
-            </ProcessBox>
-        </Col>
-	);
+  const clickHandler = (route) => {
+    history.push(route);
+  };
+  return (
+    <Col md={4}>
+      <ProcessInnerBox>
+        <div
+          className="process-card bg-white d-flex align-items-center frame-icon"
+          onClick={() => clickHandler(route)}
+        >
+          <ButtonIcon
+            size={51}
+            name={iconName}
+            className="border-dark-gray text-primary"
+          />
+          <Text Tag="span" className="ml-2 process-name">
+            {processName}
+          </Text>
+        </div>
+      </ProcessInnerBox>
+    </Col>
+  );
 };
 
 Process.propTypes = {};

@@ -18,26 +18,12 @@ export const getRequestBody = (recipeName, formikState) => {
   return requestBody;
 };
 
-export const getOptions = (lowerLimit, higherLimit, options) => {
-  const optionsObj = [];
-  if (options) {
-    options.forEach((optionObj) => {
-      if (optionObj.id >= lowerLimit && optionObj.id <= higherLimit) {
-        optionsObj.push({
-          value: optionObj.id,
-          label: optionObj.name ? optionObj.name : optionObj.description,
-        });
-      }
-    });
-  }
-  return optionsObj;
-};
-
-export const getOptionsForTubesAndCartridges = (options, position) => {
+export const getOptions = (options, allowedPositions) => {
   let optionsObj;
+
   if (options) {
     optionsObj = options.map((optionObject) => {
-      if (optionObject.id === position) {
+      if (allowedPositions && allowedPositions.includes(optionObject.id)) {
         return {
           value: optionObject.id,
           label: optionObject.name
