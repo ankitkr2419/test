@@ -11,98 +11,72 @@ const AspireCommonField = (props) => {
   const nCyclesDisabled = mixingVolume === null || mixingVolume === "";
 
   return (
-    <>
-      <CommmonFields>
-        <FormGroup className="d-flex align-items-center mb-2">
-          <Label for="aspire-height" className="px-0 label-name">
-            Aspire Height
-          </Label>
-          <div className="d-flex flex-column input-field position-relative">
-            <Input
-              type="text"
-              name="aspireHeight"
-              id="aspire-height"
-              placeholder="Type here"
-              className="aspire-input-field"
-              onChange={(e) =>
-                setFormikField(
-                  formik,
-                  true,
-                  currentTab,
-                  e.target.name,
-                  e.target.value
-                )
-              }
-            />
-            <Text Tag="span" className="height-icon-box">
-              <Icon name="height" size={20} />
-            </Text>
-            <FormError>Incorrect Aspire Height</FormError>
-          </div>
-        </FormGroup>
-
-        <FormGroup className="d-flex align-items-center mb-2">
-          <Label for="mixing-volume" className="px-0 label-name">
-            Mixing Volume
-          </Label>
-          <div className="d-flex flex-column input-field">
-            <Input
-              type="text"
-              name="mixingVolume"
-              id="mixing-volume"
-              placeholder="Type here"
-              onChange={(e) =>
-                setFormikField(
-                  formik,
-                  true,
-                  currentTab,
-                  e.target.name,
-                  e.target.value
-                )
-              }
-            />
-            <FormError>Incorrect Mixing Volume</FormError>
-          </div>
-          <Text
-            Tag="span"
-            className={`d-flex align-items-center ${
-              nCyclesDisabled ? "disabled" : ""
-            } ml-4`}
-          >
-            <Label for="no-of-cycles" className="px-0 label-name">
-              No. Of Cycles
-            </Label>
-            <Text Tag="span" className="d-flex flex-column cycle-input">
-              <Input
-                type="text"
-                name="nCycles"
-                id="no-of-cycles"
-                placeholder=""
-                onChange={(e) =>
-                  setFormikField(
-                    formik,
-                    true,
-                    currentTab,
-                    e.target.name,
-                    e.target.value
-                  )
-                }
-              />
-              <FormError>Incorrect No. Of Cycles</FormError>
-            </Text>
+    <CommmonFields>
+      <FormGroup className="d-flex align-items-center mb-2">
+        <Label for="aspire-height" className="px-0 label-name">
+          Aspire Height
+        </Label>
+        <div className="d-flex flex-column input-field position-relative">
+          <Input
+            type="text"
+            name="aspireHeight"
+            id="aspire-height"
+            placeholder="Type here"
+            className="aspire-input-field"
+            onChange={(e) =>
+              setFormikField(
+                formik,
+                true,
+                currentTab,
+                e.target.name,
+                e.target.value
+              )
+            }
+          />
+          <Text Tag="span" className="height-icon-box">
+            <Icon name="height" size={20} />
           </Text>
-        </FormGroup>
+          <FormError>Incorrect Aspire Height</FormError>
+        </div>
+      </FormGroup>
 
-        <FormGroup className="d-flex align-items-center mb-2">
-          <Label for="aspire-volume" className="px-0 label-name">
-            Aspire Volume
+      <FormGroup className="d-flex align-items-center mb-2">
+        <Label for="mixing-volume" className="px-0 label-name">
+          Mixing Volume
+        </Label>
+        <div className="d-flex flex-column input-field">
+          <Input
+            type="text"
+            name="mixingVolume"
+            id="mixing-volume"
+            placeholder="Type here"
+            onChange={(e) =>
+              setFormikField(
+                formik,
+                true,
+                currentTab,
+                e.target.name,
+                e.target.value
+              )
+            }
+          />
+          <FormError>Incorrect Mixing Volume</FormError>
+        </div>
+        <Text
+          Tag="span"
+          className={`d-flex align-items-center ${
+            nCyclesDisabled ? "disabled" : ""
+          } ml-4`}
+        >
+          <Label for="no-of-cycles" className="px-0 label-name">
+            No. Of Cycles
           </Label>
-          <div className="d-flex flex-column input-field">
+          <Text Tag="span" className="d-flex flex-column cycle-input">
             <Input
               type="text"
-              name="aspireVolume"
-              id="aspire-volume"
-              placeholder="Type here"
+              name="nCycles"
+              id="no-of-cycles"
+              placeholder=""
               onChange={(e) =>
                 setFormikField(
                   formik,
@@ -113,35 +87,59 @@ const AspireCommonField = (props) => {
                 )
               }
             />
-            <FormError>Incorrect Aspire Volume</FormError>
-          </div>
-        </FormGroup>
+            <FormError>Incorrect No. Of Cycles</FormError>
+          </Text>
+        </Text>
+      </FormGroup>
 
-        <FormGroup className="d-flex align-items-center mb-2">
-          <Label for="air-volume" className="px-0 label-name">
-            Air Volume
-          </Label>
-          <div className="d-flex flex-column input-field">
-            <Input
-              type="text"
-              name="airVolume"
-              id="air-volume"
-              placeholder="Type here"
-              onChange={(e) =>
-                setFormikField(
-                  formik,
-                  true,
-                  currentTab,
-                  e.target.name,
-                  e.target.value
-                )
-              }
-            />
-            <FormError>Incorrect Air Volume</FormError>
-          </div>
-        </FormGroup>
-      </CommmonFields>
-    </>
+      <FormGroup className="d-flex align-items-center mb-2">
+        <Label for="aspire-volume" className="px-0 label-name">
+          Aspire Volume
+        </Label>
+        <div className="d-flex flex-column input-field">
+          <Input
+            type="text"
+            name="aspireVolume"
+            id="aspire-volume"
+            placeholder="Type here"
+            onChange={(e) =>
+              setFormikField(
+                formik,
+                true,
+                currentTab,
+                e.target.name,
+                e.target.value
+              )
+            }
+          />
+          <FormError>Incorrect Aspire Volume</FormError>
+        </div>
+      </FormGroup>
+
+      <FormGroup className="d-flex align-items-center mb-2">
+        <Label for="air-volume" className="px-0 label-name">
+          Air Volume
+        </Label>
+        <div className="d-flex flex-column input-field">
+          <Input
+            type="text"
+            name="airVolume"
+            id="air-volume"
+            placeholder="Type here"
+            onChange={(e) =>
+              setFormikField(
+                formik,
+                true,
+                currentTab,
+                e.target.name,
+                e.target.value
+              )
+            }
+          />
+          <FormError>Incorrect Air Volume</FormError>
+        </div>
+      </FormGroup>
+    </CommmonFields>
   );
 };
 

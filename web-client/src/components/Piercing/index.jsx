@@ -17,7 +17,7 @@ import { getWellsInitialArray } from "./functions";
 const extractionWells = getWellsInitialArray(8, 0);
 const pcrWells = getWellsInitialArray(4, 1);
 
-const PiercingComponent = (props) => {
+const PiercingComponent = () => {
   const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
@@ -154,7 +154,5 @@ const PiercingComponent = (props) => {
     </>
   );
 };
-
-PiercingComponent.propTypes = {};
 
 export default React.memo(PiercingComponent);

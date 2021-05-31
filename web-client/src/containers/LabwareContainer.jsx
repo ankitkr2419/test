@@ -8,7 +8,7 @@ import {
   getTubesActionInitiated,
 } from "action-creators/saveNewRecipeActionCreators";
 
-const LabwareContainer = (props) => {
+const LabwareContainer = () => {
   const dispatch = useDispatch();
 
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -26,7 +26,5 @@ const LabwareContainer = (props) => {
   }, [dispatch, params]);
   return <LabWareComponent />;
 };
-
-LabwareContainer.propTypes = {};
 
 export default LabwareContainer;
