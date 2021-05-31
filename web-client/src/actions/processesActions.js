@@ -15,3 +15,9 @@ export const aspireDispenseAction = {
   saveAspireDispenseSuccess: "SAVE_ASPIRE_DISPENSE_SUCCESS",
   saveAspireDispenseFailed: "SAVE_ASPIRE_DISPENSE_FAILED",
 };
+
+export const delayAction = {
+  saveDelayInitiated: "SAVE_DELAY_INITIATED",
+  saveDelaySuccess: "SAVE_DELAY_SUCCESS",
+  saveDelayFailed: "SAVE_DELAY_FAILED",
+};

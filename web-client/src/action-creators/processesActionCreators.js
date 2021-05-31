@@ -1,5 +1,6 @@
 import {
   aspireDispenseAction,
+  delayAction,
   piercingAction,
   tipPickupAction,
 } from "actions/processesActions";
@@ -46,5 +47,21 @@ export const saveTipPickupSuccess = (response) => ({
 
 export const saveTipPickupFailure = (error) => ({
   type: tipPickupAction.saveTipPickUpFailed,
+  payload: error,
+});
+
+//delay
+export const saveDelayInitiated = (params) => ({
+  type: delayAction.saveDelayInitiated,
+  payload: params,
+});
+
+export const saveDelaySuccess = (response) => ({
+  type: delayAction.saveDelaySuccess,
+  payload: response,
+});
+
+export const saveDelayFailure = (error) => ({
+  type: delayAction.saveDelayFailed,
   payload: error,
 });
