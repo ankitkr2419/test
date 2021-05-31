@@ -3,6 +3,8 @@ import { callApi } from "apis/apiHelper";
 import {
   aspireDispenseAction,
   heatingAction,
+  magnetAction,
+  delayAction,
   piercingAction,
   shakingAction,
   tipPickupAction,
@@ -90,6 +92,7 @@ export function* shaking(actions) {
   const { body, recipeID, token } = actions.payload;
 
   const { saveShakingSuccess, saveShakingFailed } = shakingAction;
+
   try {
     yield call(callApi, {
       payload: {
@@ -132,6 +135,51 @@ export function* heating(actions) {
   }
 }
 
+export function* magnet(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveMagnetSuccess, saveMagnetFailed } = magnetAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.magnet}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveMagnetSuccess,
+        failureAction: saveMagnetFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveMagnetFailed(error);
+  }
+}
+export function* delay(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveDelaySuccess, saveDelayFailed } = delayAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.delay}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveDelaySuccess,
+        failureAction: saveDelayFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveDelayFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
@@ -141,4 +189,6 @@ export function* processesSaga() {
   );
   yield takeEvery(shakingAction.saveShakingInitiated, shaking);
   yield takeEvery(heatingAction.saveHeatingInitiated, heating);
+  yield takeEvery(magnetAction.saveMagnetInitiated, magnet);
+  yield takeEvery(delayAction.saveDelayInitiated, delay);
 }

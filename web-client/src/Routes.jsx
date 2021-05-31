@@ -21,6 +21,8 @@ import TipPickupContainer from "containers/TipPickupContainer";
 import AspireDispenseContainer from "containers/AspireDispenseContainer";
 import ShakingContainer from "containers/ShakingContainer";
 import HeatingContainer from "containers/HeatingContainer";
+import MagnetContainer from "containers/MagnetContainer";
+import DelayContainer from "containers/DelayContainer";
 
 export const routeDefinitions = [
   {
@@ -113,12 +115,12 @@ export const routeDefinitions = [
       //   component: TipPositionContainer,
       //   key: 16,
       // },
-      // {
-      //   path: `${ROOT_URL_PATH}magnet`,
-      //   exact: true,
-      //   component: MagnetContainer,
-      //   key: 17,
-      // },
+      {
+        path: `${ROOT_URL_PATH}magnet`,
+        exact: true,
+        component: MagnetContainer,
+        key: 17,
+      },
       // {
       //   path: `${ROOT_URL_PATH}tip-discard`,
       //   exact: true,
@@ -143,12 +145,12 @@ export const routeDefinitions = [
         component: ProcessListingContainer,
         key: 22,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}delay`,
-      //   exact: true,
-      //   component: DelayContainer,
-      //   key: 21,
-      // },
+      {
+        path: `${ROOT_URL_PATH}delay`,
+        exact: true,
+        component: DelayContainer,
+        key: 21,
+      },
     ],
   },
 ];

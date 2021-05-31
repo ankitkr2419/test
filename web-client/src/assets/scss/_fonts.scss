@@ -62,6 +62,9 @@ $icon-download-1: "\e936";
 $icon-published: "\e937";
 $icon-timer: "\e938";
 $icon-process: "\e939";
+$icon-downward-magnet: "\e93a";
+$icon-upward-magnet: "\e93b";
+$icon-height: "\e93c";
 
 @font-face {
 	font-family: '#{$icon-font-family}';
@@ -441,5 +444,23 @@ $icon-process: "\e939";
 .icon-process {
 	&:before {
 		content: $icon-process;
+	}
+}
+
+.icon-downward-magnet {
+	&:before {
+		content: $icon-downward-magnet;
+	}
+}
+
+.icon-upward-magnet {
+	&:before {
+		content: $icon-upward-magnet;
+	}
+}
+
+.icon-height {
+	&:before {
+		content: $icon-height;
 	}
 }

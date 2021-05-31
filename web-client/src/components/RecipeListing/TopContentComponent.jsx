@@ -19,6 +19,7 @@ const TopContentComponent = (props) => {
         recipeName,
         createdAt,
         updatedAt,
+        processListBackButtonHandler,
     } = props;
     /**
      * prop: isProcessListingPage: false/undefined  means RecipeListing Page (default)
@@ -103,11 +104,16 @@ const TopContentComponent = (props) => {
                 <>
                     <div className="d-flex flex-column">
                         <div className="d-flex align-items-center">
-                            <Icon
-                                name="angle-left"
-                                size={32}
-                                className="text-white"
-                            />
+                            <div
+                                style={{ cursor: "pointer" }}
+                                onClick={processListBackButtonHandler}
+                            >
+                                <Icon
+                                    name="angle-left"
+                                    size={32}
+                                    className="text-white"
+                                />
+                            </div>
                             <div className="d-flex flex-column">
                                 <Text className="text-white mb-0">Recipe</Text>
                                 <HeadingTitle
