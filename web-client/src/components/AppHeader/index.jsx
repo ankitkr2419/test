@@ -28,7 +28,7 @@ import { useHistory, useLocation } from "react-router";
 
 /**
  * Please note : Commented code has features/elements that may be needed in the future.
- * Therefore, please do not "un-comment" without confirmation.
+ * Therefore, please do not "un-comment" or delete without confirmation.
  */
 
 const AppHeader = (props) => {
