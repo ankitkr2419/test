@@ -19,7 +19,7 @@ const TipsDropdown = (props) => {
     const tipPositions = formik.values.tips.processDetails;
 
     return Object.keys(tipPositions).map((tipPosition, i) => {
-      let id = tipPosition.id;
+      let id = tipPositions[tipPosition].id;
       //match the id of option with current tipPosition ID
       let index = options && options.map((item) => item.value).indexOf(id);
 
