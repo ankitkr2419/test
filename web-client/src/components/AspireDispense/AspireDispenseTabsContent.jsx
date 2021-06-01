@@ -15,9 +15,9 @@ const AspireDispenseTabsContent = (props) => {
 
   const disabledTabObj = isAspire ? disabledTab.aspire : disabledTab.dispense;
   const aspireCategoryLabel = formik.values.aspire.selectedCategory
-    ? CATEGORY_LABEL(formik.values.aspire.selectedCategory)
-    : CATEGORY_LABEL(activeTab);
-  const dispenseCategoryLabel = CATEGORY_LABEL(activeTab);
+    ? CATEGORY_LABEL[formik.values.aspire.selectedCategory]
+    : CATEGORY_LABEL[activeTab];
+  const dispenseCategoryLabel = CATEGORY_LABEL[activeTab];
 
   return (
     <div className="d-flex">

@@ -17,7 +17,14 @@ const TimeInfoBox = styled.div`
 `;
 
 const TimeInfo = (props) => {
-  const { handleHoursChange, handleMinsChange, handleSecsChange } = props;
+  const {
+    hours,
+    mins,
+    secs,
+    handleHoursChange,
+    handleMinsChange,
+    handleSecsChange,
+  } = props;
   return (
     <>
       <TimeInfoBox>
@@ -34,6 +41,7 @@ const TimeInfo = (props) => {
                     name="hours"
                     id="hours"
                     placeholder=""
+                    value={hours}
                     onChange={handleHoursChange}
                   />
                   <Label for="hours" className="font-weight-bold">
@@ -47,6 +55,7 @@ const TimeInfo = (props) => {
                     name="minutes"
                     id="minutes"
                     placeholder=""
+                    value={mins}
                     onChange={handleMinsChange}
                   />
                   <Label for="minutes" className="font-weight-bold px-1">
@@ -60,6 +69,7 @@ const TimeInfo = (props) => {
                     name="seconds"
                     id="seconds"
                     placeholder=""
+                    value={secs}
                     onChange={handleSecsChange}
                   />
                   <Label for="minutes" className="font-weight-bold">
