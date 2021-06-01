@@ -2,7 +2,12 @@ import { takeEvery, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
 import {
   aspireDispenseAction,
+  heatingAction,
+  magnetAction,
+  delayAction,
   piercingAction,
+  tipDiscardAction,
+  shakingAction,
   tipPickupAction,
 } from "actions/processesActions";
 import {} from "action-creators/processesActionCreators";
@@ -84,6 +89,121 @@ export function* aspireDispense(actions) {
   }
 }
 
+export function* tipDiscard(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveTipDiscardSuccess, saveTipDiscardFailed } = tipDiscardAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.tipDiscard}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveTipDiscardSuccess,
+        failureAction: saveTipDiscardFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveTipDiscardFailed(error);
+  }
+}
+
+export function* shaking(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveShakingSuccess, saveShakingFailed } = shakingAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.shaking}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveShakingSuccess,
+        failureAction: saveShakingFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveShakingFailed(error);
+  }
+}
+
+export function* heating(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveHeatingSuccess, saveHeatingFailed } = heatingAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.heating}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveHeatingSuccess,
+        failureAction: saveHeatingFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveHeatingFailed(error);
+  }
+}
+
+export function* magnet(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveMagnetSuccess, saveMagnetFailed } = magnetAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.magnet}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveMagnetSuccess,
+        failureAction: saveMagnetFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveMagnetFailed(error);
+  }
+}
+export function* delay(actions) {
+  const { body, recipeID, token } = actions.payload;
+
+  const { saveDelaySuccess, saveDelayFailed } = delayAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        body: body,
+        reqPath: `${API_ENDPOINTS.delay}/${recipeID}`,
+        method: HTTP_METHODS.POST,
+        successAction: saveDelaySuccess,
+        failureAction: saveDelayFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token: token,
+      },
+    });
+  } catch (error) {
+    console.log("error while login: ", error);
+    saveDelayFailed(error);
+  }
+}
+
 export function* processesSaga() {
   yield takeEvery(piercingAction.savePiercingInitiated, piercing);
   yield takeEvery(tipPickupAction.saveTipPickUpInitiated, tipPickUp);
@@ -91,4 +211,9 @@ export function* processesSaga() {
     aspireDispenseAction.saveAspireDispenseInitiated,
     aspireDispense
   );
+  yield takeEvery(tipDiscardAction.saveTipDiscardInitiated, tipDiscard);
+  yield takeEvery(shakingAction.saveShakingInitiated, shaking);
+  yield takeEvery(heatingAction.saveHeatingInitiated, heating);
+  yield takeEvery(magnetAction.saveMagnetInitiated, magnet);
+  yield takeEvery(delayAction.saveDelayInitiated, delay);
 }

@@ -1,1 +1,0 @@
-ALTER TYPE process_type ADD VALUE IF NOT EXISTS 'TipPickup';

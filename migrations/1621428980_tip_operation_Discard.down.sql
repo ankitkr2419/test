@@ -1,1 +1,0 @@
-UPDATE processes SET type='TipOperation' where type='TipPickup';

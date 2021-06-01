@@ -7,7 +7,8 @@ import {
   abortRecipeAction,
   recipeListingAction,
   stepRunRecipeAction,
-  publishRecipeAction
+  publishRecipeAction,
+  deleteRecipeAction,
 } from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
 import {
@@ -250,6 +251,32 @@ export function* publishRecipe(actions) {
   }
 }
 
+export function* deleteRecipe(actions) {
+  const {
+    payload: {
+      params: { recipeId, token },
+    },
+  } = actions;
+  const { deleteRecipeSuccess, deleteRecipeFailure } = deleteRecipeAction;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.DELETE,
+        body: null,
+        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}`,
+        successAction: deleteRecipeSuccess,
+        failureAction: deleteRecipeFailure,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
+      },
+    });
+  } catch (error) {
+    console.error("Error in publish recipe", error);
+  }
+}
+
 export function* recipeActionSaga() {
   yield takeEvery(runRecipeAction.runRecipeInitiated, runRecipe);
   yield takeEvery(abortRecipeAction.abortRecipeInitiated, abortRecipe);
@@ -259,4 +286,5 @@ export function* recipeActionSaga() {
   yield takeEvery(stepRunRecipeAction.stepRunRecipeInitiated, stepRunRecipe);
   yield takeEvery(stepRunRecipeAction.nextStepRunRecipeInitiated, nextStepRunRecipe);
   yield takeEvery(publishRecipeAction.publishRecipeInitiated, publishRecipe);
+  yield takeEvery(deleteRecipeAction.deleteRecipeInitiated, deleteRecipe);
 }
