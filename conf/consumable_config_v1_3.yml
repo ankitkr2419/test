@@ -78,11 +78,11 @@ ConsumableDistance:
   - id: 56
     name: "pos_6"
     distance: 81.50
-    description: "position 6 on deck, here sample tube may reside"
+    description: "position 6 on deck, here sample tube(swap or blood or other sample holding tube) may reside"
   - id: 57
     name: "pos_7"
     distance: 137.50
-    description: "position 7 on deck, here lysis tube (swap or blood or other sample holding tube) may reside. This tip is also known as reaction tube."
+    description: "position 7 on deck, here lysis tube  may reside. This tip is also known as reaction tube."
   - id: 58
     name: "pos_8"
     distance: 164.50
@@ -94,7 +94,7 @@ ConsumableDistance:
   - id: 60
     name: "pos_10"
     distance: 268.85
-    description: "position 10 on deck, here cartridge 2 may reside"
+    description: "position 10 on deck, here cartridge 2 starts"
   - id: 61
     name: "pos_11"
     distance: 325.50
