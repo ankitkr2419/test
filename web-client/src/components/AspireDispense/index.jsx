@@ -13,11 +13,13 @@ import {
   setFormikField,
   getFormikInitialState,
   getRequestBody,
+  disabledTab,
+  toggler,
 } from "./functions";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 
-const AspireDispenseComponent = (props) => {
+const AspireDispenseComponent = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
 
@@ -41,6 +43,16 @@ const AspireDispenseComponent = (props) => {
     enableReinitialize: true,
   });
 
+  useEffect(() => {
+    toggler(formik, isAspire, activeTab);
+  });
+
+  useEffect(() => {
+    setActiveTab(
+      formik.values[isAspire ? "aspire" : "dispense"].selectedCategory
+    );
+  });
+
   const errorInAPICall = processesReducer.error;
   useEffect(() => {
     if (errorInAPICall === false) {
@@ -52,7 +64,10 @@ const AspireDispenseComponent = (props) => {
   const token = activeDeckObj.token;
 
   const toggle = (tab) => {
-    if (activeTab !== tab) setActiveTab(tab);
+    formik.setFieldValue(
+      `${isAspire ? "aspire" : "dispense"}.selectedCategory`,
+      `${tab}`
+    );
   };
 
   const wellClickHandler = (id, type) => {
@@ -75,15 +90,21 @@ const AspireDispenseComponent = (props) => {
         isAspire,
         activeTab,
         `cartridge${activeTab}Wells.${index}.isSelected`,
-        wellObj.id === id
+        wellObj.id === id ? !wellObj.isSelected : false
       );
     });
   };
 
-  const handleNextBtn = () => {
-    //sets the selected category, and this is used in API call further.
-    formik.setFieldValue("aspire.selectedCategory", activeTab);
+  const handleModifyBtn = () => {
     setIsAspire(!isAspire);
+    setActiveTab(formik.values.aspire.selectedCategory);
+    formik.setFieldValue("dispense.selectedCategory", activeTab);
+  };
+
+  const handleNextBtn = () => {
+    setIsAspire(!isAspire);
+    setActiveTab(formik.values.dispense.selectedCategory);
+    formik.setFieldValue("aspire.selectedCategory", activeTab);
   };
 
   const handleSaveBtn = () => {
@@ -136,7 +157,7 @@ const AspireDispenseComponent = (props) => {
           <ButtonBar
             leftBtnLabel={isAspire ? null : "Modify"}
             rightBtnLabel={isAspire ? "Next" : "Save"}
-            handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
+            handleLeftBtn={() => (isAspire ? null : handleModifyBtn())}
             handleRightBtn={() =>
               isAspire ? handleNextBtn() : handleSaveBtn()
             }
