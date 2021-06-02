@@ -85,12 +85,12 @@ iterateCSV:
 			return err
 		}
 
-		logger.Infoln("Record-> ", record)
 
 		switch strings.TrimSpace(strings.ToUpper(record[0])) {
 		case dummy:
 			continue
 		case recipe:
+			logger.Infoln("Record-> ", record)
 			err = addRecipeDetails(record[1:])
 			if err != nil {
 				err = fmt.Errorf("Couldn't add recipe details.")
@@ -98,6 +98,7 @@ iterateCSV:
 				return err
 			}
 		case position:
+			logger.Infoln("Record-> ", record)
 			err = createRecipe(record, store)
 			if err != nil {
 				err = fmt.Errorf("Couldn't create recipe entry.")
@@ -105,6 +106,7 @@ iterateCSV:
 				return err
 			}
 		case blank:
+			logger.Infoln("Record-> ", record)
 			if len(record) < 2 || record[1] == "" {
 				err = fmt.Errorf("record has unexpected length or empty process name, maybe CSV is over.")
 				logger.Warnln(err, record)
@@ -118,6 +120,7 @@ iterateCSV:
 				}
 			}
 		default:
+			logger.Infoln("Record-> ", record)
 			return responses.CSVBadContentError
 		}
 	}
@@ -127,7 +130,7 @@ iterateCSV:
 }
 
 func addRecipeDetails(recipeDetails []string) (err error) {
-	for _, rd := range recipeDetails {
+	for _, rd := range recipeDetails[:2] {
 		if rd == blank {
 			return responses.BlankDetailsError
 		}
@@ -216,6 +219,8 @@ func createRecipe(record []string, store Storer) (err error) {
 	if createdRecipe.TotalTime, err = CalculateTimeInSeconds(record[12]); err != nil {
 		logger.Warnln(err, record[12])
 	}
+
+	logger.Infoln("Record that will be created--> ", createdRecipe)
 
 	// Create Recipe
 	createdRecipe, err = store.CreateRecipe(csvCtx, createdRecipe)

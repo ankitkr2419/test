@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	defaultRecipeTime = 900
 	getRecipeQuery = `SELECT * FROM recipes WHERE id = $1`
 	selectRecipesQuery = `SELECT * FROM recipes`
 	deleteRecipeQuery = `DELETE FROM recipes WHERE id = $1`
@@ -27,8 +28,9 @@ const (
 						pos_9,
 						pos_cartridge_2,
 						pos_11,
+						total_time,
 						is_published)
-						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`
+						VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`
 	updateRecipeQuery = `UPDATE recipes SET (
 						name,
 						description,
@@ -43,8 +45,9 @@ const (
 						pos_9,
 						pos_cartridge_2,
 						pos_11,
+						total_time,
 						is_published,
-						updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) WHERE id = $16`
+						updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) WHERE id = $17`
 )
 
 type Recipe struct {
@@ -89,6 +92,11 @@ func (s *pgStore) ListRecipes(ctx context.Context) (dbRecipe []Recipe, err error
 
 func (s *pgStore) CreateRecipe(ctx context.Context, r Recipe) (createdRecipe Recipe, err error) {
 	var lastInsertID uuid.UUID
+	
+	if r.TotalTime == 0{
+		r.TotalTime = defaultRecipeTime
+	}
+
 	err = s.db.QueryRow(
 		createRecipeQuery,
 		r.Name,
@@ -104,6 +112,7 @@ func (s *pgStore) CreateRecipe(ctx context.Context, r Recipe) (createdRecipe Rec
 		r.Position9,
 		r.Cartridge2Position,
 		r.Position11,
+		r.TotalTime,
 		r.IsPublished,
 	).Scan(&lastInsertID)
 
@@ -137,6 +146,11 @@ func (s *pgStore) DeleteRecipe(ctx context.Context, id uuid.UUID) (err error) {
 }
 
 func (s *pgStore) UpdateRecipe(ctx context.Context, r Recipe) (err error) {
+
+	if r.TotalTime == 0{
+		r.TotalTime = defaultRecipeTime
+	}
+	
 	result, err := s.db.Exec(
 		updateRecipeQuery,
 		r.Name,
@@ -152,6 +166,7 @@ func (s *pgStore) UpdateRecipe(ctx context.Context, r Recipe) (err error) {
 		r.Position9,
 		r.Cartridge2Position,
 		r.Position11,
+		r.TotalTime,
 		r.IsPublished,
 		time.Now(),
 		r.ID,
