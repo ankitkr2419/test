@@ -116,4 +116,5 @@ type Storer interface {
 	InsertAuditLog(ctx context.Context, al AuditLog) (err error)
 	ShowAuditLog(ctx context.Context) (al AuditLog, err error)
 	AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error)
+	ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error)
 }
