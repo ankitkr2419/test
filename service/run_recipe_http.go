@@ -135,6 +135,13 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if runStepWise {
 
 			logger.Infoln(responses.WaitingRunNextProcess)
+
+			// To handle continuous run timer
+			// this delay is supposed to be more than 500 ms
+			// as the delay time in delay.go is 500ms
+			time.Sleep(600 * time.Millisecond)
+			deps.PlcDeck[deck].SetPaused()
+
 			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
 			err = checkForAbortOrNext(deck)
@@ -142,6 +149,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return
 			}
 			setRunNext(deck)
+			
+			// To handle continuous run timer
+			deps.PlcDeck[deck].ResetPaused()
+
 			logger.Infoln(responses.NextProcessInProgress)
 		}
 		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.InitialisedState)))
@@ -275,13 +286,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	}
 
-	for {
-		if deps.PlcDeck[deck].IsRunInProgress() {
-			time.Sleep(200 * time.Millisecond)
-		} else {
-			break
-		}
-	}
+	// -2 means recipe is over but timer isn't
+	deps.PlcDeck[deck].SetCurrentProcessNumber(int64(-2))
+	deps.PlcDeck[deck].ResetRunInProgress()
+	// Sleep so that we can reset Abort in Delay
+	time.Sleep(2 * time.Second)
 
 	// Home the machine
 	response, err = deps.PlcDeck[deck].Homing()

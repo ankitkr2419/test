@@ -134,7 +134,7 @@ func (s *pgStore) createDelay(ctx context.Context, tx *sql.Tx, d Delay) (created
 }
 
 func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateDelayQuery,
 		d.DelayTime,
 		time.Now(),
@@ -143,6 +143,12 @@ func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating delay")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
 	}
 	return
 }

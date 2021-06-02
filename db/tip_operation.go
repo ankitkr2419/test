@@ -28,8 +28,6 @@ const (
 						WHERE process_id = $1`
 	selectTipOperationQuery = `SELECT *
 						FROM tip_operation`
-	deleteTipOperationQuery = `DELETE FROM tip_operation
-						WHERE process_id = $1`
 	createTipOperationQuery = `INSERT INTO tip_operation (
 						type,
 						position,
@@ -167,22 +165,13 @@ func (s *pgStore) createTipOperation(ctx context.Context, tx *sql.Tx, to TipOper
 	return to, err
 }
 
-func (s *pgStore) DeleteTipOperation(ctx context.Context, id uuid.UUID) (err error) {
-	_, err = s.db.Exec(deleteTipOperationQuery, id)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error deleting tip operation")
-		return
-	}
-	return
-}
-
 func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipOperationInitialisedState)
 
 	// TODO: Remove this default Discard for tip operation whenever support for at_pickup_passing added
 	t.Discard = at_discard_box
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateTipOperationQuery,
 		t.Type,
 		t.Position,
@@ -201,6 +190,12 @@ func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err e
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating tip operation")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
 	}
 	return
 }

@@ -112,7 +112,7 @@ func (s *pgStore) CreateProcess(ctx context.Context, p Process) (createdProcess 
 func (s *pgStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.ProcessInitialisedState)
 
-	_, err = s.db.Exec(deleteProcessQuery, id)
+	result, err := s.db.Exec(deleteProcessQuery, id)
 	defer func() {
 		if err != nil {
 			go s.AddAuditLog(ctx, DBOperation, ErrorState, DeleteOperation, "", err.Error())
@@ -124,13 +124,20 @@ func (s *pgStore) DeleteProcess(ctx context.Context, id uuid.UUID) (err error) {
 		logger.WithField("err", err.Error()).Error("Error deleting process")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		logger.Errorln(responses.ProcessIDInvalidError)
+		return responses.ProcessIDInvalidError
+	}
 	return
 }
 
 func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.ProcessInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateProcessQuery,
 		p.Name,
 		p.SequenceNumber,
@@ -147,6 +154,13 @@ func (s *pgStore) UpdateProcess(ctx context.Context, p Process) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating process")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		logger.Errorln(responses.ProcessIDInvalidError)
+		return responses.ProcessIDInvalidError
 	}
 	return
 }

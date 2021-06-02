@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"time"
+	"mylab/cpagent/responses"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -120,16 +121,23 @@ func (s *pgStore) CreateRecipe(ctx context.Context, r Recipe) (createdRecipe Rec
 }
 
 func (s *pgStore) DeleteRecipe(ctx context.Context, id uuid.UUID) (err error) {
-	_, err = s.db.Exec(deleteRecipeQuery, id)
+	result, err := s.db.Exec(deleteRecipeQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error deleting recipe")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		logger.Errorln(responses.RecipeIDInvalidError)
+		return responses.RecipeIDInvalidError
 	}
 	return
 }
 
 func (s *pgStore) UpdateRecipe(ctx context.Context, r Recipe) (err error) {
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateRecipeQuery,
 		r.Name,
 		r.Description,
@@ -151,6 +159,13 @@ func (s *pgStore) UpdateRecipe(ctx context.Context, r Recipe) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating recipe")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		logger.Errorln(responses.RecipeIDInvalidError)
+		return responses.RecipeIDInvalidError
 	}
 	return
 }
