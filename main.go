@@ -34,7 +34,7 @@ var Version, User, Machine, CommitID, Branch, BuiltOn string
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
-		ForceColors: true,
+		ForceColors:     true,
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
 
@@ -114,13 +114,8 @@ func main() {
 		},
 		{
 			Name:  "import",
-			Usage: "import [--recipename RECIPE_NAME] [--csv CSV_ABSOLUTE_PATH] ",
+			Usage: "import --csv CSV_ABSOLUTE_PATH ",
 			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "recipename",
-					Value: "recipe",
-					Usage: "put recipe name",
-				},
 				&cli.StringFlag{
 					Name:  "csv",
 					Value: "recipe.csv",
@@ -128,7 +123,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				return db.ImportCSV(c.String("recipename"), c.String("csv"))
+				return db.ImportCSV(c.String("csv"))
 			},
 		},
 		{
