@@ -1,26 +1,7 @@
 import React from 'react';
-
-import styled from 'styled-components'
 import { Button} from 'core-components';
 import { Text, Center } from 'shared-components';
-
-const AllSetScreen = styled.div`
-display: flex;
-min-height: 100vh;
-flex-direction: column;
-justify-content: space-between;
-	.footer-bg{
-		background-color:#F9E7D7;
-		height:6.25rem;
-		border-radius:2.25rem 2.25rem 0 0;
-		.next-btn{
-			position:absolute;
-			top:-1rem;
-			left: 0;
-    	right: 0;
-		}
-	}
-`;
+import { AllSetScreen } from './AllSetScreen';
 
 const AllSetScreenComponent = (props) => {
 	return (

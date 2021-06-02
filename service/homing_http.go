@@ -1,87 +1,95 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"reflect"
 	"time"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
-	
 )
 
 func homingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		var response string
+
 		var err error
+		var msg string
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
+		ctx := context.WithValue(req.Context(), contextKeyUsername, "main")
+
 		switch deck {
 		case "":
-			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(`both decks operation in progress`))
 			fmt.Println("At both deck!!!")
-			rw.Write([]byte(`Operation in progress for both decks`))
-			rw.WriteHeader(http.StatusOK)
-			response, err = bothDeckOperation(deps, "Homing")
+			msg = "homing in progress for both decks"
+			plc.SetBothDeckHomingInProgress()
+			go bothDeckOperation(ctx, deps, "Homing")
 		case "A", "B":
-			rw.Write([]byte(`Operation in progress for single deck`))
-			rw.WriteHeader(http.StatusOK)
-			response, err = singleDeckOperation(deps, deck, "Homing")
+			msg = "homing in progress for single deck"
+			go singleDeckOperation(ctx, deps, deck, "Homing")
 		default:
 			err = fmt.Errorf("Check your deck name")
-			rw.Write([]byte(err.Error()))
-			rw.WriteHeader(http.StatusBadRequest)
 		}
 
 		if err != nil {
+			rw.Write([]byte(err.Error()))
+			rw.WriteHeader(http.StatusBadRequest)
 			logger.Errorln(err)
-			deps.WsErrCh <- err
 		} else {
-			logger.Infoln(response)
-			deps.WsMsgCh <- "success_homing_successfully homed"
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(fmt.Sprintf(`{"msg":"%v","deck":"%v"}`, msg, deck)))
+			logger.Infoln(msg)
 		}
 
 	})
 }
 
-func bothDeckOperation(deps Dependencies, operation string) (response string, err error) {
+func bothDeckOperation(ctx context.Context, deps Dependencies, operation string) (response string, err error) {
+	defer plc.ResetBothDeckHomingInProgress()
 
 	var deckAResponse, deckBResponse string
 	var deckAErr, deckBErr error
 
 	go func() {
-		deckAResponse, deckAErr = singleDeckOperation(deps, "A", operation)
+		deckAResponse, deckAErr = singleDeckOperation(ctx, deps, "A", operation)
 	}()
 	go func() {
-		deckBResponse, deckBErr = singleDeckOperation(deps, "B", operation)
+		deckBResponse, deckBErr = singleDeckOperation(ctx, deps, "B", operation)
 	}()
 
 	for {
 		switch {
 		case deckAErr != nil:
 			fmt.Printf("Error %s deck A", operation)
-			// abort Deck B Operation as Well
-			response, err = deps.PlcDeck["B"].Abort()
-			if err != nil {
-				deps.WsErrCh <- err
-				return
-			}
 			return "", deckAErr
 		case deckBErr != nil:
 			fmt.Printf("Error %s deck B", operation)
-			// Abort Deck A Operation as well
-			response, err = deps.PlcDeck["A"].Abort()
-			if err != nil {
-				deps.WsErrCh <- err
-				return
-			}
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
-
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
+			successWsData := plc.WSData{
+				Progress: 100,
+				Deck:     "",
+				Status:   "SUCCESS_HOMING",
+				OperationDetails: plc.OperationDetails{
+					Message: operationSuccessMsg,
+				},
+			}
+			wsData, err := json.Marshal(successWsData)
+			if err != nil {
+				logger.Errorf("error in marshalling web socket data %v", err.Error())
+				deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, "", err.Error())
+				return "", err
+			}
+			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
 			fmt.Println(operationSuccessMsg)
 			return operationSuccessMsg, nil
 		default:
@@ -92,7 +100,19 @@ func bothDeckOperation(deps Dependencies, operation string) (response string, er
 
 }
 
-func singleDeckOperation(deps Dependencies, deck, operation string) (response string, err error) {
+func singleDeckOperation(ctx context.Context, deps Dependencies, deck, operation string) (response string, err error) {
+
+	go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(operation, string(db.InitialisedState)))
+
+	defer func() {
+		if err != nil {
+			logger.Errorln(err.Error())
+			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.ErrorState, db.ExecuteOperation, deck, err.Error())
+		} else {
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(operation, string(db.CompletedState)))
+		}
+	}()
 
 	// Compact32Deck is the type of deps.PlcDeck[deck]
 	result := reflect.ValueOf(deps.PlcDeck[deck]).MethodByName(operation).Call([]reflect.Value{})
@@ -100,25 +120,27 @@ func singleDeckOperation(deps Dependencies, deck, operation string) (response st
 	//  this will make Call to any method generic
 	// TODO : Handle Panics with recover()
 
+	fmt.Println("Result from Operation ", operation, result)
+
 	if len(result) != 2 {
 		fmt.Println("result is different in this reflect Call !", result)
 		err := fmt.Errorf("unexpected length result")
-		deps.WsErrCh <- err
+
 		return "", err
 	}
 
-	fmt.Println("Correct Result: ", result)
 	response = result[0].String()
-	if len(response) > 0 {
-		return
+	if len(result) == 2 {
+		errRes := result[1].Interface()
+		if errRes != nil {
+			fmt.Println(errRes)
+			err := fmt.Errorf("%v", errRes)
+			return "", err
+		}
+		if operation == "Abort" && stepRunInProgress[deck] && !runNext[deck] {
+			// handle the abortStepRun channel
+			abortStepRun[deck] <- struct{}{}
+		}
 	}
-	errRes := result[1].Interface()
-	if errRes != nil {
-		fmt.Println(errRes)
-		err := fmt.Errorf("%v", errRes)
-		deps.WsErrCh <- err
-		return "", err
-	}
-
 	return
 }

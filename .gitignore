@@ -3,7 +3,8 @@ cpagent
 application\.yml
 db/application_test\.yml
 
-
+# mylab zip file
+artifact.zip
 
 
 # web-client dependencies
@@ -30,3 +31,4 @@ config\.yml
 swaggerui/
 
 rice-box\.go
+coverage.*

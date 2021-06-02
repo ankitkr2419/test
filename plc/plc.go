@@ -1,8 +1,11 @@
 package plc
 
 import (
+	"github.com/google/uuid"
 	"mylab/cpagent/db"
 )
+
+const ErrorExtractionMonitor = "ErrorExtractionMonitor"
 
 type Status int32
 
@@ -46,27 +49,79 @@ type Driver interface {
 	Calibrate() error             // TBD
 }
 
-type DeckDriver interface {
-	NameOfDeck() string
-	Homing() (string, error)
-	ManualMovement(uint16, uint16, uint16) (string, error)
-	IsMachineHomed() bool
-	IsRunInProgress() bool
+type WSData struct {
+	Progress         float64          `json:"progress"`
+	Deck             string           `json:"deck"`
+	Status           string           `json:"status"`
+	OperationDetails OperationDetails `json:"operation_details"`
+}
+type WSError struct {
+	Message string `json:"message"`
+	Deck    string `json:"deck"`
+}
+
+type OperationDetails struct {
+	Message        string         `json:"message"`
+	CurrentStep    int64          `json:"current_step,omitempty"`
+	TotalProcesses int64          `json:"total_processes,omitempty"`
+	RecipeID       uuid.UUID      `json:"recipe_id,omitempty"`
+	RemainingTime  *TimeHMS        `json:"remaining_time,omitempty"`
+	TotalTime      *TimeHMS        `json:"total_time,omitempty"`
+	ProcessName    string         `json:"process_name,omitempty"`
+	ProcessType    db.ProcessType `json:"process_type,omitempty"`
+}
+
+type TimeHMS struct {
+	Hours   uint8 `json:"hours"`
+	Minutes uint8 `json:"minutes"`
+	Seconds uint8 `json:"seconds"`
+}
+
+type Compact32Deck struct {
+	name       string
+	ExitCh     chan error
+	WsErrCh    chan error
+	WsMsgCh    chan string
+	DeckDriver Compact32Driver
+}
+
+// Internal Interface to ensure sync'ing and testing modbus interfaces
+type Compact32Driver interface {
+	WriteSingleRegister(address, value uint16) (results []byte, err error)
+	WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error)
+	ReadCoils(address, quantity uint16) (results []byte, err error)
+	ReadSingleCoil(address uint16) (value uint16, err error)
+	ReadHoldingRegisters(address, quantity uint16) (results []byte, err error)
+	ReadSingleRegister(address uint16) (value uint16, err error)
+	WriteSingleCoil(address, value uint16) (err error)
+}
+
+type Extraction interface {
+	AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
+	AttachDetach(ad db.AttachDetach) (response string, err error)
+	DiscardBoxCleanup() (response string, err error)
+	RestoreDeck() (response string, err error)
+	UVLight(uvTime string) (response string, err error)
+	AddDelay(delay db.Delay, runRecipe bool) (response string, err error)
+	DiscardTipAndHome(discard bool) (response string, err error)
+	Heating(ht db.Heating) (response string, err error)
+	Homing() (response string, err error)
+	ManualMovement(motorNum, direction, pulses uint16) (response string, err error)
+	Resume() (response string, err error)
+	Pause() (response string, err error)
+	Abort() (response string, err error)
+	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
+	Shaking(shakerData db.Shaker) (response string, err error)
+	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 	SetRunInProgress()
 	ResetRunInProgress()
-	Pause() (string, error)
-	Resume() (string, error)
-	Abort() (string, error)
-	DiscardBoxCleanup() (string, error)
-	RestoreDeck() (string, error)
-	UVLight(string) (string, error)
-	Heating(heating db.Heating) (string, error)
-	AspireDispense(aspireDispense db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
-	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
+	IsMachineHomed() bool
+	IsRunInProgress() bool
 	TipOperation(to db.TipOperation) (response string, err error)
-	TipPickup(pos int64) (response string, err error)
-	TipDiscard() (response string, err error)
-	AttachDetach(db.AttachDetach) (response string, err error)
-	AddDelay(db.Delay) (string, error)
-	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
+	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
+	SetCurrentProcessNumber(step int64)
+}
+
+func SetDeckName(C32 *Compact32Deck, deck string) {
+	C32.name = deck
 }

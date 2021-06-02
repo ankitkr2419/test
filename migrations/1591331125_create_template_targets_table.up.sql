@@ -1,4 +1,4 @@
-CREATE TABLE template_targets
+CREATE TABLE IF NOT EXISTS template_targets
 (
     template_id uuid,
     target_id uuid,

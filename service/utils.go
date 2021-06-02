@@ -6,17 +6,95 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
+	"sync"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
 )
 
+const contextKeyUsername = "username"
+const contextKeyUserAuthID = "auth_id"
+
 const (
 	hold  = "hold"
 	cycle = "cycle"
 )
+
+const (
+	admin      = "admin"
+	supervisor = "supervisor"
+	engineer   = "engineer"
+	operator   = "operator"
+	deckA      = "A"
+	deckB      = "B"
+)
+
+var userLogin sync.Map
+
+// runNext will run the next step of process when set
+var runNext, stepRunInProgress map[string]bool
+
+// abortStepRun will help track if abort was performed after process completion
+var nextStep, abortStepRun map[string]chan struct{}
+
+func resetRunNext(deck string) {
+	runNext[deck] = false
+}
+
+func setRunNext(deck string) {
+	runNext[deck] = true
+}
+
+func resetStepRunInProgress(deck string) {
+	stepRunInProgress[deck] = false
+}
+
+func setStepRunInProgress(deck string) {
+	stepRunInProgress[deck] = true
+}
+
+func loadUtils() {
+	userLogin.Store("A", false)
+	userLogin.Store("B", false)
+	runNext = map[string]bool{
+		"A": false,
+		"B": false,
+	}
+
+	stepRunInProgress = map[string]bool{
+		"A": false,
+		"B": false,
+	}
+
+	chanA := make(chan struct{}, 1)
+	chanB := make(chan struct{}, 1)
+
+	nextStep = map[string]chan struct{}{
+		"A": chanA,
+		"B": chanB,
+	}
+
+	chanC := make(chan struct{}, 1)
+	chanD := make(chan struct{}, 1)
+
+	abortStepRun = map[string]chan struct{}{
+		"A": chanC,
+		"B": chanD,
+	}
+}
+
+type ErrObj struct {
+	Err  string `json:"err"`
+	Deck string `json:"deck,omitempty"`
+}
+
+type MsgObj struct {
+	Msg  string `json:"msg"`
+	Deck string `json:"deck,omitempty"`
+}
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
 
@@ -28,6 +106,7 @@ func validate(i interface{}) (valid bool, respBytes []byte) {
 	if err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
 			fieldErrors[e.Namespace()] = e.Tag()
+			fieldErrors["error"] = "invalid value for field " + e.Field()
 
 			logger.WithFields(logger.Fields{
 				"field": e.Namespace(),
@@ -69,7 +148,22 @@ func isvalidID(id uuid.UUID) bool {
 
 func responseBadRequest(rw http.ResponseWriter, respBytes []byte) {
 	rw.Header().Add("Content-Type", "application/json")
+	logger.WithField("err", respBytes)
 	rw.WriteHeader(http.StatusBadRequest)
+	rw.Write(respBytes)
+	return
+}
+
+func responseCodeAndMsg(rw http.ResponseWriter, statusCode int, msg interface{}) {
+	rw.Header().Add("Content-Type", "application/json")
+	rw.WriteHeader(statusCode)
+	respBytes, err := json.Marshal(msg)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.DataMarshallingError)
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write(responses.DataMarshallingError)
+		return
+	}
 	rw.Write(respBytes)
 	return
 }
@@ -96,4 +190,39 @@ func MD5Hash(s string) string {
 	hash := md5.Sum([]byte(s))
 
 	return hex.EncodeToString(hash[:])
+}
+
+func LoadAllServiceFuncs(s db.Storer) (err error) {
+	// Create a default supervisor
+	supervisor := db.User{
+		Username: "supervisor",
+		Password: MD5Hash("supervisor"),
+		Role:     "supervisor",
+	}
+
+	// Add Default supervisor user to DB
+	err = s.InsertUser(context.Background(), supervisor)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		return
+	}
+
+	// Create a default main user
+	mainUser := db.User{
+		Username: "main",
+		Password: MD5Hash("main"),
+		Role:     "admin",
+	}
+
+	// Add Default main user to DB
+	err = s.InsertUser(context.Background(), mainUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		return
+	}
+
+	logger.Info("Default users added")
+
+	loadUtils()
+	return nil
 }

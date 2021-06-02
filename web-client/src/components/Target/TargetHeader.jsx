@@ -1,20 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { Text, ButtonIcon } from 'shared-components';
-
-const StyledTargetHeader = styled.header`
-	padding: 0 48px 16px 88px;
-
-	h6.text-default {
-		line-height: 22px;
-	}
-
-	.text-truncate-multi-line {
-		height: 50px;
-		overflow: hidden;
-	}
-`;
+import { StyledTargetHeader } from './Style';
 
 const TargetHeader = (props) => {
 	const {

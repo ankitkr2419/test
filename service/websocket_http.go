@@ -59,11 +59,11 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 					sendTemperature(deps, rw, c)
 
-				} else if msgs[0] == "progress" {
+				} else if strings.EqualFold(msgs[0], "progress") {
 
 					monitorOperation(deps, rw, c, msgs)
 
-				} else if msgs[0] == "success" {
+				} else if strings.EqualFold(msgs[0], "success") {
 
 					successOperation(deps, rw, c, msgs)
 				}
@@ -96,12 +96,27 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 			case err = <-deps.WsErrCh:
 
-				logger.WithField("err", err.Error()).Error("Monitor has requested exit")
-				var errortype = "ErrorPCRMonitor"
+				errs := msgDivision(err.Error())
+				if errs[0] == "ErrorExtractionMonitor" {
 
-				go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, err.Error()))
+					errorData := plc.WSError{
+						Message: errs[2],
+						Deck:    errs[1],
+					}
+					wsError, err := json.Marshal(errorData)
+					if err != nil {
+						logger.Errorf("error in marshalling web socket data %v", err.Error())
+						return
+					}
+					sendOnFail(string(wsError), errs[0], rw, c)
+				} else {
+					logger.WithField("err", err.Error()).Error("Monitor has requested exit")
+					var errortype = "ErrorPCRMonitor"
 
-				sendOnFail(err.Error(), errortype, rw, c)
+					go LogNotification(deps, fmt.Sprintf("ExperimentId: %v, %v", experimentValues.experimentID, err.Error()))
+
+					sendOnFail(err.Error(), errortype, rw, c)
+				}
 
 			}
 
@@ -207,7 +222,7 @@ func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn
 		return
 	}
 
-	logger.WithField("data", "Fail").Info("Websocket send Data")
+	logger.WithField("data", "Fail").Infoln("Websocket send Data")
 
 }
 
@@ -523,7 +538,7 @@ func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 
 	monitorOpr := oprProgress{
 		Type: fmt.Sprintf("PROGRESS_%s", strings.ToUpper(msg[1])),
-		Data: fmt.Sprintf("%s", strings.ToLower(msg[2])),
+		Data: fmt.Sprintf("%s", msg[2]),
 	}
 
 	respBytes, err := json.Marshal(monitorOpr)
@@ -544,6 +559,7 @@ func monitorOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 }
 
 func successOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn, msg []string) (err error) {
+
 	successOpr := oprSuccess{
 		Type: fmt.Sprintf("SUCCESS_%s", strings.ToUpper(msg[1])),
 		Data: fmt.Sprintf("%s", msg[2]),
@@ -567,6 +583,6 @@ func successOperation(deps Dependencies, rw http.ResponseWriter, c *websocket.Co
 }
 
 func msgDivision(msg string) (msgs []string) {
-	msgs = strings.Split(msg, "_")
+	msgs = strings.SplitN(msg, "_", 3)
 	return
 }

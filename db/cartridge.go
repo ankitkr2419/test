@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"mylab/cpagent/responses"
 	"strings"
 	"time"
 
@@ -23,8 +24,7 @@ const (
 							volume)
 							VALUES %s `
 	onConflictDoNothing     = `ON CONFLICT DO NOTHING;`
-	selectAllCartridgeQuery = `SELECT *
-							FROM cartridges`
+	selectAllCartridgeQuery = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id GROUP BY c.id`
 	selectAllCartridgeWellsQuery = `SELECT *
 							FROM cartridge_wells`
 )
@@ -32,14 +32,15 @@ const (
 type CartridgeType string
 
 const (
-	Cartridge1 = "cartridge_1"
-	Cartridge2 = "cartridge_2"
+	Cartridge1 CartridgeType = "cartridge_1"
+	Cartridge2 CartridgeType = "cartridge_2"
 )
 
 type Cartridge struct {
 	ID          int64         `db:"id" json:"id"`
 	Type        CartridgeType `db:"type" json:"type"`
 	Description string        `db:"description" json:"description"`
+	WellsCount	int64		  `db:"wells_count" json:"wells_count"`
 	CreatedAt   time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -55,12 +56,22 @@ type CartridgeWells struct {
 }
 
 func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge, cartridgeWells []CartridgeWells) (err error) {
+
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.CartridgeInitialisedState)
+
 	stmt1 := makeCartridgeQuery(cartridges)
 	stmt2 := makeCartridgeWellsQuery(cartridgeWells)
 
 	_, err = s.db.Exec(
 		stmt1,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.CartridgeCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
@@ -105,8 +116,17 @@ func makeCartridgeWellsQuery(cartridgeWells []CartridgeWells) string {
 	return stmt
 }
 
-func (s *pgStore) ListCartridges() (cartridge []Cartridge, err error) {
+func (s *pgStore) ListCartridges(ctx context.Context) (cartridge []Cartridge, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.CartridgeListInitialisedState)
+
 	err = s.db.Select(&cartridge, selectAllCartridgeQuery)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.CartridgeListCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing cartridge details")
 		return

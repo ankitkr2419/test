@@ -9,6 +9,8 @@ import { fetchActiveWells } from 'action-creators/activeWellActionCreators';
 import { getActiveLoadedWellFlag } from 'selectors/activeWellSelector';
 import { connectSocket } from 'web-socket';
 import ModalContainer from './ModalContainer';
+import { useLocation } from 'react-router-dom'
+import AppFooter from 'components/AppFooter';
 
 /**
  * AppLayoutContainer Will contain routes(content), headers, sub-headers, notification etc.
@@ -32,21 +34,26 @@ const AppLayoutContainer = (props) => {
 
 	useEffect(() => {
 		if (loginReducer.get('isLoginTypeOperator') === true
-		&& isActiveWellDataLoaded === false
+			&& isActiveWellDataLoaded === false
 		) {
 			dispatch(fetchActiveWells());
 		}
 	}, [loginReducer, isActiveWellDataLoaded, dispatch]);
 
+	const location = useLocation();
+
 	return (
 		<Router>
-			<AppHeader
-				isPlateRoute={loginReducer.get('isPlateRoute')}
-				isUserLoggedIn={loginReducer.get('isUserLoggedIn')}
-				isLoginTypeAdmin={loginReducer.get('isLoginTypeAdmin')}
-				isLoginTypeOperator={loginReducer.get('isLoginTypeOperator')}
-				isTemplateRoute={loginReducer.get('isTemplateRoute')}
-			/>
+			{location.pathname === '/splashscreen'
+				? null
+				: <AppHeader
+					isPlateRoute={loginReducer.get('isPlateRoute')}
+					isUserLoggedIn={loginReducer.get('isUserLoggedIn')}
+					isLoginTypeAdmin={loginReducer.get('isLoginTypeAdmin')}
+					isLoginTypeOperator={loginReducer.get('isLoginTypeOperator')}
+					isTemplateRoute={loginReducer.get('isTemplateRoute')}
+				/>
+			}
 			{/* Modal container will helps in displaying error/info/warning through modal */}
 			<ModalContainer />
 			<section className="ml-content">
@@ -57,6 +64,7 @@ const AppLayoutContainer = (props) => {
 					))}
 				</Switch>
 			</section>
+			{location.pathname === '/splashscreen' ? null : <AppFooter /> }
 		</Router>
 	);
 };

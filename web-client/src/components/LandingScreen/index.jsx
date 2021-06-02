@@ -1,43 +1,43 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import ConfirmationModal from "components/modals/ConfirmationModal";
+import { VideoCard, MlModal } from "shared-components";
 
-import AppFooter from "components/AppFooter";
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
-// import TimeModal from "components/modals/TimeModal";
-import { VideoCard, MlModal, Loader } from "shared-components";
+import { LandingScreen } from "./LandingScreen";
 
-const LandingScreenComponent = () => {
-  const [homingStatus, setHomingStatus] = useState(true);
+const LandingScreenComponent = (props) => {
   const dispatch = useDispatch();
-
   const homingReducer = useSelector((state) => state.homingReducer);
-  const { isHomingActionCompleted } = homingReducer;
+
+  const { isHomingActionCompleted, homingAllDeckCompletionPercentage } =
+    homingReducer;
+
+  const [isProgressBarVisible, setIsProgressBarVisible] = useState(false);
 
   const homingConfirmation = () => {
     dispatch(homingActionInitiated());
-    setHomingStatus(!homingStatus);
+    setIsProgressBarVisible(!isProgressBarVisible);
   };
 
   return (
-    <div className="ml-content">
+    <LandingScreen>
       <div className="landing-content">
-        {isHomingActionCompleted && <Loader />}
         <VideoCard />
         <MlModal
-          isOpen={homingStatus}
+          isOpen={!isHomingActionCompleted}
           textBody={MODAL_MESSAGE.homingConfirmation}
           handleSuccessBtn={homingConfirmation}
           successBtn={MODAL_BTN.okay}
           showCrossBtn={false}
+          progressPercentage={homingAllDeckCompletionPercentage}
+          isProgressBarVisible={isProgressBarVisible}
         />
       </div>
-      <AppFooter loginBtn={true} />
-    </div>
+    </LandingScreen>
   );
 };
 
 LandingScreenComponent.propTypes = {};
 
-export default LandingScreenComponent;
+export default React.memo(LandingScreenComponent);

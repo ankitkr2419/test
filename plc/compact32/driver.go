@@ -20,7 +20,7 @@ LOOP:
 
 		// Read heartbeat status to check if PLC is alive!
 		var beat uint16
-		beat, err = d.Driver.ReadSingleRegister(MODBUS["D"][100])
+		beat, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][100])
 		if err != nil {
 			logger.WithField("beat", beat).Error("ReadSingleRegister:D100 : Read PLC heartbeat")
 			break
@@ -29,7 +29,7 @@ LOOP:
 		// 3 attempts to check for heartbeat of PLC and write ours!
 		for i := 0; i < 3; i++ {
 			if beat == 1 { // If beat is 1, PLC is alive, so write 2
-				_, err = d.Driver.WriteSingleRegister(MODBUS["D"][100], uint16(2))
+				_, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][100], uint16(2))
 				if err != nil {
 					logger.WithField("beat", beat).Error("WriteSingleRegister:D100 : Read PLC heartbeat")
 					// exit!!
@@ -80,7 +80,7 @@ func (d *Compact32) ConfigureRun(stage plc.Stage) (err error) {
 	}
 
 	// Cycle count
-	_, err = d.Driver.WriteSingleRegister(MODBUS["D"][131], stage.CycleCount)
+	_, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][131], stage.CycleCount)
 	if err != nil {
 		logger.WithField("cycle_count", stage.CycleCount).Error("WriteSingleRegister:D131 : Number of Cycles")
 	}
@@ -92,13 +92,13 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 	steps := 4
 	arr := stage.Holding
 	quantity := uint16(12)
-	address := MODBUS["D"][101]
+	address := plc.MODBUS["D"][101]
 
 	if name == CYCLE_STAGE {
 		steps = 6
 		arr = stage.Cycle
 		quantity = uint16(18)
-		address = MODBUS["D"][113]
+		address = plc.MODBUS["D"][113]
 
 	}
 	targetTemp := make([]uint16, steps)
@@ -136,7 +136,7 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 }
 
 func (d *Compact32) Start() (err error) {
-	err = d.Driver.WriteSingleCoil(MODBUS["M"][102], ON)
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][102], plc.ON)
 	if err != nil {
 		logger.Error("WriteSingleCoil:M102 : Start Cycle")
 	}
@@ -144,7 +144,7 @@ func (d *Compact32) Start() (err error) {
 }
 
 func (d *Compact32) Stop() (err error) {
-	err = d.Driver.WriteSingleCoil(MODBUS["M"][102], OFF)
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][102], plc.OFF)
 	if err != nil {
 		logger.Error("WriteSingleCoil:M102 : Stop Cycle")
 	}
@@ -155,7 +155,7 @@ func (d *Compact32) Stop() (err error) {
 func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
 	// Read current cycle
-	scan.Cycle, err = d.Driver.ReadSingleRegister(MODBUS["D"][133])
+	scan.Cycle, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][133])
 	if err != nil {
 		logger.Error("ReadSingleRegister:D133: current cycle")
 		return
@@ -163,7 +163,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
 	// Read cycle temperature.. PLC returns 653 for 65.3 degrees
 	var tmp uint16
-	tmp, err = d.Driver.ReadSingleRegister(MODBUS["D"][132])
+	tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][132])
 	if err != nil {
 		logger.Error("ReadSingleRegister:D132: Cycle Temperature")
 		return
@@ -171,7 +171,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	scan.Temp = float32(tmp) / 10
 
 	// Read lid temperature
-	tmp, err = d.Driver.ReadSingleRegister(MODBUS["D"][135])
+	tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
 	if err != nil {
 		logger.Error("ReadSingleRegister:D135: Lid temperature")
 		return
@@ -179,7 +179,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	scan.LidTemp = float32(tmp) / 10
 
 	// Read current cycle status
-	tmp, err = d.Driver.ReadSingleCoil(MODBUS["M"][107])
+	tmp, err = d.Driver.ReadSingleCoil(plc.MODBUS["M"][107])
 	if err != nil {
 		logger.Error("ReadSingleCoil:M107: Current PV cycle")
 		return
@@ -197,7 +197,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	}
 
 	// Scan all the data from the Wells (96 x 6). Since max read is 123 registers, we shall read 96 at a time.
-	start := MODBUS["D"][2000]
+	start := plc.MODBUS["D"][2000]
 
 	for i := 0; i < 6; i++ {
 		var data []byte
@@ -224,7 +224,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	logger.WithField("scan", scan).Debug("Monitored data")
 
 	// Write to inform PLC that reading is completed
-	err = d.Driver.WriteSingleCoil(MODBUS["M"][106], OFF)
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][106], plc.OFF)
 	if err != nil {
 		logger.Error("WriteSingleCoil:M106: PC reading done")
 		return

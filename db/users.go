@@ -13,6 +13,8 @@ const (
 	validateUserQuery = `SELECT * FROM users as u
 	        WHERE u.username = $1 AND u.password = $2 AND u.role = $3`
 
+	getUserQuery = `SELECT * from users WHERE username = $1`
+
 	insertUsersQuery1 = `INSERT INTO users (
 				username,
 				password,
@@ -67,5 +69,14 @@ func (s *pgStore) InsertUser(ctx context.Context, u User) (err error) {
 		return
 	}
 
+	return
+}
+
+func (s *pgStore) ShowUser(ctx context.Context, username string) (user User, err error) {
+	err = s.db.Get(&user, getUserQuery, username)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching user")
+		return
+	}
 	return
 }

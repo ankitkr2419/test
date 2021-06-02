@@ -1,12 +1,12 @@
 package service
 
 import (
-	"fmt"
+	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -22,161 +22,196 @@ type AspireDispenseHandlerTestSuite struct {
 
 func (suite *AspireDispenseHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestAspireDispenseTestSuite(t *testing.T) {
 	suite.Run(t, new(AspireDispenseHandlerTestSuite))
 }
 
-func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseSuccess() {
-	testUUID := uuid.New()
-	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{
-		ID:                 testUUID,
-		Category:           "well_to_well",
-		WellNoSource:       1,
-		AspireHeight:       2,
-		AspireMixingVolume: 3,
-		AspireNoOfCycles:   4,
-		AspireVolume:       5,
-		DispenseHeight:     6,
-		DispenseMixingVol:  7,
-		DispenseNoOfCycles: 8,
-		DispenseVol:        9,
-		DispenseBlow:       10,
-		WellToDestination:  11,
-	}, nil)
+var invalidUUID = "not-a-uuid"
 
-	body := fmt.Sprintf(`{"id":"%s","category":"well_to_well","well_no_source":1,"aspire_height":2,"aspire_mixing_volume":3,"aspire_no_of_cycles":4,"aspire_volume":5,"dispense_height":6,"dispense_mixing_volume":7,"dispense_no_of_cycles":8,"dispense_vol":9,"dispense_blow":10,"well_to_destination":11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+var testAspireDispenseRecord = db.AspireDispense{
+	ID:                   testUUID,
+	Category:             db.WW,
+	CartridgeType:        db.Cartridge1,
+	SourcePosition:       1,
+	AspireHeight:         2,
+	AspireMixingVolume:   3,
+	AspireNoOfCycles:     4,
+	AspireVolume:         5,
+	AspireAirVolume:      6,
+	DispenseHeight:       7,
+	DispenseMixingVolume: 8,
+	DispenseNoOfCycles:   9,
+	DestinationPosition:  10,
+	ProcessID:            testProcessUUID,
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseSuccess() {
+
+	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything, recipeUUID).Return(testAspireDispenseRecord, nil)
+
+	body, _ := json.Marshal(testAspireDispenseRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/aspireDispense",
-		"/aspireDispense",
-		body,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+recipeUUID.String(),
+		string(body),
 		createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","category":"well_to_well","well_no_source":1,"aspire_height":2,"aspire_mixing_volume":3,"aspire_no_of_cycles":4,"aspire_volume":5,"dispense_height":6,"dispense_mixing_volume":7,"dispense_no_of_cycles":8,"dispense_vol":9,"dispense_blow":10,"well_to_destination":11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseInvalidUUID() {
+
+	body, _ := json.Marshal(testAspireDispenseRecord)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+invalidUUID,
+		string(body),
+		createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.RecipeIDInvalidError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseFailure() {
-	testUUID := uuid.New()
-	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{}, fmt.Errorf("Error creating aspire dispense"))
 
-	body := fmt.Sprintf(`{"id":"%s","category":"well_to_well","well_no_source":1,"aspire_height":2,"aspire_mixing_volume":3,"aspire_no_of_cycles":4,"aspire_volume":5,"dispense_height":6,"dispense_mixing_volume":7,"dispense_no_of_cycles":8,"dispense_vol":9,"dispense_blow":10,"well_to_destination":11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything, recipeUUID).Return(db.AspireDispense{}, responses.AspireDispenseCreateError)
 
+	body, _ := json.Marshal(testAspireDispenseRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/aspireDispense",
-		"/aspireDispense",
-		body,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+recipeUUID.String(),
+		string(body),
 		createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Errorf("Error creating aspire dispense")
+	output := ErrObj{Err: responses.AspireDispenseCreateError.Error()}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.NotEqual(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseSuccess() {
-	testUUID := uuid.New()
-	suite.dbMock.On("ShowAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{
-		ID:                 testUUID,
-		Category:           "well_to_well",
-		WellNoSource:       1,
-		AspireHeight:       2,
-		AspireMixingVolume: 3,
-		AspireNoOfCycles:   4,
-		AspireVolume:       5,
-		DispenseHeight:     6,
-		DispenseMixingVol:  7,
-		DispenseNoOfCycles: 8,
-		DispenseVol:        9,
-		DispenseBlow:       10,
-		WellToDestination:  11,
-	}, nil)
+	suite.dbMock.On("ShowAspireDispense", mock.Anything, testProcessUUID).Return(testAspireDispenseRecord, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/aspireDispense/{id}",
-		"/aspireDispense/"+testUUID.String(),
+		"/aspire-dispense/{id}",
+		"/aspire-dispense/"+testProcessUUID.String(),
 		"",
 		showAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","category":"well_to_well","well_no_source":1,"aspire_height":2,"aspire_mixing_volume":3,"aspire_no_of_cycles":4,"aspire_volume":5,"dispense_height":6,"dispense_mixing_volume":7,"dispense_no_of_cycles":8,"dispense_vol":9,"dispense_blow":10,"well_to_destination":11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+
+	body, _ := json.Marshal(testAspireDispenseRecord)
+
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseFailure() {
-	testUUID := uuid.New()
-	suite.dbMock.On("ShowAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{}, fmt.Errorf("Error showing aspire dispense"))
+	suite.dbMock.On("ShowAspireDispense", mock.Anything, testProcessUUID).Return(db.AspireDispense{}, responses.AspireDispenseFetchError)
 
 	recorder := makeHTTPCall(http.MethodGet,
-		"/aspireDispense/{id}",
-		"/aspireDispense/"+testUUID.String(),
+		"/aspire-dispense/{id}",
+		"/aspire-dispense/"+testProcessUUID.String(),
 		"",
 		showAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ""
+	output := ErrObj{Err: responses.AspireDispenseFetchError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseInvalidUUID() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+invalidUUID,
+		"",
+		showAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
-	testUUID := uuid.New()
-	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{
-		ID:                 testUUID,
-		Category:           "well_to_well",
-		WellNoSource:       1,
-		AspireHeight:       2,
-		AspireMixingVolume: 3,
-		AspireNoOfCycles:   4,
-		AspireVolume:       5,
-		DispenseHeight:     6,
-		DispenseMixingVol:  7,
-		DispenseNoOfCycles: 8,
-		DispenseVol:        9,
-		DispenseBlow:       10,
-		WellToDestination:  11,
-	}, nil)
+	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(nil)
 
-	body := fmt.Sprintf(`{"id":"%s","category":"well_to_well","well_no_source":1,"aspire_height":2,"aspire_mixing_volume":3,"aspire_no_of_cycles":4,"aspire_volume":5,"dispense_height":6,"dispense_mixing_volume":7,"dispense_no_of_cycles":8,"dispense_vol":9,"dispense_blow":10,"well_to_destination":11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+	body, _ := json.Marshal(testAspireDispenseRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/aspireDispense/{id}",
-		"/aspireDispense/"+testUUID.String(),
-		body,
+		"/aspire-dispense/{id}",
+		"/aspire-dispense/"+testProcessUUID.String(),
+		string(body),
 		updateAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
+	output := MsgObj{Msg: responses.AspireDispenseUpdateSuccess}
+	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"aspire dispense updated successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
-	testUUID := uuid.New()
-	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(db.AspireDispense{}, fmt.Errorf("Error creating aspire dispense"))
+	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(responses.AspireDispenseUpdateError)
 
-	body := fmt.Sprintf(`{"id":"%s","category":"well_to_well","well_no_source":1,"aspire_height":2,"aspire_mixing_volume":3,"aspire_no_of_cycles":4,"aspire_volume":5,"dispense_height":6,"dispense_mixing_volume":7,"dispense_no_of_cycles":8,"dispense_vol":9,"dispense_blow":10,"well_to_destination":11,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+	body, _ := json.Marshal(testAspireDispenseRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
-		"/aspireDispense/{id}",
-		"/aspireDispense/"+testUUID.String(),
-		body,
+		"/aspire-dispense/{id}",
+		"/aspire-dispense/"+testProcessUUID.String(),
+		string(body),
 		updateAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
 
+	output := ErrObj{Err: responses.AspireDispenseUpdateError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseInvalidUUID() {
+
+	body, _ := json.Marshal(testAspireDispenseRecord)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+invalidUUID,
+		string(body),
+		updateAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

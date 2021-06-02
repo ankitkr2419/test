@@ -8,12 +8,29 @@ import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from "appConstants";
 import { updateWellThroughSocket } from "action-creators/wellActionCreators";
 import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 import { experimentedCompleted } from "action-creators/runExperimentActionCreators";
-import { showErrorModal } from "action-creators/modalActionCreators";
+// import { showErrorModal } from "action-creators/modalActionCreators";
 import { temperatureDataSucceeded } from "action-creators/temperatureGraphActionCreators";
 import {
   homingActionInProgress,
   homingActionInCompleted,
 } from "action-creators/homingActionCreators";
+
+import {
+  runRecipeInProgress,
+  runRecipeInCompleted,
+} from "action-creators/recipeActionCreators";
+
+import {
+  runCleanUpActionInProgress,
+  runCleanUpActionInCompleted
+} from "action-creators/cleanUpActionCreators";
+
+import {
+  discardTipInProgress,
+  discardTipInCompleted,
+} from "action-creators/discardDeckActionCreators";
+
+import { toast } from "react-toastify";
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
@@ -39,10 +56,36 @@ export const connectSocket = (dispatch) => {
           dispatch(experimentedCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.homingProgress:
-          dispatch(homingActionInProgress(data));
+          dispatch(homingActionInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
+          let parsedData = JSON.parse(data);
+          let homingSuccessMsg = 
+            parsedData && 
+            parsedData.operation_details && 
+            parsedData.operation_details.message 
+              ? parsedData.operation_details.message 
+              : "Homing Successfull" 
+          toast.success(homingSuccessMsg)
           dispatch(homingActionInCompleted(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.runRecipeProgress:
+          dispatch(runRecipeInProgress(JSON.parse(data)));
+          break;
+        case SOCKET_MESSAGE_TYPE.runRecipeSuccess:
+          dispatch(runRecipeInCompleted(JSON.parse(data)));
+          break;
+        case SOCKET_MESSAGE_TYPE.uvLightProgress:
+          dispatch(runCleanUpActionInProgress(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.uvLightSuccess:
+          dispatch(runCleanUpActionInCompleted(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.discardTipProgress:
+          dispatch(discardTipInProgress(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.discardTipSuccess:
+          dispatch(discardTipInCompleted(data));
           break;
         // case SOCKET_MESSAGE_TYPE.failure:
         // 	dispatch(experimentedFailed(data));
@@ -52,7 +95,14 @@ export const connectSocket = (dispatch) => {
         // case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
         case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
-          dispatch(showErrorModal(data));
+          // dispatch(showErrorModal(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:
+          let parsedErrorData = JSON.parse(data);
+          let errorMessage = parsedErrorData.message;
+          if(errorMessage) {
+           toast.error(errorMessage)
+          }
           break;
         default:
           break;

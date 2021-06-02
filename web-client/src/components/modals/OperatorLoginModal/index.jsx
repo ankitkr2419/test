@@ -1,7 +1,6 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { 
 	Modal, 
 	ModalBody, 
@@ -15,18 +14,7 @@ import {
 	Col,
 } from 'core-components';
 import { Center, Text, ButtonIcon } from 'shared-components';
-
-//For Operator Login Form
-const OperatorLoginForm = styled.div`
-.has-border-left{
-	.form-control{
-		border-left:7px solid #F38220;
-	}
-}
-.link{
-	color:#3C70FF;
-}
-`;
+import { OperatorLoginForm } from './OperatorLoginForm';
 
 
 const OperatorLoginModal = (props) => {
@@ -42,31 +30,32 @@ const OperatorLoginModal = (props) => {
 
 	//const { confirmationText, isOpen, confirmationClickHandler } = props;
 
-	// const toggleModal = () => {};
 	// Operator Login Modal
-	// const [operatorLoginModal, setOperatorLoginModal] = useState(false);
-	// const toggleOperatorLoginModal = () => setOperatorLoginModal(!operatorLoginModal);
 	return (
 		<>
 		{/* Operator Login Modal */}
-		{/* <Button color="primary" onClick={toggleOperatorLoginModal}>Operator Login</Button> */}
-		<Modal isOpen={operatorLoginModalOpen} toggle={toggleOperatorLoginModal} centered size="sm">
+		<Modal 
+			isOpen={operatorLoginModalOpen} 
+			toggle={toggleOperatorLoginModal} 
+			centered 
+			size="md"
+			>
 			<ModalBody>
-				<Text Tag="h4" size={24} className="text-center text-primary mb-4">
+				<Text Tag="h4" size={24} className="text-center text-primary mt-3 mb-4">
 					Welcome
 				</Text>
 				<ButtonIcon
 					position="absolute"
 					placement="right"
-					top={16}
-					right={16}
+					top={4}
+					right={8}
 					size={36}
 					name="cross"
 					onClick={toggleOperatorLoginModal}
 					className="border-0"
 				/>
 				<Form>
-					<OperatorLoginForm className="col-10 mx-auto">
+					<OperatorLoginForm className="col-11 mx-auto">
 						<Row>
 							<Col>
 								<FormGroup row className="has-border-left d-flex align-items-center" >
@@ -140,4 +129,4 @@ OperatorLoginModal.defaultProps = {
 	isOpen: false,
 };
 
-export default OperatorLoginModal;
+export default React.memo(OperatorLoginModal);
