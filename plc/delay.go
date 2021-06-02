@@ -53,7 +53,7 @@ skipToStartTimer:
 			}
 			if recipeRun {
 				// timer is over but recipe isn't 
-				for d.getCurrentProcess() != -2{
+				for getCurrentProcessNumber(d.name) != -2{
 					time.Sleep(500 * time.Millisecond)
 					_, _, err = d.checkPausedState(t, time1, delay.DelayTime, timeElapsed)
 					if err != nil {
@@ -88,7 +88,7 @@ skipToStartTimer:
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
 			}
 			if recipeRun {
-				if !d.IsRunInProgress() && d.getCurrentProcess() == -2 {
+				if !d.IsRunInProgress() && getCurrentProcessNumber(d.name) == -2 {
 					// This means its time to Stop
 					// recipe is over but timer isn't 
 					t.Stop()
