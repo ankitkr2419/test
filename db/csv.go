@@ -14,7 +14,14 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const version = "1.2.1"
+const (
+	csv_version = "1.3.0"
+	version     = "VERSION"
+	position    = "POSITION"
+	recipe      = "RECIPE"
+	dummy       = "DUMMY"
+	blank       = ""
+)
 
 var sequenceNumber int64 = 0
 var createdRecipe Recipe
@@ -23,7 +30,7 @@ var csvCtx context.Context = context.WithValue(context.Background(), ContextKeyU
 // done will help us clean up
 var done bool
 
-func ImportCSV(recipeName, csvPath string) (err error) {
+func ImportCSV(csvPath string) (err error) {
 
 	var store Storer
 	store, err = Init()
@@ -39,54 +46,33 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 		return
 	}
 
-	// Add the recipe entry into the database for the given recipe name here
-	r := Recipe{
-		Name:               strings.ReplaceAll(recipeName, "_", " "),
-		Description:        "Covid Recipe",
-		Position1:          1,
-		Position2:          2,
-		Position3:          3,
-		Position4:          4,
-		Position5:          5,
-		Cartridge1Position: 1,
-		Position7:          6,
-		Cartridge2Position: 2,
-		Position9:          7,
-		IsPublished:        false,
-	}
-
-	// Create Recipe
-	createdRecipe, err = store.CreateRecipe(csvCtx, r)
-	if err != nil {
-		logger.Errorln("Couldn't insert recipe entry", err)
-		return
-	}
-	logger.Info("Created Recipe-> ", createdRecipe)
-	defer clearFailedRecipe(store)
-
 	// Parse the csv file
 	csvReader := csv.NewReader(csvfile)
 	csvReader.FieldsPerRecord = -1
-	//r := csv.NewReader(bufio.NewReader(csvfile))
 
 	record, err := csvReader.Read()
 	if err != nil {
 		logger.Errorln("error while reading a record from csvReader:", err)
 		return err
 	}
-	if !strings.EqualFold(record[0], "VERSION") {
+	if !strings.EqualFold(record[0], version) {
 		logger.Errorln("No version found for csv:", record[0])
 		return err
 	}
 
-	// 1.2.1 is the currently supported version
-	if strings.TrimSpace(record[1]) != version {
+	// 1.3.0 is the only currently supported version
+	if strings.TrimSpace(record[1]) != csv_version {
 		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v", record[1], version)
 		logger.Errorln(err)
 		return err
 	}
 
+	// clean up failed recipe
+	defer clearFailedRecipe(store)
+
 	// Iterate through the records
+
+iterateCSV:
 	for {
 		// Read each record from csv
 		record, err := csvReader.Read()
@@ -99,24 +85,145 @@ func ImportCSV(recipeName, csvPath string) (err error) {
 			return err
 		}
 
-		if !strings.EqualFold(record[0], "DUMMY") {
-			if len(record) < 2 || record[1] == "" {
-				err = fmt.Errorf("record has unexpected length or empty process name, maybe CSV is over.")
-				logger.Warnln(err, record)
-				break
-			}
-			logger.Infoln("Record-> ", record)
-			err = createProcesses(record[1:], store)
+		logger.Infoln("Record-> ", record)
+
+		switch strings.TrimSpace(strings.ToUpper(record[0])) {
+		case dummy:
+			continue
+		case recipe:
+			err = addRecipeDetails(record[1:])
 			if err != nil {
-				err = fmt.Errorf("Couldn't insert process entry.")
+				err = fmt.Errorf("Couldn't add recipe details.")
 				logger.Errorln(err)
 				return err
 			}
-
+		case position:
+			err = createRecipe(record, store)
+			if err != nil {
+				err = fmt.Errorf("Couldn't create recipe entry.")
+				logger.Errorln(err)
+				return err
+			}
+		case blank:
+			if len(record) < 2 || record[1] == "" {
+				err = fmt.Errorf("record has unexpected length or empty process name, maybe CSV is over.")
+				logger.Warnln(err, record)
+				break iterateCSV
+			} else {
+				err = createProcesses(record[1:], store)
+				if err != nil {
+					err = fmt.Errorf("Couldn't create process entry.")
+					logger.Errorln(err)
+					return err
+				}
+			}
+		default:
+			return responses.CSVBadContentError
 		}
 	}
 
 	done = true
+	return nil
+}
+
+func addRecipeDetails(recipeDetails []string) (err error) {
+	for _, rd := range recipeDetails {
+		if rd == blank {
+			return responses.BlankDetailsError
+		}
+	}
+	createdRecipe.Name = recipeDetails[0]
+	createdRecipe.Description = recipeDetails[1]
+	return nil
+}
+
+func createRecipe(record []string, store Storer) (err error) {
+
+	for i, rec := range record {
+		record[i] = strings.TrimSpace(rec)
+	}
+
+	// extra record just to make creation easy
+	var positions [12]int64
+
+	// NOTE: Error during parsing at here means ignore that cell
+	if positions[1], err = strconv.ParseInt(record[1], 10, 64); err != nil {
+		logger.Warnln(err, record[1])
+	} else {
+		createdRecipe.Position1 = &positions[1]
+	}
+
+	if positions[2], err = strconv.ParseInt(record[2], 10, 64); err != nil {
+		logger.Warnln(err, record[2])
+	} else {
+		createdRecipe.Position2 = &positions[2]
+	}
+
+	if positions[3], err = strconv.ParseInt(record[3], 10, 64); err != nil {
+		logger.Warnln(err, record[3])
+	} else {
+		createdRecipe.Position3 = &positions[3]
+	}
+
+	if positions[4], err = strconv.ParseInt(record[4], 10, 64); err != nil {
+		logger.Warnln(err, record[4])
+	} else {
+		createdRecipe.Position4 = &positions[4]
+	}
+
+	if positions[5], err = strconv.ParseInt(record[5], 10, 64); err != nil {
+		logger.Warnln(err, record[5])
+	} else {
+		createdRecipe.Position5 = &positions[5]
+	}
+
+	if positions[6], err = strconv.ParseInt(record[6], 10, 64); err != nil {
+		logger.Warnln(err, record[6])
+	} else {
+		createdRecipe.Position6 = &positions[6]
+	}
+
+	if positions[7], err = strconv.ParseInt(record[7], 10, 64); err != nil {
+		logger.Warnln(err, record[7])
+	} else {
+		createdRecipe.Position7 = &positions[7]
+	}
+
+	if positions[8], err = strconv.ParseInt(record[8], 10, 64); err != nil {
+		logger.Warnln(err, record[8])
+	} else {
+		createdRecipe.Cartridge1Position = &positions[8]
+	}
+
+	if positions[9], err = strconv.ParseInt(record[9], 10, 64); err != nil {
+		logger.Warnln(err, record[9])
+	} else {
+		createdRecipe.Position9 = &positions[9]
+	}
+
+	if positions[10], err = strconv.ParseInt(record[10], 10, 64); err != nil {
+		logger.Warnln(err, record[10])
+	} else {
+		createdRecipe.Cartridge2Position = &positions[10]
+	}
+
+	if positions[11], err = strconv.ParseInt(record[11], 10, 64); err != nil {
+		logger.Warnln(err, record[11])
+	} else {
+		createdRecipe.Position11 = &positions[11]
+	}
+
+	if createdRecipe.TotalTime, err = CalculateTimeInSeconds(record[12]); err != nil {
+		logger.Warnln(err, record[12])
+	}
+
+	// Create Recipe
+	createdRecipe, err = store.CreateRecipe(csvCtx, createdRecipe)
+	if err != nil {
+		logger.Errorln("Couldn't insert recipe entry", err)
+		return
+	}
+	logger.Info("Created Recipe-> ", createdRecipe)
 	return nil
 }
 
