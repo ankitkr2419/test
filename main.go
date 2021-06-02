@@ -1,11 +1,12 @@
 package main
 
 import (
+	"io"
+
 	rice "github.com/GeertJohan/go.rice"
 
 	"flag"
 	"fmt"
-	"github.com/goburrow/modbus"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -18,7 +19,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/goburrow/modbus"
+
 	"github.com/rs/cors"
+
 	logger "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/urfave/negroni"
@@ -30,8 +34,18 @@ var Version, User, Machine, CommitID, Branch, BuiltOn string
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
+		ForceColors: true,
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
+
+	// logging output to file and console
+	var filename = fmt.Sprintf("utils/logs/output_%v.log", time.Now().Unix())
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
+	if err != nil {
+		logger.Errorln(responses.WriteToFileError)
+	}
+	mw := io.MultiWriter(os.Stdout, f)
+	logger.SetOutput(mw)
 
 	config.LoadAllConfs()
 

@@ -33,6 +33,9 @@ func (suite *RunRecipeHandlerTestSuite) SetupTest() {
 		"B": driverB,
 	}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil).Maybe()
+	suite.dbMock.On("ListProcesses", mock.Anything, recipeUUID).Return([]db.Process{testProcessRecord}, nil).Maybe()
+
 }
 
 func TestRunRecipeTestSuite(t *testing.T) {
@@ -121,6 +124,11 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 
 // Step Run Test cases
 func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeSuccess() {
+	deck := deckB
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsMachineHomed").Return(true).Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/step-run/{id}/{deck:[A-B]}",

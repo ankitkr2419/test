@@ -118,7 +118,7 @@ func (suite *RecipeHandlerTestSuite) TestListRecipesFailure() {
 		"",
 		listRecipesHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ""
+	output := `{"err":"error fetching Recipe list"}`
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -153,9 +153,8 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeFailure() {
 		"",
 		showRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ""
-	assert.Equal(suite.T(), http.StatusNotFound, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), `{"err":"error fetching Recipe record"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -195,7 +194,7 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeFailure() {
 	)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), `{"err":"error updating Recipe record"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -213,7 +212,7 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeSuccess() {
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"recipe deleted successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), `{"msg":"Recipe record deleted successfully"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -229,7 +228,7 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeFailure() {
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), `{"err":"error deleting Recipe record"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

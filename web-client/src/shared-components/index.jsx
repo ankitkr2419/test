@@ -20,6 +20,8 @@ import Loader from "./Loader";
 import VideoCard from "./VideoCard";
 import MlModal from "./MlModal";
 import TopHeading from "./TopHeading";
+import TemperatureInfo from "./TemperatureInfo";
+import TimeInfo from "./TimeInfo";
 
 export {
   ButtonGroup,
@@ -48,4 +50,6 @@ export {
   Loader,
   VideoCard,
   MlModal,
+  TimeInfo,
+  TemperatureInfo,
 };
