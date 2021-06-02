@@ -48,7 +48,7 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 	case uvlightSuccess:
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("successfully completed UV Light clean up for deck %v", d.name)
 	case recipeProgress:
-		currentStep := d.getCurrentProcess()
+		currentStep := getCurrentProcessNumber(d.name)
 
 		wsProgressOp.OperationDetails.RecipeID = deckRecipe[d.name].ID
 		wsProgressOp.OperationDetails.TotalProcesses = deckRecipe[d.name].ProcessCount

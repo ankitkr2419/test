@@ -65,8 +65,8 @@ type OperationDetails struct {
 	CurrentStep    int64          `json:"current_step,omitempty"`
 	TotalProcesses int64          `json:"total_processes,omitempty"`
 	RecipeID       uuid.UUID      `json:"recipe_id,omitempty"`
-	RemainingTime  *TimeHMS        `json:"remaining_time,omitempty"`
-	TotalTime      *TimeHMS        `json:"total_time,omitempty"`
+	RemainingTime  *TimeHMS       `json:"remaining_time,omitempty"`
+	TotalTime      *TimeHMS       `json:"total_time,omitempty"`
 	ProcessName    string         `json:"process_name,omitempty"`
 	ProcessType    db.ProcessType `json:"process_type,omitempty"`
 }

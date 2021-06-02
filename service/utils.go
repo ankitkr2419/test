@@ -32,6 +32,16 @@ const (
 	deckB      = "B"
 )
 
+const(
+	recipeC 	= "recipe"
+	processC	= "process"
+	createC 	= "create"
+	deleteC 	= "delete"
+	updateC 	= "update"
+	duplicateC	= "duplicate"
+	rearrangeC	= "rearrange"
+)
+
 var userLogin sync.Map
 
 // runNext will run the next step of process when set

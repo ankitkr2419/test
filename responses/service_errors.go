@@ -136,9 +136,17 @@ var (
 	DiscardBoxMoveError    = fmt.Errorf("error discard box moving was unsuccessful")
 	RestoreDeckError       = fmt.Errorf("error restore deck was unsuccessful")
 	DiscardBoolOptionError = fmt.Errorf("Invalid boolean value for tip discard option")
+
+	CUDNotAllowedError  = "this %v is in progress, so not allowed to %v"
+
 )
 
 // Special errors which are in []byte format
 var (
 	DataMarshallingError = []byte(`error marshalling data`)
 )
+
+func DefineCUDNotAllowedError(processOrRecipe string, operation string) (err error) {
+	msg := fmt.Sprintf(CUDNotAllowedError, processOrRecipe, operation)
+	return fmt.Errorf(msg)
+}

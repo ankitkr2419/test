@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -97,6 +98,13 @@ func deleteProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, deleteC))
+			return
+		}
+
 		err = deps.Store.DeleteProcess(req.Context(), id)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessDeleteError.Error()})
@@ -159,6 +167,13 @@ func duplicateProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &processID)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, duplicateC))
+			return
+		}
+
 		process, err := deps.Store.DuplicateProcess(req.Context(), processID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.ProcessDuplicationError)
@@ -192,6 +207,13 @@ func rearrangeProcessesHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		logger.Infoln("Sequence Array: ", sequenceArr)
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(recipeC, rearrangeC))
+			return
+		}
 
 		processes, err := deps.Store.RearrangeProcesses(req.Context(), recipeID, sequenceArr)
 		if err != nil {

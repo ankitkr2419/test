@@ -79,7 +79,6 @@ func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.P
 	return args.Error(0)
 }
 
-
 func (p *PLCMockStore) DiscardTipAndHome(discard bool) (response string, err error) {
 	args := p.Called(discard)
 	return args.Get(0).(string), args.Error(1)
