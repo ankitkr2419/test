@@ -68,13 +68,28 @@ const PiercingComponent = (props) => {
   };
 
   const wellClickHandler = (id, type) => {
-    setShowHieghtModal(!showHeightModal);    const wellsObjArray = type === 0 ? extractionWells : pcrWells;
+    const wellsObjArray = type === 0 ? extractionWells : pcrWells;
     const currentWellObj = wellsObjArray.find((wellObj) => {
       if (wellObj.id === id) {
         return wellObj;
       }
     });
-    setCurrentWellObj(currentWellObj);
+
+    // if already selected then de-select
+    if (currentWellObj.isSelected) {
+      const selectedWell = wellsObjArray.map((wellObj) => {
+        if (wellObj.id === currentWellObj.id) {
+          wellObj.isSelected = false;
+        }
+        return wellObj;
+      });
+      setCurrentWellObj(selectedWell);
+    }
+    // else open height modal and select
+    else {
+      setCurrentWellObj(currentWellObj);
+      setShowHieghtModal(!showHeightModal);
+    }
   };
 
   const handleSaveBtn = () => {

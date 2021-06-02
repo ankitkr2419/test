@@ -1,4 +1,7 @@
-import loginActions, { logoutActions } from "actions/loginActions";
+import loginActions, {
+  deckBlockActions,
+  logoutActions,
+} from "actions/loginActions";
 
 export const login = (body) => ({
   type: loginActions.loginInitiated,
@@ -61,4 +64,15 @@ export const logoutSuccess = (response) => ({
 export const logoutFailure = (error) => ({
   type: logoutActions.logoutActionFailure,
   payload: error,
+});
+
+//log out action-creators
+export const deckBlockInitiated = (deckName) => ({
+  type: deckBlockActions.deckBlockInitiated,
+  payload: deckName,
+});
+
+export const deckBlockReset = (deckName) => ({
+  type: deckBlockActions.deckBlockReset,
+  payload: deckName,
 });

@@ -14,3 +14,8 @@ export const logoutActions = {
   logoutActionSuccess: "LOGOUT_SUCCESS",
   logoutActionFailure: "LOGOUT_FAILURE",
 };
+
+export const deckBlockActions = {
+  deckBlockInitiated: "DECK_BLOCK_INITIATED",
+  deckBlockReset: "DECK_BLOCK_RESET",
+};

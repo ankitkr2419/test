@@ -29,8 +29,9 @@ import {
 import { MlModal } from "shared-components";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 import { discardTipAndHomingActionInitiated } from "action-creators/homingActionCreators";
+import { getTimeStr } from "./functions";
 
-const AppFooter = (props) => {
+const AppFooter = () => {
   const dispatch = useDispatch();
 
   const [confirmAbortModal, setConfirmAbortModal] = useState(false);
@@ -245,18 +246,26 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckA;
     let token = loginDataOfA.token;
     if (recipeReducerData.showProcess) {
-      dispatch(pauseRecipeInitiated({ deckName: recipeReducerData.name, token }));
+      dispatch(
+        pauseRecipeInitiated({ deckName: recipeReducerData.name, token })
+      );
     } else {
-      dispatch(pauseCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort, token }));
+      dispatch(
+        pauseCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort, token })
+      );
     }
   };
   const handlePauseActionDeckB = () => {
     let recipeReducerData = recipeActionReducerForDeckB;
     let token = loginDataOfB.token;
     if (recipeReducerData.showProcess) {
-      dispatch(pauseRecipeInitiated({ deckName: recipeReducerData.name, token }));
+      dispatch(
+        pauseRecipeInitiated({ deckName: recipeReducerData.name, token })
+      );
     } else {
-      dispatch(pauseCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort, token }));
+      dispatch(
+        pauseCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort, token })
+      );
     }
   };
 
@@ -265,9 +274,13 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckA;
     let token = loginDataOfA.token;
     if (recipeReducerData.showProcess) {
-      dispatch(resumeRecipeInitiated({ deckName: recipeReducerData.name, token }));
+      dispatch(
+        resumeRecipeInitiated({ deckName: recipeReducerData.name, token })
+      );
     } else {
-      dispatch(resumeCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort, token }));
+      dispatch(
+        resumeCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort, token })
+      );
     }
   };
 
@@ -275,9 +288,13 @@ const AppFooter = (props) => {
     let recipeReducerData = recipeActionReducerForDeckB;
     let token = loginDataOfB.token;
     if (recipeReducerData.showProcess) {
-      dispatch(resumeRecipeInitiated({ deckName: recipeReducerData.name, token }));
+      dispatch(
+        resumeRecipeInitiated({ deckName: recipeReducerData.name, token })
+      );
     } else {
-      dispatch(resumeCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort, token }));
+      dispatch(
+        resumeCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort, token })
+      );
     }
   };
 
@@ -329,7 +346,9 @@ const AppFooter = (props) => {
       dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckA, token }));
       setTipDiscardModal(!tipDiscardModal);
     } else {
-      dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort, token }));
+      dispatch(
+        abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort, token })
+      );
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
     }
 
@@ -343,7 +362,9 @@ const AppFooter = (props) => {
       dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckB, token }));
       setTipDiscardModal(!tipDiscardModal);
     } else {
-      dispatch(abortCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort, token }));
+      dispatch(
+        abortCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort, token })
+      );
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
     setConfirmAbortModal(!confirmAbortModal);
@@ -356,7 +377,7 @@ const AppFooter = (props) => {
         discardTipAndHomingActionInitiated({
           deckName: DECKNAME.DeckAShort,
           discardTip: discardTip,
-          token
+          token,
         })
       );
       dispatch(resetRecipeDataForDeck(DECKNAME.DeckA));
@@ -366,7 +387,7 @@ const AppFooter = (props) => {
         discardTipAndHomingActionInitiated({
           deckName: DECKNAME.DeckBShort,
           discardTip: discardTip,
-          token
+          token,
         })
       );
       dispatch(resetRecipeDataForDeck(DECKNAME.DeckB));
@@ -470,6 +491,16 @@ const AppFooter = (props) => {
         return recipeReducerData.recipeData?.processCount
           ? recipeReducerData.recipeData.processCount
           : null;
+
+      case "remainingTime":
+        return loggedInDeck
+          ? getTimeStr(recipeReducerData, cleanUpReducerData)
+          : 0;
+
+      case "totalTime":
+        return loggedInDeck
+          ? getTimeStr(recipeReducerData, cleanUpReducerData, true)
+          : 0;
 
       case "leftActionBtn":
         return loggedInDeck
@@ -600,9 +631,8 @@ const AppFooter = (props) => {
         showProcess={
           isDeckALoggedIn ? recipeActionReducerForDeckA.showProcess : false
         }
-        hours={cleanUpReducerForDeckA.hours}
-        mins={cleanUpReducerForDeckA.mins}
-        secs={cleanUpReducerForDeckA.secs}
+        totalTime={getPropsValue("totalTime", DECKNAME.DeckA)}
+        remainingTime={getPropsValue("remainingTime", DECKNAME.DeckA)}
         progressPercentComplete={getPropsValue(
           "progressPercentComplete",
           DECKNAME.DeckA
@@ -638,9 +668,8 @@ const AppFooter = (props) => {
         showProcess={
           isDeckBLoggedIn ? recipeActionReducerForDeckB.showProcess : false
         }
-        hours={cleanUpReducerForDeckB.hours}
-        mins={cleanUpReducerForDeckB.mins}
-        secs={cleanUpReducerForDeckB.secs}
+        totalTime={getPropsValue("totalTime", DECKNAME.DeckB)}
+        remainingTime={getPropsValue("remainingTime", DECKNAME.DeckB)}
         progressPercentComplete={getPropsValue(
           "progressPercentComplete",
           DECKNAME.DeckB
@@ -662,8 +691,6 @@ const AppFooter = (props) => {
     </div>
   );
 };
-
-AppFooter.propTypes = {};
 
 AppFooter.defaultProps = {
   loginBtn: false,

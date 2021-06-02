@@ -1,19 +1,31 @@
 import { CATEGORY_NAME } from "appConstants";
 
+export const getPosition = (wells) => {
+  if (wells) {
+    const selectedWell = wells.find((wellObj) => wellObj.isSelected);
+    return selectedWell ? selectedWell.id : 0;
+  }
+  return 0;
+};
+
 export const getRequestBody = (activeTab, aspire, dispense) => {
   const aspireSelectedTabName = CATEGORY_NAME[aspire.selectedCategory];
-  const dispenseSelectedTabName = CATEGORY_NAME[activeTab];
-
-  /** Aspire category is maintained using formik.
-   *  Dispense category is directly maintained using 'activeTab' state.
-   */
+  const dispenseSelectedTabName = CATEGORY_NAME[dispense.selectedCategory];
 
   const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
-  const dispenseWells = dispense[`cartridge${activeTab}Wells`];
+  const dispenseWells = dispense[`cartridge${dispense.selectedCategory}Wells`];
+
+  let cartridgeType = 1;
+  if (aspire.selectedCategory === "1" || aspire.selectedCategory === "2") {
+    cartridgeType = aspire.selectedCategory;
+  }
+  if (dispense.selectedCategory === "1" || dispense.selectedCategory === "2") {
+    cartridgeType = dispense.selectedCategory;
+  }
 
   return {
     category: `${aspireSelectedTabName}_to_${dispenseSelectedTabName}`,
-    cartridge_type: `cartridge_${activeTab}`,
+    cartridge_type: `cartridge_${cartridgeType}`,
     source_position: getPosition(aspireWells),
     aspire_height: parseFloat(aspire.aspireHeight ? aspire.aspireHeight : 0),
     aspire_mixing_volume: parseFloat(
@@ -31,11 +43,6 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
     dispense_no_of_cycles: parseFloat(dispense.nCycles ? dispense.nCycles : 0),
     destination_position: getPosition(dispenseWells),
   };
-};
-
-export const getPosition = (wells) => {
-  const selectedWell = wells.find((wellObj) => wellObj.isSelected);
-  return selectedWell.id;
 };
 
 // footerText can be: "aspire-from" or "selected"
@@ -60,9 +67,26 @@ export const getArray = (length, type, selectedPosition = null) => {
 };
 
 export const getFormikInitialState = (editReducer = null) => {
-  let type;
+  let type = "category_1";
+  let category, category1, category2;
+  let aspireSelectedCategory = "1";
+  let dispenseSelectedCategory = "1";
+
+  const CATEGORY_ID = {
+    well: type === "category_1" ? "1" : "2",
+    shaker: "3",
+    deck: "4",
+  };
+
   if (editReducer?.process_id) {
     type = editReducer.cartridge_type;
+
+    category = editReducer.category.split("_");
+    category1 = category[0];
+    category2 = category[2];
+
+    aspireSelectedCategory = CATEGORY_ID[category1];
+    dispenseSelectedCategory = CATEGORY_ID[category2];
   }
 
   return {
@@ -87,7 +111,7 @@ export const getFormikInitialState = (editReducer = null) => {
       nCycles: editReducer?.aspire_no_of_cycles
         ? editReducer.aspire_no_of_cycles
         : "",
-      selectedCategory: "",
+      selectedCategory: aspireSelectedCategory,
     },
     dispense: {
       cartridge1Wells: getArray(8, 0, editReducer.destination_position),
@@ -102,6 +126,7 @@ export const getFormikInitialState = (editReducer = null) => {
       nCycles: editReducer?.dispense_no_of_cycles
         ? editReducer.dispense_no_of_cycles
         : "",
+      selectedCategory: dispenseSelectedCategory,
     },
   };
 };
@@ -140,7 +165,8 @@ const checkIsFilled = (formikData, isAspire, currentKey) => {
       if (
         key !== currentKey &&
         key !== "cartridge1Wells" &&
-        key !== "cartridge2Wells"
+        key !== "cartridge2Wells" &&
+        key !== "selectedCategory"
       ) {
         const value = formikData[key];
         isFilled = value ? true : false;
@@ -178,6 +204,7 @@ export const toggler = (
     }
   } else {
     const formikData = formik.values[isAspire ? "aspire" : "dispense"];
+    console.log(formikData);
     const isFilled = checkIsFilled(formikData, isAspire, fieldName);
 
     if (!isFilled) {
