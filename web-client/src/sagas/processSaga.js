@@ -9,10 +9,14 @@ import {
     processListActions,
     duplicateProcessActions,
     fetchProcessDataActions,
+    sequenceActions,
+    deleteProcessActions,
 } from "actions/processActions";
 import {
     duplicateProcessFail,
     fetchProcessDataFail,
+    sequenceFail,
+    deleteProcessFail,
 } from "action-creators/processActionCreators";
 export function* fetchProcessList(actions) {
     const {
@@ -99,6 +103,56 @@ export function* fetchProcessData(actions) {
     }
 }
 
+export function* changeSequence(actions) {
+    const {
+        payload: { recipeId, processList, token },
+    } = actions;
+    const { sequenceSuccess, sequenceFailure } = sequenceActions;
+
+    try {
+        yield call(callApi, {
+            payload: {
+                method: HTTP_METHODS.POST,
+                body: processList,
+                reqPath: `${API_ENDPOINTS.rearrangeProcesses}/${recipeId}`,
+                successAction: sequenceSuccess,
+                failureAction: sequenceFailure,
+                showPopupSuccessMessage: true,
+                showPopupFailureMessage: true,
+                token,
+            },
+        });
+    } catch (error) {
+        console.error("Error in changing sequence", error);
+        yield put(sequenceFail({ error }));
+    }
+}
+
+export function* deleteProcess(actions) {
+    const {
+        payload: { processId, token },
+    } = actions;
+    const { deleteProcessSuccess, deleteProcessFailure } = deleteProcessActions;
+
+    try {
+        yield call(callApi, {
+            payload: {
+                method: HTTP_METHODS.DELETE,
+                body: null,
+                reqPath: `${API_ENDPOINTS.processes}/${processId}`,
+                successAction: deleteProcessSuccess,
+                failureAction: deleteProcessFailure,
+                showPopupSuccessMessage: true,
+                showPopupFailureMessage: true,
+                token,
+            },
+        });
+    } catch (error) {
+        console.error("Error in delete process", error);
+        yield put(deleteProcessFail({ error }));
+    }
+}
+
 export function* processSaga() {
     yield takeEvery(processListActions.processListInitiated, fetchProcessList);
     yield takeEvery(
@@ -109,4 +163,6 @@ export function* processSaga() {
         fetchProcessDataActions.fetchProcessDataInitiated,
         fetchProcessData
     );
+    yield takeEvery(sequenceActions.sequenceInitiated, changeSequence);
+    yield takeEvery(deleteProcessActions.deleteProcessInitiated, deleteProcess);
 }

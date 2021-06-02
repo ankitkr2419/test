@@ -24,6 +24,16 @@ func (p *PLCMockStore) SetRunInProgress() {
 	return
 }
 
+func (p *PLCMockStore) SetPaused() {
+	_ = p.Called()
+	return
+}
+
+func (p *PLCMockStore) ResetPaused() {
+	_ = p.Called()
+	return
+}
+
 func (p *PLCMockStore) ResetRunInProgress() {
 	_ = p.Called()
 	return

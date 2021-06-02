@@ -19,6 +19,11 @@ import SelectProcessContainer from "containers/SelectProcessContainer";
 import PiercingContainer from "containers/PiercingContainer";
 import TipPickupContainer from "containers/TipPickupContainer";
 import AspireDispenseContainer from "containers/AspireDispenseContainer";
+import TipDiscardContainer from "containers/TipDiscardContainer";
+import ShakingContainer from "containers/ShakingContainer";
+import HeatingContainer from "containers/HeatingContainer";
+import MagnetContainer from "containers/MagnetContainer";
+import DelayContainer from "containers/DelayContainer";
 
 export const routeDefinitions = [
   {
@@ -93,36 +98,36 @@ export const routeDefinitions = [
         component: PiercingContainer,
         key: 13,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}shaking`,
-      //   exact: true,
-      //   component: ShakingContainer,
-      //   key: 14,
-      // },
-      // {
-      //   path: `${ROOT_URL_PATH}heating`,
-      //   exact: true,
-      //   component: HeatingContainer,
-      //   key: 15,
-      // },
+      {
+        path: `${ROOT_URL_PATH}shaking`,
+        exact: true,
+        component: ShakingContainer,
+        key: 14,
+      },
+      {
+        path: `${ROOT_URL_PATH}heating`,
+        exact: true,
+        component: HeatingContainer,
+        key: 15,
+      },
       // {
       //   path: `${ROOT_URL_PATH}tip-position`,
       //   exact: true,
       //   component: TipPositionContainer,
       //   key: 16,
       // },
-      // {
-      //   path: `${ROOT_URL_PATH}magnet`,
-      //   exact: true,
-      //   component: MagnetContainer,
-      //   key: 17,
-      // },
-      // {
-      //   path: `${ROOT_URL_PATH}tip-discard`,
-      //   exact: true,
-      //   component: TipDiscardContainer,
-      //   key: 18,
-      // },
+      {
+        path: `${ROOT_URL_PATH}tip-discard`,
+        exact: true,
+        component: TipDiscardContainer,
+        key: 18,
+      },
+      {
+        path: `${ROOT_URL_PATH}magnet`,
+        exact: true,
+        component: MagnetContainer,
+        key: 17,
+      },
       {
         path: `${ROOT_URL_PATH}aspire-dispense`,
         exact: true,
@@ -141,12 +146,12 @@ export const routeDefinitions = [
         component: ProcessListingContainer,
         key: 22,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}delay`,
-      //   exact: true,
-      //   component: DelayContainer,
-      //   key: 21,
-      // },
+      {
+        path: `${ROOT_URL_PATH}delay`,
+        exact: true,
+        component: DelayContainer,
+        key: 21,
+      },
     ],
   },
 ];

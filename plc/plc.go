@@ -114,6 +114,8 @@ type Extraction interface {
 	Shaking(shakerData db.Shaker) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 	SetRunInProgress()
+	SetPaused()
+	ResetPaused()
 	ResetRunInProgress()
 	IsMachineHomed() bool
 	IsRunInProgress() bool
