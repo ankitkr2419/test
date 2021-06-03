@@ -166,9 +166,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			fmt.Println(ad)
 
 			if ad.CartridgeType == db.Cartridge1 {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
@@ -207,9 +207,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			fmt.Println(pi)
 
 			if pi.Type == db.Cartridge1 {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 
 			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
@@ -262,9 +262,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(td)
 			if td.Type == string(db.Cartridge1) {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)
 			if err != nil {
@@ -302,15 +302,19 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 }
 
 func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err error) {
-	// Currently only 3 positions are allowed for tips deck version 1.2
-	// TODO: Change this for version 1.3
+	// Currently only 5 positions are allowed for tips deck version 1.3
+	// TODO: Change this for next version
 	switch position {
 	case 1:
-		return recipe.Position1, nil
+		return *recipe.Position1, nil
 	case 2:
-		return recipe.Position2, nil
+		return *recipe.Position2, nil
 	case 3:
-		return recipe.Position3, nil
+		return *recipe.Position3, nil
+	case 4:
+		return *recipe.Position4, nil
+	case 5:
+		return *recipe.Position5, nil
 	}
 	err = responses.PickupPositionInvalid
 	return 0, err
