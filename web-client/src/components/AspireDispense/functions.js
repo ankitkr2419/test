@@ -131,7 +131,7 @@ export const getFormikInitialState = (editReducer = null) => {
   };
 };
 
-export const disabledTab = {
+export const disabledTabInitTab = {
   aspire: {
     cartridge1: false,
     cartridge2: false,
@@ -148,25 +148,24 @@ export const disabledTab = {
 
 //return true if any value is filled or updated, else returns false
 //this will check for all keys except currentKey
-const checkIsFilled = (formikData, isAspire, currentKey) => {
+const checkIsFilled = (formikData, currentKey = null) => {
   let isFilled = false;
 
+  // if key is wells array
   if (currentKey === "cartridge1Wells" || currentKey === "cartridge2Wells") {
-    isFilled = true;
-
-    //if cartridge1 is selected in Aspire, cart2 will be discarded in dispense
-    const aspireOrDispense = !isAspire ? "aspire" : "dispense";
-    const disabledTabInNextPage =
-      currentKey === "cartridge1Wells" ? "cartridge2" : "cartridge1";
-
-    disabledTab[aspireOrDispense][disabledTabInNextPage] = true;
-  } else {
+    isFilled = !formikData[`${currentKey}`].every(
+      (wellObj) => wellObj.isSelected === false
+    );
+  }
+  // other than wells array.
+  else {
     for (const key in formikData) {
       if (
         key !== currentKey &&
         key !== "cartridge1Wells" &&
         key !== "cartridge2Wells" &&
-        key !== "selectedCategory"
+        key !== "selectedCategory" &&
+        key !== "nCycles"
       ) {
         const value = formikData[key];
         isFilled = value ? true : false;
@@ -179,13 +178,7 @@ const checkIsFilled = (formikData, isAspire, currentKey) => {
 
 //this function is used to change the disablility of
 //different tabs according to different cases
-export const toggler = (
-  formik,
-  isAspire,
-  currentTab,
-  fieldName,
-  fieldValue
-) => {
+export const toggler = (formik, isAspire) => {
   const tabNames = {
     1: "cartridge1",
     2: "cartridge2",
@@ -193,26 +186,55 @@ export const toggler = (
     4: "deckPosition",
   };
 
-  const currentTabName = tabNames[currentTab];
-  const aspireOrDispense = isAspire ? disabledTab.aspire : disabledTab.dispense;
+  const disabledState = disabledTabInitTab;
+  const formikData = formik.values[isAspire ? "aspire" : "dispense"];
 
-  if (fieldValue) {
+  const currentTab = formikData.selectedCategory;
+  const currentTabName = tabNames[currentTab];
+  const aspireOrDispense = isAspire
+    ? disabledState.aspire
+    : disabledState.dispense;
+
+  let isFilled = false;
+
+  //check for cartridge
+  if (currentTabName === "cartridge1" || currentTabName === "cartridge2") {
+    const cartWells =
+      currentTabName === "cartridge1" ? "cartridge1Wells" : "cartridge2Wells";
+    isFilled = checkIsFilled(formikData, cartWells);
+  }
+  //check for others only if isFilled is not true
+  if (!isFilled) {
+    isFilled = checkIsFilled(formikData);
+  }
+
+  //disable other tabs accordingly
+  if (isFilled) {
     for (const key in aspireOrDispense) {
       if (key !== currentTabName) {
         aspireOrDispense[key] = true;
       }
     }
-  } else {
-    const formikData = formik.values[isAspire ? "aspire" : "dispense"];
-    console.log(formikData);
-    const isFilled = checkIsFilled(formikData, isAspire, fieldName);
 
-    if (!isFilled) {
-      for (const key in aspireOrDispense) {
-        aspireOrDispense[key] = false;
-      }
+    //also if cartridge1 is selected in Aspire, cart2 will be discarded in dispense
+    if (currentTabName === "cartridge1" || currentTabName === "cartridge2") {
+      const otherTab = !isAspire ? "aspire" : "dispense";
+      const tabToDisableInNextPage =
+        currentTabName === "cartridge1" ? "cartridge2" : "cartridge1";
+      disabledState[otherTab][tabToDisableInNextPage] = true;
     }
   }
+  // enable all tabs
+  else {
+    for (const key in disabledState.aspire) {
+      disabledState.aspire[key] = false;
+    }
+    for (const key in disabledState.dispense) {
+      disabledState.dispense[key] = false;
+    }
+  }
+
+  return disabledState;
 };
 
 export const setFormikField = (
@@ -227,7 +249,4 @@ export const setFormikField = (
   //set formik field
   const formikFieldKey = `${isAspireName}.${fieldName}`;
   formik.setFieldValue(formikFieldKey, fieldValue);
-
-  const convertedFieldName = fieldName.split(".")[0];
-  toggler(formik, isAspire, currentTab, convertedFieldName, fieldValue);
 };
