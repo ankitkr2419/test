@@ -94,6 +94,7 @@ func main() {
 			Name:  "create_migration",
 			Usage: "create migration file",
 			Action: func(c *cli.Context) error {
+				logger.Infoln("Creating migration -->", c.Args().Get(0))
 				return db.CreateMigrationFile(c.Args().Get(0))
 			},
 		},
@@ -101,6 +102,7 @@ func main() {
 			Name:  "migrate",
 			Usage: "run db migrations",
 			Action: func(c *cli.Context) error {
+				logger.Infoln("Running migrations")
 				return db.RunMigrations()
 			},
 		},
@@ -108,7 +110,7 @@ func main() {
 			Name:  "rollback",
 			Usage: "rollback migrations",
 			Action: func(c *cli.Context) error {
-
+				logger.Infoln("Rolling back migrations by ", c.Args().Get(0), " steps")
 				return db.RollbackMigrations(c.Args().Get(0))
 			},
 		},
@@ -123,6 +125,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
+				logger.Infoln("Importing CSV named -->", c.String("csv"))
 				return db.ImportCSV(c.String("csv"))
 			},
 		},
@@ -130,6 +133,7 @@ func main() {
 			Name:  "version",
 			Usage: "version",
 			Action: func(c *cli.Context) {
+				logger.Infoln("Printing Version Information")
 				printBinaryInfo()
 			},
 		},
@@ -257,5 +261,6 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 }
 
 func printBinaryInfo() {
-	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n", Version, User, Machine, Branch, CommitID, BuiltOn)
+	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
+		Version, User, Machine, Branch, CommitID, BuiltOn)
 }

@@ -85,7 +85,6 @@ iterateCSV:
 			return err
 		}
 
-
 		switch strings.TrimSpace(strings.ToUpper(record[0])) {
 		case dummy:
 			continue
@@ -130,13 +129,25 @@ iterateCSV:
 }
 
 func addRecipeDetails(recipeDetails []string) (err error) {
+	// recipe time and is_published are allowed to be empty/blank
 	for _, rd := range recipeDetails[:2] {
 		if rd == blank {
 			return responses.BlankDetailsError
 		}
 	}
+
 	createdRecipe.Name = recipeDetails[0]
 	createdRecipe.Description = recipeDetails[1]
+
+	if createdRecipe.TotalTime, err = CalculateTimeInSeconds(recipeDetails[2]); err != nil {
+		logger.Warnln(err, recipeDetails[2])
+	}
+
+	if createdRecipe.IsPublished, err = strconv.ParseBool(recipeDetails[3]); err != nil {
+		logger.Warnln(err, recipeDetails[3])
+		return err
+	}
+
 	return nil
 }
 
@@ -214,10 +225,6 @@ func createRecipe(record []string, store Storer) (err error) {
 		logger.Warnln(err, record[11])
 	} else {
 		createdRecipe.Position11 = &positions[11]
-	}
-
-	if createdRecipe.TotalTime, err = CalculateTimeInSeconds(record[12]); err != nil {
-		logger.Warnln(err, record[12])
 	}
 
 	logger.Infoln("Record that will be created--> ", createdRecipe)
