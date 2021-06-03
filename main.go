@@ -38,7 +38,7 @@ func main() {
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
 
-	logsPath := "./util/logs"
+	logsPath := "./utils/logs"
 	// logging output to file and console
 	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
 		_ = os.MkdirAll(logsPath, 0755)
