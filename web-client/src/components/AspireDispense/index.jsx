@@ -13,7 +13,7 @@ import {
   setFormikField,
   getFormikInitialState,
   getRequestBody,
-  disabledTab,
+  disabledTabInitTab,
   toggler,
 } from "./functions";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
@@ -22,6 +22,7 @@ import { saveProcessInitiated } from "action-creators/processesActionCreators";
 const AspireDispenseComponent = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
+  const [disabledTab, setDisabledTab] = useState(disabledTabInitTab);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -41,10 +42,6 @@ const AspireDispenseComponent = () => {
   const formik = useFormik({
     initialValues: getFormikInitialState(editReducerData),
     enableReinitialize: true,
-  });
-
-  useEffect(() => {
-    toggler(formik, isAspire, activeTab);
   });
 
   useEffect(() => {
@@ -85,15 +82,26 @@ const AspireDispenseComponent = () => {
     }
 
     wellsObjArray.forEach((wellObj, index) => {
+      //get current selected value : true or false?
+      let isSelected =
+        formik.values[type === 0 ? "aspire" : "dispense"][
+          `cartridge${activeTab}Wells`
+        ][index].isSelected;
+
       setFormikField(
         formik,
         isAspire,
         activeTab,
         `cartridge${activeTab}Wells.${index}.isSelected`,
-        wellObj.id === id ? !wellObj.isSelected : false
+        wellObj.id === id ? !isSelected : false
       );
     });
   };
+
+  useEffect(() => {
+    let updatedDisabledTabState = toggler(formik, isAspire);
+    setDisabledTab({ ...disabledTab, ...updatedDisabledTabState });
+  }, [formik.values]);
 
   const handleModifyBtn = () => {
     setIsAspire(!isAspire);
@@ -151,6 +159,7 @@ const AspireDispenseComponent = () => {
                 toggle={toggle}
                 activeTab={activeTab}
                 wellClickHandler={wellClickHandler}
+                disabledTab={disabledTab}
               />
             </CardBody>
           </Card>
