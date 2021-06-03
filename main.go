@@ -38,10 +38,10 @@ func main() {
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
 
-	logsPath := "utils/logs"
+	logsPath := "./util/logs"
 	// logging output to file and console
 	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
-		_ = os.Mkdir(logsPath, 0755)
+		_ = os.MkdirAll(logsPath, 0755)
 		// ignore error and try creating log output file
 	}
 
