@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
-	"strconv"
-	"strings"
 	"mylab/cpagent/responses"
 	"time"
 
@@ -140,7 +138,10 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	//
 	totalTime, err = calculateUVTimeInSeconds(uvTime)
 	if err != nil {
-
+		return "", err
+	}
+	if totalTime < minimumUVLightOnTime {
+		err = fmt.Errorf("please check your time. minimum time is : %v seconds", minimumUVLightOnTime)
 		return "", err
 	}
 
@@ -186,44 +187,6 @@ func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err erro
 }
 
 func calculateUVTimeInSeconds(uvTime string) (totalTime int64, err error) {
-
-	var hours, minutes, seconds int64
-	timeArr := strings.Split(uvTime, ":")
-	if len(timeArr) != 3 {
-		err = fmt.Errorf("time format isn't of the form HH:MM:SS")
-		return 0, err
-	}
-
-	hours, err = parseIntRange(timeArr[0], "hours", 0, 24)
-	if err != nil {
-		return 0, err
-	}
-
-	minutes, err = parseIntRange(timeArr[1], "minutes", 0, 59)
-	if err != nil {
-		return 0, err
-	}
-
-	seconds, err = parseIntRange(timeArr[2], "seconds", 0, 59)
-	if err != nil {
-		return 0, err
-	}
-
-	totalTime = hours*60*60 + minutes*60 + seconds
-
-	if totalTime < minimumUVLightOnTime {
-		err = fmt.Errorf("please check your time. minimum time is : %v seconds", minimumUVLightOnTime)
-		return 0, err
-	}
-
-	return
-}
-
-func parseIntRange(timeString, unit string, min, max int64) (value int64, err error) {
-	value, err = strconv.ParseInt(timeString, 10, 64)
-	if err != nil || value > max || value < min {
-		err = fmt.Errorf("please check %v format, valid range: [%d,%d]", unit, min, max)
-		return 0, err
-	}
+	totalTime, err = db.CalculateTimeInSeconds(uvTime)
 	return
 }

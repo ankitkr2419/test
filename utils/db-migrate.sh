@@ -15,6 +15,6 @@ echo "sleeping for 3 secs"
 sleep 3
 echo "stopping simulator process"
 echo "inserting Covid Extraction recipe into database"
-./cpagent import --recipename Covid_Extraction --csv utils/Covid_Ext_1.2.1.csv
+./cpagent import --csv utils/Covid_Ext_1.3.0.csv
 echo "inserting Covid PCR recipe into database"
-./cpagent import --recipename Covid_PCR --csv utils/Covid_PCR_1.2.1.csv
+./cpagent import --csv utils/Covid_PCR_1.3.0.csv
