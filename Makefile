@@ -22,6 +22,8 @@ zip:
 	utils/build-zip.sh
 	echo "zip created successfully"
 
+baz: build-and-zip
+
 build-and-zip: build zip
 
 migrate:
