@@ -42,6 +42,13 @@ const ShakingComponent = (props) => {
   const recipeID = recipeDetailsReducer.recipeDetails.id;
   const token = activeDeckObj.token;
 
+  useEffect(() => {
+    if (editReducerData.process_id) {
+      const selectedTab = editReducerData.with_temp ? "2" : "1";
+      setActiveTab(selectedTab);
+    }
+  }, [editReducerData.process_id]);
+
   const errorInAPICall = processesReducer.error;
   useEffect(() => {
     if (errorInAPICall === false) {
@@ -54,7 +61,10 @@ const ShakingComponent = (props) => {
   };
 
   const handleSaveBtn = () => {
-    const body = getRequestBody(formik);
+    const body = getRequestBody(formik, activeTab);
+
+    console.log(body);
+
     if (body) {
       const requestBody = {
         body: body,
@@ -106,7 +116,7 @@ const ShakingComponent = (props) => {
                       onClick={() => {
                         toggle("1");
                       }}
-                      disabled={isDisabled.withoutHeating}
+                      // disabled={isDisabled.withoutHeating} //This feature may get activated later
                     >
                       Without heating
                     </NavLink>
@@ -117,7 +127,7 @@ const ShakingComponent = (props) => {
                       onClick={() => {
                         toggle("2");
                       }}
-                      disabled={isDisabled.withHeating}
+                      // disabled={isDisabled.withHeating}  //This feature may get activated later
                     >
                       With heating
                     </NavLink>
@@ -125,18 +135,13 @@ const ShakingComponent = (props) => {
                 </Nav>
                 <TabContent activeTab={activeTab} className="p-5">
                   <TabPane tabId="1">
-                    <ShakingProcess
-                      formik={formik}
-                      activeTab={activeTab}
-                      disabled={true}
-                    />
+                    <ShakingProcess formik={formik} activeTab={activeTab} />
                   </TabPane>
                   <TabPane tabId="2">
                     <ShakingProcess
                       formik={formik}
                       activeTab={activeTab}
                       temperature={true}
-                      disabled={true}
                     />
                   </TabPane>
                 </TabContent>

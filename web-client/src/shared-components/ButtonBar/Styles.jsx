@@ -30,12 +30,12 @@ export const ButtonBarBox = styled.div`
 
   &.btn-bar-adjust-shaking {
     top: unset !important;
-    bottom: 5rem !important;
+    bottom: 2rem !important;
   }
 
   &.btn-bar-adjust-heating {
     top: unset !important;
-    bottom: 5rem !important;
+    bottom: 2rem !important;
   }
 
   &.btn-bar-adjust-magnet {

@@ -1,4 +1,4 @@
-export const getRequestBody = (formik) => {
+export const getRequestBody = (formik, activeTab) => {
   const formikValues = formik.values;
 
   const time1 =
@@ -23,6 +23,11 @@ export const getRequestBody = (formik) => {
     }
   }
 
+  const rpm1 = parseInt(formikValues.rpm1);
+  if (!rpm1 || rpm1 === 0) {
+    return false;
+  }
+
   const temperature = parseInt(formikValues.temperature);
   if (temperature !== 0) {
     if (temperature < 20 || temperature > 120) {
@@ -31,13 +36,13 @@ export const getRequestBody = (formik) => {
   }
 
   const body = {
-    with_temp: formikValues.withHeating,
-    temperature: temperature,
+    with_temp: activeTab === "2",
+    temperature: temperature ? temperature : 0,
     follow_temp: formikValues.followTemperature,
-    rpm_1: parseInt(formikValues.rpm1),
-    rpm_2: parseInt(formikValues.rpm2),
-    time_1: time1,
-    time_2: time2,
+    rpm_1: parseInt(formikValues.rpm1) ? parseInt(formikValues.rpm1) : 0,
+    rpm_2: parseInt(formikValues.rpm2) ? parseInt(formikValues.rpm2) : 0,
+    time_1: time1 ? time1 : 0,
+    time_2: time2 ? time2 : 0,
   };
 
   return body;
@@ -45,6 +50,10 @@ export const getRequestBody = (formik) => {
 
 export const getFormikInitialState = (editData = null) => {
   let hours1, mins1, secs1, hours2, mins2, secs2;
+
+  if (editData && editData.rpm_1 !== 0) {
+    isDisabled.rpm2 = false;
+  }
 
   if (editData && editData.time_1) {
     const time1 = editData.time_1;
@@ -72,13 +81,13 @@ export const getFormikInitialState = (editData = null) => {
     hours2: hours2 ? hours2 : 0,
     mins2: mins2 ? mins2 : 0,
     secs2: secs2 ? secs2 : 0,
+    rpm2IsDisabled: editData && editData.rpm_1 !== 0 ? false : true,
   };
 };
 
 export const isDisabled = {
   withHeating: false,
   withoutHeating: false,
-  rpm2: true, //initially it is disabled
 };
 
 export const setRpmFormikField = (formik, activeTab, fieldName, fieldValue) => {
@@ -89,17 +98,11 @@ export const setRpmFormikField = (formik, activeTab, fieldName, fieldValue) => {
   }
 
   const currentTab = activeTab === "1" ? "withHeating" : "withoutHeating";
-  const rpm1Value = fieldValue;
-
-  //set with heatingField in formik
-  let isWithHeating = null;
-  if (rpm1Value) {
-    isWithHeating = activeTab === "2";
-  }
-  formik.setFieldValue("withHeating", isWithHeating);
+  const rpm1Value = parseInt(fieldValue);
 
   //toggle disabled state of rpm2 based on rpm1Value
-  isDisabled["rpm2"] = rpm1Value ? false : true;
+  const rpm2IsDisabled = rpm1Value && rpm1Value !== 0 ? false : true;
+  formik.setFieldValue("rpm2IsDisabled", rpm2IsDisabled);
 
   //toggle disabled state of tabs based on rpm1Value
   isDisabled[currentTab] = rpm1Value ? true : false;
