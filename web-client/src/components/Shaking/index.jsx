@@ -142,7 +142,11 @@ const ShakingComponent = (props) => {
                 </TabContent>
               </CardBody>
             </Card>
-            <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
+            <ButtonBar
+              rightBtnLabel="Save"
+              handleRightBtn={handleSaveBtn}
+              btnBarClassname={"btn-bar-adjust-shaking"}
+            />
           </div>
         </ShakingBox>
       </PageBody>

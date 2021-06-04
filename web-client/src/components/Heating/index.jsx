@@ -91,7 +91,11 @@ const HeatingComponent = (props) => {
                 <HeatingProcess formik={formik} />
               </CardBody>
             </Card>
-            <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
+            <ButtonBar
+              rightBtnLabel="Save"
+              handleRightBtn={handleSaveBtn}
+              btnBarClassname={"btn-bar-adjust-heating"}
+            />
           </div>
         </HeatingBox>
       </PageBody>
