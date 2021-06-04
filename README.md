@@ -116,9 +116,9 @@ DEPENDENCY: Make sure that cpagent binary is built
 ## When there are changes in Migration/DB schema files 
 
 Only if below make command doesn't work then go for individual statements
-`
+```
 $ make migrate
-`
+```
 
 
 Please drop the cpagentdb database.
@@ -164,17 +164,17 @@ Congrats if your setup runs, else feel free to contact us.
 # Import CSV
 
 After a successfull latest build from master, type the below command in below format to import a Recipe from CSV
+As of version 1.3.0 there is also a provision to add labware details via CSV itself.
 
 ```
-$ ./cpagent import --recipename name_of_the_recipe --csv PATH_TO_CSV
+$ ./cpagent import --csv PATH_TO_CSV
 ```
 
-name_of_the_recipe is name without spaces. These underscores will be replaced by space.
 PATH_TO_CSV contains name of the csv along its extension.
 
 E.g
 ```
-$ ./cpagent import --recipename covidExtract --csv /home/josh/Downloads/CER.csv
+$ ./cpagent import --csv /home/josh/Downloads/CER.csv
 ```
 
 # Create Zipped Artifact

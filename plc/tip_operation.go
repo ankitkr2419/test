@@ -84,11 +84,11 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// So, in future add a field like height of tip above the deck
 	switch pos {
 	// extraction tip
-	case 1, 2:
+	case 1, 2, 3:
 		tipFast = "syringe_module_fast_down_1000_tip"
 		tipSlow = "syringe_module_slow_down_1000_tip"
 	// piercing tip
-	case 3:
+	case 4, 5:
 		tipFast = "syringe_module_fast_down_piercing_tip"
 		tipSlow = "syringe_module_slow_down_piercing_tip"
 	}

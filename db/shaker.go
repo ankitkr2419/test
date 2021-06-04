@@ -157,7 +157,7 @@ func (s *pgStore) createShaking(ctx context.Context, tx *sql.Tx, sh Shaker) (cre
 func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.ShakingInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateShakingQuery,
 		sh.WithTemp,
 		sh.Temperature,
@@ -179,6 +179,12 @@ func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating shaking")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
 	}
 	return
 }

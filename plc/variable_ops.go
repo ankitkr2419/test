@@ -56,11 +56,11 @@ func (d *Compact32Deck) resetAborted() {
 	aborted.Store(d.name, false)
 }
 
-func (d *Compact32Deck) setPaused() {
+func (d *Compact32Deck) SetPaused() {
 	paused.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetPaused() {
+func (d *Compact32Deck) ResetPaused() {
 	paused.Store(d.name, false)
 }
 
@@ -285,8 +285,8 @@ func (d *Compact32Deck) getHomingPercent() float64 {
 	}
 }
 
-func (d *Compact32Deck) getCurrentProcess() int64 {
-	if temp, ok := currentProcess.Load(d.name); !ok {
+func getCurrentProcessNumber(deck string) int64 {
+	if temp, ok := currentProcess.Load(deck); !ok {
 		logger.Errorln("currentProcess isn't loaded!")
 		return -1
 	} else {

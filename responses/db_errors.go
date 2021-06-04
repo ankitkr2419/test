@@ -66,4 +66,7 @@ var (
 	ProcessSubtractError           = fmt.Errorf("error subtracting process count from sequence number in db")
 	ProcessRearrangeDBError        = fmt.Errorf("error rearranging the procceses in db")
 	ProcessHighestSeqNumFetchError = fmt.Errorf("error getting highest sequence number of process in db")
+
+	CSVBadContentError = fmt.Errorf("error unparsable content found in csv import")
+	BlankDetailsError  = fmt.Errorf("error blank details found")
 )
