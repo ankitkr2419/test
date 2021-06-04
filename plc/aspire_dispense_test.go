@@ -153,3 +153,85 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseSuccess() {
 	assert.Nil(suite.T(), err)
 	suite.driverMock.AssertExpectations(suite.T())
 }
+
+func (suite *AspireDispenseTestSuite) TestAspireDispenseTipTubeNotExists() {
+
+	d.DeckDriver = suite.driverMock
+
+	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip1")
+
+	assert.Equal(suite.T(), "", res)
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), "testTip1 tip doesn't exist for tipstubes", err.Error())
+
+}
+
+func (suite *AspireDispenseTestSuite) TestAspireDispenseCartridgeNotExists() {
+
+	d.DeckDriver = suite.driverMock
+
+	res, err := d.AspireDispense(testAspireDispenseRecord, 3, "testTip")
+
+	assert.Equal(suite.T(), "", res)
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), "sourceCartridge doesn't exist", err.Error())
+
+}
+
+func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongCategory() {
+
+	d.DeckDriver = suite.driverMock
+	var wrongCatergory db.Category = "wrongCatergory"
+	testAspireDispenseRecord.Category = wrongCatergory
+
+	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+
+	assert.Equal(suite.T(), "", res)
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), "category is invalid for aspire_dispense opeartion", err.Error())
+	suite.driverMock.AssertExpectations(suite.T())
+	testAspireDispenseRecord.Category = db.WW
+}
+func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongSourcePosition() {
+
+	d.DeckDriver = suite.driverMock
+
+	testAspireDispenseRecord.SourcePosition = 10
+
+	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+
+	assert.Equal(suite.T(), "", res)
+	assert.NotNil(suite.T(), err)
+	suite.driverMock.AssertExpectations(suite.T())
+	assert.Equal(suite.T(), "sourceCartridge doesn't exist", err.Error())
+	testAspireDispenseRecord.SourcePosition = 4
+}
+func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongDestinationPosition() {
+
+	d.DeckDriver = suite.driverMock
+	d.name = "C"
+
+	testAspireDispenseRecord.DestinationPosition = 10
+
+	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+
+	assert.Equal(suite.T(), "", res)
+	assert.NotNil(suite.T(), err)
+	suite.driverMock.AssertExpectations(suite.T())
+	assert.Equal(suite.T(), "destinationCartridge doesn't exist", err.Error())
+	testAspireDispenseRecord.DestinationPosition = 8
+}
+
+func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongDeck() {
+
+	d.DeckDriver = suite.driverMock
+	d.name = "C"
+	aborted.Store("C", false)
+
+	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+
+	assert.Equal(suite.T(), "", res)
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), "failed to load syringe module for deck: C", err.Error())
+	suite.driverMock.AssertExpectations(suite.T())
+}
