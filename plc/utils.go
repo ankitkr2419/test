@@ -74,6 +74,11 @@ const (
 	OutDeck
 )
 
+const(
+	deckA = "A"
+	deckB = "B"
+)
+
 var deckRecipe map[string]db.Recipe
 var deckProcesses map[string][]db.Process
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
@@ -129,8 +134,8 @@ func loadUtils() {
 	BothDeckHomingInProgress = false
 	homingPercent.Store("A", float64(0))
 	homingPercent.Store("B", float64(0))
-	currentProcess.Store("A", int(0))
-	currentProcess.Store("B", int(0))
+	currentProcess.Store("A", int64(-1))
+	currentProcess.Store("B", int64(-1))
 
 	motorNumReg.Store("A", uint16(0))
 	motorNumReg.Store("B", uint16(0))

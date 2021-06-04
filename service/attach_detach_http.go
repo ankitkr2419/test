@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -44,6 +45,13 @@ func createAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.AttachDetachValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, createC))
 			return
 		}
 
@@ -132,6 +140,14 @@ func updateAttachDetachHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, updateC))
+			return
+		}
+
 		adObj.ProcessID = id
 		err = deps.Store.UpdateAttachDetach(req.Context(), adObj)
 		if err != nil {

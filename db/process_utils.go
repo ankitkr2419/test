@@ -99,7 +99,7 @@ func (s *pgStore) getProcessCount(ctx context.Context, tx *sql.Tx, recipeID uuid
 func (s *pgStore) rearrangeProcessSequence(ctx context.Context, tx *sql.Tx, sequenceArr []ProcessSequence) (err error) {
 
 	for _, pr := range sequenceArr {
-		_, err = tx.Exec(
+		result, err := tx.Exec(
 			rearrangeSequenceQuery,
 			pr.SequenceNumber+highNum,
 			pr.ID,
@@ -107,7 +107,14 @@ func (s *pgStore) rearrangeProcessSequence(ctx context.Context, tx *sql.Tx, sequ
 
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ProcessRearrangeDBError)
-			return
+			return err
+		}
+
+		c, _ := result.RowsAffected()
+		// check row count as no error is returned when row not found for update
+		if c == 0 {
+			logger.Errorln(responses.ProcessIDInvalidError)
+			return responses.ProcessIDInvalidError
 		}
 	}
 

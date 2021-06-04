@@ -3,12 +3,14 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
+
 
 func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -147,6 +149,13 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&id, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Errorln(responses.DefineCUDNotAllowedError(recipeC, deleteC))
+			return
+		}
+
 		err = deps.Store.DeleteRecipe(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.RecipeDeleteError)
@@ -159,6 +168,8 @@ func deleteRecipeHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+// NOTE: no need to call CheckIfRecipeOrProcessSafeForCRUDs
+//  as before run itself complete recipe data is stored
 func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
@@ -195,6 +206,13 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.RecipeValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&id, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(recipeC, updateC))
 			return
 		}
 

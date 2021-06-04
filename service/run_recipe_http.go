@@ -135,6 +135,13 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if runStepWise {
 
 			logger.Infoln(responses.WaitingRunNextProcess)
+
+			// To handle continuous run timer
+			// this delay is supposed to be more than 500 ms
+			// as the delay time in delay.go is 500ms
+			time.Sleep(600 * time.Millisecond)
+			deps.PlcDeck[deck].SetPaused()
+
 			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
 			err = checkForAbortOrNext(deck)
@@ -142,6 +149,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return
 			}
 			setRunNext(deck)
+			
+			// To handle continuous run timer
+			deps.PlcDeck[deck].ResetPaused()
+
 			logger.Infoln(responses.NextProcessInProgress)
 		}
 		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.InitialisedState)))
@@ -155,9 +166,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			fmt.Println(ad)
 
 			if ad.CartridgeType == db.Cartridge1 {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
@@ -196,9 +207,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			fmt.Println(pi)
 
 			if pi.Type == db.Cartridge1 {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 
 			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
@@ -251,9 +262,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(td)
 			if td.Type == string(db.Cartridge1) {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)
 			if err != nil {
@@ -275,13 +286,11 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	}
 
-	for {
-		if deps.PlcDeck[deck].IsRunInProgress() {
-			time.Sleep(200 * time.Millisecond)
-		} else {
-			break
-		}
-	}
+	// -2 means recipe is over but timer isn't
+	deps.PlcDeck[deck].SetCurrentProcessNumber(int64(-2))
+	deps.PlcDeck[deck].ResetRunInProgress()
+	// Sleep so that we can reset Abort in Delay
+	time.Sleep(2 * time.Second)
 
 	// Home the machine
 	response, err = deps.PlcDeck[deck].Homing()
@@ -293,15 +302,19 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 }
 
 func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err error) {
-	// Currently only 3 positions are allowed for tips deck version 1.2
-	// TODO: Change this for version 1.3
+	// Currently only 5 positions are allowed for tips deck version 1.3
+	// TODO: Change this for next version
 	switch position {
 	case 1:
-		return recipe.Position1, nil
+		return *recipe.Position1, nil
 	case 2:
-		return recipe.Position2, nil
+		return *recipe.Position2, nil
 	case 3:
-		return recipe.Position3, nil
+		return *recipe.Position3, nil
+	case 4:
+		return *recipe.Position4, nil
+	case 5:
+		return *recipe.Position5, nil
 	}
 	err = responses.PickupPositionInvalid
 	return 0, err
