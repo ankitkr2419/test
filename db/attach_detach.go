@@ -131,7 +131,7 @@ func (s *pgStore) createAttachDetach(ctx context.Context, tx *sql.Tx, ad AttachD
 func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AttachDetachInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateAttachDetachQuery,
 		a.Operation,
 		a.OperationType,
@@ -149,5 +149,12 @@ func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err e
 		logger.WithField("err", err.Error()).Error("Error updating attach detach")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
+	}
+
 	return
 }

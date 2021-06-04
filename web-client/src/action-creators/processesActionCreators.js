@@ -1,6 +1,11 @@
 import {
   aspireDispenseAction,
+  heatingAction,
+  magnetAction,
+  delayAction,
   piercingAction,
+  tipDiscardAction,
+  shakingAction,
   tipPickupAction,
 } from "actions/processesActions";
 
@@ -46,5 +51,84 @@ export const saveTipPickupSuccess = (response) => ({
 
 export const saveTipPickupFailure = (error) => ({
   type: tipPickupAction.saveTipPickUpFailed,
+  payload: error,
+});
+
+//tip-discard
+export const saveTipDiscardInitiated = (params) => ({
+  type: tipDiscardAction.saveTipDiscardInitiated,
+  payload: params,
+});
+
+export const saveTipDiscardSuccess = (response) => ({
+  type: tipDiscardAction.saveTipDiscardSuccess,
+  payload: response,
+});
+
+export const saveTipDiscardFailure = (error) => ({
+  type: tipDiscardAction.saveTipDiscardFailed,
+  payload: error,
+});
+
+export const saveShakingInitiated = (params) => ({
+  type: shakingAction.saveShakingInitiated,
+  payload: params,
+});
+
+export const saveShakingSuccess = (response) => ({
+  type: shakingAction.saveShakingSuccess,
+  payload: response,
+});
+
+export const saveShakingFailure = (error) => ({
+  type: shakingAction.saveShakingFailed,
+  payload: error,
+});
+
+//heating
+export const saveHeatingInitiated = (params) => ({
+  type: heatingAction.saveHeatingInitiated,
+  payload: params,
+});
+
+export const saveHeatingSuccess = (response) => ({
+  type: heatingAction.saveHeatingSuccess,
+  payload: response,
+});
+
+export const saveHeatingFailure = (error) => ({
+  type: heatingAction.saveHeatingFailed,
+  payload: error,
+});
+
+//magnet
+export const saveMagnetInitiated = (params) => ({
+  type: magnetAction.saveMagnetInitiated,
+  payload: params,
+});
+
+export const saveMagnetSuccess = (response) => ({
+  type: magnetAction.saveMagnetSuccess,
+  payload: response,
+});
+
+export const saveMagnetFailure = (error) => ({
+  type: magnetAction.saveMagnetFailed,
+  payload: error,
+});
+
+//delay
+export const saveDelayInitiated = (params) => ({
+  type: delayAction.saveDelayInitiated,
+  payload: params,
+});
+
+export const saveDelaySuccess = (response) => ({
+  type: delayAction.saveDelaySuccess,
+  payload: response,
+});
+
+export const saveDelayFailure = (error) => ({
+  type: delayAction.saveDelayFailed,
   payload: error,
 });

@@ -139,7 +139,7 @@ func (s *pgStore) createHeating(ctx context.Context, tx *sql.Tx, h Heating) (cre
 func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.HeatingInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateHeatingQuery,
 		ht.Temperature,
 		ht.FollowTemp,
@@ -157,6 +157,12 @@ func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating heating")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
 	}
 	return
 }

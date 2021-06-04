@@ -135,7 +135,7 @@ func (s *pgStore) createTipDocking(ctx context.Context, tx *sql.Tx, t TipDock) (
 func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipDockingInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateTipDockQuery,
 		t.Type,
 		t.Position,
@@ -154,5 +154,12 @@ func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 		logger.WithField("err", err.Error()).Error("Error updating TipDocking")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
+	}
+
 	return
 }

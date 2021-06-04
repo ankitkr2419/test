@@ -16,6 +16,7 @@ const RecipeCard = (props) => {
     toggleRunRecipesModal,
     handlePublishModalClick,
     handleEditRecipe,
+    handleDeleteRecipe,
   } = props;
 
   const [toggle, setToggle] = useState(true);
@@ -84,7 +85,7 @@ const RecipeCard = (props) => {
                 size={20}
                 name="minus-1"
                 className="border-gray text-primary"
-                // onClick={toggleExportDataModal}
+                onClick={handleDeleteRecipe}
               />
             </div>
           </Fade>

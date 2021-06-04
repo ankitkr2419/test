@@ -1,11 +1,12 @@
 package main
 
 import (
+	"io"
+
 	rice "github.com/GeertJohan/go.rice"
 
 	"flag"
 	"fmt"
-	"github.com/goburrow/modbus"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -18,7 +19,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/goburrow/modbus"
+
 	"github.com/rs/cors"
+
 	logger "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/urfave/negroni"
@@ -30,8 +34,24 @@ var Version, User, Machine, CommitID, Branch, BuiltOn string
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
+		ForceColors:     true,
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
+
+	logsPath := "./utils/logs"
+	// logging output to file and console
+	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
+		_ = os.MkdirAll(logsPath, 0755)
+		// ignore error and try creating log output file
+	}
+
+	filename := fmt.Sprintf("%v/output_%v.log", logsPath, time.Now().Unix())
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
+	if err != nil {
+		logger.Errorln(responses.WriteToFileError)
+	}
+	mw := io.MultiWriter(os.Stdout, f)
+	logger.SetOutput(mw)
 
 	config.LoadAllConfs()
 
@@ -74,6 +94,7 @@ func main() {
 			Name:  "create_migration",
 			Usage: "create migration file",
 			Action: func(c *cli.Context) error {
+				logger.Infoln("Creating migration -->", c.Args().Get(0))
 				return db.CreateMigrationFile(c.Args().Get(0))
 			},
 		},
@@ -81,6 +102,7 @@ func main() {
 			Name:  "migrate",
 			Usage: "run db migrations",
 			Action: func(c *cli.Context) error {
+				logger.Infoln("Running migrations")
 				return db.RunMigrations()
 			},
 		},
@@ -88,19 +110,14 @@ func main() {
 			Name:  "rollback",
 			Usage: "rollback migrations",
 			Action: func(c *cli.Context) error {
-
+				logger.Infoln("Rolling back migrations by ", c.Args().Get(0), " steps")
 				return db.RollbackMigrations(c.Args().Get(0))
 			},
 		},
 		{
 			Name:  "import",
-			Usage: "import [--recipename RECIPE_NAME] [--csv CSV_ABSOLUTE_PATH] ",
+			Usage: "import --csv CSV_ABSOLUTE_PATH ",
 			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "recipename",
-					Value: "recipe",
-					Usage: "put recipe name",
-				},
 				&cli.StringFlag{
 					Name:  "csv",
 					Value: "recipe.csv",
@@ -108,13 +125,15 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				return db.ImportCSV(c.String("recipename"), c.String("csv"))
+				logger.Infoln("Importing CSV named -->", c.String("csv"))
+				return db.ImportCSV(c.String("csv"))
 			},
 		},
 		{
 			Name:  "version",
 			Usage: "version",
 			Action: func(c *cli.Context) {
+				logger.Infoln("Printing Version Information")
 				printBinaryInfo()
 			},
 		},
@@ -242,5 +261,6 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 }
 
 func printBinaryInfo() {
-	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n", Version, User, Machine, Branch, CommitID, BuiltOn)
+	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
+		Version, User, Machine, Branch, CommitID, BuiltOn)
 }

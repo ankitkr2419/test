@@ -34,6 +34,16 @@ func (p *PLCMockStore) SetRunInProgress() {
 	return
 }
 
+func (p *PLCMockStore) SetPaused() {
+	_ = p.Called()
+	return
+}
+
+func (p *PLCMockStore) ResetPaused() {
+	_ = p.Called()
+	return
+}
+
 func (p *PLCMockStore) ResetRunInProgress() {
 	_ = p.Called()
 	return
@@ -78,7 +88,6 @@ func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.P
 	args := p.Called(recipe, processes)
 	return args.Error(0)
 }
-
 
 func (p *PLCMockStore) DiscardTipAndHome(discard bool) (response string, err error) {
 	args := p.Called(discard)
