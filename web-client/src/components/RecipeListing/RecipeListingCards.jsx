@@ -19,6 +19,7 @@ const RecipeListingCards = (props) => {
         onSearchRecipeTextChanged,
         fileteredRecipeData,
         handleCarousalModal,
+        selectedRecipeData,
         returnRecipeDetails,
         toggleRunRecipesModal,
         handlePublishModalClick,
@@ -105,7 +106,7 @@ const RecipeListingCards = (props) => {
                             onChange={onSearchRecipeTextChanged}
                         />
                     ) : null}
-                    <div className="d-flex justify-content-end">
+                    <div className="d-flex justify-content-end ml-auto">
                         <PaginationBox
                             firstIndexOnPage={paginatedData.from}
                             lastIndexOnPage={paginatedData.to}
@@ -139,6 +140,7 @@ const RecipeListingCards = (props) => {
                                     processCount={recipe.process_count}
                                     isPublished={recipe.is_published}
                                     handleCarousalModal={handleCarousalModal}
+                                    selectedRecipeData={selectedRecipeData}
                                     returnRecipeDetails={returnRecipeDetails}
                                     toggleRunRecipesModal={
                                         toggleRunRecipesModal

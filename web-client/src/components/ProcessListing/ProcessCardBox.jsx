@@ -31,6 +31,7 @@ export const ProcessCardBox = styled.div`
         }
         > label {
             margin-left: 0.75rem;
+            word-break: break-word;
         }
     }
     .more-action {

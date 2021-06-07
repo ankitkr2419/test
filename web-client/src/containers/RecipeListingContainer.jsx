@@ -47,6 +47,10 @@ const RecipeListingContainer = (props) => {
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
   ) => {
+    //clear recipe data if run recipe closed
+    if(prevState === true) {
+      setSelectedRecipeData({})
+    }
     setOperatorRunRecipeCarousalModalVisible(!prevState);
   };
 
@@ -82,6 +86,11 @@ const RecipeListingContainer = (props) => {
   const isProcessInProgress =
     recipeReducerDataOfActiveDeck.showProcess ||
     cleanUpReducerDataOfActiveDeck.showCleanUp;
+
+  //clear selected Recipe Data if user 
+  if(!isProcessInProgress && selectedRecipeData?.recipeId){
+    setSelectedRecipeData({})
+  } 
 
   const returnRecipeDetails = (data) => {
     setSelectedRecipeData({ data, deckName });
@@ -128,6 +137,7 @@ const RecipeListingContainer = (props) => {
           isOperatorRunRecipeCarousalModalVisible
         }
         handleCarousalModal={handleCarousalModal}
+        selectedRecipeData={selectedRecipeData}
         returnRecipeDetails={returnRecipeDetails}
         onConfirmedRecipeSelection={onConfirmedRecipeSelection}
         onConfirmedRunRecipeByAdmin={onConfirmedRunRecipeByAdmin}

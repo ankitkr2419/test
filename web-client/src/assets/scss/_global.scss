@@ -598,3 +598,12 @@ button:focus {
 		line-height: 20px;
 	}
 }
+
+.recipe-action {
+	.icon-play,
+	.icon-edit-pencil,
+	.icon-publish,
+	.icon-published {
+			font-size: 14px !important;
+	}
+}

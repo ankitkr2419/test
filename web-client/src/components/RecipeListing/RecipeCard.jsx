@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Fade } from "reactstrap";
 import { Text, Icon, ButtonIcon } from "shared-components";
@@ -12,6 +12,7 @@ const RecipeCard = (props) => {
     isAdmin,
     isPublished,
     handleCarousalModal,
+    selectedRecipeData,
     returnRecipeDetails,
     toggleRunRecipesModal,
     handlePublishModalClick,
@@ -20,6 +21,16 @@ const RecipeCard = (props) => {
   } = props;
 
   const [toggle, setToggle] = useState(true);
+
+  //maintain a var which tells when to show recipe as selected (orange background)
+  const isSelected = (!isAdmin && selectedRecipeData?.data?.recipeId === recipeId) ? true : false;
+
+  //hide menu if menu open and tab changed
+  useEffect(() => {
+    if(!toggle) {
+      setToggle(true)
+    }
+  }, [isAdmin])
 
   const handleClickOnCard = () => {
     if (isAdmin) {
@@ -37,7 +48,7 @@ const RecipeCard = (props) => {
 
   return (
     <div onClick={handleClickOnCard}>
-      <RecipeCardStyle>
+      <RecipeCardStyle className={isSelected ? "selected": ""}>
         <div className="recipe-heading d-flex justify-content-between align-items-center">
           <div className="font-weight-bold">{recipeName}</div>
           {isAdmin && isPublished ? (
@@ -60,22 +71,22 @@ const RecipeCard = (props) => {
           </>
         ) : (
           <Fade in tag="h5" className="m-0">
-            <div className="recipe-action d-flex justify-content-between align-items-center">
+            <div className="recipe-action d-flex justify-content-between align-items-center pt-2">
               <div className="d-flex justify-content-between align-items-center">
                 <ButtonIcon
-                  size={14}
+                  size={25}
                   name="play"
                   className="border-gray text-primary mr-2"
                   onClick={handleRunRecipeByAdmin}
                 />
                 <ButtonIcon
-                  size={14}
+                  size={25}
                   name="edit-pencil"
                   className="border-gray text-primary mr-2"
                   onClick={handleEditRecipe}
                 />
                 <ButtonIcon
-                  size={14}
+                  size={25}
                   name={isPublished ? 'published' : `publish`}
                   className={`border-gray ${isPublished ? "published-icon text-white bg-primary": "text-primary"}`}
                   onClick={() => handlePublishModalClick(recipeId, isPublished)}
