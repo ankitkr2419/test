@@ -28,7 +28,7 @@ export const paginator = (items, currentPage, perPageItems) => {
 //for processListing page
 export const initialPaginationStateProcessList = {
   page: 1,
-  perPageItems: 15, //fixed
+  perPageItems: 10, //fixed
   prevPage: null,
   nextPage: null,
   total: 0,
