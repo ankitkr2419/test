@@ -133,13 +133,15 @@ var testAspireDispenseRecord = db.AspireDispense{
 	DestinationPosition:  8,
 	ProcessID:            testProcessUUID,
 }
-var d = Compact32Deck{
-	name: "A",
+var testdeck = Compact32Deck{
+	name:    "A",
+	WsMsgCh: make(chan string),
+	WsErrCh: make(chan error),
 }
 
 func (suite *AspireDispenseTestSuite) TestAspireDispenseSuccess() {
 
-	d.DeckDriver = suite.driverMock
+	testdeck.DeckDriver = suite.driverMock
 	suite.driverMock.On("WriteSingleCoil", mock.Anything, mock.Anything).Return(nil)
 
 	for i := 1; i >= 0; i-- {
@@ -147,7 +149,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseSuccess() {
 		suite.driverMock.On("ReadCoils", mock.Anything, mock.Anything).Return([]uint8{uint8(i)}, nil)
 	}
 
-	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
 
 	assert.Equal(suite.T(), "ASPIRE and DISPENSE was successful", res)
 	assert.Nil(suite.T(), err)
@@ -156,9 +158,9 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseSuccess() {
 
 func (suite *AspireDispenseTestSuite) TestAspireDispenseTipTubeNotExists() {
 
-	d.DeckDriver = suite.driverMock
+	testdeck.DeckDriver = suite.driverMock
 
-	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip1")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip1")
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -168,9 +170,9 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseTipTubeNotExists() {
 
 func (suite *AspireDispenseTestSuite) TestAspireDispenseCartridgeNotExists() {
 
-	d.DeckDriver = suite.driverMock
+	testdeck.DeckDriver = suite.driverMock
 
-	res, err := d.AspireDispense(testAspireDispenseRecord, 3, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 3, "testTip")
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -180,11 +182,11 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseCartridgeNotExists() {
 
 func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongCategory() {
 
-	d.DeckDriver = suite.driverMock
+	testdeck.DeckDriver = suite.driverMock
 	var wrongCatergory db.Category = "wrongCatergory"
 	testAspireDispenseRecord.Category = wrongCatergory
 
-	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -194,11 +196,11 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongCategory() {
 }
 func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongSourcePosition() {
 
-	d.DeckDriver = suite.driverMock
+	testdeck.DeckDriver = suite.driverMock
 
 	testAspireDispenseRecord.SourcePosition = 10
 
-	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -208,12 +210,12 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongSourcePosition() {
 }
 func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongDestinationPosition() {
 
-	d.DeckDriver = suite.driverMock
-	d.name = "C"
+	testdeck.DeckDriver = suite.driverMock
+	testdeck.name = "C"
 
 	testAspireDispenseRecord.DestinationPosition = 10
 
-	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -224,11 +226,11 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongDestinationPosition
 
 func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongDeck() {
 
-	d.DeckDriver = suite.driverMock
-	d.name = "C"
+	testdeck.DeckDriver = suite.driverMock
+	testdeck.name = "C"
 	aborted.Store("C", false)
 
-	res, err := d.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
