@@ -28,9 +28,6 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// variables for Binary Build info
-var Version, User, Machine, CommitID, Branch, BuiltOn string
-
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
@@ -134,7 +131,7 @@ func main() {
 			Usage: "version",
 			Action: func(c *cli.Context) {
 				logger.Infoln("Printing Version Information")
-				printBinaryInfo()
+				service.PrintBinaryInfo()
 			},
 		},
 	}
@@ -258,9 +255,4 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			time.Sleep(5 * time.Second)
 		}
 	}
-}
-
-func printBinaryInfo() {
-	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
-		Version, User, Machine, Branch, CommitID, BuiltOn)
 }

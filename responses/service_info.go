@@ -5,6 +5,8 @@ import "fmt"
 var (
 	Pong = "pong"
 
+	AppInfoFetch = "application information is being fetched"
+
 	PiercingCreateSuccess        = "piercing record created successfully"
 	PiercingFetchSuccess         = "piercing record fetched successfully"
 	PiercingUpdateSuccess        = "piercing record updated successfully"
