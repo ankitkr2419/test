@@ -53,7 +53,7 @@ LOOP:
 
 	// something went wrong. Signal parent process
 	logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-	//d.ExitCh <- errors.New("PCR Dead")
+	d.ExitCh <- errors.New("PLC is not responding and maybe dead. Abort!!")
 	return
 }
 

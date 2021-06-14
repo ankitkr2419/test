@@ -1,0 +1,159 @@
+package plc
+
+import (
+	"fmt"
+	"mylab/cpagent/db"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/gorilla/websocket"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
+)
+
+type DelayTestSuite struct {
+	suite.Suite
+	dbMock     *db.DBMockStore
+	driverMock *MockCompact32Driver
+}
+
+var testProcesses = []db.Process{
+	db.Process{
+		ID:             testUUID,
+		Name:           "one",
+		Type:           "test 1",
+		SequenceNumber: 1,
+		RecipeID:       recipeUUID,
+	},
+	db.Process{
+		ID:             testUUID,
+		Name:           "two",
+		Type:           "test 2",
+		SequenceNumber: 2,
+		RecipeID:       recipeUUID,
+	},
+	db.Process{
+		ID:             testUUID,
+		Name:           "three",
+		Type:           "test 3",
+		SequenceNumber: 3,
+		RecipeID:       recipeUUID,
+	},
+}
+
+func (suite *DelayTestSuite) SetupTest() {
+	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{testTTObj}, nil)
+	suite.dbMock.On("ListCartridges", mock.Anything).Return(testCartridgeObj, nil)
+	suite.dbMock.On("ListCartridgeWells").Return(testCartridgeWellsObj, nil)
+	suite.dbMock.On("ListMotors").Return(testMotorObj, nil)
+	suite.dbMock.On("ListConsDistances").Return(testConsDistanceObj, nil)
+
+	LoadAllPLCFuncs(suite.dbMock)
+	suite.driverMock = &MockCompact32Driver{}
+
+}
+
+var testDelayRecord = db.Delay{
+	ID:        testUUID,
+	DelayTime: 10,
+	ProcessID: testProcessUUID,
+}
+
+func TestDelayTestSuite(t *testing.T) {
+	suite.Run(t, new(DelayTestSuite))
+}
+
+var upgrader = websocket.Upgrader{}
+
+func testWebSocket(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	defer c.Close()
+	for {
+		select {
+		case msg := <-testdeck.WsMsgCh:
+			fmt.Println(msg)
+		case err := <-testdeck.WsErrCh:
+			fmt.Println(err.Error())
+		}
+	}
+}
+
+func (suite *DelayTestSuite) TestDelaySuccess() {
+	initiateWebSocket()
+	testdeck.DeckDriver = suite.driverMock
+
+	res, err := testdeck.AddDelay(testDelayRecord, false)
+
+	assert.Equal(suite.T(), "SUCCESS", res)
+	assert.Nil(suite.T(), err)
+	suite.driverMock.AssertExpectations(suite.T())
+}
+
+func (suite *DelayTestSuite) TestDelayMachineAbortedSuccess() {
+	initiateWebSocket()
+	testdeck.DeckDriver = suite.driverMock
+	testDelayRecord.DelayTime = 20
+	go func() {
+		time.Sleep(200 * time.Millisecond)
+		testdeck.setAborted()
+	}()
+	res, err := testdeck.AddDelay(testDelayRecord, false)
+
+	assert.Equal(suite.T(), "", res)
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), "Operation was ABORTED!", err.Error())
+	suite.driverMock.AssertExpectations(suite.T())
+	testDelayRecord.DelayTime = 5
+}
+
+func (suite *DelayTestSuite) TestDelayUVLightInProgressSuccess() {
+	initiateWebSocket()
+	testdeck.setUVLightInProgress()
+	testdeck.DeckDriver = suite.driverMock
+
+	res, err := testdeck.AddDelay(testDelayRecord, false)
+
+	assert.Equal(suite.T(), "SUCCESS", res)
+	assert.Nil(suite.T(), err)
+	suite.driverMock.AssertExpectations(suite.T())
+}
+
+func (suite *DelayTestSuite) TestDelayRecipeProgressSuccess() {
+	initiateWebSocket()
+	deckProcesses[testdeck.name] = testProcesses
+	testDelayRecord.DelayTime = 2
+	testdeck.resetAborted()
+	testdeck.ResetPaused()
+	testdeck.SetRunInProgress()
+	go func() {
+		for i := 2; i >= -2; i-- {
+			testdeck.SetCurrentProcessNumber(int64(i))
+		}
+	}()
+	testdeck.DeckDriver = suite.driverMock
+
+	res, err := testdeck.AddDelay(testDelayRecord, true)
+
+	assert.Equal(suite.T(), "SUCCESS", res)
+	assert.Nil(suite.T(), err)
+	suite.driverMock.AssertExpectations(suite.T())
+	testDelayRecord.DelayTime = 10
+}
+
+func initiateWebSocket() {
+	s := httptest.NewServer(http.HandlerFunc(testWebSocket))
+	defer s.Close()
+	// Convert http://127.0.0.1 to ws://127.0.0.
+	u := "ws" + strings.TrimPrefix(s.URL, "http")
+	ws, _, _ := websocket.DefaultDialer.Dial(u, nil)
+
+	defer ws.Close()
+}
