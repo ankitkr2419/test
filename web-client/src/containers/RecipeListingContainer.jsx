@@ -68,9 +68,17 @@ const RecipeListingContainer = (props) => {
     }
   }, [activeDeckObj.isDeckBlocked]);
 
-  if (!activeDeckObj.isLoggedIn) {
-    return <Redirect to={`/${ROUTES.landing}`} />;
-  }
+  /** Reset selectedRecipeData if deck is switched */
+  useEffect(() => {
+    if (
+      selectedRecipeData?.deckName &&
+      selectedRecipeData.deckName !== activeDeckObj.name
+    ) {
+      setSelectedRecipeData({});
+    }
+  });
+
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
   let deckName = activeDeckObj.name;
   let isAdmin = activeDeckObj.isAdmin;
   if (!token) setToken(activeDeckObj.token);
@@ -86,11 +94,6 @@ const RecipeListingContainer = (props) => {
   const isProcessInProgress =
     recipeReducerDataOfActiveDeck.showProcess ||
     cleanUpReducerDataOfActiveDeck.showCleanUp;
-
-  //clear selected Recipe Data if user 
-  if(!isProcessInProgress && selectedRecipeData?.recipeId){
-    setSelectedRecipeData({})
-  } 
 
   const returnRecipeDetails = (data) => {
     setSelectedRecipeData({ data, deckName });
