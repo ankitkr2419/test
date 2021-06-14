@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
+	"mylab/cpagent/plc"
 	"net/http"
 	"sync"
 
@@ -28,8 +29,6 @@ const (
 	supervisor = "supervisor"
 	engineer   = "engineer"
 	operator   = "operator"
-	deckA      = "A"
-	deckB      = "B"
 )
 
 const(
@@ -67,32 +66,32 @@ func setStepRunInProgress(deck string) {
 }
 
 func loadUtils() {
-	userLogin.Store("A", false)
-	userLogin.Store("B", false)
+	userLogin.Store(plc.DeckA, false)
+	userLogin.Store(plc.DeckB, false)
 	runNext = map[string]bool{
-		"A": false,
-		"B": false,
+		plc.DeckA: false,
+		plc.DeckB: false,
 	}
 
 	stepRunInProgress = map[string]bool{
-		"A": false,
-		"B": false,
+		plc.DeckA: false,
+		plc.DeckB: false,
 	}
 
 	chanA := make(chan struct{}, 1)
 	chanB := make(chan struct{}, 1)
 
 	nextStep = map[string]chan struct{}{
-		"A": chanA,
-		"B": chanB,
+		plc.DeckA: chanA,
+		plc.DeckB: chanB,
 	}
 
 	chanC := make(chan struct{}, 1)
 	chanD := make(chan struct{}, 1)
 
 	abortStepRun = map[string]chan struct{}{
-		"A": chanC,
-		"B": chanD,
+		plc.DeckA: chanC,
+		plc.DeckB: chanD,
 	}
 }
 
