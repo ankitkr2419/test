@@ -1,9 +1,10 @@
 package service
 
 import (
+	"fmt"
+	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
-	"fmt"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -41,10 +42,11 @@ func appInfoHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.AppInfoFetch, appInfo)
 		responseCodeAndMsg(rw, http.StatusOK, appInfo)
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AppInfoRequested)
 	})
 }
 
-// NOTE: Application doesn't make sense below as its set on run time only
+// NOTE: Application doesn't make sense below as it is set at run time only
 func PrintBinaryInfo() {
 	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
 		Version, User, Machine, Branch, CommitID, BuiltOn)
