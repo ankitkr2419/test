@@ -178,23 +178,29 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		service.Application = service.None
 	case noExtraction && plcName == C32:
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
+		service.Application = service.RTPCR
 	case noExtraction && plcName == SIM:
 		driver = simulator.NewSimulator(exit)
+		service.Application = service.RTPCR
 	case noRTPCR && plcName == C32:
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+		service.Application = service.Extraction
 	case noRTPCR && plcName == SIM:
 		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
 		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
+		service.Application = service.Extraction
 		// Only cases that remain are of combined RTPCR and Extraction
 	case plcName == C32:
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+		service.Application = service.Combined
 	case plcName == SIM:
 		driver = simulator.NewSimulator(exit)
 		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
 		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
+		service.Application = service.Combined
 	default:
 		logger.Errorln(responses.UnknownCase)
 		return responses.UnknownCase
