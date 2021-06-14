@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"context"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -21,6 +22,8 @@ var Version, Application, User, Machine, CommitID, Branch, BuiltOn string
 
 func appInfoHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		ctx := context.WithValue(req.Context(), contextKeyUsername, "main")
 
 		appInfo := struct {
 			Application string `json:"app"`
@@ -42,7 +45,7 @@ func appInfoHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.AppInfoFetch, appInfo)
 		responseCodeAndMsg(rw, http.StatusOK, appInfo)
-		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AppInfoRequested)
+		go deps.Store.AddAuditLog(ctx, db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AppInfoRequested)
 	})
 }
 
