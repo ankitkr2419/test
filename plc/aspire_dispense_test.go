@@ -78,7 +78,7 @@ var testMotorObj = []db.Motor{
 	db.Motor{
 		ID:     1,
 		Name:   "test motor 1",
-		Deck:   "A",
+		Deck:   DeckA,
 		Number: 10,
 		Ramp:   100,
 		Steps:  200,
@@ -88,7 +88,7 @@ var testMotorObj = []db.Motor{
 	db.Motor{
 		ID:     2,
 		Name:   "test motor 2",
-		Deck:   "A",
+		Deck:   DeckA,
 		Number: 9,
 		Ramp:   200,
 		Steps:  400,
@@ -134,7 +134,7 @@ var testAspireDispenseRecord = db.AspireDispense{
 	ProcessID:            testProcessUUID,
 }
 var testdeck = Compact32Deck{
-	name:    "A",
+	name:    DeckA,
 	WsMsgCh: make(chan string),
 	WsErrCh: make(chan error),
 }
