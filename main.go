@@ -28,6 +28,11 @@ import (
 	"github.com/urfave/negroni"
 )
 
+const(
+	C32 = "compact32"
+	SIM = "simulator"
+)
+
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
@@ -38,7 +43,7 @@ func main() {
 	logsPath := "./utils/logs"
 	// logging output to file and console
 	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
-		_ = os.MkdirAll(logsPath, 0755)
+		os.MkdirAll(logsPath, 0755)
 		// ignore error and try creating log output file
 	}
 
@@ -58,7 +63,7 @@ func main() {
 	cliApp.Commands = []cli.Command{
 		{
 			Name:  "start",
-			Usage: "start server [--plc {simulator|compact32}] [--delay range:(0,100] ]",
+			Usage: "start server [--plc {simulator|compact32}] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:  "plc",
@@ -69,6 +74,14 @@ func main() {
 					Name:  "test",
 					Usage: "Run in test mode!",
 				},
+				&cli.BoolFlag{
+					Name:  "no-extraction",
+					Usage: "Run without extraction",
+				},
+				&cli.BoolFlag{
+					Name:  "no-rtpcr",
+					Usage: "Run withour rtpcr",
+				},
 				&cli.IntFlag{
 					Name:  "delay",
 					Value: 50,
@@ -76,7 +89,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				if c.String("plc") != "simulator" && c.Int("delay") != 50 {
+				if c.String("plc") != SIM && c.Int("delay") != 50 {
 					return responses.SimulatorReservedDelayError
 				}
 				err := simulator.UpdateDelay(c.Int("delay"))
@@ -84,7 +97,7 @@ func main() {
 					logger.Error("Re-check delay argument")
 					return err
 				}
-				return startApp(c.String("plc"), c.Bool("test"))
+				return startApp(c.String("plc"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction") )
 			},
 		},
 		{
@@ -141,14 +154,14 @@ func main() {
 	}
 }
 
-func startApp(plcName string, test bool) (err error) {
+func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	var store db.Storer
 	var driver plc.Driver
 	var handler *modbus.RTUClientHandler
 	var driverDeckA plc.Extraction
 	var driverDeckB plc.Extraction
 
-	if plcName != "simulator" && plcName != "compact32" {
+	if plcName != SIM && plcName != C32 {
 		logger.Errorln(responses.UnsupportedPLCError)
 		return
 	}
@@ -159,17 +172,35 @@ func startApp(plcName string, test bool) (err error) {
 
 	websocketErr := make(chan error)
 
-	// PLC work in a completely separate go-routine!
-	if plcName == "compact32" {
+	switch{
+	case noExtraction && noRTPCR:
+		logger.Infoln("application neither supports extraction nor rtpcr")
+		service.Application = service.None
+	case noExtraction && plcName == C32:
+		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
+	case noExtraction && plcName == SIM:
+		driver = simulator.NewSimulator(exit)
+	case noRTPCR && plcName == C32:
+		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
+		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+	case noRTPCR && plcName == SIM:
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckA)
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckB)
+		// Only cases that remain are of combined RTPCR and Extraction
+	case plcName == C32:
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
-	} else {
+	case plcName == SIM:
 		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, "A")
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, "B")
-
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckA)
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckB)
+	default:
+		logger.Errorln(responses.UnknownCase)
+		return responses.UnknownCase
 	}
+
+	// PLC work in a completely separate go-routine!
 
 	store, err = db.Init()
 	if err != nil {
@@ -178,8 +209,8 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	plcDeckMap := map[string]plc.Extraction{
-		"A": driverDeckA,
-		"B": driverDeckB,
+		deckA: driverDeckA,
+		deckB: driverDeckB,
 	}
 
 	deps := service.Dependencies{
@@ -247,8 +278,8 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
 			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
 			plcDeckMap := map[string]plc.Extraction{
-				"A": driverDeckA,
-				"B": driverDeckB,
+				deckA: driverDeckA,
+				deckB: driverDeckB,
 			}
 			deps.PlcDeck = plcDeckMap
 		default:
