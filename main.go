@@ -184,8 +184,8 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
 	case noRTPCR && plcName == SIM:
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckA)
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckB)
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
 		// Only cases that remain are of combined RTPCR and Extraction
 	case plcName == C32:
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
@@ -193,8 +193,8 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
 	case plcName == SIM:
 		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckA)
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, deckB)
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
 	default:
 		logger.Errorln(responses.UnknownCase)
 		return responses.UnknownCase
@@ -209,8 +209,8 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	}
 
 	plcDeckMap := map[string]plc.Extraction{
-		deckA: driverDeckA,
-		deckB: driverDeckB,
+		plc.DeckA: driverDeckA,
+		plc.DeckB: driverDeckB,
 	}
 
 	deps := service.Dependencies{
@@ -278,8 +278,8 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
 			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
 			plcDeckMap := map[string]plc.Extraction{
-				deckA: driverDeckA,
-				deckB: driverDeckB,
+				plc.DeckA: driverDeckA,
+				plc.DeckB: driverDeckB,
 			}
 			deps.PlcDeck = plcDeckMap
 		default:
