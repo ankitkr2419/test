@@ -30,17 +30,17 @@ func TestMotorTestSuite(t *testing.T) {
 
 func (suite *MotorHandlerTestSuite) TestCreateMotorSuccess() {
 	suite.dbMock.On("InsertMotor", mock.Anything, mock.Anything).Return(db.Motor{
-		ID: 1, Deck: "A", Number: 1, Name: "TestMotor", Ramp: 400, Steps: 500, Slow: 500, Fast: 2000,
+		ID: 1, Deck: plc.DeckA, Number: 1, Name: "TestMotor", Ramp: 400, Steps: 500, Slow: 500, Fast: 2000,
 	}, nil)
 
-	body := fmt.Sprintf(`{"id":1, "deck":"A", "number":1, "name": "TestMotor", "ramp": 400, "steps": 500, "slow": 500, "fast": 2000, "created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	body := fmt.Sprintf(`{"id":1, "deck":plc.DeckA, "number":1, "name": "TestMotor", "ramp": 400, "steps": 500, "slow": 500, "fast": 2000, "created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/motor",
 		"/motor",
 		body,
 		createMotorHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":1,"deck":"A","number":1,"name":"TestMotor","ramp":400,"steps":500,"slow":500,"fast":2000,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	output := fmt.Sprintf(`{"id":1,"deck":plc.DeckA,"number":1,"name":"TestMotor","ramp":400,"steps":500,"slow":500,"fast":2000,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
@@ -50,17 +50,17 @@ func (suite *MotorHandlerTestSuite) TestCreateMotorSuccess() {
 
 func (suite *MotorHandlerTestSuite) TestCreateMotorFailure() {
 	suite.dbMock.On("InsertMotor", mock.Anything, mock.Anything).Return(db.Motor{
-		ID: 1, Deck: "A", Number: 1, Name: "TestMotor", Ramp: 400, Steps: 500, Slow: 500, Fast: 2000,
+		ID: 1, Deck: plc.DeckA, Number: 1, Name: "TestMotor", Ramp: 400, Steps: 500, Slow: 500, Fast: 2000,
 	}, nil)
 
-	body := fmt.Sprintf(`{"id":1, "deck":"A", "number":1, "name": "TestMotor", "ramp": 500, "steps": 500, "slow": 500, "fast": 2000, "created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	body := fmt.Sprintf(`{"id":1, "deck":plc.DeckA, "number":1, "name": "TestMotor", "ramp": 500, "steps": 500, "slow": 500, "fast": 2000, "created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 	recorder := makeHTTPCall(http.MethodPost,
 		"/motor",
 		"/motor",
 		body,
 		createMotorHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":1,"deck":"A","number":1,"name":"TestMotor","ramp":400,"steps":500,"slow":500,"fast":2000,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	output := fmt.Sprintf(`{"id":1,"deck":plc.DeckA,"number":1,"name":"TestMotor","ramp":400,"steps":500,"slow":500,"fast":2000,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
 
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
 	assert.NotEqual(suite.T(), output, recorder.Body.String())

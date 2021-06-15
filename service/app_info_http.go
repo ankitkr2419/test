@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	None   	   = "none"
 	Combined   = "combined"
 	RTPCR      = "rtpcr"
 	Extraction = "extraction"
