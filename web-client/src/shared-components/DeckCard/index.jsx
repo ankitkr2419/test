@@ -207,7 +207,7 @@ const DeckCard = (props) => {
         className="p-4 w-100 h-100 deck-content logged-in1"
         style={
           isProcessRunning()
-            ? { background: null }
+            ? { background: null, zIndex: isActiveDeck ? 4 : null }
             : { background: '#fff url("/images/deck-card-bg.svg") no-repeat' }
         }
       >
