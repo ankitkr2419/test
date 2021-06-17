@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Fade } from "reactstrap";
 import { Text, Icon, ButtonIcon } from "shared-components";
@@ -18,23 +18,13 @@ const RecipeCard = (props) => {
     handlePublishModalClick,
     handleEditRecipe,
     handleDeleteRecipe,
+    toggle,
   } = props;
-
-  const [toggle, setToggle] = useState(true);
-
-  //maintain a var which tells when to show recipe as selected (orange background)
-  const isSelected = (!isAdmin && selectedRecipeData?.data?.recipeId === recipeId) ? true : false;
-
-  //hide menu if menu open and tab changed
-  useEffect(() => {
-    if(!toggle) {
-      setToggle(true)
-    }
-  }, [isAdmin])
 
   const handleClickOnCard = () => {
     if (isAdmin) {
-      setToggle(!toggle);
+      const param = toggle ? {} : { recipeId };
+      returnRecipeDetails(param);
     } else {
       handleCarousalModal();
       returnRecipeDetails({ recipeId, recipeName, processCount });
@@ -48,7 +38,9 @@ const RecipeCard = (props) => {
 
   return (
     <div onClick={handleClickOnCard}>
-      <RecipeCardStyle className={isSelected ? "selected": ""}>
+      <RecipeCardStyle
+        className={toggle ? `${isAdmin ? "admin-" : ""}selected` : ""}
+      >
         <div className="recipe-heading d-flex justify-content-between align-items-center">
           <div className="font-weight-bold">{recipeName}</div>
           {isAdmin && isPublished ? (
@@ -57,19 +49,7 @@ const RecipeCard = (props) => {
             </Text>
           ) : null}
         </div>
-        {toggle ? (
-          <>
-            <Text Tag="span" className="recipe-name">
-              Total Processes -
-            </Text>
-            <Text
-              Tag="span"
-              className="text-primary font-weight-bold recipe-value ml-2"
-            >
-              {processCount}
-            </Text>
-          </>
-        ) : (
+        {isAdmin && toggle ? (
           <Fade in tag="h5" className="m-0">
             <div className="recipe-action d-flex justify-content-between align-items-center pt-2">
               <div className="d-flex justify-content-between align-items-center">
@@ -87,8 +67,12 @@ const RecipeCard = (props) => {
                 />
                 <ButtonIcon
                   size={25}
-                  name={isPublished ? 'published' : `publish`}
-                  className={`border-gray ${isPublished ? "published-icon text-white bg-primary": "text-primary"}`}
+                  name={isPublished ? "published" : `publish`}
+                  className={`border-gray ${
+                    isPublished
+                      ? "published-icon text-white bg-primary"
+                      : "text-primary"
+                  }`}
                   onClick={() => handlePublishModalClick(recipeId, isPublished)}
                 />
               </div>
@@ -100,6 +84,18 @@ const RecipeCard = (props) => {
               />
             </div>
           </Fade>
+        ) : (
+          <>
+            <Text Tag="span" className="recipe-name">
+              Total Processes -
+            </Text>
+            <Text
+              Tag="span"
+              className="text-primary font-weight-bold recipe-value ml-2"
+            >
+              {processCount}
+            </Text>
+          </>
         )}
       </RecipeCardStyle>
     </div>
