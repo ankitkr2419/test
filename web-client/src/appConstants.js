@@ -6,6 +6,13 @@ export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 
 export const ROOT_URL_PATH = "/";
 
+export const CREDS_FOR_HOMING = {
+  email: "main",
+  password: "main",
+  role: "admin",
+  deckName: "Deck A",
+};
+
 export const HTTP_METHODS = {
   GET: "GET",
   POST: "POST",

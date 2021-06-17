@@ -4,9 +4,9 @@ import {
   discardTipAndHomingActions,
 } from "actions/homingActions";
 
-export const homingActionInitiated = () => ({
+export const homingActionInitiated = (params) => ({
   type: homingActions.homingActionInitiated,
-  payload: {},
+  payload: { params },
 });
 
 export const homingActionSuccess = (homingData) => ({
