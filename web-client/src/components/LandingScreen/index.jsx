@@ -34,7 +34,7 @@ const LandingScreenComponent = (props) => {
       <div className="landing-content">
         <VideoCard />
         <MlModal
-          isOpen={isOpen}
+          isOpen={isOpen && !isHomingActionCompleted}
           textBody={MODAL_MESSAGE.homingConfirmation}
           handleSuccessBtn={() =>
             isHomingActionCompleted ? setIsOpen(false) : homingConfirmation()
