@@ -93,12 +93,12 @@ export const getFormikInitialState = (editReducer = null) => {
     aspire: {
       cartridge1Wells:
         type === "cartridge_1"
-          ? getArray(8, 0, editReducer.source_position)
-          : getArray(8, 0),
+          ? getArray(13, 0, editReducer.source_position)
+          : getArray(13, 0),
       cartridge2Wells:
         type === "cartridge_2"
-          ? getArray(8, 0, editReducer.source_position)
-          : getArray(8, 0),
+          ? getArray(13, 0, editReducer.source_position)
+          : getArray(13, 0),
       deckPosition: "",
       aspireHeight: editReducer?.aspire_height ? editReducer.aspire_height : "",
       mixingVolume: editReducer?.aspire_mixing_volume
@@ -114,8 +114,8 @@ export const getFormikInitialState = (editReducer = null) => {
       selectedCategory: aspireSelectedCategory,
     },
     dispense: {
-      cartridge1Wells: getArray(8, 0, editReducer.destination_position),
-      cartridge2Wells: getArray(8, 0, editReducer.destination_position),
+      cartridge1Wells: getArray(13, 1, editReducer.destination_position),
+      cartridge2Wells: getArray(13, 1, editReducer.destination_position),
       deckPosition: "",
       dispenseHeight: editReducer?.dispense_height
         ? editReducer.dispense_height
@@ -151,41 +151,54 @@ export const disabledTabInitTab = {
 const checkIsFilled = (formikData, currentKey = null) => {
   let isFilled = false;
 
-  // if key is wells array
-  if (currentKey === "cartridge1Wells" || currentKey === "cartridge2Wells") {
-    isFilled = !formikData[`${currentKey}`].every(
-      (wellObj) => wellObj.isSelected === false
-    );
-  }
-  // other than wells array.
-  else {
-    for (const key in formikData) {
-      if (
-        key !== currentKey &&
-        key !== "cartridge1Wells" &&
-        key !== "cartridge2Wells" &&
-        key !== "selectedCategory" &&
-        key !== "nCycles"
-      ) {
-        const value = formikData[key];
-        isFilled = value ? true : false;
-        if (isFilled) break;
-      }
+  for (const key in formikData) {
+    // check for wells
+    if (key === "cartridge1Wells" || key === "cartridge2Wells") {
+      isFilled = !formikData[`${key}`].every(
+        (wellObj) => wellObj.isSelected === false
+      );
     }
+    // check for form fields other than wells
+    else if (
+      key !== currentKey &&
+      key !== "selectedCategory" &&
+      key !== "nCycles"
+    ) {
+      const value = formikData[key];
+      isFilled = value ? true : false;
+    }
+    if (isFilled) break;
   }
   return isFilled;
+};
+
+const tabNames = {
+  1: "cartridge1",
+  2: "cartridge2",
+  3: "shaker",
+  4: "deckPosition",
+};
+
+/** This function enables tab of aspire or dispense
+ * if no parameter is sent it will enable tabs for both
+ */
+const enableAllTabs = (aspireOrDispense = null) => {
+  Object.values(tabNames).forEach((key) => {
+    // enable tabs for aspire AND dispense
+    if (!aspireOrDispense) {
+      disabledTabInitTab.aspire[key] = false;
+      disabledTabInitTab.dispense[key] = false;
+    }
+    // enable tabs only for the param sent
+    else {
+      disabledTabInitTab[`${aspireOrDispense}`][key] = false;
+    }
+  });
 };
 
 //this function is used to change the disablility of
 //different tabs according to different cases
 export const toggler = (formik, isAspire) => {
-  const tabNames = {
-    1: "cartridge1",
-    2: "cartridge2",
-    3: "shaker",
-    4: "deckPosition",
-  };
-
   const disabledState = disabledTabInitTab;
   const formikData = formik.values[isAspire ? "aspire" : "dispense"];
 
@@ -196,17 +209,7 @@ export const toggler = (formik, isAspire) => {
     : disabledState.dispense;
 
   let isFilled = false;
-
-  //check for cartridge
-  if (currentTabName === "cartridge1" || currentTabName === "cartridge2") {
-    const cartWells =
-      currentTabName === "cartridge1" ? "cartridge1Wells" : "cartridge2Wells";
-    isFilled = checkIsFilled(formikData, cartWells);
-  }
-  //check for others only if isFilled is not true
-  if (!isFilled) {
-    isFilled = checkIsFilled(formikData);
-  }
+  isFilled = checkIsFilled(formikData);
 
   //disable other tabs accordingly
   if (isFilled) {
@@ -224,13 +227,44 @@ export const toggler = (formik, isAspire) => {
       disabledState[otherTab][tabToDisableInNextPage] = true;
     }
   }
-  // enable all tabs
+  // here we check conditions and enable tabs accordingly
   else {
-    for (const key in disabledState.aspire) {
-      disabledState.aspire[key] = false;
-    }
-    for (const key in disabledState.dispense) {
-      disabledState.dispense[key] = false;
+    const formikAspire = formik.values.aspire;
+    const formikDispense = formik.values.dispense;
+
+    const aspireSelectedCategory = parseInt(formikAspire.selectedCategory);
+    const dispenseSelectedCategory = parseInt(formikDispense.selectedCategory);
+    const aspireFieldsAreFilled = checkIsFilled(formikAspire);
+    const dispenseFieldsAreFilled = checkIsFilled(formikDispense);
+
+    // if aspire and dispense BOTH have no fields, then enable all tabs
+    if (!aspireFieldsAreFilled && !dispenseFieldsAreFilled) {
+      enableAllTabs();
+    } else {
+      // in aspire tab
+      if (isAspire) {
+        /** if dispense selected category is cartridge1
+         * then we enable cartridge2 and others in aspire AND vice-versa*/
+        if (dispenseSelectedCategory <= 2) {
+          disabledState.aspire[`cartridge${dispenseSelectedCategory}`] = false;
+          disabledState.aspire["shaker"] = false;
+          disabledState.aspire["deckPosition"] = false;
+        } else {
+          enableAllTabs("aspire");
+        }
+      }
+      // in dispense tab
+      else {
+        /** if aspire selected category is cartridge1
+         * then we enable cartridge2 and others in dispense AND vice-versa*/
+        if (aspireSelectedCategory <= 2) {
+          disabledState.dispense[`cartridge${aspireSelectedCategory}`] = false;
+          disabledState.dispense["shaker"] = false;
+          disabledState.dispense["deckPosition"] = false;
+        } else {
+          enableAllTabs("dispense");
+        }
+      }
     }
   }
 
