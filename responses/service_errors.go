@@ -99,30 +99,34 @@ var (
 	UrlArgumentInvalid         = fmt.Errorf("error invalid url argument")
 
 	//user
-	UserDecodeError         = fmt.Errorf("error decoding user record")
-	UserDeckLoginError      = fmt.Errorf("error login in deck")
-	UserInvalidError        = fmt.Errorf("error invalid user")
-	UserAuthError           = fmt.Errorf("error in storing user authentication data")
-	UserTokenEncodeError    = fmt.Errorf("error in fetching token")
-	UserMarshallingError    = fmt.Errorf("error in marshalling token")
-	UserInsertError         = fmt.Errorf("error in inserting user")
-	UserAuthDataFetchError  = fmt.Errorf("error in authenticating user")
-	UserAuthDataDeleteError = fmt.Errorf("error in deleting authenticated user data")
-	UserInvalidDeckError    = fmt.Errorf("error invalid deck")
+	UserDecodeError           = fmt.Errorf("error decoding user record")
+	UserDeckLoginError        = fmt.Errorf("error login in deck")
+	UserInvalidError          = fmt.Errorf("error invalid user")
+	UserAuthError             = fmt.Errorf("error in storing user authentication data")
+	UserTokenEncodeError      = fmt.Errorf("error in fetching token")
+	UserMarshallingError      = fmt.Errorf("error in marshalling token")
+	UserInsertError           = fmt.Errorf("error in inserting user")
+	UserAuthDataFetchError    = fmt.Errorf("error in authenticating user")
+	UserAuthDataDeleteError   = fmt.Errorf("error in deleting authenticated user data")
+	UserTokenApplicationError = fmt.Errorf("error in token application type")
+	UserInvalidDeckError      = fmt.Errorf("error invalid deck")
 
 	//user authenticate
-	UserUnauthorised            = fmt.Errorf("error user unauthorised")
-	UserTokenEmptyError         = fmt.Errorf("error empty token")
-	UserTokenDecodeError        = fmt.Errorf("error in decoding token")
-	UserTokenRoleEmptyError     = fmt.Errorf("error failed to fetch role")
-	UserTokenDeckError          = fmt.Errorf("error failed to fetch deck")
-	UserTokenInvalidRoleError   = fmt.Errorf("error invalid role")
-	UserTokenCrossDeckError     = fmt.Errorf("error wrong token for deck")
-	UserTokenLoggedOutDeckError = fmt.Errorf("error already logged out ")
-	UserTokenUsernameError      = fmt.Errorf("error username not in token ")
-	UserTokenAuthIdError        = fmt.Errorf("error auth_id not in token ")
-	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
-	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
+	UserUnauthorised              = fmt.Errorf("error user unauthorised")
+	UserTokenEmptyError           = fmt.Errorf("error empty token")
+	UserTokenDecodeError          = fmt.Errorf("error in decoding token")
+	UserTokenRoleEmptyError       = fmt.Errorf("error failed to fetch role")
+	UserTokenDeckError            = fmt.Errorf("error failed to fetch deck")
+	UserTokenInvalidRoleError     = fmt.Errorf("error invalid role")
+	UserTokenCrossDeckError       = fmt.Errorf("error wrong token for deck")
+	UserTokenLoggedOutDeckError   = fmt.Errorf("error already logged out ")
+	UserTokenUsernameError        = fmt.Errorf("error username not in token ")
+	UserTokenApplicationTypeError = fmt.Errorf("error application type not in token ")
+	UserTokenAppMismatchError     = fmt.Errorf("error application type mismatch ")
+
+	UserTokenAuthIdError      = fmt.Errorf("error auth_id not in token ")
+	UserTokenAuthIdParseError = fmt.Errorf("error auth_id parse error ")
+	UserAuthNotFoundError     = fmt.Errorf("error user already logged out")
 
 	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
 	AuditLogCreateError = fmt.Errorf("error failed saving log")
@@ -137,8 +141,7 @@ var (
 	RestoreDeckError       = fmt.Errorf("error restore deck was unsuccessful")
 	DiscardBoolOptionError = fmt.Errorf("Invalid boolean value for tip discard option")
 
-	CUDNotAllowedError  = "this %v is in progress, so not allowed to %v"
-
+	CUDNotAllowedError = "this %v is in progress, so not allowed to %v"
 )
 
 // Special errors which are in []byte format

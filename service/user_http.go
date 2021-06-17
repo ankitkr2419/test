@@ -68,10 +68,10 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		if deck != "" {
-			token, err = EncodeToken(u.Username, authID, u.Role, deck, map[string]string{})
+			token, err = EncodeToken(u.Username, authID, u.Role, deck, Application, map[string]string{})
 			userLogin.Store(deck, true)
 		} else {
-			token, err = EncodeToken(u.Username, authID, u.Role, "", map[string]string{})
+			token, err = EncodeToken(u.Username, authID, u.Role, "", Application, map[string]string{})
 		}
 
 		if err != nil {
