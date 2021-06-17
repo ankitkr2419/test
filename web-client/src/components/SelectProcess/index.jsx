@@ -27,7 +27,7 @@ const SelectProcessPageComponent = () => {
                 Tag="h5"
                 className="text-primary font-weight-bold mb-0"
               >
-                Select a process
+                Add a process
               </HeadingTitle>
             </div>
           </TopContent>

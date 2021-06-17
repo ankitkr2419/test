@@ -24,6 +24,7 @@ export const RecipeCardStyle = styled.div`
             line-height: 1.313rem;
         }
         .recipe-action {
+            border-top: 1px solid #D9D9D9 !important;
             button {
                 width: 33px !important;
                 height: 33px !important;
@@ -36,6 +37,21 @@ export const RecipeCardStyle = styled.div`
     }
     &:focus,
     &:hover {
+        background-color: "white";
+    }
+    &.selected {
         background-color: rgba(243, 130, 32, 0.3);
+    }
+
+    .recipe-action {
+        border-top: 1px solid #D9D9D9 !important;
+        button {
+            width: 33px !important;
+            height: 33px !important;
+            border: 1px solid #696969 !important;
+            &:not(:first-child) {
+                margin-left: 12px;
+            }
+        }
     }
 `;

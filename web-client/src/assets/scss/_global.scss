@@ -682,3 +682,12 @@ button:focus {
 .card-box {
   height: 30.75rem !important;
 }
+
+.recipe-action {
+	.icon-play,
+	.icon-edit-pencil,
+	.icon-publish,
+	.icon-published {
+			font-size: 14px !important;
+	}
+}

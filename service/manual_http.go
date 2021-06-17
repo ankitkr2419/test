@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"mylab/cpagent/plc"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -29,7 +30,7 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		switch {
-		case m.Deck != "A" && m.Deck != "B":
+		case m.Deck != plc.DeckA && m.Deck != plc.DeckB:
 			err = fmt.Errorf("Use A or B deck only")
 		case m.MotorNum <= 4 || m.MotorNum > 10:
 			err = fmt.Errorf("Select motor num in only in between 5-10")
