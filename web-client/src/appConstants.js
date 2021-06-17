@@ -54,8 +54,9 @@ export const EXPERIMENT_STATUS = {
 };
 
 export const ROUTES = {
-  landing: "landing",
-  splashScreen: "splashscreen",
+  login: "login", //rtpcr login page
+  landing: "landing", //extraction login page
+  splashScreen: "splashscreen", //application homepage
   recipeListing: "recipe-listing",
   labware: "labware",
   processListing: "process-listing",
@@ -107,6 +108,7 @@ export const API_ENDPOINTS = {
   delay: "delay",
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
+  appInfo: "app-info",
 };
 
 export const MODAL_MESSAGE = {
@@ -368,3 +370,10 @@ export const CATEGORY_LABEL = {
   3: "Shaker",
   4: "Deck Position",
 };
+
+export const APP_TYPE = {
+  COMBINED: "combined",
+  RTPCR: "rtpcr",
+  EXTRACTION: "extraction",
+  NONE: "none",
+}

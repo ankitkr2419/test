@@ -1,15 +1,20 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { ImageIcon } from "shared-components";
-import { ROUTES } from "appConstants";
 import CirclelogoIcon from "assets/images/mylab-logo-with-circle.png";
 import { SplashScreen } from './SplashScreen';
+import { toast } from "react-toastify";
 
-const SplashScreenComponent = () => {
+const SplashScreenComponent = (props) => {
+  const { redirectionPath } = props;
   const history = useHistory();
 
   const redirectToLandingPage = () => {
-    return history.push(ROUTES.landing);
+    if(redirectionPath){
+      return history.push(redirectionPath);
+    } else {
+      toast.warn('Unknown application type!');
+    }
   };
 
   return (

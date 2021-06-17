@@ -64,7 +64,11 @@ const AppLayoutContainer = (props) => {
 					))}
 				</Switch>
 			</section>
-			{location.pathname === '/splashscreen' ? null : <AppFooter /> }
+			{location.pathname === '/splashscreen' ||
+				location.pathname === '/login' 
+			 		? null 
+					: <AppFooter /> 
+			}
 		</Router>
 	);
 };
