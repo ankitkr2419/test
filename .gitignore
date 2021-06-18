@@ -8,6 +8,7 @@ artifact.zip
 
 # log files
 /utils/logs/*.log
+/tec/ComLog.txt
 
 # web-client dependencies
 /web-client/node_modules
