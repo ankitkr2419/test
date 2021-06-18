@@ -367,3 +367,9 @@ export const CATEGORY_LABEL = {
   3: "Shaker",
   4: "Deck Position",
 };
+
+// constants for tip position process
+export const TIP_HEIGHT_MAX_ALLOWED_VALUE = 25;
+export const TIP_HEIGHT_MIN_ALLOWED_VALUE = 0;
+export const TIP_POSTION_ERROR_MSG =
+  "Invalid request sent! Please check input values.";

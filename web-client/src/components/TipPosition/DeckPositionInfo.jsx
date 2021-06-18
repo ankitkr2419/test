@@ -11,7 +11,7 @@ const DeckPositionInfo = (props) => {
 
   const handleDeckClick = (id) => {
     let otherTabsAreDisabled = true;
-    let deckPosition = deckPositionNames[parseInt(id)];
+    let deckPosition = parseInt(id);
     const deck = formik.values.deck;
     const formikDeckPosition = deck.deckPosition;
     const tipHeightValue = deck.tipHeight;
@@ -26,6 +26,7 @@ const DeckPositionInfo = (props) => {
         otherTabsAreDisabled = false;
       }
     }
+
     // set deckPosition value
     formik.setFieldValue(`deck.deckPosition`, deckPosition);
 
@@ -47,12 +48,11 @@ const DeckPositionInfo = (props) => {
                 {deckPositionNames.map((deckPositionName, index) => {
                   return (
                     <Button
-                      key={index}
-                      id={index}
+                      key={index + 1}
+                      id={index + 1}
                       outline
                       className={
-                        formik.values.deck.deckPosition ===
-                        deckPositionNames[index]
+                        formik.values.deck.deckPosition === index + 1
                           ? "selected-opt"
                           : ""
                       }

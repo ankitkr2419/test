@@ -13,17 +13,17 @@ export const deckPositionNames = [
 ];
 
 export const apiNameToLabel = {
-  tip_position_1: "Tip Position 1",
-  tip_position_2: "Tip Position 2",
-  tip_position_3: "Tip Position 3",
-  piercing_tip_1: "Piercing Tip 1",
-  piercing_tip_2: "Piercing Tip 2",
-  sample_tube: "Sample Tube",
-  shaker_tube: "Shaker Tube",
-  cartridge_1: "Cartridge 1",
-  extraction_tube: "Extraction Tube",
-  cartridge_2: "Cartridge 2",
-  pcr_tube: "PCR Tube",
+  1: "Tip Position 1",
+  2: "Tip Position 2",
+  3: "Tip Position 3",
+  4: "Piercing Tip 1",
+  5: "Piercing Tip 2",
+  6: "Sample Tube",
+  7: "Shaker Tube",
+  8: "Cartridge 1",
+  9: "Extraction Tube",
+  10: "Cartridge 2",
+  11: "PCR Tube",
 };
 
 export const typeName = {
@@ -32,14 +32,17 @@ export const typeName = {
   3: "cartridge2",
 };
 
+export const typeNameAPI = {
+  1: "cartridge_1",
+  2: "deck",
+  3: "cartridge_2",
+};
+
 export const tabApiNames = { cartridge_1: 1, deck: 2, cartridge_2: 3 };
 
 export const getPosition = (wells) => {
-  if (wells) {
-    const selectedWell = wells.find((wellObj) => wellObj.isSelected);
-    return selectedWell ? selectedWell.id : 0;
-  }
-  return 0;
+  const selectedWell = wells.find((wellObj) => wellObj.isSelected);
+  return selectedWell ? selectedWell.id : 0;
 };
 
 //this function updates and renders wellsArray after selecting or de-selecting wells
@@ -90,7 +93,7 @@ export const getFormikInitialState = (editReducer = null) => {
 
   const deckPosition =
     editReducer?.process_id && tabApiNames[editReducer.type] === 2
-      ? apiNameToLabel[editReducer.deck_position]
+      ? parseInt(editReducer.position)
       : null;
 
   const deckTipHeight =

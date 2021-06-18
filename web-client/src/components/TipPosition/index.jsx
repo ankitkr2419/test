@@ -6,13 +6,26 @@ import { ButtonIcon, ButtonBar } from "shared-components";
 
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TipPositionBox, TopContent } from "./Style";
-import { getFormikInitialState, typeName, updateWellsArray } from "./functions";
+import {
+  getFormikInitialState,
+  typeName,
+  typeNameAPI,
+  updateWellsArray,
+} from "./functions";
 import HeightModal from "components/modals/HeightModal";
 import { TabsContent } from "./TabsContent";
-import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
+import {
+  API_ENDPOINTS,
+  HTTP_METHODS,
+  ROUTES,
+  TIP_HEIGHT_MAX_ALLOWED_VALUE,
+  TIP_HEIGHT_MIN_ALLOWED_VALUE,
+  TIP_POSTION_ERROR_MSG,
+} from "appConstants";
 import { getPosition, tabApiNames } from "./functions";
 import { Redirect, useHistory } from "react-router";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
+import { toast } from "react-toastify";
 
 const TipPositionComponent = (props) => {
   const { editReducerData } = props;
@@ -44,11 +57,13 @@ const TipPositionComponent = (props) => {
   useEffect(() => {
     if (editReducerData?.process_id) {
       const value = editReducerData.type;
+      const type = tabApiNames[value];
+
       setActiveTab(`${tabApiNames[value]}`);
 
       // disable other tabs
       for (const key in formik.values) {
-        formik.setFieldValue(`${key}.isDisabled`, key !== typeName[activeTab]);
+        formik.setFieldValue(`${key}.isDisabled`, key !== typeName[type]);
       }
     }
   }, [editReducerData]);
@@ -65,6 +80,7 @@ const TipPositionComponent = (props) => {
     // type 0 is for cartridge 1 and 1 is for cartridge 2
     const cartridge = formik.values[`cartridge${type + 1}`];
     const wellsObjArray = cartridge.wellsArray;
+    const otherTabType = type === 0 ? 2 : 1;
 
     const currentWellObj = wellsObjArray.find((wellObj) => {
       if (wellObj.id === id) {
@@ -82,50 +98,53 @@ const TipPositionComponent = (props) => {
         `cartridge${type + 1}.wellsArray`,
         updatedWellObjArray
       );
-
-      //check for tipHeight and disable other tabs accordingly
+      //check for tipHeight and enable other tabs accordingly
       if (!cartridge.tipHeight) {
-        const otherTabType = type === 0 ? 2 : 1;
         formik.setFieldValue(`cartridge${otherTabType}.isDisabled`, false);
         formik.setFieldValue(`deck.isDisabled`, false);
       }
     }
-    // else open height modal and select
+    // else select well
     else {
-      setShowHieghtModal(!showHeightModal);
+      //selecting one well and also sets height
+      const wellsObjArray = formik.values[`cartridge${type + 1}`].wellsArray;
+      wellsObjArray.forEach((wellObj, index) => {
+        formik.setFieldValue(
+          `cartridge${type + 1}.wellsArray.${index}.isSelected`,
+          wellObj.id === currentWellObj.id
+        );
+      });
+      //disable other tabs
+      formik.setFieldValue(`cartridge${otherTabType}.isDisabled`, true);
+      formik.setFieldValue(`deck.isDisabled`, true);
     }
   };
 
-  //modal's 'okay' btn
-  const handleSuccessBtn = (height, type) => {
-    setShowHieghtModal(!showHeightModal);
-
-    //selecting one and de-selecting others and also sets height
-    const wellsObjArray = formik.values[`cartridge${type + 1}`].wellsArray;
-    wellsObjArray.forEach((wellObj, index) => {
-      formik.setFieldValue(
-        `cartridge${type + 1}.wellsArray.${index}.isSelected`,
-        wellObj.id === currentWellObj.id
-      );
-      formik.setFieldValue(
-        `cartridge${type + 1}.wellsArray.${index}.height`,
-        wellObj.id === currentWellObj.id ? height : null
-      );
-    });
-
-    const otherTabType = type === 0 ? 2 : 1;
-    //disable other tabs
-    formik.setFieldValue(`cartridge${otherTabType}.isDisabled`, true);
-    formik.setFieldValue(`deck.isDisabled`, true);
-  };
-
   const handleSaveBtn = () => {
-    const type = typeName[activeTab];
+    const type = typeNameAPI[activeTab];
+    const position =
+      type === "deck"
+        ? formik.values.deck.deckPosition
+        : getPosition(formik.values[typeName[activeTab]].wellsArray);
+    const tipHeight = formik.values[typeName[activeTab]].tipHeight;
+
+    // check for valid data; if invalid data is sent, throw toast;
+    // TipHeight: max:25 min:0;
+    if (
+      !position ||
+      !tipHeight ||
+      position === parseInt(0) ||
+      tipHeight < TIP_HEIGHT_MIN_ALLOWED_VALUE ||
+      tipHeight > TIP_HEIGHT_MAX_ALLOWED_VALUE
+    ) {
+      toast.error(TIP_POSTION_ERROR_MSG);
+      return;
+    }
 
     const body = {
       type: type,
-      position: getPosition(formik.values[type].wellsArray),
-      height: formik.values[type].tipHeight,
+      position: position,
+      height: tipHeight,
     };
 
     const requestBody = {
@@ -137,7 +156,6 @@ const TipPositionComponent = (props) => {
         ? HTTP_METHODS.PUT
         : HTTP_METHODS.POST,
     };
-    console.log(requestBody);
     dispatch(saveProcessInitiated(requestBody));
   };
 
@@ -147,14 +165,6 @@ const TipPositionComponent = (props) => {
 
   return (
     <>
-      {showHeightModal && (
-        <HeightModal
-          isOpen={showHeightModal}
-          handleCrossBtn={() => setShowHieghtModal(!showHeightModal)}
-          handleSuccessBtn={handleSuccessBtn}
-          wellObj={currentWellObj}
-        />
-      )}
       <PageBody>
         <TipPositionBox>
           <div className="process-content process-tip-position px-2">
