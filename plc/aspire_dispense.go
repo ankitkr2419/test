@@ -239,7 +239,8 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	defer d.setIndeck(deckBase, tipHeight)
 
 	if val, ok := syringeModuleState.Load(d.name); !ok {
-		panic(ok)
+		err = fmt.Errorf("failed to load syringe module for deck: %s", d.name)
+		return "", err
 	} else {
 		if val == InDeck {
 			goto skipToAspireInside

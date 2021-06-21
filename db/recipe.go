@@ -2,19 +2,19 @@ package db
 
 import (
 	"context"
-	"time"
 	"mylab/cpagent/responses"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
 
 const (
-	defaultRecipeTime = 900
-	getRecipeQuery = `SELECT * FROM recipes WHERE id = $1`
+	defaultRecipeTime  = 900
+	getRecipeQuery     = `SELECT * FROM recipes WHERE id = $1`
 	selectRecipesQuery = `SELECT * FROM recipes`
-	deleteRecipeQuery = `DELETE FROM recipes WHERE id = $1`
-	createRecipeQuery = `INSERT INTO recipes (
+	deleteRecipeQuery  = `DELETE FROM recipes WHERE id = $1`
+	createRecipeQuery  = `INSERT INTO recipes (
 						name,
 						description,
 						pos_1,
@@ -52,7 +52,7 @@ const (
 
 type Recipe struct {
 	ID                 uuid.UUID `db:"id" json:"id"`
-	Name               string    `db:"name" json:"name"`
+	Name               string    `db:"name" json:"name" validate:"required"`
 	Description        string    `db:"description" json:"description"`
 	Position1          *int64    `db:"pos_1" json:"pos_1"`
 	Position2          *int64    `db:"pos_2" json:"pos_2"`
@@ -92,8 +92,8 @@ func (s *pgStore) ListRecipes(ctx context.Context) (dbRecipe []Recipe, err error
 
 func (s *pgStore) CreateRecipe(ctx context.Context, r Recipe) (createdRecipe Recipe, err error) {
 	var lastInsertID uuid.UUID
-	
-	if r.TotalTime == 0{
+
+	if r.TotalTime == 0 {
 		r.TotalTime = defaultRecipeTime
 	}
 
@@ -147,10 +147,10 @@ func (s *pgStore) DeleteRecipe(ctx context.Context, id uuid.UUID) (err error) {
 
 func (s *pgStore) UpdateRecipe(ctx context.Context, r Recipe) (err error) {
 
-	if r.TotalTime == 0{
+	if r.TotalTime == 0 {
 		r.TotalTime = defaultRecipeTime
 	}
-	
+
 	result, err := s.db.Exec(
 		updateRecipeQuery,
 		r.Name,
