@@ -316,7 +316,7 @@ int DemoFunc()
 {
 if(ConsoleIO_YesNo("Do you want to open a Comport? (press enter for default)", 1))
     {
-        ComPort_Open(ConsoleIO_IntInput("Please enter ComPort number", 0, 50, 1), 
+        ComPort_Open(ConsoleIO_IntInput("Please enter ComPort number", 0, 50, 0), 
             ConsoleIO_IntInput("Please enter ComPort Speed", 4800, 1000000, 57600));
     }
     else

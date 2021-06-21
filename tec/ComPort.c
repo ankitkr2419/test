@@ -9,7 +9,7 @@
 #include "MePort.h"
 
 
-#define DEVICE "/dev/ttyS"
+#define DEVICE "/dev/ttyUSB"
 static int FDSerial;
 
 static void WriteDataToDebugFile(char *prefix, char *in);
