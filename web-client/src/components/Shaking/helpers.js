@@ -10,7 +10,7 @@ const { SEC_IN_ONE_HOUR, SEC_IN_ONE_MIN, MIN_IN_ONE_HOUR } = timeConstants;
 /** This function checks for validity of input data and
  *  returns the request body.
  */
-export const getRequestBody = (formik) => {
+export const getRequestBody = (formik, activeTab) => {
   const formikValues = formik.values;
 
   const time1 =

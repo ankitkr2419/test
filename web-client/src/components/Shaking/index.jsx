@@ -63,8 +63,6 @@ const ShakingComponent = (props) => {
   const handleSaveBtn = () => {
     const body = getRequestBody(formik, activeTab);
 
-    console.log(body);
-
     if (body) {
       const requestBody = {
         body: body,
