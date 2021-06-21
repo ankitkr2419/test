@@ -1,12 +1,22 @@
 package plc
 
 import (
-	"github.com/stretchr/testify/mock"
 	"mylab/cpagent/db"
+
+	"github.com/stretchr/testify/mock"
 )
 
 type PLCMockStore struct {
 	mock.Mock
+}
+
+type MockCompact32Driver struct {
+	mock.Mock
+	ExitCh chan error
+
+	LastAddress  uint16
+	LastQuantity uint16
+	LastValue    []byte
 }
 
 func (p *PLCMockStore) IsMachineHomed() (homed bool) {
@@ -20,6 +30,16 @@ func (p *PLCMockStore) IsRunInProgress() (pro bool) {
 }
 
 func (p *PLCMockStore) SetRunInProgress() {
+	_ = p.Called()
+	return
+}
+
+func (p *PLCMockStore) SetPaused() {
+	_ = p.Called()
+	return
+}
+
+func (p *PLCMockStore) ResetPaused() {
 	_ = p.Called()
 	return
 }
@@ -68,7 +88,6 @@ func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.P
 	args := p.Called(recipe, processes)
 	return args.Error(0)
 }
-
 
 func (p *PLCMockStore) DiscardTipAndHome(discard bool) (response string, err error) {
 	args := p.Called(discard)
@@ -123,4 +142,42 @@ func (p *PLCMockStore) TipDocking(td db.TipDock, cartridgeID int64) (response st
 func (p *PLCMockStore) TipOperation(to db.TipOperation) (response string, err error) {
 	args := p.Called(to)
 	return args.Get(0).(string), args.Error(1)
+}
+
+func (m *MockCompact32Driver) WriteSingleRegister(address, value uint16) (results []byte, err error) {
+	args := m.Called(address, value)
+	return args.Get(0).([]byte), args.Error(1)
+}
+
+func (m *MockCompact32Driver) WriteMultipleRegisters(address, quantity uint16, value []byte) (results []byte, err error) {
+	m.LastAddress = address
+	m.LastQuantity = quantity
+	m.LastValue = value
+
+	args := m.Called(address, quantity, value)
+	return args.Get(0).([]byte), args.Error(1)
+}
+
+func (m *MockCompact32Driver) ReadCoils(address, quantity uint16) (results []byte, err error) {
+	args := m.Called(address, quantity)
+	return args.Get(0).([]byte), args.Error(1)
+}
+
+func (m *MockCompact32Driver) ReadSingleCoil(address uint16) (value uint16, err error) {
+	args := m.Called(address)
+	return args.Get(0).(uint16), args.Error(1)
+}
+
+func (m *MockCompact32Driver) ReadHoldingRegisters(address, quantity uint16) (results []byte, err error) {
+	args := m.Called(address, quantity)
+	return args.Get(0).([]byte), args.Error(1)
+}
+
+func (m *MockCompact32Driver) ReadSingleRegister(address uint16) (value uint16, err error) {
+	args := m.Called(address)
+	return args.Get(0).(uint16), args.Error(1)
+}
+func (m *MockCompact32Driver) WriteSingleCoil(address, value uint16) (err error) {
+	args := m.Called(address, value)
+	return args.Error(0)
 }

@@ -31,7 +31,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 			msg = "homing in progress for both decks"
 			plc.SetBothDeckHomingInProgress()
 			go bothDeckOperation(ctx, deps, "Homing")
-		case "A", "B":
+		case plc.DeckA, plc.DeckB:
 			msg = "homing in progress for single deck"
 			go singleDeckOperation(ctx, deps, deck, "Homing")
 		default:
@@ -59,10 +59,10 @@ func bothDeckOperation(ctx context.Context, deps Dependencies, operation string)
 	var deckAErr, deckBErr error
 
 	go func() {
-		deckAResponse, deckAErr = singleDeckOperation(ctx, deps, "A", operation)
+		deckAResponse, deckAErr = singleDeckOperation(ctx, deps, plc.DeckA, operation)
 	}()
 	go func() {
-		deckBResponse, deckBErr = singleDeckOperation(ctx, deps, "B", operation)
+		deckBResponse, deckBErr = singleDeckOperation(ctx, deps, plc.DeckB, operation)
 	}()
 
 	for {

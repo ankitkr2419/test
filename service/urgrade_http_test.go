@@ -25,8 +25,8 @@ func (suite *UpgradeHandlerTestSuite) SetupTest() {
 	driverA := &plc.PLCMockStore{}
 	driverB := &plc.PLCMockStore{}
 	suite.plcDeck = map[string]plc.Extraction{
-		"A":driverA,
-		"B":driverB,
+		plc.DeckA:driverA,
+		plc.DeckB:driverB,
 	}
 }
 
@@ -36,13 +36,13 @@ func TestUpgradeTestSuite(t *testing.T) {
 
 func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeSuccess() {
 	// Deck A
-	suite.plcDeck[deckA].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
-	suite.plcDeck[deckA].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
-	suite.plcDeck[deckA].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
+	suite.plcDeck[plc.DeckA].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
+	suite.plcDeck[plc.DeckA].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
+	suite.plcDeck[plc.DeckA].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
 	// Deck B
-	suite.plcDeck[deckB].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
-	suite.plcDeck[deckB].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
-	suite.plcDeck[deckB].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
+	suite.plcDeck[plc.DeckB].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
+	suite.plcDeck[plc.DeckB].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
+	suite.plcDeck[plc.DeckB].(*plc.PLCMockStore).On("ResetRunInProgress").Return().Maybe()
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/safe-to-upgrade",
@@ -59,11 +59,11 @@ func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeDeckBFailure() {
+func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeplc.DeckBFailure() {
 	// Deck A will return false
-	suite.plcDeck[deckA].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
+	suite.plcDeck[plc.DeckA].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
 	// Deck B will return true
-	suite.plcDeck[deckB].(*plc.PLCMockStore).On("IsRunInProgress").Return(true).Once()
+	suite.plcDeck[plc.DeckB].(*plc.PLCMockStore).On("IsRunInProgress").Return(true).Once()
 	
 	recorder := makeHTTPCall(http.MethodGet,
 		"/safe-to-upgrade",

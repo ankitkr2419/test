@@ -1,11 +1,44 @@
 package plc
 
 import (
+	"github.com/google/uuid"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 
 	logger "github.com/sirupsen/logrus"
 )
+
+func CheckIfRecipeOrProcessSafeForCUDs(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
+	if recipeID != nil {
+		// for deck A or deck B
+		if (deckRecipe[DeckA] != db.Recipe{} && *recipeID == deckRecipe[DeckA].ID) ||
+			(deckRecipe[DeckB] != db.Recipe{} && *recipeID == deckRecipe[DeckB].ID) {
+			logger.Errorln(responses.RecipeUnsafeForCUDError)
+			return responses.RecipeUnsafeForCUDError
+		}
+		logger.Infoln(responses.RecipeSafeForCUD)
+	}
+
+	if processID != nil {
+		// for deck A
+		for _, pr := range deckProcesses[DeckA] {
+			if pr.ID == *processID {
+				logger.Errorln(responses.RecipeUnsafeForCUDError)
+				return responses.ProcessUnsafeForCUDError
+			}
+		}
+		// for deck B
+		for _, pr := range deckProcesses[DeckB] {
+			if pr.ID == *processID {
+				logger.Errorln(responses.RecipeUnsafeForCUDError)
+				return responses.ProcessUnsafeForCUDError
+			}
+		}
+		logger.Infoln(responses.ProcessSafeForCUD)
+	}
+
+	return
+}
 
 func (d *Compact32Deck) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error) {
 	deckRecipe[d.name] = recipe
@@ -23,6 +56,6 @@ func (d *Compact32Deck) RunRecipeWebsocketData(recipe db.Recipe, processes []db.
 func (d *Compact32Deck) resetRunRecipeData() {
 	deckRecipe[d.name] = db.Recipe{}
 	deckProcesses[d.name] = []db.Process{}
-	d.SetCurrentProcessNumber(0)
+	d.SetCurrentProcessNumber(-1)
 	logger.Infoln(responses.ResetRunRecipeDataSuccess)
 }
