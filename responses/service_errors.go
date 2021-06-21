@@ -123,10 +123,10 @@ var (
 	UserTokenUsernameError        = fmt.Errorf("error username not in token ")
 	UserTokenApplicationTypeError = fmt.Errorf("error application type not in token ")
 	UserTokenAppMismatchError     = fmt.Errorf("error application type mismatch ")
-
-	UserTokenAuthIdError      = fmt.Errorf("error auth_id not in token ")
-	UserTokenAuthIdParseError = fmt.Errorf("error auth_id parse error ")
-	UserAuthNotFoundError     = fmt.Errorf("error user already logged out")
+	UserTokenAppNotExistError     = fmt.Errorf("error application type does not exist or is incorrect ")
+	UserTokenAuthIdError          = fmt.Errorf("error auth_id not in token ")
+	UserTokenAuthIdParseError     = fmt.Errorf("error auth_id parse error ")
+	UserAuthNotFoundError         = fmt.Errorf("error user already logged out")
 
 	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
 	AuditLogCreateError = fmt.Errorf("error failed saving log")

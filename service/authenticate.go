@@ -81,7 +81,7 @@ func decodeToken(token string) (jwt.MapClaims, error) {
 
 // Authenticate ... Authenticate token sent in the request
 // if token is valid set userId in the context
-func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) http.HandlerFunc {
+func authenticate(next http.HandlerFunc, deps Dependencies, appType string, roles ...string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		token := extractToken(req.Header.Get("Authorization"))
@@ -89,7 +89,7 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 			vars := mux.Vars(req)
 			deck := vars["deck"]
 
-			user, err := getUserAuth(token, deck, deps, roles...)
+			user, err := getUserAuth(token, deck, deps, appType, roles...)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
 				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: err.Error()})
@@ -107,7 +107,7 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 	}
 }
 
-func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user db.UserAuth, err error) {
+func getUserAuth(token, deck string, deps Dependencies, appType string, roles ...string) (user db.UserAuth, err error) {
 
 	var validRole bool
 	decodedToken, err := decodeToken(token)
@@ -170,14 +170,14 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 	}
 
 	//Validate Application Type
-	app, ok := decodedToken["app_type"].(string)
+	tokenApp, ok := decodedToken["app_type"].(string)
 	if !ok {
 		logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenApplicationTypeError)
 		err = responses.UserTokenApplicationTypeError
 		return
 	}
 
-	if app == "" {
+	if tokenApp == "" {
 		if Application == None {
 			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenApplicationError)
 			err = responses.UserTokenApplicationError
@@ -185,15 +185,17 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 		}
 	}
 
-	if app == RTPCR || app == Extraction || app == Combined {
+	if tokenApp == appType || Application == Combined {
 		//proceed futher
-		if app != Application {
+		if tokenApp != Application {
 			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenAppMismatchError)
 			err = responses.UserTokenAppMismatchError
 			return
 		}
 	} else {
-
+		logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenAppNotExistError)
+		err = responses.UserTokenAppNotExistError
+		return
 	}
 
 	username, ok := decodedToken["sub"].(string)
