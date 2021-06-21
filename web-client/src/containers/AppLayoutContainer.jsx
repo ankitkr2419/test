@@ -51,11 +51,11 @@ const AppLayoutContainer = (props) => {
       {location.pathname === "/splashscreen" ? null : (
         <AppHeader
           isPlateRoute={loginReducer.get("isPlateRoute")}
-          isUserLoggedIn={activeDeckObj.isLoggedIn}
-          isLoginTypeAdmin={activeDeckObj.isAdmin}
-          isLoginTypeOperator={!activeDeckObj.isAdmin}
+          isUserLoggedIn={activeDeckObj && activeDeckObj.isLoggedIn}
+          isLoginTypeAdmin={activeDeckObj && activeDeckObj.isAdmin}
+          isLoginTypeOperator={activeDeckObj && !activeDeckObj.isAdmin}
           isTemplateRoute={loginReducer.get("isTemplateRoute")}
-          currentDeckName={activeDeckObj.name}
+          currentDeckName={activeDeckObj && activeDeckObj.name}
         />
       )}
       {/* Modal container will helps in displaying error/info/warning through modal */}

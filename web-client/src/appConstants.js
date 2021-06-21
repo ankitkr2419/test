@@ -10,7 +10,8 @@ export const CREDS_FOR_HOMING = {
   email: "main",
   password: "main",
   role: "admin",
-  deckName: "Deck A",
+  deckName: "",
+  showToast: false,
 };
 
 export const HTTP_METHODS = {

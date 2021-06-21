@@ -6,7 +6,6 @@ import {
   MODAL_MESSAGE,
   MODAL_BTN,
   ROUTES,
-  DECKNAME,
   CREDS_FOR_HOMING,
 } from "appConstants";
 import { homingActionInitiated } from "action-creators/homingActionCreators";
@@ -22,8 +21,8 @@ const LandingScreenComponent = (props) => {
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
+  const { isLoading, isLoggedInForHoming, tokenForHoming } = loginReducerData;
   let { isLoggedIn, error } = activeDeckObj ? activeDeckObj : {};
-  let token = activeDeckObj ? activeDeckObj.token : "";
 
   const { isHomingActionCompleted, homingAllDeckCompletionPercentage } =
     homingReducer;
@@ -33,7 +32,7 @@ const LandingScreenComponent = (props) => {
   const [disabled, setDisabled] = useState(false);
 
   const homingConfirmation = () => {
-    dispatch(homingActionInitiated({ token: token }));
+    dispatch(homingActionInitiated({ token: tokenForHoming }));
     setIsProgressBarVisible(!isProgressBarVisible);
     setDisabled(!disabled);
   };
@@ -43,12 +42,20 @@ const LandingScreenComponent = (props) => {
   };
 
   useEffect(() => {
-    dispatch(login(CREDS_FOR_HOMING));
+    if (!isHomingActionCompleted) {
+      dispatch(login(CREDS_FOR_HOMING));
+    }
   }, []);
 
   useEffect(() => {
-    if (isHomingActionCompleted && isLoggedIn) {
-      dispatch(logoutInitiated({ deckName: DECKNAME.DeckA, token: token }));
+    if (isHomingActionCompleted && isLoggedInForHoming && !isLoading) {
+      dispatch(
+        logoutInitiated({
+          deckName: "",
+          token: tokenForHoming,
+          showToast: false,
+        })
+      );
     }
   }, [isHomingActionCompleted]);
 
