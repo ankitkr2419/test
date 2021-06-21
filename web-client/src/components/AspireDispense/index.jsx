@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { CATEGORY_NAME, ROUTES } from "appConstants";
-import { Redirect } from "react-router";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
+import { Redirect, useHistory } from "react-router";
 
 import { Card, CardBody } from "core-components";
 import { ButtonBar, ButtonIcon } from "shared-components";
@@ -11,28 +11,45 @@ import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
 import {
   setFormikField,
-  getPosition,
   getFormikInitialState,
-} from "./functions";
+  getRequestBody,
+} from "./helpers";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
-import { saveAspireDispenseInitiated } from "action-creators/processesActionCreators";
+import { saveProcessInitiated } from "action-creators/processesActionCreators";
 
 const AspireDispenseComponent = (props) => {
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
-  const formik = useFormik({
-    initialValues: getFormikInitialState(),
-  });
-
+  const editReducer = useSelector((state) => state.editProcessReducer);
+  const editReducerData = editReducer.toJS();
   const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
+  const processesReducer = useSelector((state) => state.processesReducer);
+
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+
+  const formik = useFormik({
+    initialValues: getFormikInitialState(editReducerData),
+    enableReinitialize: true,
+  });
+
+  const errorInAPICall = processesReducer.error;
+  useEffect(() => {
+    if (errorInAPICall === false) {
+      history.push(ROUTES.processListing);
+    }
+  }, [errorInAPICall]);
+
   const recipeID = recipeDetailsReducer.recipeDetails.id;
-  const token = recipeDetailsReducer.token;
+  const token = activeDeckObj.token;
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
@@ -73,38 +90,19 @@ const AspireDispenseComponent = (props) => {
     const aspire = formik.values.aspire;
     const dispense = formik.values.dispense;
 
-    /** Aspire category is maintained using formik.
-     *  Dispense category is directly maintained using 'activeTab' state.
-     */
-
-    const aspireSelectedTabName = CATEGORY_NAME(aspire.selectedCategory);
-    const dispenseSelectedTabName = CATEGORY_NAME(activeTab);
-
-    const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
-    const dispenseWells = dispense[`cartridge${activeTab}Wells`];
-
-    const body = {
-      category: `${aspireSelectedTabName}_to_${dispenseSelectedTabName}`,
-      cartridge_type: `cartridge_${activeTab}`,
-      source_position: getPosition(aspireWells),
-      aspire_height: aspire.aspireHeight,
-      aspire_mixing_volumne: aspire.mixingVolume,
-      aspire_no_of_cycles: aspire.nCycles,
-      aspire_volume: aspire.aspireVolume,
-      aspire_air_volume: aspire.airVolume,
-      dispense_height: dispense.dispenseHeight,
-      dispense_mixing_volume: dispense.mixingVolume,
-      dispense_no_of_cycles: dispense.nCycles,
-      destination_position: getPosition(dispenseWells),
-    };
     const requestBody = {
-      body: body,
-      recipeID: recipeID,
+      body: getRequestBody(activeTab, aspire, dispense),
+      id: editReducerData?.process_id ? editReducerData.process_id : recipeID,
       token: token,
+      api: API_ENDPOINTS.aspireDispense,
+      method: editReducerData?.process_id
+        ? HTTP_METHODS.PUT
+        : HTTP_METHODS.POST,
     };
-
-    dispatch(saveAspireDispenseInitiated(requestBody));
+    dispatch(saveProcessInitiated(requestBody));
   };
+
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
 
   return (
     <PageBody>
