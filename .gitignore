@@ -6,6 +6,8 @@ db/application_test\.yml
 # mylab zip file
 artifact.zip
 
+# log files
+/utils/logs/*.log
 
 # web-client dependencies
 /web-client/node_modules

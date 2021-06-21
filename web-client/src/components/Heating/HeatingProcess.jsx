@@ -13,6 +13,8 @@ const HeatingProcess = (props) => {
         <div className="process-box mx-auto py-5">
           <div className="border-bottom-line">
             <TemperatureInfo
+              temperature={formik.values.temperature}
+              followTemp={formik.values.followTemperature}
               temperatureHandler={(e) => {
                 formik.setFieldValue("temperature", e.target.value);
               }}
@@ -25,12 +27,15 @@ const HeatingProcess = (props) => {
             <Col lg={8} className="py-4">
               {/* <TimeInfo /> */}
               <TimeInfo
+                hours={formik.values.hours}
                 handleHoursChange={(e) =>
                   formik.setFieldValue("hours", e.target.value)
                 }
+                mins={formik.values.mins}
                 handleMinsChange={(e) =>
                   formik.setFieldValue("mins", e.target.value)
                 }
+                secs={formik.values.secs}
                 handleSecsChange={(e) =>
                   formik.setFieldValue("secs", e.target.value)
                 }

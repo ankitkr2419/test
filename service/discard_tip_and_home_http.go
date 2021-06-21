@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"strconv"
@@ -40,7 +41,7 @@ func discardAndHomeHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		switch deck {
-		case "A", "B":
+		case plc.DeckA, plc.DeckB:
 			go deps.PlcDeck[deck].DiscardTipAndHome(discard)
 			logger.Infoln(responses.DiscardTipHomeSuccess)
 			responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.DiscardTipHomeSuccess, Deck: deck})

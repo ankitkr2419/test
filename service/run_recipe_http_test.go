@@ -29,8 +29,8 @@ func (suite *RunRecipeHandlerTestSuite) SetupTest() {
 	driverA := &plc.PLCMockStore{}
 	driverB := &plc.PLCMockStore{}
 	suite.plcDeck = map[string]plc.Extraction{
-		"A": driverA,
-		"B": driverB,
+		plc.DeckA: driverA,
+		plc.DeckB: driverB,
 	}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil).Maybe()
@@ -50,7 +50,7 @@ var recipeID = uuid.New()
 // Run Recipe Continuously Test cases
 func (suite *RunRecipeHandlerTestSuite) TestRunRecipeSuccess() {
 
-	deck := deckB
+	deck := plc.DeckB
 
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsMachineHomed").Return(true).Maybe()
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Maybe()
@@ -78,14 +78,14 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
-		"/run/"+invalidUUID+"/"+deckB,
+		"/run/"+invalidUUID+"/"+plc.DeckB,
 		"",
 		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
 	)
 
 	_, err := uuid.Parse(invalidUUID)
 
-	errObj := ErrObj{Err: err.Error(), Deck: deckB}
+	errObj := ErrObj{Err: err.Error(), Deck: plc.DeckB}
 
 	output, _ := json.Marshal(errObj)
 
@@ -102,7 +102,7 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeUUIDParseFailure() {
 /*
 func (suite *RunRecipeHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 
-	suite.dbMock.On("runRecipe", mock.Anything, mock.Anything, deckB, runStepWise, recipeID).Return("Success", nil)
+	suite.dbMock.On("runRecipe", mock.Anything, mock.Anything, plc.DeckB, runStepWise, recipeID).Return("Success", nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run/{id}/{deck:[A-B]}",
@@ -124,7 +124,7 @@ func (suite *RunRecipeHandlerTestSuite) TestRunRecipeInvalidDeckFailure() {
 
 // Step Run Test cases
 func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeSuccess() {
-	deck := deckB
+	deck := plc.DeckB
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsMachineHomed").Return(true).Maybe()
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Maybe()
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("SetRunInProgress").Return().Maybe()
@@ -132,12 +132,12 @@ func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeSuccess() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/step-run/{id}/{deck:[A-B]}",
-		"/step-run/"+recipeUUID.String()+"/"+deckB,
+		"/step-run/"+recipeUUID.String()+"/"+plc.DeckB,
 		"",
 		runRecipeHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}, false),
 	)
 
-	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: deckB}
+	msg := MsgObj{Msg: responses.RecipeRunInProgress, Deck: plc.DeckB}
 
 	output, _ := json.Marshal(msg)
 
@@ -151,14 +151,14 @@ func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/step-run/{id}/{deck:[A-B]}",
-		"/step-run/"+invalidUUID+"/"+deckB,
+		"/step-run/"+invalidUUID+"/"+plc.DeckB,
 		"",
 		runRecipeHandler(Dependencies{Store: suite.dbMock}, false),
 	)
 
 	_, err := uuid.Parse(invalidUUID)
 
-	errObj := ErrObj{Err: err.Error(), Deck: deckB}
+	errObj := ErrObj{Err: err.Error(), Deck: plc.DeckB}
 
 	output, _ := json.Marshal(errObj)
 
@@ -170,21 +170,21 @@ func (suite *RunRecipeHandlerTestSuite) TestStepRunRecipeUUIDParseFailure() {
 
 func (suite *RunRecipeHandlerTestSuite) TestRunNextStepSuccess() {
 
-	runNext[deckB] = false
+	runNext[plc.DeckB] = false
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run-next-step/{deck:[A-B]}",
-		"/run-next-step/"+deckB,
+		"/run-next-step/"+plc.DeckB,
 		"",
 		runNextStepHandler(Dependencies{Store: suite.dbMock}),
 	)
 
 	go func() {
 		// drain nextStep channel
-		<-nextStep[deckB]
+		<-nextStep[plc.DeckB]
 	}()
 
-	msg := MsgObj{Msg: responses.NextStepRunInProgress, Deck: deckB}
+	msg := MsgObj{Msg: responses.NextStepRunInProgress, Deck: plc.DeckB}
 
 	output, _ := json.Marshal(msg)
 
@@ -196,16 +196,16 @@ func (suite *RunRecipeHandlerTestSuite) TestRunNextStepSuccess() {
 
 func (suite *RunRecipeHandlerTestSuite) TestRunNextStepFailure() {
 
-	runNext[deckB] = true
+	runNext[plc.DeckB] = true
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/run-next-step/{deck:[A-B]}",
-		"/run-next-step/"+deckB,
+		"/run-next-step/"+plc.DeckB,
 		"",
 		runNextStepHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	errObj := ErrObj{Err: responses.StepRunNotInProgressError.Error(), Deck: deckB}
+	errObj := ErrObj{Err: responses.StepRunNotInProgressError.Error(), Deck: plc.DeckB}
 
 	output, _ := json.Marshal(errObj)
 

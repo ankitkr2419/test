@@ -320,12 +320,12 @@ func (m *DBMockStore) ListTipsTubes(ttype string) (t []TipsTubes, err error) {
 }
 
 func (m *DBMockStore) ListConsDistances() (c []ConsumableDistance, err error) {
-	args := m.Called(c)
+	args := m.Called()
 	return args.Get(0).([]ConsumableDistance), args.Error(1)
 }
 
 func (m *DBMockStore) ListMotors() (motor []Motor, err error) {
-	args := m.Called(motor)
+	args := m.Called()
 	return args.Get(0).([]Motor), args.Error(1)
 }
 
@@ -549,18 +549,21 @@ func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (er
 	return args.Error(0)
 }
 
-func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error){
+func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error) {
 	args := m.Called(ctx, al)
 	return args.Error(0)
 }
 
-func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error){
+func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error) {
 	args := m.Called(ctx)
 	return args.Get(0).(AuditLog), args.Error(1)
 }
 
-func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error){
+func (m *DBMockStore) ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error) {
+	args := m.Called(ctx, ttype, position)
+	return args.Get(0).([]TipsTubes), args.Error(1)
+}
+func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error) {
 	args := m.Called(ctx, activity, state, oprType, deck, description)
 	return args.Error(0)
 }
-

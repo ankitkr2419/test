@@ -12,10 +12,11 @@ import (
 )
 
 type TipDock struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	Type      string    `json:"type" db:"type" validate:"required"`
-	Position  int64     `json:"position" db:"position" validate:"required"`
-	Height    float64   `json:"height" db:"height" validate:"required"`
+	ID       uuid.UUID `json:"id" db:"id"`
+	Type     string    `json:"type" db:"type" validate:"required"`
+	Position int64     `json:"position" db:"position" validate:"required,lte=13"`
+	// since we are not considering the height of labware so we keep the maximum height as 25mm.
+	Height    float64   `json:"height" db:"height" validate:"required,lte=25"`
 	ProcessID uuid.UUID `json:"process_id" db:"process_id"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
@@ -135,7 +136,7 @@ func (s *pgStore) createTipDocking(ctx context.Context, tx *sql.Tx, t TipDock) (
 func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipDockingInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateTipDockQuery,
 		t.Type,
 		t.Position,
@@ -154,5 +155,12 @@ func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 		logger.WithField("err", err.Error()).Error("Error updating TipDocking")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
+	}
+
 	return
 }

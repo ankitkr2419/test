@@ -67,16 +67,16 @@ type AspireDispense struct {
 	ID                   uuid.UUID     `db:"id" json:"id"`
 	Category             Category      `db:"category" json:"category"`
 	CartridgeType        CartridgeType `db:"cartridge_type" json:"cartridge_type"`
-	SourcePosition       int64         `db:"source_position" json:"source_position"`
-	AspireHeight         float64       `db:"aspire_height" json:"aspire_height"`
-	AspireMixingVolume   float64       `db:"aspire_mixing_volume" json:"aspire_mixing_volume"`
-	AspireNoOfCycles     int64         `db:"aspire_no_of_cycles" json:"aspire_no_of_cycles"`
-	AspireVolume         float64       `db:"aspire_volume" json:"aspire_volume"`
+	SourcePosition       int64         `db:"source_position" json:"source_position" validate:"lte=13"`
+	AspireHeight         float64       `db:"aspire_height" json:"aspire_height" validate:"required,lte=60"`
+	AspireMixingVolume   float64       `db:"aspire_mixing_volume" json:"aspire_mixing_volume" validate:"lte=1000"`
+	AspireNoOfCycles     int64         `db:"aspire_no_of_cycles" json:"aspire_no_of_cycles" validate:"lte=100"`
+	AspireVolume         float64       `db:"aspire_volume" json:"aspire_volume" validate:"lte=1000"`
 	AspireAirVolume      float64       `db:"aspire_air_volume" json:"aspire_air_volume"`
-	DispenseHeight       float64       `db:"dispense_height" json:"dispense_height"`
-	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
+	DispenseHeight       float64       `db:"dispense_height" json:"dispense_height" validate:"required,lte=60"`
+	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume" validate:"lte=1000"`
 	DispenseNoOfCycles   int64         `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
-	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
+	DestinationPosition  int64         `db:"destination_position" json:"destination_position" validate:"lte=13"`
 	ProcessID            uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt            time.Time     `db:"updated_at" json:"updated_at"`
@@ -217,7 +217,7 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 	// logging initialised db operation
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AspireDispenseInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updateAspireDispenseQuery,
 		ad.Category,
 		ad.CartridgeType,
@@ -247,5 +247,12 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 		logger.WithField("err", err.Error()).Error("Error updating aspire dispense")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
+	}
+
 	return
 }
