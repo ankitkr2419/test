@@ -26,15 +26,18 @@ LOOP:
 			break
 		}
 
+		logger.Infoln("Heartbeat output: ", beat)
+
 		// 3 attempts to check for heartbeat of PLC and write ours!
 		for i := 0; i < 3; i++ {
 			if beat == 1 { // If beat is 1, PLC is alive, so write 2
-				_, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][100], uint16(2))
+				val, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][100], uint16(2))
 				if err != nil {
 					logger.WithField("beat", beat).Error("WriteSingleRegister:D100 : Read PLC heartbeat")
 					// exit!!
 					break LOOP
 				}
+				logger.Infoln("Read val:", val)
 				continue LOOP
 			}
 
