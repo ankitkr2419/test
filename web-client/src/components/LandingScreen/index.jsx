@@ -8,7 +8,10 @@ import {
   ROUTES,
   CREDS_FOR_HOMING,
 } from "appConstants";
-import { homingActionInitiated } from "action-creators/homingActionCreators";
+import {
+  homingActionInitiated,
+  hideHomingModal,
+} from "action-creators/homingActionCreators";
 import { LandingScreen } from "./LandingScreen";
 import { Redirect } from "react-router";
 import { login, logoutInitiated } from "action-creators/loginActionCreators";
@@ -24,8 +27,11 @@ const LandingScreenComponent = (props) => {
   const { isLoading, isLoggedInForHoming, tokenForHoming } = loginReducerData;
   let { isLoggedIn, error } = activeDeckObj ? activeDeckObj : {};
 
-  const { isHomingActionCompleted, homingAllDeckCompletionPercentage } =
-    homingReducer;
+  const {
+    showHomingModal,
+    isHomingActionCompleted,
+    homingAllDeckCompletionPercentage,
+  } = homingReducer;
 
   const [isProgressBarVisible, setIsProgressBarVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
@@ -39,6 +45,7 @@ const LandingScreenComponent = (props) => {
 
   const handleCompleteBtn = () => {
     setIsOpen(false);
+    dispatch(hideHomingModal());
   };
 
   useEffect(() => {
@@ -68,7 +75,7 @@ const LandingScreenComponent = (props) => {
   /**
    * if user logged in, go to recipeListing page
    */
-  if (isLoggedIn && !error && isHomingActionCompleted && !isOpen) {
+  if (isLoggedIn && !error) {
     return <Redirect to={`/${ROUTES.recipeListing}`} />;
   }
 
@@ -77,7 +84,7 @@ const LandingScreenComponent = (props) => {
       <div className="landing-content">
         <VideoCard />
         <MlModal
-          isOpen={isOpen}
+          isOpen={isOpen && showHomingModal}
           textBody={MODAL_MESSAGE.homingConfirmation}
           handleSuccessBtn={() =>
             isHomingActionCompleted ? handleCompleteBtn() : homingConfirmation()
