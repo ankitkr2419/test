@@ -26,6 +26,13 @@ const TemplateContainer = (props) => {
 		isCreateTemplateModalVisible,
 	} = props;
 	const dispatch = useDispatch();
+
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { token } = activeDeckObj;
+
 	// reading templates from redux
 	const templates = useSelector(state => state.listTemplatesReducer);
 
@@ -63,13 +70,13 @@ const TemplateContainer = (props) => {
 		// Once we delete template will fetch updated template list
 		if (isTemplateDeleted === true) {
 			dispatch(deleteTemplateReset());
-			dispatch(fetchTemplates());
+			dispatch(fetchTemplates({ token }));
 		}
 	}, [isTemplateDeleted, dispatch]);
 
 	useEffect(() => {
 		// getting templates through api.
-		dispatch(fetchTemplates());
+		dispatch(fetchTemplates({ token }));
 	}, [dispatch]);
 
 	/**

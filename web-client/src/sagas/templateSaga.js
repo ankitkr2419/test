@@ -17,7 +17,7 @@ import { HTTP_METHODS } from 'appConstants';
 
 export function* createTemplate(actions) {
 	const {
-		payload: { body },
+		payload: { body, token },
 	} = actions;
 
 	const { successAction, failureAction } = createTemplateActions;
@@ -30,6 +30,7 @@ export function* createTemplate(actions) {
 				reqPath: 'templates',
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {
@@ -42,7 +43,12 @@ function* createTemplateSuccess() {
 	yield put(fetchTemplatesActions());
 }
 
-export function* fetchTemplates() {
+export function* fetchTemplates(actions) {
+	const {
+		payload: {
+			token
+		}
+	} = actions;
 	const { successAction, failureAction } = listTemplateActions;
 	try {
 		yield call(callApi, {
@@ -51,6 +57,7 @@ export function* fetchTemplates() {
 				reqPath: 'templates',
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {

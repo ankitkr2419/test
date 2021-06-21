@@ -32,13 +32,13 @@ const getUpdatedList = (state, selectedID) => {
 	return updatedState;
 };
 
-export const getWizardListByLoginType = (list, isLoginTypeAdmin, isLoginTypeOperator) => {
+export const getWizardListByLoginType = (list, isAdmin) => {
 	// return all options for admin
-	if (isLoginTypeAdmin === true) {
+	if (isAdmin === true) {
 		return list.filter(ele => ele.get('isAdmin') === true);
 	}
 	// return option visible to operator
-	return list.filter(ele => ele.get('isOperatorVisible') === isLoginTypeOperator);
+	return list.filter(ele => ele.get('isOperatorVisible') === !isAdmin);
 };
 
 const templateLayoutReducer = (state, action) => {

@@ -11,6 +11,7 @@ import { connectSocket } from 'web-socket';
 import ModalContainer from './ModalContainer';
 import { useLocation } from 'react-router-dom'
 import AppFooter from 'components/AppFooter';
+import { APP_TYPE } from 'appConstants';
 
 /**
  * AppLayoutContainer Will contain routes(content), headers, sub-headers, notification etc.
@@ -23,6 +24,10 @@ const AppLayoutContainer = (props) => {
 	const isActiveWellDataLoaded = useSelector(getActiveLoadedWellFlag);
 	const socketReducer = useSelector(state => state.socketReducer);
 	const isOpened = socketReducer.get('isOpened');
+
+	const appInfoReducer = useSelector((state) => state.appInfoReducer);
+	const appInfoData = appInfoReducer.toJS();
+	const app = appInfoData?.appInfo?.app;
 
 	// connect to websocket on mount
 	useEffect(() => {
@@ -65,7 +70,7 @@ const AppLayoutContainer = (props) => {
 				</Switch>
 			</section>
 			{location.pathname === '/splashscreen' ||
-				location.pathname === '/login' 
+				app === APP_TYPE.RTPCR/**dont show in rtpcr flow */
 			 		? null 
 					: <AppFooter /> 
 			}

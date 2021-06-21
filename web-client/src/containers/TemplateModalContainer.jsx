@@ -28,6 +28,12 @@ const TemplateModalContainer = (props) => {
 
 	const dispatch = useDispatch();
 
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { token } = activeDeckObj;
+
 	// useSelector section
 	const { isTemplateUpdated } = useSelector(
 		state => state.updateTemplateReducer,
@@ -81,7 +87,7 @@ const TemplateModalContainer = (props) => {
 
 	const createTemplate = (template) => {
 		// creating template though api
-		dispatch(createTemplateAction(template));
+		dispatch(createTemplateAction(template, token));
 	};
 
 	const updateTemplate = (template) => {
@@ -137,7 +143,7 @@ const TemplateModalContainer = (props) => {
 	useEffect(() => {
 		if (isTemplateUpdated === true) {
 			dispatch(updateTemplateReset());
-			dispatch(fetchTemplates());
+			dispatch(fetchTemplates({ token }));
 		}
 	}, [isTemplateUpdated, dispatch]);
 

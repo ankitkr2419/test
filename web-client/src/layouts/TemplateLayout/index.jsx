@@ -16,10 +16,15 @@ import templateLayoutReducer, {
 	templateLayoutActions,
 	getWizardListByLoginType,
 } from './templateState';
-
+import { useSelector } from "react-redux";
 
 const TemplateLayout = (props) => {
-	const { isLoginTypeOperator, isLoginTypeAdmin } = props;
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { isAdmin } = activeDeckObj;
+
 	// Local state to manage selected wizard
 	const [templateLayoutState, templateLayoutDispatch] = useReducer(
 		templateLayoutReducer,
@@ -34,12 +39,13 @@ const TemplateLayout = (props) => {
 
 	// Here we have stored id for active widget
 	const activeWidgetID = templateLayoutState.get('activeWidgetID');
+	// console.log('activeWidgetID: ',activeWidgetID);
 	const templateID = templateLayoutState.get('templateID');
+	// console.log('templateID: ', templateID)
 
 	const wizardList = getWizardListByLoginType(
 		templateLayoutState.get('wizardList'),
-		isLoginTypeAdmin,
-		isLoginTypeOperator,
+		isAdmin
 	);
 
 	// helper method to toggle template modal
@@ -80,7 +86,7 @@ const TemplateLayout = (props) => {
 			<Wizard
 				list={wizardList}
 				onClickHandler={updateSelectedWizard}
-				isLoginTypeAdmin={isLoginTypeAdmin}
+				isAdmin={isAdmin}
 			/>
 			<Card>
 				<CardBody className='d-flex flex-unset overflow-hidden p-0'>
@@ -94,34 +100,36 @@ const TemplateLayout = (props) => {
 					/>
 					{activeWidgetID === 'template' && (
 						<TemplateContainer
-							isLoginTypeOperator={isLoginTypeOperator}
-							isLoginTypeAdmin={isLoginTypeAdmin}
+							isLoginTypeOperator={!isAdmin}
+							isLoginTypeAdmin={isAdmin}
 							updateSelectedWizard={updateSelectedWizard}
 							updateTemplateID={updateTemplateID}
 							toggleTemplateModal={toggleTemplateModal}
 							isCreateTemplateModalVisible={templateModalState.get('isCreateTemplateModalVisible')}
 						/>
 					)}
-					{activeWidgetID === 'target' && (
+
+					{/**TODO remove comments when above code is working/tested */}
+					{/*activeWidgetID === 'target' && (
 						<TargetContainer
-							isLoginTypeOperator={isLoginTypeOperator}
-							isLoginTypeAdmin={isLoginTypeAdmin}
+							isLoginTypeOperator={!isAdmin}
+							isLoginTypeAdmin={isAdmin}
 							updateSelectedWizard={updateSelectedWizard}
 							templateID={templateID}
 							setIsTemplateEdited={setIsTemplateEdited}
 						/>
-					)}
-					{activeWidgetID === 'target-operator' && (
+					)*/}
+					{/*activeWidgetID === 'target-operator' && (
 						<TargetExperimentContainer
-							isLoginTypeOperator={isLoginTypeOperator}
-							isLoginTypeAdmin={isLoginTypeAdmin}
+							isLoginTypeOperator={!isAdmin}
+							isLoginTypeAdmin={isAdmin}
 							updateSelectedWizard={updateSelectedWizard}
 							templateID={templateID}
 						/>
-					)}
-					{activeWidgetID === 'step' && (
+					)*/}
+					{/*activeWidgetID === 'step' && (
 						<StepContainer />
-					)}
+					)*/}
 				</CardBody>
 			</Card>
 		</div>

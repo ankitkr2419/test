@@ -5,10 +5,11 @@ import {
 	deleteTemplateActions,
 } from 'actions/templateActions';
 
-export const createTemplate = body => ({
+export const createTemplate = (body, token) => ({
 	type: createTemplateActions.createAction,
 	payload: {
 		body,
+		token
 	},
 });
 
@@ -24,8 +25,11 @@ export const addTemplateReset = () => ({
 	type: createTemplateActions.createTemplateReset,
 });
 
-export const fetchTemplates = () => ({
+export const fetchTemplates = (params) => ({
 	type: listTemplateActions.listAction,
+	payload: {
+		...params
+	}
 });
 
 export const fetchTemplatesFailed = errorResponse => ({
