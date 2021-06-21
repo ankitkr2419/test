@@ -85,6 +85,29 @@ func (s *pgStore) ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	return
 }
 
+func (s *pgStore) ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error) {
+	var tt []TipsTubes
+	if ttype == "" {
+		err = s.db.Select(&tt, getTipsTubesQuery)
+	} else {
+		err = s.db.Select(&tt, getTipsTubesBytypeQuery, ttype)
+	}
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing tipstubes details")
+		return
+	}
+	//return only those record which are allowed for the position
+	for _, v := range tt {
+		for _, allowedPos := range v.AllowedPositions {
+			if allowedPos == position {
+				tipstubes = append(tipstubes, v)
+				break
+			}
+		}
+	}
+	return
+}
+
 func (s *pgStore) ShowTip(id int64) (tip TipsTubes, err error) {
 	err = s.db.Get(&tip, getTipByIDQuery, id)
 	if err != nil {

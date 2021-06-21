@@ -155,7 +155,7 @@ func (s *pgStore) createPiercing(ctx context.Context, tx *sql.Tx, pi Piercing) (
 func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.PiercingInitialisedState)
 
-	_, err = s.db.Exec(
+	result, err := s.db.Exec(
 		updatePiercingQuery,
 		p.Type,
 		p.CartridgeWells,
@@ -173,6 +173,12 @@ func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating piercing")
 		return
+	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
 	}
 	return
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar } from "shared-components";
@@ -9,27 +9,45 @@ import ShakingProcess from "./ShakingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TopContent, ShakingBox } from "./Style";
 import { useFormik } from "formik";
-import { isDisabled, getFormikInitialState, getRequestBody } from "./functions";
+import { isDisabled, getFormikInitialState, getRequestBody } from "./helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { saveShakingInitiated } from "action-creators/processesActionCreators";
+import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";
-import { Redirect } from "react-router";
-import { ROUTES } from "appConstants";
+import { Redirect, useHistory } from "react-router";
+import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 
 const ShakingComponent = (props) => {
   const [activeTab, setActiveTab] = useState("2");
   const dispatch = useDispatch();
+  const history = useHistory();
 
-  const formik = useFormik({
-    initialValues: getFormikInitialState(),
-  });
-
+  const editReducer = useSelector((state) => state.editProcessReducer);
+  const editReducerData = editReducer.toJS();
+  const processesReducer = useSelector((state) => state.processesReducer);
   const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const recipeDetailsReducer = useSelector(
     (state) => state.updateRecipeDetailsReducer
   );
+
+  const formik = useFormik({
+    initialValues: editReducerData.process_id
+      ? getFormikInitialState(editReducerData)
+      : getFormikInitialState(),
+    enableReinitialize: true,
+  });
+
   const recipeID = recipeDetailsReducer.recipeDetails.id;
-  const token = recipeDetailsReducer.token;
+  const token = activeDeckObj.token;
+
+  const errorInAPICall = processesReducer.error;
+  useEffect(() => {
+    if (errorInAPICall === false) {
+      history.push(ROUTES.processListing);
+    }
+  }, [errorInAPICall]);
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
@@ -40,19 +58,20 @@ const ShakingComponent = (props) => {
     if (body) {
       const requestBody = {
         body: body,
-        recipeID: recipeID,
+        id: editReducerData?.process_id ? editReducerData.process_id : recipeID,
         token: token,
+        api: API_ENDPOINTS.shaking,
+        method: editReducerData?.process_id
+          ? HTTP_METHODS.PUT
+          : HTTP_METHODS.POST,
       };
-      dispatch(saveShakingInitiated(requestBody));
+      dispatch(saveProcessInitiated(requestBody));
     } else {
       //error
-      toast.error("Invalid time");
+      toast.error("Invalid Request");
     }
   };
 
-  const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   if (!activeDeckObj.isLoggedIn) {
     return <Redirect to={`/${ROUTES.landing}`} />;
   }

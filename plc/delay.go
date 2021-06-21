@@ -52,11 +52,24 @@ skipToStartTimer:
 				d.ResetRunInProgress()
 			}
 			if recipeRun {
+				// timer is over but recipe isn't 
+				for getCurrentProcessNumber(d.name) != -2{
+					time.Sleep(500 * time.Millisecond)
+					_, _, err = d.checkPausedState(t, time1, delay.DelayTime, timeElapsed)
+					if err != nil {
+						return "", err
+					}
+					d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
+					if d.isMachineInAbortedState() || d.isMachineInPausedState() {
+						response, err = d.waitUntilResumed(d.name)
+						if err != nil{
+							return "", err
+						}
+					}
+				}
 				// Send 100 % Progress
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
-				// Send Success
-				d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeSuccess)
-				d.ResetRunInProgress()
+				// Send Success is implicit
 			}
 			return "SUCCESS", nil
 		default:
@@ -75,6 +88,14 @@ skipToStartTimer:
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
 			}
 			if recipeRun {
+				if !d.IsRunInProgress() && getCurrentProcessNumber(d.name) == -2 {
+					// This means its time to Stop
+					// recipe is over but timer isn't 
+					t.Stop()
+					d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
+					// Send Success handled implicitly
+					return "Recipe is over but timer isn't", nil
+				}
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
 			}
 			// if paused then

@@ -3,7 +3,7 @@ import React from "react";
 import { FormGroup, Label, Input, FormError } from "core-components";
 import { Text, Icon } from "shared-components";
 import { CommmonFields } from "./Style";
-import { setFormikField } from "./functions";
+import { setFormikField } from "./helpers";
 
 const DispenseCommonField = (props) => {
   const { formik, currentTab } = props;
@@ -23,6 +23,7 @@ const DispenseCommonField = (props) => {
             id="dispense-height"
             placeholder="Type here"
             className="dispense-input-field"
+            value={formik.values.dispense.dispenseHeight}
             onChange={(e) =>
               setFormikField(
                 formik,
@@ -50,6 +51,7 @@ const DispenseCommonField = (props) => {
             name="mixingVolume"
             id="mixing-volume"
             placeholder="Type here"
+            value={formik.values.dispense.mixingVolume}
             onChange={(e) =>
               setFormikField(
                 formik,
@@ -77,6 +79,7 @@ const DispenseCommonField = (props) => {
               type="text"
               name="nCycles"
               id="no-of-cycles"
+              value={formik.values.dispense.nCycles}
               placeholder=""
               onChange={(e) =>
                 setFormikField(

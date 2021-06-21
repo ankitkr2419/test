@@ -67,7 +67,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
-	d.setPaused()
+	d.SetPaused()
 
 	return "Operation PAUSED Successfully", nil
 }
@@ -127,7 +127,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			return "", err
 		}
 	}
-	d.resetPaused()
+	d.ResetPaused()
 
 	return "Operation RESUMED Successfully.", nil
 }
@@ -170,7 +170,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	wrotePulses.Store(d.name, uint16(0))
-	d.resetPaused()
+	d.ResetPaused()
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
 	if d.IsRunInProgress() && !d.isTimerInProgress() {

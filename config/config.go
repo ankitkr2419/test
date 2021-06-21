@@ -112,7 +112,7 @@ func LoadAllConfs() {
 	Load("motor_config")
 
 	// config file to configure consumable distance
-	Load("consumable_config")
+	Load("consumable_config_v1_3")
 
 	// config file to configure labware
 	Load("labware_config")

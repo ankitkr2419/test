@@ -48,20 +48,34 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 	case uvlightSuccess:
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("successfully completed UV Light clean up for deck %v", d.name)
 	case recipeProgress:
-		currentStep := d.getCurrentProcess()
+		currentStep := getCurrentProcessNumber(d.name)
+
+		wsProgressOp.OperationDetails.RecipeID = deckRecipe[d.name].ID
+		wsProgressOp.OperationDetails.TotalProcesses = deckRecipe[d.name].ProcessCount
+
+		// This means all Processes are completed!!
+		// But Our Recipe Remaining time was still working!!
+		if currentStep == -2 {
+			wsProgressOp.OperationDetails.CurrentStep = deckRecipe[d.name].ProcessCount
+			wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v in progress", deckRecipe[d.name].ProcessCount , d.name)
+			wsProgressOp.OperationDetails.RemainingTime = convertToHMS(0)
+			wsProgressOp.Progress = 100
+			defer d.sendWSData(time1, timeElapsed, delayTime, recipeSuccess)
+			break
+		}
 
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v in progress", currentStep+1, d.name)
 		wsProgressOp.OperationDetails.CurrentStep = currentStep + 1
-		wsProgressOp.OperationDetails.RecipeID = deckRecipe[d.name].ID
-		wsProgressOp.OperationDetails.TotalProcesses = deckRecipe[d.name].ProcessCount
 		wsProgressOp.OperationDetails.ProcessName = deckProcesses[d.name][currentStep].Name
 		wsProgressOp.OperationDetails.ProcessType = deckProcesses[d.name][currentStep].Type
 
 	case recipeSuccess:
+		wsProgressOp.Progress = 100
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v completed", deckRecipe[d.name].ProcessCount, d.name)
 		wsProgressOp.OperationDetails.CurrentStep = deckRecipe[d.name].ProcessCount
 		wsProgressOp.OperationDetails.RecipeID = deckRecipe[d.name].ID
 		wsProgressOp.OperationDetails.TotalProcesses = deckRecipe[d.name].ProcessCount
+		wsProgressOp.OperationDetails.RemainingTime = convertToHMS(0)
 
 	default:
 		return responses.InvalidOperationWebsocket

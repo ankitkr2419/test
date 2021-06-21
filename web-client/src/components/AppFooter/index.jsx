@@ -29,7 +29,7 @@ import {
 import { MlModal } from "shared-components";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 import { discardTipAndHomingActionInitiated } from "action-creators/homingActionCreators";
-import { getTimeStr } from "./functions";
+import { getTimeStr } from "./helpers";
 
 const AppFooter = () => {
   const dispatch = useDispatch();
