@@ -4,7 +4,7 @@ import labwareTips from "assets/images/labware-plate-tips.png";
 import { ImageIcon } from "shared-components";
 import { FormGroup, Label, FormError, Select } from "core-components";
 import { ProcessSetting } from "./Styles";
-import { getOptions } from "./functions";
+import { getOptions } from "./helpers";
 
 const TipsDropdown = (props) => {
   const { formik, tipsOptions, allowedPositions } = props;
@@ -19,7 +19,7 @@ const TipsDropdown = (props) => {
     const tipPositions = formik.values.tips.processDetails;
 
     return Object.keys(tipPositions).map((tipPosition, i) => {
-      let id = tipPosition.id;
+      let id = tipPositions[tipPosition].id;
       //match the id of option with current tipPosition ID
       let index = options && options.map((item) => item.value).indexOf(id);
 
