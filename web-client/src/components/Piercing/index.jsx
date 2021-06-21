@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 import { Redirect, useHistory } from "react-router";
-import { getWellsInitialArray, updatedWellsArray } from "./functions";
+import { getWellsInitialArray, updatedWellsArray } from "./helpers";
 
 let extractionWells = getWellsInitialArray(8, 0);
 let pcrWells = getWellsInitialArray(4, 1);

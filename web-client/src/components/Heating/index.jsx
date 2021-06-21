@@ -7,7 +7,7 @@ import HeatingProcess from "./HeatingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { getFormikInitialState, getRequestBody } from "./functions";
+import { getFormikInitialState, getRequestBody } from "./helpers";
 import { PageBody, HeatingBox, TopContent } from "./Style";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";

@@ -1,3 +1,8 @@
+import { MAX_TEMP_ALLOWED, MIN_TEMP_ALLOWED } from "appConstants";
+
+/** This function checks for validity of input data and
+ *  returns the request body.
+ */
 export const getRequestBody = (formik) => {
   const formikValues = formik.values;
 
@@ -25,7 +30,7 @@ export const getRequestBody = (formik) => {
 
   const temperature = parseInt(formikValues.temperature);
   if (temperature !== 0) {
-    if (temperature < 20 || temperature > 120) {
+    if (temperature < MIN_TEMP_ALLOWED || temperature > MAX_TEMP_ALLOWED) {
       return false;
     }
   }
@@ -81,6 +86,7 @@ export const isDisabled = {
   rpm2: true, //initially it is disabled
 };
 
+/** This function is used  */
 export const setRpmFormikField = (formik, activeTab, fieldName, fieldValue) => {
   formik.setFieldValue(fieldName, fieldValue);
 

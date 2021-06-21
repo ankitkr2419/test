@@ -366,3 +366,7 @@ export const CATEGORY_LABEL = {
   3: "Shaker",
   4: "Deck Position",
 };
+
+//constants for shaking
+export const MAX_TEMP_ALLOWED = 120;
+export const MIN_TEMP_ALLOWED = 20;

@@ -9,7 +9,7 @@ import ShakingProcess from "./ShakingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TopContent, ShakingBox } from "./Style";
 import { useFormik } from "formik";
-import { isDisabled, getFormikInitialState, getRequestBody } from "./functions";
+import { isDisabled, getFormikInitialState, getRequestBody } from "./helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";

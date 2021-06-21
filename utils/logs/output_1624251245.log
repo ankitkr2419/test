@@ -1,0 +1,9 @@
+[36mINFO[0m[21-06-2021 10:24:05] Starting Simulator HeartBeat...              
+[36mINFO[0m[21-06-2021 10:24:05] Connected to pg database                      [36muri[0m="postgresql://postgres:root@localhost:5432/cpagentdb?sslmode=disable"
+[36mINFO[0m[21-06-2021 10:24:05] Default users added                          
+[36mINFO[0m[21-06-2021 10:24:05] Dyes Added in Database                       
+[36mINFO[0m[21-06-2021 10:24:05] Targets Added in Database                    
+[36mINFO[0m[21-06-2021 10:24:05] Motors Added in Database                     
+[31mERRO[0m[21-06-2021 10:24:05] Query Failed                                  [31merror in exec query[0m="pq: syntax error at or near \"ON\""
+[31mERRO[0m[21-06-2021 10:24:05] Setup Cosumable Distance failed               [31merr[0m="pq: syntax error at or near \"ON\""
+[31mERRO[0m[21-06-2021 10:24:05] error loading DB Setups failed                [31merr[0m="pq: syntax error at or near \"ON\""

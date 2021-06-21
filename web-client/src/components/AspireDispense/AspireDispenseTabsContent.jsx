@@ -8,7 +8,7 @@ import CommonDeckPosition from "./CommonDeckPosition";
 import { ASPIRE_DISPENSE_SIDEBAR_LABELS, CATEGORY_LABEL } from "appConstants";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
-import { disabledTab } from "./functions";
+import { disabledTab } from "./helpers";
 
 const AspireDispenseTabsContent = (props) => {
   const { formik, isAspire, toggle, activeTab, wellClickHandler } = props;
