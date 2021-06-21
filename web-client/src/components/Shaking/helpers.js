@@ -1,4 +1,11 @@
-import { MAX_TEMP_ALLOWED, MIN_TEMP_ALLOWED } from "appConstants";
+import {
+  MAX_TEMP_ALLOWED,
+  MIN_TEMP_ALLOWED,
+  MAX_TIME_ALLOWED,
+  timeConstants,
+} from "appConstants";
+
+const { SEC_IN_ONE_HOUR, SEC_IN_ONE_MIN, MIN_IN_ONE_HOUR } = timeConstants;
 
 /** This function checks for validity of input data and
  *  returns the request body.
@@ -7,23 +14,23 @@ export const getRequestBody = (formik) => {
   const formikValues = formik.values;
 
   const time1 =
-    parseInt(formikValues.hours1) * 60 * 60 +
-    parseInt(formikValues.mins1) * 60 +
+    parseInt(formikValues.hours1) * MIN_IN_ONE_HOUR * SEC_IN_ONE_MIN +
+    parseInt(formikValues.mins1) * SEC_IN_ONE_MIN +
     parseInt(formikValues.secs1);
 
   const time2 =
-    parseInt(formikValues.hours2) * 60 * 60 +
-    parseInt(formikValues.mins2) * 60 +
+    parseInt(formikValues.hours2) * MIN_IN_ONE_HOUR * SEC_IN_ONE_MIN +
+    parseInt(formikValues.mins2) * SEC_IN_ONE_MIN +
     parseInt(formikValues.secs2);
 
   if (time1 !== 0) {
-    if (time1 > 3660) {
+    if (time1 > MAX_TIME_ALLOWED) {
       return false;
     }
   }
 
   if (time2 !== 0) {
-    if (time2 > 3660) {
+    if (time2 > MAX_TIME_ALLOWED) {
       return false;
     }
   }
@@ -53,16 +60,16 @@ export const getFormikInitialState = (editData = null) => {
 
   if (editData && editData.time_1) {
     const time1 = editData.time_1;
-    hours1 = Math.floor(time1 / 3600);
-    mins1 = Math.floor((time1 % 3600) / 60);
-    secs1 = Math.floor(time1 % 60);
+    hours1 = Math.floor(time1 / SEC_IN_ONE_HOUR);
+    mins1 = Math.floor((time1 % SEC_IN_ONE_HOUR) / MIN_IN_ONE_HOUR);
+    secs1 = Math.floor(time1 % MIN_IN_ONE_HOUR);
   }
 
   if (editData && editData.time_2) {
     const time2 = editData.time_2;
-    hours2 = Math.floor(time2 / 3600);
-    mins2 = Math.floor((time2 % 3600) / 60);
-    secs2 = Math.floor(time2 % 60);
+    hours2 = Math.floor(time2 / SEC_IN_ONE_HOUR);
+    mins2 = Math.floor((time2 % SEC_IN_ONE_HOUR) / MIN_IN_ONE_HOUR);
+    secs2 = Math.floor(time2 % MIN_IN_ONE_HOUR);
   }
 
   return {
