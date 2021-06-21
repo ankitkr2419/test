@@ -31,19 +31,28 @@ func TestRecipeTestSuite(t *testing.T) {
 	suite.Run(t, new(RecipeHandlerTestSuite))
 }
 
+var(
+	pos1 int64 = 1
+	pos2 int64 = 2
+	pos3 int64 = 3
+	pos4 int64 = 4
+	car1 int64 = 1
+	car2 int64 = 2
+)
+
 var testRecipeRecord = db.Recipe{
 	ID:                 recipeUUID,
 	Name:               "testRecipeName",
 	Description:        "testDescription",
-	Position1:          1,
-	Position2:          2,
-	Position3:          2,
-	Position4:          3,
-	Position5:          3,
-	Cartridge1Position: 1,
-	Position7:          2,
-	Cartridge2Position: 2,
-	Position9:          4,
+	Position1:          &pos1,
+	Position2:          &pos1,
+	Position3:          &pos1,
+	Position4:          &pos2,
+	Position5:          &pos2,
+	Cartridge1Position: &car1,
+	Position7:          &pos3,
+	Cartridge2Position: &car2,
+	Position9:          &pos4,
 	ProcessCount:       10,
 	IsPublished:        false,
 }

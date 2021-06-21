@@ -3,7 +3,7 @@ import React from "react";
 import { FormGroup, Label, Input, FormError } from "core-components";
 import { Text, Icon } from "shared-components";
 import { CommmonFields } from "./Style";
-import { setFormikField } from "./functions";
+import { setFormikField } from "./helpers";
 
 const DispenseCommonField = (props) => {
   const { formik, currentTab } = props;

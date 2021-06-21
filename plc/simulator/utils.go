@@ -9,14 +9,14 @@ import (
 var motorDone, sensorDone, motorInProgress, heaterInProgress sync.Map
 
 func loadUtils() {
-	motorDone.Store("A", false)
-	motorDone.Store("B", false)
-	sensorDone.Store("A", false)
-	sensorDone.Store("B", false)
-	motorInProgress.Store("A", false)
-	motorInProgress.Store("B", false)
-	heaterInProgress.Store("A", false)
-	heaterInProgress.Store("B", false)
+	motorDone.Store(plc.DeckA, false)
+	motorDone.Store(plc.DeckB, false)
+	sensorDone.Store(plc.DeckA, false)
+	sensorDone.Store(plc.DeckB, false)
+	motorInProgress.Store(plc.DeckA, false)
+	motorInProgress.Store(plc.DeckB, false)
+	heaterInProgress.Store(plc.DeckA, false)
+	heaterInProgress.Store(plc.DeckB, false)
 }
 
 func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint16) (err error) {
