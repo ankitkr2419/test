@@ -34,7 +34,6 @@ const LandingScreenComponent = (props) => {
   } = homingReducer;
 
   const [isProgressBarVisible, setIsProgressBarVisible] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
   const [disabled, setDisabled] = useState(false);
 
   const homingConfirmation = () => {
@@ -44,7 +43,6 @@ const LandingScreenComponent = (props) => {
   };
 
   const handleCompleteBtn = () => {
-    setIsOpen(false);
     dispatch(hideHomingModal());
   };
 
@@ -84,7 +82,7 @@ const LandingScreenComponent = (props) => {
       <div className="landing-content">
         <VideoCard />
         <MlModal
-          isOpen={isOpen && showHomingModal}
+          isOpen={showHomingModal}
           textBody={MODAL_MESSAGE.homingConfirmation}
           handleSuccessBtn={() =>
             isHomingActionCompleted ? handleCompleteBtn() : homingConfirmation()
