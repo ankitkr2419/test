@@ -92,7 +92,7 @@ const TemplateModalContainer = (props) => {
 
 	const updateTemplate = (template) => {
 		// updating template though api
-		dispatch(updateTemplateAction(templateID, template));
+		dispatch(updateTemplateAction(templateID, template, token));
 	};
 
 	// helper method to reset the local modal state

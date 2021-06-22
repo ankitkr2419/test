@@ -17,13 +17,17 @@ import templateLayoutReducer, {
 	getWizardListByLoginType,
 } from './templateState';
 import { useSelector } from "react-redux";
+import { ROUTES } from 'appConstants';
+import { useHistory } from "react-router";
 
 const TemplateLayout = (props) => {
+	const history = useHistory();
+
 	//get login reducer details
 	const loginReducer = useSelector((state) => state.loginReducer);
 	const loginReducerData = loginReducer.toJS();
 	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-	const { isAdmin } = activeDeckObj;
+	const { isAdmin, isLoggedIn } = activeDeckObj;
 
 	// Local state to manage selected wizard
 	const [templateLayoutState, templateLayoutDispatch] = useReducer(
@@ -81,6 +85,11 @@ const TemplateLayout = (props) => {
 		});
 	}, []);
 
+	if(!isLoggedIn){
+		// history.push(ROUTES.login);		
+		history.push('splashscreen');
+	}
+
 	return (
 		<div className='template-content'>
 			<Wizard
@@ -108,9 +117,7 @@ const TemplateLayout = (props) => {
 							isCreateTemplateModalVisible={templateModalState.get('isCreateTemplateModalVisible')}
 						/>
 					)}
-
-					{/**TODO remove comments when above code is working/tested */}
-					{/*activeWidgetID === 'target' && (
+					{activeWidgetID === 'target' && (
 						<TargetContainer
 							isLoginTypeOperator={!isAdmin}
 							isLoginTypeAdmin={isAdmin}
@@ -118,7 +125,8 @@ const TemplateLayout = (props) => {
 							templateID={templateID}
 							setIsTemplateEdited={setIsTemplateEdited}
 						/>
-					)*/}
+					)}
+					{/**TODO remove comments when above code is working/tested */}
 					{/*activeWidgetID === 'target-operator' && (
 						<TargetExperimentContainer
 							isLoginTypeOperator={!isAdmin}

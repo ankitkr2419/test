@@ -68,7 +68,7 @@ export function* fetchTemplates(actions) {
 
 export function* updateTemplate(actions) {
 	const {
-		payload: { templateID, body },
+		payload: { templateID, body, token },
 	} = actions;
 
 	const { successAction, failureAction } = updateTemplateActions;
@@ -81,6 +81,7 @@ export function* updateTemplate(actions) {
 				reqPath: `templates/${templateID}`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {
@@ -91,7 +92,7 @@ export function* updateTemplate(actions) {
 
 export function* deleteTemplate(actions) {
 	const {
-		payload: { templateID },
+		payload: { templateID, token },
 	} = actions;
 
 	const { successAction, failureAction } = deleteTemplateActions;
@@ -103,6 +104,7 @@ export function* deleteTemplate(actions) {
 				reqPath: `templates/${templateID}`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {

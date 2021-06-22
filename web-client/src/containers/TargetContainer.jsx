@@ -33,6 +33,13 @@ const TargetContainer = (props) => {
 	const dispatch = useDispatch();
 
 	// useSelector section
+
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { token } = activeDeckObj;
+
 	// listTargetReducer => master targets from server
 	const listTargetReducer = useSelector(state => state.listTargetReducer);
 	// listTargetReducer => selected targets from server
@@ -58,7 +65,7 @@ const TargetContainer = (props) => {
 	// useEffect section
 	useEffect(() => {
 		// fetch updated stage list from server. required for next steps wizard
-		dispatch(fetchStages(templateID));
+		dispatch(fetchStages(templateID, token));
 	}, [templateID, dispatch]);
 
 	// below useEffect is use to navigate to next wizard when user will save targets
@@ -67,7 +74,7 @@ const TargetContainer = (props) => {
 			// isTargetSaved = true means targets saved successfully
 			// reset save target reducer to avoid multiple re-renders
 			dispatch(resetSaveTarget());
-			dispatch(fetchTargetsByTemplateID(templateID));
+			dispatch(fetchTargetsByTemplateID(templateID, token));
 		}
 	}, [dispatch, isTargetSaved, updateSelectedWizard, templateID]);
 
@@ -87,12 +94,12 @@ const TargetContainer = (props) => {
 
 	useEffect(() => {
 		// get master targets from server
-		dispatch(fetchMasterTargets());
+		dispatch(fetchMasterTargets(token));
 	}, [dispatch]);
 
 	useEffect(() => {
 		// get selected targets from server
-		dispatch(fetchTargetsByTemplateID(templateID));
+		dispatch(fetchTargetsByTemplateID(templateID, token));
 	}, [dispatch, templateID]);
 
 	// handler function section
@@ -162,7 +169,7 @@ const TargetContainer = (props) => {
 			selectedTargetState.get('targetList'),
 			templateID,
 		);
-		dispatch(saveTarget(templateID, checkedTargets));
+		dispatch(saveTarget(templateID, checkedTargets, token));
 	}, [
 		selectedTargetState,
 		templateID,

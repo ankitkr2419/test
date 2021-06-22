@@ -28,6 +28,13 @@ import { HOLD_STAGE, CYCLE_STAGE } from 'components/Step/stepConstants';
 
 const StepContainer = (props) => {
 	const dispatch = useDispatch();
+
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { token } = activeDeckObj;
+
 	// local state for storing step id for row selection
 	const [selectedStepId, setSelectedStepId] = useState(null);
 
@@ -109,7 +116,7 @@ const StepContainer = (props) => {
 	useEffect(() => {
 		if (isStageUpdated === true) {
 			dispatch(updateStageReset());
-			dispatch(fetchStages(cycleStage.get('template_id')));
+			dispatch(fetchStages(cycleStage.get('template_id'),token));
 		}
 	}, [isStageUpdated, cycleStage, dispatch]);
 

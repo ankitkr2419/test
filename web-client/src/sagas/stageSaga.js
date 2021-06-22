@@ -12,7 +12,7 @@ import { HTTP_METHODS } from 'appConstants';
 
 export function* fetchStages(actions) {
 	const {
-		payload: { templateID },
+		payload: { templateID, token },
 	} = actions;
 	const { successAction, failureAction } = listStageActions;
 	try {
@@ -22,6 +22,7 @@ export function* fetchStages(actions) {
 				reqPath: `templates/${templateID}/stages`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {

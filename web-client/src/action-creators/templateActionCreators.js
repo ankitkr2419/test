@@ -40,11 +40,12 @@ export const fetchTemplatesFailed = errorResponse => ({
 	},
 });
 
-export const updateTemplate = (templateID, body) => ({
+export const updateTemplate = (templateID, body, token) => ({
 	type: updateTemplateActions.updateAction,
 	payload: {
 		templateID,
 		body,
+		token
 	},
 });
 
@@ -60,10 +61,11 @@ export const updateTemplateReset = () => ({
 	type: updateTemplateActions.updateTemplateReset,
 });
 
-export const deleteTemplate = templateID => ({
+export const deleteTemplate = (templateID, token) => ({
 	type: deleteTemplateActions.deleteAction,
 	payload: {
 		templateID,
+		token
 	},
 });
 

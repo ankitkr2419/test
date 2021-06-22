@@ -3,10 +3,11 @@ import {
 	updateStageActions,
 } from 'actions/stageActions';
 
-export const fetchStages = templateID => ({
+export const fetchStages = (templateID, token) => ({
 	type: listStageActions.listAction,
 	payload: {
 		templateID,
+		token
 	},
 });
 

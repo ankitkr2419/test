@@ -93,14 +93,14 @@ const TemplateContainer = (props) => {
 
 	const deleteTemplate = (templateID) => {
 		// deleting template though api
-		dispatch(deleteTemplateAction(templateID));
+		dispatch(deleteTemplateAction(templateID, token));
 	};
 
 	/**
 	 * createExperiment belongs to operator flow
 	 */
 	const createExperiment = (experimentBody) => {
-		dispatch(createExperimentAction(experimentBody));
+		dispatch(createExperimentAction(experimentBody, token));
 	};
 
 	return (
