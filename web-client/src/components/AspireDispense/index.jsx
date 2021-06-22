@@ -15,7 +15,7 @@ import {
   getRequestBody,
   disabledTabInitTab,
   toggler,
-} from "./functions";
+} from "./helpers";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 

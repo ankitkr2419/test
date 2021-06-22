@@ -12,10 +12,11 @@ import (
 )
 
 type TipDock struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	Type      string    `json:"type" db:"type" validate:"required"`
-	Position  int64     `json:"position" db:"position" validate:"required"`
-	Height    float64   `json:"height" db:"height" validate:"required"`
+	ID       uuid.UUID `json:"id" db:"id"`
+	Type     string    `json:"type" db:"type" validate:"required"`
+	Position int64     `json:"position" db:"position" validate:"required,lte=13"`
+	// since we are not considering the height of labware so we keep the maximum height as 25mm.
+	Height    float64   `json:"height" db:"height" validate:"required,lte=25"`
 	ProcessID uuid.UUID `json:"process_id" db:"process_id"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`

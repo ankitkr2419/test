@@ -23,8 +23,8 @@ func (suite *HomingHandlerTestSuite) SetupTest() {
 	driverA := &plc.PLCMockStore{}
 	driverB := &plc.PLCMockStore{}
 	suite.plcDeck = map[string]plc.Extraction{
-		"A": driverA,
-		"B": driverB,
+		plc.DeckA: driverA,
+		plc.DeckB: driverB,
 	}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
@@ -37,7 +37,7 @@ func TestHomingTestSuite(t *testing.T) {
 
 func (suite *HomingHandlerTestSuite) TestHomingSuccess() {
 
-	deck := deckB
+	deck := plc.DeckB
 
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("Homing").Return("homing success", nil).Maybe()
 
@@ -60,7 +60,7 @@ func (suite *HomingHandlerTestSuite) TestHomingSuccess() {
 
 func (suite *HomingHandlerTestSuite) TestHomingFailure() {
 
-	deck := deckB
+	deck := plc.DeckB
 
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("Homing").Return("homing success", nil).Maybe()
 
