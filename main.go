@@ -14,6 +14,7 @@ import (
 	"mylab/cpagent/plc/simulator"
 	"mylab/cpagent/responses"
 	"mylab/cpagent/service"
+	"mylab/cpagent/tec"
 	"net/http"
 	"os"
 	"strconv"
@@ -165,6 +166,8 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		logger.Errorln(responses.UnsupportedPLCError)
 		return
 	}
+
+	tec.ConnectTEC()
 
 	exit := make(chan error)
 
