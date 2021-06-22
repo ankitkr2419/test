@@ -185,15 +185,15 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckSuccess() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
 	//first need to login to test logout
-	userLogin.Store(deckA, true)
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, deckA, map[string]string{})
+	userLogin.Store(plc.DeckA, true)
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
 		http.MethodDelete,
 		"/logout/{deck:[A-B]?}",
-		"/logout/"+deckA,
+		"/logout/"+plc.DeckA,
 		string(body),
 		map[string]string{"Authorization": testTokenA},
 		logoutUserHandler(Dependencies{Store: suite.dbMock}),
@@ -228,16 +228,16 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, errors.New("failed to fetch user auth record"))
 
 	//first need to login to test logout
-	userLogin.Store(deckA, true)
+	userLogin.Store(plc.DeckA, true)
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, deckA, map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
 		http.MethodDelete,
 		"/logout/{deck:[A-B]?}",
-		"/logout/"+deckA,
+		"/logout/"+plc.DeckA,
 		string(body),
 		map[string]string{"Authorization": testTokenA},
 		logoutUserHandler(Dependencies{Store: suite.dbMock}),
@@ -254,16 +254,16 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckDeleteFailure() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError)
 
 	//first need to login to test logout
-	userLogin.Store(deckA, true)
+	userLogin.Store(plc.DeckA, true)
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, deckA, map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
 		http.MethodDelete,
 		"/logout/{deck:[A-B]?}",
-		"/logout/"+deckA,
+		"/logout/"+plc.DeckA,
 		string(body),
 		map[string]string{"Authorization": testTokenA},
 		logoutUserHandler(Dependencies{Store: suite.dbMock}),

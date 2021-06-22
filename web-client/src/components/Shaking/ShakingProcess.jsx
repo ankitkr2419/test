@@ -4,7 +4,7 @@ import { Row, Col, FormGroup, Label, Input, FormError } from "core-components";
 import { TemperatureInfo, TimeInfo } from "shared-components";
 
 import { ShakingProcessBox } from "./Style";
-import { isDisabled, setRpmFormikField } from "./functions";
+import { isDisabled, setRpmFormikField } from "./helpers";
 
 const ShakingProcess = (props) => {
   const { formik, activeTab, temperature } = props;

@@ -16,7 +16,7 @@ import {
   getWellsArrayForEdit,
   getWellsInitialArray,
   updateWellsArray,
-} from "./functions";
+} from "./helpers";
 
 const PiercingComponent = (props) => {
   const { editReducerData } = props;

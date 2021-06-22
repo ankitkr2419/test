@@ -99,7 +99,7 @@ func ValidateExperiment(wells []Well) (valid bool, resp WarnResponse) {
 				tasksCount["NTC"] = tasksCount["NTC"] + 1
 			}
 		}
-
+		//ASK: Is this a BUG? 
 		for _, v := range tasksCount {
 			if v == 0 {
 				resp.Code = "Warning"

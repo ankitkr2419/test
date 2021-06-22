@@ -18,7 +18,7 @@ import {
   updateRecipeActionReset,
 } from "action-creators/saveNewRecipeActionCreators";
 import { Redirect, useHistory } from "react-router";
-import { getRequestBody } from "./functions";
+import { getRequestBody } from "./helpers";
 import Preview from "./Preview";
 import SelectProcesses from "./SelectProcesses";
 
