@@ -167,7 +167,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		return
 	}
 
-	tec.ConnectTEC()
+	tec.InitiateTEC()
 
 	exit := make(chan error)
 
