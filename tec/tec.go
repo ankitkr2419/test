@@ -5,6 +5,8 @@ package tec
 int DemoFunc(double, double);
 int InitiateTEC();
 int checkForErrorState();
+int autoTune();
+int resetDevice();
 #include <stdlib.h>
 #include <time.h>
 #include <fcntl.h>
@@ -31,27 +33,47 @@ type TECTempSet struct {
 	TargetRampRate		   float64 `json:"ramp_rate" validate:"gte=-20,lte=100"`
 }
 
+var errorCheckStopped bool 
+
 func InitiateTEC()(err error){
 	C.InitiateTEC()
 	
-	go func(){
-		for {
-			time.Sleep(1 * time.Second)
-			var errNum C.int
-			errNum = C.checkForErrorState()
-			if errNum != 0{
-				logger.Errorln("Error Code for TEC: ", errNum)
-				return
-			}
-		}
-
-	}()
+	go startErrorCheck()
 	
 	return nil
 }
 
+func startErrorCheck(){
+go func(){
+	time.Sleep(5 * time.Second)
+	for {
+		time.Sleep(2 * time.Second)
+		var errNum C.int
+		errNum = C.checkForErrorState()
+		if errNum != 0{
+			errorCheckStopped = true
+			logger.Errorln("Error Code for TEC: ", errNum)
+			return
+		}
+	}
+}()
+}
 
 func ConnectTEC(t TECTempSet) (err error) {
 	C.DemoFunc(C.double(t.TargetTemperature), C.double(t.TargetRampRate))
+	return nil
+}
+
+func AutoTune() (err error){
+	C.autoTune()
+	return nil
+}
+
+func ResetDevice() (err error){
+	C.resetDevice()
+
+	if errorCheckStopped {
+		startErrorCheck()
+	}
 	return nil
 }

@@ -131,7 +131,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/app-info", appInfoHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/set-temp-and-ramp", setTempAndRampHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/set-temp-and-ramp", setTempAndRampHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/auto-tune", autoTuneHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/reset-device", resetDeviceHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	return
 }
