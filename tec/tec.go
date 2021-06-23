@@ -2,7 +2,9 @@ package tec
 
 
 /*
-int DemoFunc();
+int DemoFunc(double, double);
+int InitiateTEC();
+int checkForErrorState();
 #include <stdlib.h>
 #include <time.h>
 #include <fcntl.h>
@@ -18,8 +20,38 @@ int DemoFunc();
 #cgo LDFLAGS : -pthread -lrt
 */
 import "C"
+import (
+	"time"
+logger "github.com/sirupsen/logrus"
 
-func ConnectTEC(){
+)
 
-	C.DemoFunc()
+type TECTempSet struct {
+	TargetTemperature      float64 `json:"target_temp" validate:"gte=-20,lte=100"`
+	TargetRampRate		   float64 `json:"ramp_rate" validate:"gte=-20,lte=100"`
+}
+
+func InitiateTEC()(err error){
+	C.InitiateTEC()
+	
+	go func(){
+		for {
+			time.Sleep(1 * time.Second)
+			var errNum C.int
+			errNum = C.checkForErrorState()
+			if errNum != 0{
+				logger.Errorln("Error Code for TEC: ", errNum)
+				return
+			}
+		}
+
+	}()
+	
+	return nil
+}
+
+
+func ConnectTEC(t TECTempSet) (err error) {
+	C.DemoFunc(C.double(t.TargetTemperature), C.double(t.TargetRampRate))
+	return nil
 }
