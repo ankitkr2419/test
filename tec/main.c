@@ -314,16 +314,20 @@ int main2()
 
 int InitiateTEC()
 {
-    if(ConsoleIO_YesNo("Do you want to open a Comport? (press enter for default)", 1))
-    {
-        ComPort_Open(0, 57600);
-    } else {
-        printf("No Comport has been opened, this will result in some communications timeouts.\n");
-        printf("It is even though possible to see the resulting Host communication\nin the Communication Log file\n\n");
-    }
+    // if(ConsoleIO_YesNo("Do you want to open a Comport? (press enter for default)", 1))
+    // {
+    // } else {
+    //     printf("No Comport has been opened, this will result in some communications timeouts.\n");
+    //     printf("It is even though possible to see the resulting Host communication\nin the Communication Log file\n\n");
+    // }
+
+    ComPort_Open(0, 57600);
+
     
-    Address = ConsoleIO_IntInput("Please Enter the Device Address", 0, 255, 0);
+    // Address = ConsoleIO_IntInput("Please Enter the Device Address", 0, 255, 0);
     
+    Address = 2;
+
     if(MeCom_GetIdentString(Address, Buf)) 
     {
                ConsoleIO_SetColor(ConsoleIO_Green);
@@ -400,6 +404,7 @@ int InitiateTEC()
         return -1;
     }
 
+/*
     Fields.Value = 44.40232;
     if(MeCom_TEC_Tem_Kp(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Tem_Kp(Address, Inst, &Fields, MeSet);
@@ -431,7 +436,7 @@ int InitiateTEC()
         printf("TEC MeCom_TEC_Tem_DPartDampPT1 value out of range( %f, %f).", Fields.Max, Fields.Min);
         return -1;
     }
-
+*/
     // Peltier Max Current
 
     Fields.Value = 7;
@@ -471,6 +476,7 @@ int InitiateTEC()
     }
 
     // Read all parameters
+    /*
     if(MeCom_TEC_Oth_AtmPIDParameterKp(Address, Inst, &Fields, MeGet)){
         printf("TEC MeCom_TEC_Oth_AtmPIDParameterKp value is: %f\n", Fields.Value);
     } else{
@@ -501,7 +507,7 @@ int InitiateTEC()
         printf("TEC MeCom_TEC_Oth_AtmPIDDPartDamping value couldn't be read");
         return -1;
     }
-
+    */
 
     // 5. Read Target Temp(Current) till target reached
     int i = 0;
@@ -601,10 +607,12 @@ skipRamp:
 
 int checkForErrorState()
 {
-    MeParLongFields Longs;
-
+    MeParLongFields Longs; 
     if(MeCom_COM_DeviceStatus(Address, &Longs, MeGet)){
-        printf("TEC MeCom_COM_DeviceStatus :%d", Longs.Value);
+        // print only if its not Run
+        if (Longs.Value != 2){
+            printf("TEC MeCom_COM_DeviceStatus :%d\n", Longs.Value);
+        }
     } else{
         printf("TEC Reading MeCom_COM_DeviceStatus error");
         return -1;
@@ -613,7 +621,8 @@ int checkForErrorState()
 // check for Error type
     if (Longs.Value == 3) {
         if(MeCom_COM_ErrorNumber(Address, &Longs, MeGet)){
-            printf("TEC MeCom_COM_ErrorNumber :%d", Longs.Value);
+            printf("TEC MeCom_COM_ErrorNumber :%d\n", Longs.Value);
+            return 3;
         } else{
             printf("TEC Reading MeCom_COM_ErrorNumber error");
             return -1;
@@ -622,6 +631,70 @@ int checkForErrorState()
     return 0;
 }
 
+int autoTune(){
+    MeParLongFields Longs;
+    MeParFloatFields Fields;
+
+    Longs.Value = 1;
+    if(MeCom_TEC_Oth_AtmAutoTuningStart(Address, Inst, &Longs, MeGetLimits)){
+        MeCom_TEC_Oth_AtmAutoTuningStart(Address, Inst, &Longs, MeSet);
+        printf("TEC MeCom_TEC_Oth_AtmAutoTuningStart :%d\n", Longs.Value);
+    } else{
+        printf("TEC Reading MeCom_TEC_Oth_AtmAutoTuningStart error");
+        return -1;
+    }
+
+    if(MeCom_TEC_Oth_AtmTuningStatus(Address, Inst, &Longs, MeGet)){
+        printf("TEC MeCom_TEC_Oth_AtmTuningStatus :%d\n", Longs.Value);
+    } else{
+        printf("TEC Reading MeCom_TEC_Oth_AtmTuningStatus error");
+        return -1;
+    }
+
+    // Other Longs value means its either idle or success or err
+    while (Longs.Value > 0 && Longs.Value < 4){
+        sleep(5);
+        if(MeCom_TEC_Oth_AtmTuningStatus(Address, Inst, &Longs, MeGet)){
+            printf("TEC MeCom_TEC_Oth_AtmTuningStatus :%d\n", Longs.Value);
+        } else{
+            printf("TEC Reading MeCom_TEC_Oth_AtmTuningStatus error");
+        return -1;
+        }
+
+        //  Read Progress
+        if(MeCom_TEC_Oth_AtmTuningProgress(Address, Inst, &Fields, MeGet)){
+            printf("TEC MeCom_TEC_Oth_AtmTuningProgress :%f\n", Fields.Value);
+        } else{
+            printf("TEC Reading MeCom_TEC_Oth_AtmTuningProgress error");
+        return -1;
+        }
+    }
+
+    // Error
+    if (Longs.Value == 10){
+        printf("TEC Reading Auto Tuning error");
+        return -1;
+    // Success
+    } else if (Longs.Value == 4){
+        printf("TEC Auto Tuning SUCCESS");
+        return 4;
+    // Other
+    } else {
+        printf("TEC looks to be in idle state");
+        return 0;
+    }
+
+}
+
+int resetDevice(){
+    if (MeCom_ResetDevice(Address)){
+        printf("TEC Reset SUCCESS");
+    } else {
+        printf("TEC Reset FAIL");
+        return -1;
+    }
+    return 0;
+}
 /*==============================================================================*/
 /** @brief      Menu selection function
  *
