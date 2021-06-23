@@ -126,18 +126,17 @@ const TemplateLayout = (props) => {
 							setIsTemplateEdited={setIsTemplateEdited}
 						/>
 					)}
-					{/**TODO remove comments when above code is working/tested */}
-					{/*activeWidgetID === 'target-operator' && (
+					{activeWidgetID === 'target-operator' && (
 						<TargetExperimentContainer
 							isLoginTypeOperator={!isAdmin}
 							isLoginTypeAdmin={isAdmin}
 							updateSelectedWizard={updateSelectedWizard}
 							templateID={templateID}
 						/>
-					)*/}
-					{/*activeWidgetID === 'step' && (
+					)}
+					{activeWidgetID === 'step' && (
 						<StepContainer />
-					)*/}
+					)}
 				</CardBody>
 			</Card>
 		</div>

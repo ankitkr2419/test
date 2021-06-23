@@ -19,11 +19,12 @@ export const fetchStagesFailed = errorResponse => ({
 	},
 });
 
-export const updateStage = (stageId, body) => ({
+export const updateStage = (stageId, body, token) => ({
 	type: updateStageActions.updateAction,
 	payload: {
 		stageId,
 		body,
+		token
 	},
 });
 
