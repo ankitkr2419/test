@@ -39,9 +39,9 @@ export function* createTemplate(actions) {
   }
 }
 
-function* createTemplateSuccess() {
-  //   yield put(fetchTemplatesActions());
-}
+// function* createTemplateSuccess() {
+//   //   yield put(fetchTemplatesActions());
+// }
 
 export function* fetchTemplates(actions) {
   const {
@@ -117,7 +117,7 @@ export function* createTemplateSaga() {
 }
 
 export function* createTemplateSuccessSaga() {
-  yield takeEvery(createTemplateActions.successAction, createTemplateSuccess);
+  // yield takeEvery(createTemplateActions.successAction, createTemplateSuccess);
 }
 
 export function* fetchTemplatesSaga() {
