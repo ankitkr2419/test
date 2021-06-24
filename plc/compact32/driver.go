@@ -26,7 +26,7 @@ LOOP:
 			break
 		}
 
-		logger.Infoln("Heartbeat output: ", beat)
+		// logger.Infoln("Heartbeat output: ", beat)
 
 		// 3 attempts to check for heartbeat of PLC and write ours!
 		for i := 0; i < 3; i++ {
@@ -225,6 +225,10 @@ func (d *Compact32) Cycle() (err error) {
 		logger.Error("WriteSingleCoil:M21 : Start Cycle")
 		return
 	}
+
+	// Let the rotation complete
+	time.Sleep(time.Second * 20)
+
 	return
 }
 
