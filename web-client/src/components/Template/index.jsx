@@ -44,7 +44,14 @@ const TemplateComponent = (props) => {
     // if its admin save template id and show edit & delete options on button
     // if its operator save template id an navigate to target wizard
     // set selected template id to local state for maintaining active state of button
-    setSelectedTemplateId(templateId);
+
+    // toggle button to show edit/delete buttons
+    let toggleTemplateButton = null;
+    if (selectedTemplateId === null) {
+      toggleTemplateButton = templateId;
+    }
+    setSelectedTemplateId(toggleTemplateButton);
+
     if (isLoginTypeOperator === true) {
       // make api call to save experiments
       createExperiment({

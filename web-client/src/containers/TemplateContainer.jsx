@@ -38,11 +38,11 @@ const TemplateContainer = (props) => {
 
   const isTemplatesLoading = templates.get("isLoading");
   // isTemplateCreated = true means template created successfully
-  const { isTemplateCreated, response } = useSelector(
+  const { isTemplateCreated, errorCreatingTemplate, response } = useSelector(
     (state) => state.createTemplateReducer
   );
   // isTemplateDeleted = true means template deleted successfully
-  const { isTemplateDeleted } = useSelector(
+  const { isTemplateDeleted, errorDeletingTemplate } = useSelector(
     (state) => state.deleteTemplateReducer
   );
 
@@ -57,7 +57,7 @@ const TemplateContainer = (props) => {
 
   useEffect(() => {
     // Once we create template will fetch updated template list
-    if (isTemplateCreated === true) {
+    if (isTemplateCreated === true && errorCreatingTemplate === false) {
       // update the templateId in templateState maintained in templateLayout with created Id
       updateTemplateID(response.id);
       // navigate to next wizard
@@ -66,6 +66,7 @@ const TemplateContainer = (props) => {
     }
   }, [
     isTemplateCreated,
+    errorCreatingTemplate,
     dispatch,
     response,
     updateSelectedWizard,
@@ -74,11 +75,11 @@ const TemplateContainer = (props) => {
 
   useEffect(() => {
     // Once we delete template will fetch updated template list
-    if (isTemplateDeleted === true) {
+    if (isTemplateDeleted === true && errorDeletingTemplate === false) {
       dispatch(deleteTemplateReset());
       dispatch(fetchTemplates({ token }));
     }
-  }, [isTemplateDeleted, dispatch]);
+  }, [isTemplateDeleted, errorDeletingTemplate, dispatch]);
 
   useEffect(() => {
     // getting templates through api.
