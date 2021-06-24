@@ -31,13 +31,13 @@ LOOP:
 		// 3 attempts to check for heartbeat of PLC and write ours!
 		for i := 0; i < 3; i++ {
 			if beat == 1 { // If beat is 1, PLC is alive, so write 2
-				val, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][100], uint16(2))
+				_, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][100], uint16(2))
 				if err != nil {
 					logger.WithField("beat", beat).Error("WriteSingleRegister:D100 : Read PLC heartbeat")
 					// exit!!
 					break LOOP
 				}
-				logger.Infoln("Read val:", val)
+				// logger.Infoln("Read val:", val)
 				continue LOOP
 			}
 
@@ -138,11 +138,56 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 	return
 }
 
-func (d *Compact32) Start() (err error) {
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][102], plc.ON)
+func (d *Compact32) HomingRTPCR() (err error) {
+	//First Home
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][1], plc.ON)
 	if err != nil {
-		logger.Error("WriteSingleCoil:M102 : Start Cycle")
+		logger.Error("WriteSingleCoil:M1 : Start Cycle")
+		return
 	}
+	//First Home
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][2], plc.ON)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M2 : Start Cycle")
+		return
+	}
+	// Also Reset
+	return d.Reset()
+}
+
+func (d *Compact32) Reset() (err error) {
+	//First reset the values
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][25], plc.ON)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M25 ON: Reset")
+		return
+	}
+	time.Sleep(time.Second * 1)
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][25], plc.OFF)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M25 OFF: Reset")
+		return
+	}
+	return
+}
+
+func (d *Compact32) Start() (err error) {
+
+	cycle := uint16(0)
+	_, err = d.Monitor(cycle)
+	if err != nil {
+		logger.WithField("error", err).Error("Error in Monitoring")
+
+	}
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][25], plc.OFF)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M102 : Start Cycle")
+	// }
+
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][102], plc.ON)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M102 : Start Cycle")
+	// }
 	return
 }
 
@@ -154,84 +199,155 @@ func (d *Compact32) Stop() (err error) {
 	return
 }
 
+func (d *Compact32) Cycle() (err error) {
+	//For the cycle button
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][20], plc.ON)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M20 : Start Cycle")
+		return
+	}
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][21], plc.ON)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M21 : Start Cycle")
+		return
+	}
+
+	time.Sleep(time.Second * 1)
+
+	// for the rotation button
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][14], plc.ON)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M20 : Start Cycle")
+		return
+	}
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][15], plc.ON)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M21 : Start Cycle")
+		return
+	}
+	return
+}
+
 // Monitor periodically. If CycleComplete == true, Scan will be populated
 func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
 	// Read current cycle
-	scan.Cycle, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][133])
-	if err != nil {
-		logger.Error("ReadSingleRegister:D133: current cycle")
-		return
-	}
+	// scan.Cycle, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][133])
+	// if err != nil {
+	// 	logger.Error("ReadSingleRegister:D133: current cycle")
+	// 	return
+	// }
 
-	// Read cycle temperature.. PLC returns 653 for 65.3 degrees
-	var tmp uint16
-	tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][132])
-	if err != nil {
-		logger.Error("ReadSingleRegister:D132: Cycle Temperature")
-		return
-	}
-	scan.Temp = float32(tmp) / 10
+	// // Read cycle temperature.. PLC returns 653 for 65.3 degrees
+	// var tmp uint16
+	// tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][132])
+	// if err != nil {
+	// 	logger.Error("ReadSingleRegister:D132: Cycle Temperature")
+	// 	return
+	// }
+	// scan.Temp = float32(tmp) / 10
 
-	// Read lid temperature
-	tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
-	if err != nil {
-		logger.Error("ReadSingleRegister:D135: Lid temperature")
-		return
-	}
-	scan.LidTemp = float32(tmp) / 10
+	// // Read lid temperature
+	// tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
+	// if err != nil {
+	// 	logger.Error("ReadSingleRegister:D135: Lid temperature")
+	// 	return
+	// }
+	// scan.LidTemp = float32(tmp) / 10
 
-	// Read current cycle status
-	tmp, err = d.Driver.ReadSingleCoil(plc.MODBUS["M"][107])
-	if err != nil {
-		logger.Error("ReadSingleCoil:M107: Current PV cycle")
-		return
-	}
-	if tmp == 0 { // 0x0000 means cycle is not complete
-		// Values would not have changed.
-		scan.CycleComplete = false
-		return
-	}
-	scan.CycleComplete = true
+	// // Read current cycle status
+	// tmp, err = d.Driver.ReadSingleCoil(plc.MODBUS["M"][107])
+	// if err != nil {
+	// 	logger.Error("ReadSingleCoil:M107: Current PV cycle")
+	// 	return
+	// }
+	// if tmp == 0 { // 0x0000 means cycle is not complete
+	// 	// Values would not have changed.
+	// 	scan.CycleComplete = false
+	// 	return
+	// }
+	// scan.CycleComplete = true
 
-	// If the invoker has already read this cycle data, don't send it again!
-	if cycle == scan.Cycle {
-		return
-	}
+	// // If the invoker has already read this cycle data, don't send it again!
+	// if cycle == scan.Cycle {
+	// 	return
+	// }
 
 	// Scan all the data from the Wells (96 x 6). Since max read is 123 registers, we shall read 96 at a time.
-	start := plc.MODBUS["D"][2000]
+	// start := plc.MODBUS["D"][23]
 
-	for i := 0; i < 6; i++ {
-		var data []byte
-		data, err = d.Driver.ReadHoldingRegisters(start+uint16(96*i), uint16(96))
-		if err != nil {
-			logger.WithField("register", start+uint16(96*i)).Error("ReadHoldingRegisters: Wells emission data")
-			return
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][20], plc.OFF)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M20 : Start Cycle")
+	// 	return
+	// }
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][21], plc.OFF)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M21 : Start Cycle")
+	// 	return
+	// }
+
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][14], plc.OFF)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M14 : Start Cycle")
+	// 	return
+	// }
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][15], plc.OFF)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M15 : Start Cycle")
+	// 	return
+	// }
+
+	start := 44
+	var data []byte
+
+	for i := 0; i < 2; i++ {
+		start = start + (16 * i)
+
+	LOOP:
+		for {
+
+			data, err = d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
+			if err != nil {
+				logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")
+
+			}
+
+			if len(data) != 0 {
+				logger.Println("data received-------------->", data, "\n start", start)
+				break LOOP
+			}
+
 		}
 
 		offset := 0 // offset of data. increment every 2 bytes!
-		for j := 0; j < 16; j++ {
-			// populate each wells with 6 emissions each
-			emission := plc.Emissions{}
-			for k := 0; k < 6; k++ {
-				emission[k] = binary.BigEndian.Uint16(data[offset : offset+2])
-				offset += 2
-			}
 
-			scan.Wells[(i*16)+j] = emission
+		for j := 0; j < 4; j++ {
+			// populate each wells with 2 emissions each
+
+			scan.Wells[j][i] = binary.BigEndian.Uint16(data[offset : offset+2])
+			logger.Println("emission----", scan.Wells[j][i])
+			offset += 8
+
+			logger.Println("well----", j, "value", scan.Wells[j])
+
 		}
 
 	}
+	//write values to the file
 
-	logger.WithField("scan", scan).Debug("Monitored data")
+	logger.Println(scan.Wells)
+
+	// logger.WithField("scan", scan).Debug("Monitored data")
 
 	// Write to inform PLC that reading is completed
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][106], plc.OFF)
-	if err != nil {
-		logger.Error("WriteSingleCoil:M106: PC reading done")
-		return
-	}
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][106], plc.OFF)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M106: PC reading done")
+	// 	return
+	// }
+
+	d.Reset()
 
 	return
 }
