@@ -66,26 +66,26 @@ const StepContainer = (props) => {
 	const fetchUpdatedSteps = useCallback(() => {
 		// if the stage type is hold fetch hold steps
 		if (stageType === HOLD_STAGE) {
-			dispatch(fetchHoldSteps(holdStageId));
+			dispatch(fetchHoldSteps(holdStageId, token));
 		}
 		// if the stage type is cycle fetch cycle steps
 		if (stageType === CYCLE_STAGE) {
-			dispatch(fetchCycleSteps(cycleStageId));
+			dispatch(fetchCycleSteps(cycleStageId, token));
 		}
 	}, [holdStageId, cycleStageId, stageType, dispatch]);
 
 	const addStep = (step) => {
 		// creating step though api
-		dispatch(addStepAction(step));
+		dispatch(addStepAction(step, token));
 	};
 
 	const deleteStep = (stepId) => {
 		// deleting step though api
-		dispatch(deleteStepAction(stepId));
+		dispatch(deleteStepAction(stepId, token));
 	};
 
 	const saveStep = (stepId, step) => {
-		dispatch(updateStepAction(stepId, step));
+		dispatch(updateStepAction(stepId, step, token));
 	};
 
 	// Here will update selected step id
@@ -108,7 +108,7 @@ const StepContainer = (props) => {
 			name: 'Cycle',
 			type: cycleStage.get('type'),
 			repeat_count: parseInt(repeatCount, 10),
-		}));
+		}, token));
 	};
 
 	// useEffect section
@@ -122,8 +122,8 @@ const StepContainer = (props) => {
 
 	useEffect(() => {
 		// fetch hold and cycle steps list from server on mount
-		dispatch(fetchHoldSteps(holdStageId));
-		dispatch(fetchCycleSteps(cycleStageId));
+		dispatch(fetchHoldSteps(holdStageId, token));
+		dispatch(fetchCycleSteps(cycleStageId, token));
 	}, [holdStageId, cycleStageId, dispatch]);
 
 	useEffect(() => {

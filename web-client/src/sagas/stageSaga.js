@@ -33,7 +33,7 @@ export function* fetchStages(actions) {
 
 export function* updateStage(actions) {
 	const {
-		payload: { stageId, body },
+		payload: { stageId, body, token },
 	} = actions;
 
 	const { successAction, failureAction } = updateStageActions;
@@ -46,6 +46,7 @@ export function* updateStage(actions) {
 				reqPath: `stages/${stageId}`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {

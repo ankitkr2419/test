@@ -18,7 +18,7 @@ import { HTTP_METHODS } from "appConstants";
 
 export function* addStep(actions) {
   const {
-    payload: { body },
+    payload: { body, token },
   } = actions;
 
   const { successAction, failureAction } = addStepActions;
@@ -31,6 +31,7 @@ export function* addStep(actions) {
         reqPath: "steps",
         successAction,
         failureAction,
+        token
       },
     });
   } catch (error) {
@@ -41,7 +42,7 @@ export function* addStep(actions) {
 
 export function* fetchHoldSteps(actions) {
   const {
-    payload: { stageId },
+    payload: { stageId, token },
   } = actions;
   const { successAction, failureAction } = listHoldStepActions;
   try {
@@ -51,6 +52,7 @@ export function* fetchHoldSteps(actions) {
         reqPath: `stages/${stageId}/steps`,
         successAction,
         failureAction,
+        token
       },
     });
   } catch (error) {
@@ -61,7 +63,7 @@ export function* fetchHoldSteps(actions) {
 
 export function* fetchCycleSteps(actions) {
   const {
-    payload: { stageId },
+    payload: { stageId, token },
   } = actions;
   const { successAction, failureAction } = listCycleStepActions;
   try {
@@ -71,6 +73,7 @@ export function* fetchCycleSteps(actions) {
         reqPath: `stages/${stageId}/steps`,
         successAction,
         failureAction,
+        token
       },
     });
   } catch (error) {
@@ -81,7 +84,7 @@ export function* fetchCycleSteps(actions) {
 
 export function* updateStep(actions) {
   const {
-    payload: { stepId, body },
+    payload: { stepId, body, token },
   } = actions;
 
   const { successAction, failureAction } = updateStepActions;
@@ -94,6 +97,7 @@ export function* updateStep(actions) {
         reqPath: `steps/${stepId}`,
         successAction,
         failureAction,
+        token
       },
     });
   } catch (error) {
@@ -104,7 +108,7 @@ export function* updateStep(actions) {
 
 export function* deleteStep(actions) {
   const {
-    payload: { stepId },
+    payload: { stepId, token },
   } = actions;
 
   const { successAction, failureAction } = deleteStepActions;
@@ -116,6 +120,7 @@ export function* deleteStep(actions) {
         reqPath: `steps/${stepId}`,
         successAction,
         failureAction,
+        token
       },
     });
   } catch (error) {
