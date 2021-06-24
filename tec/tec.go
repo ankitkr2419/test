@@ -105,7 +105,6 @@ func Run() (err error) {
 		CycleCount: 3,
 	}
 
-
 	tecLogsPath := "./utils/tec"
 	// logging output to file and console
 	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
@@ -124,15 +123,26 @@ func Run() (err error) {
 
 	// Start line
 	err = writer.Write([]string{"Description", "Time Taken", "Initial Temp", "Final Temp"})
-
+	if err != nil{
+		return
+	}
 	err = writer.Write([]string{"Holding Stage About to start"})
+	if err != nil{
+		return
+	}
+	// Go back to Room Temp at the end
+	defer reachRoomTemp()
 
+	logger.Infoln("Room Temp 27 Reached ")
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
 	runStage(p.Holding, writer, 0)
 
 	// Run Cycle Stage
 	err = writer.Write([]string{"Cycle Stage About to start"})
+	if err != nil{
+		return
+	}
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
@@ -140,8 +150,10 @@ func Run() (err error) {
 		logger.Infoln("Holding Completed ->", p.Cycle[i-1].HoldTime, " for cycle number ", i)
 	}
 
-	// Go back to Room Temp
+	return nil
+}
 
+func reachRoomTemp(){
 	logger.Infoln("Going Back to Room Temp 27 ")
 	t := TECTempSet{
 		TargetTemperature: 27,
@@ -149,8 +161,7 @@ func Run() (err error) {
 	}
 	ConnectTEC(t)
 	logger.Infoln("Room Temp 27 Reached ")
-
-	return nil
+	return
 }
 
 func runStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) {
