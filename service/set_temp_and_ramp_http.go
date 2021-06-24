@@ -1,9 +1,9 @@
 package service
 
 import (
-	"encoding/json"
-
 	"mylab/cpagent/tec"
+
+	"encoding/json"
 	"net/http"
 )
 
@@ -19,7 +19,7 @@ func setTempAndRampHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = tec.ConnectTEC(t)
+		err = deps.Tec.ConnectTEC(t)
 		if err != nil{
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return

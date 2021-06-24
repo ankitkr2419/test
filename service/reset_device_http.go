@@ -1,7 +1,6 @@
 package service
 
 import (
-	"mylab/cpagent/tec"
 	"net/http"
 )
 
@@ -10,7 +9,7 @@ func resetDeviceHandler(deps Dependencies) http.HandlerFunc {
 
 		var err error
 
-		err = tec.ResetDevice()
+		err = deps.Tec.ResetDevice()
 		if err != nil{
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
