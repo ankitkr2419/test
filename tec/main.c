@@ -334,7 +334,7 @@ int InitiateTEC()
                printf("Ident String: %s\n", Buf);
     }
 
-    Fields.Value = 1;
+    Fields.Value = 4;
     if(MeCom_TEC_Ope_CurrentLimitation(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Ope_CurrentLimitation(Address, Inst, &Fields, MeSet);
     } else{
@@ -342,7 +342,7 @@ int InitiateTEC()
         return -1;
     }
 
-    Fields.Value = 9.6;
+    Fields.Value = 20;
     if(MeCom_TEC_Ope_VoltageLimitation(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Ope_VoltageLimitation(Address, Inst, &Fields, MeSet);
     } else{
@@ -358,7 +358,7 @@ int InitiateTEC()
         return -1;
     }
 
-    Fields.Value = 12;
+    Fields.Value = 21;
     if(MeCom_TEC_Ope_VoltageErrorThreshold(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Ope_VoltageErrorThreshold(Address, Inst, &Fields, MeSet);
     } else{
@@ -553,6 +553,7 @@ int InitiateTEC()
 
 int DemoFunc(double target, double ramp)
 {   
+    MeParFloatFields Fields;
     int i = 0;
    
     // 1. Setup Target Temp
@@ -586,11 +587,9 @@ int DemoFunc(double target, double ramp)
     }
 
 skipRamp:
-    i = 0;
-    // 5. Read Target Temp(Current) till 3 times
-    while(i != 3){
+    while(1){
             i++;
-            sleep(3); 
+            sleep(1);
 
             if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
             {
@@ -600,6 +599,11 @@ skipRamp:
                 return -1;
             }
 
+            // Play of +- 1
+            if ( ( (target + 1) >= Fields.Value ) && ( (target - 1) <= Fields.Value ) ) {
+                printf("TEC Object Temperature Reached:: %f, target: %f\n", Fields.Value, target);
+                return 0;
+            }
     }
     return 0;
 }
@@ -607,6 +611,7 @@ skipRamp:
 
 int checkForErrorState()
 {
+
     MeParLongFields Longs; 
     if(MeCom_COM_DeviceStatus(Address, &Longs, MeGet)){
         // print only if its not Run
