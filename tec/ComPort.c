@@ -6,6 +6,8 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "MePort.h"
 
 
@@ -108,7 +110,14 @@ static void* recvData(void* arg)
 static void WriteDataToDebugFile(char *prefix, char *in)
 {
 	FILE *fd;
-	fd = fopen("./ComLog.txt", "a+");
+
+	struct stat st = {0};
+
+	if (stat("./utils/tec", &st) == -1) {
+		mkdir("./utils/tec", 0755);
+	}
+
+	fd = fopen("./utils/tec/ComLog.txt", "a+");
 	if(fd >= 0)
 	{
 		int len = strcspn(in, "\r\n");
