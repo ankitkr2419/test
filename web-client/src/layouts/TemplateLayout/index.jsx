@@ -16,7 +16,6 @@ import templateLayoutReducer, {
   getWizardListByLoginType,
 } from "./templateState";
 import { useSelector } from "react-redux";
-import { ROUTES } from "appConstants";
 import { useHistory } from "react-router";
 
 const TemplateLayout = (props) => {
