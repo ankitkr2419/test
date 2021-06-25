@@ -10,16 +10,16 @@ const (
 )
 
 const (
-	UP          = uint16(1)
-	DOWN        = uint16(0)
-	FWD         = uint16(1)
-	REV         = uint16(0)
-	ASPIRE      = uint16(0)
-	DISPENSE    = uint16(1)
+	UP            = uint16(1)
+	DOWN          = uint16(0)
+	FWD           = uint16(1)
+	REV           = uint16(0)
+	ASPIRE        = uint16(0)
+	DISPENSE      = uint16(1)
 	TowardsSensor = uint16(1)
 	AgainstSensor = uint16(0)
-	SensorUncut = 2
-	SensorCut   = 3
+	SensorUncut   = 2
+	SensorCut     = 3
 )
 
 // *** NOTE ***
@@ -48,6 +48,11 @@ const (
 var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	// Data Registers
 	"D": map[int]uint16{
+		//updated addresses
+		23: uint16(0x1017), //register for setting rotation pulses
+		44: uint16(0x102C), //start address of register For FAM
+		60: uint16(0x103C), //start address of register For VIC
+
 		100:  uint16(0x1064), // heartbeat register (W)
 		101:  uint16(0x1065), // offset for holding stage config (W)
 		113:  uint16(0x1071), // offset for cycling stage config (W)
@@ -62,6 +67,16 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	},
 	// Coil registers: ON:0xFF00, OFF: 0x0000
 	"M": map[int]uint16{
+
+		//Updated addresses
+		1:  uint16(0x0801), //combined Homing rt-pcr
+		2:  uint16(0x0802), //combined Homing rt-pcr
+		14: uint16(0x080E), //combined with M15 ON/OFF rotate button
+		15: uint16(0x080F), //combined with M14 ON/OFF rotate button
+		20: uint16(0x0814), //combined with M21 ON/OFF cycle button
+		21: uint16(0x0815), //combined with M20 ON/OFF cycle button
+		25: uint16(0x0819), //reset values
+
 		100: uint16(0x0864), // homing success (R)
 		101: uint16(0x0865), // homing error (R)
 		102: uint16(0x0866), // Start / Stop Cycle (W)

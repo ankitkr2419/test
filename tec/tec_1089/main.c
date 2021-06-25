@@ -21,6 +21,7 @@
 /*                          IMPORT                                              */
 /*==============================================================================*/
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include "ConsoleIO.h"
 #include "ComPort.h"
@@ -33,11 +34,17 @@
 /*==============================================================================*/
 /*                          STATIC FUNCTION PROTOTYPES                          */
 /*==============================================================================*/
-int DemoFunc();
+int DemoFunc(double target, double ramp);
 static int32_t MenuSelection(void);
 static void TestAllCommonGetFunctions(uint8_t Address);
 static void TestAllLDDGetFunctions(uint8_t Address);
 static void TestAllTECGetFunctions(uint8_t Address);
+int32_t Address;
+int8_t Buf[25];
+MeParFloatFields Fields;
+MeParLongFields Longs;
+int32_t Inst = 1;         
+
 
 /*==============================================================================*/
 /*                          EXTERN VARIABLES                                    */
@@ -52,13 +59,7 @@ static void TestAllTECGetFunctions(uint8_t Address);
  *
 */
 int main2()
-{
-
-
-    DemoFunc();
-
-    return 0;
- 
+{ 
  
     printf("* Demo Application of the Meerstetter Engineering Communication Protocol API *\n\n");
     printf("If you have any questions, please do not hesitate to contact us under:\ncontact@meerstetter.ch or www.meerstetter.ch\n\n");
@@ -311,31 +312,394 @@ int main2()
     return 0;
 }
 
-
-int DemoFunc()
+int InitiateTEC()
 {
-if(ConsoleIO_YesNo("Do you want to open a Comport? (press enter for default)", 1))
-    {
-        ComPort_Open(ConsoleIO_IntInput("Please enter ComPort number", 0, 50, 0), 
-            ConsoleIO_IntInput("Please enter ComPort Speed", 4800, 1000000, 57600));
-    }
-    else
-    {
-        printf("No Comport has been opened, this will result in some communications timeouts.\n");
-        printf("It is even though possible to see the resulting Host communication\nin the Communication Log file\n\n");
-    }
-    int32_t Address = ConsoleIO_IntInput("Please Enter the Device Address", 0, 255, 0);
+    // if(ConsoleIO_YesNo("Do you want to open a Comport? (press enter for default)", 1))
+    // {
+    // } else {
+    //     printf("No Comport has been opened, this will result in some communications timeouts.\n");
+    //     printf("It is even though possible to see the resulting Host communication\nin the Communication Log file\n\n");
+    // }
+
+    ComPort_Open(0, 57600);
+
     
-    int8_t Buf[25];
-    ConsoleIO_SetColor(ConsoleIO_Red);
+    // Address = ConsoleIO_IntInput("Please Enter the Device Address", 0, 255, 0);
+    
+    Address = 2;
+
     if(MeCom_GetIdentString(Address, Buf)) 
     {
                ConsoleIO_SetColor(ConsoleIO_Green);
                printf("Ident String: %s\n", Buf);
     }
+
+    Fields.Value = 4;
+    if(MeCom_TEC_Ope_CurrentLimitation(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Ope_CurrentLimitation(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Ope_CurrentLimitation value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    Fields.Value = 20;
+    if(MeCom_TEC_Ope_VoltageLimitation(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Ope_VoltageLimitation(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Ope_VoltageLimitation value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    Fields.Value = 4.8;
+    if(MeCom_TEC_Ope_CurrentErrorThreshold(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Ope_CurrentErrorThreshold(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Ope_CurrentErrorThreshold value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    Fields.Value = 21;
+    if(MeCom_TEC_Ope_VoltageErrorThreshold(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Ope_VoltageErrorThreshold(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Ope_VoltageErrorThreshold value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    // Temperature Controlling
+
+    // 1. Setup Initial Target Temp
+
+    // setValue = 40;
+    Fields.Value = 27;
+    printf("TEC Object Temperature: New Value: %f\n", Fields.Value);
+
+    // check for limit
+
+    if(MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC Object Temperature value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+
+    // Peltier Full Control
+    Longs.Value = 0;
+
+    if(MeCom_TEC_Tem_ModelizationMode(Address, Inst, &Longs, MeGetLimits)){
+        MeCom_TEC_Tem_ModelizationMode(Address, Inst, &Longs, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_ModelizationMode value out of range( %d, %d).", Longs.Max, Longs.Min);
+        return -1;
+    }
+
+    // Temperature Controller
+    Longs.Value = 2;
+
+    if(MeCom_TEC_Ope_OutputStageInputSelection(Address, Inst, &Longs, MeGetLimits)){
+        MeCom_TEC_Ope_OutputStageInputSelection(Address, Inst, &Longs, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Ope_OutputStageInputSelection value out of range( %d, %d).", Longs.Max, Longs.Min);
+        return -1;
+    }
+
+/*
+    Fields.Value = 44.40232;
+    if(MeCom_TEC_Tem_Kp(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_Kp(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_Kp value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    Fields.Value = 0.7976229;
+    if(MeCom_TEC_Tem_Ti(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_Ti(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_Ti value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    Fields.Value = 0.1914295;
+    if(MeCom_TEC_Tem_Td(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_Td(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_Td value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    Fields.Value = 0.3;
+    if(MeCom_TEC_Tem_DPartDampPT1(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_DPartDampPT1(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_DPartDampPT1 value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+*/
+    // Peltier Max Current
+
+    Fields.Value = 7;
+    if(MeCom_TEC_Tem_PeltierMaxCurrent(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_PeltierMaxCurrent(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_PeltierMaxCurrent value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    Fields.Value = 75;
+    if(MeCom_TEC_Tem_PeltierDeltaTemperature(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_PeltierDeltaTemperature(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_PeltierDeltaTemperature value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    // 0 means cooling
+    Longs.Value = 0;
+
+    if(MeCom_TEC_Tem_PeltierPositiveCurrentIs(Address, Inst, &Longs, MeGetLimits)){
+        MeCom_TEC_Tem_PeltierPositiveCurrentIs(Address, Inst, &Longs, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_PeltierPositiveCurrentIs value out of range( %d, %d).", Longs.Max, Longs.Min);
+        return -1;
+    }
+
+    // Stage Enable
+    Longs.Value = 1;
+
+    if (MeCom_TEC_Ope_OutputStageEnable(Address, Inst, &Longs , MeSet)){
+        printf("MeCom_TEC_Ope_OutputStageEnable %d", Longs.Value);
+    } else{
+        printf("TEC MeCom_TEC_Ope_OutputStageEnable value out of range( %d, %d).", Longs.Max, Longs.Min);
+        return -1;
+    }
+
+    // Read all parameters
+    /*
+    if(MeCom_TEC_Oth_AtmPIDParameterKp(Address, Inst, &Fields, MeGet)){
+        printf("TEC MeCom_TEC_Oth_AtmPIDParameterKp value is: %f\n", Fields.Value);
+    } else{
+        printf("TEC MeCom_TEC_Oth_AtmPIDParameterKp value couldn't be read");
+        return -1;
+    }
+
+    if(MeCom_TEC_Oth_AtmPIDParameterTi(Address, Inst, &Fields, MeGet)){
+        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTi value is: %f\n", Fields.Value);
+        
+    } else{
+        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTi value couldn't be read");
+        return -1;
+    }
+
+    if(MeCom_TEC_Oth_AtmPIDParameterTd(Address, Inst, &Fields, MeGet)){
+        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTd value is: %f\n", Fields.Value);
+        
+    } else{
+        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTd value couldn't be read");
+        return -1;
+    }
+
+    if(MeCom_TEC_Oth_AtmPIDDPartDamping(Address, Inst, &Fields, MeGet)){
+        printf("TEC MeCom_TEC_Oth_AtmPIDDPartDamping value is: %f\n", Fields.Value);
+        
+    } else{
+        printf("TEC MeCom_TEC_Oth_AtmPIDDPartDamping value couldn't be read");
+        return -1;
+    }
+    */
+
+    // 5. Read Target Temp(Current) till target reached
+    int i = 0;
+    while(i != 3){
+            i++;
+            sleep(3); 
+            if(MeCom_TEC_Mon_TargetObjectTemperature(Address, Inst, &Fields, MeGet))
+            {
+                printf("TEC Target Object Temperature: Value: %f\n", Fields.Value);
+            } else {
+                printf("TEC Target Object Temperature value couldn't be read");
+                return -1;
+            }
+
+            if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
+            {
+                printf("TEC Object Temperature: Value: %f\n", Fields.Value);
+            } else {
+                printf("TEC Object Temperature value couldn't be read");
+                return -1;
+            }
+
+            if(MeCom_TEC_Mon_ActualOutputCurrent(Address, Inst, &Fields, MeGet))
+            {
+                printf("TEC MeCom_TEC_Mon_ActualOutputCurrent: Value: %f\n", Fields.Value);
+            } else {
+                printf("TEC MeCom_TEC_Mon_ActualOutputCurrent value couldn't be read");
+                return -1;
+            }
+
+            if(MeCom_TEC_Mon_ActualOutputVoltage(Address, Inst, &Fields, MeGet))
+            {
+                printf("TEC MeCom_TEC_Mon_ActualOutputVoltage: Value: %f\n", Fields.Value);
+            } else {
+                printf("TEC MeCom_TEC_Mon_ActualOutputVoltage value couldn't be read");
+                return -1;
+            }
+    }
+
     return 0;
 }
 
+
+int DemoFunc(double target, double ramp)
+{   
+    MeParFloatFields Fields;
+    int i = 0;
+   
+    // 1. Setup Target Temp
+
+    // setValue = 40;
+    Fields.Value = target;
+    printf("TEC Object Temperature: New Value: %f\n", Fields.Value);
+
+    // check for limit
+
+    if(MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC Object Temperature value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    if (ramp == 0){
+        goto skipRamp;
+    }
+    Fields.Value = ramp;
+    printf("TEC Object Ramp Up Rate: New Value: %f\n", Fields.Value);
+
+    // check for limit
+
+    if(MeCom_TEC_Tem_CoarseTempRamp(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_CoarseTempRamp(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC Object Ramp Up Rate value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+skipRamp:
+    while(1){
+            i++;
+            sleep(1);
+
+            if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
+            {
+                printf("TEC Object Temperature: Value: %f\n", Fields.Value);
+            } else {
+                printf("TEC Object Temperature value couldn't be read");
+                return -1;
+            }
+
+            // Play of +- 1
+            if ( ( (target + 1) >= Fields.Value ) && ( (target - 1) <= Fields.Value ) ) {
+                printf("TEC Object Temperature Reached:: %f, target: %f\n", Fields.Value, target);
+                return 0;
+            }
+    }
+    return 0;
+}
+
+
+int checkForErrorState()
+{
+
+    MeParLongFields Longs; 
+    if(MeCom_COM_DeviceStatus(Address, &Longs, MeGet)){
+        // print only if its not Run
+        if (Longs.Value != 2){
+            printf("TEC MeCom_COM_DeviceStatus :%d\n", Longs.Value);
+        }
+    } else{
+        printf("TEC Reading MeCom_COM_DeviceStatus error");
+        return -1;
+    }
+
+// check for Error type
+    if (Longs.Value == 3) {
+        if(MeCom_COM_ErrorNumber(Address, &Longs, MeGet)){
+            printf("TEC MeCom_COM_ErrorNumber :%d\n", Longs.Value);
+            return 3;
+        } else{
+            printf("TEC Reading MeCom_COM_ErrorNumber error");
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int autoTune(){
+    MeParLongFields Longs;
+    MeParFloatFields Fields;
+
+    Longs.Value = 1;
+    if(MeCom_TEC_Oth_AtmAutoTuningStart(Address, Inst, &Longs, MeGetLimits)){
+        MeCom_TEC_Oth_AtmAutoTuningStart(Address, Inst, &Longs, MeSet);
+        printf("TEC MeCom_TEC_Oth_AtmAutoTuningStart :%d\n", Longs.Value);
+    } else{
+        printf("TEC Reading MeCom_TEC_Oth_AtmAutoTuningStart error");
+        return -1;
+    }
+
+    if(MeCom_TEC_Oth_AtmTuningStatus(Address, Inst, &Longs, MeGet)){
+        printf("TEC MeCom_TEC_Oth_AtmTuningStatus :%d\n", Longs.Value);
+    } else{
+        printf("TEC Reading MeCom_TEC_Oth_AtmTuningStatus error");
+        return -1;
+    }
+
+    // Other Longs value means its either idle or success or err
+    while (Longs.Value > 0 && Longs.Value < 4){
+        sleep(5);
+        if(MeCom_TEC_Oth_AtmTuningStatus(Address, Inst, &Longs, MeGet)){
+            printf("TEC MeCom_TEC_Oth_AtmTuningStatus :%d\n", Longs.Value);
+        } else{
+            printf("TEC Reading MeCom_TEC_Oth_AtmTuningStatus error");
+        return -1;
+        }
+
+        //  Read Progress
+        if(MeCom_TEC_Oth_AtmTuningProgress(Address, Inst, &Fields, MeGet)){
+            printf("TEC MeCom_TEC_Oth_AtmTuningProgress :%f\n", Fields.Value);
+        } else{
+            printf("TEC Reading MeCom_TEC_Oth_AtmTuningProgress error");
+        return -1;
+        }
+    }
+
+    // Error
+    if (Longs.Value == 10){
+        printf("TEC Reading Auto Tuning error");
+        return -1;
+    // Success
+    } else if (Longs.Value == 4){
+        printf("TEC Auto Tuning SUCCESS");
+        return 4;
+    // Other
+    } else {
+        printf("TEC looks to be in idle state");
+        return 0;
+    }
+
+}
+
+int resetDevice(){
+    if (MeCom_ResetDevice(Address)){
+        printf("TEC Reset SUCCESS");
+    } else {
+        printf("TEC Reset FAIL");
+        return -1;
+    }
+    return 0;
+}
 /*==============================================================================*/
 /** @brief      Menu selection function
  *

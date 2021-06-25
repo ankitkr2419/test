@@ -1,25 +1,20 @@
 package tec
 
+import (
+	"encoding/csv"
+	"mylab/cpagent/plc"
+)
+type TECTempSet struct {
+	TargetTemperature float64 `json:"target_temp" validate:"gte=-20,lte=100"`
+	TargetRampRate    float64 `json:"ramp_rate" validate:"gte=-20,lte=100"`
+}
 
-/*
-int DemoFunc();
-#include <stdlib.h>
-#include <time.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
-#include <errno.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#cgo CFLAGS  : -std=gnu99 -Wall -g -O3
-#cgo LDFLAGS : -pthread -lrt
-*/
-import "C"
-
-func ConnectTEC(){
-
-	C.DemoFunc()
+type Driver interface{
+	TestRun() error
+	ReachRoomTemp() error
+	InitiateTEC() error
+	ConnectTEC(TECTempSet) error
+	AutoTune() error
+	ResetDevice() error
+	RunStage([]plc.Step, *csv.Writer, uint16) error
 }
