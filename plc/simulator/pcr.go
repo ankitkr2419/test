@@ -177,3 +177,7 @@ func jitter(n uint16, min, max int) uint16 {
 	}).Debug("inside jitter...")
 	return final
 }
+
+func (d *Simulator) Cycle() (err error)       { return }
+func (d *Simulator) HomingRTPCR() (err error) { return }
+func (d *Simulator) Reset() (err error)       { return }
