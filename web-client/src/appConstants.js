@@ -123,6 +123,7 @@ export const MODAL_MESSAGE = {
   finishProcessListConfirmation: "Are you sure you want to save changes to ",
   deleteProcessConfirmation: "Are you sure you want to delete this process?",
   deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
+  exitConfirmation: "Are you sure you want to exit?",
 };
 
 export const MODAL_BTN = {
@@ -376,4 +377,4 @@ export const APP_TYPE = {
   RTPCR: "rtpcr",
   EXTRACTION: "extraction",
   NONE: "none",
-}
+};
