@@ -311,7 +311,7 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 	deps.Plc.HomingRTPCR()
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Initial Temp", "Final Temp"})
+	err = writer.Write([]string{"Description", "Time Taken","Expected Time", "Initial Temp", "Final Temp", "Ramp"})
 	if err != nil{
 		return
 	}
@@ -320,9 +320,13 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 		return
 	}
 	// Go back to Room Temp at the end
-	defer deps.Tec.ReachRoomTemp()
-
-	logger.Infoln("Room Temp 27 Reached ")
+	defer func(){
+		if err != nil{
+			return
+		}
+		err = deps.Tec.ReachRoomTemp()
+		return
+	}()
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
 	deps.Tec.RunStage(p.Holding, writer, 0)
@@ -340,7 +344,7 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
 		deps.Tec.RunStage(p.Cycle, writer, i)
-		logger.Infoln("Holding Completed ->", p.Cycle[i-1].HoldTime, " for cycle number ", i)
+		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
 		deps.Plc.Cycle()
 		deps.Plc.Start()
