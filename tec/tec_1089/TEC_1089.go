@@ -25,6 +25,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"math"
 
 	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/plc"
@@ -95,7 +96,8 @@ func (t *TEC1089) ConnectTEC(ts tec.TECTempSet) (err error) {
 
 func (t *TEC1089) AutoTune() (err error) {
 	C.autoTune()
-	return nil
+	err = t.InitiateTEC()
+	return err
 }
 
 func (t *TEC1089) ResetDevice() (err error) {
@@ -141,7 +143,7 @@ func (t *TEC1089) TestRun() (err error) {
 	defer writer.Flush()
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Initial Temp", "Final Temp"})
+	err = writer.Write([]string{"Description", "Time Taken","Expected Time", "Initial Temp", "Final Temp", "Ramp"})
 	if err != nil{
 		return
 	}
@@ -166,7 +168,7 @@ func (t *TEC1089) TestRun() (err error) {
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
 		t.RunStage(p.Cycle, writer, i)
-		logger.Infoln("Holding Completed ->", p.Cycle[i-1].HoldTime, " for cycle number ", i)
+		logger.Infoln("Holding Completed ->", p.Cycle[len(p.Cycle)-1].HoldTime, " for cycle number ", i)
 	}
 
 	return nil
@@ -194,7 +196,7 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		}
 		logger.Infoln("Started ->", ti)
 		t.ConnectTEC(ti)
-		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp)})
+		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(),  fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp - prevTemp))/ float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
 
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 		time.Sleep(time.Duration(h.HoldTime) * time.Second)
@@ -203,9 +205,9 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 
 	}
 	if cycleNum != 0 {
-		writer.Write([]string{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
+		writer.Write([]string{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
 	} else {
-		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
+		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
 	}
 	return nil
 }
