@@ -1,5 +1,5 @@
 import React from "react";
-import { getOptions } from "./functions";
+import { getOptions } from "./helpers";
 import labwareDeckPosition1 from "assets/images/labware-plate-deck-position-1.png";
 import labwareDeckPosition2 from "assets/images/labware-plate-deck-position-2.png";
 import labwareDeckPosition3 from "assets/images/labware-plate-deck-position-3.png";

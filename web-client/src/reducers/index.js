@@ -50,6 +50,7 @@ import { cleanUpReducer } from "reducers/cleanUpReducer";
 import { updateRecipeDetailsReducer } from "reducers/updateRecipeDetailsReducer";
 import { processListReducer } from "reducers/processListReducer";
 import { editProcessReducer } from "reducers/editProcessReducer";
+import { processesReducer } from "reducers/processesReducer";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -90,6 +91,7 @@ const rootReducer = combineReducers({
   updateRecipeDetailsReducer,
   processListReducer,
   editProcessReducer,
+  processesReducer,
 });
 
 export default rootReducer;

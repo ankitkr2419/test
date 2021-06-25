@@ -1,13 +1,22 @@
 import React from "react";
 
-import { Row, Card, CardBody } from "core-components";
-import { ButtonBar } from "shared-components";
+import { Redirect } from "react-router";
+import { useSelector } from "react-redux";
 
+import { Row, Card, CardBody } from "core-components";
 import Process from "./Process";
 import { HeadingTitle, PageBody, ProcessOuterBox, TopContent } from "./Style";
-import { SELECT_PROCESS_PROPS } from "appConstants";
+import { ROUTES, SELECT_PROCESS_PROPS } from "appConstants";
 
 const SelectProcessPageComponent = () => {
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  if (!activeDeckObj.isLoggedIn) {
+    return <Redirect to={`/${ROUTES.landing}`} />;
+  }
+
   return (
     <PageBody className="h-100">
       <ProcessOuterBox className="h-100">
@@ -39,7 +48,6 @@ const SelectProcessPageComponent = () => {
               </Row>
             </CardBody>
           </Card>
-          <ButtonBar />
         </div>
       </ProcessOuterBox>
     </PageBody>
