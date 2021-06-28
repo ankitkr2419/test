@@ -116,7 +116,7 @@ const SampleSideBarContainer = (props) => {
   }, [updateWell, experimentTargetsList]);
 
   const fetchSamples = (text) => {
-    dispatch(fetchSamplesAction(text));
+    dispatch(fetchSamplesAction(text, token));
   };
 
   const addNewLocalSample = (sample) => {

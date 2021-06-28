@@ -39,8 +39,6 @@ export function* fetchWells(actions) {
     payload: { experimentId, token },
   } = actions;
 
-  console.log("Actions: ", actions);
-
   const { successAction, failureAction } = listWellActions;
   try {
     yield call(callApi, {

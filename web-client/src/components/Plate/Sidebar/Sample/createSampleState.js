@@ -20,7 +20,7 @@ export const createSampleInitialState = fromJS({
 
 export const validate = (state) => {
 	const { sample, targets, task } = state.toJS();
-	if (sample === undefined || targets.length === 0 || task === null) {
+	if (!sample || targets.length === 0 || !task) {
 		return false;
 	}
 	return true;
