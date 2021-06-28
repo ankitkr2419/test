@@ -9,6 +9,9 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+var HeatingCycleComplete bool = false
+var CurrentCycleTemperature float32
+
 type DeckNumber struct {
 	Deck   string
 	Number uint16
