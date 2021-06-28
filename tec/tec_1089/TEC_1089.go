@@ -6,6 +6,7 @@ int InitiateTEC();
 int checkForErrorState();
 int autoTune();
 int resetDevice();
+int getAllTEC();
 #include <stdlib.h>
 #include <time.h>
 #include <fcntl.h>
@@ -197,7 +198,7 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		logger.Infoln("Started ->", ti)
 		t.ConnectTEC(ti)
 		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(),  fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp - prevTemp))/ float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
-
+		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0),"\nExpected Time: " ,  math.Abs(float64(h.TargetTemp - prevTemp))/ float64(h.RampUpTemp), "\nInitial Temp:",  prevTemp, "\nTarget Temp: ", h.TargetTemp , "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 		time.Sleep(time.Duration(h.HoldTime) * time.Second)
 		logger.Infoln("Holding Completed ->", h.HoldTime)
@@ -209,5 +210,44 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 	} else {
 		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
 	}
+	return nil
+}
+
+func (t *TEC1089) GetAllTEC() (err error){
+	C.getAllTEC()
+	return nil
+}
+
+
+func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error){
+	tecLogsPath := "./utils/tec"
+	// logging output to file and console
+	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
+		os.MkdirAll(tecLogsPath, 0755)
+		// ignore error and try creating log output file
+	}
+
+	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tecLogsPath, time.Now().Unix()))
+	if err != nil {
+		logger.Errorln(responses.FileCreationError)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// Start line
+	err = writer.Write([]string{"Description", "Time Taken","Expected Time", "Initial Temp", "Final Temp", "Ramp"})
+	if err != nil{
+		return
+	}
+
+
+	for i := uint16(1); i <= uint16(tp.Cycles); i++ {
+		logger.Infoln("Started Cycle->", i)
+		t.RunStage(tp.Profile, writer, i)
+		logger.Infoln("Cycle Completed -> ", i)
+	}
+
 	return nil
 }
