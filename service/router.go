@@ -140,9 +140,11 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 
 	// tec funcs
 	router.HandleFunc("/tec/set-temp-and-ramp", setTempAndRampHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/run", runProfileHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/auto-tune", autoTuneHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/reset-device", resetDeviceHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/run", runTECHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/get-all", getAllTECHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	return
 }
