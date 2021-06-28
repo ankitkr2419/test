@@ -26,16 +26,15 @@ import { getRunExperimentReducer } from "selectors/runExperimentSelector";
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
 import {
+  APP_TYPE,
   EXPERIMENT_STATUS,
   MODAL_BTN,
   MODAL_MESSAGE,
   ROUTES,
 } from "appConstants";
-import { getRedirectObj, NAV_ITEMS, PATH_TO_SHOW_CROSS_BTN } from "./constants";
+import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
-import { useHistory, useLocation } from "react-router";
-
 
 const AppHeader = (props) => {
   const {
@@ -46,11 +45,10 @@ const AppHeader = (props) => {
     isTemplateRoute,
     token,
     deckName,
+    app,
   } = props;
 
-  const location = useLocation();
   const dispatch = useDispatch();
-  const history = useHistory();
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -84,7 +82,7 @@ const AppHeader = (props) => {
 
   const startExperiment = () => {
     if (isExperimentRunning === false && isExperimentSucceeded === false) {
-      dispatch(runExperiment(experimentId));
+      dispatch(runExperiment(experimentId, token));
     }
   };
 
@@ -135,7 +133,7 @@ const AppHeader = (props) => {
     if (isConfirmed) {
       if (isExperimentRunning === true) {
         // user aborted experiment
-        dispatch(stopExperiment(experimentId));
+        dispatch(stopExperiment(experimentId, token));
       } else {
         dispatch(logoutInitiated({ deckName: deckName, token: token }));
       }
@@ -145,7 +143,7 @@ const AppHeader = (props) => {
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} />
-      {isUserLoggedIn && (
+      {isUserLoggedIn && app === APP_TYPE.RTPCR && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map((ele) => (
             <NavItem key={ele.name}>
@@ -163,50 +161,57 @@ const AppHeader = (props) => {
         </Nav>
       )}
       {isUserLoggedIn && (
-        <div className="d-flex align-items-center">
+        <div
+          // TODO : remove "style"
+          style={{ position: "absolute", right: 15 }}
+          className="d-flex align-items-center"
+        >
           {/* <PrintDataModal /> */}
           {/* <ExportDataModal /> */}
-          <div className="experiment-info text-right mx-3">
-            <Text
-              size={12}
-              className={`text-default mb-1 ${
-                isExperimentRunning ? "show" : ""
-              }`}
-            >
-              {`Experiment started at ${runExperimentReducer.get(
-                "experimentStartedTime"
-              )}`}
-            </Text>
-            <Text
-              size={12}
-              className={`text-error mb-1 ${isRunFailed ? "show" : ""}`}
-            >
-              Experiment failed to run.
-            </Text>
-            {isExperimentSucceeded === false && isPlateRoute === true && (
-              <Button
-                color={isExperimentRunning ? "primary" : "secondary"}
-                size="sm"
-                className="font-weight-light border-2 border-gray shadow-none"
-                outline={
-                  isExperimentRunning === false &&
-                  isExperimentSucceeded === false
-                }
-                onClick={startExperiment}
+          {app === APP_TYPE.RTPCR && (
+            <div className="experiment-info text-right mx-3">
+              <Text
+                size={12}
+                className={`text-default mb-1 ${
+                  isExperimentRunning ? "show" : ""
+                }`}
               >
-                Run
-              </Button>
-            )}
-            {isExperimentSucceeded === true && (
-              <Button
-                color="success"
-                size="sm"
-                className="font-weight-light border-2 border-gray shadow-none"
+                {`Experiment started at ${runExperimentReducer.get(
+                  "experimentStartedTime"
+                )}`}
+              </Text>
+              <Text
+                size={12}
+                className={`text-error mb-1 ${isRunFailed ? "show" : ""}`}
               >
-                Result - Successful
-              </Button>
-            )}
-          </div>
+                Experiment failed to run.
+              </Text>
+              {isExperimentSucceeded === false && isPlateRoute === true && (
+                <Button
+                  color={isExperimentRunning ? "primary" : "secondary"}
+                  size="sm"
+                  className="font-weight-light border-2 border-gray shadow-none"
+                  outline={
+                    isExperimentRunning === false &&
+                    isExperimentSucceeded === false
+                  }
+                  onClick={startExperiment}
+                >
+                  Run
+                </Button>
+              )}
+              {isExperimentSucceeded === true && (
+                <Button
+                  color="success"
+                  size="sm"
+                  className="font-weight-light border-2 border-gray shadow-none"
+                >
+                  Result - Successful
+                </Button>
+              )}
+            </div>
+          )}
+
           {isLoginTypeAdmin === true && (
             <Dropdown
               isOpen={userDropdownOpen}

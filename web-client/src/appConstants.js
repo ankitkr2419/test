@@ -1,6 +1,8 @@
 export const API_HOST_URL = process.env.REACT_APP_API_HOST_URL;
 export const WS_HOST_URL = process.env.REACT_APP_WS_HOST_URL;
 export const API_HOST_VERSION = process.env.REACT_APP_API_HOST_VERSION;
+export const WS_PROTOCOL = "websocket";
+
 // Target capacity is used to restrict selection of targets
 export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 

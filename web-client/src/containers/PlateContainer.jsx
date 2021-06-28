@@ -50,7 +50,7 @@ const PlateContainer = () => {
 	useEffect(() => {
 		if (experimentId !== null) {
 			// fetching configured wells data
-			dispatch(fetchWells(experimentId));
+			dispatch(fetchWells(experimentId, token));
 			// fetching experiment targets to show while configuring sample and graph filter
 			dispatch(fetchExperimentTargets(experimentId, token));
 		}
