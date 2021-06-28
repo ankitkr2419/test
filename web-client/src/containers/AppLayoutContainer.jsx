@@ -76,6 +76,7 @@ const AppLayoutContainer = (props) => {
           isTemplateRoute={loginReducer.get("isTemplateRoute")}
           token={activeDeckObj.token}
           deckName={activeDeckObj.name}
+          app={app}
         />
       )}
       {/* Modal container will helps in displaying error/info/warning through modal */}
