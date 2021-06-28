@@ -37,8 +37,6 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
-		go deps.Plc.SelfTest()
-
 		for {
 
 			select {
