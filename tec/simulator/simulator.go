@@ -63,3 +63,13 @@ func (t *Simulator) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16)
 	
 	return nil
 }
+
+func (t *Simulator) GetAllTEC() (err error){
+	
+	return nil
+}
+
+func (t *Simulator) RunProfile(tp tec.TempProfile) (err error){
+	
+	return nil
+}

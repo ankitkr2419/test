@@ -706,6 +706,12 @@ int resetDevice(){
     }
     return 0;
 }
+
+
+int getAllTEC(){
+    TestAllTECGetFunctions(Address);
+    return 0;
+}
 /*==============================================================================*/
 /** @brief      Menu selection function
  *
