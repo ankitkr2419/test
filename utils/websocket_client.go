@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
@@ -27,7 +28,10 @@ func main() {
 	u := url.URL{Scheme: "ws", Host: *addr, Path: "/monitor"}
 	log.Printf("connecting to %s", u.String())
 
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	var head http.Header = map[string][]string{
+		"Sec-WebSocket-Protocol": []string{"websocket"},
+	}
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), head)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}

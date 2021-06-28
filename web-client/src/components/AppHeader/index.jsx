@@ -80,7 +80,7 @@ const AppHeader = (props) => {
 
   const startExperiment = () => {
     if (isExperimentRunning === false && isExperimentSucceeded === false) {
-      dispatch(runExperiment(experimentId));
+      dispatch(runExperiment(experimentId, token));
     }
   };
 
@@ -131,7 +131,7 @@ const AppHeader = (props) => {
     if (isConfirmed) {
       if (isExperimentRunning === true) {
         // user aborted experiment
-        dispatch(stopExperiment(experimentId));
+        dispatch(stopExperiment(experimentId, token));
       } else {
         dispatch(logoutInitiated({ deckName: deckName, token: token }));
       }

@@ -4,7 +4,7 @@ import { Row, Col, FormGroup, Label, Input, FormError } from "core-components";
 import { TemperatureInfo, TimeInfo } from "shared-components";
 
 import { ShakingProcessBox } from "./Style";
-import { isDisabled, setRpmFormikField } from "./functions";
+import { isDisabled, setRpmFormikField } from "./helpers";
 
 const ShakingProcess = (props) => {
   const { formik, activeTab, temperature } = props;
@@ -16,6 +16,8 @@ const ShakingProcess = (props) => {
           {temperature && (
             <div className="border-bottom-line">
               <TemperatureInfo
+                temperature={formik.values.temperature}
+                followTemp={formik.values.followTemperature}
                 temperatureHandler={(e) => {
                   formik.setFieldValue("temperature", e.target.value);
                 }}
@@ -39,6 +41,7 @@ const ShakingProcess = (props) => {
                     name="rpm1"
                     id="rpm"
                     placeholder="Type here"
+                    value={formik.values.rpm1}
                     onChange={(e) =>
                       setRpmFormikField(
                         formik,
@@ -56,12 +59,15 @@ const ShakingProcess = (props) => {
               <Row>
                 <Col sm={11} className="ml-4 mr-auto">
                   <TimeInfo
+                    hours={formik.values.hours1}
                     handleHoursChange={(e) =>
                       formik.setFieldValue("hours1", e.target.value)
                     }
+                    mins={formik.values.mins1}
                     handleMinsChange={(e) =>
                       formik.setFieldValue("mins1", e.target.value)
                     }
+                    secs={formik.values.secs1}
                     handleSecsChange={(e) =>
                       formik.setFieldValue("secs1", e.target.value)
                     }
@@ -84,6 +90,7 @@ const ShakingProcess = (props) => {
                     name="rpm2"
                     id="rpm"
                     placeholder="Type here"
+                    value={formik.values.rpm2}
                     onChange={(e) =>
                       setRpmFormikField(
                         formik,
@@ -101,9 +108,12 @@ const ShakingProcess = (props) => {
               <Row>
                 <Col sm={11} className="ml-4 mr-auto">
                   <TimeInfo
+                    hours={formik.values.hours2}
                     handleHoursChange={(e) =>
                       formik.setFieldValue("hours2", e.target.value)
                     }
+                    secs={formik.values.secs2}
+                    mins={formik.values.mins2}
                     handleMinsChange={(e) =>
                       formik.setFieldValue("mins2", e.target.value)
                     }

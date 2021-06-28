@@ -4,7 +4,7 @@ import {
   webSocketClosed,
   webSocketError,
 } from "action-creators/webSocketActionCreators";
-import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from "appConstants";
+import { WS_HOST_URL, WS_PROTOCOL, SOCKET_MESSAGE_TYPE } from "appConstants";
 import { updateWellThroughSocket } from "action-creators/wellActionCreators";
 import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 import { experimentedCompleted } from "action-creators/runExperimentActionCreators";
@@ -22,7 +22,7 @@ import {
 
 import {
   runCleanUpActionInProgress,
-  runCleanUpActionInCompleted
+  runCleanUpActionInCompleted,
 } from "action-creators/cleanUpActionCreators";
 
 import {
@@ -34,7 +34,7 @@ import { toast } from "react-toastify";
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
-  webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`);
+  webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`, WS_PROTOCOL);
   webSocket.onopen = (event) => {
     console.info("socket connection opened", event);
     dispatch(webSocketOpened());
@@ -60,13 +60,13 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
           let parsedData = JSON.parse(data);
-          let homingSuccessMsg = 
-            parsedData && 
-            parsedData.operation_details && 
-            parsedData.operation_details.message 
-              ? parsedData.operation_details.message 
-              : "Homing Successfull" 
-          toast.success(homingSuccessMsg)
+          let homingSuccessMsg =
+            parsedData &&
+            parsedData.operation_details &&
+            parsedData.operation_details.message
+              ? parsedData.operation_details.message
+              : "Homing Successfull";
+          toast.success(homingSuccessMsg);
           dispatch(homingActionInCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
@@ -100,8 +100,8 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:
           let parsedErrorData = JSON.parse(data);
           let errorMessage = parsedErrorData.message;
-          if(errorMessage) {
-           toast.error(errorMessage)
+          if (errorMessage) {
+            toast.error(errorMessage);
           }
           break;
         default:
