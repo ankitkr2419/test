@@ -29,7 +29,8 @@ const TemperatureInfoBox = styled.div`
 `;
 
 const TemperatureInfo = (props) => {
-  const { temperatureHandler, checkBoxHandler } = props;
+  const { temperature, followTemp, temperatureHandler, checkBoxHandler } =
+    props;
   return (
     <TemperatureInfoBox>
       <FormGroup className="d-flex temperature-info">
@@ -42,6 +43,7 @@ const TemperatureInfo = (props) => {
             name="temperature"
             id="temperature"
             placeholder="Type here"
+            value={temperature}
             onChange={temperatureHandler}
           />
           <FormError>Incorrect Temperature</FormError>
@@ -52,6 +54,7 @@ const TemperatureInfo = (props) => {
               name="follow-temperature"
               label="Follow Temperature"
               className="mb-3 mr-4"
+              checked={followTemp}
               onChange={checkBoxHandler}
             />
           </div>

@@ -1,8 +1,9 @@
 package plc
 
 import (
-	"github.com/google/uuid"
 	"mylab/cpagent/db"
+
+	"github.com/google/uuid"
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
@@ -29,7 +30,7 @@ type Stage struct {
 	IdealLidTemp uint16 // ideal lid temp
 }
 
-type Emissions [6]uint16
+type Emissions [8]uint16
 
 type Scan struct {
 	Cycle         uint16 // current running cycle
@@ -47,6 +48,9 @@ type Driver interface {
 	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
+	HomingRTPCR() (err error)     //Homing of RTPCR
+	Reset() (err error)           //reseting the values
+	Cycle() (err error)           // start the cycle
 }
 
 type WSData struct {

@@ -101,8 +101,6 @@ export const API_ENDPOINTS = {
   tipDiscard: "tip-operation",
   magnet: "attach-detach",
   duplicateProcess: "duplicate-process",
-  heating: "heating",
-  shaking: "shaking",
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
@@ -377,4 +375,14 @@ export const APP_TYPE = {
   RTPCR: "rtpcr",
   EXTRACTION: "extraction",
   NONE: "none",
+};
+
+//constants for shaking
+export const MAX_TEMP_ALLOWED = 120;
+export const MIN_TEMP_ALLOWED = 20;
+export const MAX_TIME_ALLOWED = 3660; // 1 hour 1 min
+export const timeConstants = {
+  SEC_IN_ONE_MIN: 60,
+  SEC_IN_ONE_HOUR: 3600,
+  MIN_IN_ONE_HOUR: 60,
 };

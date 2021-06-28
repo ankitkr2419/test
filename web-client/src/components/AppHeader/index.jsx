@@ -31,9 +31,11 @@ import {
   MODAL_MESSAGE,
   ROUTES,
 } from "appConstants";
-import { NAV_ITEMS } from "./constants";
+import { getRedirectObj, NAV_ITEMS, PATH_TO_SHOW_CROSS_BTN } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
+import { useHistory, useLocation } from "react-router";
+
 
 const AppHeader = (props) => {
   const {
@@ -46,7 +48,9 @@ const AppHeader = (props) => {
     deckName,
   } = props;
 
+  const location = useLocation();
   const dispatch = useDispatch();
+  const history = useHistory();
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
