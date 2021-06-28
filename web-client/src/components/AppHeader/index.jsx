@@ -161,11 +161,7 @@ const AppHeader = (props) => {
         </Nav>
       )}
       {isUserLoggedIn && (
-        <div
-          // TODO : remove "style"
-          style={{ position: "absolute", right: 15 }}
-          className="d-flex align-items-center"
-        >
+        <div className="header-elements d-flex align-items-center">
           {/* <PrintDataModal /> */}
           {/* <ExportDataModal /> */}
           {app === APP_TYPE.RTPCR && (
