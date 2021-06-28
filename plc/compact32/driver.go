@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"mylab/cpagent/plc"
+
 	"time"
 
 	logger "github.com/sirupsen/logrus"
@@ -248,13 +249,53 @@ func (d *Compact32) Cycle() (err error) {
 func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
 	fmt.Println("INSIDE MONITOR------------------------")
+	// Read current cycle
+	scan.Cycle = plc.CurrentCycle
 
 	if plc.HeatingCycleComplete {
 		scan.Cycle = cycle
 		// tmp, err = d.Driver.ReadSingleCoil(plc.MODBUS["M"][107])
 
+		// // Read lid temperature
+		// tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
+		// if err != nil {
+		// 	logger.Error("ReadSingleRegister:D135: Lid temperature")
+		// 	return
+		// }
+		// scan.LidTemp = float32(tmp) / 10
+
+		// // Read current cycle status
+		// tmp, err = d.Driver.ReadSingleCoil(plc.MODBUS["M"][107])
+		// if err != nil {
+		// 	logger.Error("ReadSingleCoil:M107: Current PV cycle")
+		// 	return
+		// }
+		// if tmp == 0 { // 0x0000 means cycle is not complete
+		// 	// Values would not have changed.
+		// 	scan.CycleComplete = false
+		// 	return
+		// }
+		// scan.CycleComplete = true
 		start := 44
 		var data []byte
+		// If the invoker has already read this cycle data, don't send it again!
+		if cycle == scan.Cycle {
+			return
+		}
+
+		// Scan all the data from the Wells (96 x 6). Since max read is 123 registers, we shall read 96 at a time.
+		// start := plc.MODBUS["D"][23]
+
+		// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][20], plc.OFF)
+		// if err != nil {
+		// 	logger.Error("WriteSingleCoil:M20 : Start Cycle")
+		// 	return
+		// }
+		// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][21], plc.OFF)
+		// if err != nil {
+		// 	logger.Error("WriteSingleCoil:M21 : Start Cycle")
+		// 	return
+		// }
 
 		for i := 0; i < 2; i++ {
 			start = start + (16 * i)

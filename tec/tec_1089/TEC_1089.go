@@ -186,7 +186,6 @@ func (t *TEC1089) ReachRoomTemp() error {
 }
 
 func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (err error) {
-
 	ts := time.Now()
 	stagePrevTemp := prevTemp
 	for i, h := range st {
@@ -211,6 +210,7 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
 	}
 	plc.CurrentCycleTemperature = st[len(st)-1].TargetTemp
+	plc.CurrentCycle = cycleNum
 	return nil
 }
 

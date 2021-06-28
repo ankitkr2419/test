@@ -242,19 +242,21 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	// Read current cycle
 	scan.Cycle = d.plcIO.d.currentCycle
 
+	//do not need this as handled in the software
+
 	// Read cycle temperature.. PLC returns 653 for 65.3 degrees
-	scan.Temp = float32(d.plcIO.d.currentTemp) / 10
+	//scan.Temp = float32(d.plcIO.d.currentTemp) / 10
 
 	// Read lid temperature
-	scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10
+	//scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10
 
 	// Read current cycle status
-	if d.plcIO.m.cycleCompleted == 0 { // 0x0000 means cycle is not complete
-		// Values would not have changed.
-		scan.CycleComplete = false
-		return
-	}
-	scan.CycleComplete = true
+	// if d.plcIO.m.cycleCompleted == 0 { // 0x0000 means cycle is not complete
+	// 	// Values would not have changed.
+	// 	scan.CycleComplete = false
+	// 	return
+	// }
+	// scan.CycleComplete = true
 
 	// If the invoker has already read this cycle data, don't send it again!
 	if cycle == scan.Cycle {

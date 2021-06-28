@@ -11,6 +11,7 @@ import (
 
 var HeatingCycleComplete bool = false
 var CurrentCycleTemperature float32
+var CurrentCycle uint16
 
 type DeckNumber struct {
 	Deck   string
