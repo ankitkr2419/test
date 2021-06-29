@@ -126,14 +126,7 @@ func (t *TEC1089) TestRun() (err error) {
 		CycleCount: 3,
 	}
 
-	tecLogsPath := "./utils/tec"
-	// logging output to file and console
-	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
-		os.MkdirAll(tecLogsPath, 0755)
-		// ignore error and try creating log output file
-	}
-
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tecLogsPath, time.Now().Unix()))
+	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
 	if err != nil {
 		logger.Errorln(responses.FileCreationError)
 	}
@@ -220,14 +213,9 @@ func (t *TEC1089) GetAllTEC() (err error) {
 }
 
 func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
-	tecLogsPath := "./utils/tec"
-	// logging output to file and console
-	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
-		os.MkdirAll(tecLogsPath, 0755)
-		// ignore error and try creating log output file
-	}
 
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tecLogsPath, time.Now().Unix()))
+
+	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
 	if err != nil {
 		logger.Errorln(responses.FileCreationError)
 	}
