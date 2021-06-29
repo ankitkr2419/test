@@ -353,7 +353,6 @@ func monitorExperiment(deps Dependencies) {
 
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for experimentRunning {
-		fmt.Println("inside monitor exp cycle completed?", plc.HeatingCycleComplete)
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
 		if plc.HeatingCycleComplete {
 
