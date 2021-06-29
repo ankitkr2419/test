@@ -5,6 +5,8 @@ import (
 	"mylab/cpagent/plc"
 )
 
+const LogsPath = "./utils/tec"
+
 type TECTempSet struct {
 	TargetTemperature float64 `json:"target_temp" validate:"gte=-20,lte=100"`
 	TargetRampRate    float64 `json:"ramp_rate" validate:"gte=-20,lte=100"`
