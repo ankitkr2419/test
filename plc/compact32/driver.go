@@ -248,7 +248,7 @@ func (d *Compact32) Cycle() (err error) {
 // Monitor periodically. If CycleComplete == true, Scan will be populated
 func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
-	fmt.Println("INSIDE MONITOR------------------------")
+	logger.Println("INSIDE MONITOR------------------------")
 	// Read current cycle
 	scan.Cycle = plc.CurrentCycle
 

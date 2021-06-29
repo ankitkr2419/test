@@ -21,8 +21,6 @@ func runTECHandler(deps Dependencies) http.HandlerFunc {
 			CycleCount: 3,
 		}
 
-		experimentRunning = true
-		go monitorExperiment(deps)
 		go startExp(deps, p)
 
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Run Started success"})
