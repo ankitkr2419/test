@@ -1,16 +1,16 @@
 package service
 
 import (
-	"fmt"
-	"os"
 	"context"
-	"encoding/json"
 	"encoding/csv"
+	"encoding/json"
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -288,7 +288,7 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func startExp(deps Dependencies, p plc.Stage) (err error){
+func startExp(deps Dependencies, p plc.Stage) (err error) {
 	tecLogsPath := "./utils/tec"
 	// logging output to file and console
 	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
@@ -305,26 +305,26 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-
-	// Home the TEC 
+	// Home the TEC
 	// Reset is implicit in Homing
 	deps.Plc.HomingRTPCR()
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken","Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil{
+	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
+	if err != nil {
 		return
 	}
 	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil{
+	if err != nil {
 		return
 	}
-	// Go back to Room Temp at the end
-	defer func(){
-		if err != nil{
+	//Go back to Room Temp at the end
+	defer func() {
+		if err != nil {
 			return
 		}
 		err = deps.Tec.ReachRoomTemp()
+		experimentRunning = false
 		return
 	}()
 	// Run Holding Stage
@@ -333,11 +333,10 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 
 	// Cycle in Plc
 	deps.Plc.Cycle()
-	deps.Plc.Start()
 
 	// Run Cycle Stage
 	err = writer.Write([]string{"Cycle Stage About to start"})
-	if err != nil{
+	if err != nil {
 		return
 	}
 
@@ -347,9 +346,7 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
 		deps.Plc.Cycle()
-		deps.Plc.Start()
 	}
 
 	return
 }
-
