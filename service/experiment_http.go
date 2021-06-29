@@ -324,6 +324,7 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 			return
 		}
 		err = deps.Tec.ReachRoomTemp()
+		experimentRunning = false
 		return
 	}()
 	// Run Holding Stage

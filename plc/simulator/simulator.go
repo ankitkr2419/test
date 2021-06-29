@@ -259,9 +259,9 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	// scan.CycleComplete = true
 
 	// If the invoker has already read this cycle data, don't send it again!
-	if cycle == scan.Cycle {
-		return
-	}
+	// if cycle == scan.Cycle {
+	// 	return
+	// }
 
 	// Scan all the data from the Wells (96 x 6)
 	for i, data := range d.emissions {

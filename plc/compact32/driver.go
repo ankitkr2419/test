@@ -276,12 +276,11 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		// 	return
 		// }
 		// scan.CycleComplete = true
-		start := 44
-		var data []byte
+
 		// If the invoker has already read this cycle data, don't send it again!
-		if cycle == scan.Cycle {
-			return
-		}
+		// if cycle == scan.Cycle {
+		// 	return
+		// }
 
 		// Scan all the data from the Wells (96 x 6). Since max read is 123 registers, we shall read 96 at a time.
 		// start := plc.MODBUS["D"][23]
@@ -296,7 +295,8 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		// 	logger.Error("WriteSingleCoil:M21 : Start Cycle")
 		// 	return
 		// }
-
+		start := 44
+		var data []byte
 		for i := 0; i < 2; i++ {
 			start = start + (16 * i)
 
@@ -318,21 +318,21 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 			}
 			scan.CycleComplete = true
 			offset := 0 // offset of data. increment every 2 bytes!
-			k := 0
-			p := 2
 			for j := 0; j < 4; j++ {
+				k := 0
+				p := 2
 				// populate each wells with 2 emissions each
-				if j/2 <= 1 {
+				if j/2 >= 1 {
 					k = 1
 				}
 				if j%2 == 0 {
 					p = 1
 				}
 				scan.Wells[(8*k)+p-1][i] = binary.BigEndian.Uint16(data[offset : offset+2])
-				logger.Println("emission----", scan.Wells[(8*i)+p-1][i])
+				logger.Println("emission----", scan.Wells[(8*k)+p-1][i])
 				offset += 8
-				k++
-				logger.Println("well----", (8*k)+p-1, "value", scan.Wells[(8*i)+p-1])
+				logger.Println("well----", ((8 * k) + p - 1), "value", scan.Wells[(8*k)+p-1])
+
 			}
 
 		}
@@ -349,6 +349,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		// 	return
 		// }
 		scan.Temp = plc.CurrentCycleTemperature
+		plc.HeatingCycleComplete = false
 
 	}
 	return
