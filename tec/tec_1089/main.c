@@ -41,8 +41,6 @@ static void TestAllLDDGetFunctions(uint8_t Address);
 static void TestAllTECGetFunctions(uint8_t Address);
 int32_t Address;
 int8_t Buf[25];
-MeParFloatFields Fields;
-MeParLongFields Longs;
 int32_t Inst = 1;         
 
 
@@ -314,6 +312,9 @@ int main2()
 
 int InitiateTEC()
 {
+    MeParFloatFields Fields;
+    MeParLongFields Longs;
+
     // if(ConsoleIO_YesNo("Do you want to open a Comport? (press enter for default)", 1))
     // {
     // } else {
@@ -380,6 +381,15 @@ int InitiateTEC()
         MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeSet);
     } else{
         printf("TEC Object Temperature value out of range( %f, %f).", Fields.Max, Fields.Min);
+        return -1;
+    }
+
+    // Might need to set Proximity to 0
+    Fields.Value = 0;
+    if(MeCom_TEC_Tem_ProximityWidth(Address, Inst, &Fields, MeGetLimits)){
+        MeCom_TEC_Tem_ProximityWidth(Address, Inst, &Fields, MeSet);
+    } else{
+        printf("TEC MeCom_TEC_Tem_ProximityWidth value out of range( %f, %f).", Fields.Max, Fields.Min);
         return -1;
     }
 
@@ -554,16 +564,13 @@ int InitiateTEC()
 int DemoFunc(double target, double ramp)
 {   
     MeParFloatFields Fields;
-    int i = 0;
-   
+  
     // 1. Setup Target Temp
 
-    // setValue = 40;
     Fields.Value = target;
     printf("TEC Object Temperature: New Value: %f\n", Fields.Value);
 
     // check for limit
-
     if(MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeSet);
     } else{
@@ -588,8 +595,7 @@ int DemoFunc(double target, double ramp)
 
 skipRamp:
     while(1){
-            i++;
-            sleep(1);
+            usleep(200 * 1000);
 
             if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
             {
@@ -600,7 +606,7 @@ skipRamp:
             }
 
             // Play of +- 1
-            if ( ( (target + 1) >= Fields.Value ) && ( (target - 1) <= Fields.Value ) ) {
+            if ( ( (target + 0.25) >= Fields.Value ) && ( (target - 0.25) <= Fields.Value ) ) {
                 printf("TEC Object Temperature Reached:: %f, target: %f\n", Fields.Value, target);
                 return 0;
             }
@@ -698,6 +704,12 @@ int resetDevice(){
         printf("TEC Reset FAIL");
         return -1;
     }
+    return 0;
+}
+
+
+int getAllTEC(){
+    TestAllTECGetFunctions(Address);
     return 0;
 }
 /*==============================================================================*/
