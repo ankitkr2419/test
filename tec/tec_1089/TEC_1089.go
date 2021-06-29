@@ -25,23 +25,22 @@ import "C"
 import (
 	"encoding/csv"
 	"fmt"
-	"os"
 	"math"
+	"os"
 
-	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"mylab/cpagent/tec"
 	"time"
-)
 
+	logger "github.com/sirupsen/logrus"
+)
 
 type TEC1089 struct {
 	ExitCh  chan error
 	WsMsgCh chan string
 	wsErrch chan error
 }
-
 
 func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) tec.Driver {
 
@@ -51,7 +50,7 @@ func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, 
 	tec1089.wsErrch = wsErrch
 	go tec1089.InitiateTEC()
 
-	if test{
+	if test {
 		tec1089.TestRun()
 	}
 
@@ -144,12 +143,12 @@ func (t *TEC1089) TestRun() (err error) {
 	defer writer.Flush()
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken","Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil{
+	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
+	if err != nil {
 		return
 	}
 	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil{
+	if err != nil {
 		return
 	}
 	// Go back to Room Temp at the end
@@ -162,7 +161,7 @@ func (t *TEC1089) TestRun() (err error) {
 
 	// Run Cycle Stage
 	err = writer.Write([]string{"Cycle Stage About to start"})
-	if err != nil{
+	if err != nil {
 		return
 	}
 
@@ -175,7 +174,7 @@ func (t *TEC1089) TestRun() (err error) {
 	return nil
 }
 
-func (t *TEC1089) ReachRoomTemp() error{
+func (t *TEC1089) ReachRoomTemp() error {
 	logger.Infoln("Going Back to Room Temp 27 ")
 	ts := tec.TECTempSet{
 		TargetTemperature: 27,
@@ -186,7 +185,7 @@ func (t *TEC1089) ReachRoomTemp() error{
 	return nil
 }
 
-func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (err error){
+func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (err error) {
 	ts := time.Now()
 	stagePrevTemp := prevTemp
 	for i, h := range st {
@@ -197,8 +196,8 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		}
 		logger.Infoln("Started ->", ti)
 		t.ConnectTEC(ti)
-		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(),  fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp - prevTemp))/ float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
-		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0),"\nExpected Time: " ,  math.Abs(float64(h.TargetTemp - prevTemp))/ float64(h.RampUpTemp), "\nInitial Temp:",  prevTemp, "\nTarget Temp: ", h.TargetTemp , "\nRamp Rate: ", h.RampUpTemp)
+		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
+		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 		time.Sleep(time.Duration(h.HoldTime) * time.Second)
 		logger.Infoln("Holding Completed ->", h.HoldTime)
@@ -210,16 +209,17 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 	} else {
 		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
 	}
+	plc.CurrentCycleTemperature = st[len(st)-1].TargetTemp
+	plc.CurrentCycle = cycleNum
 	return nil
 }
 
-func (t *TEC1089) GetAllTEC() (err error){
+func (t *TEC1089) GetAllTEC() (err error) {
 	C.getAllTEC()
 	return nil
 }
 
-
-func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error){
+func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
 	tecLogsPath := "./utils/tec"
 	// logging output to file and console
 	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
@@ -237,11 +237,10 @@ func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error){
 	defer writer.Flush()
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken","Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil{
+	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
+	if err != nil {
 		return
 	}
-
 
 	for i := uint16(1); i <= uint16(tp.Cycles); i++ {
 		logger.Infoln("Started Cycle->", i)
