@@ -17,9 +17,9 @@ const (
 )
 
 type Step struct {
-	TargetTemp float32 // holding temperature for step
-	RampUpTemp float32 // ramp-up temperature for step
-	HoldTime   int32   // hold time for step
+	TargetTemp float32 `json:"target_temp"`// holding temperature for step
+	RampUpTemp float32 `json:"ramp_rate"`// ramp-up temperature for step
+	HoldTime   int32   `json:"hold_time"`// hold time for step
 }
 
 // We can have at most 4 Holding steps and 6 Cycling steps.
