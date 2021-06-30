@@ -44,9 +44,14 @@ func main() {
 	})
 
 	logsPath := "./utils/logs"
+	tecPath :=  "./utils/tec"
 	// logging output to file and console
 	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
 		os.MkdirAll(logsPath, 0755)
+		// ignore error and try creating log output file
+	}
+	if _, err := os.Stat(tecPath); os.IsNotExist(err) {
+		os.MkdirAll(tecPath, 0755)
 		// ignore error and try creating log output file
 	}
 

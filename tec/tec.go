@@ -5,6 +5,7 @@ import (
 	"mylab/cpagent/plc"
 )
 
+const LogsPath = "./utils/tec"
 var TempMonStarted bool
 
 type TECTempSet struct {

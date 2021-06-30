@@ -290,16 +290,16 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 }
 
 func startExp(deps Dependencies, p plc.Stage) (err error) {
-	tecLogsPath := "./utils/tec"
 	// logging output to file and console
-	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
-		os.MkdirAll(tecLogsPath, 0755)
+	if _, err := os.Stat(tec.LogsPath); os.IsNotExist(err) {
+		os.MkdirAll(tec.LogsPath, 0755)
 		// ignore error and try creating log output file
 	}
 
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tecLogsPath, time.Now().Unix()))
+	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
 	if err != nil {
-		logger.Errorln(responses.FileCreationError)
+		logger.WithField("Err", err).Errorln(responses.FileCreationError)
+		return	
 	}
 	defer file.Close()
 
