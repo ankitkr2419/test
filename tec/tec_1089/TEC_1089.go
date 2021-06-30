@@ -7,6 +7,7 @@ int checkForErrorState();
 int autoTune();
 int resetDevice();
 int getAllTEC();
+double getObjectTemp();
 #include <stdlib.h>
 #include <time.h>
 #include <fcntl.h>
@@ -54,6 +55,8 @@ func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, 
 		tec1089.TestRun()
 	}
 
+	go startMonitor()
+
 	return &tec1089 // tec Driver
 }
 
@@ -66,6 +69,18 @@ func (t *TEC1089) InitiateTEC() (err error) {
 	go startErrorCheck()
 
 	return nil
+}
+
+func startMonitor() {
+	go func() {
+		for  {
+			if tec.TempMonStarted{
+			target := C.getObjectTemp()
+			logger.Infoln("Current Temp: ", target)
+			}
+			time.Sleep(1 * time.Second)
+		}
+	}()
 }
 
 func startErrorCheck() {
