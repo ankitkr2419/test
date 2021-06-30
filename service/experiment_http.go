@@ -8,6 +8,7 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/tec"
 	"mylab/cpagent/responses"
 	"net/http"
 	"os"
@@ -318,13 +319,16 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	if err != nil {
 		return
 	}
+	tec.TempMonStarted = true
+
 	//Go back to Room Temp at the end
 	defer func() {
+		tec.TempMonStarted = false
+		experimentRunning = false
 		if err != nil {
 			return
 		}
 		err = deps.Tec.ReachRoomTemp()
-		experimentRunning = false
 		return
 	}()
 	// Run Holding Stage
