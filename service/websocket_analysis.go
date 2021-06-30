@@ -1,10 +1,15 @@
 package service
 
 import (
+	"encoding/csv"
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -57,7 +62,26 @@ func makePLCStage(ss []db.StageStep) plc.Stage {
 
 // makeResult return result from plc.scan
 func makeResult(scan plc.Scan) (result []db.Result) {
+	tecLogsPath := "./utils/rtpcr"
+	// logging output to file and console
+	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
+		os.MkdirAll(tecLogsPath, 0755)
+		// ignore error and try creating log output file
+	}
 
+	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tecLogsPath, time.Now().Unix()))
+	if err != nil {
+		logger.Errorln(responses.FileCreationError)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+	// Start line
+	err = writer.Write([]string{"ExperimentID", "Well Position", "Cycle", "Dye Position", "TargetID", "FValue", "Temperature"})
+	if err != nil {
+		return
+	}
 	for _, w := range experimentValues.activeWells {
 		var r db.Result
 		r.WellPosition = w
@@ -69,6 +93,8 @@ func makeResult(scan plc.Scan) (result []db.Result) {
 			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
 
 			result = append(result, r)
+			writer.Write([]string{r.ExperimentID.String(), fmt.Sprintf("%d", r.WellPosition), fmt.Sprintf("%d", r.Cycle), fmt.Sprintf("%d", t.DyePosition), t.TargetID.String(), fmt.Sprintf("%d", r.FValue), fmt.Sprintf("%f", scan.Temp)})
+
 		}
 	}
 

@@ -14,16 +14,12 @@ const (
 	CYCLE_STAGE   = "cycle"
 )
 
-
-
 type Compact32 struct {
 	ExitCh  chan error
 	WsMsgCh chan string
 	wsErrch chan error
 	Driver  plc.Compact32Driver
 }
-
-
 
 func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */

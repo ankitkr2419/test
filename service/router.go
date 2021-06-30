@@ -56,7 +56,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments/{experiment_id}/run", authenticate(runExperimentHandler(deps), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	//Websocket router
-	router.HandleFunc("/monitor", wsHandler(deps)).Methods(http.MethodGet).Headers("Sec-WebSocket-Protocol", "websocket")
+	router.HandleFunc("/monitor", wsHandler(deps)).Methods(http.MethodGet)
 
 	router.HandleFunc("/experiments/{experiment_id}/stop", authenticate(stopExperimentHandler(deps), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/activewells", authenticate(listActiveWellsHandler(), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
@@ -140,9 +140,11 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 
 	// tec funcs
 	router.HandleFunc("/tec/set-temp-and-ramp", setTempAndRampHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/run", runProfileHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/auto-tune", autoTuneHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/reset-device", resetDeviceHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/run", runTECHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/get-all", getAllTECHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	return
 }

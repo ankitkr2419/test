@@ -1,16 +1,17 @@
 package service
 
 import (
-	"fmt"
-	"os"
 	"context"
-	"encoding/json"
 	"encoding/csv"
+	"encoding/json"
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/tec"
 	"mylab/cpagent/responses"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -288,40 +289,43 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func startExp(deps Dependencies, p plc.Stage) (err error){
-	tecLogsPath := "./utils/tec"
+func startExp(deps Dependencies, p plc.Stage) (err error) {
 	// logging output to file and console
-	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
-		os.MkdirAll(tecLogsPath, 0755)
+	if _, err := os.Stat(tec.LogsPath); os.IsNotExist(err) {
+		os.MkdirAll(tec.LogsPath, 0755)
 		// ignore error and try creating log output file
 	}
 
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tecLogsPath, time.Now().Unix()))
+	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
 	if err != nil {
-		logger.Errorln(responses.FileCreationError)
+		logger.WithField("Err", err).Errorln(responses.FileCreationError)
+		return	
 	}
 	defer file.Close()
 
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-
-	// Home the TEC 
+	// Home the TEC
 	// Reset is implicit in Homing
 	deps.Plc.HomingRTPCR()
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken","Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil{
+	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
+	if err != nil {
 		return
 	}
 	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil{
+	if err != nil {
 		return
 	}
-	// Go back to Room Temp at the end
-	defer func(){
-		if err != nil{
+	tec.TempMonStarted = true
+
+	//Go back to Room Temp at the end
+	defer func() {
+		tec.TempMonStarted = false
+		experimentRunning = false
+		if err != nil {
 			return
 		}
 		err = deps.Tec.ReachRoomTemp()
@@ -333,11 +337,10 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 
 	// Cycle in Plc
 	deps.Plc.Cycle()
-	deps.Plc.Start()
 
 	// Run Cycle Stage
 	err = writer.Write([]string{"Cycle Stage About to start"})
-	if err != nil{
+	if err != nil {
 		return
 	}
 
@@ -347,9 +350,7 @@ func startExp(deps Dependencies, p plc.Stage) (err error){
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
 		deps.Plc.Cycle()
-		deps.Plc.Start()
 	}
 
 	return
 }
-
