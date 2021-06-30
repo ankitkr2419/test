@@ -73,10 +73,10 @@ func (t *TEC1089) InitiateTEC() (err error) {
 
 func startMonitor() {
 	go func() {
-		for  {
-			if tec.TempMonStarted{
-			target := C.getObjectTemp()
-			logger.Infoln("Current Temp: ", target)
+		for {
+			if tec.TempMonStarted {
+				target := C.getObjectTemp()
+				logger.Infoln("Current Temp: ", target)
 			}
 			time.Sleep(1 * time.Second)
 		}
@@ -209,6 +209,7 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 		time.Sleep(time.Duration(h.HoldTime) * time.Second)
 		logger.Infoln("Holding Completed ->", h.HoldTime)
+		plc.CurrentCycleTemperature = h.TargetTemp
 		prevTemp = h.TargetTemp
 
 	}
@@ -217,8 +218,9 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 	} else {
 		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
 	}
-	plc.CurrentCycleTemperature = st[len(st)-1].TargetTemp
+
 	plc.CurrentCycle = cycleNum
+	plc.CycleComplete = true
 	return nil
 }
 
@@ -228,7 +230,6 @@ func (t *TEC1089) GetAllTEC() (err error) {
 }
 
 func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
-
 
 	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
 	if err != nil {

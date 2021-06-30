@@ -56,7 +56,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments/{experiment_id}/run", authenticate(runExperimentHandler(deps), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	//Websocket router
-	router.HandleFunc("/monitor", wsHandler(deps)).Methods(http.MethodGet).Headers("Sec-WebSocket-Protocol", "websocket")
+	router.HandleFunc("/monitor", wsHandler(deps)).Methods(http.MethodGet)
 
 	router.HandleFunc("/experiments/{experiment_id}/stop", authenticate(stopExperimentHandler(deps), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/activewells", authenticate(listActiveWellsHandler(), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
@@ -131,7 +131,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/app-info", appInfoHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	
+
 	//rt-pcr funcs
 	router.HandleFunc("/rt-pcr/homing", rtpcrHomingHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/rt-pcr/reset", rtpcrResetHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
