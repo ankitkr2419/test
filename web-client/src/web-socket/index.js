@@ -4,7 +4,7 @@ import {
   webSocketClosed,
   webSocketError,
 } from "action-creators/webSocketActionCreators";
-import { WS_HOST_URL, WS_PROTOCOL, SOCKET_MESSAGE_TYPE } from "appConstants";
+import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from "appConstants";
 import { updateWellThroughSocket } from "action-creators/wellActionCreators";
 import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 import { experimentedCompleted } from "action-creators/runExperimentActionCreators";
@@ -34,7 +34,7 @@ import { toast } from "react-toastify";
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
-  webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`, WS_PROTOCOL);
+  webSocket = new W3CWebSocket(`${WS_HOST_URL}/monitor`);
   webSocket.onopen = (event) => {
     console.info("socket connection opened", event);
     dispatch(webSocketOpened());
