@@ -245,11 +245,13 @@ func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
 		return
 	}
 
-	for i := uint16(1); i <= uint16(tp.Cycles); i++ {
-		logger.Infoln("Started Cycle->", i)
-		t.RunStage(tp.Profile, writer, i)
-		logger.Infoln("Cycle Completed -> ", i)
-	}
+	go func(){
+		for i := uint16(1); i <= uint16(tp.Cycles); i++ {
+			logger.Infoln("Started Cycle->", i)
+			t.RunStage(tp.Profile, writer, i)
+			logger.Infoln("Cycle Completed -> ", i)
+		}
+	}()
 
 	return nil
 }
