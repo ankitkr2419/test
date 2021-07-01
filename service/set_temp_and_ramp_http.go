@@ -19,11 +19,7 @@ func setTempAndRampHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = deps.Tec.ConnectTEC(t)
-		if err != nil{
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
-			return
-		}
+		go deps.Tec.ConnectTEC(t)
 
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Temp and Ramp set success"} )
 	})
