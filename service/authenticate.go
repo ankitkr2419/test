@@ -12,6 +12,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -80,27 +81,27 @@ func decodeToken(token string) (jwt.MapClaims, error) {
 // if token is valid set userId in the context
 func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		next(res, req)
-		// token := extractToken(req.Header.Get("Authorization"))
-		// if token != "" {
-		// 	vars := mux.Vars(req)
-		// 	deck := vars["deck"]
 
-		// 	user, err := getUserAuth(token, deck, deps, roles...)
-		// 	if err != nil {
-		// 		logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
-		// 		responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: err.Error()})
-		// 		return
-		// 	}
-		// 	ctx := context.WithValue(req.Context(), contextKeyUsername, user.Username)
-		// 	ctx = context.WithValue(ctx, contextKeyUserAuthID, user.AuthID)
-		// 	next(res, req.WithContext(ctx))
+		token := extractToken(req.Header.Get("Authorization"))
+		if token != "" {
+			vars := mux.Vars(req)
+			deck := vars["deck"]
 
-		// } else {
-		// 	logger.WithField("err", "TOKEN EMPTY").Error(responses.UserTokenEmptyError)
-		// 	responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: responses.UserTokenEmptyError.Error()})
-		// 	return
-		// }
+			user, err := getUserAuth(token, deck, deps, roles...)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
+				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: err.Error()})
+				return
+			}
+			ctx := context.WithValue(req.Context(), contextKeyUsername, user.Username)
+			ctx = context.WithValue(ctx, contextKeyUserAuthID, user.AuthID)
+			next(res, req.WithContext(ctx))
+
+		} else {
+			logger.WithField("err", "TOKEN EMPTY").Error(responses.UserTokenEmptyError)
+			responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: responses.UserTokenEmptyError.Error()})
+			return
+		}
 	}
 }
 
