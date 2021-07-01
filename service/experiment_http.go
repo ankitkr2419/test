@@ -315,10 +315,12 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	if err != nil {
 		return
 	}
-	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil {
-		return
-	}
+	
+	timeStarted := time.Now()
+	writer.Write([]string{"Experiment Started at: ", timeStarted.String()})
+
+	writer.Write([]string{"Holding Stage About to start"})
+
 	tec.TempMonStarted = true
 
 	//Go back to Room Temp at the end
@@ -334,6 +336,7 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
 	deps.Tec.RunStage(p.Holding, writer, 0)
+	writer.Flush()
 
 	// Cycle in Plc
 	deps.Plc.Cycle()
@@ -347,10 +350,14 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
 		deps.Tec.RunStage(p.Cycle, writer, i)
+		writer.Flush()
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
 		deps.Plc.Cycle()
 	}
+
+	writer.Write([]string{"Experiment Completed at: ", time.Now().String()})
+	writer.Write([]string{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()})
 
 	return
 }
