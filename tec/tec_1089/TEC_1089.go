@@ -208,7 +208,12 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
-		time.Sleep(time.Duration(h.HoldTime) * time.Second)
+		if i == (len(st) - 1) {
+			// If this is the last step then 16 seconds needed for Cycle
+			time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
+		} else {
+			time.Sleep(time.Duration(h.HoldTime) * time.Second)
+		}
 		logger.Infoln("Holding Completed ->", h.HoldTime)
 
 		prevTemp = h.TargetTemp
@@ -221,7 +226,7 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 	}
 
 	plc.CurrentCycle = cycleNum
-	plc.CycleComplete = true
+	plc.HeatingCycleComplete = true
 	return nil
 }
 

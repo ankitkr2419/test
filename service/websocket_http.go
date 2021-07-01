@@ -354,7 +354,6 @@ func monitorExperiment(deps Dependencies) {
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for experimentRunning {
 		time.Sleep(500 * time.Millisecond)
-		logger.Println("heating cycle complete?", plc.HeatingCycleComplete)
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc monitor")
@@ -373,9 +372,7 @@ func monitorExperiment(deps Dependencies) {
 		if plc.HeatingCycleComplete && scan.CycleComplete {
 
 			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle, scan)
-			if scan.Wells[0][0] == 0 {
-				continue
-			}
+
 			DBResult, err := WriteResult(deps, scan)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error in dbresult")
@@ -386,10 +383,7 @@ func monitorExperiment(deps Dependencies) {
 				logger.WithField("err", err.Error()).Error("Error in ct values")
 				return
 			}
-			logger.Println("before read.............................")
-
 			deps.WsMsgCh <- "read"
-			logger.Println("after read.............................")
 			if scan.Cycle == experimentValues.plcStage.CycleCount {
 				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID, "successful")
 				if err != nil {
@@ -403,16 +397,13 @@ func monitorExperiment(deps Dependencies) {
 				experimentRunning = false
 				break
 			}
-
 			cycle++
 			previousCycle++
 			plc.CycleComplete = false
 			plc.HeatingCycleComplete = false
 
 		}
-
 		// adding delay of 0.5s to reduce the cpu usage
-
 	}
 	logger.Info("Stop monitoring experiment")
 }

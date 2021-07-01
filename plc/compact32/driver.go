@@ -206,7 +206,7 @@ func (d *Compact32) Cycle() (err error) {
 	}
 
 	time.Sleep(time.Second * 15)
-	plc.HeatingCycleComplete = true
+	plc.CycleComplete = true
 	// for {
 	// 	cycleCompletion, err := d.Driver.ReadCoils(plc.MODBUS["M"][27], uint16(1))
 	// 	if err != nil {
@@ -247,11 +247,11 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
 	logger.Println("---------------------------MONITOR------------------------")
 	// Read current cycle
-	scan.Cycle = plc.CurrentCycle
+
 	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(100)
-
-	if plc.HeatingCycleComplete {
+	scan.CycleComplete = false
+	if plc.CycleComplete {
 
 		// // Read lid temperature
 		// tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
@@ -267,18 +267,19 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		// 	logger.Error("ReadSingleCoil:M107: Current PV cycle")
 		// 	return
 		// }
-		if !plc.CycleComplete { // 0x0000 means cycle is not complete
-			// Values would not have changed.
-			scan.CycleComplete = false
-			return
-		}
+		// if !plc.CycleComplete { // 0x0000 means cycle is not complete
+		// 	// Values would not have changed.
+		// 	scan.CycleComplete = false
+		// 	return
+		// }
 		scan.CycleComplete = true
 
 		// If the invoker has already read this cycle data, don't send it again!
 		if cycle == scan.Cycle {
+			logger.Println("cycle----------scan cycle------EQUAL", cycle, scan.Cycle)
 			return
 		}
-
+		scan.Cycle = plc.CurrentCycle
 		start := 44
 		var data []byte
 		for i := 0; i < 2; i++ {

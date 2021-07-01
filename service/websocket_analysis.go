@@ -98,7 +98,6 @@ func makeResult(scan plc.Scan) (result []db.Result) {
 		}
 	}
 
-	logger.Println("Result------------------>", result)
 	return
 }
 
@@ -222,7 +221,6 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 			wellResult.FValue = []float32{}
 		}
 
-		logger.Println("Analyase Result------------------>", finalResult)
 	}
 	return
 }
