@@ -361,6 +361,14 @@ func monitorExperiment(deps Dependencies) {
 			deps.WsErrCh <- err
 			return
 		}
+		// writes temp on every step against time in DB
+		err = WriteExperimentTemperature(deps, scan)
+		if err != nil {
+			fmt.Println("Write Exp Temp Error")
+			return
+		} else {
+			deps.WsMsgCh <- "read_temp"
+		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
 		if plc.HeatingCycleComplete && scan.CycleComplete {
 
@@ -402,14 +410,6 @@ func monitorExperiment(deps Dependencies) {
 			plc.HeatingCycleComplete = false
 
 		}
-		// writes temp on every step against time in DB
-		err = WriteExperimentTemperature(deps, scan)
-		if err != nil {
-			fmt.Println("Write Exp Temp Error")
-			return
-		} else {
-			deps.WsMsgCh <- "read_temp"
-		}
 
 		// adding delay of 0.5s to reduce the cpu usage
 
@@ -435,6 +435,8 @@ func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err er
 		deps.WsErrCh <- err
 		return
 	}
+	logger.Println("DBRESULT Cycle", scan.Cycle, DBResult)
+
 	return
 }
 

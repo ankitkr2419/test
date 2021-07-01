@@ -77,6 +77,7 @@ func startMonitor() {
 			if tec.TempMonStarted {
 				target := C.getObjectTemp()
 				logger.Infoln("Current Temp: ", target)
+				plc.CurrentCycleTemperature = float32(target)
 			}
 			time.Sleep(1 * time.Second)
 		}
@@ -209,7 +210,7 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 		time.Sleep(time.Duration(h.HoldTime) * time.Second)
 		logger.Infoln("Holding Completed ->", h.HoldTime)
-		plc.CurrentCycleTemperature = h.TargetTemp
+
 		prevTemp = h.TargetTemp
 
 	}

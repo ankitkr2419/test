@@ -3,7 +3,6 @@ package compact32
 import (
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"mylab/cpagent/plc"
 
 	"time"
@@ -182,15 +181,6 @@ func (d *Compact32) Start() (err error) {
 		logger.WithField("error", err).Error("Error in Monitoring")
 
 	}
-	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][25], plc.OFF)
-	// if err != nil {
-	// 	logger.Error("WriteSingleCoil:M102 : Start Cycle")
-	// }
-
-	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][102], plc.ON)
-	// if err != nil {
-	// 	logger.Error("WriteSingleCoil:M102 : Start Cycle")
-	// }
 	return
 }
 
@@ -215,32 +205,39 @@ func (d *Compact32) Cycle() (err error) {
 		return
 	}
 
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second * 15)
+	plc.HeatingCycleComplete = true
+	// for {
+	// 	cycleCompletion, err := d.Driver.ReadCoils(plc.MODBUS["M"][27], uint16(1))
+	// 	if err != nil {
+	// 		logger.Error("ReadSingleCoil:M27: Current PV cycle")
+	// 		return err
+	// 	}
+	// 	fmt.Println("cycle completion ---------", cycleCompletion)
+	// 	if cycleCompletion[0] == 1 {
+	// 		plc.HeatingCycleComplete = true
+	// 		err := d.Driver.WriteSingleCoil(plc.MODBUS["M"][27], uint16(0))
+	// 		if err != nil {
+	// 			logger.Error("ReadSingleCoil:M27: Current PV cycle")
+	// 			return err
+	// 		}
+	// 		return nil
+	// 	}
+	// 	time.Sleep(time.Millisecond * 500)
+	// }
 
-	// for the rotation button
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][14], plc.ON)
-	if err != nil {
-		logger.Error("WriteSingleCoil:M20 : Start Cycle")
-		return
-	}
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][15], plc.ON)
-	if err != nil {
-		logger.Error("WriteSingleCoil:M21 : Start Cycle")
-		return
-	}
-	for {
-		cycleCompletion, err := d.Driver.ReadCoils(plc.MODBUS["M"][27], uint16(1))
-		if err != nil {
-			logger.Error("ReadSingleCoil:M27: Current PV cycle")
-			return err
-		}
-		fmt.Println("cycle completion ---------", cycleCompletion)
-		if cycleCompletion[0] == 1 {
-			plc.HeatingCycleComplete = true
-			return nil
-		}
-		time.Sleep(time.Millisecond * 500)
-	}
+	// for the rotation button, rotation button is required in manual move
+
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][14], plc.ON)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M20 : Start Cycle")
+	// 	return
+	// }
+	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][15], plc.ON)
+	// if err != nil {
+	// 	logger.Error("WriteSingleCoil:M21 : Start Cycle")
+	// 	return
+	// }
 
 	return
 }
@@ -248,13 +245,13 @@ func (d *Compact32) Cycle() (err error) {
 // Monitor periodically. If CycleComplete == true, Scan will be populated
 func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
-	logger.Println("INSIDE MONITOR------------------------")
+	logger.Println("---------------------------MONITOR------------------------")
 	// Read current cycle
 	scan.Cycle = plc.CurrentCycle
+	scan.Temp = plc.CurrentCycleTemperature
+	scan.LidTemp = float32(100)
 
 	if plc.HeatingCycleComplete {
-		scan.Cycle = cycle
-		// tmp, err = d.Driver.ReadSingleCoil(plc.MODBUS["M"][107])
 
 		// // Read lid temperature
 		// tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
@@ -270,52 +267,35 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		// 	logger.Error("ReadSingleCoil:M107: Current PV cycle")
 		// 	return
 		// }
-		// if tmp == 0 { // 0x0000 means cycle is not complete
-		// 	// Values would not have changed.
-		// 	scan.CycleComplete = false
-		// 	return
-		// }
-		// scan.CycleComplete = true
+		if !plc.CycleComplete { // 0x0000 means cycle is not complete
+			// Values would not have changed.
+			scan.CycleComplete = false
+			return
+		}
+		scan.CycleComplete = true
 
 		// If the invoker has already read this cycle data, don't send it again!
-		// if cycle == scan.Cycle {
-		// 	return
-		// }
+		if cycle == scan.Cycle {
+			return
+		}
 
-		// Scan all the data from the Wells (96 x 6). Since max read is 123 registers, we shall read 96 at a time.
-		// start := plc.MODBUS["D"][23]
-
-		// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][20], plc.OFF)
-		// if err != nil {
-		// 	logger.Error("WriteSingleCoil:M20 : Start Cycle")
-		// 	return
-		// }
-		// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][21], plc.OFF)
-		// if err != nil {
-		// 	logger.Error("WriteSingleCoil:M21 : Start Cycle")
-		// 	return
-		// }
 		start := 44
 		var data []byte
 		for i := 0; i < 2; i++ {
 			start = start + (16 * i)
 
-		LOOP:
-			for {
-
-				data, err = d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
-				if err != nil {
-					logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")
-
-				}
-
-				//need to change just for testing
-				if data[1] != 0 {
-					logger.Println("data received-------------->", data, "\n start", start)
-					break LOOP
-				}
+			data, err = d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
+			if err != nil {
+				logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")
 
 			}
+
+			//need to change just for testing
+			// if data[1] != 0 {
+			// 	logger.Println("data received-------------->", data, "\n start", start)
+			// 	break LOOP
+			// }
+
 			scan.CycleComplete = true
 			offset := 0 // offset of data. increment every 2 bytes!
 			for j := 0; j < 4; j++ {
@@ -329,27 +309,11 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 					p = 1
 				}
 				scan.Wells[(8*k)+p-1][i] = binary.BigEndian.Uint16(data[offset : offset+2])
-				logger.Println("emission----", scan.Wells[(8*k)+p-1][i])
 				offset += 8
-				logger.Println("well----", ((8 * k) + p - 1), "value", scan.Wells[(8*k)+p-1])
-
 			}
 
 		}
 		//write values to the file
-
-		logger.Println(scan.Wells)
-
-		// logger.WithField("scan", scan).Debug("Monitored data")
-
-		// Write to inform PLC that reading is completed
-		// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][106], plc.OFF)
-		// if err != nil {
-		// 	logger.Error("WriteSingleCoil:M106: PC reading done")
-		// 	return
-		// }
-		scan.Temp = plc.CurrentCycleTemperature
-		plc.HeatingCycleComplete = false
 
 	}
 	return
