@@ -11,8 +11,8 @@ import (
 func CheckIfRecipeOrProcessSafeForCUDs(recipeID *uuid.UUID, processID *uuid.UUID) (err error) {
 	if recipeID != nil {
 		// for deck A or deck B
-		if (deckRecipe[deckA] != db.Recipe{} && *recipeID == deckRecipe[deckA].ID) ||
-			(deckRecipe[deckB] != db.Recipe{} && *recipeID == deckRecipe[deckB].ID) {
+		if (deckRecipe[DeckA] != db.Recipe{} && *recipeID == deckRecipe[DeckA].ID) ||
+			(deckRecipe[DeckB] != db.Recipe{} && *recipeID == deckRecipe[DeckB].ID) {
 			logger.Errorln(responses.RecipeUnsafeForCUDError)
 			return responses.RecipeUnsafeForCUDError
 		}
@@ -21,14 +21,14 @@ func CheckIfRecipeOrProcessSafeForCUDs(recipeID *uuid.UUID, processID *uuid.UUID
 
 	if processID != nil {
 		// for deck A
-		for _, pr := range deckProcesses[deckA] {
+		for _, pr := range deckProcesses[DeckA] {
 			if pr.ID == *processID {
 				logger.Errorln(responses.RecipeUnsafeForCUDError)
 				return responses.ProcessUnsafeForCUDError
 			}
 		}
 		// for deck B
-		for _, pr := range deckProcesses[deckB] {
+		for _, pr := range deckProcesses[DeckB] {
 			if pr.ID == *processID {
 				logger.Errorln(responses.RecipeUnsafeForCUDError)
 				return responses.ProcessUnsafeForCUDError

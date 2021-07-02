@@ -2,10 +2,16 @@ package service
 
 import (
 	"context"
+	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
+	"mylab/cpagent/tec"
+	"mylab/cpagent/responses"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -173,19 +179,21 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 		plcStage := makePLCStage(ss)
 
-		err = deps.Plc.ConfigureRun(plcStage)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// err = deps.Plc.ConfigureRun(plcStage)
+		// if err != nil {
+		// 	logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
+		// 	rw.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
 
-		err = deps.Plc.Start()
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error in plc start")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// err = tec.Run(plcStage)
+
+		// err = deps.Plc.Start()
+		// if err != nil {
+		// 	logger.WithField("err", err.Error()).Error("Error in plc start")
+		// 	rw.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
 
 		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
 		if err != nil {
@@ -224,8 +232,10 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 		//experimentRunning set true
 		experimentRunning = true
+		go startExp(deps, plcStage)
 
 		//invoke monitor
+		// ASK: Do we need this?
 		go monitorExperiment(deps)
 
 		if !isValid {
@@ -277,4 +287,70 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write([]byte(`{"msg":"experiment stopped"}`))
 
 	})
+}
+
+func startExp(deps Dependencies, p plc.Stage) (err error) {
+	// logging output to file and console
+	if _, err := os.Stat(tec.LogsPath); os.IsNotExist(err) {
+		os.MkdirAll(tec.LogsPath, 0755)
+		// ignore error and try creating log output file
+	}
+
+	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
+	if err != nil {
+		logger.WithField("Err", err).Errorln(responses.FileCreationError)
+		return	
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// Home the TEC
+	// Reset is implicit in Homing
+	deps.Plc.HomingRTPCR()
+
+	// Start line
+	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
+	if err != nil {
+		return
+	}
+	err = writer.Write([]string{"Holding Stage About to start"})
+	if err != nil {
+		return
+	}
+	tec.TempMonStarted = true
+
+	//Go back to Room Temp at the end
+	defer func() {
+		tec.TempMonStarted = false
+		experimentRunning = false
+		if err != nil {
+			return
+		}
+		err = deps.Tec.ReachRoomTemp()
+		return
+	}()
+	// Run Holding Stage
+	logger.Infoln("Holding Stage Started")
+	deps.Tec.RunStage(p.Holding, writer, 0)
+
+	// Cycle in Plc
+	deps.Plc.Cycle()
+
+	// Run Cycle Stage
+	err = writer.Write([]string{"Cycle Stage About to start"})
+	if err != nil {
+		return
+	}
+
+	for i := uint16(1); i <= p.CycleCount; i++ {
+		logger.Infoln("Started Cycle->", i)
+		deps.Tec.RunStage(p.Cycle, writer, i)
+		logger.Infoln("Cycle Completed -> ", i)
+		// Cycle in Plc
+		deps.Plc.Cycle()
+	}
+
+	return
 }

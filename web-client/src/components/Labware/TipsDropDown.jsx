@@ -4,7 +4,7 @@ import labwareTips from "assets/images/labware-plate-tips.png";
 import { ImageIcon } from "shared-components";
 import { FormGroup, Label, FormError, Select } from "core-components";
 import { ProcessSetting } from "./Styles";
-import { getOptions } from "./functions";
+import { getOptions } from "./helpers";
 
 const TipsDropdown = (props) => {
   const { formik, tipsOptions, allowedPositions } = props;

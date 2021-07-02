@@ -14,16 +14,12 @@ const (
 	CYCLE_STAGE   = "cycle"
 )
 
-
-
 type Compact32 struct {
 	ExitCh  chan error
 	WsMsgCh chan string
 	wsErrch chan error
 	Driver  plc.Compact32Driver
 }
-
-
 
 func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */
@@ -32,7 +28,7 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 	handler.DataBits = 8
 	handler.Parity = "E"
 	handler.StopBits = 1
-	handler.SlaveId = 5 // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
+	handler.SlaveId = 1 // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
 	handler.Timeout = 500 * time.Millisecond
 
 	handler.Connect()
@@ -46,7 +42,7 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 
 	// Start the Heartbeat
 	// TODO: Uncomment this after RT-PCR m/c is ready
-	// go C32.HeartBeat()
+	go C32.HeartBeat()
 
 	// Specifically for testing!
 	if test {
@@ -119,7 +115,7 @@ func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan 
 	C32.WsMsgCh = wsMsgCh
 	C32.WsErrCh = wsErrch
 
-	plc.SetDeckName(&C32, "A")
+	plc.SetDeckName(&C32, plc.DeckA)
 
 	return &C32, handler
 }
@@ -143,7 +139,7 @@ func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, ha
 	C32.ExitCh = exit
 	C32.WsMsgCh = wsMsgCh
 
-	plc.SetDeckName(&C32, "B")
+	plc.SetDeckName(&C32, plc.DeckB)
 
 	return &C32
 }

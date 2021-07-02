@@ -14,6 +14,9 @@ import (
 	"mylab/cpagent/plc/simulator"
 	"mylab/cpagent/responses"
 	"mylab/cpagent/service"
+	"mylab/cpagent/tec/tec_1089"
+	tecSim "mylab/cpagent/tec/simulator"
+	"mylab/cpagent/tec"
 	"net/http"
 	"os"
 	"strconv"
@@ -28,20 +31,27 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// variables for Binary Build info
-var Version, User, Machine, CommitID, Branch, BuiltOn string
+const(
+	C32 = "compact32"
+	SIM = "simulator"
+)
 
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
-		ForceColors: true,
+		ForceColors:     true,
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
 
-	logsPath := "utils/logs"
+	logsPath := "./utils/logs"
+	tecPath :=  "./utils/tec"
 	// logging output to file and console
 	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
-		_ = os.Mkdir(logsPath, 0755)
+		os.MkdirAll(logsPath, 0755)
+		// ignore error and try creating log output file
+	}
+	if _, err := os.Stat(tecPath); os.IsNotExist(err) {
+		os.MkdirAll(tecPath, 0755)
 		// ignore error and try creating log output file
 	}
 
@@ -61,7 +71,7 @@ func main() {
 	cliApp.Commands = []cli.Command{
 		{
 			Name:  "start",
-			Usage: "start server [--plc {simulator|compact32}] [--delay range:(0,100] ]",
+			Usage: "start server [--plc {simulator|compact32}] [--test] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:  "plc",
@@ -72,6 +82,14 @@ func main() {
 					Name:  "test",
 					Usage: "Run in test mode!",
 				},
+				&cli.BoolFlag{
+					Name:  "no-extraction",
+					Usage: "Run without extraction",
+				},
+				&cli.BoolFlag{
+					Name:  "no-rtpcr",
+					Usage: "Run withour rtpcr",
+				},
 				&cli.IntFlag{
 					Name:  "delay",
 					Value: 50,
@@ -79,7 +97,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				if c.String("plc") != "simulator" && c.Int("delay") != 50 {
+				if c.String("plc") != SIM && c.Int("delay") != 50 {
 					return responses.SimulatorReservedDelayError
 				}
 				err := simulator.UpdateDelay(c.Int("delay"))
@@ -87,13 +105,14 @@ func main() {
 					logger.Error("Re-check delay argument")
 					return err
 				}
-				return startApp(c.String("plc"), c.Bool("test"))
+				return startApp(c.String("plc"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction") )
 			},
 		},
 		{
 			Name:  "create_migration",
 			Usage: "create migration file",
 			Action: func(c *cli.Context) error {
+				logger.Infoln("Creating migration -->", c.Args().Get(0))
 				return db.CreateMigrationFile(c.Args().Get(0))
 			},
 		},
@@ -101,6 +120,7 @@ func main() {
 			Name:  "migrate",
 			Usage: "run db migrations",
 			Action: func(c *cli.Context) error {
+				logger.Infoln("Running migrations")
 				return db.RunMigrations()
 			},
 		},
@@ -108,19 +128,14 @@ func main() {
 			Name:  "rollback",
 			Usage: "rollback migrations",
 			Action: func(c *cli.Context) error {
-
+				logger.Infoln("Rolling back migrations by ", c.Args().Get(0), " steps")
 				return db.RollbackMigrations(c.Args().Get(0))
 			},
 		},
 		{
 			Name:  "import",
-			Usage: "import [--recipename RECIPE_NAME] [--csv CSV_ABSOLUTE_PATH] ",
+			Usage: "import --csv CSV_ABSOLUTE_PATH ",
 			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "recipename",
-					Value: "recipe",
-					Usage: "put recipe name",
-				},
 				&cli.StringFlag{
 					Name:  "csv",
 					Value: "recipe.csv",
@@ -128,14 +143,16 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				return db.ImportCSV(c.String("recipename"), c.String("csv"))
+				logger.Infoln("Importing CSV named -->", c.String("csv"))
+				return db.ImportCSV(c.String("csv"))
 			},
 		},
 		{
 			Name:  "version",
 			Usage: "version",
 			Action: func(c *cli.Context) {
-				printBinaryInfo()
+				logger.Infoln("Printing Version Information")
+				service.PrintBinaryInfo()
 			},
 		},
 	}
@@ -145,35 +162,63 @@ func main() {
 	}
 }
 
-func startApp(plcName string, test bool) (err error) {
+func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
+	logger.Println("run in test mode --->", test)
 	var store db.Storer
 	var driver plc.Driver
+	var tecDriver tec.Driver
 	var handler *modbus.RTUClientHandler
 	var driverDeckA plc.Extraction
 	var driverDeckB plc.Extraction
 
-	if plcName != "simulator" && plcName != "compact32" {
+	if plcName != SIM && plcName != C32 {
 		logger.Errorln(responses.UnsupportedPLCError)
 		return
 	}
 
 	exit := make(chan error)
-
 	websocketMsg := make(chan string)
-
 	websocketErr := make(chan error)
 
-	// PLC work in a completely separate go-routine!
-	if plcName == "compact32" {
+	switch{
+	case noExtraction && noRTPCR:
+		logger.Infoln("application neither supports extraction nor rtpcr")
+		service.Application = service.None
+	case noExtraction && plcName == C32:
+		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
+		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test)
+		service.Application = service.RTPCR
+	case noExtraction && plcName == SIM:
+		driver = simulator.NewSimulator(exit)
+		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
+		service.Application = service.RTPCR
+	case noRTPCR && plcName == C32:
+		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
+		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+		service.Application = service.Extraction
+	case noRTPCR && plcName == SIM:
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
+		service.Application = service.Extraction
+		// Only cases that remain are of combined RTPCR and Extraction
+	case plcName == C32:
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
-	} else {
+		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test)
+		service.Application = service.Combined
+	case plcName == SIM:
 		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, "A")
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, "B")
-
+		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
+		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
+		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
+		service.Application = service.Combined
+	default:
+		logger.Errorln(responses.UnknownCase)
+		return responses.UnknownCase
 	}
+
+	// PLC work in a completely separate go-routine!
 
 	store, err = db.Init()
 	if err != nil {
@@ -182,12 +227,13 @@ func startApp(plcName string, test bool) (err error) {
 	}
 
 	plcDeckMap := map[string]plc.Extraction{
-		"A": driverDeckA,
-		"B": driverDeckB,
+		plc.DeckA: driverDeckA,
+		plc.DeckB: driverDeckB,
 	}
 
 	deps := service.Dependencies{
 		Store:   store,
+		Tec: 	 tecDriver,
 		Plc:     driver,
 		PlcDeck: plcDeckMap,
 		ExitCh:  exit,
@@ -251,16 +297,12 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
 			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
 			plcDeckMap := map[string]plc.Extraction{
-				"A": driverDeckA,
-				"B": driverDeckB,
+				plc.DeckA: driverDeckA,
+				plc.DeckB: driverDeckB,
 			}
 			deps.PlcDeck = plcDeckMap
 		default:
 			time.Sleep(5 * time.Second)
 		}
 	}
-}
-
-func printBinaryInfo() {
-	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n", Version, User, Machine, Branch, CommitID, BuiltOn)
 }

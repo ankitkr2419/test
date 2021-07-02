@@ -320,12 +320,12 @@ func (m *DBMockStore) ListTipsTubes(ttype string) (t []TipsTubes, err error) {
 }
 
 func (m *DBMockStore) ListConsDistances() (c []ConsumableDistance, err error) {
-	args := m.Called(c)
+	args := m.Called()
 	return args.Get(0).([]ConsumableDistance), args.Error(1)
 }
 
 func (m *DBMockStore) ListMotors() (motor []Motor, err error) {
-	args := m.Called(motor)
+	args := m.Called()
 	return args.Get(0).([]Motor), args.Error(1)
 }
 
