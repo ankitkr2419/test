@@ -238,7 +238,7 @@ func (d *Simulator) setWells() {
 func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	d.Lock()
 	defer d.Unlock()
-	scan.Cycle = plc.CurrentCycle
+
 	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10
 
@@ -259,7 +259,7 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 			logger.Println("same cycle")
 			return
 		}
-
+		scan.Cycle = plc.CurrentCycle
 		d.emit()
 		logger.Println("emissions------------------>", d.emissions)
 		// Scan all the data from the Wells (96 x 6)
