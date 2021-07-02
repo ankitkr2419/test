@@ -102,16 +102,16 @@ func (t *Simulator) GetAllTEC() (err error) {
 func (t *Simulator) TestRun() (err error) {
 	p := plc.Stage{
 		Holding: []plc.Step{
-			plc.Step{65.3, 10, 5},
-			plc.Step{85.3, 10, 5},
-			plc.Step{95, 10, 5},
+			plc.Step{65.3, 10, 5, false},
+			plc.Step{85.3, 10, 5, false},
+			plc.Step{95, 10, 5, false},
 		},
 		Cycle: []plc.Step{
 			// plc.Step{60, 10, 10},
-			plc.Step{95, 10, 5},
-			plc.Step{85, 10, 5},
-			plc.Step{75, 10, 5},
-			plc.Step{65, 10, 5},
+			plc.Step{95, 10, 5, false},
+			plc.Step{85, 10, 5, false},
+			plc.Step{75, 10, 5, false},
+			plc.Step{65, 10, 5, false},
 		},
 		CycleCount: 3,
 	}
