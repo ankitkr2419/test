@@ -67,8 +67,8 @@ func (t *TEC1089) InitiateTEC() (err error) {
 	C.InitiateTEC()
 
 	go startErrorCheck()
-
-	return nil
+	
+	return t.ReachRoomTemp()
 }
 
 func startMonitor() {
@@ -103,6 +103,7 @@ func (t *TEC1089) ConnectTEC(ts tec.TECTempSet) (err error) {
 	if tecInProgress {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
+	tec.TempMonStarted = true
 	tecInProgress = true
 	C.DemoFunc(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 	tecInProgress = false
@@ -182,14 +183,19 @@ func (t *TEC1089) TestRun() (err error) {
 	return nil
 }
 
-func (t *TEC1089) ReachRoomTemp() error {
+func (t *TEC1089) ReachRoomTemp() (err error) {
 	logger.Infoln("Going Back to Room Temp 27 ")
 	ts := tec.TECTempSet{
 		TargetTemperature: 27,
 		TargetRampRate:    4,
 	}
-	t.ConnectTEC(ts)
+	err = t.ConnectTEC(ts)
+	if err != nil{
+		logger.Errorln("Couldn't Reach Room Temp 27")
+		return
+	}
 	logger.Infoln("Room Temp 27 Reached ")
+	tec.TempMonStarted = false
 	return nil
 }
 
