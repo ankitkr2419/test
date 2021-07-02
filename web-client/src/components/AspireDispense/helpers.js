@@ -1,5 +1,6 @@
 import { CATEGORY_NAME } from "appConstants";
 
+// returns the position (index) of selected well
 export const getPosition = (wells) => {
   if (wells) {
     const selectedWell = wells.find((wellObj) => wellObj.isSelected);
@@ -8,6 +9,7 @@ export const getPosition = (wells) => {
   return 0;
 };
 
+// used to generated request body for API call.
 export const getRequestBody = (activeTab, aspire, dispense) => {
   const aspireSelectedTabName = CATEGORY_NAME[aspire.selectedCategory];
   const dispenseSelectedTabName = CATEGORY_NAME[dispense.selectedCategory];
@@ -46,6 +48,7 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
 };
 
 // footerText can be: "aspire-from" or "selected"
+// generates array of objects for wells.
 export const getArray = (length, type, selectedPosition = null) => {
   const array = [];
 
@@ -66,6 +69,9 @@ export const getArray = (length, type, selectedPosition = null) => {
   return array;
 };
 
+// this function generates the initial formik state according to the
+// operation being performeed i.e. if NEW process is being created than
+// empty data is loaded in formikState else for EDIT old values are loaded.
 export const getFormikInitialState = (editReducer = null) => {
   let type = "category_1";
   let category, category1, category2;
@@ -131,6 +137,7 @@ export const getFormikInitialState = (editReducer = null) => {
   };
 };
 
+// initial state of all tabs.
 export const disabledTabInitTab = {
   aspire: {
     cartridge1: false,
@@ -237,6 +244,7 @@ export const toggler = (formik, isAspire) => {
   return disabledState;
 };
 
+// sets formik field
 export const setFormikField = (
   formik,
   isAspire,
