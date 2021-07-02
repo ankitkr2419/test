@@ -315,17 +315,7 @@ int InitiateTEC()
     MeParFloatFields Fields;
     MeParLongFields Longs;
 
-    // if(ConsoleIO_YesNo("Do you want to open a Comport? (press enter for default)", 1))
-    // {
-    // } else {
-    //     printf("No Comport has been opened, this will result in some communications timeouts.\n");
-    //     printf("It is even though possible to see the resulting Host communication\nin the Communication Log file\n\n");
-    // }
-
     ComPort_Open(0, 57600);
-
-    
-    // Address = ConsoleIO_IntInput("Please Enter the Device Address", 0, 255, 0);
     
     Address = 2;
 
@@ -364,23 +354,6 @@ int InitiateTEC()
         MeCom_TEC_Ope_VoltageErrorThreshold(Address, Inst, &Fields, MeSet);
     } else{
         printf("TEC MeCom_TEC_Ope_VoltageErrorThreshold value out of range( %f, %f).", Fields.Max, Fields.Min);
-        return -1;
-    }
-
-    // Temperature Controlling
-
-    // 1. Setup Initial Target Temp
-
-    // setValue = 40;
-    Fields.Value = 27;
-    printf("TEC Object Temperature: New Value: %f\n", Fields.Value);
-
-    // check for limit
-
-    if(MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeGetLimits)){
-        MeCom_TEC_Tem_TargetObjectTemp(Address, Inst, &Fields, MeSet);
-    } else{
-        printf("TEC Object Temperature value out of range( %f, %f).", Fields.Max, Fields.Min);
         return -1;
     }
 
@@ -485,60 +458,11 @@ int InitiateTEC()
         return -1;
     }
 
-    // Read all parameters
-    /*
-    if(MeCom_TEC_Oth_AtmPIDParameterKp(Address, Inst, &Fields, MeGet)){
-        printf("TEC MeCom_TEC_Oth_AtmPIDParameterKp value is: %f\n", Fields.Value);
-    } else{
-        printf("TEC MeCom_TEC_Oth_AtmPIDParameterKp value couldn't be read");
-        return -1;
-    }
-
-    if(MeCom_TEC_Oth_AtmPIDParameterTi(Address, Inst, &Fields, MeGet)){
-        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTi value is: %f\n", Fields.Value);
-        
-    } else{
-        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTi value couldn't be read");
-        return -1;
-    }
-
-    if(MeCom_TEC_Oth_AtmPIDParameterTd(Address, Inst, &Fields, MeGet)){
-        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTd value is: %f\n", Fields.Value);
-        
-    } else{
-        printf("TEC MeCom_TEC_Oth_AtmPIDParameterTd value couldn't be read");
-        return -1;
-    }
-
-    if(MeCom_TEC_Oth_AtmPIDDPartDamping(Address, Inst, &Fields, MeGet)){
-        printf("TEC MeCom_TEC_Oth_AtmPIDDPartDamping value is: %f\n", Fields.Value);
-        
-    } else{
-        printf("TEC MeCom_TEC_Oth_AtmPIDDPartDamping value couldn't be read");
-        return -1;
-    }
-    */
-
-    // 5. Read Target Temp(Current) till target reached
+    // 5. Read Actual Output Current and Voltage
     int i = 0;
     while(i != 3){
             i++;
-            sleep(3); 
-            if(MeCom_TEC_Mon_TargetObjectTemperature(Address, Inst, &Fields, MeGet))
-            {
-                printf("TEC Target Object Temperature: Value: %f\n", Fields.Value);
-            } else {
-                printf("TEC Target Object Temperature value couldn't be read");
-                return -1;
-            }
-
-            if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
-            {
-                printf("TEC Object Temperature: Value: %f\n", Fields.Value);
-            } else {
-                printf("TEC Object Temperature value couldn't be read");
-                return -1;
-            }
+            sleep(1); 
 
             if(MeCom_TEC_Mon_ActualOutputCurrent(Address, Inst, &Fields, MeGet))
             {
@@ -639,7 +563,7 @@ int checkForErrorState()
     MeParLongFields Longs; 
     if(MeCom_COM_DeviceStatus(Address, &Longs, MeGet)){
         // print only if its not Run
-        if (Longs.Value != 2){
+        if (Longs.Value != 2 && Longs.Value < 11 && Longs.Value >= 0){
             printf("TEC MeCom_COM_DeviceStatus :%d\n", Longs.Value);
         }
     } else{
