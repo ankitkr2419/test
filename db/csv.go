@@ -25,8 +25,8 @@ const (
 	blank       = ""
 	rtpcr       = "RTPCR"
 	extraction  = "EXTRACTION"
-	hold        = "HOLDING"
-	cycle       = "CYCLING"
+	hold        = "hold"
+	cycle       = "cycle"
 )
 
 var sequenceNumber int64 = 0

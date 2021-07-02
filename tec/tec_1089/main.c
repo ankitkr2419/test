@@ -618,8 +618,12 @@ skipRamp:
 double getObjectTemp(){
     MeParFloatFields Fields;
 
+getTemp:
     if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
     {
+        if (Fields.Value == 0) {
+            goto getTemp;
+        }
         return Fields.Value;    
     } else {
         printf("TEC Object Temperature value couldn't be read");
