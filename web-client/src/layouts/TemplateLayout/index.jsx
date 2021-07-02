@@ -17,6 +17,7 @@ import templateLayoutReducer, {
 } from "./templateState";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 
 const TemplateLayout = (props) => {
   const history = useHistory();
@@ -88,12 +89,19 @@ const TemplateLayout = (props) => {
     history.push("splashscreen");
   }
 
+  const finishBtnHandler = () => {
+    updateSelectedWizard("template");
+    toast.success("Template details Saved");
+  };
+
   return (
     <div className="template-content">
       <Wizard
         list={wizardList}
         onClickHandler={updateSelectedWizard}
         isAdmin={isAdmin}
+        showFinishBtn={activeWidgetID === "step"}
+        finishBtnHandler={finishBtnHandler}
       />
       <Card>
         <CardBody className="d-flex flex-unset overflow-hidden p-0">
