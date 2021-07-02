@@ -8,8 +8,8 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/tec"
 	"mylab/cpagent/responses"
+	"mylab/cpagent/tec"
 	"net/http"
 	"os"
 	"time"
@@ -186,7 +186,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		// 	return
 		// }
 
-		// err = tec.Run(plcStage)
+		// // err = tec.Run(plcStage)
 
 		// err = deps.Plc.Start()
 		// if err != nil {
@@ -218,10 +218,15 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			}
 
 		}
+		logger.Println("target details", targetDetails)
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
+		logger.Println("Experiment values", experimentValues)
+
 		WellTargets := initializeWellTargets()
+
+		logger.Println("well targets", WellTargets)
 
 		// update well targets value in DB
 		_, err = deps.Store.UpsertWellTargets(context.Background(), WellTargets, experimentValues.experimentID, false)
@@ -230,6 +235,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
 			return
 		}
+
 		//experimentRunning set true
 		experimentRunning = true
 		go startExp(deps, plcStage)
@@ -299,7 +305,7 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
 	if err != nil {
 		logger.WithField("Err", err).Errorln(responses.FileCreationError)
-		return	
+		return
 	}
 	defer file.Close()
 
