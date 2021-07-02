@@ -306,6 +306,10 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
+	err = deps.Tec.ReachRoomTemp()
+	if err != nil{
+		return
+	}
 	// Home the TEC
 	// Reset is implicit in Homing
 	deps.Plc.HomingRTPCR()
@@ -339,7 +343,6 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	writer.Flush()
 
 	// Cycle in Plc
-	deps.Plc.Cycle()
 
 	// Run Cycle Stage
 	err = writer.Write([]string{"Cycle Stage About to start"})
