@@ -35,7 +35,7 @@ type Emissions [4]uint16
 
 type Scan struct {
 	Cycle         uint16 // current running cycle
-	Wells         [64]Emissions
+	Wells         [16]Emissions
 	Temp          float32
 	LidTemp       float32
 	CycleComplete bool

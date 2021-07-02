@@ -13,7 +13,7 @@ import (
 type Well struct {
 	// emissions plc.Emissions // dye emmissions.
 	control string    // "", positive, negative, internal or no_template
-	goals   [6]string // "", "high", "low"
+	goals   [4]string // "", "high", "low"
 }
 
 type Simulator struct {
@@ -191,30 +191,30 @@ func (d *Simulator) setWells() {
 
 		if i == pc {
 			well.control = "positive"
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				well.goals[i] = "high"
 			}
 
 		} else if i == nc {
 			well.control = "negative"
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				well.goals[i] = ""
 			}
 
 		} else if i == ic {
 			well.control = "internal"
-			well.goals = [6]string{"", "", "", "", "", "high"} //TODO: discuss
+			well.goals = [4]string{"", "", "", "high"} //TODO: discuss
 
 		} else if i == ntc {
 			well.control = "no_template"
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				well.goals[i] = "0"
 			}
 
 		} else {
 			well.control = "" // patient sample
 
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				if i != ic { // for all targets accept ic assign random goals
 					switch goal := jitter(0, 1, 4); goal { // randomization of goals
 					case 1:
@@ -239,38 +239,38 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	d.Lock()
 	defer d.Unlock()
 
-	// Read current cycle
-	scan.Cycle = d.plcIO.d.currentCycle
+	scan.Temp = plc.CurrentCycleTemperature
+	scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10
 
-	//do not need this as handled in the software
+	if plc.HeatingCycleComplete {
 
-	// Read cycle temperature.. PLC returns 653 for 65.3 degrees
-	//scan.Temp = float32(d.plcIO.d.currentTemp) / 10
+		// Read current cycle status
+		if !plc.CycleComplete { // 0x0000 means cycle is not complete
+			// Values would not have changed.
+			scan.CycleComplete = false
+			logger.Println("prev cycle")
 
-	// Read lid temperature
-	//scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10
+			return
+		}
+		scan.CycleComplete = true
 
-	// Read current cycle status
-	// if d.plcIO.m.cycleCompleted == 0 { // 0x0000 means cycle is not complete
-	// 	// Values would not have changed.
-	// 	scan.CycleComplete = false
-	// 	return
-	// }
-	// scan.CycleComplete = true
+		// If the invoker has already read this cycle data, don't send it again!
+		if cycle == scan.Cycle {
+			logger.Println("same cycle")
+			return
+		}
+		scan.Cycle = plc.CurrentCycle
+		d.emit()
+		logger.Println("emissions------------------>", d.emissions)
+		// Scan all the data from the Wells (96 x 6)
+		for i, data := range d.emissions {
+			scan.Wells[i] = data
+			logger.Println("scan wells ", scan.Wells[i])
+		}
 
-	// If the invoker has already read this cycle data, don't send it again!
-	// if cycle == scan.Cycle {
-	// 	return
-	// }
-
-	// Scan all the data from the Wells (96 x 6)
-	for i, data := range d.emissions {
-		scan.Wells[i] = data
+		// PC reading done
+		d.plcIO.m.emissionFlag = 0
 	}
-
-	// PC reading done
-	d.plcIO.m.emissionFlag = 0
-
 	return
 }
 

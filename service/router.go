@@ -131,7 +131,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/app-info", appInfoHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	
+
 	//rt-pcr funcs
 	router.HandleFunc("/rt-pcr/homing", rtpcrHomingHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/rt-pcr/reset", rtpcrResetHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)

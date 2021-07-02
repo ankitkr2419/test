@@ -216,7 +216,6 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 					}
 
 				}
-
 			}
 			finalResult = append(finalResult, wellResult)
 			wellResult.Cycle = []uint16{}

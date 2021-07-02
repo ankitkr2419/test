@@ -7,4 +7,4 @@ controls:
   no_template: 4     # position of well to be set no template
 
 wells:
-  count: 96           # total no of well count range in between 1-96, note that controls position should not exceed well_count
+  count: 16           # total no of well count range in between 1-96, note that controls position should not exceed well_count
