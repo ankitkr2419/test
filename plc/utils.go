@@ -4,14 +4,25 @@ import (
 	"context"
 	"fmt"
 	"mylab/cpagent/db"
-	"sync"
+	"mylab/cpagent/responses"
 
+	"os"
+	"sync"
+	"time"
+
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
 )
 
 var HeatingCycleComplete, CycleComplete bool
 var CurrentCycleTemperature float32
 var CurrentCycle uint16
+
+const (
+	TECSheet   = "tec"
+	RTPCRSheet = "rtpcr"
+	TempLogs   = "temperature logs"
+)
 
 type DeckNumber struct {
 	Deck   string
@@ -330,4 +341,51 @@ func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *ui
 		*distanceToTravel *= -1
 		*direction = 0
 	}
+}
+
+func GetExcelFile(path, fileName string) (f *excelize.File) {
+	// logging output to file and console
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, 0755)
+		// ignore error and try creating log output file
+	}
+
+	f = excelize.NewFile()
+
+	index := f.NewSheet(TECSheet)
+	f.NewSheet(RTPCRSheet)
+	f.NewSheet(TempLogs)
+	f.SetActiveSheet(index)
+	f.Path = fmt.Sprintf("%v/%s_%v.xlsx", path, fileName, time.Now().Unix())
+	logger.Infoln("file saved in path---------->", f.Path)
+
+	return
+}
+
+func AddRowToExcel(file *excelize.File, sheet string, values []string) {
+
+	rows, err := file.Rows(sheet)
+	if err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
+	}
+	rowCount := 1
+	for rows.Next() {
+		rowCount = rowCount + 1
+	}
+
+	for i, v := range values {
+		cell, err := excelize.CoordinatesToCellName(i+1, rowCount)
+		if err != nil {
+			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+			return
+		}
+		file.SetCellValue(sheet, cell, v)
+	}
+
+	if err = file.SaveAs(file.Path); err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
+	}
+
 }
