@@ -125,6 +125,7 @@ export const MODAL_MESSAGE = {
   exitConfirmation: "Are you sure you want to exit?",
   deleteTemplateConfirmation: "Are you sure you want to delete this template?",
   deleteStepConfirmation: "Are you sure you want to delete this step?",
+  deleteActivityConfirmation: "Are you sure you want to delete this activity?",
 };
 
 export const MODAL_BTN = {
