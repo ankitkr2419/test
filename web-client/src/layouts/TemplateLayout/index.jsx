@@ -18,6 +18,7 @@ import templateLayoutReducer, {
 } from "./templateState";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 
 const TemplateLayout = (props) => {
   const history = useHistory();
@@ -95,6 +96,11 @@ const TemplateLayout = (props) => {
     // history.push(ROUTES.login);
     history.push("splashscreen");
   }
+
+  const finishBtnHandler = () => {
+    updateSelectedWizard("template");
+    toast.success("Template details Saved");
+  };
 
   return (
     <div className="template-content">

@@ -23,7 +23,7 @@ const SubHeader = (props) => {
 		experimentTemplate,
 		isExperimentSucceeded,
 		experimentDetails,
-		experimentId,
+		experimentId,//TODO remove if not needed anymore
 	} = props;
 
 	const { templateName } = experimentTemplate;
@@ -31,9 +31,6 @@ const SubHeader = (props) => {
 
 	return (
 		<StyledSubHeader className="plate-subheader">
-			<Text Tag="h6" className="mb-0">
-				{experimentId}
-			</Text>
 			<Text Tag="h6" className="mb-0 mx-5">
 				{templateName}
 			</Text>
