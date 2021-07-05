@@ -237,7 +237,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		//experimentRunning set true
-		experimentRunning = true
+		plc.ExperimentRunning = true
 		go startExp(deps, plcStage)
 
 		//invoke monitor
@@ -318,7 +318,10 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	}
 	// Home the TEC
 	// Reset is implicit in Homing
-	deps.Plc.HomingRTPCR()
+	err = deps.Plc.HomingRTPCR()
+	if err != nil {
+		return
+	}
 
 	// Start line
 	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
@@ -336,11 +339,17 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	//Go back to Room Temp at the end
 	defer func() {
 		tec.TempMonStarted = false
-		experimentRunning = false
+		plc.ExperimentRunning = false
 		if err != nil {
 			return
 		}
 		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			return
+		}
+
+		err = deps.Plc.SwitchOffLidTemp()
+
 		return
 	}()
 	// Run Holding Stage

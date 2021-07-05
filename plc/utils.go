@@ -10,7 +10,7 @@ import (
 )
 
 
-var HeatingCycleComplete, CycleComplete, DataCapture bool
+var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
 var CurrentCycleTemperature float32
 var CurrentCycle uint16
 
