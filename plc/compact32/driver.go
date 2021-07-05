@@ -3,6 +3,7 @@ package compact32
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"mylab/cpagent/plc"
 
 	"time"
@@ -140,6 +141,7 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 }
 
 func (d *Compact32) HomingRTPCR() (err error) {
+
 	//First Home
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][1], plc.ON)
 	if err != nil {
@@ -185,10 +187,12 @@ func (d *Compact32) Start() (err error) {
 }
 
 func (d *Compact32) Stop() (err error) {
+	plc.ExperimentRunning = false
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][102], plc.OFF)
 	if err != nil {
 		logger.Error("WriteSingleCoil:M102 : Stop Cycle")
 	}
+	d.SwitchOffLidTemp()
 	return
 }
 
@@ -329,3 +333,80 @@ func (d *Compact32) Calibrate() (err error) {
 	// TBD
 	return
 }
+
+
+
+func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
+
+	var currentLidTemp uint16
+	// Off Lid Heating
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.OFF)
+	if err != nil {
+		logger.Errorln("WriteSingleCoil:M109 : Stop Lid Heating")
+		return
+	}
+
+	_, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][134], expectedLidTemp)
+	if err != nil {
+		logger.WithField("lid_temperature", expectedLidTemp ).Errorln("WriteSingleRegister:D134 :", err)
+		return
+	}
+
+	currentLidTemp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
+	if err != nil {
+		logger.WithField("lid_temperature", expectedLidTemp ).Errorln("ReadSingleRegister:D135 :", err)
+		return
+	}
+	logger.Infoln("Current Lid Temperature:", currentLidTemp)
+
+	// Start Lid Heating
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.ON)
+	if err != nil {
+		logger.Errorln("WriteSingleCoil:M109 : Start Lid Heating")
+		return
+	}
+
+	if expectedLidTemp > currentLidTemp{
+		// give 0.5 degree per sec increment
+		// expected Sleep time secs:= ((expectedLidTemp - currentLidTemp)/10) * 2  
+		time.Sleep( time.Duration((expectedLidTemp - currentLidTemp)/5 ) * time.Second)
+		logger.Infoln( "Waiting for " , time.Duration((expectedLidTemp - currentLidTemp)/5), " secs." )
+	}
+
+	go func(){
+		for{
+			time.Sleep(2 * time.Second)
+			//  Read lid temperature
+			currentLidTemp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
+			if err != nil {
+				logger.Errorln("ReadSingleRegister:D135: Lid temperature", err)
+				return
+			}
+			logger.Infoln("Current Lid Temp: ", currentLidTemp)
+
+			if !plc.ExperimentRunning {
+				return
+			}
+			if (currentLidTemp + 50 > expectedLidTemp) ||  (currentLidTemp - 50 < expectedLidTemp) {
+				logger.Errorln("Current Lid Temp has exceeded the limits: ", currentLidTemp)
+				d.wsErrch <- errors.New("PCR Aborted")
+				err = fmt.Errorf("lid temperature has exceeded the limits")
+				return
+			}
+		}	
+	}()
+
+	return nil
+}
+
+
+
+func (d *Compact32) SwitchOffLidTemp() (err error) {
+	// Off Lid Heating
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.OFF)
+	if err != nil {
+		logger.Errorln("WriteSingleCoil:M109 : Stop Lid Heating")
+	}
+	return
+}
+
