@@ -8,8 +8,8 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/tec"
 	"mylab/cpagent/responses"
+	"mylab/cpagent/tec"
 	"net/http"
 	"os"
 	"time"
@@ -186,7 +186,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		// 	return
 		// }
 
-		// err = tec.Run(plcStage)
+		// // err = tec.Run(plcStage)
 
 		// err = deps.Plc.Start()
 		// if err != nil {
@@ -218,10 +218,15 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			}
 
 		}
+		logger.Println("target details", targetDetails)
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
+		logger.Println("Experiment values", experimentValues)
+
 		WellTargets := initializeWellTargets()
+
+		logger.Println("well targets", WellTargets)
 
 		// update well targets value in DB
 		_, err = deps.Store.UpsertWellTargets(context.Background(), WellTargets, experimentValues.experimentID, false)
@@ -230,6 +235,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
 			return
 		}
+
 		//experimentRunning set true
 		experimentRunning = true
 		go startExp(deps, plcStage)
@@ -299,13 +305,17 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
 	if err != nil {
 		logger.WithField("Err", err).Errorln(responses.FileCreationError)
-		return	
+		return
 	}
 	defer file.Close()
 
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
+	err = deps.Tec.ReachRoomTemp()
+	if err != nil{
+		return
+	}
 	// Home the TEC
 	// Reset is implicit in Homing
 	deps.Plc.HomingRTPCR()
@@ -315,10 +325,12 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	if err != nil {
 		return
 	}
-	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil {
-		return
-	}
+	
+	timeStarted := time.Now()
+	writer.Write([]string{"Experiment Started at: ", timeStarted.String()})
+
+	writer.Write([]string{"Holding Stage About to start"})
+
 	tec.TempMonStarted = true
 
 	//Go back to Room Temp at the end
@@ -334,9 +346,9 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
 	deps.Tec.RunStage(p.Holding, writer, 0)
+	writer.Flush()
 
 	// Cycle in Plc
-	deps.Plc.Cycle()
 
 	// Run Cycle Stage
 	err = writer.Write([]string{"Cycle Stage About to start"})
@@ -347,10 +359,14 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
 		deps.Tec.RunStage(p.Cycle, writer, i)
+		writer.Flush()
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
 		deps.Plc.Cycle()
 	}
+
+	writer.Write([]string{"Experiment Completed at: ", time.Now().String()})
+	writer.Write([]string{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()})
 
 	return
 }

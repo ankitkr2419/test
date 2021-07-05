@@ -45,6 +45,7 @@ func makePLCStage(ss []db.StageStep) plc.Stage {
 		step.RampUpTemp = s.RampRate
 		step.TargetTemp = s.TargetTemperature
 		step.HoldTime = s.HoldTime
+		step.DataCapture = s.DataCapture
 
 		switch s.Type {
 		case "hold":
@@ -215,7 +216,6 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 					}
 
 				}
-
 			}
 			finalResult = append(finalResult, wellResult)
 			wellResult.Cycle = []uint16{}
