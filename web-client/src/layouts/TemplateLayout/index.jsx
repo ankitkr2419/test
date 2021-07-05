@@ -1,5 +1,6 @@
 import React, { useCallback, useReducer } from "react";
-import { CardBody, Card } from "core-components";
+import { CardBody, Card, Input } from "core-components";
+import { Text } from "shared-components";
 import Wizard from "shared-components/Wizard";
 import TemplateContainer from "containers/TemplateContainer";
 import TargetContainer from "containers/TargetContainer";
@@ -83,6 +84,13 @@ const TemplateLayout = (props) => {
     });
   }, []);
 
+  const onLidTempChange = useCallback((temperature) => {
+    templateLayoutDispatch({
+      type: templateLayoutActions.SET_LID_TEMPERATURE,
+      value: temperature,
+    });
+  }, []);
+
   if (!isLoggedIn) {
     // history.push(ROUTES.login);
     history.push("splashscreen");
@@ -90,11 +98,32 @@ const TemplateLayout = (props) => {
 
   return (
     <div className="template-content">
-      <Wizard
-        list={wizardList}
-        onClickHandler={updateSelectedWizard}
-        isAdmin={isAdmin}
-      />
+      <div className="d-flex">
+        <Wizard
+          list={wizardList}
+          onClickHandler={updateSelectedWizard}
+          isAdmin={isAdmin}
+        />
+        {/* TODO : changes will be made here after ui is finalized. */}
+        {/* {activeWidgetID === "step" && (
+          <div>
+            <Text
+              size={16}
+              className="text-default text-truncate-multi-line font-weight-bold mb-0 px-2"
+            >
+              Lid Temperature (°C)
+            </Text>
+            <Input
+              className="flex-100"
+              type="number"
+              name={`threshold`}
+              placeholder={`°C units`}
+              onChange={(event) => onLidTempChange(event.target.value)}
+            />
+          </div>
+        )} */}
+      </div>
+
       <Card>
         <CardBody className="d-flex flex-unset overflow-hidden p-0">
           {/* TemplateModal container that provides template modal to create

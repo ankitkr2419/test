@@ -15,6 +15,7 @@ import activeWellActions from 'actions/activeWellActions';
 const listWellInitialState = fromJS({
 	isLoading: true,
 	isMultiSelectionOptionOn: false,
+	isAllWellsSelected: false,
 	defaultList: getDefaultWellsList(),
 	list: [],
 	isWellFilled: false,
@@ -46,6 +47,11 @@ export const wellListReducer = (state = listWellInitialState, action) => {
 		}
 		// clear selected wells if any and update toggle value
 		return resetWellDefaultList(state).setIn(['isMultiSelectionOptionOn'], !state.get('isMultiSelectionOptionOn'));
+
+	case listWellActions.selectAllWellsOption:
+		return resetWellDefaultList(state).setIn(['isAllWellsSelected'], !state.get('isAllWellsSelected'));
+	
+		
 
 	// Update wells list when new wells are added
 	case addWellActions.successAction:

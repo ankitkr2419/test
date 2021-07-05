@@ -46,6 +46,7 @@ const AppHeader = (props) => {
     token,
     deckName,
     app,
+    activeWidgetID,
   } = props;
 
   const dispatch = useDispatch();
@@ -84,6 +85,14 @@ const AppHeader = (props) => {
     if (isExperimentRunning === false && isExperimentSucceeded === false) {
       dispatch(runExperiment(experimentId, token));
     }
+  };
+
+  /** Hide plates tab if the user is admin */
+  const getIsNavLinkHidden = (pathname) => {
+    if (pathname === "/plate" && isLoginTypeAdmin === true) {
+      return true;
+    }
+    return false;
   };
 
   const getIsNavLinkDisabled = (pathname) => {
@@ -145,19 +154,22 @@ const AppHeader = (props) => {
       <Logo isUserLoggedIn={isUserLoggedIn} />
       {isUserLoggedIn && app === APP_TYPE.RTPCR && (
         <Nav className="ml-3 mr-auto">
-          {NAV_ITEMS.map((ele) => (
-            <NavItem key={ele.name}>
-              <NavLink
-                onClick={(event) => {
-                  onNavLinkClickHandler(event, ele.path);
-                }}
-                to={ele.path}
-                disabled={getIsNavLinkDisabled(ele.path)}
-              >
-                {ele.name}
-              </NavLink>
-            </NavItem>
-          ))}
+          {NAV_ITEMS.map(
+            (ele) =>
+              !getIsNavLinkHidden(ele.path) && (
+                <NavItem key={ele.name}>
+                  <NavLink
+                    onClick={(event) => {
+                      onNavLinkClickHandler(event, ele.path);
+                    }}
+                    to={ele.path}
+                    disabled={getIsNavLinkDisabled(ele.path)}
+                  >
+                    {ele.name}
+                  </NavLink>
+                </NavItem>
+              )
+          )}
         </Nav>
       )}
       {isUserLoggedIn && (
@@ -182,6 +194,7 @@ const AppHeader = (props) => {
               >
                 Experiment failed to run.
               </Text>
+              
               {isExperimentSucceeded === false && isPlateRoute === true && (
                 <Button
                   color={isExperimentRunning ? "primary" : "secondary"}
@@ -194,6 +207,17 @@ const AppHeader = (props) => {
                   onClick={startExperiment}
                 >
                   Run
+                </Button>
+              )}
+
+              {isLoginTypeAdmin && activeWidgetID === "step" && (
+                <Button
+                  color="primary"
+                  size="sm"
+                  className="font-weight-light border-2 border-gray shadow-none"
+                  // onClick={startExperiment}
+                >
+                  Save
                 </Button>
               )}
               {isExperimentSucceeded === true && (

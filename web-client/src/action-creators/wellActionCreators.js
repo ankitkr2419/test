@@ -71,3 +71,7 @@ export const resetMultiSelectedWells = () => ({
 export const toggleMultiSelectOption = () => ({
   type: listWellActions.toggleMultiSelectOption,
 });
+
+export const selectAllWellsOption = () => ({
+  type: listWellActions.selectAllWellsOption,
+});

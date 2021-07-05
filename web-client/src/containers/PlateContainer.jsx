@@ -7,6 +7,7 @@ import {
 	setMultiSelectedWell as setMultiSelectedWellAction,
 	toggleMultiSelectOption as toggleMultiSelectOptionAction,
 	resetSelectedWells as resetSelectedWellAction,
+	selectAllWellsOption as selectAllWellsAction,
 	fetchWells,
 } from 'action-creators/wellActionCreators';
 import { getExperimentTargets } from 'selectors/experimentTargetSelector';
@@ -77,6 +78,10 @@ const PlateContainer = () => {
 		dispatch(toggleMultiSelectOptionAction());
 	};
 
+	const toggleAllWellSelectedOption = () => {
+		dispatch(selectAllWellsAction());
+	};
+	
 	return (
 		<Plate
 			wells={wellListReducer.get('defaultList')}
@@ -87,7 +92,9 @@ const PlateContainer = () => {
 			experimentId={experimentId}
 			setMultiSelectedWell={setMultiSelectedWell}
 			isMultiSelectionOptionOn={wellListReducer.get('isMultiSelectionOptionOn')}
+			isAllWellsSelected={wellListReducer.get('isAllWellsSelected')}
 			toggleMultiSelectOption={toggleMultiSelectOption}
+			toggleAllWellSelectedOption={toggleAllWellSelectedOption}
 			activeWells={activeWells}
 			experimentTemplate={experimentTemplate}
 		/>
