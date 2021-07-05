@@ -11,7 +11,7 @@ import (
 
 
 var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
-var CurrentCycleTemperature float32
+var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
 
 type DeckNumber struct {

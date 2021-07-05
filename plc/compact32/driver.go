@@ -253,7 +253,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	// Read current cycle
 
 	scan.Temp = plc.CurrentCycleTemperature
-	scan.LidTemp = float32(100)
+	scan.LidTemp = float32(plc.CurrentLidTemp)/10
 	scan.CycleComplete = false
 	if plc.CycleComplete {
 
@@ -337,7 +337,6 @@ func (d *Compact32) Calibrate() (err error) {
 
 
 func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
-
 	var currentLidTemp uint16
 	// Off Lid Heating
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.OFF)
@@ -382,6 +381,7 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 				logger.Errorln("ReadSingleRegister:D135: Lid temperature", err)
 				return
 			}
+			plc.CurrentLidTemp = float32(currentLidTemp)/10
 			logger.Infoln("Current Lid Temp: ", currentLidTemp)
 
 			if !plc.ExperimentRunning {
@@ -398,8 +398,6 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 
 	return nil
 }
-
-
 
 func (d *Compact32) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
