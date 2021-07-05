@@ -123,6 +123,8 @@ export const MODAL_MESSAGE = {
   deleteProcessConfirmation: "Are you sure you want to delete this process?",
   deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
   exitConfirmation: "Are you sure you want to exit?",
+  deleteTemplateConfirmation: "Are you sure you want to delete this template?",
+  deleteStepConfirmation: "Are you sure you want to delete this step?",
 };
 
 export const MODAL_BTN = {

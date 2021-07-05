@@ -104,6 +104,8 @@ export function* deleteTemplate(actions) {
         successAction,
         failureAction,
         token,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
