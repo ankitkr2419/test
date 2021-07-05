@@ -67,8 +67,8 @@ func (t *TEC1089) InitiateTEC() (err error) {
 	C.InitiateTEC()
 
 	go startErrorCheck()
-
-	return nil
+	
+	return t.ReachRoomTemp()
 }
 
 func startMonitor() {
@@ -104,6 +104,7 @@ func (t *TEC1089) ConnectTEC(ts tec.TECTempSet) (err error) {
 	if tecInProgress {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
+	tec.TempMonStarted = true
 	tecInProgress = true
 	C.DemoFunc(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 	tecInProgress = false
@@ -128,16 +129,16 @@ func (t *TEC1089) ResetDevice() (err error) {
 func (t *TEC1089) TestRun() (err error) {
 	p := plc.Stage{
 		Holding: []plc.Step{
-			plc.Step{65.3, 10, 5},
-			plc.Step{85.3, 10, 5},
-			plc.Step{95, 10, 5},
+			plc.Step{65.3, 10, 5, false},
+			plc.Step{85.3, 10, 5, false},
+			plc.Step{95, 10, 5, false},
 		},
 		Cycle: []plc.Step{
 			// plc.Step{60, 10, 10},
-			plc.Step{95, 10, 5},
-			plc.Step{85, 10, 5},
-			plc.Step{75, 10, 5},
-			plc.Step{65, 10, 5},
+			plc.Step{95, 10, 5, false},
+			plc.Step{85, 10, 5, false},
+			plc.Step{75, 10, 5, false},
+			plc.Step{65, 10, 5, false},
 		},
 		CycleCount: 3,
 	}
@@ -183,14 +184,19 @@ func (t *TEC1089) TestRun() (err error) {
 	return nil
 }
 
-func (t *TEC1089) ReachRoomTemp() error {
+func (t *TEC1089) ReachRoomTemp() (err error) {
 	logger.Infoln("Going Back to Room Temp 27 ")
 	ts := tec.TECTempSet{
 		TargetTemperature: 27,
 		TargetRampRate:    4,
 	}
-	t.ConnectTEC(ts)
+	err = t.ConnectTEC(ts)
+	if err != nil{
+		logger.Errorln("Couldn't Reach Room Temp 27")
+		return
+	}
 	logger.Infoln("Room Temp 27 Reached ")
+	tec.TempMonStarted = false
 	return nil
 }
 
@@ -205,6 +211,7 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 		}
 		logger.Infoln("Started ->", ti)
 		t.ConnectTEC(ti)
+		plc.DataCapture = h.DataCapture
 		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)

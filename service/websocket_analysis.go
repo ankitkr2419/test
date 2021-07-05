@@ -45,6 +45,7 @@ func makePLCStage(ss []db.StageStep) plc.Stage {
 		step.RampUpTemp = s.RampRate
 		step.TargetTemp = s.TargetTemperature
 		step.HoldTime = s.HoldTime
+		step.DataCapture = s.DataCapture
 
 		switch s.Type {
 		case "hold":
