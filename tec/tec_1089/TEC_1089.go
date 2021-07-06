@@ -204,6 +204,9 @@ func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (
 	ts := time.Now()
 	stagePrevTemp := prevTemp
 	for i, h := range st {
+		if !plc.ExperimentRunning{
+			return fmt.Errorf("Experiment is not Running!")
+		}
 		t0 := time.Now()
 		ti := tec.TECTempSet{
 			TargetTemperature: float64(h.TargetTemp),
