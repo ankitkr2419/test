@@ -370,29 +370,30 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 	// NOTE: If temperature doesn't reach in this time interval then
 	// experiment should be aborted
 	if expectedLidTemp > currentLidTemp{
-		// give 0.5 degree per sec increment
-		// expected Sleep time secs:= ((expectedLidTemp - currentLidTemp)/10) * 2
-		sleepTimeSecs := (expectedLidTemp - currentLidTemp)/5
-		go func(){
-			var i uint16
-			// monitor lid temp accurately till sleepTimeSecs is reached
-			for i < sleepTimeSecs{
-				go func(){
-					currentLidTemp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
-					if err != nil {
-						logger.WithField("lid_temperature", expectedLidTemp ).Errorln("ReadSingleRegister:D135 :", err)
-						return
-					}
-					logger.Infoln("Current Lid Temperature:", currentLidTemp)
-					plc.CurrentLidTemp = float32(currentLidTemp)/10
-				}()
-
-				i++
-				time.Sleep( time.Second)
+		// give 0.1 degree per sec increment
+		// expected Sleep time secs:= ((expectedLidTemp - currentLidTemp)/10) * 10
+		sleepTimeSecs := expectedLidTemp - currentLidTemp
+		logger.Infoln( "Waiting for " , sleepTimeSecs, " secs at Max for Lid to reach the Expected Temp of: ", expectedLidTemp)
+		
+		var i uint16
+		// monitor lid temp accurately till sleepTimeSecs is reached
+		for i < sleepTimeSecs{
+			go func(){
+				currentLidTemp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
+				if err != nil {
+					logger.WithField("lid_temperature", expectedLidTemp ).Errorln("ReadSingleRegister:D135 :", err)
+					return
+				}
+				logger.Infoln("Current Lid Temperature:", currentLidTemp)
+				plc.CurrentLidTemp = float32(currentLidTemp)/10
+			}()
+			i++
+			if expectedLidTemp < (currentLidTemp + 3){
+				logger.Infoln("Lid Temperature of" , currentLidTemp , " reached.")
+				break
 			}
-		}()
-		logger.Infoln( "Waiting for " , time.Duration(sleepTimeSecs), " secs." )
-		time.Sleep( time.Duration(sleepTimeSecs ) * time.Second)
+			time.Sleep( time.Second)
+		}
 	}
 
 	go func(){
