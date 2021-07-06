@@ -211,13 +211,27 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var ICTargetID uuid.UUID
+		var dyePositions []int32
 
 		for _, t := range targetDetails {
 			if t.DyePosition == int32(config.GetICPosition()) {
 				ICTargetID = t.TargetID
 			}
+			dyePositions = append(dyePositions, t.DyePosition)
 
 		}
+		heading := []interface{}{"Dye Position"}
+		for _, v := range dyePositions {
+			heading = append(heading, v)
+		}
+
+		plc.AddMergeRowToExcel(file, plc.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
+
+		row := []interface{}{"well positions"}
+		for _, v := range config.ActiveWells("activeWells") {
+			row = append(row, v)
+		}
+		plc.AddRowToExcel(file, plc.RTPCRSheet, row)
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 

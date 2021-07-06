@@ -58,7 +58,7 @@ func makePLCStage(ss []db.StageStep) plc.Stage {
 
 // makeResult return result from plc.scan
 func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
-
+	var wellFval []uint16
 	for _, w := range experimentValues.activeWells {
 		var r db.Result
 		r.WellPosition = w
@@ -68,13 +68,16 @@ func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
 			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
-
+			wellFval = append(wellFval, r.FValue)
 			result = append(result, r)
-			row := []interface{}{r.ExperimentID.String(), r.WellPosition, r.Cycle, t.DyePosition, t.TargetID.String(), r.FValue, scan.Temp}
-			plc.AddRowToExcel(file, plc.RTPCRSheet, row)
-
 		}
+
 	}
+	row := []interface{}{scan.Cycle}
+	for _, v := range wellFval {
+		row = append(row, v)
+	}
+	plc.AddRowToExcel(file, plc.RTPCRSheet, row)
 
 	return
 }

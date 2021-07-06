@@ -351,9 +351,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 	var previousCycle uint16
 
 	cycle = 0
-	// Start line
-	heading := []interface{}{"ExperimentID", "Well Position", "Cycle", "Dye Position", "TargetID", "FValue", "Temperature"}
-	plc.AddRowToExcel(file, plc.RTPCRSheet, heading)
+
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for experimentRunning {
 		time.Sleep(500 * time.Millisecond)

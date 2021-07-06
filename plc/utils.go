@@ -357,7 +357,7 @@ func GetExcelFile(path, fileName string) (f *excelize.File) {
 	f.NewSheet(TempLogs)
 	f.SetActiveSheet(index)
 
-	f.SetSheetFormatPr(RTPCRSheet, excelize.DefaultColWidth(40))
+	f.SetSheetFormatPr(RTPCRSheet, excelize.DefaultColWidth(25))
 	f.SetSheetFormatPr(TempLogs, excelize.DefaultColWidth(40))
 	f.SetSheetFormatPr(TECSheet, excelize.DefaultColWidth(40))
 
@@ -393,4 +393,49 @@ func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err
 	}
 
 	return
+}
+
+func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{}, space int) {
+
+	rows, err := file.Rows(sheet)
+	if err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
+	}
+	rowCount := 1
+	for rows.Next() {
+		rowCount = rowCount + 1
+	}
+	//first cell is always the start cell
+	startCell, err := excelize.CoordinatesToCellName(1, rowCount)
+	if err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+	}
+	file.SetCellValue(sheet, startCell, values[0])
+	j := 1
+	for i, v := range values {
+		if i == 0 {
+			continue
+		}
+		startCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
+		if err != nil {
+			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		}
+		logger.Println("cell, value---------------->", startCell, v)
+
+		file.SetCellValue(sheet, startCell, v)
+		j = j + space - 1
+
+		endCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
+		if err != nil {
+			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		}
+		file.MergeCell(sheet, startCell, endCell)
+
+	}
+
+	if err = file.SaveAs(file.Path); err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
+	}
 }
