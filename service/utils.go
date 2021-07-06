@@ -6,8 +6,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"mylab/cpagent/db"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"sync"
 
@@ -31,14 +31,14 @@ const (
 	operator   = "operator"
 )
 
-const(
-	recipeC 	= "recipe"
-	processC	= "process"
-	createC 	= "create"
-	deleteC 	= "delete"
-	updateC 	= "update"
-	duplicateC	= "duplicate"
-	rearrangeC	= "rearrange"
+const (
+	recipeC    = "recipe"
+	processC   = "process"
+	createC    = "create"
+	deleteC    = "delete"
+	updateC    = "update"
+	duplicateC = "duplicate"
+	rearrangeC = "rearrange"
 )
 
 var userLogin sync.Map

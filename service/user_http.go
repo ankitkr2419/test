@@ -68,10 +68,10 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		if deck != "" {
-			token, err = EncodeToken(u.Username, authID, u.Role, deck, map[string]string{})
+			token, err = EncodeToken(u.Username, authID, u.Role, deck, Application, map[string]string{})
 			userLogin.Store(deck, true)
 		} else {
-			token, err = EncodeToken(u.Username, authID, u.Role, "", map[string]string{})
+			token, err = EncodeToken(u.Username, authID, u.Role, "", Application, map[string]string{})
 		}
 
 		if err != nil {
@@ -155,7 +155,7 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 			deck = "cloudUser"
 		}
 
-		userAuth, err := getUserAuth(token, deck, deps, validRoles...)
+		userAuth, err := getUserAuth(token, deck, deps, Application, validRoles...)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.UserAuthDataFetchError)
 			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserAuthDataFetchError.Error()})
