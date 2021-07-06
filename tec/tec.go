@@ -6,7 +6,6 @@ import (
 )
 
 const LogsPath = "./utils/tec"
-var TempMonStarted bool
 
 type TECTempSet struct {
 	TargetTemperature float64 `json:"target_temp" validate:"gte=-20,lte=100"`
