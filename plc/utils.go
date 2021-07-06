@@ -367,7 +367,7 @@ func GetExcelFile(path, fileName string) (f *excelize.File) {
 	return
 }
 
-func AddRowToExcel(file *excelize.File, sheet string, values []string) (err error) {
+func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err error) {
 
 	rows, err := file.Rows(sheet)
 	if err != nil {

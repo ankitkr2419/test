@@ -297,13 +297,13 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	deps.Plc.HomingRTPCR()
 
 	// Start line
-	headers := []string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
 	plc.AddRowToExcel(file, plc.TECSheet, headers)
 
-	row := []string{"Holding Stage About to start"}
+	row := []interface{}{"Holding Stage About to start"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
 
-	row = []string{"timestamp", "current Temperature", "lid Temperature"}
+	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
 	plc.AddRowToExcel(file, plc.TempLogs, row)
 
 	tec.TempMonStarted = true
@@ -326,7 +326,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	deps.Plc.Cycle()
 
 	// Run Cycle Stage
-	row = []string{"Cycle Stage About to start"}
+	row = []interface{}{"Cycle Stage About to start"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -71,7 +70,7 @@ func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
 
 			result = append(result, r)
-			row := []string{r.ExperimentID.String(), fmt.Sprintf("%d", r.WellPosition), fmt.Sprintf("%d", r.Cycle), fmt.Sprintf("%d", t.DyePosition), t.TargetID.String(), fmt.Sprintf("%d", r.FValue), fmt.Sprintf("%f", scan.Temp)}
+			row := []interface{}{r.ExperimentID.String(), r.WellPosition, r.Cycle, t.DyePosition, t.TargetID.String(), r.FValue, scan.Temp}
 			plc.AddRowToExcel(file, plc.RTPCRSheet, row)
 
 		}

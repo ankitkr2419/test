@@ -143,10 +143,10 @@ func (t *TEC1089) TestRun() (err error) {
 	file := plc.GetExcelFile(tec.LogsPath, "output")
 
 	// Start line
-	headings := []string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
 	plc.AddRowToExcel(file, plc.TECSheet, headings)
 
-	row := []string{"Holding Stage About to start"}
+	row := []interface{}{"Holding Stage About to start"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	// Go back to Room Temp at the end
@@ -158,7 +158,7 @@ func (t *TEC1089) TestRun() (err error) {
 	t.RunStage(p.Holding, file, 0)
 
 	// Run Cycle Stage
-	row = []string{"Cycle Stage About to start"}
+	row = []interface{}{"Cycle Stage About to start"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
@@ -193,7 +193,7 @@ func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) 
 		logger.Infoln("Started ->", ti)
 		t.ConnectTEC(ti)
 
-		row := []string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)}
+		row := []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
 		plc.AddRowToExcel(file, plc.TECSheet, row)
 
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
@@ -210,10 +210,10 @@ func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) 
 
 	}
 	if cycleNum != 0 {
-		row := []string{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)}
+		row := []interface{}{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
 		plc.AddRowToExcel(file, plc.TECSheet, row)
 	} else {
-		row := []string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)}
+		row := []interface{}{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
 		plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	}
@@ -232,7 +232,7 @@ func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
 	file := plc.GetExcelFile(tec.LogsPath, "test")
 
 	// Start line
-	row := []string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	row := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	go func() {

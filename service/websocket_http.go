@@ -352,7 +352,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 
 	cycle = 0
 	// Start line
-	heading := []string{"ExperimentID", "Well Position", "Cycle", "Dye Position", "TargetID", "FValue", "Temperature"}
+	heading := []interface{}{"ExperimentID", "Well Position", "Cycle", "Dye Position", "TargetID", "FValue", "Temperature"}
 	plc.AddRowToExcel(file, plc.RTPCRSheet, heading)
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for experimentRunning {
@@ -365,13 +365,13 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 			return
 		}
 		//Add to excel
-		row := []string{time.Now().String(), fmt.Sprintf("%v", scan.Temp), fmt.Sprintf("%v", scan.LidTemp)}
+		row := []interface{}{time.Now().String(), scan.Temp, scan.LidTemp}
 		plc.AddRowToExcel(file, plc.TempLogs, row)
 
 		// writes temp on every step against time in DB
 		err = WriteExperimentTemperature(deps, scan)
 		if err != nil {
-			fmt.Println("Write Exp Temp Error")
+			logger.Errorln("Write Exp Temp Error")
 			return
 		} else {
 			deps.WsMsgCh <- "read_temp"
@@ -400,7 +400,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 					return
 				}
 				deps.WsMsgCh <- "stop"
-				fmt.Println("exit chan 2--------------------------------")
+				logger.Errorln("exit chan 2--------------------------------")
 
 				experimentRunning = false
 				break
