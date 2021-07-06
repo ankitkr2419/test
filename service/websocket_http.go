@@ -37,8 +37,6 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 		}
 		defer c.Close()
 
-		go deps.Plc.SelfTest()
-
 		for {
 
 			select {
@@ -355,25 +353,34 @@ func monitorExperiment(deps Dependencies) {
 
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for experimentRunning {
-
+		time.Sleep(500 * time.Millisecond)
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc monitor")
 			deps.WsErrCh <- err
 			return
 		}
-
+		// writes temp on every step against time in DB
+		err = WriteExperimentTemperature(deps, scan)
+		if err != nil {
+			fmt.Println("Write Exp Temp Error")
+			return
+		} else {
+			deps.WsMsgCh <- "read_temp"
+		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
-		if scan.CycleComplete && scan.Cycle != previousCycle {
+		if plc.HeatingCycleComplete && scan.CycleComplete {
 
-			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle)
+			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle, scan)
 
 			DBResult, err := WriteResult(deps, scan)
 			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in dbresult")
 				return
 			}
 			WriteColorCTValues(deps, DBResult, scan)
 			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in ct values")
 				return
 			}
 			deps.WsMsgCh <- "read"
@@ -385,25 +392,18 @@ func monitorExperiment(deps Dependencies) {
 					return
 				}
 				deps.WsMsgCh <- "stop"
+				fmt.Println("exit chan 2--------------------------------")
+
 				experimentRunning = false
 				break
 			}
-
 			cycle++
 			previousCycle++
-		}
+			plc.CycleComplete = false
+			plc.HeatingCycleComplete = false
 
-		// writes temp on every step against time in DB
-		err = WriteExperimentTemperature(deps, scan)
-		if err != nil {
-			return
-		} else {
-			deps.WsMsgCh <- "read_temp"
 		}
-
 		// adding delay of 0.5s to reduce the cpu usage
-		time.Sleep(500 * time.Millisecond)
-
 	}
 	logger.Info("Stop monitoring experiment")
 }
@@ -426,6 +426,8 @@ func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err er
 		deps.WsErrCh <- err
 		return
 	}
+	logger.Println("DBRESULT Cycle", scan.Cycle, DBResult)
+
 	return
 }
 

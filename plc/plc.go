@@ -1,8 +1,9 @@
 package plc
 
 import (
-	"github.com/google/uuid"
 	"mylab/cpagent/db"
+
+	"github.com/google/uuid"
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
@@ -16,9 +17,10 @@ const (
 )
 
 type Step struct {
-	TargetTemp float32 // holding temperature for step
-	RampUpTemp float32 // ramp-up temperature for step
-	HoldTime   int32   // hold time for step
+	TargetTemp  float32 `json:"target_temp"`// holding temperature for step
+	RampUpTemp  float32 `json:"ramp_rate"`// ramp-up temperature for step
+	HoldTime    int32   `json:"hold_time"`// hold time for step
+	DataCapture bool	`json:"data_capture"`
 }
 
 // We can have at most 4 Holding steps and 6 Cycling steps.
@@ -29,11 +31,11 @@ type Stage struct {
 	IdealLidTemp uint16 // ideal lid temp
 }
 
-type Emissions [6]uint16
+type Emissions [4]uint16
 
 type Scan struct {
 	Cycle         uint16 // current running cycle
-	Wells         [96]Emissions
+	Wells         [16]Emissions
 	Temp          float32
 	LidTemp       float32
 	CycleComplete bool
@@ -47,6 +49,9 @@ type Driver interface {
 	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
+	HomingRTPCR() (err error)     //Homing of RTPCR
+	Reset() (err error)           //reseting the values
+	Cycle() (err error)           // start the cycle
 }
 
 type WSData struct {

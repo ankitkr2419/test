@@ -142,6 +142,10 @@ var (
 	DiscardBoolOptionError = fmt.Errorf("Invalid boolean value for tip discard option")
 
 	CUDNotAllowedError = "this %v is in progress, so not allowed to %v"
+
+	//RTPCR
+	RTPCRHomingError = fmt.Errorf("error in homing rt-pcr")
+	RTPCRResetError  = fmt.Errorf("error in reseting rt-pcr")
 )
 
 // Special errors which are in []byte format

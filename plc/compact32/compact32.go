@@ -14,16 +14,12 @@ const (
 	CYCLE_STAGE   = "cycle"
 )
 
-
-
 type Compact32 struct {
 	ExitCh  chan error
 	WsMsgCh chan string
 	wsErrch chan error
 	Driver  plc.Compact32Driver
 }
-
-
 
 func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */
@@ -32,7 +28,7 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 	handler.DataBits = 8
 	handler.Parity = "E"
 	handler.StopBits = 1
-	handler.SlaveId = 5 // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
+	handler.SlaveId = 1 // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
 	handler.Timeout = 500 * time.Millisecond
 
 	handler.Connect()
@@ -46,22 +42,22 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 
 	// Start the Heartbeat
 	// TODO: Uncomment this after RT-PCR m/c is ready
-	// go C32.HeartBeat()
+	go C32.HeartBeat()
 
 	// Specifically for testing!
 	if test {
 		p := plc.Stage{
 			Holding: []plc.Step{
-				plc.Step{65.3, 3.2, 1},
-				plc.Step{85.3, 3.1, 1},
-				plc.Step{95, 2.8, 1},
+				plc.Step{65.3, 3.2, 1, false},
+				plc.Step{85.3, 3.1, 1, false},
+				plc.Step{95, 2.8, 1, false},
 			},
 			Cycle: []plc.Step{
-				plc.Step{55, 3, 1},
-				plc.Step{65, 3, 1},
-				plc.Step{75, 3, 1},
-				plc.Step{85, 3, 1},
-				plc.Step{95, 3, 1},
+				plc.Step{55, 3, 1, false},
+				plc.Step{65, 3, 1, false},
+				plc.Step{75, 3, 1, false},
+				plc.Step{85, 3, 1, false},
+				plc.Step{95, 3, 1, false},
 			},
 			CycleCount: 3,
 		}
