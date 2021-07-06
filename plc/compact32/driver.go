@@ -192,8 +192,8 @@ func (d *Compact32) Stop() (err error) {
 	if err != nil {
 		logger.Error("WriteSingleCoil:M102 : Stop Cycle")
 	}
-	d.SwitchOffLidTemp()
-	return
+	
+	return d.SwitchOffLidTemp()
 }
 
 func (d *Compact32) Cycle() (err error) {
@@ -253,7 +253,8 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	// Read current cycle
 
 	scan.Temp = plc.CurrentCycleTemperature
-	scan.LidTemp = float32(plc.CurrentLidTemp)/10
+	scan.LidTemp = float32(plc.CurrentLidTemp)
+	logger.Infoln("	scan.Temp: ", scan.Temp, "\tscan.LidTemp: ", scan.LidTemp)
 	scan.CycleComplete = false
 	if plc.CycleComplete {
 
@@ -357,6 +358,7 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 		return
 	}
 	logger.Infoln("Current Lid Temperature:", currentLidTemp)
+	plc.CurrentLidTemp = float32(currentLidTemp)/10
 
 	// Start Lid Heating
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.ON)
@@ -365,11 +367,32 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 		return
 	}
 
+	// NOTE: If temperature doesn't reach in this time interval then
+	// experiment should be aborted
 	if expectedLidTemp > currentLidTemp{
 		// give 0.5 degree per sec increment
-		// expected Sleep time secs:= ((expectedLidTemp - currentLidTemp)/10) * 2  
-		time.Sleep( time.Duration((expectedLidTemp - currentLidTemp)/5 ) * time.Second)
-		logger.Infoln( "Waiting for " , time.Duration((expectedLidTemp - currentLidTemp)/5), " secs." )
+		// expected Sleep time secs:= ((expectedLidTemp - currentLidTemp)/10) * 2
+		sleepTimeSecs := (expectedLidTemp - currentLidTemp)/5
+		go func(){
+			var i uint16
+			// monitor lid temp accurately till sleepTimeSecs is reached
+			for i < sleepTimeSecs{
+				go func(){
+					currentLidTemp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
+					if err != nil {
+						logger.WithField("lid_temperature", expectedLidTemp ).Errorln("ReadSingleRegister:D135 :", err)
+						return
+					}
+					logger.Infoln("Current Lid Temperature:", currentLidTemp)
+					plc.CurrentLidTemp = float32(currentLidTemp)/10
+				}()
+
+				i++
+				time.Sleep( time.Second)
+			}
+		}()
+		time.Sleep( time.Duration(sleepTimeSecs ) * time.Second)
+		logger.Infoln( "Waiting for " , time.Duration(sleepTimeSecs), " secs." )
 	}
 
 	go func(){
@@ -382,14 +405,15 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 				return
 			}
 			plc.CurrentLidTemp = float32(currentLidTemp)/10
-			logger.Infoln("Current Lid Temp: ", currentLidTemp)
+			logger.Infoln("Current Lid Temp: ", currentLidTemp/10)
 
 			if !plc.ExperimentRunning {
 				return
 			}
+			// Play is of +- 5 degrees
 			if (currentLidTemp + 50 > expectedLidTemp) ||  (currentLidTemp - 50 < expectedLidTemp) {
 				logger.Errorln("Current Lid Temp has exceeded the limits: ", currentLidTemp)
-				d.wsErrch <- errors.New("PCR Aborted")
+				d.ExitCh <- errors.New("PCR Aborted")
 				err = fmt.Errorf("lid temperature has exceeded the limits")
 				return
 			}
