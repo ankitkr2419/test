@@ -45,6 +45,7 @@ func (s *pgStore) ListExperimentTemperature(ctx context.Context, experimentID uu
 func (s *pgStore) InsertExperimentTemperature(ctx context.Context, r ExperimentTemperature) (err error) {
 
 	stmt := makeInsertTempQuery(r)
+	logger.Infoln("Insert Experiment Query:", stmt)
 	_, err = s.db.Exec(
 		stmt,
 	)
