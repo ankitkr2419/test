@@ -306,6 +306,10 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
+	err = deps.Tec.ReachRoomTemp()
+	if err != nil {
+		return
+	}
 	// Home the TEC
 	// Reset is implicit in Homing
 	deps.Plc.HomingRTPCR()
@@ -314,7 +318,11 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
 	plc.AddRowToExcel(file, plc.TECSheet, headers)
 
-	row := []interface{}{"Holding Stage About to start"}
+	timeStarted := time.Now()
+	row := []interface{}{"Experiment Started at: ", timeStarted.String()}
+	plc.AddRowToExcel(file, plc.TempLogs, row)
+
+	row = []interface{}{"Holding Stage About to start"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
@@ -337,7 +345,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	deps.Tec.RunStage(p.Holding, file, 0)
 
 	// Cycle in Plc
-	deps.Plc.Cycle()
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
@@ -350,6 +357,12 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		// Cycle in Plc
 		deps.Plc.Cycle()
 	}
+
+	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
+
+	row = []interface{}{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	return
 }

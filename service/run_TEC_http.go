@@ -11,13 +11,13 @@ func runTECHandler(deps Dependencies) http.HandlerFunc {
 		file := plc.GetExcelFile(tec.LogsPath, "test_output")
 		p := plc.Stage{
 			Holding: []plc.Step{
-				plc.Step{25, 2, 0},
-				plc.Step{50, 2, 0},
-				plc.Step{95, 2, 0},
+				plc.Step{25, 2, 1, false},
+				plc.Step{50, 2, 1, false},
+				plc.Step{95, 2, 1, false},
 			},
 			Cycle: []plc.Step{
-				plc.Step{95, 2, 0},
-				plc.Step{60, 2, 0},
+				plc.Step{95, 2, 1, false},
+				plc.Step{60, 2, 1, false},
 			},
 			CycleCount: 3,
 		}

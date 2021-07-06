@@ -14,7 +14,8 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-var HeatingCycleComplete, CycleComplete bool
+
+var HeatingCycleComplete, CycleComplete, DataCapture bool
 var CurrentCycleTemperature float32
 var CurrentCycle uint16
 
