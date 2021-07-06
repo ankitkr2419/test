@@ -242,10 +242,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		plc.ExperimentRunning = true
 		go startExp(deps, plcStage)
 
-		//invoke monitor
-		// ASK: Do we need this?
-		go monitorExperiment(deps)
-
 		if !isValid {
 			respBytes, err := json.Marshal(response)
 			if err != nil {
@@ -332,6 +328,11 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 		return
 	}
 
+	//invoke monitor
+	// ASK: Do we need this?
+	go monitorExperiment(deps)
+
+
 	// Start line
 	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
 	if err != nil {
@@ -343,11 +344,9 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 
 	writer.Write([]string{"Holding Stage About to start"})
 
-	tec.TempMonStarted = true
 
 	//Go back to Room Temp at the end
 	defer func() {
-		tec.TempMonStarted = false
 		plc.ExperimentRunning = false
 		if err != nil {
 			return
