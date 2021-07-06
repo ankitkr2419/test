@@ -5,8 +5,10 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"strconv"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
@@ -57,12 +59,13 @@ func makePLCStage(ss []db.StageStep) plc.Stage {
 }
 
 // makeResult return result from plc.scan
-func makeResult(scan plc.Scan) (result []db.Result) {
-	rtpcrPath := "./utils/rtpcr"
-	file := plc.GetExcelFile(rtpcrPath, "output")
+func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 	// Start line
 	heading := []string{"ExperimentID", "Well Position", "Cycle", "Dye Position", "TargetID", "FValue", "Temperature"}
-	plc.AddRowToExcel(file, plc.RTPCRSheet, heading)
+	err := plc.AddRowToExcel(file, plc.RTPCRSheet, heading)
+	if err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+	}
 	for _, w := range experimentValues.activeWells {
 		var r db.Result
 		r.WellPosition = w

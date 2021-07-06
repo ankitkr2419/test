@@ -238,6 +238,8 @@ func (d *Simulator) setWells() {
 func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	d.Lock()
 	defer d.Unlock()
+	// simulate currentLidTemp
+	d.plcIO.d.currentLidTemp = jitter(uint16(d.config.IdealLidTemp*10), 0, 5)
 
 	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10

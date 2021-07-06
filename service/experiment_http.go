@@ -3,14 +3,15 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/tec"
 	"net/http"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -149,6 +150,8 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		// create  new file for each experiment with experiment id in file name.
+		file := plc.GetExcelFile(tec.LogsPath, fmt.Sprintf("output_%v", expID))
 
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
@@ -218,11 +221,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
-		logger.Println("Experiment values", experimentValues)
-
 		WellTargets := initializeWellTargets()
-
-		logger.Println("well targets", WellTargets)
 
 		// update well targets value in DB
 		_, err = deps.Store.UpsertWellTargets(context.Background(), WellTargets, experimentValues.experimentID, false)
@@ -234,11 +233,11 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		//experimentRunning set true
 		experimentRunning = true
-		go startExp(deps, plcStage)
+		go startExp(deps, plcStage, file)
 
 		//invoke monitor
 		// ASK: Do we need this?
-		go monitorExperiment(deps)
+		go monitorExperiment(deps, file)
 
 		if !isValid {
 			respBytes, err := json.Marshal(response)
@@ -291,9 +290,8 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func startExp(deps Dependencies, p plc.Stage) (err error) {
+func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
-	file := plc.GetExcelFile(tec.LogsPath, "output")
 	// Home the TEC
 	// Reset is implicit in Homing
 	deps.Plc.HomingRTPCR()
@@ -301,16 +299,12 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	// Start line
 	headers := []string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
 	plc.AddRowToExcel(file, plc.TECSheet, headers)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
+
 	row := []string{"Holding Stage About to start"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
+
+	row = []string{"timestamp", "current Temperature", "lid Temperature"}
+	plc.AddRowToExcel(file, plc.TempLogs, row)
 
 	tec.TempMonStarted = true
 
@@ -334,9 +328,6 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	// Run Cycle Stage
 	row = []string{"Cycle Stage About to start"}
 	plc.AddRowToExcel(file, plc.TECSheet, row)
-	if err != nil {
-		return
-	}
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)

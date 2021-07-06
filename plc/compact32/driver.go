@@ -249,7 +249,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	// Read current cycle
 
 	scan.Temp = plc.CurrentCycleTemperature
-	scan.LidTemp = float32(100)
+	scan.LidTemp = 100.00
 	scan.CycleComplete = false
 	if plc.CycleComplete {
 

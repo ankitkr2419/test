@@ -13,6 +13,7 @@ import (
 
 	"strconv"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
@@ -344,22 +345,26 @@ func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes
 	return
 }
 
-func monitorExperiment(deps Dependencies) {
+func monitorExperiment(deps Dependencies, file *excelize.File) {
 
 	var cycle uint16
 	var previousCycle uint16
 
 	cycle = 0
-
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for experimentRunning {
 		time.Sleep(500 * time.Millisecond)
+
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error in plc monitor")
 			deps.WsErrCh <- err
 			return
 		}
+		//Add to excel
+		row := []string{time.Now().String(), fmt.Sprintf("%v", scan.Temp), fmt.Sprintf("%v", scan.LidTemp)}
+		plc.AddRowToExcel(file, plc.TempLogs, row)
+
 		// writes temp on every step against time in DB
 		err = WriteExperimentTemperature(deps, scan)
 		if err != nil {
@@ -373,7 +378,7 @@ func monitorExperiment(deps Dependencies) {
 
 			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle, scan)
 
-			DBResult, err := WriteResult(deps, scan)
+			DBResult, err := WriteResult(deps, scan, file)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error in dbresult")
 				return
@@ -408,10 +413,10 @@ func monitorExperiment(deps Dependencies) {
 	logger.Info("Stop monitoring experiment")
 }
 
-func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err error) {
+func WriteResult(deps Dependencies, scan plc.Scan, file *excelize.File) (DBResult []db.Result, err error) {
 
 	// makeResult returns data in DB result format
-	result := makeResult(scan)
+	result := makeResult(scan, file)
 
 	// for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
 	if scan.Cycle == 1 {

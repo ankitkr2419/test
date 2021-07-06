@@ -117,11 +117,9 @@ func (t *Simulator) TestRun() (err error) {
 	file := plc.GetExcelFile(tec.LogsPath, "output")
 	// Start line
 	headings := []string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
-
 	plc.AddRowToExcel(file, plc.TECSheet, headings)
 
 	row := []string{"Holding Stage About to start"}
-
 	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	// Go back to Room Temp at the end

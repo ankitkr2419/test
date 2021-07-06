@@ -356,13 +356,18 @@ func GetExcelFile(path, fileName string) (f *excelize.File) {
 	f.NewSheet(RTPCRSheet)
 	f.NewSheet(TempLogs)
 	f.SetActiveSheet(index)
+
+	f.SetSheetFormatPr(RTPCRSheet, excelize.DefaultColWidth(40))
+	f.SetSheetFormatPr(TempLogs, excelize.DefaultColWidth(40))
+	f.SetSheetFormatPr(TECSheet, excelize.DefaultColWidth(40))
+
 	f.Path = fmt.Sprintf("%v/%s_%v.xlsx", path, fileName, time.Now().Unix())
 	logger.Infoln("file saved in path---------->", f.Path)
 
 	return
 }
 
-func AddRowToExcel(file *excelize.File, sheet string, values []string) {
+func AddRowToExcel(file *excelize.File, sheet string, values []string) (err error) {
 
 	rows, err := file.Rows(sheet)
 	if err != nil {
@@ -378,7 +383,6 @@ func AddRowToExcel(file *excelize.File, sheet string, values []string) {
 		cell, err := excelize.CoordinatesToCellName(i+1, rowCount)
 		if err != nil {
 			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-			return
 		}
 		file.SetCellValue(sheet, cell, v)
 	}
@@ -388,4 +392,5 @@ func AddRowToExcel(file *excelize.File, sheet string, values []string) {
 		return
 	}
 
+	return
 }

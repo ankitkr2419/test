@@ -6,7 +6,9 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 )
 
-const LogsPath = "./utils/tec"
+const LogsPath = "./utils/output"
+
+var TecTempLogFile *excelize.File
 
 var TempMonStarted bool
 

@@ -229,7 +229,7 @@ func (t *TEC1089) GetAllTEC() (err error) {
 }
 
 func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
-	file := plc.GetExcelFile(tec.LogsPath, "output")
+	file := plc.GetExcelFile(tec.LogsPath, "test")
 
 	// Start line
 	row := []string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
