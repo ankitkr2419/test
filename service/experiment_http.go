@@ -179,6 +179,8 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 		plcStage := makePLCStage(ss)
 
+		// list the template and extract its LidTemp
+
 		// err = deps.Plc.ConfigureRun(plcStage)
 		// if err != nil {
 		// 	logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
@@ -316,9 +318,16 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	if err != nil{
 		return
 	}
+
 	// Home the TEC
 	// Reset is implicit in Homing
 	err = deps.Plc.HomingRTPCR()
+	if err != nil {
+		return
+	}
+
+	// TODO: Lid Temp reaching
+	err = deps.Plc.SetLidTemp(990)
 	if err != nil {
 		return
 	}
@@ -354,7 +363,10 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	}()
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	deps.Tec.RunStage(p.Holding, writer, 0)
+	err = deps.Tec.RunStage(p.Holding, writer, 0)
+	if err != nil{
+		return
+	}
 	writer.Flush()
 
 	// Cycle in Plc
@@ -367,11 +379,17 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		deps.Tec.RunStage(p.Cycle, writer, i)
+		err = deps.Tec.RunStage(p.Cycle, writer, i)
+		if err != nil{
+			return
+		}
 		writer.Flush()
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
-		deps.Plc.Cycle()
+		err = deps.Plc.Cycle()
+		if err != nil{
+			return
+		}
 	}
 
 	writer.Write([]string{"Experiment Completed at: ", time.Now().String()})
