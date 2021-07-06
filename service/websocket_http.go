@@ -525,6 +525,8 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 		Cycle:        scan.Cycle,
 	}
 
+	logger.Infoln("ExpTemp: ", expTemp)
+
 	// insert every cycle  result temp into Database
 	err = deps.Store.InsertExperimentTemperature(context.Background(), expTemp)
 	if err != nil {
