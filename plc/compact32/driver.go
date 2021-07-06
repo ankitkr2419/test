@@ -388,7 +388,8 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 				plc.CurrentLidTemp = float32(currentLidTemp)/10
 			}()
 			i++
-			if expectedLidTemp < (currentLidTemp + 3){
+			// 3 degree play
+			if expectedLidTemp < (currentLidTemp + 30){
 				logger.Infoln("Lid Temperature of" , currentLidTemp , " reached.")
 				break
 			}
@@ -412,7 +413,7 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 				return
 			}
 			// Play is of +- 5 degrees
-			if (currentLidTemp + 50 > expectedLidTemp) ||  (currentLidTemp - 50 < expectedLidTemp) {
+			if (currentLidTemp > (expectedLidTemp + 50)) ||  (currentLidTemp < (expectedLidTemp - 50)) {
 				logger.Errorln("Current Lid Temp has exceeded the limits: ", currentLidTemp)
 				d.ExitCh <- errors.New("PCR Aborted")
 				err = fmt.Errorf("lid temperature has exceeded the limits")
