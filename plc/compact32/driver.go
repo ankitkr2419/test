@@ -391,8 +391,8 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 				time.Sleep( time.Second)
 			}
 		}()
-		time.Sleep( time.Duration(sleepTimeSecs ) * time.Second)
 		logger.Infoln( "Waiting for " , time.Duration(sleepTimeSecs), " secs." )
+		time.Sleep( time.Duration(sleepTimeSecs ) * time.Second)
 	}
 
 	go func(){
