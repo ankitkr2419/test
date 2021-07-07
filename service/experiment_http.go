@@ -249,7 +249,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		//experimentRunning set true
 		plc.ExperimentRunning = true
-		go startExp(deps, plcStage)
+		go startExp(deps, plcStage, file)
 
 		if !isValid {
 			respBytes, err := json.Marshal(response)
@@ -324,7 +324,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	//invoke monitor
 	// ASK: Do we need this?
-	go monitorExperiment(deps)
+	go monitorExperiment(deps, file)
 
 
 	// Start line
