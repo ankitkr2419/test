@@ -141,7 +141,7 @@ func (t *TEC1089) TestRun() (err error) {
 		CycleCount: 3,
 	}
 
-	file := plc.GetExcelFile(tec.LogsPath, "output")
+	file := plc.GetExcelFile(tec.LogsPath, "output_test")
 
 	// Start line
 	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
