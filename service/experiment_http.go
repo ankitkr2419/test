@@ -293,12 +293,13 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// And then Homing should happen
 	defer func() {
 		plc.ExperimentRunning = false
-
+		deps.WsMsgCh <- "stop"
 		err = deps.Plc.HomingRTPCR()
 		if err != nil {
 			deps.WsErrCh <- err
 			return
 		}
+
 	}()
 
 	// Send error on websocket

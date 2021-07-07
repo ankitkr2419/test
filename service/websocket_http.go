@@ -350,7 +350,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 	var cycle uint16
 	var previousCycle uint16
 
-	cycle = 0
+	cycle = 1
 
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for plc.ExperimentRunning {
@@ -363,7 +363,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 			return
 		}
 		//Add to excel
-		row := []interface{}{time.Now().String(), scan.Temp, scan.LidTemp}
+		row := []interface{}{time.Now().Format("2006-01-02 15:04:05"), scan.Temp, scan.LidTemp}
 		plc.AddRowToExcel(file, plc.TempLogs, row)
 
 		// writes temp on every step against time in DB
@@ -397,11 +397,9 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 					deps.WsErrCh <- err
 					return
 				}
-				deps.WsMsgCh <- "stop"
-				logger.Errorln("exit chan 2--------------------------------")
-
-				plc.ExperimentRunning = false
-				break
+				plc.CycleComplete = false
+				plc.HeatingCycleComplete = false
+				continue
 			}
 			cycle++
 			previousCycle++
@@ -419,10 +417,10 @@ func WriteResult(deps Dependencies, scan plc.Scan, file *excelize.File) (DBResul
 	// makeResult returns data in DB result format
 	result := makeResult(scan, file)
 
-	// for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
-	if scan.Cycle == 1 {
-		addResultForZerothCycle(deps, result)
-	}
+	// // for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
+	// if scan.Cycle == 1 {
+	// 	addResultForZerothCycle(deps, result)
+	// }
 
 	// insert current cycle result into Database
 	DBResult, err = deps.Store.InsertResult(context.Background(), result)
@@ -436,34 +434,34 @@ func WriteResult(deps Dependencies, scan plc.Scan, file *excelize.File) (DBResul
 	return
 }
 
-//addResultForZerothCycle for graph
-func addResultForZerothCycle(deps Dependencies, result []db.Result) {
+// //addResultForZerothCycle for graph
+// func addResultForZerothCycle(deps Dependencies, result []db.Result) {
 
-	// set default value [0,0]
-	var zerothResult []db.Result
-	for _, v := range result {
-		var r db.Result
+// 	// set default value [0,0]
+// 	var zerothResult []db.Result
+// 	for _, v := range result {
+// 		var r db.Result
 
-		// copy all fields
-		r = v
+// 		// copy all fields
+// 		r = v
 
-		// set cycle & FValue to [0,0]
-		r.Cycle = 0
-		r.FValue = 0
+// 		// set cycle & FValue to [0,0]
+// 		r.Cycle = 0
+// 		r.FValue = 0
 
-		zerothResult = append(zerothResult, r)
+// 		zerothResult = append(zerothResult, r)
 
-	}
+// 	}
 
-	// insert current cycle result into Database
-	_, err := deps.Store.InsertResult(context.Background(), zerothResult)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error inserting result data")
-		// send error
-		deps.WsErrCh <- err
-		return
-	}
-}
+// 	// insert current cycle result into Database
+// 	_, err := deps.Store.InsertResult(context.Background(), zerothResult)
+// 	if err != nil {
+// 		logger.WithField("err", err.Error()).Error("Error inserting result data")
+// 		// send error
+// 		deps.WsErrCh <- err
+// 		return
+// 	}
+// }
 
 func WriteColorCTValues(deps Dependencies, DBResult []db.Result, scan plc.Scan) (err error) {
 
