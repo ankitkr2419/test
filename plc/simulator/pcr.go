@@ -86,9 +86,6 @@ func (d *Simulator) performSteps(steps []plc.Step) {
 			//time.Sleep(200 * time.Millisecond)
 			time.Sleep(time.Duration(jitter(0, 1, 3)) * time.Second) // sleep for 1 to 3 seconds
 
-			// simulate currentLidTemp
-			d.plcIO.d.currentLidTemp = jitter(uint16(d.config.IdealLidTemp*10), 0, 5)
-
 			// simulate currentTemp
 			d.plcIO.d.currentTemp = d.plcIO.d.currentTemp + uint16(stp.RampUpTemp*10)
 
