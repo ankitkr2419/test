@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS steps
     data_capture boolean,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (stage_id) REFERENCES stages(id) ON DELETE CASCADE
+    FOREIGN KEY (stage_id) REFERENCES stages(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
