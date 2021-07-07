@@ -326,22 +326,12 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 			scan.CycleComplete = true
 			offset := 0 // offset of data. increment every 2 bytes!
 			for j := 0; j < 4; j++ {
-				k := 0
-				p := 2
-				// populate each wells with 2 emissions each
-				if j/2 >= 1 {
-					k = 1
-				}
-				if j%2 == 0 {
-					p = 1
-				}
-				scan.Wells[(8*k)+p-1][i] = binary.BigEndian.Uint16(data[offset : offset+2])
+				scan.Wells[j][i] = binary.BigEndian.Uint16(data[offset : offset+2])
 				offset += 8
 			}
 
 		}
 		//write values to the file
-
 	}
 	return
 }

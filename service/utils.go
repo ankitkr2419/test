@@ -230,6 +230,20 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 		return
 	}
 
+	// Create a default operator user
+	operatorUser := db.User{
+		Username: "operator",
+		Password: MD5Hash("operator"),
+		Role:     "operator",
+	}
+
+	// Add Default operator user to DB
+	err = s.InsertUser(context.Background(), operatorUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		return
+	}
+
 	logger.Info("Default users added")
 
 	loadUtils()
