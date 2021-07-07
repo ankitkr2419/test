@@ -179,24 +179,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 		plcStage := makePLCStage(ss)
 
-		// list the template and extract its LidTemp
-
-		// err = deps.Plc.ConfigureRun(plcStage)
-		// if err != nil {
-		// 	logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
-		// 	rw.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
-
-		// // err = tec.Run(plcStage)
-
-		// err = deps.Plc.Start()
-		// if err != nil {
-		// 	logger.WithField("err", err.Error()).Error("Error in plc start")
-		// 	rw.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
-
 		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
@@ -246,6 +228,8 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
 			return
 		}
+
+		plcStage.IdealLidTemp = 1000
 
 		//experimentRunning set true
 		plc.ExperimentRunning = true
@@ -303,6 +287,40 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 }
 
 func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
+	//Go back to Room Temp at the end
+
+	// Experiment Running should stop at the end
+	// And then Homing should happen
+	defer func() {
+		plc.ExperimentRunning = false
+
+		err = deps.Plc.HomingRTPCR()
+		if err != nil {
+			deps.WsErrCh <- err
+			return
+		}
+	}()
+
+	// Send error on websocket
+	// Reach Room Temp and SwitchOffLid
+	defer func() {
+
+		if err != nil {
+			deps.WsErrCh <- err
+		}
+
+		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			deps.WsErrCh <- err
+		}
+
+		err = deps.Plc.SwitchOffLidTemp()
+		if err != nil {
+			deps.WsErrCh <- err
+		}
+
+		return
+	}()
 
 	err = deps.Tec.ReachRoomTemp()
 	if err != nil {
@@ -317,7 +335,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	}
 
 	// TODO: Lid Temp reaching
-	err = deps.Plc.SetLidTemp(990)
+	err = deps.Plc.SetLidTemp(p.IdealLidTemp)
 	if err != nil {
 		return
 	}
@@ -325,7 +343,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	//invoke monitor
 	// ASK: Do we need this?
 	go monitorExperiment(deps, file)
-
 
 	// Start line
 	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
@@ -341,26 +358,10 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
 	plc.AddRowToExcel(file, plc.TempLogs, row)
 
-
-	//Go back to Room Temp at the end
-	defer func() {
-		plc.ExperimentRunning = false
-		if err != nil {
-			return
-		}
-		err = deps.Tec.ReachRoomTemp()
-		if err != nil {
-			return
-		}
-
-		err = deps.Plc.SwitchOffLidTemp()
-
-		return
-	}()
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
 	err = deps.Tec.RunStage(p.Holding, file, 0)
-	if err != nil{
+	if err != nil {
 		return
 	}
 
@@ -373,13 +374,13 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
 		err = deps.Tec.RunStage(p.Cycle, file, i)
-		if err != nil{
+		if err != nil {
 			return
 		}
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
 		err = deps.Plc.Cycle()
-		if err != nil{
+		if err != nil {
 			return
 		}
 	}
