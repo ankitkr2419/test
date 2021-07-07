@@ -2,18 +2,16 @@ package service
 
 import (
 	"context"
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/tec"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -152,6 +150,8 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		// create  new file for each experiment with experiment id in file name.
+		file := plc.GetExcelFile(tec.LogsPath, fmt.Sprintf("output_%v", expID))
 
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
@@ -211,22 +211,31 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var ICTargetID uuid.UUID
+		var dyePositions []int32
 
 		for _, t := range targetDetails {
 			if t.DyePosition == int32(config.GetICPosition()) {
 				ICTargetID = t.TargetID
 			}
+			dyePositions = append(dyePositions, t.DyePosition)
 
 		}
-		logger.Println("target details", targetDetails)
+		heading := []interface{}{"Dye Position"}
+		for _, v := range dyePositions {
+			heading = append(heading, v)
+		}
+
+		plc.AddMergeRowToExcel(file, plc.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
+
+		row := []interface{}{"well positions"}
+		for _, v := range config.ActiveWells("activeWells") {
+			row = append(row, v)
+		}
+		plc.AddRowToExcel(file, plc.RTPCRSheet, row)
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
-		logger.Println("Experiment values", experimentValues)
-
 		WellTargets := initializeWellTargets()
-
-		logger.Println("well targets", WellTargets)
 
 		// update well targets value in DB
 		_, err = deps.Store.UpsertWellTargets(context.Background(), WellTargets, experimentValues.experimentID, false)
@@ -238,11 +247,11 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		//experimentRunning set true
 		experimentRunning = true
-		go startExp(deps, plcStage)
+		go startExp(deps, plcStage, file)
 
 		//invoke monitor
 		// ASK: Do we need this?
-		go monitorExperiment(deps)
+		go monitorExperiment(deps, file)
 
 		if !isValid {
 			respBytes, err := json.Marshal(response)
@@ -295,25 +304,10 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func startExp(deps Dependencies, p plc.Stage) (err error) {
-	// logging output to file and console
-	if _, err := os.Stat(tec.LogsPath); os.IsNotExist(err) {
-		os.MkdirAll(tec.LogsPath, 0755)
-		// ignore error and try creating log output file
-	}
-
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
-	if err != nil {
-		logger.WithField("Err", err).Errorln(responses.FileCreationError)
-		return
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
+func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	err = deps.Tec.ReachRoomTemp()
-	if err != nil{
+	if err != nil {
 		return
 	}
 	// Home the TEC
@@ -321,15 +315,18 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	deps.Plc.HomingRTPCR()
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil {
-		return
-	}
-	
-	timeStarted := time.Now()
-	writer.Write([]string{"Experiment Started at: ", timeStarted.String()})
+	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	plc.AddRowToExcel(file, plc.TECSheet, headers)
 
-	writer.Write([]string{"Holding Stage About to start"})
+	timeStarted := time.Now()
+	row := []interface{}{"Experiment Started at: ", timeStarted.String()}
+	plc.AddRowToExcel(file, plc.TempLogs, row)
+
+	row = []interface{}{"Holding Stage About to start"}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
+
+	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
+	plc.AddRowToExcel(file, plc.TempLogs, row)
 
 	tec.TempMonStarted = true
 
@@ -345,28 +342,27 @@ func startExp(deps Dependencies, p plc.Stage) (err error) {
 	}()
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	deps.Tec.RunStage(p.Holding, writer, 0)
-	writer.Flush()
+	deps.Tec.RunStage(p.Holding, file, 0)
 
 	// Cycle in Plc
 
 	// Run Cycle Stage
-	err = writer.Write([]string{"Cycle Stage About to start"})
-	if err != nil {
-		return
-	}
+	row = []interface{}{"Cycle Stage About to start"}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		deps.Tec.RunStage(p.Cycle, writer, i)
-		writer.Flush()
+		deps.Tec.RunStage(p.Cycle, file, i)
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
 		deps.Plc.Cycle()
 	}
 
-	writer.Write([]string{"Experiment Completed at: ", time.Now().String()})
-	writer.Write([]string{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()})
+	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
+
+	row = []interface{}{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	return
 }

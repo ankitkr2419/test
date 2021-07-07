@@ -1,11 +1,15 @@
 package tec
 
 import (
-	"encoding/csv"
 	"mylab/cpagent/plc"
+
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 )
 
-const LogsPath = "./utils/tec"
+const LogsPath = "./utils/output"
+
+var TecTempLogFile *excelize.File
+
 var TempMonStarted bool
 
 type TECTempSet struct {
@@ -15,17 +19,17 @@ type TECTempSet struct {
 
 type TempProfile struct {
 	Profile []plc.Step `json:"profile"`
-	Cycles int64 `json:"cycles" validate:"gte=1,lte=100"`
+	Cycles  int64      `json:"cycles" validate:"gte=1,lte=100"`
 }
 
-type Driver interface{
+type Driver interface {
 	TestRun() error
 	ReachRoomTemp() error
 	InitiateTEC() error
 	ConnectTEC(TECTempSet) error
 	AutoTune() error
 	ResetDevice() error
-	RunStage([]plc.Step, *csv.Writer, uint16) error
+	RunStage([]plc.Step, *excelize.File, uint16) error
 	GetAllTEC() error
 	RunProfile(TempProfile) error
 }
