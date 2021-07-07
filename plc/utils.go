@@ -14,7 +14,6 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-
 var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
 var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
@@ -357,7 +356,9 @@ func GetExcelFile(path, fileName string) (f *excelize.File) {
 	f.NewSheet(RTPCRSheet)
 	f.NewSheet(TempLogs)
 	f.SetActiveSheet(index)
+	f.DeleteSheet("Sheet1")
 
+	f.NewStyle(`{"alignment":{"horizontal":"center"}]}`)
 	f.SetSheetFormatPr(RTPCRSheet, excelize.DefaultColWidth(25))
 	f.SetSheetFormatPr(TempLogs, excelize.DefaultColWidth(40))
 	f.SetSheetFormatPr(TECSheet, excelize.DefaultColWidth(40))
@@ -370,6 +371,7 @@ func GetExcelFile(path, fileName string) (f *excelize.File) {
 
 func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err error) {
 
+	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
 	rows, err := file.Rows(sheet)
 	if err != nil {
 		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
@@ -385,7 +387,9 @@ func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err
 		if err != nil {
 			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
 		}
+		file.SetCellStyle(sheet, cell, cell, styleID)
 		file.SetCellValue(sheet, cell, v)
+
 	}
 
 	if err = file.SaveAs(file.Path); err != nil {
@@ -397,6 +401,8 @@ func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err
 }
 
 func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{}, space int) {
+
+	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
 
 	rows, err := file.Rows(sheet)
 	if err != nil {
@@ -423,8 +429,9 @@ func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{},
 			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
 		}
 		logger.Println("cell, value---------------->", startCell, v)
-
+		file.SetCellStyle(sheet, startCell, startCell, styleID)
 		file.SetCellValue(sheet, startCell, v)
+
 		j = j + space - 1
 
 		endCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
