@@ -179,6 +179,8 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 		plcStage := makePLCStage(ss)
 
+		// list the template and extract its LidTemp
+
 		// err = deps.Plc.ConfigureRun(plcStage)
 		// if err != nil {
 		// 	logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
@@ -246,12 +248,8 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		//experimentRunning set true
-		experimentRunning = true
+		plc.ExperimentRunning = true
 		go startExp(deps, plcStage, file)
-
-		//invoke monitor
-		// ASK: Do we need this?
-		go monitorExperiment(deps, file)
 
 		if !isValid {
 			respBytes, err := json.Marshal(response)
@@ -310,9 +308,24 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	if err != nil {
 		return
 	}
+
 	// Home the TEC
 	// Reset is implicit in Homing
-	deps.Plc.HomingRTPCR()
+	err = deps.Plc.HomingRTPCR()
+	if err != nil {
+		return
+	}
+
+	// TODO: Lid Temp reaching
+	err = deps.Plc.SetLidTemp(990)
+	if err != nil {
+		return
+	}
+
+	//invoke monitor
+	// ASK: Do we need this?
+	go monitorExperiment(deps, file)
+
 
 	// Start line
 	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
@@ -328,21 +341,28 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
 	plc.AddRowToExcel(file, plc.TempLogs, row)
 
-	tec.TempMonStarted = true
 
 	//Go back to Room Temp at the end
 	defer func() {
-		tec.TempMonStarted = false
-		experimentRunning = false
+		plc.ExperimentRunning = false
 		if err != nil {
 			return
 		}
 		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			return
+		}
+
+		err = deps.Plc.SwitchOffLidTemp()
+
 		return
 	}()
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	deps.Tec.RunStage(p.Holding, file, 0)
+	err = deps.Tec.RunStage(p.Holding, file, 0)
+	if err != nil{
+		return
+	}
 
 	// Cycle in Plc
 
@@ -352,10 +372,16 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		deps.Tec.RunStage(p.Cycle, file, i)
+		err = deps.Tec.RunStage(p.Cycle, file, i)
+		if err != nil{
+			return
+		}
 		logger.Infoln("Cycle Completed -> ", i)
 		// Cycle in Plc
-		deps.Plc.Cycle()
+		err = deps.Plc.Cycle()
+		if err != nil{
+			return
+		}
 	}
 
 	row = []interface{}{"Experiment Completed at: ", time.Now().String()}

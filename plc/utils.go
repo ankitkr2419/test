@@ -15,8 +15,8 @@ import (
 )
 
 
-var HeatingCycleComplete, CycleComplete, DataCapture bool
-var CurrentCycleTemperature float32
+var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
+var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
 
 const (

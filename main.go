@@ -303,6 +303,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 			logger.Errorln("Couldn't reach the room temp!")
 			os.Exit(-1)
 		}
+		deps.Plc.SwitchOffLidTemp()
 		os.Exit(0)
 	}()
 

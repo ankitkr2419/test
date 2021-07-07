@@ -72,7 +72,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				if err.Error() == "PCR Aborted" {
 
 					// on pre-emptive stop
-					experimentRunning = false
+					plc.ExperimentRunning = false
 					errortype = "ErrorPCRAborted"
 					msg = "Experiment aborted by user"
 
@@ -353,7 +353,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 	cycle = 0
 
 	// experimentRunning is set when experiment started & if stopped then set to false
-	for experimentRunning {
+	for plc.ExperimentRunning {
 		time.Sleep(500 * time.Millisecond)
 
 		scan, err := deps.Plc.Monitor(cycle)
@@ -400,7 +400,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 				deps.WsMsgCh <- "stop"
 				logger.Errorln("exit chan 2--------------------------------")
 
-				experimentRunning = false
+				plc.ExperimentRunning = false
 				break
 			}
 			cycle++
@@ -529,6 +529,8 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 		LidTemp:      scan.LidTemp,
 		Cycle:        scan.Cycle,
 	}
+
+	logger.Debugln("ExpTemp: ", expTemp)
 
 	// insert every cycle  result temp into Database
 	err = deps.Store.InsertExperimentTemperature(context.Background(), expTemp)

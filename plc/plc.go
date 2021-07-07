@@ -49,9 +49,11 @@ type Driver interface {
 	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
-	HomingRTPCR() (err error)     //Homing of RTPCR
-	Reset() (err error)           //reseting the values
-	Cycle() (err error)           // start the cycle
+	HomingRTPCR() error   		  //Homing of RTPCR
+	Reset() (error)           	  //reseting the values
+	Cycle() (error)           	  // start the cycle
+	SetLidTemp(uint16) error	  // set Lid Temperature
+	SwitchOffLidTemp() error
 }
 
 type WSData struct {

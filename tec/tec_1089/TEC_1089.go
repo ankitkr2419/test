@@ -72,7 +72,7 @@ func (t *TEC1089) InitiateTEC() (err error) {
 func startMonitor() {
 	go func() {
 		for {
-			if tec.TempMonStarted {
+			if plc.ExperimentRunning {
 				target := C.getObjectTemp()
 				logger.Infoln("Current Temp: ", target)
 				plc.CurrentCycleTemperature = float32(target)
@@ -102,7 +102,6 @@ func (t *TEC1089) ConnectTEC(ts tec.TECTempSet) (err error) {
 	if tecInProgress {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
-	tec.TempMonStarted = true
 	tecInProgress = true
 	C.DemoFunc(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 	tecInProgress = false
@@ -183,7 +182,6 @@ func (t *TEC1089) ReachRoomTemp() (err error) {
 		return
 	}
 	logger.Infoln("Room Temp 27 Reached ")
-	tec.TempMonStarted = false
 	return nil
 }
 
@@ -191,6 +189,9 @@ func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) 
 	ts := time.Now()
 	stagePrevTemp := prevTemp
 	for i, h := range st {
+		if !plc.ExperimentRunning{
+			return fmt.Errorf("Experiment is not Running!")
+		}
 		t0 := time.Now()
 		ti := tec.TECTempSet{
 			TargetTemperature: float64(h.TargetTemp),

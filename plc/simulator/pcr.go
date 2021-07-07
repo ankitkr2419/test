@@ -192,3 +192,19 @@ func (d *Simulator) HomingRTPCR() (err error) {
 	return
 }
 func (d *Simulator) Reset() (err error) { return }
+
+
+func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
+	// simulate currentLidTemp
+	
+	time.Sleep(2 * time.Second)
+	d.plcIO.d.currentLidTemp = jitter(uint16(expectedLidTemp), 0, 50)
+	logger.Infoln("Current Lid Temp: ", d.plcIO.d.currentLidTemp)
+	return
+}
+
+func (d *Simulator) SwitchOffLidTemp() (err error) {
+	// Off Lid Heating
+	d.plcIO.d.currentLidTemp = jitter(uint16(27), 0, 50)
+	return
+}

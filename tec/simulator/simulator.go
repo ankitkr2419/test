@@ -59,6 +59,7 @@ func (t *Simulator) ConnectTEC(ts tec.TECTempSet) (err error) {
 			currentTemp = float32(ts.TargetTemperature)
 			tempReached = true
 		}
+		prevTemp = currentTemp
 	}
 	logger.Infoln("Target Temp reached: ", currentTemp)
 
