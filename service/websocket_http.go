@@ -350,7 +350,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 	var cycle uint16
 	var previousCycle uint16
 
-	cycle = 0
+	cycle = 1
 
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for plc.ExperimentRunning {
@@ -363,7 +363,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 			return
 		}
 		//Add to excel
-		row := []interface{}{time.Now().String(), scan.Temp, scan.LidTemp}
+		row := []interface{}{time.Now().Format("2006-01-02 15:04:05"), scan.Temp, scan.LidTemp}
 		plc.AddRowToExcel(file, plc.TempLogs, row)
 
 		// writes temp on every step against time in DB
@@ -397,11 +397,11 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 					deps.WsErrCh <- err
 					return
 				}
-				deps.WsMsgCh <- "stop"
-				logger.Errorln("exit chan 2--------------------------------")
-
-				plc.ExperimentRunning = false
-				break
+				// now emissions are completed only temperatures are to be noted till it reaches
+				// room temp
+				plc.CycleComplete = false
+				plc.HeatingCycleComplete = false
+				continue
 			}
 			cycle++
 			previousCycle++
@@ -419,11 +419,6 @@ func WriteResult(deps Dependencies, scan plc.Scan, file *excelize.File) (DBResul
 	// makeResult returns data in DB result format
 	result := makeResult(scan, file)
 
-	// for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
-	if scan.Cycle == 1 {
-		addResultForZerothCycle(deps, result)
-	}
-
 	// insert current cycle result into Database
 	DBResult, err = deps.Store.InsertResult(context.Background(), result)
 	if err != nil {
@@ -432,7 +427,6 @@ func WriteResult(deps Dependencies, scan plc.Scan, file *excelize.File) (DBResul
 		deps.WsErrCh <- err
 		return
 	}
-
 	return
 }
 

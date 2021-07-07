@@ -38,7 +38,7 @@ func (t *Simulator) InitiateTEC() (err error) {
 	return nil
 }
 
-func (t *Simulator) ConnectTEC(ts tec.TECTempSet) (err error) {
+func (t *Simulator) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 	currentTemp := prevTemp
 	// Reach the target temperature with given ramp rate
 	timeRequiredInSecs := math.Abs(ts.TargetTemperature-float64(currentTemp)) / ts.TargetRampRate
@@ -87,7 +87,7 @@ func (t *Simulator) ReachRoomTemp() error {
 		TargetTemperature: 27,
 		TargetRampRate:    2,
 	}
-	t.ConnectTEC(ts)
+	t.SetTempAndRamp(ts)
 	logger.Infoln("Room Temp Reached")
 	return nil
 }
@@ -155,7 +155,7 @@ func (t *Simulator) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16
 			TargetRampRate:    float64(h.RampUpTemp),
 		}
 		logger.Infoln("Started ->", ti)
-		t.ConnectTEC(ti)
+		t.SetTempAndRamp(ti)
 		row = []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
 		plc.AddRowToExcel(file, plc.TECSheet, row)
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)

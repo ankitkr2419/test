@@ -88,7 +88,10 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 		}
 		C32.Stop()
 	}
-
+	err := C32.SwitchOffLidTemp()
+	if err != nil {
+		logger.Warnln("Failed to switch off lid temp", err)
+	}
 	return &C32 // plc Driver
 }
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -74,7 +75,7 @@ func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 		}
 
 	}
-	row := []interface{}{scan.Cycle}
+	row := []interface{}{fmt.Sprintf("cycle %d", scan.Cycle)}
 	for _, v := range wellFval {
 		row = append(row, v)
 	}

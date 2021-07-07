@@ -34,7 +34,7 @@
 /*==============================================================================*/
 /*                          STATIC FUNCTION PROTOTYPES                          */
 /*==============================================================================*/
-int DemoFunc(double target, double ramp);
+int SetTempAndRamp(double target, double ramp);
 static int32_t MenuSelection(void);
 static void TestAllCommonGetFunctions(uint8_t Address);
 static void TestAllLDDGetFunctions(uint8_t Address);
@@ -485,7 +485,7 @@ int InitiateTEC()
 }
 
 
-int DemoFunc(double target, double ramp)
+int SetTempAndRamp(double target, double ramp)
 {   
     MeParFloatFields Fields;
   
@@ -545,7 +545,10 @@ double getObjectTemp(){
 getTemp:
     if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
     {
-        if (Fields.Value == 0) {
+        // TEC will only be valid for temperatures above Room Temp
+        if (Fields.Value < 20) {
+            // sleep for 200ms
+            usleep(200 * 1000);
             goto getTemp;
         }
         return Fields.Value;    

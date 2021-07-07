@@ -1,7 +1,7 @@
 package tec_1089
 
 /*
-int DemoFunc(double, double);
+int SetTempAndRamp(double, double);
 int InitiateTEC();
 int checkForErrorState();
 int autoTune();
@@ -30,6 +30,7 @@ import (
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
 	"time"
+	"errors"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
@@ -69,11 +70,23 @@ func (t *TEC1089) InitiateTEC() (err error) {
 	return t.ReachRoomTemp()
 }
 
+// TODO: Pass Error Chan here
 func startMonitor() {
 	go func() {
 		for {
 			if plc.ExperimentRunning {
 				target := C.getObjectTemp()
+				// Handle Failure, Try again 3 times in interval of 200ms
+				i := 0
+				for (target < 20) && (i < 3){
+					i++
+					time.Sleep(200 * time.Millisecond)
+					target = C.getObjectTemp()
+				
+					if (i == 3) && (target < 20){
+						logger.Errorln("Temperature couldn't be read even after 3 tries!")
+					}
+				}
 				logger.Infoln("Current Temp: ", target)
 				plc.CurrentCycleTemperature = float32(target)
 			}
@@ -98,14 +111,26 @@ func startErrorCheck() {
 	}()
 }
 
-func (t *TEC1089) ConnectTEC(ts tec.TECTempSet) (err error) {
+func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 	if tecInProgress {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
 	tecInProgress = true
-	C.DemoFunc(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	tempVal := C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 	tecInProgress = false
-	return nil
+	// Handle Failure, Try again 3 times in interval of 200ms
+	i := 0
+	for (tempVal == -1) && (i <3){
+		i++
+		time.Sleep(200 * time.Millisecond)
+		tempVal = C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	
+		if (i == 3) && (tempVal == -1){
+			err = errors.New("Temperature couldn't be reached even after 3 tries!")
+		}
+	}
+	
+	return
 }
 
 func (t *TEC1089) AutoTune() (err error) {
@@ -176,7 +201,7 @@ func (t *TEC1089) ReachRoomTemp() (err error) {
 		TargetTemperature: 27,
 		TargetRampRate:    4,
 	}
-	err = t.ConnectTEC(ts)
+	err = t.SetTempAndRamp(ts)
 	if err != nil {
 		logger.Errorln("Couldn't Reach Room Temp 27")
 		return
@@ -198,7 +223,7 @@ func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) 
 			TargetRampRate:    float64(h.RampUpTemp),
 		}
 		logger.Infoln("Started ->", ti)
-		t.ConnectTEC(ti)
+		t.SetTempAndRamp(ti)
 		plc.DataCapture = h.DataCapture
 		row := []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
 		plc.AddRowToExcel(file, plc.TECSheet, row)

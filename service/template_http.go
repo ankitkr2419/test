@@ -182,7 +182,7 @@ func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 				// cannot delete template as it is used in experiments
 				rw.WriteHeader(http.StatusForbidden)
 				rw.Header().Add("Content-Type", "application/json")
-				rw.Write([]byte(`{"msg":"This template is used in experiments so cannot be deleted"}`))
+				rw.Write([]byte(`{"err":"This template is used in experiments so cannot be deleted"}`))
 				return
 
 			}
