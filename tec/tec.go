@@ -24,7 +24,7 @@ type Driver interface {
 	TestRun() error
 	ReachRoomTemp() error
 	InitiateTEC() error
-	ConnectTEC(TECTempSet) error
+	SetTempAndRamp(TECTempSet) error
 	AutoTune() error
 	ResetDevice() error
 	RunStage([]plc.Step, *excelize.File, uint16) error
