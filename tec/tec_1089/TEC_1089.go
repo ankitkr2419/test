@@ -70,11 +70,23 @@ func (t *TEC1089) InitiateTEC() (err error) {
 	return t.ReachRoomTemp()
 }
 
+// TODO: Pass Error Chan here
 func startMonitor() {
 	go func() {
 		for {
 			if plc.ExperimentRunning {
 				target := C.getObjectTemp()
+				// Handle Failure, Try again 3 times in interval of 200ms
+				i := 0
+				for (target < 20) && (i < 3){
+					i++
+					time.Sleep(200 * time.Millisecond)
+					target = C.getObjectTemp()
+				
+					if (i == 3) && (target < 20){
+						logger.Errorln("Temperature couldn't be read even after 3 tries!")
+					}
+				}
 				logger.Infoln("Current Temp: ", target)
 				plc.CurrentCycleTemperature = float32(target)
 			}
@@ -114,7 +126,7 @@ func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 		tempVal = C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 	
 		if (i == 3) && (tempVal == -1){
-			err = errors.New("Teperature couldn't be reached even after 3 tries!")
+			err = errors.New("Temperature couldn't be reached even after 3 tries!")
 		}
 	}
 	
