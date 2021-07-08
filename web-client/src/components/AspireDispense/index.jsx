@@ -98,10 +98,11 @@ const AspireDispenseComponent = () => {
     });
   };
 
+  // TODO: change dependecy array after merge.
   useEffect(() => {
     let updatedDisabledTabState = toggler(formik, isAspire);
     setDisabledTab({ ...disabledTab, ...updatedDisabledTabState });
-  }, [formik]);
+  }, [formik.values]);
 
   const handleModifyBtn = () => {
     setIsAspire(!isAspire);

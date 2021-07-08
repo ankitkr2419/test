@@ -9,6 +9,13 @@ export const getPosition = (wells) => {
   return 0;
 };
 
+const catergories = {
+  CATEGORY_1: "1",
+  CATEGORY_2: "2",
+  SHAKER: "3",
+  DECK: "4",
+};
+
 // used to generated request body for API call.
 export const getRequestBody = (activeTab, aspire, dispense) => {
   const aspireSelectedTabName = CATEGORY_NAME[aspire.selectedCategory];
@@ -18,10 +25,10 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
   const dispenseWells = dispense[`cartridge${dispense.selectedCategory}Wells`];
 
   let cartridgeType = 1;
-  if (aspire.selectedCategory === "1" || aspire.selectedCategory === "2") {
+  if (aspire.selectedCategory === catergories.CATEGORY_1 || aspire.selectedCategory === catergories.CATEGORY_2) {
     cartridgeType = aspire.selectedCategory;
   }
-  if (dispense.selectedCategory === "1" || dispense.selectedCategory === "2") {
+  if (dispense.selectedCategory === catergories.CATEGORY_1 || dispense.selectedCategory === catergories.CATEGORY_2) {
     cartridgeType = dispense.selectedCategory;
   }
 
@@ -77,13 +84,13 @@ export const getFormikInitialState = (editReducer = null) => {
     category,
     category1,
     category2,
-    aspireSelectedCategory = "1",
-    dispenseSelectedCategory = "1";
+    aspireSelectedCategory = catergories.CATEGORY_1,
+    dispenseSelectedCategory = catergories.CATEGORY_1;
 
   const CATEGORY_ID = {
-    well: type === "category_1" ? "1" : "2",
-    shaker: "3",
-    deck: "4",
+    well: type === "category_1" ? catergories.CATEGORY_1 : catergories.CATEGORY_2,
+    shaker: catergories.SHAKER,
+    deck: catergories.DECK,
   };
 
   if (editReducer?.process_id) {
