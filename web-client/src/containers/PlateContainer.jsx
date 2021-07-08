@@ -15,6 +15,7 @@ import { fetchExperimentTargets } from 'action-creators/experimentTargetActionCr
 import { getExperimentId, getExperimentTemplate } from 'selectors/experimentSelector';
 import { setIsPlateRoute } from 'action-creators/loginActionCreators';
 import { getActiveLoadedWells } from 'selectors/activeWellSelector';
+import { MAX_NO_OF_WELLS } from 'appConstants';
 
 const PlateContainer = () => {
 	const dispatch = useDispatch();
@@ -78,8 +79,8 @@ const PlateContainer = () => {
 		dispatch(toggleMultiSelectOptionAction());
 	};
 
-	const toggleAllWellSelectedOption = () => {
-		dispatch(selectAllWellsAction());
+	const toggleAllWellSelectedOption = (isAllWellsSelected) => {
+		dispatch(selectAllWellsAction(isAllWellsSelected));
 	};
 	
 	return (
@@ -92,7 +93,7 @@ const PlateContainer = () => {
 			experimentId={experimentId}
 			setMultiSelectedWell={setMultiSelectedWell}
 			isMultiSelectionOptionOn={wellListReducer.get('isMultiSelectionOptionOn')}
-			isAllWellsSelected={wellListReducer.get('isAllWellsSelected')}
+			isAllWellsSelected={positions.toJS().length === MAX_NO_OF_WELLS}
 			toggleMultiSelectOption={toggleMultiSelectOption}
 			toggleAllWellSelectedOption={toggleAllWellSelectedOption}
 			activeWells={activeWells}

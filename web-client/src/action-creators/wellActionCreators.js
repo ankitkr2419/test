@@ -72,6 +72,9 @@ export const toggleMultiSelectOption = () => ({
   type: listWellActions.toggleMultiSelectOption,
 });
 
-export const selectAllWellsOption = () => ({
+export const selectAllWellsOption = (isAllWellsSelected) => ({
   type: listWellActions.selectAllWellsOption,
+  payload: {
+    isAllWellsSelected,
+  },
 });

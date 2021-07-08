@@ -5,6 +5,7 @@ import {
 	getDefaultWellsList,
 	setSelectedToList,
 	setMultiSelectedToList,
+	setAllWellsSelected,
 	resetWellDefaultList,
 	resetMultiWellDefaultList,
 	updateWellListSelector,
@@ -15,7 +16,6 @@ import activeWellActions from 'actions/activeWellActions';
 const listWellInitialState = fromJS({
 	isLoading: true,
 	isMultiSelectionOptionOn: false,
-	isAllWellsSelected: false,
 	defaultList: getDefaultWellsList(),
 	list: [],
 	isWellFilled: false,
@@ -49,9 +49,7 @@ export const wellListReducer = (state = listWellInitialState, action) => {
 		return resetWellDefaultList(state).setIn(['isMultiSelectionOptionOn'], !state.get('isMultiSelectionOptionOn'));
 
 	case listWellActions.selectAllWellsOption:
-		return resetWellDefaultList(state).setIn(['isAllWellsSelected'], !state.get('isAllWellsSelected'));
-	
-		
+		return setAllWellsSelected(state, action.payload);
 
 	// Update wells list when new wells are added
 	case addWellActions.successAction:
