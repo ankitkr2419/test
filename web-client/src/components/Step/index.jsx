@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
 	stepStateInitialState,
@@ -13,6 +13,8 @@ import { validateStepForm } from './stepHelper';
 import HoldSteps from './HoldSteps';
 import CycleSteps from './CycleSteps';
 import { HOLD_STAGE, CYCLE_STAGE } from './stepConstants';
+import MlModal from "shared-components/MlModal";
+import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 
 const StepComponent = (props) => {
 	const {
@@ -42,6 +44,10 @@ const StepComponent = (props) => {
 		repeatCounterStateReducer,
 		repeatCounterInitialState,
 	);
+
+	//local states to delete a step
+	const [stepIdToDelete, setStepIdToDelete] = useState(null);
+	const [showDeleteStepModal, setShowDeleteStepModal] = useState(false);
 
 	// immutable => js
 	const stepFormStateJS = stepFormState.toJS();
@@ -159,12 +165,39 @@ const StepComponent = (props) => {
 		updateRepeatCounterStateWrapper('repeatCount', cycleRepeatCount);
 	}, [cycleRepeatCount]);
 
+
+	const deleteStepHandler = (stepId) => {
+		setStepIdToDelete(stepId);
+		toggleDeletStepModal();
+	}
+
+	const toggleDeletStepModal = () => {
+		setShowDeleteStepModal(!showDeleteStepModal);
+	}
+
+	const onConfirmedDeleteStep = () => {
+		deleteStep(stepIdToDelete);
+		toggleDeletStepModal();
+	}
+
 	return (
 		<div className='d-flex flex-column flex-100'>
+			{/**Delete step confirmation modal */}
+      {showDeleteStepModal && (
+        <MlModal
+          isOpen={showDeleteStepModal}
+          textHead={""}
+          textBody={MODAL_MESSAGE.deleteStepConfirmation}
+          handleSuccessBtn={onConfirmedDeleteStep}
+          handleCrossBtn={toggleDeletStepModal}
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
+        />
+      )}
 			<HoldSteps
 				editStep={editStep}
 				holdSteps={holdSteps}
-				deleteStep={deleteStep}
+				deleteStep={deleteStepHandler}
 				onStepRowClicked={onStepRowClicked}
 				selectedStepId={selectedStepId}
 				addHoldStep={addHoldStep}
@@ -172,7 +205,7 @@ const StepComponent = (props) => {
 			<CycleSteps
 				editStep={editStep}
 				cycleSteps={cycleSteps}
-				deleteStep={deleteStep}
+				deleteStep={deleteStepHandler}
 				onStepRowClicked={onStepRowClicked}
 				selectedStepId={selectedStepId}
 				addCycleStep={addCycleStep}
