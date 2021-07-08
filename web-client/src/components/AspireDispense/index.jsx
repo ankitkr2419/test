@@ -101,7 +101,7 @@ const AspireDispenseComponent = () => {
   useEffect(() => {
     let updatedDisabledTabState = toggler(formik, isAspire);
     setDisabledTab({ ...disabledTab, ...updatedDisabledTabState });
-  }, [formik.values]);
+  }, [formik]);
 
   const handleModifyBtn = () => {
     setIsAspire(!isAspire);

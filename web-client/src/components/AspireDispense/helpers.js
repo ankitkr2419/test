@@ -73,10 +73,12 @@ export const getArray = (length, type, selectedPosition = null) => {
 // operation being performeed i.e. if NEW process is being created than
 // empty data is loaded in formikState else for EDIT old values are loaded.
 export const getFormikInitialState = (editReducer = null) => {
-  let type = "category_1";
-  let category, category1, category2;
-  let aspireSelectedCategory = "1";
-  let dispenseSelectedCategory = "1";
+  let type = "category_1",
+    category,
+    category1,
+    category2,
+    aspireSelectedCategory = "1",
+    dispenseSelectedCategory = "1";
 
   const CATEGORY_ID = {
     well: type === "category_1" ? "1" : "2",
