@@ -44,6 +44,7 @@ import { cleanUpSaga } from "./cleanUpSaga";
 import { processesSaga } from "./processesSaga";
 import { saveNewRecipeSaga } from "./saveNewRecipeSaga";
 import { processSaga } from "./processSaga";
+import { appInfoSaga } from "./appInfoSaga";
 
 const allSagas = [
   createTemplateSaga(),
@@ -80,6 +81,7 @@ const allSagas = [
   saveNewRecipeSaga(),
   processesSaga(),
   processSaga(),
+  appInfoSaga(),
 ];
 
 export default function* rootSaga() {

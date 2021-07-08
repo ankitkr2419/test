@@ -1,6 +1,7 @@
 export const API_HOST_URL = process.env.REACT_APP_API_HOST_URL;
 export const WS_HOST_URL = process.env.REACT_APP_WS_HOST_URL;
 export const API_HOST_VERSION = process.env.REACT_APP_API_HOST_VERSION;
+
 // Target capacity is used to restrict selection of targets
 export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 
@@ -54,8 +55,9 @@ export const EXPERIMENT_STATUS = {
 };
 
 export const ROUTES = {
-  landing: "landing",
-  splashScreen: "splashscreen",
+  login: "login", //rtpcr login page
+  landing: "landing", //extraction login page
+  splashScreen: "splashscreen", //application homepage
   recipeListing: "recipe-listing",
   labware: "labware",
   processListing: "process-listing",
@@ -105,6 +107,7 @@ export const API_ENDPOINTS = {
   delay: "delay",
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
+  appInfo: "app-info",
 };
 
 export const MODAL_MESSAGE = {
@@ -119,6 +122,7 @@ export const MODAL_MESSAGE = {
   finishProcessListConfirmation: "Are you sure you want to save changes to ",
   deleteProcessConfirmation: "Are you sure you want to delete this process?",
   deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
+  exitConfirmation: "Are you sure you want to exit?",
 };
 
 export const MODAL_BTN = {
@@ -365,6 +369,13 @@ export const CATEGORY_LABEL = {
   2: "Category 2",
   3: "Shaker",
   4: "Deck Position",
+};
+
+export const APP_TYPE = {
+  COMBINED: "combined",
+  RTPCR: "rtpcr",
+  EXTRACTION: "extraction",
+  NONE: "none",
 };
 
 //constants for shaking

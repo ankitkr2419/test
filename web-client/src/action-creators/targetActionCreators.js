@@ -4,11 +4,12 @@ import {
 	listTargetByTemplateIDActions,
 } from 'actions/targetActions';
 
-export const saveTarget = (templateID, body) => ({
+export const saveTarget = (templateID, body, token) => ({
 	type: saveTargetActions.saveAction,
 	payload: {
 		templateID,
 		body,
+		token
 	},
 });
 
@@ -24,8 +25,11 @@ export const resetSaveTarget = () => ({
 	type: saveTargetActions.saveTargetReset,
 });
 
-export const fetchMasterTargets = () => ({
+export const fetchMasterTargets = (token) => ({
 	type: listTargetActions.listAction,
+	payload: {
+		token
+	}
 });
 
 export const fetchMasterTargetsFailed = errorResponse => ({
@@ -36,10 +40,11 @@ export const fetchMasterTargetsFailed = errorResponse => ({
 	},
 });
 
-export const fetchTargetsByTemplateID = templateID => ({
+export const fetchTargetsByTemplateID = (templateID, token) => ({
 	type: listTargetByTemplateIDActions.listAction,
 	payload: {
 		templateID,
+		token
 	},
 });
 

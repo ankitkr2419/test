@@ -28,6 +28,13 @@ const TargetExperimentContainer = (props) => {
 	const { isLoginTypeAdmin, isLoginTypeOperator, templateID } = props;
 	const dispatch = useDispatch();
 	// useSelector section
+
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { token } = activeDeckObj;
+
 	// extracting experiment id
 	const experimentId = useSelector(getExperimentId);
 	// list of experiment targets
@@ -56,7 +63,7 @@ const TargetExperimentContainer = (props) => {
 
 	useEffect(() => {
 		// fetching list of experiment targets
-		dispatch(fetchExperimentTargets(experimentId));
+		dispatch(fetchExperimentTargets(experimentId, token));
 	}, [dispatch, experimentId]);
 
 	useEffect(() => {
@@ -74,7 +81,7 @@ const TargetExperimentContainer = (props) => {
 	useEffect(() => {
 		if (isExperimentTargetSaved === true) {
 			// fetching list of experiment targets
-			// dispatch(fetchExperimentTargets(experimentId));
+			// dispatch(fetchExperimentTargets(experimentId, token));
 			dispatch(createExperimentTargetReset());
 			updateTargetState({
 				type: targetStateActions.UPDATE_LIST,
@@ -126,7 +133,7 @@ const TargetExperimentContainer = (props) => {
 		const checkedTargets = getCheckedExperimentTargets(
 			selectedTargetState.get('targetList'),
 		);
-		dispatch(createExperimentTarget(checkedTargets, experimentId));
+		dispatch(createExperimentTarget(checkedTargets, experimentId, token));
 	}, [selectedTargetState, experimentId, dispatch]);
 
 	const onNextClick = () => {
