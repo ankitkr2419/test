@@ -8,7 +8,7 @@ const StyledSampleTargetList = styled.div`
 	margin: 0 0 8px;
 `;
 
-const SampleTargetList = ({ list, onTargetClickHandler }) => (
+const SampleTargetList = ({ list, onTargetClickHandler, isDisabled }) => (
 	<StyledSampleTargetList>
 		{list.map((ele, index) => (
 			<SampleTarget
@@ -16,6 +16,7 @@ const SampleTargetList = ({ list, onTargetClickHandler }) => (
 				onClickHandler={() => onTargetClickHandler(index)}
 				label={ele.get('target_name')}
 				isSelected={ele.get('isSelected')}
+				isDisabled={isDisabled}
 			/>
 		))}
 	</StyledSampleTargetList>
@@ -24,6 +25,7 @@ const SampleTargetList = ({ list, onTargetClickHandler }) => (
 SampleTargetList.propTypes = {
 	list: PropTypes.object.isRequired,
 	onTargetClickHandler: PropTypes.func.isRequired,
+	isDisabled: PropTypes.bool,
 };
 
 export default SampleTargetList;

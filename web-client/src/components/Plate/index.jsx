@@ -126,6 +126,12 @@ const Plate = (props) => {
             <div className="d-flex">
               <div className="sample-wrapper">
                 {/* TODO: Add Sample Content here */}
+                <SampleSideBarContainer
+                  experimentId={experimentId}
+                  positions={positions}
+                  experimentTargetsList={experimentTargetsList}
+                  updateWell={updateWell}
+                />
               </div>
               <div className="wells-wrapper flex-100">
                 <div className="d-flex align-items-center mb-4">
