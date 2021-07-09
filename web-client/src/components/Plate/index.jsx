@@ -31,7 +31,7 @@ const Plate = (props) => {
     toggleAllWellSelectedOption,
     activeWells,
     experimentTemplate,
-    resetSelectedWells
+    resetSelectedWells,
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -152,7 +152,15 @@ const Plate = (props) => {
           </TabPane>
           <TabPane className="tab-pane-graph flex-100" tabId="graph">
             <div className="d-flex flex-100">
-              <div className="graph-wrapper flex-100">Tab Graph Content</div>
+              <div className="graph-wrapper flex-100">
+                <ExperimentGraphContainer
+                  experimentStatus={experimentStatus}
+                  isSidebarOpen={isSidebarOpen}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                  resetSelectedWells={resetSelectedWells}
+                  isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+                />
+              </div>
             </div>
           </TabPane>
         </TabContent>
@@ -186,7 +194,7 @@ Plate.propTypes = {
   isMultiSelectionOptionOn: PropTypes.bool.isRequired,
   toggleMultiSelectOption: PropTypes.func.isRequired,
   activeWells: PropTypes.object.isRequired,
-  experimentTemplate: PropTypes.object.isRequired
+  experimentTemplate: PropTypes.object.isRequired,
 };
 
 export default Plate;
