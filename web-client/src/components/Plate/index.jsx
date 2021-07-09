@@ -28,7 +28,7 @@ const Plate = (props) => {
     toggleAllWellSelectedOption,
     activeWells,
     experimentTemplate,
-    resetSelectedWells,
+    resetSelectedWells
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -90,15 +90,15 @@ const Plate = (props) => {
       />
       <GridWrapper className="plate-body flex-100">
         <div className="d-flex">
-			{/* <WellGridHeader
+          {/* <WellGridHeader
 				isGroupSelectionOn={isMultiSelectionOptionOn}
 				toggleMultiSelectOption={toggleMultiSelectOption}
 			/> */}
-			<SelectAllGridHeader
-				isAllWellsSelected={isAllWellsSelected}
-				toggleAllWellSelectedOption={toggleAllWellSelectedOption}
-			/>
-		</div>
+          <SelectAllGridHeader
+            isAllWellsSelected={isAllWellsSelected}
+            toggleAllWellSelectedOption={toggleAllWellSelectedOption}
+          />
+        </div>
         <GridComponent
           activeWells={activeWells}
           wells={wells}
@@ -138,7 +138,7 @@ Plate.propTypes = {
   isMultiSelectionOptionOn: PropTypes.bool.isRequired,
   toggleMultiSelectOption: PropTypes.func.isRequired,
   activeWells: PropTypes.object.isRequired,
-  experimentTemplate: PropTypes.object.isRequired,
+  experimentTemplate: PropTypes.object.isRequired
 };
 
 export default Plate;
