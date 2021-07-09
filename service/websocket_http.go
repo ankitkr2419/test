@@ -348,13 +348,12 @@ func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes
 func monitorExperiment(deps Dependencies, file *excelize.File) {
 
 	var cycle uint16
-	var previousCycle uint16
 
 	cycle = 1
 
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for plc.ExperimentRunning {
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(1 * time.Second)
 
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
@@ -375,7 +374,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 			deps.WsMsgCh <- "read_temp"
 		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
-		if plc.HeatingCycleComplete && scan.CycleComplete {
+		if plc.DataCapture {
 
 			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle, scan)
 
@@ -400,14 +399,14 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 				// now emissions are completed only temperatures are to be noted till it reaches
 				// room temp
 				plc.CycleComplete = false
-				plc.HeatingCycleComplete = false
+				plc.DataCapture = false
 				continue
 			}
-			cycle++
-			previousCycle++
+			plc.DataCapture = false
+		}
+		if plc.CycleComplete {
 			plc.CycleComplete = false
-			plc.HeatingCycleComplete = false
-
+			cycle++
 		}
 		// adding delay of 0.5s to reduce the cpu usage
 	}

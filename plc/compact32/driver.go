@@ -170,8 +170,9 @@ func (d *Compact32) HomingRTPCR() (err error) {
 	}
 	logger.Infoln("homing result", result)
 	if result[0] == 101 {
-		logger.Infoln("success homing", result)
+		logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	} else {
+		logger.WithField("HOMING", err.Error()).Errorln("homing started")
 		err = errors.New("homing failed")
 		return
 	}
@@ -229,9 +230,9 @@ func (d *Compact32) Cycle() (err error) {
 		logger.Error("WriteSingleCoil:M21 : Start Cycle")
 		return
 	}
-
+	logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
 	time.Sleep(time.Second * 15)
-	plc.CycleComplete = true
+	plc.DataCapture = true
 	// for {
 	// 	cycleCompletion, err := d.Driver.ReadCoils(plc.MODBUS["M"][27], uint16(1))
 	// 	if err != nil {
@@ -276,7 +277,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(plc.CurrentLidTemp)
 	logger.Infoln("	scan.Temp: ", scan.Temp, "\tscan.LidTemp: ", scan.LidTemp)
-	scan.CycleComplete = false
+
 	if plc.CycleComplete {
 
 		// // Read lid temperature
@@ -305,32 +306,29 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 			logger.Println("cycle----------scan cycle------EQUAL", cycle, scan.Cycle)
 			return
 		}
-		scan.Cycle = plc.CurrentCycle
+	}
+	if plc.DataCapture {
 		start := 44
 		var data []byte
 		for i := 0; i < 2; i++ {
 			start = start + (16 * i)
-
 			data, err = d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
 			if err != nil {
 				logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")
 
 			}
-
 			//need to change just for testing
 			// if data[1] != 0 {
 			// 	logger.Println("data received-------------->", data, "\n start", start)
 			// 	break LOOP
 			// }
-
-			scan.CycleComplete = true
 			offset := 0 // offset of data. increment every 2 bytes!
 			for j := 0; j < 4; j++ {
 				scan.Wells[j][i] = binary.BigEndian.Uint16(data[offset : offset+2])
 				offset += 8
 			}
-
 		}
+		scan.Cycle = plc.CurrentCycle
 		//write values to the file
 	}
 	return

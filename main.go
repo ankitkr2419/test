@@ -188,7 +188,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		service.Application = service.None
 	case noExtraction && plcName == C32:
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
-		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test)
+		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
 		service.Application = service.RTPCR
 	case noExtraction && plcName == SIM:
 		driver = simulator.NewSimulator(exit)
@@ -207,7 +207,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
-		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test)
+		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
 		service.Application = service.Combined
 	case plcName == SIM:
 		driver = simulator.NewSimulator(exit)
