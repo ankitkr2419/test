@@ -33,7 +33,7 @@ func NewSimulator(exit chan error) plc.Driver {
 	s.ExitCh = ex
 	s.ErrCh = exit
 	s.pcrHeartBeat()
-
+	s.setWells()
 	go s.HeartBeat()
 
 	return &s
@@ -244,24 +244,16 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10
 
-	if plc.HeatingCycleComplete {
-
-		// Read current cycle status
-		if !plc.CycleComplete { // 0x0000 means cycle is not complete
-			// Values would not have changed.
-			scan.CycleComplete = false
-			logger.Println("prev cycle")
-
-			return
-		}
+	if plc.CycleComplete {
 		scan.CycleComplete = true
-
-		// If the invoker has already read this cycle data, don't send it again!
 		if cycle == scan.Cycle {
 			logger.Println("same cycle")
 			return
 		}
-		scan.Cycle = plc.CurrentCycle
+	}
+
+	if plc.DataCapture {
+
 		d.emit()
 		logger.Println("emissions------------------>", d.emissions)
 		// Scan all the data from the Wells (96 x 6)
@@ -269,9 +261,8 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 			scan.Wells[i] = data
 			logger.Println("scan wells ", scan.Wells[i])
 		}
+		scan.Cycle = plc.CurrentCycle
 
-		// PC reading done
-		d.plcIO.m.emissionFlag = 0
 	}
 	return
 }
