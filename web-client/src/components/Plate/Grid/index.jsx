@@ -55,6 +55,7 @@ const GridComponent = ({
                   onWellClickHandler(well, index, event);
                 }}
                 isDisabled={isWellActive === false}
+                position={index}
               />
               {/* popover will only visible when its filled and group selection is off */}
               {isWellFilled && isGroupSelectionOn === false && (
