@@ -14,9 +14,14 @@ import (
 	"mylab/cpagent/plc/simulator"
 	"mylab/cpagent/responses"
 	"mylab/cpagent/service"
+	"mylab/cpagent/tec"
+	tecSim "mylab/cpagent/tec/simulator"
+	"mylab/cpagent/tec/tec_1089"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/goburrow/modbus"
@@ -28,7 +33,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
-const(
+const (
 	C32 = "compact32"
 	SIM = "simulator"
 )
@@ -41,9 +46,14 @@ func main() {
 	})
 
 	logsPath := "./utils/logs"
+	tecPath := "./utils/tec"
 	// logging output to file and console
 	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
 		os.MkdirAll(logsPath, 0755)
+		// ignore error and try creating log output file
+	}
+	if _, err := os.Stat(tecPath); os.IsNotExist(err) {
+		os.MkdirAll(tecPath, 0755)
 		// ignore error and try creating log output file
 	}
 
@@ -63,7 +73,7 @@ func main() {
 	cliApp.Commands = []cli.Command{
 		{
 			Name:  "start",
-			Usage: "start server [--plc {simulator|compact32}] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
+			Usage: "start server [--plc {simulator|compact32}] [--test] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:  "plc",
@@ -97,7 +107,7 @@ func main() {
 					logger.Error("Re-check delay argument")
 					return err
 				}
-				return startApp(c.String("plc"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction") )
+				return startApp(c.String("plc"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction"))
 			},
 		},
 		{
@@ -155,8 +165,10 @@ func main() {
 }
 
 func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
+	logger.Println("run in test mode --->", test)
 	var store db.Storer
 	var driver plc.Driver
+	var tecDriver tec.Driver
 	var handler *modbus.RTUClientHandler
 	var driverDeckA plc.Extraction
 	var driverDeckB plc.Extraction
@@ -167,20 +179,20 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	}
 
 	exit := make(chan error)
-
 	websocketMsg := make(chan string)
-
 	websocketErr := make(chan error)
 
-	switch{
+	switch {
 	case noExtraction && noRTPCR:
 		logger.Infoln("application neither supports extraction nor rtpcr")
 		service.Application = service.None
 	case noExtraction && plcName == C32:
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
+		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test)
 		service.Application = service.RTPCR
 	case noExtraction && plcName == SIM:
 		driver = simulator.NewSimulator(exit)
+		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
 		service.Application = service.RTPCR
 	case noRTPCR && plcName == C32:
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
@@ -195,11 +207,13 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
 		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
 		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test)
 		service.Application = service.Combined
 	case plcName == SIM:
 		driver = simulator.NewSimulator(exit)
 		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
 		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
+		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
 		service.Application = service.Combined
 	default:
 		logger.Errorln(responses.UnknownCase)
@@ -221,6 +235,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 
 	deps := service.Dependencies{
 		Store:   store,
+		Tec:     tecDriver,
 		Plc:     driver,
 		PlcDeck: plcDeckMap,
 		ExitCh:  exit,
@@ -272,7 +287,29 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	server.UseHandler(router)
 
 	flag.Parse()
+
+	idleConnsClosed := make(chan struct{})
+
+	go func() {
+
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+		<-signals
+
+		// We received an interrupt signal, shut down.
+		logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
+		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			logger.Errorln("Couldn't reach the room temp!")
+			os.Exit(-1)
+		}
+		deps.Plc.SwitchOffLidTemp()
+		os.Exit(0)
+	}()
+
 	server.Run(*addr)
+	<-idleConnsClosed
+
 	return
 }
 

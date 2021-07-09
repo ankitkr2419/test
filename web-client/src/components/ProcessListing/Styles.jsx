@@ -27,7 +27,7 @@ export const StyledProcessListing = styled.div`
             margin: 0 -8px;
         }
         .box > div {
-            width: 33.33%;
+            width: 50%;
             padding: 0 8px;
             margin-bottom: 16px;
         }

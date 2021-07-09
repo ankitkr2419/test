@@ -34,6 +34,7 @@ const RecipeListingComponent = (props) => {
     recipeData,
     isOperatorRunRecipeCarousalModalVisible,
     handleCarousalModal,
+    selectedRecipeData,
     returnRecipeDetails,
     onConfirmedRecipeSelection,
     onConfirmedRunRecipeByAdmin,
@@ -316,6 +317,7 @@ const RecipeListingComponent = (props) => {
               onSearchRecipeTextChanged={onSearchRecipeTextChanged}
               fileteredRecipeData={fileteredRecipeData}
               handleCarousalModal={handleCarousalModal}
+              selectedRecipeData={selectedRecipeData}
               returnRecipeDetails={returnRecipeDetails}
               toggleRunRecipesModal={toggleRunRecipesModal}
               handlePublishModalClick={(recipeId, isPublished) =>
