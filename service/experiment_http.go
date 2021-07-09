@@ -376,11 +376,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 			return
 		}
 		logger.Infoln("Cycle Completed -> ", i)
-		// Cycle in Plc
-		err = deps.Plc.Cycle()
-		if err != nil {
-			return
-		}
 	}
 
 	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
