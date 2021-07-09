@@ -1,7 +1,7 @@
 package tec_1089
 
 /*
-int DemoFunc(double, double);
+int SetTempAndRamp(double, double);
 int InitiateTEC();
 int checkForErrorState();
 int autoTune();
@@ -24,16 +24,15 @@ double getObjectTemp();
 */
 import "C"
 import (
-	"encoding/csv"
 	"fmt"
 	"math"
-	"os"
 
 	"mylab/cpagent/plc"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/tec"
 	"time"
+	"errors"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -68,15 +67,28 @@ func (t *TEC1089) InitiateTEC() (err error) {
 
 	go startErrorCheck()
 
-	return nil
+	return t.ReachRoomTemp()
 }
 
+// TODO: Pass Error Chan here
 func startMonitor() {
 	go func() {
-		for  {
-			if tec.TempMonStarted{
-			target := C.getObjectTemp()
-			logger.Infoln("Current Temp: ", target)
+		for {
+			if plc.ExperimentRunning {
+				target := C.getObjectTemp()
+				// Handle Failure, Try again 3 times in interval of 200ms
+				i := 0
+				for (target < 20) && (i < 3){
+					i++
+					time.Sleep(200 * time.Millisecond)
+					target = C.getObjectTemp()
+				
+					if (i == 3) && (target < 20){
+						logger.Errorln("Temperature couldn't be read even after 3 tries!")
+					}
+				}
+				logger.Infoln("Current Temp: ", target)
+				plc.CurrentCycleTemperature = float32(target)
 			}
 			time.Sleep(1 * time.Second)
 		}
@@ -99,14 +111,26 @@ func startErrorCheck() {
 	}()
 }
 
-func (t *TEC1089) ConnectTEC(ts tec.TECTempSet) (err error) {
+func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 	if tecInProgress {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
 	tecInProgress = true
-	C.DemoFunc(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	tempVal := C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 	tecInProgress = false
-	return nil
+	// Handle Failure, Try again 3 times in interval of 200ms
+	i := 0
+	for (tempVal == -1) && (i <3){
+		i++
+		time.Sleep(200 * time.Millisecond)
+		tempVal = C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	
+		if (i == 3) && (tempVal == -1){
+			err = errors.New("Temperature couldn't be reached even after 3 tries!")
+		}
+	}
+	
+	return
 }
 
 func (t *TEC1089) AutoTune() (err error) {
@@ -127,98 +151,107 @@ func (t *TEC1089) ResetDevice() (err error) {
 func (t *TEC1089) TestRun() (err error) {
 	p := plc.Stage{
 		Holding: []plc.Step{
-			plc.Step{65.3, 10, 5},
-			plc.Step{85.3, 10, 5},
-			plc.Step{95, 10, 5},
+			plc.Step{65.3, 10, 5, false},
+			plc.Step{85.3, 10, 5, false},
+			plc.Step{95, 10, 5, false},
 		},
 		Cycle: []plc.Step{
 			// plc.Step{60, 10, 10},
-			plc.Step{95, 10, 5},
-			plc.Step{85, 10, 5},
-			plc.Step{75, 10, 5},
-			plc.Step{65, 10, 5},
+			plc.Step{95, 10, 5, false},
+			plc.Step{85, 10, 5, false},
+			plc.Step{75, 10, 5, false},
+			plc.Step{65, 10, 5, false},
 		},
 		CycleCount: 3,
 	}
 
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
-	if err != nil {
-		logger.Errorln(responses.FileCreationError)
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
+	file := plc.GetExcelFile(tec.LogsPath, "output_test")
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil {
-		return
-	}
-	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil {
-		return
-	}
+	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	plc.AddRowToExcel(file, plc.TECSheet, headings)
+
+	row := []interface{}{"Holding Stage About to start"}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
+
 	// Go back to Room Temp at the end
 	defer t.ReachRoomTemp()
 
 	logger.Infoln("Room Temp 27 Reached ")
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	t.RunStage(p.Holding, writer, 0)
+	t.RunStage(p.Holding, file, 0)
 
 	// Run Cycle Stage
-	err = writer.Write([]string{"Cycle Stage About to start"})
-	if err != nil {
-		return
-	}
+	row = []interface{}{"Cycle Stage About to start"}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		t.RunStage(p.Cycle, writer, i)
+		t.RunStage(p.Cycle, file, i)
 		logger.Infoln("Holding Completed ->", p.Cycle[len(p.Cycle)-1].HoldTime, " for cycle number ", i)
 	}
 
 	return nil
 }
 
-func (t *TEC1089) ReachRoomTemp() error {
+func (t *TEC1089) ReachRoomTemp() (err error) {
 	logger.Infoln("Going Back to Room Temp 27 ")
 	ts := tec.TECTempSet{
 		TargetTemperature: 27,
 		TargetRampRate:    4,
 	}
-	t.ConnectTEC(ts)
+	err = t.SetTempAndRamp(ts)
+	if err != nil {
+		logger.Errorln("Couldn't Reach Room Temp 27")
+		return
+	}
 	logger.Infoln("Room Temp 27 Reached ")
 	return nil
 }
 
-func (t *TEC1089) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (err error) {
+func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) (err error) {
 	ts := time.Now()
 	stagePrevTemp := prevTemp
 	for i, h := range st {
+		if !plc.ExperimentRunning{
+			return fmt.Errorf("Experiment is not Running!")
+		}
 		t0 := time.Now()
 		ti := tec.TECTempSet{
 			TargetTemperature: float64(h.TargetTemp),
 			TargetRampRate:    float64(h.RampUpTemp),
 		}
 		logger.Infoln("Started ->", ti)
-		t.ConnectTEC(ti)
-		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
+		t.SetTempAndRamp(ti)
+		plc.DataCapture = h.DataCapture
+		row := []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
+		plc.AddRowToExcel(file, plc.TECSheet, row)
+
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
-		time.Sleep(time.Duration(h.HoldTime) * time.Second)
+		if i == (len(st) - 1) {
+			// If this is the last step then 16 seconds needed for Cycle
+			time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
+		} else {
+			time.Sleep(time.Duration(h.HoldTime) * time.Second)
+		}
 		logger.Infoln("Holding Completed ->", h.HoldTime)
+
 		prevTemp = h.TargetTemp
 
 	}
 	if cycleNum != 0 {
-		writer.Write([]string{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
+		row := []interface{}{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
+		plc.AddRowToExcel(file, plc.TECSheet, row)
 	} else {
-		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
+		row := []interface{}{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
+		plc.AddRowToExcel(file, plc.TECSheet, row)
+
 	}
-	plc.CurrentCycleTemperature = st[len(st)-1].TargetTemp
+
 	plc.CurrentCycle = cycleNum
+	plc.HeatingCycleComplete = true
 	return nil
 }
 
@@ -228,27 +261,16 @@ func (t *TEC1089) GetAllTEC() (err error) {
 }
 
 func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
-
-
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
-	if err != nil {
-		logger.Errorln(responses.FileCreationError)
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
+	file := plc.GetExcelFile(tec.LogsPath, "test")
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil {
-		return
-	}
+	row := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
 
-	go func(){
+	go func() {
 		for i := uint16(1); i <= uint16(tp.Cycles); i++ {
 			logger.Infoln("Started Cycle->", i)
-			t.RunStage(tp.Profile, writer, i)
+			t.RunStage(tp.Profile, file, i)
 			logger.Infoln("Cycle Completed -> ", i)
 		}
 	}()
