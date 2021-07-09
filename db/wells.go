@@ -31,7 +31,7 @@ const (
 		experiment_id,
 		sample_id,
 		task,
-		color_codes
+		color_code
 		FROM wells WHERE id = $1`
 
 	deleteWellQuery = `DELETE FROM wells WHERE id = $1`

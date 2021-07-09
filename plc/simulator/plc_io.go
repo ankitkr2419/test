@@ -12,6 +12,7 @@ type holdingRegistors struct {
 	idealLidTemp   uint16 // Ideal Lid temperature (W)
 	currentLidTemp uint16 // Current Lid temperature (R)
 	errCode        uint16 // error code (R)
+
 }
 
 type coilRegistors struct {
@@ -22,4 +23,10 @@ type coilRegistors struct {
 	signalErr      uint16 // Signal Error (R)
 	emissionFlag   uint16 // Well Emmission register data  ON: PLC write & OFF: Read (RW)
 	cycleCompleted uint16 // Cycle completed (R)
+
+	//updated
+	cycleStart  uint16 // cycle start
+	homing      uint16 // homing button
+	resetValues uint16 // reset values
+	setRotation uint16 // set rotation button
 }
