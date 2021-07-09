@@ -44,10 +44,11 @@ const GridComponent = ({
             isWellActive
           } = well.toJS();
           return (
-            <React.Fragment key={index}>
+            <>
               <Well
+                key={index}
                 isRunning={isRunning}
-                isSelected={isAllWellsSelected || isSelected || isMultiSelected}
+                isSelected={isSelected || isMultiSelected}
                 status={status}
                 taskInitials={initial}
                 id={`PopoverWell${index}`}
@@ -72,7 +73,7 @@ const GridComponent = ({
                   showGraphOfWell={showGraphOfWell}
                 />
               )}
-            </React.Fragment>
+            </>
           );
         }
         return null;

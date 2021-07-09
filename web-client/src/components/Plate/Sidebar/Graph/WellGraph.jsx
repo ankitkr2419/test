@@ -12,7 +12,21 @@ import GraphFilters from "./GraphFilters";
 const options = {
   legend: {
     display: false
+  },
+  scales: {
+    xAxes: [
+      {
+        offset: true
+      }
+    ]
   }
+  //TODO: will be added later after testing & studying about it properly.
+  // This is for animation.
+
+  // animation: {
+  //   duration: 1000,
+  //   easing: "linear",
+  // },
 };
 
 const WellGraph = ({

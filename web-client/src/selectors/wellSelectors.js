@@ -71,6 +71,13 @@ export const resetMultiWellDefaultList = (state) =>
   state.updateIn(["defaultList"], (myDefaultList) =>
     myDefaultList.map((ele) => ele && ele.setIn(["isMultiSelected"], false))
   );
+// makes all wells isSelected flag to  true
+export const setAllWellsSelected = (state, { isAllWellsSelected }) =>
+  state.updateIn(["defaultList"], (myDefaultList) =>
+    myDefaultList.map(
+      (ele) => ele && ele.setIn(["isSelected"], !isAllWellsSelected)
+    )
+  );
 
 /**
  * getDefaultPlatesList return wells default data w.r.t PLATE_CAPACITY.

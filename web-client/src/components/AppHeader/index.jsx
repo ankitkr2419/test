@@ -35,6 +35,7 @@ import {
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
+import { useHistory } from "react-router";
 
 const AppHeader = (props) => {
   const {
@@ -50,6 +51,7 @@ const AppHeader = (props) => {
   } = props;
 
   const dispatch = useDispatch();
+  const history = useHistory();
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -59,7 +61,12 @@ const AppHeader = (props) => {
   const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
+  const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
+  const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [isExpSuccessModalVisible, setExpSuccessModalVisibility] =
+    useState(false);
+
   const toggleUserDropdown = () =>
     setUserDropdownOpen((prevState) => !prevState);
 
@@ -68,6 +75,12 @@ const AppHeader = (props) => {
   // 		// connectSocket(dispatch);
   // 	}
   // }, [isExperimentRunning, dispatch]);
+
+  useEffect(() => {
+    if (isExperimentSucceeded) {
+      setExpSuccessModalVisibility(true);
+    }
+  }, [isExperimentSucceeded]);
 
   useEffect(() => {
     if (isExperimentStopped === true) {
@@ -85,6 +98,11 @@ const AppHeader = (props) => {
     if (isExperimentRunning === false && isExperimentSucceeded === false) {
       dispatch(runExperiment(experimentId, token));
     }
+  };
+
+  const handleAbortConrfirmation = () => {
+    dispatch(stopExperiment(experimentId, token));
+    setAbortModalVisibility(false);
   };
 
   /** Hide plates tab if the user is admin */
@@ -133,7 +151,11 @@ const AppHeader = (props) => {
   };
 
   const onCrossClick = () => {
-    setExitModalVisibility(true);
+    if (isExperimentRunning === true) {
+      setWarningModalVisibility(true);
+    } else {
+      setExitModalVisibility(true);
+    }
   };
 
   // Exit modal confirmation click handler
@@ -141,12 +163,20 @@ const AppHeader = (props) => {
     setExitModalVisibility(false);
     if (isConfirmed) {
       if (isExperimentRunning === true) {
-        // user aborted experiment
-        dispatch(stopExperiment(experimentId, token));
+        // show warning that user needs to abort first in order to log out.
+        setWarningModalVisibility(true);
       } else {
+        // user log out
         dispatch(logoutInitiated({ deckName: deckName, token: token }));
       }
     }
+  };
+
+  // view results modal button click
+  const handleSuccessModalConfirmation = () => {
+    setExpSuccessModalVisibility(false);
+    // redirect to activity
+    history.push("activity");
   };
 
   return (
@@ -194,20 +224,33 @@ const AppHeader = (props) => {
               >
                 Experiment failed to run.
               </Text>
-              
+
               {isExperimentSucceeded === false && isPlateRoute === true && (
-                <Button
-                  color={isExperimentRunning ? "primary" : "secondary"}
-                  size="sm"
-                  className="font-weight-light border-2 border-gray shadow-none"
-                  outline={
-                    isExperimentRunning === false &&
-                    isExperimentSucceeded === false
-                  }
-                  onClick={startExperiment}
-                >
-                  Run
-                </Button>
+                <>
+                  <Button
+                    color={isExperimentRunning ? "primary" : "secondary"}
+                    size="sm"
+                    className="font-weight-light border-2 border-gray shadow-none mr-3"
+                    outline={
+                      isExperimentRunning === false &&
+                      isExperimentSucceeded === false
+                    }
+                    onClick={startExperiment}
+                    disabled={isExperimentRunning}
+                  >
+                    Run
+                  </Button>
+
+                  <Button
+                    color={isExperimentSucceeded ? "primary" : "danger"}
+                    size="sm"
+                    className="font-weight-light border-2 border-gray shadow-none"
+                    onClick={() => setAbortModalVisibility(true)}
+                    disabled={!isExperimentRunning}
+                  >
+                    Abort
+                  </Button>
+                </>
               )}
 
               {isLoginTypeAdmin && activeWidgetID === "step" && (
@@ -225,6 +268,7 @@ const AppHeader = (props) => {
                   color="success"
                   size="sm"
                   className="font-weight-light border-2 border-gray shadow-none"
+                  onClick={() => setExpSuccessModalVisibility(true)}
                 >
                   Result - Successful
                 </Button>
@@ -254,6 +298,9 @@ const AppHeader = (props) => {
               className="ml-2"
             />
           )}
+
+          {/* MODALS */}
+
           {isExitModalVisible && (
             <MlModal
               isOpen={isExitModalVisible}
@@ -264,6 +311,36 @@ const AppHeader = (props) => {
               handleCrossBtn={() => setExitModalVisibility(false)}
             />
           )}
+          {isWarningModalVisible && (
+            <MlModal
+              isOpen={isWarningModalVisible}
+              textBody={MODAL_MESSAGE.abortExpInfo}
+              successBtn={MODAL_BTN.okay}
+              handleSuccessBtn={() => setWarningModalVisibility(false)}
+              handleCrossBtn={() => setWarningModalVisibility(false)}
+            />
+          )}
+          {isAbortModalVisible && (
+            <MlModal
+              isOpen={isAbortModalVisible}
+              textBody={MODAL_MESSAGE.abortExpWarning}
+              successBtn={MODAL_BTN.yes}
+              failureBtn={MODAL_BTN.no}
+              handleSuccessBtn={handleAbortConrfirmation}
+              handleCrossBtn={() => setAbortModalVisibility(false)}
+            />
+          )}
+          {isExpSuccessModalVisible && (
+            <MlModal
+              isOpen={isExpSuccessModalVisible}
+              textBody={MODAL_MESSAGE.experimentSuccess}
+              successBtn={MODAL_BTN.viewResults}
+              failureBtn={MODAL_BTN.cancel}
+              handleSuccessBtn={handleSuccessModalConfirmation}
+              handleCrossBtn={() => setExpSuccessModalVisibility(false)}
+            />
+          )}
+
           <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
             <ActionBtnListItem>
               <Icon name="setting" size={18} />

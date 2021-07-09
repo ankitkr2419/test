@@ -125,7 +125,6 @@ const Plate = (props) => {
           <TabPane className="tab-pane-wells flex-100" tabId="wells">
             <div className="d-flex">
               <div className="sample-wrapper">
-                {/* TODO: Add Sample Content here */}
                 <SampleSideBarContainer
                   experimentId={experimentId}
                   positions={positions}
