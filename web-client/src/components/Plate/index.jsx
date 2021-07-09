@@ -16,6 +16,7 @@ import WellGridHeader from "./Grid/WellGridHeader";
 
 import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
+import { Button } from "core-components";
 
 const Plate = (props) => {
   const {
@@ -31,7 +32,7 @@ const Plate = (props) => {
     toggleAllWellSelectedOption,
     activeWells,
     experimentTemplate,
-    resetSelectedWells,
+    resetSelectedWells
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -153,6 +154,14 @@ const Plate = (props) => {
           <TabPane className="tab-pane-graph flex-100" tabId="graph">
             <div className="d-flex flex-100">
               <div className="graph-wrapper flex-100">
+                <div className="d-flex align-items-center mb-3">
+                  <Button color="primary" className="mr-3">
+                    Amplification plot
+                  </Button>
+                  <Button outline color="secondary">
+                    Temperature
+                  </Button>
+                </div>
                 <ExperimentGraphContainer
                   experimentStatus={experimentStatus}
                   isSidebarOpen={isSidebarOpen}
@@ -194,7 +203,7 @@ Plate.propTypes = {
   isMultiSelectionOptionOn: PropTypes.bool.isRequired,
   toggleMultiSelectOption: PropTypes.func.isRequired,
   activeWells: PropTypes.object.isRequired,
-  experimentTemplate: PropTypes.object.isRequired,
+  experimentTemplate: PropTypes.object.isRequired
 };
 
 export default Plate;
