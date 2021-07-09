@@ -62,15 +62,8 @@ const AppHeader = (props) => {
   const toggleUserDropdown = () =>
     setUserDropdownOpen((prevState) => !prevState);
 
-  // useEffect(() => {
-  // 	if (isExperimentRunning === true) {
-  // 		// connectSocket(dispatch);
-  // 	}
-  // }, [isExperimentRunning, dispatch]);
-
   useEffect(() => {
     if (isExperimentStopped === true) {
-      // disConnectSocket();
       dispatch(loginReset());
     }
   }, [isExperimentStopped, dispatch]);
@@ -130,7 +123,7 @@ const AppHeader = (props) => {
   // Exit modal confirmation click handler
   const confirmationClickHandler = (isConfirmed) => {
     setExitModalVisibility(false);
-    if (isConfirmed) {
+    if (isConfirmed === true) {
       if (isExperimentRunning === true) {
         // user aborted experiment
         dispatch(stopExperiment(experimentId, token));

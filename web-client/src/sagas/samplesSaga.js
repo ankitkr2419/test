@@ -19,19 +19,6 @@ export function* fetchSamples(actions) {
         token,
       },
     });
-    // yield put({
-    // 	type: listSampleActions.successAction,
-    // 	payload: {
-    // 		response : [{
-    // 			id: 'uuid',
-    // 			name: 'test string 2',
-    // 		},
-    // 		{
-    // 			id: 'uuid1',
-    // 			name: 'test string 1',
-    // 		}],
-    // 	},
-    // });
   } catch (error) {
     console.error("error in fetch stages ", error);
     yield put(fetchSamplesFailed(error));

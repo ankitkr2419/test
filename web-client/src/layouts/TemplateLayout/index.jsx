@@ -41,9 +41,7 @@ const TemplateLayout = (props) => {
 
   // Here we have stored id for active widget
   const activeWidgetID = templateLayoutState.get("activeWidgetID");
-  // console.log('activeWidgetID: ',activeWidgetID);
   const templateID = templateLayoutState.get("templateID");
-  // console.log('templateID: ', templateID)
 
   const wizardList = getWizardListByLoginType(
     templateLayoutState.get("wizardList"),
@@ -84,7 +82,6 @@ const TemplateLayout = (props) => {
   }, []);
 
   if (!isLoggedIn) {
-    // history.push(ROUTES.login);
     history.push("splashscreen");
   }
 
