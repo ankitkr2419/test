@@ -59,8 +59,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		131:  uint16(0x1083), // Number of cycles to run (W)
 		132:  uint16(0x1084), // Current temperature (R)
 		133:  uint16(0x1085), // Current cycle (R)
-		134:  uint16(0x1085), // Ideal Lid temperature (W)
-		135:  uint16(0x1086), // Current Lid temperature (R)
+		134:  uint16(0x1086), // Ideal Lid temperature (W)
+		135:  uint16(0x1087), // Current Lid temperature (R)
 		410:  uint16(0x119A), // General regisrter offset for values! (unused for now)
 		2000: uint16(0x17D0), // Well Emission data 96x6 registers (R)
 		2577: uint16(0x1A11), // error code (R)
@@ -85,6 +85,7 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		105: uint16(0x0869), // Signal Error (R)
 		106: uint16(0x086A), // Well Emmission register data  ON: PLC write & OFF: Read (RW)
 		107: uint16(0x086B), // Cycle completed (R)
+		109: uint16(0x086D), // Lid Heating On (W)
 	},
 }
 

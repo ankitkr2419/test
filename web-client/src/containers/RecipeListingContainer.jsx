@@ -9,6 +9,7 @@ import {
 } from "action-creators/recipeActionCreators";
 import { ROUTES, RUN_RECIPE_TYPE } from "appConstants";
 import { Redirect } from "react-router-dom";
+import { deckBlockReset } from "action-creators/loginActionCreators";
 const RecipeListing = styled.div`
   .landing-content {
     padding: 1.25rem 4.5rem 0.875rem 4.5rem;
@@ -25,6 +26,10 @@ const RecipeListingContainer = (props) => {
   const dispatch = useDispatch();
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const [recipeFetched, setRecipeFetched] = useState(false);
 
   const [
@@ -42,6 +47,10 @@ const RecipeListingContainer = (props) => {
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
   ) => {
+    //clear recipe data if run recipe closed
+    if(prevState === true) {
+      setSelectedRecipeData({})
+    }
     setOperatorRunRecipeCarousalModalVisible(!prevState);
   };
 
@@ -52,14 +61,24 @@ const RecipeListingContainer = (props) => {
     }
   }, [token, recipeFetched, dispatch]);
 
-  const loginReducer = useSelector((state) => state.loginReducer);
+  /** Blocked deck must be unblocked */
+  useEffect(() => {
+    if (activeDeckObj?.isDeckBlocked) {
+      dispatch(deckBlockReset({ deckName: activeDeckObj.name }));
+    }
+  }, [activeDeckObj.isDeckBlocked]);
 
-  const loginReducerData = loginReducer.toJS();
-  let activeDeckObj =
-    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
-  if (!activeDeckObj.isLoggedIn) {
-    return <Redirect to={`/${ROUTES.landing}`} />;
-  }
+  /** Reset selectedRecipeData if deck is switched */
+  useEffect(() => {
+    if (
+      selectedRecipeData?.deckName &&
+      selectedRecipeData.deckName !== activeDeckObj.name
+    ) {
+      setSelectedRecipeData({});
+    }
+  });
+
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
   let deckName = activeDeckObj.name;
   let isAdmin = activeDeckObj.isAdmin;
   if (!token) setToken(activeDeckObj.token);
@@ -121,6 +140,7 @@ const RecipeListingContainer = (props) => {
           isOperatorRunRecipeCarousalModalVisible
         }
         handleCarousalModal={handleCarousalModal}
+        selectedRecipeData={selectedRecipeData}
         returnRecipeDetails={returnRecipeDetails}
         onConfirmedRecipeSelection={onConfirmedRecipeSelection}
         onConfirmedRunRecipeByAdmin={onConfirmedRunRecipeByAdmin}

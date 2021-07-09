@@ -86,9 +86,6 @@ func (d *Simulator) performSteps(steps []plc.Step) {
 			//time.Sleep(200 * time.Millisecond)
 			time.Sleep(time.Duration(jitter(0, 1, 3)) * time.Second) // sleep for 1 to 3 seconds
 
-			// simulate currentLidTemp
-			d.plcIO.d.currentLidTemp = jitter(uint16(d.config.IdealLidTemp*10), 0, 5)
-
 			// simulate currentTemp
 			d.plcIO.d.currentTemp = d.plcIO.d.currentTemp + uint16(stp.RampUpTemp*10)
 
@@ -195,3 +192,19 @@ func (d *Simulator) HomingRTPCR() (err error) {
 	return
 }
 func (d *Simulator) Reset() (err error) { return }
+
+
+func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
+	// simulate currentLidTemp
+	
+	time.Sleep(2 * time.Second)
+	d.plcIO.d.currentLidTemp = jitter(uint16(expectedLidTemp), 0, 50)
+	logger.Infoln("Current Lid Temp: ", d.plcIO.d.currentLidTemp)
+	return
+}
+
+func (d *Simulator) SwitchOffLidTemp() (err error) {
+	// Off Lid Heating
+	d.plcIO.d.currentLidTemp = jitter(uint16(27), 0, 50)
+	return
+}

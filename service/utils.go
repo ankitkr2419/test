@@ -6,8 +6,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"mylab/cpagent/db"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"sync"
 
@@ -31,14 +31,14 @@ const (
 	operator   = "operator"
 )
 
-const(
-	recipeC 	= "recipe"
-	processC	= "process"
-	createC 	= "create"
-	deleteC 	= "delete"
-	updateC 	= "update"
-	duplicateC	= "duplicate"
-	rearrangeC	= "rearrange"
+const (
+	recipeC    = "recipe"
+	processC   = "process"
+	createC    = "create"
+	deleteC    = "delete"
+	updateC    = "update"
+	duplicateC = "duplicate"
+	rearrangeC = "rearrange"
 )
 
 var userLogin sync.Map
@@ -225,6 +225,20 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 
 	// Add Default main user to DB
 	err = s.InsertUser(context.Background(), mainUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		return
+	}
+
+	// Create a default operator user
+	operatorUser := db.User{
+		Username: "operator",
+		Password: MD5Hash("operator"),
+		Role:     "operator",
+	}
+
+	// Add Default operator user to DB
+	err = s.InsertUser(context.Background(), operatorUser)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Setup Default User failed")
 		return

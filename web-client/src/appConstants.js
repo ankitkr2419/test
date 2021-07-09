@@ -137,6 +137,7 @@ export const MODAL_BTN = {
   yes: "Yes",
   no: "No",
   viewResults: "View Results",
+  complete: "Complete",
 };
 
 export const DECKCARD_BTN = {

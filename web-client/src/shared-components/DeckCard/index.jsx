@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setActiveDeck } from "action-creators/loginActionCreators";
 import { DeckCardBox, CardOverlay } from "./Styles";
 import CommonTimerFields from "./CommonTimerFields";
+import { toast } from "react-toastify";
 
 const DeckCard = (props) => {
   const {
@@ -44,6 +45,7 @@ const DeckCard = (props) => {
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   let activeDeckName = activeDeckObj && activeDeckObj.name;
+  const isDeckBlocked = activeDeckObj && activeDeckObj.isDeckBlocked;
 
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   let recipeActionReducerForDeck = recipeActionReducer.decks.find(
@@ -155,6 +157,11 @@ const DeckCard = (props) => {
   };
 
   const setCurrentDeckActive = () => {
+    /** one cannot switch between deck while adding/editing processes.*/
+    if (deckName !== activeDeckName && isDeckBlocked) {
+      toast.warning("Decks cannot be switched while adding/editing processes!");
+      return;
+    }
     /**
      *  set active deck to current deck if:
      *  activeDeckName not found or not equal to current deck
@@ -200,7 +207,7 @@ const DeckCard = (props) => {
         className="p-4 w-100 h-100 deck-content logged-in1"
         style={
           isProcessRunning()
-            ? { background: null }
+            ? { background: null, zIndex: isActiveDeck ? 4 : null }
             : { background: '#fff url("/images/deck-card-bg.svg") no-repeat' }
         }
       >
@@ -328,6 +335,7 @@ DeckCard.defaultProps = {
   progressPercentComplete: 0,
   leftActionBtnDisabled: false,
   rightActionBtnDisabled: false,
+  isDeckBlocked: false,
 };
 
 export default React.memo(DeckCard);

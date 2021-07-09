@@ -3,14 +3,12 @@ package simulator
 import (
 	"fmt"
 	"math"
-	"os"
 
-	"encoding/csv"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/responses"
 	"mylab/cpagent/tec"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -40,7 +38,7 @@ func (t *Simulator) InitiateTEC() (err error) {
 	return nil
 }
 
-func (t *Simulator) ConnectTEC(ts tec.TECTempSet) (err error) {
+func (t *Simulator) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 	currentTemp := prevTemp
 	// Reach the target temperature with given ramp rate
 	timeRequiredInSecs := math.Abs(ts.TargetTemperature-float64(currentTemp)) / ts.TargetRampRate
@@ -61,6 +59,7 @@ func (t *Simulator) ConnectTEC(ts tec.TECTempSet) (err error) {
 			currentTemp = float32(ts.TargetTemperature)
 			tempReached = true
 		}
+		prevTemp = currentTemp
 	}
 	logger.Infoln("Target Temp reached: ", currentTemp)
 
@@ -88,7 +87,7 @@ func (t *Simulator) ReachRoomTemp() error {
 		TargetTemperature: 27,
 		TargetRampRate:    2,
 	}
-	t.ConnectTEC(ts)
+	t.SetTempAndRamp(ts)
 	logger.Infoln("Room Temp Reached")
 	return nil
 }
@@ -116,49 +115,37 @@ func (t *Simulator) TestRun() (err error) {
 		CycleCount: 3,
 	}
 
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
-	if err != nil {
-		logger.WithField("Err", err).Errorln(responses.FileCreationError)
-		return
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
+	file := plc.GetExcelFile(tec.LogsPath, "output")
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil {
-		return
-	}
-	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil {
-		return
-	}
+	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	plc.AddRowToExcel(file, plc.TECSheet, headings)
+
+	row := []interface{}{"Holding Stage About to start"}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
+
 	// Go back to Room Temp at the end
 	defer t.ReachRoomTemp()
 
 	logger.Infoln("Room Temp 27 Reached ")
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	t.RunStage(p.Holding, writer, 0)
+	t.RunStage(p.Holding, file, 0)
 
 	// Run Cycle Stage
-	err = writer.Write([]string{"Cycle Stage About to start"})
-	if err != nil {
-		return
-	}
+	row = []interface{}{"Cycle Stage About to start"}
+	plc.AddRowToExcel(file, plc.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		t.RunStage(p.Cycle, writer, i)
+		t.RunStage(p.Cycle, file, i)
 		logger.Infoln("Holding Completed ->", p.Cycle[len(p.Cycle)-1].HoldTime, " for cycle number ", i)
 	}
 
 	return nil
 }
 
-func (t *Simulator) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16) (err error) {
+func (t *Simulator) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) (err error) {
+	var row []interface{}
 	ts := time.Now()
 	stagePrevTemp := prevTemp
 	for i, h := range st {
@@ -168,8 +155,9 @@ func (t *Simulator) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16)
 			TargetRampRate:    float64(h.RampUpTemp),
 		}
 		logger.Infoln("Started ->", ti)
-		t.ConnectTEC(ti)
-		writer.Write([]string{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), fmt.Sprintf("%f", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp)), fmt.Sprintf("%f", prevTemp), fmt.Sprintf("%f", h.TargetTemp), fmt.Sprintf("%f", h.RampUpTemp)})
+		t.SetTempAndRamp(ti)
+		row = []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
+		plc.AddRowToExcel(file, plc.TECSheet, row)
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 		time.Sleep(time.Duration(h.HoldTime) * time.Second)
@@ -179,9 +167,11 @@ func (t *Simulator) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16)
 
 	}
 	if cycleNum != 0 {
-		writer.Write([]string{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
+		row = []interface{}{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
+		plc.AddRowToExcel(file, plc.TECSheet, row)
 	} else {
-		writer.Write([]string{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", fmt.Sprintf("%f", stagePrevTemp), fmt.Sprintf("%f", prevTemp)})
+		row = []interface{}{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
+		plc.AddRowToExcel(file, plc.TECSheet, row)
 	}
 
 	plc.CurrentCycle = cycleNum
@@ -190,25 +180,15 @@ func (t *Simulator) RunStage(st []plc.Step, writer *csv.Writer, cycleNum uint16)
 
 func (t *Simulator) RunProfile(tp tec.TempProfile) (err error) {
 
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
-	if err != nil {
-		logger.WithField("Err", err).Errorln(responses.FileCreationError)
-		return
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
+	file := plc.GetExcelFile(tec.LogsPath, "output")
 
 	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil {
-		return
-	}
+	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	plc.AddRowToExcel(file, plc.TECSheet, headings)
 
 	for i := uint16(1); i <= uint16(tp.Cycles); i++ {
 		logger.Infoln("Started Cycle->", i)
-		t.RunStage(tp.Profile, writer, i)
+		t.RunStage(tp.Profile, file, i)
 		logger.Infoln("Cycle Completed -> ", i)
 	}
 
