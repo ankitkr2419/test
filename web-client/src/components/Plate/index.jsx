@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
+import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
+import classnames from "classnames";
+
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
 import SampleSideBarContainer from "containers/SampleSideBarContainer";
@@ -80,6 +83,12 @@ const Plate = (props) => {
     setIsSidebarOpen(true);
   };
 
+  const [activeTab, setActiveTab] = useState("wells");
+
+  const toggle = (tab) => {
+    if (activeTab !== tab) setActiveTab(tab);
+  };
+
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative">
       <Header
@@ -89,27 +98,66 @@ const Plate = (props) => {
         experimentId={experimentId}
       />
       <GridWrapper className="plate-body flex-100">
-        <div className="d-flex">
-          {/* <WellGridHeader
-				isGroupSelectionOn={isMultiSelectionOptionOn}
-				toggleMultiSelectOption={toggleMultiSelectOption}
-			/> */}
-          <SelectAllGridHeader
-            isAllWellsSelected={isAllWellsSelected}
-            toggleAllWellSelectedOption={toggleAllWellSelectedOption}
-          />
-        </div>
-        <GridComponent
-          activeWells={activeWells}
-          wells={wells}
-          isGroupSelectionOn={isMultiSelectionOptionOn}
-          isAllWellsSelected={isAllWellsSelected}
-          onWellClickHandler={onWellClickHandler}
-          onWellUpdateClickHandler={onWellUpdateClickHandler}
-          showGraphOfWell={showGraphOfWell}
-        />
+        <Nav className="plate-nav-tabs border-0" tabs>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: activeTab === "wells" })}
+              onClick={() => {
+                toggle("wells");
+              }}
+            >
+              Wells
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: activeTab === "graph" })}
+              onClick={() => {
+                toggle("graph");
+              }}
+            >
+              Graph
+            </NavLink>
+          </NavItem>
+        </Nav>
+        <TabContent className="plate-tab-content d-flex" activeTab={activeTab}>
+          <TabPane className="tab-pane-wells flex-100" tabId="wells">
+            <div className="d-flex">
+              <div className="sample-wrapper">
+                {/* TODO: Add Sample Content here */}
+              </div>
+              <div className="wells-wrapper flex-100">
+                <div className="d-flex align-items-center mb-4">
+                  {/* <WellGridHeader
+                    className="mr-4"
+                    isGroupSelectionOn={isMultiSelectionOptionOn}
+                    toggleMultiSelectOption={toggleMultiSelectOption}
+                  /> */}
+                  <SelectAllGridHeader
+                    isAllWellsSelected={isAllWellsSelected}
+                    toggleAllWellSelectedOption={toggleAllWellSelectedOption}
+                  />
+                </div>
+                <GridComponent
+                  activeWells={activeWells}
+                  wells={wells}
+                  isGroupSelectionOn={isMultiSelectionOptionOn}
+                  isAllWellsSelected={isAllWellsSelected}
+                  onWellClickHandler={onWellClickHandler}
+                  onWellUpdateClickHandler={onWellUpdateClickHandler}
+                  showGraphOfWell={showGraphOfWell}
+                />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane className="tab-pane-graph flex-100" tabId="graph">
+            <div className="d-flex flex-100">
+              <div className="graph-wrapper flex-100">Tab Graph Content</div>
+            </div>
+          </TabPane>
+        </TabContent>
       </GridWrapper>
-      <SampleSideBarContainer
+      {/* <SampleSideBarContainer
         experimentId={experimentId}
         positions={positions}
         experimentTargetsList={experimentTargetsList}
@@ -121,7 +169,7 @@ const Plate = (props) => {
         setIsSidebarOpen={setIsSidebarOpen}
         resetSelectedWells={resetSelectedWells}
         isMultiSelectionOptionOn={isMultiSelectionOptionOn}
-      />
+      /> */}
     </div>
   );
 };

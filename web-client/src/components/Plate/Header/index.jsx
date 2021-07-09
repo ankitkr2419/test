@@ -6,10 +6,10 @@ import TemplatePopover from "components/Plate/Popover";
 import { formatDate, formatTime } from "utils/helpers";
 
 const StyledSubHeader = styled.div`
+  background-color: #f2f2f2;
   display: flex;
-  align-items: center;
-  height: 40px;
-  padding: 8px 16px 8px 88px;
+  height: 68px;
+  padding: 12px 16px 12px 76px;
   color: #707070;
 
   h6 {
@@ -31,7 +31,7 @@ const SubHeader = (props) => {
 
   return (
     <StyledSubHeader className="plate-subheader">
-      <Text Tag="h6" className="mb-0 mx-5">
+      <Text Tag="h6" className="text-capitalize mb-0">
         {templateName}
       </Text>
       {isExperimentSucceeded === true && (
@@ -47,7 +47,7 @@ const SubHeader = (props) => {
           </Text>
         </>
       )}
-      <TemplatePopover className="ml-auto" />
+      <TemplatePopover name={templateName} className="ml-auto" />
     </StyledSubHeader>
   );
 };

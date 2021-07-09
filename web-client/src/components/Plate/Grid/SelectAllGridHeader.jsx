@@ -7,13 +7,12 @@ const StyledSelectAllGridHeader = styled.header`
   display: flex;
   height: 40px;
   align-items: center;
-  padding: 0 16px 0 26px;
 `;
 
 const SelectAllGridHeader = ({
   className,
   isAllWellsSelected,
-  toggleAllWellSelectedOption,
+  toggleAllWellSelectedOption
 }) => (
   <StyledSelectAllGridHeader className={className}>
     <Switch
@@ -29,11 +28,11 @@ const SelectAllGridHeader = ({
 SelectAllGridHeader.propTypes = {
   className: PropTypes.string,
   isAllWellsSelected: PropTypes.bool.isRequired,
-  toggleAllWellSelectedOption: PropTypes.func.isRequired,
+  toggleAllWellSelectedOption: PropTypes.func.isRequired
 };
 
 SelectAllGridHeader.defaultProps = {
-  className: "",
+  className: ""
 };
 
 export default SelectAllGridHeader;

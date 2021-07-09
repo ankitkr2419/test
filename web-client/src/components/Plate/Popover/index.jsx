@@ -13,9 +13,9 @@ const StyledTemplatePopover = styled.div`
   }
 `;
 
-const TemplatePopover = (props) => {
+const TemplatePopover = ({ className, name, ...props }) => {
   return (
-    <StyledTemplatePopover {...props}>
+    <StyledTemplatePopover className={className} {...props}>
       <ButtonIcon
         name="angle-down"
         size={40}
@@ -29,7 +29,7 @@ const TemplatePopover = (props) => {
         popperClassName="popover-template"
       >
         <PopoverBody className="d-flex flex-column justify-content-center flex-100 scroll-y">
-          <Text className="font-weight-bold">(Template name)</Text>
+          <Text className="font-weight-bold text-capitalize">({name})</Text>
           <Text>Cycle Count - x</Text>
           <Text>Current temperature - x</Text>
           <Text className="mb-0">Lid temperature - x</Text>
@@ -40,7 +40,8 @@ const TemplatePopover = (props) => {
 };
 
 TemplatePopover.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  name: PropTypes.string
 };
 
 TemplatePopover.defaultProps = {

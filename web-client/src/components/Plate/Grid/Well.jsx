@@ -11,11 +11,11 @@ const Well = (props) => {
     isRunning,
     isSelected,
     taskInitials,
-    onClickHandler,
+    onClickHandler
   } = props;
   const wellClassnames = classNames(className, {
     running: isRunning,
-    selected: isSelected,
+    selected: isSelected
   });
 
   return (
@@ -51,8 +51,8 @@ const StyledWell = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 57px;
-  height: 54px;
+  width: 50px;
+  height: 50px;
   font-size: 20px;
   line-height: 24px;
   color: #666666;
@@ -62,8 +62,8 @@ const StyledWell = styled.div`
       ? "2px solid #707070"
       : "1px solid #aeaeae"};
   border-radius: 8px;
-  margin: 0 16px 16px 0;
-  padding: 20px 4px 4px;
+  margin: 0 24px 48px 0;
+  padding: 18px 4px 4px;
   box-shadow: ${(props) =>
     props.isSelected && props.isRunning ? "0 3px 6px #00000029" : ""};
   opacity: ${(props) => (props.isDisabled ? "0.2" : "1")};
@@ -100,7 +100,7 @@ const StyledWell = styled.div`
     top: 0;
     right: 0;
     left: 0;
-    height: 16px;
+    height: 14px;
     border-radius: 6px 6px 0 0;
     background-color: ${(props) => props.status};
   }
@@ -114,7 +114,7 @@ Well.propTypes = {
   isSelected: PropTypes.bool,
   isRunning: PropTypes.bool,
   onClickHandler: PropTypes.func.isRequired,
-  isDisabled: PropTypes.bool,
+  isDisabled: PropTypes.bool
 };
 
 Well.defaultProps = {
@@ -123,7 +123,7 @@ Well.defaultProps = {
   taskInitials: "",
   isSelected: false,
   isRunning: false,
-  isDisabled: false,
+  isDisabled: false
 };
 
 export default Well;
