@@ -358,7 +358,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	err = deps.Tec.RunStage(p.Holding, file, 0)
+	err = deps.Tec.RunStage(p.Holding, deps.Plc, file, 0)
 	if err != nil {
 		return
 	}
@@ -371,7 +371,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		err = deps.Tec.RunStage(p.Cycle, file, i)
+		err = deps.Tec.RunStage(p.Cycle, deps.Plc, file, i)
 		if err != nil {
 			return
 		}
