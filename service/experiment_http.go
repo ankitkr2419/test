@@ -177,7 +177,18 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
 		plcStage := makePLCStage(ss)
+
+		t, err := deps.Store.ShowTemplate(req.Context(),  e.TemplateID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching template data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Lid Temp is multiplied by 10 for PLC can't handle floats
+		plcStage.IdealLidTemp = uint16(t.LidTemp * 10)		
 
 		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
 		if err != nil {
@@ -186,7 +197,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		// retruns all targets configured for experiment
+		// returns all targets configured for experiment
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
@@ -228,8 +239,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
 			return
 		}
-
-		plcStage.IdealLidTemp = 1000
 
 		//experimentRunning set true
 		plc.ExperimentRunning = true
@@ -342,7 +351,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	}
 
 	//invoke monitor
-	// ASK: Do we need this?
 	go monitorExperiment(deps, file)
 
 	// Start line
@@ -365,8 +373,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	if err != nil {
 		return
 	}
-
-	// Cycle in Plc
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
