@@ -47,6 +47,10 @@ const RecipeListingContainer = (props) => {
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
   ) => {
+    //clear recipe data if run recipe closed
+    if(prevState === true) {
+      setSelectedRecipeData({})
+    }
     setOperatorRunRecipeCarousalModalVisible(!prevState);
   };
 
@@ -64,9 +68,17 @@ const RecipeListingContainer = (props) => {
     }
   }, [activeDeckObj.isDeckBlocked]);
 
-  if (!activeDeckObj.isLoggedIn) {
-    return <Redirect to={`/${ROUTES.landing}`} />;
-  }
+  /** Reset selectedRecipeData if deck is switched */
+  useEffect(() => {
+    if (
+      selectedRecipeData?.deckName &&
+      selectedRecipeData.deckName !== activeDeckObj.name
+    ) {
+      setSelectedRecipeData({});
+    }
+  });
+
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
   let deckName = activeDeckObj.name;
   let isAdmin = activeDeckObj.isAdmin;
   if (!token) setToken(activeDeckObj.token);
@@ -128,6 +140,7 @@ const RecipeListingContainer = (props) => {
           isOperatorRunRecipeCarousalModalVisible
         }
         handleCarousalModal={handleCarousalModal}
+        selectedRecipeData={selectedRecipeData}
         returnRecipeDetails={returnRecipeDetails}
         onConfirmedRecipeSelection={onConfirmedRecipeSelection}
         onConfirmedRunRecipeByAdmin={onConfirmedRunRecipeByAdmin}

@@ -671,12 +671,21 @@ html {
 	height: 3rem;
   
 	.title {
-	  font-size: 15px;
-	  line-height: 20px;
+		font-size: 15px;
+		line-height: 20px;
 	}
-  }
-  
-  .landing-page {
+}
+
+.recipe-action {
+	.icon-play,
+	.icon-edit-pencil,
+	.icon-publish,
+	.icon-published {
+			font-size: 14px !important;
+	}
+}
+
+.landing-page {
 	padding: 2.5rem 4.5rem 2.125rem;
-  }
+}
   
