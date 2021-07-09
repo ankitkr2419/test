@@ -20,8 +20,10 @@ const (
 
 	createTemplateQuery = `INSERT INTO templates (
 		name,
-		description)
-		VALUES ($1, $2) RETURNING id`
+		description, 
+		volume, 
+		lid_temp)
+		VALUES ($1, $2, $3, $4) RETURNING id`
 
 	getTemplateQuery = `SELECT *
 		FROM templates WHERE id = $1`
@@ -29,8 +31,10 @@ const (
 	updateTemplateQuery = `UPDATE templates SET
 		name = $1,
 		description = $2,
-		updated_at = $3
-		where id = $4 AND publish = false`
+		volume = $3,
+		lid_temp = $4,
+		updated_at = $5
+		where id = $6 AND publish = false`
 
 	deleteTemplateQuery = `DELETE FROM templates WHERE id = $1`
 
@@ -45,10 +49,13 @@ type Template struct {
 	Name        string    `db:"name" json:"name" validate:"required"`
 	Description string    `db:"description" json:"description" validate:"required"`
 	Publish     bool      `db:"publish" json:"publish"`
+	Volume     	int64     `db:"volume" json:"volume"`
+	LidTemp     int64     `db:"lid_temp" json:"lid_temp"`
 	Stages      []Stage   `json:"stages,omitempty"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
+
 type ErrorResponse struct {
 	Code    string            `json:"code"`
 	Message string            `json:"message"`
@@ -127,7 +134,7 @@ func (s *pgStore) CreateTemplate(ctx context.Context, t Template) (createdTemp T
 
 	var id uuid.UUID
 
-	err = s.db.QueryRow(createTemplateQuery, t.Name, t.Description).Scan(&id)
+	err = s.db.QueryRow(createTemplateQuery, t.Name, t.Description, t.Volume, t.LidTemp).Scan(&id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error creating Template")
 		return
@@ -146,6 +153,8 @@ func (s *pgStore) UpdateTemplate(ctx context.Context, t Template) (err error) {
 		updateTemplateQuery,
 		t.Name,
 		t.Description,
+		t.Volume,
+		t.LidTemp,
 		time.Now(),
 		t.ID,
 	)
@@ -158,7 +167,7 @@ func (s *pgStore) UpdateTemplate(ctx context.Context, t Template) (err error) {
 	c, _ := result.RowsAffected()
 	// check row count as no error is returned when row not found for update
 	if c == 0 {
-		err = errors.New("Record Not Found")
+		err = errors.New("Record Not Found or Template is published, please unpublish first")
 		logger.WithField("err", err.Error()).Error("Error Template not found")
 	}
 
