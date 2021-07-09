@@ -158,7 +158,15 @@ const Plate = (props) => {
           </TabPane>
           <TabPane className="tab-pane-graph flex-100" tabId="graph">
             <div className="d-flex flex-100">
-              <div className="graph-wrapper flex-100">Tab Graph Content</div>
+              <div className="graph-wrapper flex-100">
+                <ExperimentGraphContainer
+                  experimentStatus={experimentStatus}
+                  isSidebarOpen={isSidebarOpen}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                  resetSelectedWells={resetSelectedWells}
+                  isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+                />
+              </div>
             </div>
           </TabPane>
         </TabContent>

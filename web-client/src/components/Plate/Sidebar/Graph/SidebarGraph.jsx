@@ -43,23 +43,7 @@ const SidebarGraph = (props) => {
 
 	if (isExperimentRunning === true || isExperimentSucceeded === true) {
 		return (
-			<Sidebar
-				isOpen={isSidebarOpen}
-				toggleSideBar={toggleSideBar}
-				className="graph"
-				bodyClassName="py-4"
-				handleIcon="graph"
-				handleIconSize={56}
-			>
-				<SwitchWrapper>
-					<Switch
-						id="temperature"
-						name="temperature"
-						label="Show temperature graph"
-						value={showTempGraph}
-						onChange={toggleTempGraphSwitch}
-					/>
-				</SwitchWrapper>
+			<>
 				{/* show the well data graph if showTempGraph flag is off */}
 				{!showTempGraph
 					&& <WellGraph
@@ -76,7 +60,43 @@ const SidebarGraph = (props) => {
 				{showTempGraph
 					&& <TemperatureGraphContainer />
 				}
-			</Sidebar>
+			</>
+
+			// {/** TODO: remove after tested */}
+			// <Sidebar
+			// 	isOpen={isSidebarOpen}
+			// 	toggleSideBar={toggleSideBar}
+			// 	className="graph"
+			// 	bodyClassName="py-4"
+			// 	handleIcon="graph"
+			// 	handleIconSize={56}
+			// >
+			// 	<SwitchWrapper>
+			// 		<Switch
+			// 			id="temperature"
+			// 			name="temperature"
+			// 			label="Show temperature graph"
+			// 			value={showTempGraph}
+			// 			onChange={toggleTempGraphSwitch}
+			// 		/>
+			// 	</SwitchWrapper>
+			// 	{/* show the well data graph if showTempGraph flag is off */}
+			// 	{!showTempGraph
+			// 		&& <WellGraph
+			// 			data={data}
+			// 			experimentGraphTargetsList={experimentGraphTargetsList}
+			// 			onThresholdChangeHandler={onThresholdChangeHandler}
+			// 			toggleGraphFilterActive={toggleGraphFilterActive}
+			// 			setThresholdError={setThresholdError}
+			// 			resetThresholdError={resetThresholdError}
+			// 			isThresholdInvalid={isThresholdInvalid}
+			// 		/>
+			// 	}
+			// 	{/* show temperature graph if showTempGraph flag is on */}
+			// 	{showTempGraph
+			// 		&& <TemperatureGraphContainer />
+			// 	}
+			// </Sidebar>
 		);
 	}
 	return null;

@@ -2,9 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import styled from "styled-components";
+import { Text } from "shared-components";
 
 const Well = (props) => {
   const {
+    position,
     id,
     className,
     status,
@@ -28,6 +30,9 @@ const Well = (props) => {
       className={wellClassnames}
       onClick={onClickHandler}
     >
+      <Text Tag="span" className="well-position">
+        {position}
+      </Text>
       {taskInitials}
     </StyledWell>
   );
@@ -51,8 +56,8 @@ const StyledWell = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   font-size: 20px;
   line-height: 24px;
   color: #666666;
@@ -103,6 +108,14 @@ const StyledWell = styled.div`
     height: 14px;
     border-radius: 6px 6px 0 0;
     background-color: ${(props) => props.status};
+  }
+
+  .well-position {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #999999;
   }
 `;
 
