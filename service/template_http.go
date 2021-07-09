@@ -3,7 +3,9 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/config"
 	"net/http"
+	"context"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -290,4 +292,41 @@ func listPublishedTemplateHandler(deps Dependencies) http.HandlerFunc {
 		rw.WriteHeader(http.StatusOK)
 		rw.Write(respBytes)
 	})
+}
+
+
+
+// ALGORITHM
+// 1. Get Stage ID from Step
+// 2. Fetch Template ID from this Stage ID
+// 3. Fetch All Stages and Steps from Template ID
+// 4. Iterate over the stages and steps and calculate time accordingly
+// 5. Update time in DB
+func updateEstimatedTime(ctx context.Context, s db.Storer, step db.Step) (err error) {
+
+	var estimatedTime int64
+	var currentTemp float64
+
+	// Get stage
+	stage, err := s.ShowStage(ctx, step.StageID)
+	if err != nil{
+		logger.WithField("err", err.Error()).Error("Error fetching Stage Data")
+		return
+	}
+
+	ss, err := s.ListStageSteps(ctx, stage.TemplateID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching Stage Steps Data")
+		return
+	}
+	plcStage := makePLCStage(ss)
+	logger.WithField("Calculating Time for :", plcStage).Infoln("Calculating for every Step")
+
+	currentTemp = config.GetRoomTemp()
+	//TODO: Calculate Hold Stage Time
+
+	//TODO: Calculate Cycle Stage Time
+
+	err = s.UpdateEstimatedTime(ctx, stage.TemplateID, estimatedTime)
+	return
 }
