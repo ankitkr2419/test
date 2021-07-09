@@ -11,7 +11,7 @@ export const ButtonBarBox = styled.div`
   position: absolute;
   right: 0;
   bottom: 0rem;
-  top: 29rem;
+  top: 33rem;
 
   &.btn-bar-adjust-tipDiscard {
     top: unset !important;
