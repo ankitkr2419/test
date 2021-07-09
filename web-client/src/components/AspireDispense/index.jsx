@@ -171,6 +171,7 @@ const AspireDispenseComponent = () => {
             handleRightBtn={() =>
               isAspire ? handleNextBtn() : handleSaveBtn()
             }
+            btnBarClassname={"btn-bar-adjust-aspireDispense"}
           />
         </div>
       </AspireDispenseBox>
