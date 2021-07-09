@@ -13,13 +13,16 @@ import {
   setFormikField,
   getFormikInitialState,
   getRequestBody,
+  disabledTabInitTab,
+  toggler,
 } from "./helpers";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 
-const AspireDispenseComponent = (props) => {
+const AspireDispenseComponent = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
+  const [disabledTab, setDisabledTab] = useState(disabledTabInitTab);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -41,6 +44,12 @@ const AspireDispenseComponent = (props) => {
     enableReinitialize: true,
   });
 
+  useEffect(() => {
+    setActiveTab(
+      formik.values[isAspire ? "aspire" : "dispense"].selectedCategory
+    );
+  });
+
   const errorInAPICall = processesReducer.error;
   useEffect(() => {
     if (errorInAPICall === false) {
@@ -52,11 +61,14 @@ const AspireDispenseComponent = (props) => {
   const token = activeDeckObj.token;
 
   const toggle = (tab) => {
-    if (activeTab !== tab) setActiveTab(tab);
+    formik.setFieldValue(
+      `${isAspire ? "aspire" : "dispense"}.selectedCategory`,
+      `${tab}`
+    );
   };
 
   const wellClickHandler = (id, type) => {
-    // here type : aspire and 1 for dispense
+    // here type : 0 aspire and 1 for dispense
     const aspire = formik.values.aspire;
     const dispense = formik.values.dispense;
 
@@ -70,20 +82,41 @@ const AspireDispenseComponent = (props) => {
     }
 
     wellsObjArray.forEach((wellObj, index) => {
+      //get current selected value : true or false?
+      let isSelected =
+        formik.values[type === 0 ? "aspire" : "dispense"][
+          `cartridge${activeTab}Wells`
+        ][index].isSelected;
+
       setFormikField(
         formik,
         isAspire,
         activeTab,
         `cartridge${activeTab}Wells.${index}.isSelected`,
-        wellObj.id === id
+        wellObj.id === id ? !isSelected : false
       );
     });
   };
 
-  const handleNextBtn = () => {
-    //sets the selected category, and this is used in API call further.
-    formik.setFieldValue("aspire.selectedCategory", activeTab);
+  // TODO: change dependecy array after merge.
+  useEffect(() => {
+    let updatedDisabledTabState = toggler(formik, isAspire);
+    setDisabledTab({ ...disabledTab, ...updatedDisabledTabState });
+  }, [formik.values]);
+
+  const handleModifyBtn = () => {
     setIsAspire(!isAspire);
+    setActiveTab(formik.values.aspire.selectedCategory);
+    formik.setFieldValue("dispense.selectedCategory", activeTab);
+  };
+
+  const handleNextBtn = () => {
+    setIsAspire(!isAspire);
+    setActiveTab(formik.values.dispense.selectedCategory);
+    formik.setFieldValue("aspire.selectedCategory", activeTab);
+    if (activeTab === "2") {
+      formik.setFieldValue("dispense.selectedCategory", activeTab);
+    }
   };
 
   const handleSaveBtn = () => {
@@ -130,16 +163,18 @@ const AspireDispenseComponent = (props) => {
                 toggle={toggle}
                 activeTab={activeTab}
                 wellClickHandler={wellClickHandler}
+                disabledTab={disabledTab}
               />
             </CardBody>
           </Card>
           <ButtonBar
             leftBtnLabel={isAspire ? null : "Modify"}
             rightBtnLabel={isAspire ? "Next" : "Save"}
-            handleLeftBtn={() => (isAspire ? null : setIsAspire(!isAspire))}
+            handleLeftBtn={() => (isAspire ? null : handleModifyBtn())}
             handleRightBtn={() =>
               isAspire ? handleNextBtn() : handleSaveBtn()
             }
+            btnBarClassname={"btn-bar-adjust-aspireDispense"}
           />
         </div>
       </AspireDispenseBox>

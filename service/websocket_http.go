@@ -13,6 +13,7 @@ import (
 
 	"strconv"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
@@ -71,7 +72,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				if err.Error() == "PCR Aborted" {
 
 					// on pre-emptive stop
-					experimentRunning = false
+					plc.ExperimentRunning = false
 					errortype = "ErrorPCRAborted"
 					msg = "Experiment aborted by user"
 
@@ -344,15 +345,15 @@ func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes
 	return
 }
 
-func monitorExperiment(deps Dependencies) {
+func monitorExperiment(deps Dependencies, file *excelize.File) {
 
 	var cycle uint16
-	var previousCycle uint16
 
-	cycle = 0
+	cycle = 1
 
 	// experimentRunning is set when experiment started & if stopped then set to false
-	for experimentRunning {
+	for plc.ExperimentRunning {
+		time.Sleep(1 * time.Second)
 
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
@@ -360,18 +361,31 @@ func monitorExperiment(deps Dependencies) {
 			deps.WsErrCh <- err
 			return
 		}
+		//Add to excel
+		row := []interface{}{time.Now().Format("2006-01-02 15:04:05"), scan.Temp, scan.LidTemp}
+		plc.AddRowToExcel(file, plc.TempLogs, row)
 
+		// writes temp on every step against time in DB
+		err = WriteExperimentTemperature(deps, scan)
+		if err != nil {
+			logger.Errorln("Write Exp Temp Error")
+			return
+		} else {
+			deps.WsMsgCh <- "read_temp"
+		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
-		if scan.CycleComplete && scan.Cycle != previousCycle {
+		if plc.DataCapture {
 
-			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle)
+			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle, scan)
 
-			DBResult, err := WriteResult(deps, scan)
+			DBResult, err := WriteResult(deps, scan, file)
 			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in dbresult")
 				return
 			}
 			WriteColorCTValues(deps, DBResult, scan)
 			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in ct values")
 				return
 			}
 			deps.WsMsgCh <- "read"
@@ -382,39 +396,27 @@ func monitorExperiment(deps Dependencies) {
 					deps.WsErrCh <- err
 					return
 				}
-				deps.WsMsgCh <- "stop"
-				experimentRunning = false
-				break
+				// now emissions are completed only temperatures are to be noted till it reaches
+				// room temp
+				plc.CycleComplete = false
+				plc.DataCapture = false
+				continue
 			}
-
+			plc.DataCapture = false
+		}
+		if plc.CycleComplete {
+			plc.CycleComplete = false
 			cycle++
-			previousCycle++
 		}
-
-		// writes temp on every step against time in DB
-		err = WriteExperimentTemperature(deps, scan)
-		if err != nil {
-			return
-		} else {
-			deps.WsMsgCh <- "read_temp"
-		}
-
 		// adding delay of 0.5s to reduce the cpu usage
-		time.Sleep(500 * time.Millisecond)
-
 	}
 	logger.Info("Stop monitoring experiment")
 }
 
-func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err error) {
+func WriteResult(deps Dependencies, scan plc.Scan, file *excelize.File) (DBResult []db.Result, err error) {
 
 	// makeResult returns data in DB result format
-	result := makeResult(scan)
-
-	// for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
-	if scan.Cycle == 1 {
-		addResultForZerothCycle(deps, result)
-	}
+	result := makeResult(scan, file)
 
 	// insert current cycle result into Database
 	DBResult, err = deps.Store.InsertResult(context.Background(), result)
@@ -520,6 +522,8 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 		LidTemp:      scan.LidTemp,
 		Cycle:        scan.Cycle,
 	}
+
+	logger.Debugln("ExpTemp: ", expTemp)
 
 	// insert every cycle  result temp into Database
 	err = deps.Store.InsertExperimentTemperature(context.Background(), expTemp)

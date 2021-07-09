@@ -14,16 +14,12 @@ const (
 	CYCLE_STAGE   = "cycle"
 )
 
-
-
 type Compact32 struct {
 	ExitCh  chan error
 	WsMsgCh chan string
 	wsErrch chan error
 	Driver  plc.Compact32Driver
 }
-
-
 
 func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */
@@ -52,16 +48,16 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 	if test {
 		p := plc.Stage{
 			Holding: []plc.Step{
-				plc.Step{65.3, 3.2, 1},
-				plc.Step{85.3, 3.1, 1},
-				plc.Step{95, 2.8, 1},
+				plc.Step{65.3, 3.2, 1, false},
+				plc.Step{85.3, 3.1, 1, false},
+				plc.Step{95, 2.8, 1, false},
 			},
 			Cycle: []plc.Step{
-				plc.Step{55, 3, 1},
-				plc.Step{65, 3, 1},
-				plc.Step{75, 3, 1},
-				plc.Step{85, 3, 1},
-				plc.Step{95, 3, 1},
+				plc.Step{55, 3, 1, false},
+				plc.Step{65, 3, 1, false},
+				plc.Step{75, 3, 1, false},
+				plc.Step{85, 3, 1, false},
+				plc.Step{95, 3, 1, false},
 			},
 			CycleCount: 3,
 		}
@@ -92,7 +88,10 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 		}
 		C32.Stop()
 	}
-
+	err := C32.SwitchOffLidTemp()
+	if err != nil {
+		logger.Warnln("Failed to switch off lid temp", err)
+	}
 	return &C32 // plc Driver
 }
 

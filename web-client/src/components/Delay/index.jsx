@@ -148,7 +148,11 @@ const DelayComponent = (props) => {
                 />
               </CardBody>
             </Card>
-            <ButtonBar rightBtnLabel="Save" handleRightBtn={saveBtnHandler} />
+            <ButtonBar
+              rightBtnLabel="Save"
+              handleRightBtn={saveBtnHandler}
+              btnBarClassname={"btn-bar-adjust-delay"}
+            />
           </div>
         </DelayBox>
       </PageBody>

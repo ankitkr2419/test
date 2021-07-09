@@ -1,5 +1,8 @@
 import { fromJS } from "immutable";
-import loginActions, { logoutActions } from "actions/loginActions";
+import loginActions, {
+  deckBlockActions,
+  logoutActions,
+} from "actions/loginActions";
 import { DECKNAME, USER_ROLES } from "../appConstants";
 import { getUpdatedDecks } from "utils/helpers";
 
@@ -12,6 +15,7 @@ const initialStateOfDecks = () => {
       msg: "",
       isAdmin: false,
       isActive: true,
+      isDeckBlocked: false,
       token: "",
     },
     {
@@ -21,6 +25,7 @@ const initialStateOfDecks = () => {
       msg: "",
       isAdmin: false,
       isActive: false,
+      isDeckBlocked: false,
       token: "",
     },
   ];
@@ -28,6 +33,8 @@ const initialStateOfDecks = () => {
 
 const loginInitialState = fromJS({
   tempDeckName: "",
+  tokenForHoming: "",
+  isLoggedInForHoming: false,
   isLoading: false,
   isPlateRoute: false,
   isTemplateRoute: false,
@@ -39,24 +46,31 @@ const loginInitialState = fromJS({
 export const loginReducer = (state = loginInitialState, action) => {
   switch (action.type) {
     case loginActions.loginInitiated:
-      const changesInLoginInitMatchedDeck = {
-        error: false,
-        msg: "",
-        isActive: true,
-      };
-      const changesInLoginInitUnMatchedDeck = {
-        isActive: false,
-      };
-      const updatedDecks = getUpdatedDecks(
-        state,
-        action.payload.body.deckName,
-        changesInLoginInitMatchedDeck,
-        changesInLoginInitUnMatchedDeck,
-        true
-      );
+      let updatedDecks = state.toJS().decks;
+
+      // only if deckName is provided i.e. NOT for homing
+      // if deckName is not for homing i.e. it will contain some deckName
+      if (action.payload.body.deckName !== "") {
+        const changesInLoginInitMatchedDeck = {
+          error: false,
+          msg: "",
+          isActive: true,
+        };
+        const changesInLoginInitUnMatchedDeck = {
+          isActive: false,
+        };
+        updatedDecks = getUpdatedDecks(
+          state,
+          action.payload.body.deckName,
+          changesInLoginInitMatchedDeck,
+          changesInLoginInitUnMatchedDeck,
+          true
+        );
+      }
 
       return state.merge({
         isLoading: true,
+        isLoggedInForHoming: false,
         deckName: action.payload.body.deckName,
         isAdmin: action.payload.body.role === USER_ROLES.ADMIN,
         decks: updatedDecks,
@@ -64,7 +78,7 @@ export const loginReducer = (state = loginInitialState, action) => {
 
     case loginActions.successAction:
       const token = action.payload.response.token;
-      let deckName = state.toJS().deckName;
+      let deckName = state.toJS().deckName; //current deckname
       let isAdminTemp = state.toJS().isAdmin;
       if (deckName && deckName === DECKNAME.DeckA) {
         //update and login deck A
@@ -118,23 +132,38 @@ export const loginReducer = (state = loginInitialState, action) => {
           isLoading: false,
           decks: newDeckB,
         });
-      } else {
-        //if deck name dont match, then dont update state
-        return state;
       }
+      // only if deckName is provided i.e. NOT for homing
+      // if no deckname is provided that means we login for homing
+      else if (deckName === "") {
+        return state.merge({
+          tokenForHoming: action.payload.response.token,
+          isLoading: false,
+          isLoggedInForHoming: true,
+          decks: state.toJS().decks,
+        });
+      }
+
     case loginActions.failureAction:
       let err = action.payload.serverErrors?.msg
         ? action.payload.serverErrors.msg
         : "Something went wrong!";
-      let newDecks = getUpdatedDecks(
-        state,
-        state.toJS().deckName,
-        { error: true, msg: err, token: "" },
-        {},
-        true
-      );
+
+      let newDecks = state.toJS().decks; // current deck state
+
+      // only if deckName is provided i.e. NOT for homing
+      if (state.toJS().deckName !== "") {
+        newDecks = getUpdatedDecks(
+          state,
+          state.toJS().deckName,
+          { error: true, msg: err, token: "" },
+          {},
+          true
+        );
+      }
 
       return state.merge({
+        isLoggedInForHoming: false,
         isLoading: false,
         decks: newDecks,
       });
@@ -174,7 +203,7 @@ export const loginReducer = (state = loginInitialState, action) => {
       let newDecksAfterLogout = getUpdatedDecks(
         state,
         deckShouldLogout,
-        { error: null, isLoggedIn: false, token: "" },
+        { error: null, isLoggedIn: false, token: "", isDeckBlocked: false },
         {},
         true
       );
@@ -185,21 +214,31 @@ export const loginReducer = (state = loginInitialState, action) => {
 
     //logout init
     case logoutActions.logoutActionInitiated:
-      state.tempDeckName = action.payload.deckName;
-      return state;
+      return state.merge({
+        isLoading: true,
+        deckName: action.payload.deckName,
+        decks: state.toJS().decks,
+      });
 
     //logout success
     case logoutActions.logoutActionSuccess:
-      let newdeckStateAferLogoutSuccess = getUpdatedDecks(
-        state,
-        state.tempDeckName,
-        { error: false, isLoggedIn: false, token: "" },
-        {},
-        true
-      );
+      let newdeckStateAferLogoutSuccess = state.toJS().decks; // current decks
+
+      // only if deckName is provided i.e. NOT for homing
+      if (state.toJS().deckName !== "") {
+        newdeckStateAferLogoutSuccess = getUpdatedDecks(
+          state,
+          state.toJS().deckName,
+          { error: false, isLoggedIn: false, token: "", isDeckBlocked: false },
+          {},
+          true
+        );
+      }
 
       return state.merge({
         tempDeckName: "",
+        isLoading: false,
+        isLoggedInForHoming: false,
         decks: newdeckStateAferLogoutSuccess,
       });
 
@@ -209,18 +248,50 @@ export const loginReducer = (state = loginInitialState, action) => {
         ? action.payload.error.msg
         : "Something went wrong!";
 
-      let newDeckStateAfterLogoutFail = getUpdatedDecks(
-        state,
-        state.toJS().deckName,
-        { error: true, msg: errorMsg, token: "" },
-        {},
-        true
-      );
+      let newDeckStateAfterLogoutFail = state.toJS().decks; // current decks
+
+      // only if deckName is provided i.e. NOT for homing
+      if (state.toJS().deckName !== "") {
+        newDeckStateAfterLogoutFail = getUpdatedDecks(
+          state,
+          state.toJS().deckName,
+          { error: true, msg: errorMsg, token: "" },
+          {},
+          true
+        );
+      }
 
       return state.merge({
         tempDeckName: "",
         isLoading: false,
         decks: newDeckStateAfterLogoutFail,
+      });
+
+    //block current deck : in case of recipe edit/add process
+    case deckBlockActions.deckBlockInitiated:
+      let newDeckStateAfterDeckBlocked = getUpdatedDecks(
+        state,
+        action.payload.deckName,
+        { isDeckBlocked: true },
+        {},
+        true
+      );
+
+      return state.merge({
+        decks: newDeckStateAfterDeckBlocked,
+      });
+
+    case deckBlockActions.deckBlockReset:
+      let newDeckStateAfterDeckReset = getUpdatedDecks(
+        state,
+        action.payload.deckName,
+        { isDeckBlocked: false },
+        {},
+        true
+      );
+
+      return state.merge({
+        decks: newDeckStateAfterDeckReset,
       });
 
     default:

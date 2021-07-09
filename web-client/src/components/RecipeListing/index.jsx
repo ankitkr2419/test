@@ -18,7 +18,10 @@ import { discardDeckInitiated } from "action-creators/discardDeckActionCreators"
 import { restoreDeckInitiated } from "action-creators/restoreDeckActionCreators";
 import AddNewRecipesModal from "components/modals/AddNewRecipesModal";
 import RunRecipesModal from "components/modals/RunRecipesModal";
-import { publishRecipeInitiated, deleteRecipeInitiated } from "action-creators/recipeActionCreators";
+import {
+  publishRecipeInitiated,
+  deleteRecipeInitiated,
+} from "action-creators/recipeActionCreators";
 import TopContentComponent from "./TopContentComponent";
 import RecipeListingCards from "./RecipeListingCards";
 import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
@@ -31,6 +34,7 @@ const RecipeListingComponent = (props) => {
     recipeData,
     isOperatorRunRecipeCarousalModalVisible,
     handleCarousalModal,
+    selectedRecipeData,
     returnRecipeDetails,
     onConfirmedRecipeSelection,
     onConfirmedRunRecipeByAdmin,
@@ -83,7 +87,9 @@ const RecipeListingComponent = (props) => {
     //logout api
     // dispatch(loginReset(deckName));
     let token = activeDeckObj.token;
-    dispatch(logoutInitiated({ deckName: deckName, token: token }));
+    dispatch(
+      logoutInitiated({ deckName: deckName, token: token, showToast: true })
+    );
   };
 
   const toggleLogoutModalVisibility = () => {
@@ -169,9 +175,11 @@ const RecipeListingComponent = (props) => {
     }
   };
 
-  const fileteredRecipeData = recipeData ? recipeData.filter((recipeObj) =>
-    recipeObj.name.toLowerCase().includes(searchRecipeText.toLowerCase())
-  ): []
+  const fileteredRecipeData = recipeData
+    ? recipeData.filter((recipeObj) =>
+        recipeObj.name.toLowerCase().includes(searchRecipeText.toLowerCase())
+      )
+    : [];
 
   const handleEditRecipe = (recipe) => {
     let recipeId = recipe?.id;
@@ -182,10 +190,10 @@ const RecipeListingComponent = (props) => {
 
     dispatch(
       saveNewRecipe({
-        recipeDetails: recipe
+        recipeDetails: recipe,
       })
     );
-    
+
     //go to processList page of recipe
     history.push(ROUTES.processListing);
   };
@@ -198,8 +206,8 @@ const RecipeListingComponent = (props) => {
 
   const handleDeleteRecipe = (recipeId) => {
     let token = activeDeckObj.token;
-    dispatch(deleteRecipeInitiated({ recipeId, token, deckName }))
-  }
+    dispatch(deleteRecipeInitiated({ recipeId, token, deckName }));
+  };
 
   return (
     <>
@@ -309,6 +317,7 @@ const RecipeListingComponent = (props) => {
               onSearchRecipeTextChanged={onSearchRecipeTextChanged}
               fileteredRecipeData={fileteredRecipeData}
               handleCarousalModal={handleCarousalModal}
+              selectedRecipeData={selectedRecipeData}
               returnRecipeDetails={returnRecipeDetails}
               toggleRunRecipesModal={toggleRunRecipesModal}
               handlePublishModalClick={(recipeId, isPublished) =>

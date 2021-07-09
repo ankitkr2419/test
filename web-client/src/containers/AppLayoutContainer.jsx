@@ -8,6 +8,7 @@ import {
 import RouteWithSubRoutes from "RouteHelper";
 import { useSelector, useDispatch } from "react-redux";
 import AppHeader from "components/AppHeader";
+import styled from "styled-components";
 
 import "../assets/scss/default.scss";
 import { fetchActiveWells } from "action-creators/activeWellActionCreators";
@@ -17,6 +18,20 @@ import ModalContainer from "./ModalContainer";
 import { useLocation } from "react-router-dom";
 import AppFooter from "components/AppFooter";
 import { APP_TYPE, ROUTES } from "appConstants";
+
+export const CardOverlay = styled.div`
+  position: absolute;
+  // display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.28);
+  z-index: 3;
+  cursor: pointer;
+`;
 
 /**
  * AppLayoutContainer Will contain routes(content), headers, sub-headers, notification etc.
@@ -65,18 +80,30 @@ const AppLayoutContainer = (props) => {
 
   const location = useLocation();
 
+  //recipe reducer
+  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  let recipeActionReducerData = recipeActionReducer.decks.find(
+    (deckObj) => deckObj.name === activeDeckObj.name
+  );
+
+  //cleanUp reducer
+  const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
+  let cleanUpReducerData = cleanUpReducer.decks.find(
+    (deckObj) => deckObj.name === activeDeckObj.name
+  );
+
   return (
     <Router>
-      {location.pathname === `/${ROUTES.splashScreen}` ? null : (
+      {(cleanUpReducerData.showCleanUp ||
+        recipeActionReducerData.showProcess) && <CardOverlay />}
+      {location.pathname === "/splashscreen" ? null : (
         <AppHeader
           isPlateRoute={loginReducer.get("isPlateRoute")}
-          isUserLoggedIn={activeDeckObj.isLoggedIn} //{loginReducer.get("isUserLoggedIn")}
-          isLoginTypeAdmin={activeDeckObj.isAdmin} //{loginReducer.get("isLoginTypeAdmin")}
-          isLoginTypeOperator={!activeDeckObj.isAdmin} //{loginReducer.get("isLoginTypeOperator")}
+          isUserLoggedIn={activeDeckObj && activeDeckObj.isLoggedIn}
+          isLoginTypeAdmin={activeDeckObj && activeDeckObj.isAdmin}
+          isLoginTypeOperator={activeDeckObj && !activeDeckObj.isAdmin}
           isTemplateRoute={loginReducer.get("isTemplateRoute")}
-          token={activeDeckObj.token}
-          deckName={activeDeckObj.name}
-          app={app}
+          currentDeckName={activeDeckObj && activeDeckObj.name}
         />
       )}
       {/* Modal container will helps in displaying error/info/warning through modal */}
