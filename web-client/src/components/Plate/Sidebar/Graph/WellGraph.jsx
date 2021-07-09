@@ -20,100 +20,13 @@ const options = {
       },
     ],
   },
-  animation: {
-    duration: 10000,
-    easing: "linear",
-  },
-};
+  //TODO: will be added later after testing & studying about it properly.
+  // This is for animation.
 
-const line1 = [
-  0.5415625, 0.4934375, 0.345645, 0.6537, 0.2341, 0.815632, 0.75345,
-];
-const line2 = [
-  0.855, 0.5965625, 0.15625, 0.1234375, 0.345735, 0.75677, 0.14354,
-];
-const line3 = [
-  0.895625, 0.59877, 0.5625, 0.9756256, 0.4657625, 0.664256, 0.625,
-];
-const threshold = [2, 2, 2, 2, 2, 2, 2];
-
-const data1 = {
-  labels: [1, 2, 3, 4, 5, 6, 7],
-  datasets: [
-    {
-      fill: false,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointBorderColor: "rgba(148,147,147,1)",
-      pointBackgroundColor: "#fff",
-      pointBorderWidth: 0,
-      pointHoverRadius: 0,
-      pointHoverBackgroundColor: "rgba(148,147,147,1)",
-      pointHoverBorderColor: "rgba(148,147,147,1)",
-      pointHoverBorderWidth: 0,
-      lineTension: 0.1,
-      borderCapStyle: "butt",
-      label: "index-0",
-      borderColor: "#F590B2",
-      data: line1,
-      totalCycles: 6,
-      cycles: [1, 2],
-    },
-    {
-      fill: false,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointBorderColor: "rgba(148,147,147,1)",
-      pointBackgroundColor: "#fff",
-      pointBorderWidth: 0,
-      pointHoverRadius: 0,
-      pointHoverBackgroundColor: "rgba(148,147,147,1)",
-      pointHoverBorderColor: "rgba(148,147,147,1)",
-      pointHoverBorderWidth: 0,
-      lineTension: 0.1,
-      borderCapStyle: "butt",
-      label: "index-1",
-      borderColor: "#F590B2",
-      data: line2,
-      totalCycles: 6,
-      cycles: [1, 2],
-    },
-    {
-      fill: false,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointBorderColor: "rgba(148,147,147,1)",
-      pointBackgroundColor: "#fff",
-      pointBorderWidth: 0,
-      pointHoverRadius: 0,
-      pointHoverBackgroundColor: "rgba(148,147,147,1)",
-      pointHoverBorderColor: "rgba(148,147,147,1)",
-      pointHoverBorderWidth: 0,
-      lineTension: 0.1,
-      borderCapStyle: "butt",
-      label: "index-2",
-      borderColor: "#F590B2",
-      data: line3,
-      totalCycles: 6,
-      cycles: [1, 2],
-    },
-    {
-      label: "COVID",
-      fill: false,
-      borderWidth: 2,
-      pointRadius: 0,
-      borderColor: "#F590B2",
-      pointBorderColor: "#a2ee95",
-      borderDash: [10, 5],
-      pointBackgroundColor: "#fff",
-      pointBorderWidth: 0,
-      pointHoverRadius: 0,
-      pointHoverBackgroundColor: "#a2ee95",
-      pointHoverBorderColor: "#a2ee95",
-      pointHoverBorderWidth: 0,
-      data: threshold,
-    },
-  ],
+  // animation: {
+  //   duration: 1000,
+  //   easing: "linear",
+  // },
 };
 
 const WellGraph = ({
