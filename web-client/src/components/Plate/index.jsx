@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
@@ -32,7 +32,7 @@ const Plate = (props) => {
     toggleAllWellSelectedOption,
     activeWells,
     experimentTemplate,
-    resetSelectedWells
+    resetSelectedWells,
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -45,6 +45,12 @@ const Plate = (props) => {
 
   // local state to manage toggling of graphSidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (experimentStatus === EXPERIMENT_STATUS.success) {
+      setActiveTab("graph");
+    }
+  }, [experimentStatus]);
 
   /**
    *
@@ -116,6 +122,12 @@ const Plate = (props) => {
               onClick={() => {
                 toggle("graph");
               }}
+              disabled={
+                !(
+                  experimentStatus === EXPERIMENT_STATUS.success ||
+                  experimentStatus === EXPERIMENT_STATUS.running
+                )
+              }
             >
               Graph
             </NavLink>
@@ -208,7 +220,7 @@ Plate.propTypes = {
   isMultiSelectionOptionOn: PropTypes.bool.isRequired,
   toggleMultiSelectOption: PropTypes.func.isRequired,
   activeWells: PropTypes.object.isRequired,
-  experimentTemplate: PropTypes.object.isRequired
+  experimentTemplate: PropTypes.object.isRequired,
 };
 
 export default Plate;
