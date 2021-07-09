@@ -309,17 +309,14 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		if err != nil {
 			deps.WsErrCh <- err
 		}
-
-		err = deps.Tec.ReachRoomTemp()
-		if err != nil {
-			deps.WsErrCh <- err
-		}
-
 		err = deps.Plc.SwitchOffLidTemp()
 		if err != nil {
 			deps.WsErrCh <- err
 		}
-
+		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			deps.WsErrCh <- err
+		}
 		return
 	}()
 
@@ -361,7 +358,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	err = deps.Tec.RunStage(p.Holding, deps.Plc, file, 0)
+	err = deps.Tec.RunStage(p.Holding, file, 0)
 	if err != nil {
 		return
 	}
@@ -374,11 +371,16 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		err = deps.Tec.RunStage(p.Cycle, deps.Plc, file, i)
+		err = deps.Tec.RunStage(p.Cycle, file, i)
 		if err != nil {
 			return
 		}
 		logger.Infoln("Cycle Completed -> ", i)
+		// Cycle in Plc
+		err = deps.Plc.Cycle()
+		if err != nil {
+			return
+		}
 	}
 
 	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
