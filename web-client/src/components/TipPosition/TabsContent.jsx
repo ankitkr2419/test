@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Card, CardBody } from "core-components";
 
@@ -6,6 +6,11 @@ import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 import TipPositionInfo from "./TipPositionInfo";
 import DeckPositionInfo from "./DeckPositionInfo";
+import {
+  TAB_TYPE_CARTRIDGE_1,
+  TAB_TYPE_CARTRIDGE_2,
+  TAB_TYPE_DECK,
+} from "appConstants";
 
 export const TabsContent = (props) => {
   const { formik, activeTab, toggle, wellClickHandler } = props;
@@ -19,9 +24,11 @@ export const TabsContent = (props) => {
         >
           <NavItem className="text-center flex-fill px-2 pt-2">
             <NavLink
-              className={classnames({ active: activeTab === "1" })}
+              className={classnames({
+                active: activeTab === TAB_TYPE_CARTRIDGE_1,
+              })}
               onClick={() => {
-                toggle("1");
+                toggle(TAB_TYPE_CARTRIDGE_1);
               }}
               disabled={formik.values.cartridge1.isDisabled}
             >
@@ -30,9 +37,9 @@ export const TabsContent = (props) => {
           </NavItem>
           <NavItem className="text-center flex-fill px-2 pt-2">
             <NavLink
-              className={classnames({ active: activeTab === "2" })}
+              className={classnames({ active: activeTab === TAB_TYPE_DECK })}
               onClick={() => {
-                toggle("2");
+                toggle(TAB_TYPE_DECK);
               }}
               disabled={formik.values.deck.isDisabled}
             >
@@ -41,9 +48,11 @@ export const TabsContent = (props) => {
           </NavItem>
           <NavItem className="text-center flex-fill px-2 pt-2">
             <NavLink
-              className={classnames({ active: activeTab === "3" })}
+              className={classnames({
+                active: activeTab === TAB_TYPE_CARTRIDGE_2,
+              })}
               onClick={() => {
-                toggle("3");
+                toggle(TAB_TYPE_CARTRIDGE_2);
               }}
               disabled={formik.values.cartridge2.isDisabled}
             >

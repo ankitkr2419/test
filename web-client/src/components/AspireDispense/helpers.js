@@ -1,4 +1,9 @@
-import { CATEGORY_NAME } from "appConstants";
+import {
+  ASPIRE_WELLS,
+  CATEGORY_NAME,
+  DISPENSE_WELLS,
+  NUMBER_OF_WELLS,
+} from "appConstants";
 
 // returns the position (index) of selected well
 export const getPosition = (wells) => {
@@ -25,10 +30,16 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
   const dispenseWells = dispense[`cartridge${dispense.selectedCategory}Wells`];
 
   let cartridgeType = 1;
-  if (aspire.selectedCategory === catergories.CATEGORY_1 || aspire.selectedCategory === catergories.CATEGORY_2) {
+  if (
+    aspire.selectedCategory === catergories.CATEGORY_1 ||
+    aspire.selectedCategory === catergories.CATEGORY_2
+  ) {
     cartridgeType = aspire.selectedCategory;
   }
-  if (dispense.selectedCategory === catergories.CATEGORY_1 || dispense.selectedCategory === catergories.CATEGORY_2) {
+  if (
+    dispense.selectedCategory === catergories.CATEGORY_1 ||
+    dispense.selectedCategory === catergories.CATEGORY_2
+  ) {
     cartridgeType = dispense.selectedCategory;
   }
 
@@ -108,12 +119,12 @@ export const getFormikInitialState = (editReducer = null) => {
     aspire: {
       cartridge1Wells:
         type === "cartridge_1"
-          ? getArray(13, 0, editReducer.source_position)
-          : getArray(13, 0),
+          ? getArray(NUMBER_OF_WELLS, ASPIRE_WELLS, editReducer.source_position)
+          : getArray(NUMBER_OF_WELLS, ASPIRE_WELLS),
       cartridge2Wells:
         type === "cartridge_2"
-          ? getArray(13, 0, editReducer.source_position)
-          : getArray(13, 0),
+          ? getArray(NUMBER_OF_WELLS, ASPIRE_WELLS, editReducer.source_position)
+          : getArray(NUMBER_OF_WELLS, ASPIRE_WELLS),
       deckPosition: "",
       aspireHeight: editReducer?.aspire_height ? editReducer.aspire_height : "",
       mixingVolume: editReducer?.aspire_mixing_volume
@@ -129,8 +140,16 @@ export const getFormikInitialState = (editReducer = null) => {
       selectedCategory: aspireSelectedCategory,
     },
     dispense: {
-      cartridge1Wells: getArray(13, 1, editReducer.destination_position),
-      cartridge2Wells: getArray(13, 1, editReducer.destination_position),
+      cartridge1Wells: getArray(
+        NUMBER_OF_WELLS,
+        DISPENSE_WELLS,
+        editReducer.destination_position
+      ),
+      cartridge2Wells: getArray(
+        NUMBER_OF_WELLS,
+        DISPENSE_WELLS,
+        editReducer.destination_position
+      ),
       deckPosition: "",
       dispenseHeight: editReducer?.dispense_height
         ? editReducer.dispense_height

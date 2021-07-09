@@ -51,22 +51,6 @@ export const TipPositionInfoBox = styled.div`
         font-size: 0.75rem;
         line-height: 0.875rem;
       }
-      // .well{
-      // 	position:relative;
-
-      // 	&::before{
-      // 	counter-increment: section;
-      // 	content: counter(section);
-      // 	position: absolute;
-      // 	top: -28px;
-      // 	left: 0;
-      // 	right: 0;
-      // 	display: flex;
-      // 	justify-content: center;
-      // 	align-items: center;
-      // 	color:#999999;
-      // 	}
-      // }
       .selected {
         border: 3px solid #abd5ce;
       }

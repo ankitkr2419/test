@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { Col, FormGroup, Button } from "core-components";
 import { Text } from "shared-components";
@@ -72,6 +73,9 @@ const DeckPositionInfo = (props) => {
   );
 };
 
-DeckPositionInfo.propTypes = {};
+DeckPositionInfo.propTypes = {
+  formik: PropTypes.object,
+  activeTab: PropTypes.string,
+};
 
 export default DeckPositionInfo;

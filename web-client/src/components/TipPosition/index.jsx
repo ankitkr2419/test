@@ -16,6 +16,7 @@ import HeightModal from "components/modals/HeightModal";
 import { TabsContent } from "./TabsContent";
 import {
   API_ENDPOINTS,
+  CARTRIDGE_1_WELLS,
   HTTP_METHODS,
   ROUTES,
   TIP_HEIGHT_MAX_ALLOWED_VALUE,
@@ -77,10 +78,15 @@ const TipPositionComponent = (props) => {
 
   //when any well is clicked
   const wellClickHandler = (id, type) => {
-    // type 0 is for cartridge 1 and 1 is for cartridge 2
+    // Please note,
+    // type 0 is for cartridge-1, and,
+    // type 1 is for cartridge-2
     const cartridge = formik.values[`cartridge${type + 1}`];
     const wellsObjArray = cartridge.wellsArray;
-    const otherTabType = type === 0 ? 2 : 1;
+
+    // deck and the other cartridge tab must be disabled
+    const otherTabToDisable =
+      type === CARTRIDGE_1_WELLS ? "cartridge2" : "cartridge1";
 
     const currentWellObj = wellsObjArray.find((wellObj) => {
       if (wellObj.id === id) {
@@ -100,7 +106,7 @@ const TipPositionComponent = (props) => {
       );
       //check for tipHeight and enable other tabs accordingly
       if (!cartridge.tipHeight) {
-        formik.setFieldValue(`cartridge${otherTabType}.isDisabled`, false);
+        formik.setFieldValue(`${otherTabToDisable}.isDisabled`, false);
         formik.setFieldValue(`deck.isDisabled`, false);
       }
     }
@@ -115,7 +121,7 @@ const TipPositionComponent = (props) => {
         );
       });
       //disable other tabs
-      formik.setFieldValue(`cartridge${otherTabType}.isDisabled`, true);
+      formik.setFieldValue(`${otherTabToDisable}.isDisabled`, true);
       formik.setFieldValue(`deck.isDisabled`, true);
     }
   };

@@ -1,3 +1,5 @@
+import { CARTRIDGE_1_WELLS, CARTRIDGE_2_WELLS, NUMBER_OF_WELLS } from "appConstants";
+
 export const deckPositionNames = [
   "Tip Position 1",
   "Tip Position 2",
@@ -83,8 +85,8 @@ export const getArray = (length, type, selectedPosition = null) => {
 export const getFormikInitialState = (editReducer = null) => {
   const cartridge1Wells =
     editReducer?.process_id && tabApiNames[editReducer.type] === 1
-      ? getArray(13, 0, editReducer.position)
-      : getArray(13, 0);
+      ? getArray(NUMBER_OF_WELLS, CARTRIDGE_1_WELLS, editReducer.position)
+      : getArray(NUMBER_OF_WELLS, CARTRIDGE_1_WELLS);
 
   const cartridge1TipHeight =
     editReducer?.process_id && tabApiNames[editReducer.type] === 1
@@ -103,8 +105,8 @@ export const getFormikInitialState = (editReducer = null) => {
 
   const cartridge2Wells =
     editReducer?.process_id && tabApiNames[editReducer.type] === 3
-      ? getArray(13, 1, editReducer.position)
-      : getArray(13, 1);
+      ? getArray(NUMBER_OF_WELLS, CARTRIDGE_2_WELLS, editReducer.position)
+      : getArray(NUMBER_OF_WELLS, CARTRIDGE_2_WELLS);
 
   const cartridge2TipHeight =
     editReducer?.process_id && tabApiNames[editReducer.type] === 3
