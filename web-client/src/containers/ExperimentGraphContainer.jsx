@@ -11,6 +11,7 @@ import { isAnyThresholdInvalid } from 'components/Target/targetHelper';
 
 const ExperimentGraphContainer = (props) => {
 	const {
+		showTempGraph,
 		setIsSidebarOpen,
 		isSidebarOpen,
 		experimentStatus,
@@ -59,6 +60,7 @@ const ExperimentGraphContainer = (props) => {
 
 	return (
 		<SidebarGraph
+			showTempGraph={showTempGraph}
 			isExperimentRunning={isExperimentRunning}
 			isExperimentSucceeded={isExperimentSucceeded}
 			lineChartData={lineChartData}

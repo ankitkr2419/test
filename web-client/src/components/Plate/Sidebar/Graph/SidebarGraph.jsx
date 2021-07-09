@@ -9,6 +9,7 @@ import WellGraph from "./WellGraph";
 
 const SidebarGraph = (props) => {
   const {
+    showTempGraph,
     isExperimentRunning,
     lineChartData,
     isSidebarOpen,
@@ -19,11 +20,8 @@ const SidebarGraph = (props) => {
     isExperimentSucceeded,
     setThresholdError,
     resetThresholdError,
-    isThresholdInvalid
+    isThresholdInvalid,
   } = props;
-
-  // local state to toggle between emission graph and temperature graph
-  const [showTempGraph, setShowTempGraph] = useState(false);
 
   let cyclesCount = 0;
   // below case can happen if user selects all filter we might get empty chart data
@@ -33,12 +31,7 @@ const SidebarGraph = (props) => {
 
   const data = {
     labels: getXAxis(cyclesCount),
-    datasets: lineChartData.toJS()
-  };
-
-  // helper function to toggle the graphs
-  const toggleTempGraphSwitch = () => {
-    setShowTempGraph((value) => !value);
+    datasets: lineChartData.toJS(),
   };
 
   if (isExperimentRunning === true || isExperimentSucceeded === true) {
@@ -108,7 +101,7 @@ SidebarGraph.propTypes = {
   onThresholdChangeHandler: PropTypes.func.isRequired,
   toggleGraphFilterActive: PropTypes.func.isRequired,
   experimentGraphTargetsList: PropTypes.object.isRequired,
-  isExperimentSucceeded: PropTypes.bool.isRequired
+  isExperimentSucceeded: PropTypes.bool.isRequired,
 };
 
 export default React.memo(SidebarGraph);

@@ -43,6 +43,9 @@ const Plate = (props) => {
   // local state to maintain well data which is selected for updation
   const [updateWell, setUpdateWell] = useState(null);
 
+  // local state to toggle between emission graph and temperature graph
+  const [showTempGraph, setShowTempGraph] = useState(false);
+
   // local state to manage toggling of graphSidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -94,6 +97,11 @@ const Plate = (props) => {
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
+  };
+
+  // helper function to toggle the graphs
+  const toggleTempGraphSwitch = (graphType) => {
+    setShowTempGraph(graphType === "temperature");
   };
 
   return (
@@ -172,14 +180,24 @@ const Plate = (props) => {
             <div className="d-flex flex-100">
               <div className="graph-wrapper flex-100">
                 <div className="d-flex align-items-center mb-3">
-                  <Button color="primary" className="mr-3">
+                  <Button
+                    outline={showTempGraph}
+                    color={!showTempGraph ? "primary" : "secondary"}
+                    className="mr-3"
+                    onClick={() => toggleTempGraphSwitch("amplification")}
+                  >
                     Amplification plot
                   </Button>
-                  <Button outline color="secondary">
+                  <Button
+                    outline={!showTempGraph}
+                    color={showTempGraph ? "primary" : "secondary"}
+                    onClick={() => toggleTempGraphSwitch("temperature")}
+                  >
                     Temperature
                   </Button>
                 </div>
                 <ExperimentGraphContainer
+                  showTempGraph={showTempGraph}
                   experimentStatus={experimentStatus}
                   isSidebarOpen={isSidebarOpen}
                   setIsSidebarOpen={setIsSidebarOpen}
