@@ -31,7 +31,7 @@ const Plate = (props) => {
     toggleAllWellSelectedOption,
     activeWells,
     experimentTemplate,
-    resetSelectedWells
+    resetSelectedWells,
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -125,6 +125,12 @@ const Plate = (props) => {
             <div className="d-flex">
               <div className="sample-wrapper">
                 {/* TODO: Add Sample Content here */}
+                <SampleSideBarContainer
+                  experimentId={experimentId}
+                  positions={positions}
+                  experimentTargetsList={experimentTargetsList}
+                  updateWell={updateWell}
+                />
               </div>
               <div className="wells-wrapper flex-100">
                 <div className="d-flex align-items-center mb-4">
@@ -186,7 +192,7 @@ Plate.propTypes = {
   isMultiSelectionOptionOn: PropTypes.bool.isRequired,
   toggleMultiSelectOption: PropTypes.func.isRequired,
   activeWells: PropTypes.object.isRequired,
-  experimentTemplate: PropTypes.object.isRequired
+  experimentTemplate: PropTypes.object.isRequired,
 };
 
 export default Plate;
