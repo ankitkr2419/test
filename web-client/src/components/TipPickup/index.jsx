@@ -97,6 +97,11 @@ const TipPickupComponent = () => {
                       placeholder="Select Option"
                       className=""
                       size="sm"
+                      value={
+                        TIP_PICKUP_PROCESS_OPTIONS[
+                          formik.values.tipPosition - 1
+                        ]
+                      }
                       options={TIP_PICKUP_PROCESS_OPTIONS}
                       onChange={(e) =>
                         formik.setFieldValue("tipPosition", e.value)
