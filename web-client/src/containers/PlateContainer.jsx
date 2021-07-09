@@ -8,13 +8,13 @@ import {
   toggleMultiSelectOption as toggleMultiSelectOptionAction,
   resetSelectedWells as resetSelectedWellAction,
   selectAllWellsOption as selectAllWellsAction,
-  fetchWells
+  fetchWells,
 } from "action-creators/wellActionCreators";
 import { getExperimentTargets } from "selectors/experimentTargetSelector";
 import { fetchExperimentTargets } from "action-creators/experimentTargetActionCreators";
 import {
   getExperimentId,
-  getExperimentTemplate
+  getExperimentTemplate,
 } from "selectors/experimentSelector";
 import { setIsPlateRoute } from "action-creators/loginActionCreators";
 import { getActiveLoadedWells } from "selectors/activeWellSelector";

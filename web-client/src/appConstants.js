@@ -396,4 +396,4 @@ export const timeConstants = {
 };
 
 //constants for RTPCR
-export const MAX_NO_OF_WELLS = 96; // TODO: change to 16 after new UI.
+export const MAX_NO_OF_WELLS = 16;
