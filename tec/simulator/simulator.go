@@ -59,7 +59,6 @@ func (t *Simulator) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 			currentTemp = float32(ts.TargetTemperature)
 			tempReached = true
 		}
-		prevTemp = currentTemp
 	}
 	logger.Infoln("Target Temp reached: ", currentTemp)
 
@@ -98,7 +97,7 @@ func (t *Simulator) GetAllTEC() (err error) {
 	return nil
 }
 
-func (t *Simulator) TestRun() (err error) {
+func (t *Simulator) TestRun(plcDeps plc.Driver) (err error) {
 	p := plc.Stage{
 		Holding: []plc.Step{
 			plc.Step{65.3, 10, 5, false},
@@ -129,7 +128,7 @@ func (t *Simulator) TestRun() (err error) {
 	logger.Infoln("Room Temp 27 Reached ")
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	t.RunStage(p.Holding, file, 0)
+	t.RunStage(p.Holding, plcDeps, file, 0)
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
@@ -137,16 +136,17 @@ func (t *Simulator) TestRun() (err error) {
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		t.RunStage(p.Cycle, file, i)
+		t.RunStage(p.Cycle, plcDeps, file, i)
 		logger.Infoln("Holding Completed ->", p.Cycle[len(p.Cycle)-1].HoldTime, " for cycle number ", i)
 	}
 
 	return nil
 }
 
-func (t *Simulator) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) (err error) {
+func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.File, cycleNum uint16) (err error) {
 	var row []interface{}
 	ts := time.Now()
+	plc.CurrentCycle = cycleNum
 	stagePrevTemp := prevTemp
 	for i, h := range st {
 		t0 := time.Now()
@@ -162,10 +162,26 @@ func (t *Simulator) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 		time.Sleep(time.Duration(h.HoldTime) * time.Second)
 		logger.Infoln("Holding Completed ->", h.HoldTime)
+
+		if h.DataCapture {
+			// Cycle in Plc
+			err = plcDeps.Cycle()
+			if err != nil {
+				logger.Errorln("Couldn't Complete PLC Cycling")
+				return
+			}
+			logger.Infoln("PLC cycle Completed ->", h.HoldTime)
+			// If this is the last step then 16 seconds needed for Cycle
+			time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
+
+		} else {
+			time.Sleep(time.Duration(h.HoldTime) * time.Second)
+		}
 		plc.CurrentCycleTemperature = h.TargetTemp
 		prevTemp = h.TargetTemp
 
 	}
+
 	if cycleNum != 0 {
 		row = []interface{}{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
 		plc.AddRowToExcel(file, plc.TECSheet, row)
@@ -174,11 +190,11 @@ func (t *Simulator) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16
 		plc.AddRowToExcel(file, plc.TECSheet, row)
 	}
 
-	plc.CurrentCycle = cycleNum
+	plc.CycleComplete = true
 	return nil
 }
 
-func (t *Simulator) RunProfile(tp tec.TempProfile) (err error) {
+func (t *Simulator) RunProfile(plcDeps plc.Driver, tp tec.TempProfile) (err error) {
 
 	file := plc.GetExcelFile(tec.LogsPath, "output")
 
@@ -188,7 +204,7 @@ func (t *Simulator) RunProfile(tp tec.TempProfile) (err error) {
 
 	for i := uint16(1); i <= uint16(tp.Cycles); i++ {
 		logger.Infoln("Started Cycle->", i)
-		t.RunStage(tp.Profile, file, i)
+		t.RunStage(tp.Profile, plcDeps, file, i)
 		logger.Infoln("Cycle Completed -> ", i)
 	}
 

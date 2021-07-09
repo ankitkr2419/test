@@ -182,21 +182,21 @@ func jitter(n uint16, min, max int) uint16 {
 
 func (d *Simulator) Cycle() (err error) {
 
-	plc.HeatingCycleComplete = true
-	plc.CycleComplete = true
-
+	logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
+	time.Sleep(time.Second * 16)
+	plc.DataCapture = true
 	return
 }
 func (d *Simulator) HomingRTPCR() (err error) {
-	d.setWells()
+	logger.WithField("HOMING", "Started").Infoln("homing started")
+	logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	return
 }
 func (d *Simulator) Reset() (err error) { return }
 
-
 func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
 	// simulate currentLidTemp
-	
+
 	time.Sleep(2 * time.Second)
 	d.plcIO.d.currentLidTemp = jitter(uint16(expectedLidTemp), 0, 50)
 	logger.Infoln("Current Lid Temp: ", d.plcIO.d.currentLidTemp)

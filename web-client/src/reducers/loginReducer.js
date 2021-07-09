@@ -1,5 +1,8 @@
 import { fromJS } from "immutable";
-import loginActions, { logoutActions } from "actions/loginActions";
+import loginActions, {
+  deckBlockActions,
+  logoutActions,
+} from "actions/loginActions";
 import { DECKNAME, USER_ROLES } from "../appConstants";
 import { getUpdatedDecks } from "utils/helpers";
 
@@ -12,6 +15,7 @@ const initialStateOfDecks = () => {
       msg: "",
       isAdmin: false,
       isActive: true,
+      isDeckBlocked: false,
       token: "",
     },
     {
@@ -21,6 +25,7 @@ const initialStateOfDecks = () => {
       msg: "",
       isAdmin: false,
       isActive: false,
+      isDeckBlocked: false,
       token: "",
     },
   ];
@@ -174,7 +179,7 @@ export const loginReducer = (state = loginInitialState, action) => {
       let newDecksAfterLogout = getUpdatedDecks(
         state,
         deckShouldLogout,
-        { error: null, isLoggedIn: false, token: "" },
+        { error: null, isLoggedIn: false, token: "", isDeckBlocked: false },
         {},
         true
       );
@@ -193,7 +198,7 @@ export const loginReducer = (state = loginInitialState, action) => {
       let newdeckStateAferLogoutSuccess = getUpdatedDecks(
         state,
         state.tempDeckName,
-        { error: false, isLoggedIn: false, token: "" },
+        { error: false, isLoggedIn: false, token: "", isDeckBlocked: false },
         {},
         true
       );
@@ -221,6 +226,33 @@ export const loginReducer = (state = loginInitialState, action) => {
         tempDeckName: "",
         isLoading: false,
         decks: newDeckStateAfterLogoutFail,
+      });
+
+    //block current deck : in case of recipe edit/add process
+    case deckBlockActions.deckBlockInitiated:
+      let newDeckStateAfterDeckBlocked = getUpdatedDecks(
+        state,
+        action.payload.deckName,
+        { isDeckBlocked: true },
+        {},
+        true
+      );
+
+      return state.merge({
+        decks: newDeckStateAfterDeckBlocked,
+      });
+
+    case deckBlockActions.deckBlockReset:
+      let newDeckStateAfterDeckReset = getUpdatedDecks(
+        state,
+        action.payload.deckName,
+        { isDeckBlocked: false },
+        {},
+        true
+      );
+
+      return state.merge({
+        decks: newDeckStateAfterDeckReset,
       });
 
     default:

@@ -22,12 +22,12 @@ func runProfileHandler(deps Dependencies) http.HandlerFunc {
 
 		fmt.Println("\n", t, "\n")
 
-		err = deps.Tec.RunProfile(t)
-		if err != nil{
+		err = deps.Tec.RunProfile(deps.Plc, t)
+		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Profile Run success"} )
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Profile Run success"})
 	})
 }
