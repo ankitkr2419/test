@@ -68,6 +68,10 @@ func GetICPosition() int {
 	return ReadEnvInt("ic_position")
 }
 
+func GetHomingTime() int {
+	return ReadEnvInt("homing_time")
+}
+
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))

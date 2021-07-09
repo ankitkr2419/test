@@ -1,5 +1,6 @@
 import { CATEGORY_NAME } from "appConstants";
 
+// returns the position (index) of selected well
 export const getPosition = (wells) => {
   if (wells) {
     const selectedWell = wells.find((wellObj) => wellObj.isSelected);
@@ -8,6 +9,14 @@ export const getPosition = (wells) => {
   return 0;
 };
 
+const catergories = {
+  CATEGORY_1: "1",
+  CATEGORY_2: "2",
+  SHAKER: "3",
+  DECK: "4",
+};
+
+// used to generated request body for API call.
 export const getRequestBody = (activeTab, aspire, dispense) => {
   const aspireSelectedTabName = CATEGORY_NAME[aspire.selectedCategory];
   const dispenseSelectedTabName = CATEGORY_NAME[dispense.selectedCategory];
@@ -16,10 +25,10 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
   const dispenseWells = dispense[`cartridge${dispense.selectedCategory}Wells`];
 
   let cartridgeType = 1;
-  if (aspire.selectedCategory === "1" || aspire.selectedCategory === "2") {
+  if (aspire.selectedCategory === catergories.CATEGORY_1 || aspire.selectedCategory === catergories.CATEGORY_2) {
     cartridgeType = aspire.selectedCategory;
   }
-  if (dispense.selectedCategory === "1" || dispense.selectedCategory === "2") {
+  if (dispense.selectedCategory === catergories.CATEGORY_1 || dispense.selectedCategory === catergories.CATEGORY_2) {
     cartridgeType = dispense.selectedCategory;
   }
 
@@ -46,6 +55,7 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
 };
 
 // footerText can be: "aspire-from" or "selected"
+// generates array of objects for wells.
 export const getArray = (length, type, selectedPosition = null) => {
   const array = [];
 
@@ -66,16 +76,21 @@ export const getArray = (length, type, selectedPosition = null) => {
   return array;
 };
 
+// this function generates the initial formik state according to the
+// operation being performeed i.e. if NEW process is being created than
+// empty data is loaded in formikState else for EDIT old values are loaded.
 export const getFormikInitialState = (editReducer = null) => {
-  let type = "category_1";
-  let category, category1, category2;
-  let aspireSelectedCategory = "1";
-  let dispenseSelectedCategory = "1";
+  let type = "category_1",
+    category,
+    category1,
+    category2,
+    aspireSelectedCategory = catergories.CATEGORY_1,
+    dispenseSelectedCategory = catergories.CATEGORY_1;
 
   const CATEGORY_ID = {
-    well: type === "category_1" ? "1" : "2",
-    shaker: "3",
-    deck: "4",
+    well: type === "category_1" ? catergories.CATEGORY_1 : catergories.CATEGORY_2,
+    shaker: catergories.SHAKER,
+    deck: catergories.DECK,
   };
 
   if (editReducer?.process_id) {
@@ -131,6 +146,7 @@ export const getFormikInitialState = (editReducer = null) => {
   };
 };
 
+// initial state of all tabs.
 export const disabledTabInitTab = {
   aspire: {
     cartridge1: false,
@@ -271,6 +287,7 @@ export const toggler = (formik, isAspire) => {
   return disabledState;
 };
 
+// sets formik field
 export const setFormikField = (
   formik,
   isAspire,

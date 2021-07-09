@@ -373,3 +373,13 @@ export const TIP_HEIGHT_MAX_ALLOWED_VALUE = 25;
 export const TIP_HEIGHT_MIN_ALLOWED_VALUE = 0;
 export const TIP_POSTION_ERROR_MSG =
   "Invalid request sent! Please check input values.";
+
+//constants for shaking process
+export const MAX_TEMP_ALLOWED = 120;
+export const MIN_TEMP_ALLOWED = 20;
+export const MAX_TIME_ALLOWED = 3660; // 1 hour 1 min
+export const timeConstants = {
+  SEC_IN_ONE_MIN: 60,
+  SEC_IN_ONE_HOUR: 3600,
+  MIN_IN_ONE_HOUR: 60,
+};

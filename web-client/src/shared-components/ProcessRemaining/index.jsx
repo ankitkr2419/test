@@ -3,7 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Text, Icon } from "shared-components";
-import { getIconName } from "shared-components/DeckCard/functions";
+import { getIconName } from "shared-components/DeckCard/helpers";
 
 const ProecssRemainingBox = styled.div`
   position: absolute;

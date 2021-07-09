@@ -2,7 +2,7 @@ import React from "react";
 
 import { FormGroup, Label, Select } from "core-components";
 import { ASPIRE_DISPENSE_DECK_POS_OPTNS } from "appConstants";
-import { setFormikField } from "./functions";
+import { setFormikField } from "./helpers";
 
 const CommonDeckPosition = (props) => {
   const { formik, isAspire, currentTab } = props;
