@@ -27,10 +27,10 @@ import (
 	"fmt"
 	"math"
 
+	"errors"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
 	"time"
-	"errors"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
@@ -42,7 +42,7 @@ type TEC1089 struct {
 	wsErrch chan error
 }
 
-func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) tec.Driver {
+func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool, plcDeps plc.Driver) tec.Driver {
 
 	tec1089 := TEC1089{}
 	tec1089.ExitCh = exit
@@ -51,7 +51,7 @@ func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, 
 	go tec1089.InitiateTEC()
 
 	if test {
-		tec1089.TestRun()
+		tec1089.TestRun(plcDeps)
 	}
 
 	go startMonitor()
@@ -78,12 +78,12 @@ func startMonitor() {
 				target := C.getObjectTemp()
 				// Handle Failure, Try again 3 times in interval of 200ms
 				i := 0
-				for (target < 20) && (i < 3){
+				for (target < 20) && (i < 3) {
 					i++
 					time.Sleep(200 * time.Millisecond)
 					target = C.getObjectTemp()
-				
-					if (i == 3) && (target < 20){
+
+					if (i == 3) && (target < 20) {
 						logger.Errorln("Temperature couldn't be read even after 3 tries!")
 					}
 				}
@@ -120,16 +120,16 @@ func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 	tecInProgress = false
 	// Handle Failure, Try again 3 times in interval of 200ms
 	i := 0
-	for (tempVal == -1) && (i <3){
+	for (tempVal == -1) && (i < 3) {
 		i++
 		time.Sleep(200 * time.Millisecond)
 		tempVal = C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
-	
-		if (i == 3) && (tempVal == -1){
+
+		if (i == 3) && (tempVal == -1) {
 			err = errors.New("Temperature couldn't be reached even after 3 tries!")
 		}
 	}
-	
+
 	return
 }
 
@@ -148,7 +148,7 @@ func (t *TEC1089) ResetDevice() (err error) {
 	return nil
 }
 
-func (t *TEC1089) TestRun() (err error) {
+func (t *TEC1089) TestRun(plcDeps plc.Driver) (err error) {
 	p := plc.Stage{
 		Holding: []plc.Step{
 			plc.Step{65.3, 10, 5, false},
@@ -180,7 +180,7 @@ func (t *TEC1089) TestRun() (err error) {
 	logger.Infoln("Room Temp 27 Reached ")
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
-	t.RunStage(p.Holding, file, 0)
+	t.RunStage(p.Holding, plcDeps, file, 0)
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
@@ -188,7 +188,7 @@ func (t *TEC1089) TestRun() (err error) {
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		t.RunStage(p.Cycle, file, i)
+		t.RunStage(p.Cycle, plcDeps, file, i)
 		logger.Infoln("Holding Completed ->", p.Cycle[len(p.Cycle)-1].HoldTime, " for cycle number ", i)
 	}
 
@@ -210,11 +210,12 @@ func (t *TEC1089) ReachRoomTemp() (err error) {
 	return nil
 }
 
-func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) (err error) {
+func (t *TEC1089) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.File, cycleNum uint16) (err error) {
 	ts := time.Now()
+	plc.CurrentCycle = cycleNum
 	stagePrevTemp := prevTemp
 	for i, h := range st {
-		if !plc.ExperimentRunning{
+		if !plc.ExperimentRunning {
 			return fmt.Errorf("Experiment is not Running!")
 		}
 		t0 := time.Now()
@@ -224,15 +225,23 @@ func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) 
 		}
 		logger.Infoln("Started ->", ti)
 		t.SetTempAndRamp(ti)
-		plc.DataCapture = h.DataCapture
+
 		row := []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
 		plc.AddRowToExcel(file, plc.TECSheet, row)
 
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
-		if i == (len(st) - 1) {
+		if h.DataCapture {
+			// Cycle in Plc
+			err = plcDeps.Cycle()
+			if err != nil {
+				logger.Errorln("Couldn't Complete PLC Cycling")
+				return
+			}
+			logger.Infoln("PLC cycle Completed ->", h.HoldTime)
 			// If this is the last step then 16 seconds needed for Cycle
 			time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
+
 		} else {
 			time.Sleep(time.Duration(h.HoldTime) * time.Second)
 		}
@@ -250,8 +259,7 @@ func (t *TEC1089) RunStage(st []plc.Step, file *excelize.File, cycleNum uint16) 
 
 	}
 
-	plc.CurrentCycle = cycleNum
-	plc.HeatingCycleComplete = true
+	plc.CycleComplete = true
 	return nil
 }
 
@@ -260,7 +268,7 @@ func (t *TEC1089) GetAllTEC() (err error) {
 	return nil
 }
 
-func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
+func (t *TEC1089) RunProfile(plcDeps plc.Driver, tp tec.TempProfile) (err error) {
 	file := plc.GetExcelFile(tec.LogsPath, "test")
 
 	// Start line
@@ -270,7 +278,7 @@ func (t *TEC1089) RunProfile(tp tec.TempProfile) (err error) {
 	go func() {
 		for i := uint16(1); i <= uint16(tp.Cycles); i++ {
 			logger.Infoln("Started Cycle->", i)
-			t.RunStage(tp.Profile, file, i)
+			t.RunStage(tp.Profile, plcDeps, file, i)
 			logger.Infoln("Cycle Completed -> ", i)
 		}
 	}()

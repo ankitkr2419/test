@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="306.001" height="105.234" viewBox="0 0 306.001 105.234">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.932" y1="0.764" x2="0.177" y2="0.334" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#aedbd5"/>
+      <stop offset="0.576" stop-color="#f2bb7b"/>
+      <stop offset="1" stop-color="#f3811f"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-8" x1="0.031" y1="-0.194" x2="1.035" y2="1.468" xlink:href="#linear-gradient"/>
+    <filter id="Path_356914" x="79.163" y="-0.001" width="18.252" height="18.252" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feFlood flood-color="#717171" flood-opacity="0.275"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Component_114_1" data-name="Component 114 – 1" transform="translate(0.5 2.999)">
+    <g id="Group_823" data-name="Group 823" transform="translate(-1783.27 20865.256) rotate(90)" opacity="0.329">
+      <g id="Group_551" data-name="Group 551" transform="translate(-20861.129 -2088.271)">
+        <g id="Group_529" data-name="Group 529" transform="translate(31.899 256.227)">
+          <path id="Path_356890" data-name="Path 356890" d="M-33.373,407.378V378.219L-1.64,359.9l31.732,18.32v29.159h1.122V377.571L-1.64,358.6l-32.854,18.968v29.806Z" transform="translate(34.494 -358.603)" stroke="rgba(0,0,0,0)" stroke-width="1" fill="url(#linear-gradient)"/>
+        </g>
+        <g id="Group_530" data-name="Group 530" transform="translate(0 256.227)">
+          <path id="Path_356891" data-name="Path 356891" d="M-37.527,378.219v29.159h1.122V377.571L-69.258,358.6l-.168.1v1.295l.168-.1Z" transform="translate(69.426 -358.603)" stroke="rgba(0,0,0,0)" stroke-width="1" fill="url(#linear-gradient)"/>
+        </g>
+        <g id="Group_533" data-name="Group 533" transform="translate(0 218.841)">
+          <path id="Path_356894" data-name="Path 356894" d="M-69.426,356.44l.728-.421V318.083l-.728-.421Z" transform="translate(69.426 -317.663)" stroke="rgba(0,0,0,0)" stroke-width="1" fill="url(#linear-gradient)"/>
+        </g>
+        <g id="Group_538" data-name="Group 538" transform="translate(0 88.427)">
+          <path id="Path_356899" data-name="Path 356899" d="M-69.426,231.981l32.46,18.741,32.853-18.969V193.817l-32.853-18.968-32.46,18.741Zm32.46-55.837,31.732,18.321v36.641l-31.732,18.321L-68.7,231.106V194.465Z" transform="translate(69.426 -174.849)" stroke="rgba(0,0,0,0)" stroke-width="1" fill="url(#linear-gradient)"/>
+        </g>
+        <g id="Group_541" data-name="Group 541" transform="translate(31.899 32.494)">
+          <path id="Path_356902" data-name="Path 356902" d="M-1.641,113.6l32.854,18.968V170.5L-1.641,189.47-34.494,170.5V132.566Zm31.733,19.615-31.733-18.32-31.732,18.32v36.642l31.732,18.32,31.733-18.32Z" transform="translate(34.494 -113.598)" stroke="rgba(0,0,0,0)" stroke-width="1" fill="url(#linear-gradient)"/>
+        </g>
+        <g id="Group_542" data-name="Group 542" transform="translate(0 32.494)">
+          <path id="Path_356903" data-name="Path 356903" d="M-69.426,114.99l.168-.1,31.731,18.32v36.642l-31.731,18.321-.168-.1v1.295l.168.1L-36.406,170.5V132.566L-69.258,113.6l-.168.1Z" transform="translate(69.426 -113.598)" stroke="rgba(0,0,0,0)" stroke-width="1" fill="url(#linear-gradient)"/>
+        </g>
+        <g id="Group_550" data-name="Group 550">
+          <path id="Path_356911" data-name="Path 356911" d="M-69.426,111.9l.728-.421V78.015h-.728Z" transform="translate(69.426 -78.015)" stroke="rgba(0,0,0,0)" stroke-width="1" fill="url(#linear-gradient)"/>
+        </g>
+      </g>
+      <g transform="matrix(0, -1, 1, 0, -20868.25, -1782.77)" filter="url(#Path_356914)">
+        <path id="Path_356914-2" data-name="Path 356914" d="M4.127,0A4.126,4.126,0,1,0,8.252,4.127,4.126,4.126,0,0,0,4.127,0Z" transform="translate(84.16 11.25) rotate(-90)" stroke="#f38220" stroke-width="1" fill="url(#linear-gradient-8)"/>
+      </g>
+    </g>
+  </g>
+</svg>

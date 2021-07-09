@@ -21,13 +21,13 @@ type TempProfile struct {
 }
 
 type Driver interface {
-	TestRun() error
+	TestRun(plc.Driver) error
 	ReachRoomTemp() error
 	InitiateTEC() error
 	SetTempAndRamp(TECTempSet) error
 	AutoTune() error
 	ResetDevice() error
-	RunStage([]plc.Step, *excelize.File, uint16) error
+	RunStage([]plc.Step, plc.Driver, *excelize.File, uint16) error
 	GetAllTEC() error
-	RunProfile(TempProfile) error
+	RunProfile(plc.Driver, TempProfile) error
 }
