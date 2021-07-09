@@ -38,6 +38,10 @@ const (
 	publish = true,
 	updated_at = $2
 	where id = $1`
+
+	updateEstimatedTime = `UPDATE templates SET
+	estimated_time = $1,
+	where id = $2`
 )
 
 type Template struct {
@@ -214,6 +218,23 @@ func (s *pgStore) PublishTemplate(ctx context.Context, id uuid.UUID) (err error)
 
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error publishing Template")
+		return
+	}
+
+	return
+}
+
+
+func (s *pgStore) UpdateEstimatedTime(ctx context.Context, id uuid.UUID, et int64) (err error){
+	
+	_, err = s.db.Exec(
+		updateEstimatedTime,
+		et,
+		id,
+	)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("error updating estimated template time")
 		return
 	}
 
