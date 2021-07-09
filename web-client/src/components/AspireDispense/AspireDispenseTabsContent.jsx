@@ -55,16 +55,17 @@ const AspireDispenseTabsContent = (props) => {
 
       <TabContent activeTab={activeTab} className="flex-grow-1">
         <Text className="d-flex justify-content-end align-items-center bg-white flex-fill mb-0 tab-content-top-heading">
-          <Text Tag="span" className="">
-            <Icon className="" name={"upward-magnet"} size={19} />
+          <Text Tag="span">
+            <Icon name="upward-magnet" size={19} className="mx-3" />
             {`Aspire Target: ${aspireCategoryLabel}: Well no. 3 `}
-            {!isAspire && (
-              <>
-                <Icon className="" name={"downward-magnet"} size={19} />
-                {`Dispense Target: ${dispenseCategoryLabel}: Well no. 3`}
-              </>
-            )}
           </Text>
+
+          {!isAspire && (
+            <Text Tag="span" className="border-left ml-3">
+              <Icon name="downward-magnet" size={19} className="mx-3" />
+              {`Dispense Target: ${dispenseCategoryLabel}: Well no. 3`}
+            </Text>
+          )}
         </Text>
 
         <TabPane tabId={"1"}>

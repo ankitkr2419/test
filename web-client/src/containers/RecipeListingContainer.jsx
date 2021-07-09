@@ -24,6 +24,18 @@ const RecipeListing = styled.div`
 
 const RecipeListingContainer = (props) => {
   const dispatch = useDispatch();
+
+  const [
+    isOperatorRunRecipeCarousalModalVisible,
+    setOperatorRunRecipeCarousalModalVisible,
+  ] = useState(false);
+  const [selectedRecipeData, setSelectedRecipeData] = useState({});
+  const [token, setToken] = useState();
+  const [runRecipesmodal, setRunRecipesModal] = useState(false);
+  const [runRecipeType, setRunRecipeType] = useState(
+    RUN_RECIPE_TYPE.CONTINUOUS_RUN
+  );
+
   const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
   const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -32,24 +44,28 @@ const RecipeListingContainer = (props) => {
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
   const [recipeFetched, setRecipeFetched] = useState(false);
 
-  const [
-    isOperatorRunRecipeCarousalModalVisible,
-    setOperatorRunRecipeCarousalModalVisible,
-  ] = useState(false);
+  let deckName = activeDeckObj.name;
+  let isAdmin = activeDeckObj.isAdmin;
+  if (!token) setToken(activeDeckObj.token);
 
-  const [selectedRecipeData, setSelectedRecipeData] = useState({});
-  const [token, setToken] = useState();
-  const [runRecipesmodal, setRunRecipesModal] = useState(false);
-  const [runRecipeType, setRunRecipeType] = useState(
-    RUN_RECIPE_TYPE.CONTINUOUS_RUN
+  const recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(
+    (deck) => deck.name === deckName
   );
+  const recipeData = recipeReducerDataOfActiveDeck.allRecipeData;
+  const cleanUpReducerDataOfActiveDeck = cleanUpReducer.decks.find(
+    (deck) => deck.name === deckName
+  );
+
+  const isProcessInProgress =
+    recipeReducerDataOfActiveDeck.showProcess ||
+    cleanUpReducerDataOfActiveDeck.showCleanUp;
 
   const handleCarousalModal = (
     prevState = isOperatorRunRecipeCarousalModalVisible
   ) => {
     //clear recipe data if run recipe closed
-    if(prevState === true) {
-      setSelectedRecipeData({})
+    if (prevState === true) {
+      setSelectedRecipeData({});
     }
     setOperatorRunRecipeCarousalModalVisible(!prevState);
   };
@@ -78,22 +94,11 @@ const RecipeListingContainer = (props) => {
     }
   });
 
-  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
-  let deckName = activeDeckObj.name;
-  let isAdmin = activeDeckObj.isAdmin;
-  if (!token) setToken(activeDeckObj.token);
-
-  const recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(
-    (deck) => deck.name === deckName
-  );
-  const recipeData = recipeReducerDataOfActiveDeck.allRecipeData;
-  const cleanUpReducerDataOfActiveDeck = cleanUpReducer.decks.find(
-    (deck) => deck.name === deckName
-  );
-
-  const isProcessInProgress =
-    recipeReducerDataOfActiveDeck.showProcess ||
-    cleanUpReducerDataOfActiveDeck.showCleanUp;
+  useEffect(() => {
+    if (isProcessInProgress) {
+      setSelectedRecipeData({});
+    }
+  }, [isProcessInProgress]);
 
   const returnRecipeDetails = (data) => {
     setSelectedRecipeData({ data, deckName });
@@ -129,6 +134,8 @@ const RecipeListingContainer = (props) => {
     toggleRunRecipesModal();
   };
   const toggleRunRecipesModal = () => setRunRecipesModal(!runRecipesmodal);
+
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
 
   return (
     <RecipeListing>

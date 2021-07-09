@@ -23,6 +23,10 @@ const LandingScreenComponent = (props) => {
     setDisabled(!disabled);
   };
 
+  const handleCompleteBtn = () => {
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     if (isHomingActionCompleted) {
       setDisabled(false);
@@ -37,7 +41,7 @@ const LandingScreenComponent = (props) => {
           isOpen={isOpen}
           textBody={MODAL_MESSAGE.homingConfirmation}
           handleSuccessBtn={() =>
-            isHomingActionCompleted ? setIsOpen(false) : homingConfirmation()
+            isHomingActionCompleted ? handleCompleteBtn() : homingConfirmation()
           }
           successBtn={
             isHomingActionCompleted ? MODAL_BTN.complete : MODAL_BTN.okay
