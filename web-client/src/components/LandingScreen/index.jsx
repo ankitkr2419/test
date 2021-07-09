@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VideoCard, MlModal } from "shared-components";
 
@@ -14,24 +14,38 @@ const LandingScreenComponent = (props) => {
     homingReducer;
 
   const [isProgressBarVisible, setIsProgressBarVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [disabled, setDisabled] = useState(false);
 
   const homingConfirmation = () => {
     dispatch(homingActionInitiated());
     setIsProgressBarVisible(!isProgressBarVisible);
+    setDisabled(!disabled);
   };
+
+  useEffect(() => {
+    if (isHomingActionCompleted) {
+      setDisabled(false);
+    }
+  }, [isHomingActionCompleted]);
 
   return (
     <LandingScreen>
       <div className="landing-content">
         <VideoCard />
         <MlModal
-          isOpen={!isHomingActionCompleted}
+          isOpen={isOpen}
           textBody={MODAL_MESSAGE.homingConfirmation}
-          handleSuccessBtn={homingConfirmation}
-          successBtn={MODAL_BTN.okay}
+          handleSuccessBtn={() =>
+            isHomingActionCompleted ? setIsOpen(false) : homingConfirmation()
+          }
+          successBtn={
+            isHomingActionCompleted ? MODAL_BTN.complete : MODAL_BTN.okay
+          }
           showCrossBtn={false}
           progressPercentage={homingAllDeckCompletionPercentage}
           isProgressBarVisible={isProgressBarVisible}
+          disabled={disabled}
         />
       </div>
     </LandingScreen>

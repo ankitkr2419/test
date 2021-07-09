@@ -127,6 +127,7 @@ export const MODAL_BTN = {
   next: "Next",
   yes: "Yes",
   no: "No",
+  complete: "Complete",
 };
 
 export const DECKCARD_BTN = {
@@ -365,4 +366,14 @@ export const CATEGORY_LABEL = {
   2: "Category 2",
   3: "Shaker",
   4: "Deck Position",
+};
+
+//constants for shaking
+export const MAX_TEMP_ALLOWED = 120;
+export const MIN_TEMP_ALLOWED = 20;
+export const MAX_TIME_ALLOWED = 3660; // 1 hour 1 min
+export const timeConstants = {
+  SEC_IN_ONE_MIN: 60,
+  SEC_IN_ONE_HOUR: 3600,
+  MIN_IN_ONE_HOUR: 60,
 };

@@ -7,7 +7,7 @@ import HeatingProcess from "./HeatingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { getFormikInitialState, getRequestBody } from "./functions";
+import { getFormikInitialState, getRequestBody } from "./helpers";
 import { PageBody, HeatingBox, TopContent } from "./Style";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";
@@ -91,7 +91,11 @@ const HeatingComponent = (props) => {
                 <HeatingProcess formik={formik} />
               </CardBody>
             </Card>
-            <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
+            <ButtonBar
+              rightBtnLabel="Save"
+              handleRightBtn={handleSaveBtn}
+              btnBarClassname={"btn-bar-adjust-heating"}
+            />
           </div>
         </HeatingBox>
       </PageBody>

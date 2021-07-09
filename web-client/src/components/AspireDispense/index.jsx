@@ -15,7 +15,7 @@ import {
   getRequestBody,
   disabledTabInitTab,
   toggler,
-} from "./functions";
+} from "./helpers";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 
@@ -98,6 +98,7 @@ const AspireDispenseComponent = () => {
     });
   };
 
+  // TODO: change dependecy array after merge.
   useEffect(() => {
     let updatedDisabledTabState = toggler(formik, isAspire);
     setDisabledTab({ ...disabledTab, ...updatedDisabledTabState });
@@ -170,6 +171,7 @@ const AspireDispenseComponent = () => {
             handleRightBtn={() =>
               isAspire ? handleNextBtn() : handleSaveBtn()
             }
+            btnBarClassname={"btn-bar-adjust-aspireDispense"}
           />
         </div>
       </AspireDispenseBox>

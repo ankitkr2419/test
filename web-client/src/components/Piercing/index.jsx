@@ -12,17 +12,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 import { Redirect, useHistory } from "react-router";
-import { getWellsInitialArray, updatedWellsArray } from "./functions";
-
-let extractionWells = getWellsInitialArray(8, 0);
-let pcrWells = getWellsInitialArray(4, 1);
+import {
+  getWellsArrayForEdit,
+  getWellsInitialArray,
+  updateWellsArray,
+} from "./helpers";
 
 const PiercingComponent = (props) => {
+  const { editReducerData } = props;
+
   const dispatch = useDispatch();
   const history = useHistory();
   const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
+  const [extractionWells, setExtractionWell] = useState(
+    getWellsInitialArray(8, 0)
+  );
+  const [pcrWells, setPcrWell] = useState(getWellsInitialArray(4, 1));
 
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
@@ -32,17 +39,34 @@ const PiercingComponent = (props) => {
     (state) => state.updateRecipeDetailsReducer
   );
   const processesReducer = useSelector((state) => state.processesReducer);
-  const editReducer = useSelector((state) => state.editProcessReducer);
-  const editReducerData = editReducer.toJS();
 
-  if (editReducerData?.cartridge_wells) {
-    extractionWells = updatedWellsArray(extractionWells, editReducerData);
-    pcrWells = updatedWellsArray(pcrWells, editReducerData);
-  }
+  // if data from editReducer is NOT NULL than updated wellsArrays
+  useEffect(() => {
+    if (editReducerData?.cartridge_wells) {
+      setActiveTab(editReducerData.type === "cartridge_1" ? "0" : "1"); //change tab accordingly
+
+      const upadatedExtractionWells = getWellsArrayForEdit(
+        extractionWells,
+        editReducerData
+      );
+      setExtractionWell((extractionWells) =>
+        extractionWells.map((wellObj, index) => {
+          return { ...wellObj, ...upadatedExtractionWells[index] };
+        })
+      );
+      const upadatedPcrWells = getWellsArrayForEdit(pcrWells, editReducerData);
+      setPcrWell((pcrWells) =>
+        pcrWells.map((wellObj, index) => {
+          return { ...wellObj, ...upadatedPcrWells[index] };
+        })
+      );
+    }
+  }, [editReducerData]);
 
   const recipeID = recipeDetailsReducer.recipeDetails.id;
   const token = activeDeckObj.token;
 
+  //if no error occurs while saving process, redirect to next page
   const errorInAPICall = processesReducer.error;
   useEffect(() => {
     if (errorInAPICall === false) {
@@ -58,15 +82,13 @@ const PiercingComponent = (props) => {
   const handleSuccessBtn = (height, type) => {
     setShowHieghtModal(!showHeightModal);
     const wellsObjArray = type === 0 ? extractionWells : pcrWells;
-    wellsObjArray.map((obj) => {
-      if (!obj.isSelected) {
-        obj.isSelected = obj.id === currentWellObj.id;
-        // obj.footerText = obj.id === currentWellObj.id ? `Height: ${height}mm` : ""; //may be used in future
-      }
-      return obj;
-    });
+    const updatedWellObjArray = updateWellsArray(wellsObjArray, currentWellObj);
+    type === 0
+      ? setExtractionWell(updatedWellObjArray)
+      : setPcrWell(updatedWellObjArray);
   };
 
+  //when any well is clicked
   const wellClickHandler = (id, type) => {
     const wellsObjArray = type === 0 ? extractionWells : pcrWells;
     const currentWellObj = wellsObjArray.find((wellObj) => {
@@ -74,20 +96,19 @@ const PiercingComponent = (props) => {
         return wellObj;
       }
     });
-
+    setCurrentWellObj(currentWellObj);
     // if already selected then de-select
     if (currentWellObj.isSelected) {
-      const selectedWell = wellsObjArray.map((wellObj) => {
-        if (wellObj.id === currentWellObj.id) {
-          wellObj.isSelected = false;
-        }
-        return wellObj;
-      });
-      setCurrentWellObj(selectedWell);
+      const updatedWellObjArray = updateWellsArray(
+        wellsObjArray,
+        currentWellObj
+      );
+      type === 0
+        ? setExtractionWell(updatedWellObjArray)
+        : setPcrWell(updatedWellObjArray);
     }
     // else open height modal and select
     else {
-      setCurrentWellObj(currentWellObj);
       setShowHieghtModal(!showHeightModal);
     }
   };
@@ -115,9 +136,7 @@ const PiercingComponent = (props) => {
     dispatch(saveProcessInitiated(requestBody));
   };
 
-  if (!activeDeckObj.isLoggedIn) {
-    return <Redirect to={`/${ROUTES.landing}`} />;
-  }
+  if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
 
   return (
     <>

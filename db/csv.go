@@ -17,18 +17,29 @@ import (
 const (
 	csv_version = "1.3.0"
 	version     = "VERSION"
+	csv_type    = "TYPE"
 	position    = "POSITION"
 	recipe      = "RECIPE"
+	template    = "TEMPLATE"
 	dummy       = "DUMMY"
 	blank       = ""
+	rtpcr       = "RTPCR"
+	extraction  = "EXTRACTION"
+	hold        = "hold"
+	cycle       = "cycle"
 )
 
 var sequenceNumber int64 = 0
+var cycleCount uint16
 var createdRecipe Recipe
+var createdTemplate Template
+var createdStages []Stage
 var csvCtx context.Context = context.WithValue(context.Background(), ContextKeyUsername, "main")
+var hStage, cStage Stage
+var step Step
 
 // done will help us clean up
-var done bool
+var done, dataCapture, cycleSeen, templateCreated, createdHoldStage, createdCycleStage bool
 
 func ImportCSV(csvPath string) (err error) {
 
@@ -67,6 +78,318 @@ func ImportCSV(csvPath string) (err error) {
 		return err
 	}
 
+	// Check for Type
+	record, err = csvReader.Read()
+	if !strings.EqualFold(record[0], csv_type) {
+		logger.Errorln("No type found for csv:", record[0])
+		return err
+	}
+
+	// rtpcr and extraction are the only currently supported types
+	switch strings.TrimSpace(strings.ToUpper(record[1])) {
+	case extraction:
+		err = importExtraction(store, csvReader)
+	case rtpcr:
+		err = importRTPCR(store, csvReader)
+	default:
+		err = fmt.Errorf("%v version isn't currently supported for csv import. Please try version %v", record[1], version)
+	}
+	if err != nil {
+		logger.Errorln(err)
+	}
+	return err
+}
+
+func importRTPCR(store Storer, csvReader *csv.Reader) (err error) {
+	// clean up failed recipe
+	defer clearFailedTemplate(store)
+
+	// Iterate through the records
+
+iterateCSV:
+	for {
+		// Read each record from csv
+		record, err := csvReader.Read()
+		if err == io.EOF {
+			logger.Infoln("Reached end of csv file")
+			break
+		}
+		if err != nil {
+			logger.Errorln("error while reading a record from csvReader:", err)
+			return err
+		}
+
+		switch strings.TrimSpace(strings.ToUpper(record[0])) {
+		case dummy:
+			continue
+		case template:
+			logger.Infoln("Record-> ", record)
+			err = addTemplate(store, record[1:])
+			if err != nil {
+				err = fmt.Errorf("Couldn't add template details.")
+				logger.Errorln(err)
+				return err
+			}
+			templateCreated = true
+		case blank:
+			logger.Infoln("Record-> ", record)
+			if len(record) < 2 || record[1] == "" {
+				err = fmt.Errorf("record has unexpected length or empty process name, maybe CSV is over.")
+				logger.Warnln(err, record)
+				break iterateCSV
+			} else {
+				err = addStage(store, record[1:])
+				if err != nil {
+					return err
+				}
+			}
+		default:
+			logger.Infoln("Record-> ", record)
+			return responses.CSVBadContentError
+		}
+	}
+
+	cStage.RepeatCount = cycleCount
+	err = store.UpdateStage(csvCtx, cStage)
+	if err != nil{
+		return
+	}
+
+	err = store.UpdateStepCount(csvCtx)
+	if err != nil{
+		return
+	}
+
+	done = true
+	return nil
+}
+
+func addStage(store Storer, record []string) (err error) {
+	logger.Infoln("Record-> ", record)
+	if !templateCreated {
+		err = fmt.Errorf("template doesn't exist, first add its entry")
+		logger.Errorln(err)
+		return err
+	}
+
+	switch strings.TrimSpace(strings.ToUpper(record[0])) {
+	case hold:
+		if cycleSeen {
+			err = fmt.Errorf("Couldn't create Holding step entry as Cycle entry is alreday present.")
+			logger.Errorln(err)
+			return err
+		}
+		if createdHoldStage {
+			err = addHoldStep(store, record[1:])
+			break
+		}
+		err = addHoldStage(store, record[1:])
+		if err != nil {
+			err = fmt.Errorf("Couldn't create Holding step entry.")
+			logger.Errorln(err)
+			return err
+		}
+
+	case cycle:
+		if createdCycleStage {
+			err = addCycleStep(store, record[1:])
+			break
+		}
+		err = addCycleStage(store, record[1:])
+		if err != nil {
+			err = fmt.Errorf("Couldn't create Cycling step entry.")
+			logger.Errorln(err)
+			return err
+		}
+		cycleSeen = true
+	default:
+		err = fmt.Errorf("unknown stage type found!")
+		logger.Errorln(err)
+		return err
+	}
+	if err != nil{
+		logger.Errorln(err)
+		return err
+	}
+	return nil
+}
+
+func addTemplate(store Storer, templateDetails []string) (err error) {
+	// template name and description are NOT allowed to be empty/blank
+	for _, rd := range templateDetails[:2] {
+		if rd == blank {
+			return responses.BlankDetailsError
+		}
+	}
+
+	createdTemplate.Name = templateDetails[0]
+	createdTemplate.Description = templateDetails[1]
+
+	if temp, err := strconv.ParseInt(templateDetails[2], 10, 64); err != nil {
+		logger.Errorln(err, templateDetails[2])
+		return err
+	} else {
+		cycleCount = uint16(temp)
+	}
+
+	if dataCapture, err = strconv.ParseBool(templateDetails[3]); err != nil {
+		logger.Warnln(err, templateDetails[3])
+		return err
+	}
+
+	if createdTemplate.Publish, err = strconv.ParseBool(templateDetails[4]); err != nil {
+		logger.Warnln(err, templateDetails[4])
+		return err
+	}
+
+	// Create Template
+	createdTemplate, err = store.CreateTemplate(csvCtx, createdTemplate)
+	if err != nil {
+		logger.Errorln("Couldn't insert template entry", err)
+		return
+	}
+	logger.Info("Created template-> ", createdTemplate)
+	return nil
+
+}
+
+func addHoldStage(store Storer, record []string) (err error) {
+
+	hStage.Type = hold
+	hStage.TemplateID = createdTemplate.ID
+
+	cStage.Type = cycle
+	cStage.TemplateID = createdTemplate.ID
+	cStage.RepeatCount = cycleCount
+
+	// Create both Stages
+	createdStages, err = store.CreateStages(csvCtx, []Stage{hStage, cStage})
+	if err != nil {
+		logger.Errorln("Couldn't insert Stage entries", err)
+		return
+	}
+
+	for _, st := range createdStages {
+		if st.Type == hold {
+			hStage = st
+		} else {
+			cStage = st
+		}
+	}
+
+	createdHoldStage = true
+	logger.Info("Created Stages-> ", createdStages)
+
+	err = addHoldStep(store, record)
+	if err != nil {
+		return
+	}
+
+	return nil
+}
+
+func addHoldStep(store Storer, record []string) (err error) {
+
+	step.StageID = hStage.ID
+	step.DataCapture = dataCapture
+
+	if temp, err := strconv.ParseFloat(record[0], 64); err != nil {
+		logger.Errorln(err, record[1])
+		return err
+	} else {
+		step.TargetTemperature = float32(temp)
+	}
+
+	if temp, err := strconv.ParseFloat(record[1], 64); err != nil {
+		logger.Errorln(err, record[4])
+		return err
+	} else {
+		step.RampRate = float32(temp)
+	}
+
+	if temp, err := strconv.ParseInt(record[2], 10, 32); err != nil {
+		logger.Errorln(err, record[2])
+		return err
+	} else {
+		step.HoldTime = int32(temp)
+	}
+
+	createdStep, err := store.CreateStep(csvCtx, step)
+	if err != nil {
+		logger.Errorln("Couldn't insert Step entry", err)
+		return err
+	}
+
+	logger.Infoln("Step Created for Hold: ", createdStep)
+
+	return nil
+}
+
+func addCycleStep(store Storer, record []string) (err error) {
+
+	step.StageID = cStage.ID
+	step.DataCapture = dataCapture
+
+	if temp, err := strconv.ParseFloat(record[0], 64); err != nil {
+		logger.Errorln(err, record[1])
+		return err
+	} else {
+		step.TargetTemperature = float32(temp)
+	}
+
+	if temp, err := strconv.ParseFloat(record[1], 64); err != nil {
+		logger.Errorln(err, record[4])
+		return err
+	} else {
+		step.RampRate = float32(temp)
+	}
+
+	if temp, err := strconv.ParseInt(record[2], 10, 32); err != nil {
+		logger.Errorln(err, record[2])
+		return err
+	} else {
+		step.HoldTime = int32(temp)
+	}
+
+	createdStep, err := store.CreateStep(csvCtx, step)
+	if err != nil {
+		logger.Errorln("Couldn't insert Step entry", err)
+		return err
+	}
+
+	logger.Infoln("Step Created for Cycle: ", createdStep)
+
+	return nil
+}
+
+func addCycleStage(store Storer, record []string) (err error) {
+
+	if !createdHoldStage {
+
+		cStage.Type = cycle
+		cStage.TemplateID = createdTemplate.ID
+		cStage.RepeatCount = cycleCount
+
+		createdStages, err = store.CreateStages(csvCtx, []Stage{cStage})
+		if err != nil {
+			logger.Errorln("Couldn't insert Cycle Stage entry", err)
+			return
+		}
+		cStage = createdStages[0]
+
+		createdCycleStage = true
+		logger.Info("Created Stages-> ", createdStages)
+	}
+
+	err = addCycleStep(store, record)
+	if err != nil {
+		return
+	}
+
+	return nil
+}
+
+func importExtraction(store Storer, csvReader *csv.Reader) (err error) {
 	// clean up failed recipe
 	defer clearFailedRecipe(store)
 
@@ -610,5 +933,19 @@ func clearFailedRecipe(store Storer) {
 		return
 	}
 	logger.Info("complete recipe inserted successfully")
+	return
+}
+
+func clearFailedTemplate(store Storer) {
+	if !done {
+		err := store.DeleteTemplate(csvCtx, createdTemplate.ID)
+		if err != nil {
+			logger.Warnln("Couldn't cleanUp the partial template with ID: ", createdTemplate.ID)
+			return
+		}
+		logger.Info("Partial template cleaned up")
+		return
+	}
+	logger.Info("complete template inserted successfully")
 	return
 }

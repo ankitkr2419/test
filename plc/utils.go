@@ -4,9 +4,24 @@ import (
 	"context"
 	"fmt"
 	"mylab/cpagent/db"
-	"sync"
+	"mylab/cpagent/responses"
 
+	"os"
+	"sync"
+	"time"
+
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
+)
+
+var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
+var CurrentCycleTemperature, CurrentLidTemp float32
+var CurrentCycle uint16
+
+const (
+	TECSheet   = "tec"
+	RTPCRSheet = "rtpcr"
+	TempLogs   = "temperature logs"
 )
 
 type DeckNumber struct {
@@ -74,9 +89,10 @@ const (
 	OutDeck
 )
 
-const(
-	deckA = "A"
-	deckB = "B"
+// Deck Names
+const (
+	DeckA = "A"
+	DeckB = "B"
 )
 
 var deckRecipe map[string]db.Recipe
@@ -93,88 +109,88 @@ var homingPercent, currentProcess sync.Map
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
 func loadUtils() {
-	wrotePulses.Store("A", uint16(0))
-	wrotePulses.Store("B", uint16(0))
-	executedPulses.Store("A", uint16(0))
-	executedPulses.Store("B", uint16(0))
-	aborted.Store("A", false)
-	aborted.Store("B", false)
-	paused.Store("A", false)
-	paused.Store("B", false)
-	runInProgress.Store("A", false)
-	runInProgress.Store("B", false)
-	timerInProgress.Store("A", false)
-	timerInProgress.Store("B", false)
-	heaterInProgress.Store("A", false)
-	heaterInProgress.Store("B", false)
-	shakerInProgress.Store("A", false)
-	shakerInProgress.Store("B", false)
-	tipDiscardInProgress.Store("A", false)
-	tipDiscardInProgress.Store("B", false)
-	uvLightInProgress.Store("A", false)
-	uvLightInProgress.Store("B", false)
-	magnetState.Store("A", detached)
-	magnetState.Store("B", detached)
-	syringeModuleState.Store("A", OutDeck)
-	syringeModuleState.Store("B", OutDeck)
+	wrotePulses.Store(DeckA, uint16(0))
+	wrotePulses.Store(DeckB, uint16(0))
+	executedPulses.Store(DeckA, uint16(0))
+	executedPulses.Store(DeckB, uint16(0))
+	aborted.Store(DeckA, false)
+	aborted.Store(DeckB, false)
+	paused.Store(DeckA, false)
+	paused.Store(DeckB, false)
+	runInProgress.Store(DeckA, false)
+	runInProgress.Store(DeckB, false)
+	timerInProgress.Store(DeckA, false)
+	timerInProgress.Store(DeckB, false)
+	heaterInProgress.Store(DeckA, false)
+	heaterInProgress.Store(DeckB, false)
+	shakerInProgress.Store(DeckA, false)
+	shakerInProgress.Store(DeckB, false)
+	tipDiscardInProgress.Store(DeckA, false)
+	tipDiscardInProgress.Store(DeckB, false)
+	uvLightInProgress.Store(DeckA, false)
+	uvLightInProgress.Store(DeckB, false)
+	magnetState.Store(DeckA, detached)
+	magnetState.Store(DeckB, detached)
+	syringeModuleState.Store(DeckA, OutDeck)
+	syringeModuleState.Store(DeckB, OutDeck)
 
-	homed.Store("A", false)
-	homed.Store("B", false)
+	homed.Store(DeckA, false)
+	homed.Store(DeckB, false)
 
 	deckRecipe = map[string]db.Recipe{
-		"A": db.Recipe{},
-		"B": db.Recipe{},
+		DeckA: db.Recipe{},
+		DeckB: db.Recipe{},
 	}
 
 	deckProcesses = map[string][]db.Process{
-		"A": []db.Process{},
-		"B": []db.Process{},
+		DeckA: []db.Process{},
+		DeckB: []db.Process{},
 	}
 
 	BothDeckHomingInProgress = false
-	homingPercent.Store("A", float64(0))
-	homingPercent.Store("B", float64(0))
-	currentProcess.Store("A", int64(-1))
-	currentProcess.Store("B", int64(-1))
+	homingPercent.Store(DeckA, float64(0))
+	homingPercent.Store(DeckB, float64(0))
+	currentProcess.Store(DeckA, int64(-1))
+	currentProcess.Store(DeckB, int64(-1))
 
-	motorNumReg.Store("A", uint16(0))
-	motorNumReg.Store("B", uint16(0))
-	speedReg.Store("A", uint16(0))
-	speedReg.Store("B", uint16(0))
-	directionReg.Store("A", uint16(0))
-	directionReg.Store("B", uint16(0))
-	rampReg.Store("A", uint16(0))
-	rampReg.Store("B", uint16(0))
-	pulseReg.Store("A", uint16(0))
-	pulseReg.Store("B", uint16(0))
-	onReg.Store("A", OFF)
-	onReg.Store("B", OFF)
+	motorNumReg.Store(DeckA, uint16(0))
+	motorNumReg.Store(DeckB, uint16(0))
+	speedReg.Store(DeckA, uint16(0))
+	speedReg.Store(DeckB, uint16(0))
+	directionReg.Store(DeckA, uint16(0))
+	directionReg.Store(DeckB, uint16(0))
+	rampReg.Store(DeckA, uint16(0))
+	rampReg.Store(DeckB, uint16(0))
+	pulseReg.Store(DeckA, uint16(0))
+	pulseReg.Store(DeckB, uint16(0))
+	onReg.Store(DeckA, OFF)
+	onReg.Store(DeckB, OFF)
 }
 
 // positions = map[deck(A or B)]map[motor number(1 to 10)]distance(only positive)
 var Positions = map[DeckNumber]float64{
 	// Deck A and its Motors
-	DeckNumber{Deck: "A", Number: K1_Syringe_Module_LH}:   0,
-	DeckNumber{Deck: "A", Number: K2_Syringe_Module_RH}:   0,
-	DeckNumber{Deck: "A", Number: K3_Syringe_LH}:          0,
-	DeckNumber{Deck: "A", Number: K4_Syringe_RH}:          0,
-	DeckNumber{Deck: "A", Number: K5_Deck}:                0,
-	DeckNumber{Deck: "A", Number: K6_Magnet_Up_Down}:      0,
-	DeckNumber{Deck: "A", Number: K7_Magnet_Rev_Fwd}:      0,
-	DeckNumber{Deck: "A", Number: K8_Shaker}:              0,
-	DeckNumber{Deck: "A", Number: K9_Syringe_Module_LHRH}: 0,
-	DeckNumber{Deck: "A", Number: K10_Syringe_LHRH}:       0,
+	DeckNumber{Deck: DeckA, Number: K1_Syringe_Module_LH}:   0,
+	DeckNumber{Deck: DeckA, Number: K2_Syringe_Module_RH}:   0,
+	DeckNumber{Deck: DeckA, Number: K3_Syringe_LH}:          0,
+	DeckNumber{Deck: DeckA, Number: K4_Syringe_RH}:          0,
+	DeckNumber{Deck: DeckA, Number: K5_Deck}:                0,
+	DeckNumber{Deck: DeckA, Number: K6_Magnet_Up_Down}:      0,
+	DeckNumber{Deck: DeckA, Number: K7_Magnet_Rev_Fwd}:      0,
+	DeckNumber{Deck: DeckA, Number: K8_Shaker}:              0,
+	DeckNumber{Deck: DeckA, Number: K9_Syringe_Module_LHRH}: 0,
+	DeckNumber{Deck: DeckA, Number: K10_Syringe_LHRH}:       0,
 	// Deck B and its Motors
-	DeckNumber{Deck: "B", Number: K1_Syringe_Module_LH}:   0,
-	DeckNumber{Deck: "B", Number: K2_Syringe_Module_RH}:   0,
-	DeckNumber{Deck: "B", Number: K3_Syringe_LH}:          0,
-	DeckNumber{Deck: "B", Number: K4_Syringe_RH}:          0,
-	DeckNumber{Deck: "B", Number: K5_Deck}:                0,
-	DeckNumber{Deck: "B", Number: K6_Magnet_Up_Down}:      0,
-	DeckNumber{Deck: "B", Number: K7_Magnet_Rev_Fwd}:      0,
-	DeckNumber{Deck: "B", Number: K8_Shaker}:              0,
-	DeckNumber{Deck: "B", Number: K9_Syringe_Module_LHRH}: 0,
-	DeckNumber{Deck: "B", Number: K10_Syringe_LHRH}:       0,
+	DeckNumber{Deck: DeckB, Number: K1_Syringe_Module_LH}:   0,
+	DeckNumber{Deck: DeckB, Number: K2_Syringe_Module_RH}:   0,
+	DeckNumber{Deck: DeckB, Number: K3_Syringe_LH}:          0,
+	DeckNumber{Deck: DeckB, Number: K4_Syringe_RH}:          0,
+	DeckNumber{Deck: DeckB, Number: K5_Deck}:                0,
+	DeckNumber{Deck: DeckB, Number: K6_Magnet_Up_Down}:      0,
+	DeckNumber{Deck: DeckB, Number: K7_Magnet_Rev_Fwd}:      0,
+	DeckNumber{Deck: DeckB, Number: K8_Shaker}:              0,
+	DeckNumber{Deck: DeckB, Number: K9_Syringe_Module_LHRH}: 0,
+	DeckNumber{Deck: DeckB, Number: K10_Syringe_LHRH}:       0,
 	//***WARNING
 	//* Careful when dealing with K1, K2, K3 and K4
 }
@@ -244,11 +260,11 @@ func selectAllConsDistances(store db.Storer) (err error) {
 		deckAndNumber := DeckNumber{}
 		switch {
 		case cd.ID > 1000 && cd.ID <= 1010:
-			deckAndNumber.Deck = "A"
+			deckAndNumber.Deck = DeckA
 			deckAndNumber.Number = uint16(cd.ID - 1000)
 			Calibs[deckAndNumber] = cd.Distance
 		case cd.ID > 1050 && cd.ID <= 1060:
-			deckAndNumber.Deck = "B"
+			deckAndNumber.Deck = DeckB
 			deckAndNumber.Number = uint16(cd.ID - 1050)
 			Calibs[deckAndNumber] = cd.Distance
 		}
@@ -324,5 +340,110 @@ func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *ui
 	} else {
 		*distanceToTravel *= -1
 		*direction = 0
+	}
+}
+
+func GetExcelFile(path, fileName string) (f *excelize.File) {
+	// logging output to file and console
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, 0755)
+		// ignore error and try creating log output file
+	}
+
+	f = excelize.NewFile()
+
+	index := f.NewSheet(TECSheet)
+	f.NewSheet(RTPCRSheet)
+	f.NewSheet(TempLogs)
+	f.SetActiveSheet(index)
+	f.DeleteSheet("Sheet1")
+
+	f.NewStyle(`{"alignment":{"horizontal":"center"}]}`)
+	f.SetSheetFormatPr(RTPCRSheet, excelize.DefaultColWidth(25))
+	f.SetSheetFormatPr(TempLogs, excelize.DefaultColWidth(40))
+	f.SetSheetFormatPr(TECSheet, excelize.DefaultColWidth(40))
+
+	f.Path = fmt.Sprintf("%v/%s_%v.xlsx", path, fileName, time.Now().Unix())
+	logger.Infoln("file saved in path---------->", f.Path)
+
+	return
+}
+
+func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err error) {
+
+	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+	rows, err := file.Rows(sheet)
+	if err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
+	}
+	rowCount := 1
+	for rows.Next() {
+		rowCount = rowCount + 1
+	}
+
+	for i, v := range values {
+		cell, err := excelize.CoordinatesToCellName(i+1, rowCount)
+		if err != nil {
+			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		}
+		file.SetCellStyle(sheet, cell, cell, styleID)
+		file.SetCellValue(sheet, cell, v)
+
+	}
+
+	if err = file.SaveAs(file.Path); err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
+	}
+
+	return
+}
+
+func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{}, space int) {
+
+	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+
+	rows, err := file.Rows(sheet)
+	if err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
+	}
+	rowCount := 1
+	for rows.Next() {
+		rowCount = rowCount + 1
+	}
+	//first cell is always the start cell
+	startCell, err := excelize.CoordinatesToCellName(1, rowCount)
+	if err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+	}
+	file.SetCellValue(sheet, startCell, values[0])
+	j := 1
+	for i, v := range values {
+		if i == 0 {
+			continue
+		}
+		startCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
+		if err != nil {
+			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		}
+		logger.Println("cell, value---------------->", startCell, v)
+		file.SetCellStyle(sheet, startCell, startCell, styleID)
+		file.SetCellValue(sheet, startCell, v)
+
+		j = j + space - 1
+
+		endCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
+		if err != nil {
+			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		}
+		file.MergeCell(sheet, startCell, endCell)
+
+	}
+
+	if err = file.SaveAs(file.Path); err != nil {
+		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
+		return
 	}
 }

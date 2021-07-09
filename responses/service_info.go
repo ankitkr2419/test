@@ -5,6 +5,9 @@ import "fmt"
 var (
 	Pong = "pong"
 
+	AppInfoFetch     = "application information is being fetched"
+	AppInfoRequested = "application information was requested"
+
 	PiercingCreateSuccess        = "piercing record created successfully"
 	PiercingFetchSuccess         = "piercing record fetched successfully"
 	PiercingUpdateSuccess        = "piercing record updated successfully"
@@ -128,17 +131,21 @@ var (
 
 	ProcessInitialisedState          = "process initialised"
 	ProcessCompletedState            = "process completed"
-	ProcessesFetchSuccess			 = "processes fetch success"
-	ProcessFetchSuccess				 = "process fetch success"
-	ProcessDeleteSuccess			 = "process delete success"
-	ProcessCreateSuccess			 = "process create success"
-	ProcessUpdateSuccess			 = "process updated successfully"
+	ProcessesFetchSuccess            = "processes fetch success"
+	ProcessFetchSuccess              = "process fetch success"
+	ProcessDeleteSuccess             = "process delete success"
+	ProcessCreateSuccess             = "process create success"
+	ProcessUpdateSuccess             = "process updated successfully"
 	ProcessListInitialisedState      = "process list initialised"
 	ProcessListCompletedState        = "process list completed"
 	DuplicateProcessInitialisedState = "duplicate process initialised"
 	DuplicateProcessCompletedState   = "duplicate process completed"
 	RearrangeProcessInitialisedState = "rearrange process initialised"
 	RearrangeProcessCompletedState   = "rearrange process completed"
+
+	//RTPCR
+	RTPCRHomingSuccess = "Homing Success"
+	RTPCRResetSuccess  = "Reset Success"
 )
 
 func GetMachineOperationMessage(operation string, state string) (message string) {

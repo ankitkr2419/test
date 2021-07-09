@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
@@ -30,7 +31,7 @@ func TestcleanupTestSuite(t *testing.T) {
 
 func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupSuccess() {
 
-	deck := deckB
+	deck := plc.DeckB
 	//TODO: On Mock return success
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -51,7 +52,7 @@ func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupSuccess() {
 
 func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupFailure() {
 
-	deck := deckB
+	deck := plc.DeckB
 	//TODO: On Mock return error
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -72,7 +73,7 @@ func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupFailure() {
 
 func (suite *CleanupHandlerTestSuite) TestRestoreDeckSuccess() {
 
-	deck := deckB
+	deck := plc.DeckB
 	//TODO: On Mock return success
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -93,7 +94,7 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckSuccess() {
 
 func (suite *CleanupHandlerTestSuite) TestRestoreDeckFailure() {
 
-	deck := deckB
+	deck := plc.DeckB
 	//TODO: On Mock return error
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -114,7 +115,7 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckFailure() {
 
 func (suite *CleanupHandlerTestSuite) TestUVCleanupSuccess() {
 
-	deck := deckB
+	deck := plc.DeckB
 	time := "01:20:00"
 	//TODO: On Mock return success
 

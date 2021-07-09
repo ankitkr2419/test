@@ -18,7 +18,7 @@ import {
   updateRecipeActionReset,
 } from "action-creators/saveNewRecipeActionCreators";
 import { Redirect, useHistory } from "react-router";
-import { getRequestBody } from "./functions";
+import { getRequestBody } from "./helpers";
 import Preview from "./Preview";
 import SelectProcesses from "./SelectProcesses";
 
@@ -122,6 +122,7 @@ const LabWareComponent = (props) => {
                     handleRightBtn={handleSaveBtn}
                     leftBtnLabel={"Modify"}
                     rightBtnLabel={"Save"}
+                    btnBarClassname={"btn-bar-adjust-labware"}
                   />
                 ) : (
                   <ButtonBar
@@ -130,6 +131,7 @@ const LabWareComponent = (props) => {
                       updateAllTicks(formik);
                     }}
                     rightBtnLabel={"Preview"}
+                    btnBarClassname={"btn-bar-adjust-labware"}
                   />
                 )}
               </div>

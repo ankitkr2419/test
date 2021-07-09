@@ -4,7 +4,7 @@ import { Row, Col, FormGroup, Label, Input, FormError } from "core-components";
 import { TemperatureInfo, TimeInfo } from "shared-components";
 
 import { ShakingProcessBox } from "./Style";
-import { isDisabled, setRpmFormikField } from "./functions";
+import { isDisabled, setRpmFormikField } from "./helpers";
 
 const ShakingProcess = (props) => {
   const { formik, activeTab, temperature } = props;
@@ -78,7 +78,7 @@ const ShakingProcess = (props) => {
           </Row>
 
           {/* RPM 2 */}
-          <Row className={isDisabled.rpm2 && "disabled"}>
+          <Row className={formik.values.rpm2IsDisabled && "disabled"}>
             <Col lg={3}>
               <FormGroup row className="d-flex align-items-center">
                 <Label for="tip-selection" className="mb-0">

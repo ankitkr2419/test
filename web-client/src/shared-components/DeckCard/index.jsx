@@ -158,7 +158,7 @@ const DeckCard = (props) => {
 
   const setCurrentDeckActive = () => {
     /** one cannot switch between deck while adding/editing processes.*/
-    if (isDeckBlocked) {
+    if (deckName !== activeDeckName && isDeckBlocked) {
       toast.warning("Decks cannot be switched while adding/editing processes!");
       return;
     }
