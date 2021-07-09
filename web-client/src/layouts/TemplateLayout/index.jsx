@@ -104,11 +104,13 @@ const TemplateLayout = (props) => {
 
   return (
     <div className="template-content">
-      <div className="d-flex">
+      {/* <div className="d-flex"> */}
         <Wizard
           list={wizardList}
           onClickHandler={updateSelectedWizard}
           isAdmin={isAdmin}
+          showFinishBtn={activeWidgetID === "step"}
+          finishBtnHandler={finishBtnHandler}
         />
         {/* TODO : changes will be made here after ui is finalized. */}
         {/* {activeWidgetID === "step" && (
@@ -128,7 +130,7 @@ const TemplateLayout = (props) => {
             />
           </div>
         )} */}
-      </div>
+      {/* </div> */}
 
       <Card>
         <CardBody className="d-flex flex-unset overflow-hidden p-0">
