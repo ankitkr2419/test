@@ -17,6 +17,7 @@ import WellGridHeader from "./Grid/WellGridHeader";
 import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
+import { Text } from "shared-components";
 
 const Plate = (props) => {
   const {
@@ -32,7 +33,7 @@ const Plate = (props) => {
     toggleAllWellSelectedOption,
     activeWells,
     experimentTemplate,
-    resetSelectedWells,
+    resetSelectedWells
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -105,14 +106,14 @@ const Plate = (props) => {
   };
 
   return (
-    <div className="plate-content d-flex flex-column h-100 position-relative">
+    <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
       <Header
         experimentTemplate={experimentTemplate}
         isExperimentSucceeded={experimentStatus === EXPERIMENT_STATUS.success}
         experimentDetails={experimentDetails}
         experimentId={experimentId}
       />
-      <GridWrapper className="plate-body flex-100">
+      <GridWrapper className="plate-body flex-100 scroll-y">
         <Nav className="plate-nav-tabs border-0" tabs>
           <NavItem>
             <NavLink
@@ -141,10 +142,16 @@ const Plate = (props) => {
             </NavLink>
           </NavItem>
         </Nav>
-        <TabContent className="plate-tab-content d-flex" activeTab={activeTab}>
-          <TabPane className="tab-pane-wells flex-100" tabId="wells">
-            <div className="d-flex">
-              <div className="sample-wrapper">
+        <TabContent
+          className="plate-tab-content d-flex scroll-y"
+          activeTab={activeTab}
+        >
+          <TabPane className="tab-pane-wells flex-100 scroll-y" tabId="wells">
+            <div className="d-flex flex-100">
+              <div className="sample-wrapper d-flex flex-column scroll-y">
+                <Text className="wrapper-title font-weight-bold text-center mb-4">
+                  Add Samples
+                </Text>
                 <SampleSideBarContainer
                   experimentId={experimentId}
                   positions={positions}
@@ -152,7 +159,7 @@ const Plate = (props) => {
                   updateWell={updateWell}
                 />
               </div>
-              <div className="wells-wrapper flex-100">
+              <div className="wells-wrapper flex-100 scroll-y">
                 <div className="d-flex align-items-center mb-4">
                   {/* <WellGridHeader
                     className="mr-4"
@@ -176,9 +183,9 @@ const Plate = (props) => {
               </div>
             </div>
           </TabPane>
-          <TabPane className="tab-pane-graph flex-100" tabId="graph">
+          <TabPane className="tab-pane-graph flex-100 scroll-y" tabId="graph">
             <div className="d-flex flex-100">
-              <div className="graph-wrapper flex-100">
+              <div className="graph-wrapper flex-100 scroll-y">
                 <div className="d-flex align-items-center mb-3">
                   <Button
                     outline={showTempGraph}
@@ -238,7 +245,7 @@ Plate.propTypes = {
   isMultiSelectionOptionOn: PropTypes.bool.isRequired,
   toggleMultiSelectOption: PropTypes.func.isRequired,
   activeWells: PropTypes.object.isRequired,
-  experimentTemplate: PropTypes.object.isRequired,
+  experimentTemplate: PropTypes.object.isRequired
 };
 
 export default Plate;
