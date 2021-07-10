@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Switch } from "core-components";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const StyledSelectAllGridHeader = styled.header`
   display: flex;
@@ -12,7 +13,8 @@ const StyledSelectAllGridHeader = styled.header`
 const SelectAllGridHeader = ({
   className,
   isAllWellsSelected,
-  toggleAllWellSelectedOption
+  toggleAllWellSelectedOption,
+  experimentStatus,
 }) => (
   <StyledSelectAllGridHeader className={className}>
     <Switch
@@ -21,6 +23,10 @@ const SelectAllGridHeader = ({
       label="Select all wells"
       checked={isAllWellsSelected}
       onChange={() => toggleAllWellSelectedOption(isAllWellsSelected)}
+      disabled={
+        experimentStatus === EXPERIMENT_STATUS.success ||
+        experimentStatus === EXPERIMENT_STATUS.running
+      }
     />
   </StyledSelectAllGridHeader>
 );
@@ -28,11 +34,11 @@ const SelectAllGridHeader = ({
 SelectAllGridHeader.propTypes = {
   className: PropTypes.string,
   isAllWellsSelected: PropTypes.bool.isRequired,
-  toggleAllWellSelectedOption: PropTypes.func.isRequired
+  toggleAllWellSelectedOption: PropTypes.func.isRequired,
 };
 
 SelectAllGridHeader.defaultProps = {
-  className: ""
+  className: "",
 };
 
 export default SelectAllGridHeader;

@@ -6,14 +6,15 @@ import CoordinateItem from "./CoordinateItem";
 import WellGrid from "./WellGrid";
 import Well from "./Well";
 import WellPopover from "./WellPopover";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const GridComponent = ({
   wells,
   onWellClickHandler,
   onWellUpdateClickHandler,
   isGroupSelectionOn,
-  isAllWellsSelected,
-  showGraphOfWell
+  showGraphOfWell,
+  experimentStatus,
 }) => (
   <div className="d-flex flex-column flex-100 pt-4">
     {/* <Coordinate direction="horizontal">
@@ -41,7 +42,7 @@ const GridComponent = ({
             sample,
             task,
             targets,
-            isWellActive
+            isWellActive,
           } = well.toJS();
           return (
             <>
@@ -55,7 +56,12 @@ const GridComponent = ({
                 onClickHandler={(event) => {
                   onWellClickHandler(well, index, event);
                 }}
-                isDisabled={isWellActive === false}
+                // isDisabled={isWellActive === false}
+                isDisabled={
+                  isWellFilled === false &&
+                  (experimentStatus === EXPERIMENT_STATUS.success ||
+                    experimentStatus === EXPERIMENT_STATUS.running)
+                }
                 position={index}
               />
               {/* popover will only visible when its filled and group selection is off */}
@@ -87,7 +93,7 @@ GridComponent.propTypes = {
   onWellClickHandler: PropTypes.func.isRequired,
   wells: PropTypes.object.isRequired,
   onWellUpdateClickHandler: PropTypes.func.isRequired,
-  isGroupSelectionOn: PropTypes.bool.isRequired
+  isGroupSelectionOn: PropTypes.bool.isRequired,
 };
 
 export default GridComponent;
