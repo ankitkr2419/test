@@ -65,9 +65,6 @@ const WellGraph = ({
   resetThresholdError,
 }) => (
   <div>
-    <Text size={20} className="text-default mb-4">
-      Amplification Plot
-    </Text>
     <GraphCard>
       <LineChart data={data} options={options} />
     </GraphCard>

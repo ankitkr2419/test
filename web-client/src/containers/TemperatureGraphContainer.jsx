@@ -54,9 +54,6 @@ const TemperatureGraphContainer = (props) => {
   const temperatureChartData = useSelector(getTemperatureChartData);
   return (
     <div>
-      <Text size={20} className="text-default mb-4">
-        Temperature Plot
-      </Text>
       <GraphCard>
         <LineChart data={temperatureChartData} options={options} />
       </GraphCard>
