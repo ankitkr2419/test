@@ -51,7 +51,10 @@ const Plate = (props) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (experimentStatus === EXPERIMENT_STATUS.success) {
+    if (
+      experimentStatus === EXPERIMENT_STATUS.success &&
+      activeTab !== "graph"
+    ) {
       setActiveTab("graph");
     }
   }, [experimentStatus]);
@@ -169,6 +172,7 @@ const Plate = (props) => {
                   <SelectAllGridHeader
                     isAllWellsSelected={isAllWellsSelected}
                     toggleAllWellSelectedOption={toggleAllWellSelectedOption}
+                    experimentStatus={experimentStatus}
                   />
                 </div>
                 <GridComponent
@@ -179,6 +183,7 @@ const Plate = (props) => {
                   onWellClickHandler={onWellClickHandler}
                   onWellUpdateClickHandler={onWellUpdateClickHandler}
                   showGraphOfWell={showGraphOfWell}
+                  experimentStatus={experimentStatus}
                 />
               </div>
             </div>

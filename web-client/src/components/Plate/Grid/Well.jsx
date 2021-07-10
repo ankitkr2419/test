@@ -12,12 +12,13 @@ const Well = (props) => {
     status,
     isRunning,
     isSelected,
+    isDisabled,
     taskInitials,
-    onClickHandler
+    onClickHandler,
   } = props;
   const wellClassnames = classNames(className, {
     running: isRunning,
-    selected: isSelected
+    selected: isSelected,
   });
 
   return (
@@ -25,7 +26,7 @@ const Well = (props) => {
       id={id}
       // isRunning={isDisabled}
       isSelected={isSelected}
-      // isDisabled={isDisabled}
+      isDisabled={isDisabled}
       status={status}
       className={wellClassnames}
       onClick={onClickHandler}
@@ -127,7 +128,7 @@ Well.propTypes = {
   isSelected: PropTypes.bool,
   isRunning: PropTypes.bool,
   onClickHandler: PropTypes.func.isRequired,
-  isDisabled: PropTypes.bool
+  isDisabled: PropTypes.bool,
 };
 
 Well.defaultProps = {
@@ -136,7 +137,7 @@ Well.defaultProps = {
   taskInitials: "",
   isSelected: false,
   isRunning: false,
-  isDisabled: false
+  isDisabled: false,
 };
 
 export default Well;

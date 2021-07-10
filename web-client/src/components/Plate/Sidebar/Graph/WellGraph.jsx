@@ -83,9 +83,10 @@ const WellGraph = ({
         Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
       </Text>
     )}
-    <Text size={14} className="text-default text-center mb-0">
+    {/* TODO: Un-comment after discussion with client/backend-team */}
+    {/* <Text size={14} className="text-default text-center mb-0">
       Note: Click on the threshold number to change it.
-    </Text>
+    </Text> */}
   </div>
 );
 
