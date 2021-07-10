@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
 import {
   loginReset,
-  logoutInitiated,
+  logoutInitiated
 } from "action-creators/loginActionCreators";
 import {
   Button,
@@ -14,12 +14,12 @@ import {
   DropdownItem,
   Nav,
   NavItem,
-  NavLink,
+  NavLink
 } from "core-components";
 // import { getExperimentId } from 'selectors/experimentSelector';
 import {
   runExperiment,
-  stopExperiment,
+  stopExperiment
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
@@ -30,7 +30,7 @@ import {
   EXPERIMENT_STATUS,
   MODAL_BTN,
   MODAL_MESSAGE,
-  ROUTES,
+  ROUTES
 } from "appConstants";
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
@@ -47,7 +47,7 @@ const AppHeader = (props) => {
     token,
     deckName,
     app,
-    activeWidgetID,
+    activeWidgetID
   } = props;
 
   const dispatch = useDispatch();
@@ -210,9 +210,7 @@ const AppHeader = (props) => {
             <div className="experiment-info text-right mx-3">
               <Text
                 size={12}
-                className={`text-default mb-1 ${
-                  isExperimentRunning ? "show" : ""
-                }`}
+                className={`text-default ${isExperimentRunning ? "show" : ""}`}
               >
                 {`Experiment started at ${runExperimentReducer.get(
                   "experimentStartedTime"
@@ -220,13 +218,13 @@ const AppHeader = (props) => {
               </Text>
               <Text
                 size={12}
-                className={`text-error mb-1 ${isRunFailed ? "show" : ""}`}
+                className={`text-error ${isRunFailed ? "show" : ""}`}
               >
                 Experiment failed to run.
               </Text>
 
               {isExperimentSucceeded === false && isPlateRoute === true && (
-                <>
+                <div className="d-flex align-items-center">
                   <Button
                     color={isExperimentRunning ? "primary" : "secondary"}
                     size="sm"
@@ -250,7 +248,7 @@ const AppHeader = (props) => {
                   >
                     Abort
                   </Button>
-                </>
+                </div>
               )}
 
               {isLoginTypeAdmin && activeWidgetID === "step" && (
@@ -359,11 +357,11 @@ const AppHeader = (props) => {
 };
 
 AppHeader.propTypes = {
-  isUserLoggedIn: PropTypes.bool,
+  isUserLoggedIn: PropTypes.bool
 };
 
 AppHeader.defaultProps = {
-  isUserLoggedIn: false,
+  isUserLoggedIn: false
 };
 
 export default React.memo(AppHeader);

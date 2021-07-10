@@ -94,7 +94,7 @@ const SidebarSample = (props) => {
         isDisabled={isDisabled}
       />
       <Button
-        className="ml-2"
+        className="mt-auto ml-2"
         disabled={isDisabled || !isSampleStateValid}
         onClick={addButtonClickHandler}
         color="primary"

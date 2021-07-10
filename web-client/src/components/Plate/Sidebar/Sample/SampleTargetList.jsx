@@ -5,7 +5,6 @@ import SampleTarget from "./SampleTarget";
 import { Text } from "shared-components";
 
 const StyledSampleTargetList = styled.div`
-  flex: 1;
   margin: 0 0 24px;
 
   .list-title {
