@@ -16,7 +16,7 @@ const getOpacityValue = (props) => {
 
 const StyledSampleTarget = styled.div`
   width: 220px;
-  height: 42px;
+  height: 38px;
   display: flex;
   align-items: center;
   background: #ffffff 0% 0% no-repeat padding-box;
@@ -26,8 +26,7 @@ const StyledSampleTarget = styled.div`
   border: 1px solid #e5e5e5;
   border-radius: 8px;
   box-shadow: 0 3px 6px #0000000b;
-  margin: 0 auto 8px;
-  padding: 1px;
+  margin: 0 auto 2px;
   opacity: ${(props) => getOpacityValue(props)};
 
   button {
@@ -44,7 +43,7 @@ const SampleTarget = (props) => {
       isSelected={isSelected}
       isDisabled={isDisabled}
     >
-      <Text className="m-0 px-3">{label}</Text>
+      <Text className="m-0 px-2">{label}</Text>
       {isSelected ? (
         <ButtonIcon name="cross" size={28} className="ml-auto" />
       ) : null}
@@ -56,11 +55,11 @@ SampleTarget.propTypes = {
   label: PropTypes.string.isRequired,
   onClickHandler: PropTypes.func.isRequired,
   isSelected: PropTypes.bool,
-  isDisabled: PropTypes.bool,
+  isDisabled: PropTypes.bool
 };
 
 SampleTarget.defaultProps = {
-  isSelected: false,
+  isSelected: false
 };
 
 export default SampleTarget;

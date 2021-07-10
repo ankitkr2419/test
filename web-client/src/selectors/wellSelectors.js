@@ -1,6 +1,5 @@
+import { MAX_NO_OF_WELLS } from "appConstants";
 import { createSelector } from "reselect";
-
-const PLATE_CAPACITY = 16;
 
 const getWellListSelector = (state) => state.wellListReducer;
 const getAddWellsSelector = (state) => state.addWellsReducer;
@@ -71,9 +70,16 @@ export const resetMultiWellDefaultList = (state) =>
   state.updateIn(["defaultList"], (myDefaultList) =>
     myDefaultList.map((ele) => ele && ele.setIn(["isMultiSelected"], false))
   );
+// makes all wells isSelected flag to  true
+export const setAllWellsSelected = (state, { isAllWellsSelected }) =>
+  state.updateIn(["defaultList"], (myDefaultList) =>
+    myDefaultList.map(
+      (ele) => ele && ele.setIn(["isSelected"], !isAllWellsSelected)
+    )
+  );
 
 /**
- * getDefaultPlatesList return wells default data w.r.t PLATE_CAPACITY.
+ * getDefaultPlatesList return wells default data w.r.t MAX_NO_OF_WELLS.
  */
 export const getDefaultWellsList = createSelector(() => {
   const arr = [];
@@ -92,7 +98,7 @@ export const getDefaultWellsList = createSelector(() => {
     isWellActive: false
   };
   // Initial plate state added for wells in array from index 1
-  for (let i = 0; i !== PLATE_CAPACITY; i += 1) {
+  for (let i = 0; i !== MAX_NO_OF_WELLS; i += 1) {
     arr.push(initialPlateState);
   }
   return arr;

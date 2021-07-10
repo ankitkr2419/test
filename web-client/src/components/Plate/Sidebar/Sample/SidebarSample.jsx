@@ -17,7 +17,7 @@ const SidebarSample = (props) => {
     addButtonClickHandler,
     isSampleStateValid, // form state valid
     isDisabled,
-    resetLocalState,
+    resetLocalState
   } = props;
 
   const { isSideBarOpen, sample, task, isEdit } = sampleState.toJS();
@@ -35,7 +35,7 @@ const SidebarSample = (props) => {
   const handleSampleCreate = (inputValue) => {
     const newOption = {
       label: inputValue,
-      value: inputValue,
+      value: inputValue
     };
     // update local state
     updateCreateSampleWrapper("sample", newOption);
@@ -79,7 +79,6 @@ const SidebarSample = (props) => {
         value={sample}
         placeholder="Select Sample"
         className="mb-3"
-        size="lg"
       />
       <SampleTargetList
         list={sampleState.get("targets")}
@@ -88,8 +87,7 @@ const SidebarSample = (props) => {
       />
       <Select
         placeholder="Select Task"
-        className="mb-3"
-        size="md"
+        className="mb-4"
         options={taskOptions}
         value={task}
         onChange={handleTaskChange}
@@ -120,7 +118,7 @@ SidebarSample.propTypes = {
   addButtonClickHandler: PropTypes.func.isRequired,
   isSampleStateValid: PropTypes.bool.isRequired,
   isDisabled: PropTypes.bool.isRequired,
-  resetLocalState: PropTypes.func.isRequired,
+  resetLocalState: PropTypes.func.isRequired
 };
 
 export default React.memo(SidebarSample);
