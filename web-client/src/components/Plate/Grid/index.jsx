@@ -77,6 +77,10 @@ const GridComponent = ({
                     onWellUpdateClickHandler(well, index, event);
                   }}
                   showGraphOfWell={showGraphOfWell}
+                  isDisabled={
+                    experimentStatus === EXPERIMENT_STATUS.success ||
+                    experimentStatus === EXPERIMENT_STATUS.running
+                  }
                 />
               )}
             </>

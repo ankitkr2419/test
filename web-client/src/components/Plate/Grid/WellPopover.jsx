@@ -24,6 +24,7 @@ const WellPopover = (props) => {
     targets,
     onEditClickHandler,
     showGraphOfWell,
+    isDisabled,
     ...rest
   } = props;
 
@@ -104,7 +105,9 @@ const WellPopover = (props) => {
           <Button className="mb-4" onClick={onShowClickHandler}>
             Show on Graph
           </Button>
-          <Button onClick={onEditClick}>Edit Info</Button>
+          <Button onClick={onEditClick} disabled={isDisabled}>
+            Edit Info
+          </Button>
         </Center>
       </PopoverBody>
     </Popover>
@@ -118,7 +121,8 @@ WellPopover.propTypes = {
   sample: PropTypes.string,
   task: PropTypes.string,
   targets: PropTypes.array,
-  onEditClickHandler: PropTypes.func
+  onEditClickHandler: PropTypes.func,
+  isDisabled: PropTypes.bool,
 };
 
 export default WellPopover;
