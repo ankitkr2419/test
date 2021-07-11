@@ -1,5 +1,47 @@
 @import "../../assets/scss/core";
 
+.progress-wrapper {
+  width: 576px;
+  margin: 0 auto;
+
+  .time-wrapper {
+    color: #000;
+    margin-left: 8px;
+
+    p {
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .separator {
+      width: 2px;
+      height: 20px;
+      background-color: $primary;
+      margin: 0 8px;
+      border-radius: 1px;
+    }
+
+    span {
+      font-size: 10px;
+      line-height: 20px;
+      line-height: normal;
+      margin: 1px 0 0 4px;
+    }
+  }
+
+  .experiment-progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #b2dad1;
+
+    .progress-bar {
+      background-color: #10907a;
+    }
+  }
+}
+
 .plate-nav-tabs {
   background-color: #fff;
 
