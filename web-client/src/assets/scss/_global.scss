@@ -27,6 +27,15 @@ body {
 .experiment-info {
   position: relative;
 
+  > p {
+    width: rem(192px);
+    position: absolute;
+    top: rem(-14px);
+    right: 0;
+    line-height: rem(14px);
+    margin: 0;
+  }
+
   .text-default {
     width: rem(192px);
     position: absolute;
@@ -39,6 +48,10 @@ body {
     &.show {
       @include fade(show);
     }
+  }
+
+  &.text-error {
+    color: rgb(204, 201, 201);
   }
 
   .text-error {
@@ -683,11 +696,27 @@ button:focus {
   height: 30.75rem !important;
 }
 
+// Modal Heading
+.modal-heading {
+  background-color: rgba(178, 218, 209, 0.22);
+  border-radius: 2.25rem 2.25rem 0 0;
+  height: 3rem;
+
+  .title {
+    font-size: 15px;
+    line-height: 20px;
+  }
+}
+
+.card-box {
+  height: 30.75rem !important;
+}
+
 .recipe-action {
-	.icon-play,
-	.icon-edit-pencil,
-	.icon-publish,
-	.icon-published {
-			font-size: 14px !important;
-	}
+  .icon-play,
+  .icon-edit-pencil,
+  .icon-publish,
+  .icon-published {
+    font-size: 14px !important;
+  }
 }

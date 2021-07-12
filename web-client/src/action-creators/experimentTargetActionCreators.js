@@ -3,11 +3,12 @@ import {
 	listExperimentTargetActions,
 } from 'actions/experimentTargetActions';
 
-export const createExperimentTarget = (body, experimentId) => ({
+export const createExperimentTarget = (body, experimentId, token) => ({
 	type: createExperimentTargetActions.createAction,
 	payload: {
 		body,
 		experimentId,
+		token
 	},
 });
 
@@ -23,10 +24,11 @@ export const createExperimentTargetReset = () => ({
 	type: createExperimentTargetActions.createExperimentTargetReset,
 });
 
-export const fetchExperimentTargets = experimentId => ({
+export const fetchExperimentTargets = (experimentId, token) => ({
 	type: listExperimentTargetActions.listAction,
 	payload: {
 		experimentId,
+		token
 	},
 });
 

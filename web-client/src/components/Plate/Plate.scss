@@ -1,5 +1,112 @@
 @import "../../assets/scss/core";
 
+.progress-wrapper {
+  width: 576px;
+  margin: 0 auto;
+
+  .time-wrapper {
+    color: #000;
+    margin-left: 8px;
+
+    p {
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .separator {
+      width: 2px;
+      height: 20px;
+      background-color: $primary;
+      margin: 0 8px;
+      border-radius: 1px;
+    }
+
+    span {
+      font-size: 10px;
+      line-height: 20px;
+      line-height: normal;
+      margin: 1px 0 0 4px;
+    }
+  }
+
+  .experiment-progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #b2dad1;
+
+    .progress-bar {
+      background-color: #10907a;
+    }
+  }
+}
+
+.plate-nav-tabs {
+  background-color: #fff;
+
+  .nav-item {
+    flex: 1;
+    margin: 0;
+  }
+
+  .nav-link {
+    position: relative;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    color: #666666;
+    padding: 1rem;
+    text-align: center;
+    border: 0 none;
+    border-radius: 0;
+  }
+
+  .nav-link.active,
+  .nav-item.show .nav-link {
+    font-weight: bold;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: transparent
+        linear-gradient(90deg, #fafafa 0%, #f38220 47%, #fafafa 100%) 0% 0%
+        no-repeat padding-box;
+      width: 80%;
+      height: 2px;
+    }
+  }
+}
+
+.plate-tab-content {
+  background-color: rgba($color: #f2f2f2, $alpha: 0.35);
+  flex: 1;
+
+  > .active {
+    display: flex;
+  }
+}
+
+.sample-wrapper {
+  background-color: #f2f2f2;
+  width: 18rem;
+  padding: 2rem;
+
+  .wrapper-title {
+    color: #707070;
+  }
+}
+
+.wells-wrapper {
+  padding: 1.5rem 3.5rem;
+}
+
+.graph-wrapper {
+  padding: 2rem 6rem;
+}
+
 // Grid Coordinates
 .coordinate {
   &.-vertical {
@@ -15,7 +122,7 @@
 
   &.-horizontal {
     .coordinate-item {
-      width: rem(57px);
+      width: rem(50px);
 
       &:not(:last-child) {
         margin-right: rem(16px);
@@ -48,7 +155,6 @@
 }
 
 // Graph Filter
-
 .graph-filters {
   .title {
     color: $gray-40;
@@ -192,7 +298,7 @@
 // Template Popover
 .popover-template {
   width: rem(265px);
-  height: rem(226px);
+  height: rem(192px);
   border-color: $gray-90;
   box-shadow: rem(0 3px 16px) #00000029;
 

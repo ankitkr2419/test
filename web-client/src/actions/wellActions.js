@@ -16,4 +16,5 @@ export const listWellActions =  {
 	toggleMultiSelectOption: 'TOGGLE_MULTI_SELECT_OPTION',
 	updateWellThroughSocket: 'UPDATE_WELL_THROUGH_SOCKET_DATA',
 	resetWells: 'RESET_WELLS',
+	selectAllWellsOption: 'SELECT_ALL_WELLS',
 };

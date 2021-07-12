@@ -3,10 +3,11 @@ import {
 	listExperimentActions,
 } from 'actions/experimentActions';
 
-export const createExperiment = body => ({
+export const createExperiment = (body, token) => ({
 	type: createExperimentActions.createAction,
 	payload: {
 		body,
+		token
 	},
 });
 

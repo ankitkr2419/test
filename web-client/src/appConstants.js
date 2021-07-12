@@ -1,6 +1,7 @@
 export const API_HOST_URL = process.env.REACT_APP_API_HOST_URL;
 export const WS_HOST_URL = process.env.REACT_APP_WS_HOST_URL;
 export const API_HOST_VERSION = process.env.REACT_APP_API_HOST_VERSION;
+
 // Target capacity is used to restrict selection of targets
 export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 
@@ -62,8 +63,9 @@ export const EXPERIMENT_STATUS = {
 };
 
 export const ROUTES = {
-  landing: "landing",
-  splashScreen: "splashscreen",
+  login: "login", //rtpcr login page
+  landing: "landing", //extraction login page
+  splashScreen: "splashscreen", //application homepage
   recipeListing: "recipe-listing",
   labware: "labware",
   processListing: "process-listing",
@@ -113,9 +115,13 @@ export const API_ENDPOINTS = {
   delay: "delay",
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
+  appInfo: "app-info",
 };
 
 export const MODAL_MESSAGE = {
+  runConfirmMsg: "Wells are not configured. Are you sure you want to proceed?",
+  abortExpInfo: "Can't log out while experiment is still running.",
+  abortExpWarning: "Are you sure you want to abort experiment?",
   setPosition: "Please check the position of tip and magnet!",
   homingConfirmation: "Homing Confirmation",
   experimentSuccess: "Experiment was successful",
@@ -127,6 +133,10 @@ export const MODAL_MESSAGE = {
   finishProcessListConfirmation: "Are you sure you want to save changes to ",
   deleteProcessConfirmation: "Are you sure you want to delete this process?",
   deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
+  exitConfirmation: "Are you sure you want to exit?",
+  deleteTemplateConfirmation: "Are you sure you want to delete this template?",
+  deleteStepConfirmation: "Are you sure you want to delete this step?",
+  deleteActivityConfirmation: "Are you sure you want to delete this activity?",
 };
 
 export const MODAL_BTN = {
@@ -135,6 +145,7 @@ export const MODAL_BTN = {
   next: "Next",
   yes: "Yes",
   no: "No",
+  viewResults: "View Results",
   complete: "Complete",
 };
 
@@ -376,6 +387,13 @@ export const CATEGORY_LABEL = {
   4: "Deck Position",
 };
 
+export const APP_TYPE = {
+  COMBINED: "combined",
+  RTPCR: "rtpcr",
+  EXTRACTION: "extraction",
+  NONE: "none",
+};
+
 // common constants used for aspire-dispense process and tip-position process
 export const NUMBER_OF_WELLS = 13;
 
@@ -403,3 +421,6 @@ export const timeConstants = {
   SEC_IN_ONE_HOUR: 3600,
   MIN_IN_ONE_HOUR: 60,
 };
+
+//constants for RTPCR
+export const MAX_NO_OF_WELLS = 16;

@@ -4,44 +4,61 @@ import { Redirect } from "react-router";
 import LoginComponent from "components/Login";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  loginAsOperator as loginAsOperatorAction,
-  login,
+    loginAsOperator as loginAsOperatorAction,
+    login,
 } from "action-creators/loginActionCreators";
+import { toast } from "react-toastify";
 
 const LoginContainer = () => {
-  const loginReducer = useSelector((state) => state.loginReducer);
-  const { isUserLoggedIn, error } = loginReducer.toJS();
+    const dispatch = useDispatch();
 
-  // error in case user enters wrong credentials
-  // TODO Extract error message from response once api implemented
+    const loginReducer = useSelector((state) => state.loginReducer);
+    const loginReducerData = loginReducer.toJS();
+    let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+    const { isLoggedIn, error, name } = activeDeckObj; //name refers to deckName
 
-  // local state to handle admin form visibility
-  const [isAdminFormVisible, setIsAdminFormVisibility] = useState(false);
-  const dispatch = useDispatch();
+    // local state to handle admin form visibility
+    const [isAdminFormVisible, setIsAdminFormVisibility] = useState(false);
 
-  const loginAsOperator = () => {
-    dispatch(loginAsOperatorAction());
-  };
+    // local state to handle operator login modal visibility
+    const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
 
-  const loginAsAdmin = (data) => {
-    dispatch(login(data));
-  };
+    const loginAsAdmin = (data) => {
+        let { username, password } = data;
+        let role = username
+            ? username.split("@").pop().split(".")[0]
+            : undefined;
+        let email = username.split("@")[0];
 
-  // redirection to admin once logged in
-  if (isUserLoggedIn === true) {
-    // if (isUserLoggedIn === true && isSocketConnected === true) {
-    return <Redirect to="/templates" />;
-  }
+        if (role !== "admin") {
+            toast.error("Incorrect admin credentials");
+            return;
+        }
 
-  return (
-    <LoginComponent
-      isAdminFormVisible={isAdminFormVisible}
-      setIsAdminFormVisibility={setIsAdminFormVisibility}
-      loginAsOperator={loginAsOperator}
-      loginAsAdmin={loginAsAdmin}
-      isLoginError={error}
-    />
-  );
+        dispatch(login({ email, password, deckName: name, role }));
+    };
+
+    const toggleOperatorLoginModal = () => {
+        setOperatorLoginModalOpen(!operatorLoginModalOpen);
+    };
+
+    // redirection to admin once logged in
+    if (isLoggedIn === true) {
+        // if (isLoggedIn === true && isSocketConnected === true) {
+        return <Redirect to="/templates" />;
+    }
+
+    return (
+        <LoginComponent
+            isAdminFormVisible={isAdminFormVisible}
+            setIsAdminFormVisibility={setIsAdminFormVisibility}
+            operatorLoginModalOpen={operatorLoginModalOpen}
+            toggleOperatorLoginModal={toggleOperatorLoginModal}
+            deckName={name}
+            loginAsAdmin={loginAsAdmin}
+            isLoginError={error}
+        />
+    );
 };
 
 export default LoginContainer;

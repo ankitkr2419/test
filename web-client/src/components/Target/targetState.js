@@ -7,6 +7,7 @@ import { getTargetOption } from './targetHelper';
 export const targetStateActions = {
 	ADD_TARGET_ID: 'ADD_TARGET_ID',
 	ADD_THRESHOLD_VALUE: 'ADD_THRESHOLD_VALUE',
+	ADD_VOLUME_VALUE: 'ADD_VOLUME_VALUE',
 	SET_CHECKED_STATE: 'SET_CHECKED_STATE',
 	UPDATE_LIST: 'UPDATE_LIST',
 	SET_THRESHOLD_ERROR: 'SET_THRESHOLD_ERROR',
@@ -17,6 +18,7 @@ export const targetInitialState = fromJS({
 	// getTargetOption will return fixed size array with object initialize with isChecked false
 	targetList: List(getTargetOption()),
 	originalTargetList: List([]),
+	volume: 0,
 });
 
 // isCheckable will validate weather target and threshold value is present for given index
@@ -37,6 +39,9 @@ const addTargetId = (state, { targetId, index }) => state.setIn(['targetList', i
 
 // function will set threshold flag w.r.t index
 const addThresholdValue = (state, { threshold, index }) => state.setIn(['targetList', index, 'threshold'], parseFloatWrapper(threshold));
+
+// function will set volume
+const addVolumeValue = (state, volume) => state.setIn(['volume'], volume);
 
 // function will set threshold error flag
 const setThresholdError = (state, { thresholdError, index }) => state.setIn(['targetList', index, 'thresholdError'], thresholdError);
@@ -100,6 +105,8 @@ const targetStateReducer = (state, action) => {
 		return addTargetId(state, action.value);
 	case targetStateActions.ADD_THRESHOLD_VALUE:
 		return addThresholdValue(state, action.value);
+	case targetStateActions.ADD_VOLUME_VALUE:
+		return addVolumeValue(state, action.value);
 	case targetStateActions.SET_THRESHOLD_ERROR:
 		return setThresholdError(state, action.value);
 	case targetStateActions.SET_CHECKED_STATE:
