@@ -149,6 +149,9 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 	plc.CurrentCycle = cycleNum
 	stagePrevTemp := prevTemp
 	for i, h := range st {
+		if !plc.ExperimentRunning {
+			return fmt.Errorf("Experiment is not Running or aborted!")
+		}
 		t0 := time.Now()
 		ti := tec.TECTempSet{
 			TargetTemperature: float64(h.TargetTemp),
