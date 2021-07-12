@@ -328,12 +328,15 @@ func updateEstimatedTime(ctx context.Context, s db.Storer, step db.Step) (err er
 
 	// Calculate Homing Time as its included in Experiment Time
 	estimatedTime += float64(config.GetHomingTime())
+	logger.Infoln("Estimated Time for Homing RTPCR: ", config.GetHomingTime())
 
 	// Calculate Lid Temp Time
 	// NOTE: This is where most variance exists for estimated time
 	// TODO: Handle this in a better and accurate way
 	// here 0.5 is the rate of heating/ cooling per sec 
 	estimatedTime += math.Abs(float64(plcStage.IdealLidTemp) - roomTemp)/ 0.5
+	logger.Infoln("Estimated Time for Lid Temp Reaching: ", math.Abs(float64(plcStage.IdealLidTemp) - roomTemp)/ 0.5)
+
 
 	// Calculate Hold Stage Time
 	for _, ho := range plcStage.Holding {
@@ -341,6 +344,7 @@ func updateEstimatedTime(ctx context.Context, s db.Storer, step db.Step) (err er
 		estimatedTime += float64(ho.HoldTime)
 		currentTemp = float64(ho.TargetTemp)
 	}
+	logger.Infoln("Estimated Time after Holding Stage: ", estimatedTime)
 
 	// Calculate Cycle Stage Time
 	temp = 0
@@ -351,6 +355,8 @@ func updateEstimatedTime(ctx context.Context, s db.Storer, step db.Step) (err er
 	}
 
 	estimatedTime += temp * float64(plcStage.CycleCount)
+	logger.Infoln("Estimated Time after Cycling Stage: ", estimatedTime)
+
 
 	// Last step to go back to Room Temp
 	estimatedTime += math.Abs(currentTemp - roomTemp)/tec.RoomTempRamp
