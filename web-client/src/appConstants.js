@@ -111,6 +111,7 @@ export const API_ENDPOINTS = {
 };
 
 export const MODAL_MESSAGE = {
+  runConfirmMsg: "Wells are not configured. Are you sure you want to proceed?",
   abortExpInfo: "Can't log out while experiment is still running.",
   abortExpWarning: "Are you sure you want to abort experiment?",
   setPosition: "Please check the position of tip and magnet!",
