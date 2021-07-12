@@ -309,17 +309,14 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		if err != nil {
 			deps.WsErrCh <- err
 		}
-
-		err = deps.Tec.ReachRoomTemp()
-		if err != nil {
-			deps.WsErrCh <- err
-		}
-
 		err = deps.Plc.SwitchOffLidTemp()
 		if err != nil {
 			deps.WsErrCh <- err
 		}
-
+		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			deps.WsErrCh <- err
+		}
 		return
 	}()
 
