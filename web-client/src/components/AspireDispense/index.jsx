@@ -68,7 +68,7 @@ const AspireDispenseComponent = () => {
   };
 
   const wellClickHandler = (id, type) => {
-    // here type : aspire and 1 for dispense
+    // here type : 0 aspire and 1 for dispense
     const aspire = formik.values.aspire;
     const dispense = formik.values.dispense;
 
@@ -114,6 +114,9 @@ const AspireDispenseComponent = () => {
     setIsAspire(!isAspire);
     setActiveTab(formik.values.dispense.selectedCategory);
     formik.setFieldValue("aspire.selectedCategory", activeTab);
+    if (activeTab === "2") {
+      formik.setFieldValue("dispense.selectedCategory", activeTab);
+    }
   };
 
   const handleSaveBtn = () => {

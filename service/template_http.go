@@ -126,8 +126,8 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.UpdateTemplate(req.Context(), t)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error update template")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()} )
 			return
 		}
 

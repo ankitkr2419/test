@@ -5,6 +5,7 @@ import {
 
 export const initialState = {
   isLoading: false,
+  showHomingModal: true,
   homingData: {},
   serverErrors: {},
   homingAllDeckCompletionPercentage: 0,
@@ -45,6 +46,19 @@ export const homingReducer = (state = initialState, action = {}) => {
         isLoading: false,
         isHomingActionCompleted: true,
       };
+
+    case homingActions.hideHomingModaal:
+      return {
+        ...state,
+        showHomingModal: false,
+      };
+
+    case homingActions.showHomingModaal:
+      return {
+        ...state,
+        showHomingModal: true,
+      };
+
     default:
       return state;
   }
