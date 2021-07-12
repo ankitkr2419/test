@@ -378,7 +378,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 			deps.WsMsgCh <- "read_temp"
 		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
-		if plc.DataCapture {
+		if plc.DataCapture && scan.Cycle != 0 {
 
 			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle, scan)
 
