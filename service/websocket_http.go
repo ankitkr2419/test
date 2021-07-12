@@ -350,15 +350,19 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 	var cycle uint16
 
 	cycle = 1
-
+	var err error
+	defer func() {
+		if err != nil {
+			deps.WsErrCh <- err
+		}
+	}()
 	// experimentRunning is set when experiment started & if stopped then set to false
 	for plc.ExperimentRunning {
 		time.Sleep(1 * time.Second)
 
 		scan, err := deps.Plc.Monitor(cycle)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error in plc monitor")
-			deps.WsErrCh <- err
+			logger.Errorln("error in inner monitor", err.Error())
 			return
 		}
 		//Add to excel
@@ -393,7 +397,6 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID, "successful")
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error updating stop time")
-					deps.WsErrCh <- err
 					return
 				}
 				// now emissions are completed only temperatures are to be noted till it reaches
