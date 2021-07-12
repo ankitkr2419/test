@@ -215,11 +215,15 @@ func (d *Compact32) Stop() (err error) {
 	// if err != nil {
 	// 	logger.Error("WriteSingleCoil:M102 : Stop Cycle")
 	// }
-	d.ExitCh <- errors.New("abort")
+	d.ExitCh <- errors.New("PCR ABORTED")
 	return nil
 }
 
 func (d *Compact32) Cycle() (err error) {
+
+	if !plc.ExperimentRunning {
+		return errors.New("experiment is not running or maybe aborted")
+	}
 	//For the cycle button
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][20], plc.ON)
 	if err != nil {
@@ -278,6 +282,9 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(plc.CurrentLidTemp)
 	logger.Infoln("	scan.Temp: ", scan.Temp, "\tscan.LidTemp: ", scan.LidTemp)
+	if !plc.ExperimentRunning {
+		return scan, errors.New("experiment is not running or maybe aborted")
+	}
 
 	if plc.CycleComplete {
 
