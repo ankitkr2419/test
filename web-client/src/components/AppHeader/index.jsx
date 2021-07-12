@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
 import {
   loginReset,
-  logoutInitiated
+  logoutInitiated,
 } from "action-creators/loginActionCreators";
 import {
   Button,
@@ -14,15 +14,16 @@ import {
   DropdownItem,
   Nav,
   NavItem,
-  NavLink
+  NavLink,
 } from "core-components";
 // import { getExperimentId } from 'selectors/experimentSelector';
 import {
   runExperiment,
-  stopExperiment
+  stopExperiment,
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
+import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
 import {
@@ -30,7 +31,7 @@ import {
   EXPERIMENT_STATUS,
   MODAL_BTN,
   MODAL_MESSAGE,
-  ROUTES
+  ROUTES,
 } from "appConstants";
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
@@ -47,13 +48,16 @@ const AppHeader = (props) => {
     token,
     deckName,
     app,
-    activeWidgetID
+    activeWidgetID,
   } = props;
 
   const dispatch = useDispatch();
   const history = useHistory();
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
+  const wellListReducer = useSelector(getWells);
+
+  const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
   const isExperimentRunning = experimentStatus === EXPERIMENT_STATUS.running;
   const isExperimentStopped = experimentStatus === EXPERIMENT_STATUS.stopped;
@@ -65,6 +69,8 @@ const AppHeader = (props) => {
   const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [isExpSuccessModalVisible, setExpSuccessModalVisibility] =
+    useState(false);
+  const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
     useState(false);
 
   const toggleUserDropdown = () =>
@@ -95,7 +101,14 @@ const AppHeader = (props) => {
   };
 
   const startExperiment = () => {
-    if (isExperimentRunning === false && isExperimentSucceeded === false) {
+    // if no well is filled then show confirmation modal.
+    if (filledWellsPositions.toJS().length === 0) {
+      //showModal = True
+      setRunConfirmModalVisibility(true);
+    } else if (
+      isExperimentRunning === false &&
+      isExperimentSucceeded === false
+    ) {
       dispatch(runExperiment(experimentId, token));
     }
   };
@@ -177,6 +190,12 @@ const AppHeader = (props) => {
     setExpSuccessModalVisibility(false);
     // redirect to activity
     history.push("activity");
+  };
+
+  // if user selects 'yes', run experiment
+  const handleRunModalConfirmation = () => {
+    setRunConfirmModalVisibility(false);
+    dispatch(runExperiment(experimentId, token));
   };
 
   return (
@@ -339,6 +358,17 @@ const AppHeader = (props) => {
             />
           )}
 
+          {isRunConfirmModalVisible && (
+            <MlModal
+              isOpen={isRunConfirmModalVisible}
+              textBody={MODAL_MESSAGE.runConfirmMsg}
+              successBtn={MODAL_BTN.yes}
+              failureBtn={MODAL_BTN.cancel}
+              handleSuccessBtn={handleRunModalConfirmation}
+              handleCrossBtn={() => setRunConfirmModalVisibility(false)}
+            />
+          )}
+
           <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
             <ActionBtnListItem>
               <Icon name="setting" size={18} />
@@ -357,11 +387,11 @@ const AppHeader = (props) => {
 };
 
 AppHeader.propTypes = {
-  isUserLoggedIn: PropTypes.bool
+  isUserLoggedIn: PropTypes.bool,
 };
 
 AppHeader.defaultProps = {
-  isUserLoggedIn: false
+  isUserLoggedIn: false,
 };
 
 export default React.memo(AppHeader);

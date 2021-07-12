@@ -20,10 +20,17 @@ import {
   getSampleTargetList,
   getInitSampleTargetList,
 } from "components/Plate/Sidebar/Sample/sampleHelper";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const SampleSideBarContainer = (props) => {
   // constant
-  const { experimentTargetsList, positions, experimentId, updateWell } = props;
+  const {
+    experimentTargetsList,
+    positions,
+    experimentStatus,
+    experimentId,
+    updateWell,
+  } = props;
   const dispatch = useDispatch();
   // useSelector
   const samplesListReducer = useSelector(getSamples);
@@ -150,7 +157,9 @@ const SampleSideBarContainer = (props) => {
       isSampleStateValid={isSampleStateValid}
       resetLocalState={resetLocalState}
       isDisabled={
-        positions.size === 0 && sampleState.get("isSideBarOpen") === false
+        experimentStatus === EXPERIMENT_STATUS.running ||
+        experimentStatus === EXPERIMENT_STATUS.success ||
+        positions.size === 0
       }
     />
   );

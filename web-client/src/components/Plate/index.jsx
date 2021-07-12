@@ -33,7 +33,7 @@ const Plate = (props) => {
     toggleAllWellSelectedOption,
     activeWells,
     experimentTemplate,
-    resetSelectedWells
+    resetSelectedWells,
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -158,6 +158,7 @@ const Plate = (props) => {
                 <SampleSideBarContainer
                   experimentId={experimentId}
                   positions={positions}
+                  experimentStatus={experimentStatus}
                   experimentTargetsList={experimentTargetsList}
                   updateWell={updateWell}
                 />
@@ -250,7 +251,7 @@ Plate.propTypes = {
   isMultiSelectionOptionOn: PropTypes.bool.isRequired,
   toggleMultiSelectOption: PropTypes.func.isRequired,
   activeWells: PropTypes.object.isRequired,
-  experimentTemplate: PropTypes.object.isRequired
+  experimentTemplate: PropTypes.object.isRequired,
 };
 
 export default Plate;
