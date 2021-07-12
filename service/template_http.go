@@ -1,13 +1,9 @@
 package service
 
 import (
-	"mylab/cpagent/tec"
 	"encoding/json"
 	"mylab/cpagent/db"
-	"mylab/cpagent/config"
 	"net/http"
-	"context"
-	"math"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -129,7 +125,7 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 		err = deps.Store.UpdateTemplate(req.Context(), t)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error update template")
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()} )
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
@@ -297,70 +293,3 @@ func listPublishedTemplateHandler(deps Dependencies) http.HandlerFunc {
 }
 
 
-// ALGORITHM
-// 1. Get Stage ID from Step
-// 2. Fetch Template ID from this Stage ID
-// 3. Fetch All Stages and Steps from Template ID
-// 4. Iterate over the stages and steps and calculate time accordingly
-// 5. Update time in DB
-func updateEstimatedTime(ctx context.Context, s db.Storer, step db.Step) (err error) {
-
-	var currentTemp, estimatedTime, roomTemp, temp float64
-
-	// Get stage
-	stage, err := s.ShowStage(ctx, step.StageID)
-	if err != nil{
-		logger.WithField("err", err.Error()).Error("Error fetching Stage Data")
-		return
-	}
-
-	ss, err := s.ListStageSteps(ctx, stage.TemplateID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching Stage Steps Data")
-		return
-	}
-	plcStage := makePLCStage(ss)
-	logger.WithField("Calculating Time for :", plcStage).Infoln("Calculating for every Step")
-
-	roomTemp = config.GetRoomTemp()
-	currentTemp = roomTemp
-	logger.Infoln(currentTemp)
-
-	// Calculate Homing Time as its included in Experiment Time
-	estimatedTime += float64(config.GetHomingTime())
-	logger.Infoln("Estimated Time for Homing RTPCR: ", config.GetHomingTime())
-
-	// Calculate Lid Temp Time
-	// NOTE: This is where most variance exists for estimated time
-	// TODO: Handle this in a better and accurate way
-	// here 0.5 is the rate of heating/ cooling per sec 
-	estimatedTime += math.Abs(float64(plcStage.IdealLidTemp) - roomTemp)/ 0.5
-	logger.Infoln("Estimated Time for Lid Temp Reaching: ", math.Abs(float64(plcStage.IdealLidTemp) - roomTemp)/ 0.5)
-
-
-	// Calculate Hold Stage Time
-	for _, ho := range plcStage.Holding {
-		estimatedTime += math.Abs(currentTemp - float64(ho.TargetTemp))/float64(ho.RampUpTemp)
-		estimatedTime += float64(ho.HoldTime)
-		currentTemp = float64(ho.TargetTemp)
-	}
-	logger.Infoln("Estimated Time after Holding Stage: ", estimatedTime)
-
-	// Calculate Cycle Stage Time
-	temp = 0
-	for _, co := range plcStage.Cycle {
-		temp += math.Abs(currentTemp - float64(co.TargetTemp))/float64(co.RampUpTemp)
-		temp += float64(co.HoldTime)
-		currentTemp = float64(co.TargetTemp)
-	}
-
-	estimatedTime += temp * float64(plcStage.CycleCount)
-	logger.Infoln("Estimated Time after Cycling Stage: ", estimatedTime)
-
-
-	// Last step to go back to Room Temp
-	estimatedTime += math.Abs(currentTemp - roomTemp)/tec.RoomTempRamp
-
-	err = s.UpdateEstimatedTime(ctx, stage.TemplateID, int64(estimatedTime))
-	return
-}
