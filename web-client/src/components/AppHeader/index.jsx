@@ -222,7 +222,7 @@ const AppHeader = (props) => {
         </Nav>
       )}
       {isUserLoggedIn && (
-        <div className="header-elements d-flex align-items-center">
+        <div className="header-elements d-flex align-items-center ml-auto">
           {/* <PrintDataModal /> */}
           {/* <ExportDataModal /> */}
           {app === APP_TYPE.RTPCR && (
