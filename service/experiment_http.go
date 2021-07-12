@@ -264,25 +264,25 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		// instruct plc to stop the experiment: stops if experiment is already running else returns error
-		err = deps.Plc.Stop()
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error in plc stop")
-			rw.WriteHeader(http.StatusInternalServerError)
+		if plc.ExperimentRunning {
+			// instruct plc to stop the experiment: stops if experiment is already running else returns error
+			err = deps.Plc.Stop()
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in plc stop")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
+			if err != nil {
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "error fetching data"})
+				return
+			}
+		} else {
+			logger.WithField("err", "experiment not running").Error("No experiment running")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "no experiment is running"})
 			return
 		}
-
-		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(`{"msg":"experiment stopped"}`))
-
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "experiment stopped"})
 	})
 }
 
@@ -293,7 +293,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// And then Homing should happen
 	defer func() {
 		plc.ExperimentRunning = false
-		deps.WsMsgCh <- "stop"
 		err = deps.Plc.HomingRTPCR()
 		if err != nil {
 			deps.WsErrCh <- err
@@ -308,6 +307,8 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 		if err != nil {
 			deps.WsErrCh <- err
+		} else {
+			deps.WsMsgCh <- "stop"
 		}
 
 		err = deps.Tec.ReachRoomTemp()
