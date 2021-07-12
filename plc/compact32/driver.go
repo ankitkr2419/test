@@ -158,7 +158,7 @@ func (d *Compact32) HomingRTPCR() (err error) {
 
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][100], plc.OFF)
 	if err != nil {
-		logger.Error("WriteSingleCoil:M2 : Start Cycle")
+		logger.Error("WriteSingleCoil:M100 : Start Cycle")
 		return
 	}
 	logger.WithField("HOMING", "homing started").Infoln("HOMING STARTED")
