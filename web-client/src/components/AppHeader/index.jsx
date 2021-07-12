@@ -226,9 +226,18 @@ const AppHeader = (props) => {
               {isExperimentSucceeded === false && isPlateRoute === true && (
                 <div className="d-flex align-items-center">
                   <Button
+                    color={isExperimentSucceeded ? "primary" : "secondary"}
+                    size="sm"
+                    className="font-weight-light border-2 border-gray shadow-none  mr-3"
+                    onClick={() => setAbortModalVisibility(true)}
+                    disabled={!isExperimentRunning}
+                  >
+                    Abort
+                  </Button>
+                  <Button
                     color={isExperimentRunning ? "primary" : "secondary"}
                     size="sm"
-                    className="font-weight-light border-2 border-gray shadow-none mr-3"
+                    className="font-weight-light border-2 border-gray shadow-none"
                     outline={
                       isExperimentRunning === false &&
                       isExperimentSucceeded === false
@@ -237,16 +246,6 @@ const AppHeader = (props) => {
                     disabled={isExperimentRunning}
                   >
                     Run
-                  </Button>
-
-                  <Button
-                    color={isExperimentSucceeded ? "primary" : "danger"}
-                    size="sm"
-                    className="font-weight-light border-2 border-gray shadow-none"
-                    onClick={() => setAbortModalVisibility(true)}
-                    disabled={!isExperimentRunning}
-                  >
-                    Abort
                   </Button>
                 </div>
               )}
