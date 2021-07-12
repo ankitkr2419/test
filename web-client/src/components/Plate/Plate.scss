@@ -1,8 +1,9 @@
 @import "../../assets/scss/core";
 
 .progress-wrapper {
-  width: 576px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 576px;
+  flex: 1;
 
   .time-wrapper {
     color: #000;
