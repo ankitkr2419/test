@@ -124,7 +124,11 @@ const TipPickupComponent = () => {
               />
             </CardBody>
           </Card>
-          <ButtonBar rightBtnLabel="Save" handleRightBtn={handleRightBtn} />
+          <ButtonBar
+            rightBtnLabel="Save"
+            handleRightBtn={handleRightBtn}
+            btnBarClassname={"btn-bar-adjust-tipPickup"}
+          />
         </div>
       </TipPickupBox>
     </PageBody>
