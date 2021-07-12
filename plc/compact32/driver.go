@@ -172,8 +172,8 @@ func (d *Compact32) HomingRTPCR() (err error) {
 	if result[0] == 101 {
 		logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	} else {
-		logger.WithField("HOMING", err.Error()).Errorln("homing started")
 		err = errors.New("homing failed")
+		logger.WithField("HOMING", err.Error()).Errorln("homing failed")
 		d.ExitCh <- errors.New("PCR Aborted")
 		return
 	}
@@ -397,6 +397,9 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 		var i uint16
 		// monitor lid temp accurately till sleepTimeSecs is reached
 		for i < sleepTimeSecs {
+			if !plc.ExperimentRunning {
+				return
+			}
 			go func() {
 				currentLidTemp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
 				if err != nil {

@@ -44,8 +44,9 @@ const (
 	updateStartTimeQuery = `UPDATE experiments
 		SET start_time = $1,
 		repeat_cycle = $2,
-		updated_at = $3
-		WHERE id = $4`
+		updated_at = $3,
+		result = $4
+		WHERE id = $5`
 	updateStopTimeQuery = `UPDATE experiments
 		SET end_time = $1,
 		result = $2,
@@ -99,7 +100,7 @@ func ValidateExperiment(wells []Well) (valid bool, resp WarnResponse) {
 				tasksCount["NTC"] = tasksCount["NTC"] + 1
 			}
 		}
-		//ASK: Is this a BUG? 
+		//ASK: Is this a BUG?
 		for _, v := range tasksCount {
 			if v == 0 {
 				resp.Code = "Warning"
@@ -157,12 +158,13 @@ func (s *pgStore) ShowExperiment(ctx context.Context, id uuid.UUID) (e Experimen
 	return
 }
 
-func (s *pgStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID, repeatCycle uint16) (err error) {
+func (s *pgStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID, repeatCycle uint16, state string) (err error) {
 	_, err = s.db.Exec(
 		updateStartTimeQuery,
 		t,
 		repeatCycle,
 		time.Now(),
+		state,
 		experimentID,
 	)
 	if err != nil {

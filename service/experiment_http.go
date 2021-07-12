@@ -180,17 +180,17 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 
 		plcStage := makePLCStage(ss)
 
-		t, err := deps.Store.ShowTemplate(req.Context(),  e.TemplateID)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching template data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// t, err := deps.Store.ShowTemplate(req.Context(), e.TemplateID)
+		// if err != nil {
+		// 	logger.WithField("err", err.Error()).Error("Error fetching template data")
+		// 	rw.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
 
 		// Lid Temp is multiplied by 10 for PLC can't handle floats
-		plcStage.IdealLidTemp = uint16(t.LidTemp * 10)		
-
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
+		plcStage.IdealLidTemp = uint16(100 * 10)
+		e.Result = "running"
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount, e.Result)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -273,7 +273,18 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		e, err := deps.Store.ShowExperiment(req.Context(), expID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		if plc.ExperimentRunning {
+			if e.Result != "running" {
+				logger.WithField("err", "invalid running experiment").Error("this experiment id not running")
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "this experiment is not running"})
+				return
+			}
 			// instruct plc to stop the experiment: stops if experiment is already running else returns error
 			err = deps.Plc.Stop()
 			if err != nil {
