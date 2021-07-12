@@ -1,11 +1,13 @@
 package service
 
 import (
+	"mylab/cpagent/tec"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/config"
 	"net/http"
 	"context"
+	"math"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -295,7 +297,6 @@ func listPublishedTemplateHandler(deps Dependencies) http.HandlerFunc {
 }
 
 
-
 // ALGORITHM
 // 1. Get Stage ID from Step
 // 2. Fetch Template ID from this Stage ID
@@ -304,8 +305,7 @@ func listPublishedTemplateHandler(deps Dependencies) http.HandlerFunc {
 // 5. Update time in DB
 func updateEstimatedTime(ctx context.Context, s db.Storer, step db.Step) (err error) {
 
-	var estimatedTime int64
-	var currentTemp float64
+	var currentTemp, estimatedTime, roomTemp, temp float64
 
 	// Get stage
 	stage, err := s.ShowStage(ctx, step.StageID)
@@ -322,11 +322,39 @@ func updateEstimatedTime(ctx context.Context, s db.Storer, step db.Step) (err er
 	plcStage := makePLCStage(ss)
 	logger.WithField("Calculating Time for :", plcStage).Infoln("Calculating for every Step")
 
-	currentTemp = config.GetRoomTemp()
-	//TODO: Calculate Hold Stage Time
+	roomTemp = config.GetRoomTemp()
+	currentTemp = roomTemp
+	logger.Infoln(currentTemp)
 
-	//TODO: Calculate Cycle Stage Time
+	// Calculate Homing Time as its included in Experiment Time
+	estimatedTime += float64(config.GetHomingTime())
 
-	err = s.UpdateEstimatedTime(ctx, stage.TemplateID, estimatedTime)
+	// Calculate Lid Temp Time
+	// NOTE: This is where most variance exists for estimated time
+	// TODO: Handle this in a better and accurate way
+	// here 0.5 is the rate of heating/ cooling per sec 
+	estimatedTime += math.Abs(float64(plcStage.IdealLidTemp) - roomTemp)/ 0.5
+
+	// Calculate Hold Stage Time
+	for _, ho := range plcStage.Holding {
+		estimatedTime += math.Abs(currentTemp - float64(ho.TargetTemp))/float64(ho.RampUpTemp)
+		estimatedTime += float64(ho.HoldTime)
+		currentTemp = float64(ho.TargetTemp)
+	}
+
+	// Calculate Cycle Stage Time
+	temp = 0
+	for _, co := range plcStage.Cycle {
+		temp += math.Abs(currentTemp - float64(co.TargetTemp))/float64(co.RampUpTemp)
+		temp += float64(co.HoldTime)
+		currentTemp = float64(co.TargetTemp)
+	}
+
+	estimatedTime += temp * float64(plcStage.CycleCount)
+
+	// Last step to go back to Room Temp
+	estimatedTime += math.Abs(currentTemp - roomTemp)/tec.RoomTempRamp
+
+	err = s.UpdateEstimatedTime(ctx, stage.TemplateID, int64(estimatedTime))
 	return
 }
