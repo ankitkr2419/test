@@ -31,7 +31,8 @@ const RecipeCard = (props) => {
     }
   };
 
-  const handleRunRecipeByAdmin = () => {
+  const handleRunRecipeByAdmin = (e) => {
+    e.stopPropagation();
     toggleRunRecipesModal();
     returnRecipeDetails({ recipeId, recipeName, processCount, isAdmin });
   };
