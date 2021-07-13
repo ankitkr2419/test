@@ -21,13 +21,13 @@ type Simulator struct {
 	plcIO     plcRegistors
 	config    plc.Stage
 	emissions []plc.Emissions
-	ExitCh    chan string
+	ExitCh    chan error
 	ErrCh     chan error
 	wells     []Well
 }
 
 func NewSimulator(exit chan error) plc.Driver {
-	ex := make(chan string)
+	ex := make(chan error)
 
 	s := Simulator{}
 	s.ExitCh = ex
@@ -71,7 +71,7 @@ func (d *Simulator) HeartBeat() {
 
 		// something went wrong. Signal parent process
 		logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-		d.ExitCh <- "dead"
+		d.ExitCh <- errors.New("dead")
 		return
 	}()
 }
@@ -107,14 +107,8 @@ func (d *Simulator) Start() (err error) {
 func (d *Simulator) Stop() (err error) {
 	// Abort running process
 
-	if d.plcIO.m.startStopCycle == 0 {
-		err = errors.New("Cannot stop, not yet started")
-		return
-	}
-
-	d.plcIO.m.startStopCycle = 0
-
-	d.ExitCh <- "abort"
+	plc.ExperimentRunning = false
+	d.ErrCh <- errors.New("PCR Aborted")
 	return
 }
 
@@ -133,7 +127,7 @@ func (d *Simulator) simulate() {
 		select {
 		case msg := <-d.ExitCh:
 			logger.WithField("msg", msg).Info("simulate: ExitCh received data")
-			if msg == "stop" {
+			if msg.Error() == "stop" {
 				d.ErrCh <- errors.New("PCR Stopped")
 
 				// reset to start new experiment
@@ -142,7 +136,7 @@ func (d *Simulator) simulate() {
 				d.wells = []Well{}
 
 			}
-			if msg == "abort" {
+			if msg.Error() == "abort" {
 
 				d.ErrCh <- errors.New("PCR Aborted")
 
@@ -152,10 +146,11 @@ func (d *Simulator) simulate() {
 				d.wells = []Well{}
 
 			}
-			if msg == "pause" {
-				//TBD
-			}
-			if msg == "dead" {
+			// we will handle this later with a different string channel as this is not a error
+			// if msg == "pause" {
+			// 	//TBD
+			// }
+			if msg.Error() == "dead" {
 
 				// heart beat failes, pcr is not responding
 				d.ErrCh <- errors.New("PCR Dead")
