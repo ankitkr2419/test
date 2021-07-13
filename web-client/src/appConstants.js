@@ -116,6 +116,7 @@ export const API_ENDPOINTS = {
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
   appInfo: "app-info",
+  experiments: "experiments", 
 };
 
 export const MODAL_MESSAGE = {
