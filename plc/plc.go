@@ -76,6 +76,7 @@ type OperationDetails struct {
 	TotalTime      *TimeHMS       `json:"total_time,omitempty"`
 	ProcessName    string         `json:"process_name,omitempty"`
 	ProcessType    db.ProcessType `json:"process_type,omitempty"`
+	Progress	   *int64		  `json:"progress,omitempty"`
 }
 
 type TimeHMS struct {
