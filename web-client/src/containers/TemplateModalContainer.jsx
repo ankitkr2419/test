@@ -100,19 +100,17 @@ const TemplateModalContainer = (props) => {
   const autofillNameDescription = useCallback(() => {
     setTemplateName(prevTemplate.get("name"));
     setTemplateDescription(prevTemplate.get("description"));
-
-    // TODO : un-comment after APIs are ready
-    // setVolume(prevTemplate.get("volume"));
-    // setLidTemperature(prevTemplate.get("lidTemperature"));
+    setVolume(prevTemplate.get("volume"));
+    setLidTemperature(prevTemplate.get("lidTemperature"));
   }, [prevTemplate, setTemplateName, setTemplateDescription]);
 
   // check if changes are persent by comparing previous values
   const checkForChanges = () => {
     if (
       templateDescription !== prevTemplate.get("description") ||
-      templateName !== prevTemplate.get("name")
-      // volume !== prevTemplate.get("volume") ||
-      // lidTemperature !== prevTemplate.get("lidTemperature")
+      templateName !== prevTemplate.get("name") ||
+      volume !== prevTemplate.get("volume") ||
+      lidTemperature !== prevTemplate.get("lidTemperature")
     ) {
       return true;
     }
@@ -167,10 +165,8 @@ const TemplateModalContainer = (props) => {
           updateTemplate({
             description: templateDescription,
             name: templateName,
-
-            // TODO: add and test after API is build via backend
-            // volume: volume,
-            // lidTemperature: lidTemperature
+            volume: volume,
+            lid_temp: lidTemperature,
           });
         }
       } else {
@@ -178,10 +174,8 @@ const TemplateModalContainer = (props) => {
         createTemplate({
           description: templateDescription,
           name: templateName,
-
-          // TODO: add and test after API is build via backend
-          // volume: volume,
-          // lidTemperature: lidTemperature
+          volume: volume,
+          lid_temp: lidTemperature,
         });
       }
       // reset modal state to initial values

@@ -122,7 +122,7 @@ const TemplateModal = (props) => {
                     placeholder="Type here"
                     value={volume}
                     onChange={(event) => {
-                      setVolume(event.target.value);
+                      setVolume(parseInt(event.target.value));
                     }}
                   />
                 </FormGroup>
@@ -142,7 +142,7 @@ const TemplateModal = (props) => {
                     placeholder="Type here"
                     value={lidTemperature}
                     onChange={(event) => {
-                      setLidTemperature(event.target.value);
+                      setLidTemperature(parseInt(event.target.value));
                     }}
                   />
                 </FormGroup>
