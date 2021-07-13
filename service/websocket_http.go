@@ -200,6 +200,10 @@ func sendTemperatureAndProgress(deps Dependencies, rw http.ResponseWriter, c *we
 
 	logger.WithField("data", "Temperature").Info("Websocket send Data")
 
+	if !plc.ExperimentRunning{
+		return
+	}
+
 	err = c.WriteMessage(1, respBytesProgress)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Websocket failed to write")
