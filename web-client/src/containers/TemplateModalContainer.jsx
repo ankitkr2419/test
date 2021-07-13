@@ -23,7 +23,7 @@ const TemplateModalContainer = (props) => {
     templateDescription,
     templateName,
     volume,
-    lidTemperature,
+    lid_temp,
     isCreateTemplateModalVisible,
     isTemplateEdited,
   } = templateModalState.toJS();
@@ -81,10 +81,10 @@ const TemplateModalContainer = (props) => {
 
   // helper method to set lid temperature
   const setLidTemperature = useCallback(
-    (lidTemperature) => {
+    (lid_temp) => {
       templateModalDispatch({
         type: templateModalActions.SET_LID_TEMPERATURE,
-        value: lidTemperature,
+        value: lid_temp,
       });
     },
     [templateModalDispatch]
@@ -101,7 +101,7 @@ const TemplateModalContainer = (props) => {
     setTemplateName(prevTemplate.get("name"));
     setTemplateDescription(prevTemplate.get("description"));
     setVolume(prevTemplate.get("volume"));
-    setLidTemperature(prevTemplate.get("lidTemperature"));
+    setLidTemperature(prevTemplate.get("lid_temp"));
   }, [prevTemplate, setTemplateName, setTemplateDescription]);
 
   // check if changes are persent by comparing previous values
@@ -110,7 +110,7 @@ const TemplateModalContainer = (props) => {
       templateDescription !== prevTemplate.get("description") ||
       templateName !== prevTemplate.get("name") ||
       volume !== prevTemplate.get("volume") ||
-      lidTemperature !== prevTemplate.get("lidTemperature")
+      lid_temp !== prevTemplate.get("lid_temp")
     ) {
       return true;
     }
@@ -123,7 +123,7 @@ const TemplateModalContainer = (props) => {
       templateDescription !== "" &&
       templateName !== "" &&
       volume &&
-      lidTemperature
+      lid_temp
     ) {
       return true;
     }
@@ -166,7 +166,7 @@ const TemplateModalContainer = (props) => {
             description: templateDescription,
             name: templateName,
             volume: volume,
-            lid_temp: lidTemperature,
+            lid_temp: lid_temp,
           });
         }
       } else {
@@ -175,7 +175,7 @@ const TemplateModalContainer = (props) => {
           description: templateDescription,
           name: templateName,
           volume: volume,
-          lid_temp: lidTemperature,
+          lid_temp: lid_temp,
         });
       }
       // reset modal state to initial values
@@ -211,7 +211,7 @@ const TemplateModalContainer = (props) => {
       setTemplateName={setTemplateName}
       volume={volume}
       setVolume={setVolume}
-      lidTemperature={lidTemperature}
+      lid_temp={lid_temp}
       setLidTemperature={setLidTemperature}
       addClickHandler={addClickHandler}
       isFormValid={validateTemplateForm()}

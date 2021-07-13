@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Button,
@@ -12,6 +12,7 @@ import {
   ModalBody,
 } from "core-components";
 import { Center, ButtonIcon, Text } from "shared-components";
+import { MAX_LID_TEMP, MAX_VOLUME, MIN_LID_TEMP, MIN_VOLUME } from "appConstants";
 
 const TemplateModal = (props) => {
   const {
@@ -23,7 +24,7 @@ const TemplateModal = (props) => {
     setTemplateName,
     volume,
     setVolume,
-    lidTemperature,
+    lid_temp,
     setLidTemperature,
     addClickHandler,
     isFormValid,
@@ -31,6 +32,9 @@ const TemplateModal = (props) => {
     isTemplateEdited,
     resetModalState,
   } = props;
+
+  const [volumeInvalid, setVolumeInvalid] = useState(false);
+  const [lidTempInvalid, setLidTempInvalid] = useState(false);
 
   // disabled as we only need effect to be run while component is un-mounting
   // eslint-disable-next-line arrow-body-style
@@ -40,6 +44,24 @@ const TemplateModal = (props) => {
     };
     // eslint-disable-next-line
   }, []);
+
+  const onVolumeBlurHandler = useCallback(
+    (volume) => {
+      if (volume < MIN_VOLUME || volume > MAX_VOLUME) {
+        setVolumeInvalid(true);
+      }
+    },
+    [setVolumeInvalid]
+  );
+
+  const onLidTempBlurHandler = useCallback(
+    (temp) => {
+      if (temp < MIN_LID_TEMP || temp > MAX_LID_TEMP) {
+        setLidTempInvalid(true);
+      }
+    },
+    [setLidTempInvalid]
+  );
 
   return (
     <>
@@ -119,12 +141,23 @@ const TemplateModal = (props) => {
                     type="number"
                     name="volume_name"
                     id="volume_name"
-                    placeholder="Type here"
+                    placeholder="10-250 (µ units)"
                     value={volume}
                     onChange={(event) => {
                       setVolume(parseInt(event.target.value));
                     }}
+                    onBlur={(event) =>
+                      onVolumeBlurHandler(parseInt(event.target.value))
+                    }
+                    onFocus={() => setVolumeInvalid(false)}
                   />
+                  {volumeInvalid && (
+                    <div className="flex-70">
+                      <Text Tag="p" size={14} className="text-danger">
+                        Volume should be between {MIN_VOLUME} -{MAX_VOLUME}.
+                      </Text>
+                    </div>
+                  )}
                 </FormGroup>
               </Col>
               <Col sm={6}>
@@ -139,12 +172,23 @@ const TemplateModal = (props) => {
                     type="number"
                     name="lid_temperature_name"
                     id="lid_temperature_name"
-                    placeholder="Type here"
-                    value={lidTemperature}
+                    placeholder="30-100 (°C)"
+                    value={lid_temp}
                     onChange={(event) => {
                       setLidTemperature(parseInt(event.target.value));
                     }}
+                    onBlur={(event) =>
+                      onLidTempBlurHandler(parseInt(event.target.value))
+                    }
+                    onFocus={() => setLidTempInvalid(false)}
                   />
+                  {lidTempInvalid && (
+                    <div className="flex-70">
+                      <Text Tag="p" size={14} className="text-danger">
+                        Lid temperature should be between {MIN_LID_TEMP} -{MAX_LID_TEMP} °C.
+                      </Text>
+                    </div>
+                  )}
                 </FormGroup>
               </Col>
             </Row>
@@ -152,7 +196,7 @@ const TemplateModal = (props) => {
               <Button
                 onClick={addClickHandler}
                 color="primary"
-                disabled={isFormValid === false}
+                disabled={lidTempInvalid || volumeInvalid || !isFormValid}
               >
                 {isTemplateEdited ? "Save" : "Add"}
               </Button>
