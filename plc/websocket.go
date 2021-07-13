@@ -37,8 +37,8 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 		Deck:     d.name,
 		Status:   string(ops),
 		OperationDetails: OperationDetails{
-			RemainingTime: convertToHMS(opRemainingTime),
-			TotalTime:     convertToHMS(delayTime),
+			RemainingTime: ConvertToHMS(opRemainingTime),
+			TotalTime:     ConvertToHMS(delayTime),
 		},
 	}
 
@@ -58,7 +58,7 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 		if currentStep == -2 {
 			wsProgressOp.OperationDetails.CurrentStep = deckRecipe[d.name].ProcessCount
 			wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v in progress", deckRecipe[d.name].ProcessCount , d.name)
-			wsProgressOp.OperationDetails.RemainingTime = convertToHMS(0)
+			wsProgressOp.OperationDetails.RemainingTime = ConvertToHMS(0)
 			wsProgressOp.Progress = 100
 			defer d.sendWSData(time1, timeElapsed, delayTime, recipeSuccess)
 			break
@@ -75,7 +75,7 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 		wsProgressOp.OperationDetails.CurrentStep = deckRecipe[d.name].ProcessCount
 		wsProgressOp.OperationDetails.RecipeID = deckRecipe[d.name].ID
 		wsProgressOp.OperationDetails.TotalProcesses = deckRecipe[d.name].ProcessCount
-		wsProgressOp.OperationDetails.RemainingTime = convertToHMS(0)
+		wsProgressOp.OperationDetails.RemainingTime = ConvertToHMS(0)
 
 	default:
 		return responses.InvalidOperationWebsocket
@@ -92,7 +92,7 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 	return
 }
 
-func convertToHMS(secs int64) *TimeHMS {
+func ConvertToHMS(secs int64) *TimeHMS {
 	var t TimeHMS
 	t.Hours = uint8(secs / (60 * 60))
 	t.Minutes = uint8(secs/60 - int64(t.Hours)*60)
