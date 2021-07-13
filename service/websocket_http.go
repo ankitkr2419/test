@@ -325,15 +325,40 @@ func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
 }
 
 func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes []byte, err error) {
+	var progress, remainingTime, timeTaken int64
+
 	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error get experiment")
 		return
 	}
 
+	timeTaken = int64(time.Now().Sub(expStartTime).Seconds())
+	// if timeTaken is greater than estimated time then progress should be stuck
+	// that is why cutting 5 secs from EstimatedTime
+	if timeTaken > currentExpTemplate.EstimatedTime {
+		remainingTime = 5
+		timeTaken = currentExpTemplate.EstimatedTime - 5
+	} else {
+		remainingTime = currentExpTemplate.EstimatedTime - timeTaken
+	}
+
+	if templateRunSuccess {
+		progress = 100
+		remainingTime = 0
+	} else {
+		progress = int64(float64(timeTaken)/float64(currentExpTemplate.EstimatedTime) * 100 )
+	}
+
 	result := experimentTemperature{
 		Type: "Temperature",
 		Data: Temp,
+		OperationDetails: plc.OperationDetails{
+			Progress: &progress,
+			RecipeID: currentExpTemplate.ID,
+			RemainingTime: plc.ConvertToHMS(remainingTime),
+			TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
+		},
 	}
 
 	respBytes, err = json.Marshal(result)
