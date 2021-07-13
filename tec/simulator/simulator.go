@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"mylab/cpagent/plc"
+	"mylab/cpagent/config"
 	"mylab/cpagent/tec"
 	"time"
 
@@ -83,8 +84,8 @@ func (t *Simulator) ResetDevice() (err error) {
 func (t *Simulator) ReachRoomTemp() error {
 	logger.Infoln("Reaching Room Temp")
 	ts := tec.TECTempSet{
-		TargetTemperature: 27,
-		TargetRampRate:    2,
+		TargetTemperature: config.GetRoomTemp(),
+		TargetRampRate:    tec.RoomTempRamp,
 	}
 	t.SetTempAndRamp(ts)
 	logger.Infoln("Room Temp Reached")

@@ -76,6 +76,8 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		go updateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
+
 		rw.WriteHeader(http.StatusCreated)
 		rw.Write(respBytes)
 		rw.Header().Add("Content-Type", "application/json")
@@ -114,6 +116,8 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error update step")
 			return
 		}
+
+		go updateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
@@ -162,6 +166,13 @@ func deleteStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		step, err := deps.Store.ShowStep(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while deleting step")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		err = deps.Store.DeleteStep(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error while deleting step")
@@ -176,6 +187,8 @@ func deleteStepHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error in updating step count")
 			return
 		}
+
+		go updateEstimatedTimeByStageID(req.Context(), deps.Store, step.StageID)
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")

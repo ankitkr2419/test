@@ -7,6 +7,7 @@ import (
 )
 
 const LogsPath = "./utils/output"
+const RoomTempRamp = 6
 
 var TecTempLogFile *excelize.File
 

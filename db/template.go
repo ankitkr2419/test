@@ -42,18 +42,24 @@ const (
 	publish = true,
 	updated_at = $2
 	where id = $1`
+
+	updateEstimatedTime = `UPDATE templates SET
+	estimated_time = $1
+	where id = $2`
 )
 
+// TODO: Add validate for Lid and Volume once UI is ready
 type Template struct {
-	ID          uuid.UUID `db:"id" json:"id"`
-	Name        string    `db:"name" json:"name" validate:"required"`
-	Description string    `db:"description" json:"description" validate:"required"`
-	Publish     bool      `db:"publish" json:"publish"`
-	Volume     	int64     `db:"volume" json:"volume" validate:"required,gte=10,lte=250"`
-	LidTemp     int64     `db:"lid_temp" json:"lid_temp" validate:"required,gte=30,lte=110"`
-	Stages      []Stage   `json:"stages,omitempty"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
+	ID            uuid.UUID `db:"id" json:"id"`
+	Name          string    `db:"name" json:"name" validate:"required"`
+	Description   string    `db:"description" json:"description" validate:"required"`
+	Publish       bool      `db:"publish" json:"publish"`
+	Volume        int64     `db:"volume" json:"volume" `    //validate:"required,gte=10,lte=250"`
+	LidTemp       int64     `db:"lid_temp" json:"lid_temp"` // validate:"required,gte=30,lte=110"`
+	EstimatedTime int64     `db:"estimated_time" json:"estimated_time"`
+	Stages        []Stage   `json:"stages,omitempty"`
+	CreatedAt     time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type ErrorResponse struct {
@@ -223,6 +229,22 @@ func (s *pgStore) PublishTemplate(ctx context.Context, id uuid.UUID) (err error)
 
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error publishing Template")
+		return
+	}
+
+	return
+}
+
+func (s *pgStore) UpdateEstimatedTime(ctx context.Context, id uuid.UUID, et int64) (err error) {
+
+	_, err = s.db.Exec(
+		updateEstimatedTime,
+		et,
+		id,
+	)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("error updating estimated template time")
 		return
 	}
 
