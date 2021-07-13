@@ -177,16 +177,27 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
 		plcStage := makePLCStage(ss)
 
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
+		// t, err := deps.Store.ShowTemplate(req.Context(), e.TemplateID)
+		// if err != nil {
+		// 	logger.WithField("err", err.Error()).Error("Error fetching template data")
+		// 	rw.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
+
+		// Lid Temp is multiplied by 10 for PLC can't handle floats
+		plcStage.IdealLidTemp = uint16(100 * 10)
+		e.Result = "running"
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount, e.Result)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		// retruns all targets configured for experiment
+		// returns all targets configured for experiment
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
@@ -229,8 +240,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		plcStage.IdealLidTemp = 1000
-
 		//experimentRunning set true
 		plc.ExperimentRunning = true
 		go startExp(deps, plcStage, file)
@@ -264,25 +273,36 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		// instruct plc to stop the experiment: stops if experiment is already running else returns error
-		err = deps.Plc.Stop()
+		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error in plc stop")
+			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
-		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusInternalServerError)
+		if plc.ExperimentRunning {
+			if e.Result != "running" {
+				logger.WithField("err", "invalid running experiment").Error("this experiment id not running")
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "this experiment is not running"})
+				return
+			}
+			// instruct plc to stop the experiment: stops if experiment is already running else returns error
+			err = deps.Plc.Stop()
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in plc stop")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
+			if err != nil {
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "error fetching data"})
+				return
+			}
+		} else {
+			logger.WithField("err", "experiment not running").Error("No experiment running")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "no experiment is running"})
 			return
 		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(`{"msg":"experiment stopped"}`))
-
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "experiment stopped"})
 	})
 }
 
@@ -293,7 +313,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// And then Homing should happen
 	defer func() {
 		plc.ExperimentRunning = false
-		deps.WsMsgCh <- "stop"
 		err = deps.Plc.HomingRTPCR()
 		if err != nil {
 			deps.WsErrCh <- err
@@ -308,18 +327,17 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 		if err != nil {
 			deps.WsErrCh <- err
+		} else {
+			deps.WsMsgCh <- "stop"
 		}
-
-		err = deps.Tec.ReachRoomTemp()
-		if err != nil {
-			deps.WsErrCh <- err
-		}
-
 		err = deps.Plc.SwitchOffLidTemp()
 		if err != nil {
 			deps.WsErrCh <- err
 		}
-
+		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			deps.WsErrCh <- err
+		}
 		return
 	}()
 
@@ -342,7 +360,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	}
 
 	//invoke monitor
-	// ASK: Do we need this?
 	go monitorExperiment(deps, file)
 
 	// Start line
@@ -365,8 +382,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	if err != nil {
 		return
 	}
-
-	// Cycle in Plc
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}

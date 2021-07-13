@@ -25,6 +25,7 @@ import HeatingContainer from "containers/HeatingContainer";
 import MagnetContainer from "containers/MagnetContainer";
 import DelayContainer from "containers/DelayContainer";
 import LoginContainer from 'containers/LoginContainer';
+import TipPositionContainer from "containers/TipPositionContainer";
 
 export const routeDefinitions = [
   {
@@ -117,12 +118,12 @@ export const routeDefinitions = [
         component: HeatingContainer,
         key: 15,
       },
-      // {
-      //   path: `${ROOT_URL_PATH}tip-position`,
-      //   exact: true,
-      //   component: TipPositionContainer,
-      //   key: 16,
-      // },
+      {
+        path: `${ROOT_URL_PATH}tip-position`,
+        exact: true,
+        component: TipPositionContainer,
+        key: 16,
+      },
       {
         path: `${ROOT_URL_PATH}tip-discard`,
         exact: true,

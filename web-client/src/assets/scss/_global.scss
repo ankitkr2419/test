@@ -34,15 +34,38 @@ body {
     right: 0;
     line-height: rem(14px);
     margin: 0;
+  }
+
+  .text-default {
+    width: rem(192px);
+    position: absolute;
+    top: rem(-16px);
+    right: 0;
+    line-height: rem(14px);
     @include fade(hide);
     @extend .text-truncate;
 
     &.show {
       @include fade(show);
     }
+  }
 
-    &.text-error {
-      color: rgb(204, 201, 201);
+  &.text-error {
+    color: rgb(204, 201, 201);
+  }
+
+  .text-error {
+    color: red;
+    width: rem(192px);
+    position: absolute;
+    top: rem(-16px);
+    right: 0;
+    line-height: rem(14px);
+    @include fade(hide);
+    @extend .text-truncate;
+
+    &.show {
+      @include fade(show);
     }
   }
 }
@@ -666,6 +689,29 @@ button:focus {
   }
 }
 
+.landing-page {
+  padding: 2.5rem 4.5rem 2.125rem;
+}
+.card-box {
+  height: 30.75rem !important;
+}
+
+// Modal Heading
+.modal-heading {
+  background-color: rgba(178, 218, 209, 0.22);
+  border-radius: 2.25rem 2.25rem 0 0;
+  height: 3rem;
+
+  .title {
+    font-size: 15px;
+    line-height: 20px;
+  }
+}
+
+.card-box {
+  height: 30.75rem !important;
+}
+
 .recipe-action {
   .icon-play,
   .icon-edit-pencil,
@@ -673,8 +719,4 @@ button:focus {
   .icon-published {
     font-size: 14px !important;
   }
-}
-
-.landing-page {
-  padding: 2.5rem 4.5rem 2.125rem;
 }

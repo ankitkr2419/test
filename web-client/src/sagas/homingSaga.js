@@ -12,7 +12,12 @@ import {
   discardTipAndHomingActionFailed as discardTipAndHomingActionFailure,
 } from "action-creators/homingActionCreators";
 
-export function* homingAction() {
+export function* homingAction(actions) {
+  const {
+    payload: {
+      params: { token },
+    },
+  } = actions;
   const { homingActionSuccess, homingActionFailed } = homingActions;
   try {
     yield call(callApi, {
@@ -24,6 +29,7 @@ export function* homingAction() {
         failureAction: homingActionFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
+        token,
       },
     });
   } catch (error) {
@@ -50,7 +56,7 @@ export function* deckHoming(actions) {
         failureAction: deckHomingActionFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -60,16 +66,13 @@ export function* deckHoming(actions) {
 }
 
 export function* discardTipAndHoming(actions) {
-
   const {
     payload: {
       params: { discardTip, deckName, token },
     },
   } = actions;
-  const {
-    discardTipAndHomingActionSuccess,
-    discardTipAndHomingActionFailed,
-  } = discardTipAndHomingActions;
+  const { discardTipAndHomingActionSuccess, discardTipAndHomingActionFailed } =
+    discardTipAndHomingActions;
 
   try {
     yield call(callApi, {
@@ -81,7 +84,7 @@ export function* discardTipAndHoming(actions) {
         failureAction: discardTipAndHomingActionFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {

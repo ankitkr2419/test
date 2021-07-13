@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS templates DROP COLUMN volume;
+ALTER TABLE IF EXISTS templates DROP COLUMN lid_temp;

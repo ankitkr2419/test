@@ -70,7 +70,7 @@ func (d *Simulator) cycleStage() {
 		time.Sleep(time.Duration(jitter(1, 1, 3)) * time.Second)
 	}
 
-	d.ExitCh <- "stop"
+	d.ExitCh <- errors.New("stop")
 }
 
 func (d *Simulator) performSteps(steps []plc.Step) {
@@ -182,9 +182,11 @@ func jitter(n uint16, min, max int) uint16 {
 
 func (d *Simulator) Cycle() (err error) {
 
-	logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
-	time.Sleep(time.Second * 16)
-	plc.DataCapture = true
+	if plc.ExperimentRunning {
+		logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
+		time.Sleep(time.Second * 16)
+		plc.DataCapture = true
+	}
 	return
 }
 func (d *Simulator) HomingRTPCR() (err error) {
@@ -196,10 +198,11 @@ func (d *Simulator) Reset() (err error) { return }
 
 func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
 	// simulate currentLidTemp
-
-	time.Sleep(2 * time.Second)
-	d.plcIO.d.currentLidTemp = jitter(uint16(expectedLidTemp), 0, 50)
-	logger.Infoln("Current Lid Temp: ", d.plcIO.d.currentLidTemp)
+	if plc.ExperimentRunning {
+		time.Sleep(2 * time.Second)
+		d.plcIO.d.currentLidTemp = jitter(uint16(expectedLidTemp), 0, 30)
+		logger.Infoln("Current Lid Temp: ", d.plcIO.d.currentLidTemp)
+	}
 	return
 }
 
