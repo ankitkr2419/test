@@ -17,7 +17,7 @@ const Preview = (props) => {
     nestedKeys.forEach((nestedKey) => {
       recipeData[key].processDetails[nestedKey].id &&
         previewInfoSubHead.push(
-          <Text>
+          <Text className="mb-2">
             {LEN > 1 && (
               <Text Tag="span" className="font-weight-bold">
                 {LABWARE_NAME[nestedKey]}
@@ -58,12 +58,12 @@ const Preview = (props) => {
               return (
                 recipeData[key].isTicked && (
                   <li className="d-flex justify-content-between">
-                    <Text className="d-flex w-25 font-weight-bold">
+                    <Text className="d-flex mb-2 w-25 font-weight-bold">
                       {LABWARE_NAME[key]} :{" "}
                     </Text>
                     <div className="w-75">
                       <div className="ml-2 setting-value">
-                        <Text>{getSubHead(key)}</Text>
+                        <Text className="mb-2">{getSubHead(key)}</Text>
                       </div>
                     </div>
                   </li>

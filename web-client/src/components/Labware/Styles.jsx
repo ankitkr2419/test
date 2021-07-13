@@ -96,7 +96,7 @@ export const LabwareBox = styled.div`
         line-height: 1.313rem;
       }
       .labware-selection-info {
-        padding: 2rem 5.5rem 2rem 5.5rem;
+        padding: 1rem 5.5rem;
 
         .selected-positions {
           color: #92c4bc;
