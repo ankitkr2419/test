@@ -30,6 +30,7 @@ import (
 	"errors"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
+	"mylab/cpagent/config"
 	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
@@ -196,17 +197,17 @@ func (t *TEC1089) TestRun(plcDeps plc.Driver) (err error) {
 }
 
 func (t *TEC1089) ReachRoomTemp() (err error) {
-	logger.Infoln("Going Back to Room Temp 27 ")
+	logger.Infoln("Going Back to Room Temp ")
 	ts := tec.TECTempSet{
-		TargetTemperature: 27,
-		TargetRampRate:    4,
+		TargetTemperature: config.GetRoomTemp(),
+		TargetRampRate:    tec.RoomTempRamp,
 	}
 	err = t.SetTempAndRamp(ts)
 	if err != nil {
-		logger.Errorln("Couldn't Reach Room Temp 27")
+		logger.Errorln("Couldn't Reach Room Temp ")
 		return
 	}
-	logger.Infoln("Room Temp 27 Reached ")
+	logger.Infoln("Room Temp Reached ")
 	return nil
 }
 
