@@ -16,7 +16,7 @@ export const templateModalInitialState = fromJS({
   templateDescription: "",
   templateName: "",
   volume: null,
-  lidTemperature: null,
+  lid_temp: null,
   isCreateTemplateModalVisible: false,
   isTemplateEdited: false,
 });
@@ -30,7 +30,7 @@ const templateModalReducer = (state, action) => {
     case templateModalActions.SET_VOLUME:
       return state.setIn(["volume"], action.value);
     case templateModalActions.SET_LID_TEMPERATURE:
-      return state.setIn(["lidTemperature"], action.value);
+      return state.setIn(["lid_temp"], action.value);
     case templateModalActions.TOGGLE_TEMPLATE_MODAL_VISIBLE:
       return state.update("isCreateTemplateModalVisible", (value) => !value);
     case templateModalActions.SET_IS_TEMPLATE_EDITED:

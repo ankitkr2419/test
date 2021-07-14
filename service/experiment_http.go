@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -187,10 +188,17 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		// Set currentExpTemplate to current running Template
+		currentExpTemplate = t
+
 		// Lid Temp is multiplied by 10 for PLC can't handle floats
 		plcStage.IdealLidTemp = uint16(t.LidTemp * 10)
 		e.Result = "running"
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount, e.Result)
+
+		// Set expStartTime to current Time
+		expStartTime = time.Now()
+
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), expStartTime, expID, plcStage.CycleCount, e.Result)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -354,10 +362,22 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		return
 	}
 
-	// TODO: Lid Temp reaching
+	// templateRunSuccess has to happen before monitor is called
+	templateRunSuccess = false
+
+	lidTempStartTime := time.Now()
 	err = deps.Plc.SetLidTemp(p.IdealLidTemp)
 	if err != nil {
 		return
+	}
+	lidTempSecs := time.Now().Sub(lidTempStartTime).Seconds()
+
+	// Setting currentExpTemplate Estimated Time more accurately.
+	if currentExpTemplate.EstimatedTime != 0 {
+		// Below formula is copied from estimated_time.go
+		// We are removing variable LidTempTime
+		estimatedLidTime := int64(math.Abs(float64(p.IdealLidTemp/10)-config.GetRoomTemp()) / 0.5)
+		currentExpTemplate.EstimatedTime = currentExpTemplate.EstimatedTime - estimatedLidTime + int64(lidTempSecs)
 	}
 
 	//invoke monitor
@@ -396,6 +416,8 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		}
 		logger.Infoln("Cycle Completed -> ", i)
 	}
+
+	templateRunSuccess = true
 
 	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
 	plc.AddRowToExcel(file, plc.TECSheet, row)

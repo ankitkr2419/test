@@ -1,41 +1,57 @@
-import React, { useState } from 'react';
-import { Table } from 'core-components';
-import { ButtonIcon } from 'shared-components';
-import './activity.scss';
-import ActivityData from './ActivityData.json';
-import SearchBar from './SearchBar';
+import React, { useState } from "react";
+import { Table } from "core-components";
+import { ButtonIcon } from "shared-components";
+import "./activity.scss";
+import ActivityData from "./ActivityData.json";
+import SearchBar from "./SearchBar";
 import MlModal from "shared-components/MlModal";
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
+import moment from "moment";
 
 const headers = ActivityData.headers;
-const experiments = ActivityData.experiments;
+// const experiments = ActivityData.experiments;//TODO remove if not needed
 
 const ActivityComponent = (props) => {
+  let { experiments, searchText, onSearchTextChanged } = props;
 
-	const [activityIdToDelete, setActivityIdToDelete] = useState(null);
-	const [showDeleteActivityModal, setShowDeleteActivityModal] = useState(false)
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [showDeleteActivityModal, setShowDeleteActivityModal] = useState(false);
 
-	const deleteActivityClickHandler = (activityId) => {
-		setActivityIdToDelete(activityId);
-		toggleDeleteActivityModal();
-	} 
+  const deleteActivityClickHandler = (e) => {
+    e.stopPropagation();
+    toggleDeleteActivityModal();
+  };
 
-	const toggleDeleteActivityModal = () => {
-		setShowDeleteActivityModal(!showDeleteActivityModal);
-	}
-	
-	const onConfirmedDeleteActivity = () => {
-		//TODO remove console
-		console.log('activity Id confirmed to delete: ', activityIdToDelete);
-		
-		toggleDeleteActivityModal();
-		
-		//TODO: API call here
-	}
+  const toggleDeleteActivityModal = () => {
+    setShowDeleteActivityModal(!showDeleteActivityModal);
+  };
 
-	return (
-		<div className='activity-content h-100 py-0'>
-			{/**Delete activity confirmation modal */}
+  const onConfirmedDeleteActivity = () => {
+    const activityIdToDelete = selectedActivity?.id;
+
+    //TODO remove console
+    console.log("activity Id confirmed to delete: ", activityIdToDelete);
+
+    toggleDeleteActivityModal();
+
+    //TODO: API call here
+  };
+
+  const toggleSelectedActivity = (experiment) => {
+    if (selectedActivity?.id === experiment.id) {
+      setSelectedActivity(null);
+    } else {
+      setSelectedActivity(experiment);
+    }
+  };
+
+  let filteredExperiments = experiments?.filter((experiment) =>
+    experiment.template_name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  return (
+    <div className="activity-content h-100 py-0">
+      {/**Delete activity confirmation modal */}
       {showDeleteActivityModal && (
         <MlModal
           isOpen={showDeleteActivityModal}
@@ -47,57 +63,91 @@ const ActivityComponent = (props) => {
           failureBtn={MODAL_BTN.no}
         />
       )}
-			<SearchBar id='search' name='search' placeholder='Search' />
-			<div className='table-responsive'>
-				<Table striped className='table-log'>
-					<colgroup>
-						<col width='9%' />
-						<col />
-						<col width='12%' />
-						<col width='10.5%' />
-						<col width='10.5%' />
-						<col width='8%' />
-						<col width='8%' />
-						<col width='12%' />
-						<col width='15%' />
-					</colgroup>
-					<thead>
-						<tr>
-							{headers.map((header, i) => (
-								<th key={i}>{header}</th>
-							))}
-							<th />
-						</tr>
-					</thead>
-					<tbody>
-						{experiments.map((experiment, i) => (
-							<tr
-								className={experiment.result === 'Inconclusive' ? 'active' : ''}
-								key={i}
-							>
-								<td>{experiment.id}</td>
-								<td>{experiment.template}</td>
-								<td>{experiment.date}</td>
-								<td>{experiment.start_time}</td>
-								<td>{experiment.end_time}</td>
-								<td>{experiment.no_of_wells}</td>
-								<td>{experiment.repeat_cycles}</td>
-								<td
-									className={experiment.result === 'Error' ? 'text-danger' : ''}
-								>
-									{experiment.result}
-								</td>
-								<td className='td-actions'>
-									<ButtonIcon size={28} name='expand' />
-									<ButtonIcon size={28} name='trash' onClick={() => deleteActivityClickHandler(experiment.id)}/>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</Table>
-			</div>
-		</div>
-	);
+      <SearchBar
+        id="search"
+        name="search"
+        placeholder="Search"
+        value={searchText}
+        onChange={(e) => onSearchTextChanged(e.target.value)}
+      />
+      <div className="table-responsive">
+        <Table striped className="table-log">
+          <colgroup>
+            <col width="9%" />
+            <col />
+            <col width="12%" />
+            <col width="10.5%" />
+            <col width="10.5%" />
+            <col width="8%" />
+            <col width="8%" />
+            <col width="12%" />
+            <col width="15%" />
+          </colgroup>
+          <thead>
+            <tr>
+              {headers.map((header, i) => (
+                <th key={i}>{header}</th>
+              ))}
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {filteredExperiments.map((experiment, i) => (
+              <tr
+                className={
+                  experiment.id === selectedActivity?.id ? "active" : ""
+                }
+                key={i}
+                onClick={() => toggleSelectedActivity(experiment)}
+              >
+                {/**TODO remove comments once activity log finalized */}
+                <td>
+                  {i + 1}
+                  {/*experiment.id*/}
+                </td>
+                <td>{experiment.template_name /*{experiment.template}*/}</td>
+                <td>
+                  {
+                    experiment.created_at &&
+                      moment(experiment.created_at).format(
+                        "DD/MM/YYYY"
+                      ) /*date*/
+                  }
+                </td>
+                <td>
+                  {experiment.start_time &&
+                    moment(experiment.start_time).format("HH:MM A")}
+                </td>
+                <td>
+                  {experiment.end_time &&
+                    moment(experiment.end_time).format("HH:MM A")}
+                </td>
+                <td>{experiment.well_count /*no_of_wells*/}</td>
+                <td>{experiment.repeat_cycle /*repeat_cycles*/}</td>
+                <td
+                  className={
+                    experiment.result === "Error"
+                      ? "text-danger text-capitalize"
+                      : "text-capitalize"
+                  }
+                >
+                  {experiment.result}
+                </td>
+                <td className="td-actions">
+                  <ButtonIcon size={28} name="expand" />
+                  <ButtonIcon
+                    size={28}
+                    name="trash"
+                    onClick={deleteActivityClickHandler}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    </div>
+  );
 };
 
 ActivityComponent.propTypes = {};

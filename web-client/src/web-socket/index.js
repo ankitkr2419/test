@@ -7,7 +7,11 @@ import {
 import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from "appConstants";
 import { updateWellThroughSocket } from "action-creators/wellActionCreators";
 import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
-import { experimentedCompleted } from "action-creators/runExperimentActionCreators";
+import {
+  experimentedCompleted,
+  runExperimentInProgress,
+  runExperimentSuccess,
+} from "action-creators/runExperimentActionCreators";
 // import { showErrorModal } from "action-creators/modalActionCreators";
 import { temperatureDataSucceeded } from "action-creators/temperatureGraphActionCreators";
 import {
@@ -51,6 +55,12 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.temperatureData:
           dispatch(temperatureDataSucceeded(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.rtpcrProgress:
+          dispatch(runExperimentInProgress(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.rtpcrSuccess:
+          dispatch(runExperimentSuccess(data));
           break;
         case SOCKET_MESSAGE_TYPE.success:
           dispatch(experimentedCompleted(data));
