@@ -12,6 +12,17 @@ import (
 var oldString, newString []string 
 var replaceCountLength int
 
+type Conf struct {
+	RoomTemperature int64 `json:"room_temperature" validate:"required,lte=30,gte=20"`
+	HomingTime      int64 `json:"homing_time" validate:"required,lte=30,gte=16"`
+	NumHomingCycles int64 `json:"no_of_homing_cycles" validate:"required,lte=100,gte=0"`
+}
+
+func SetValues(c Conf) (err error) {
+	
+	return
+}
+
 func visit(path string, fi os.FileInfo, err error) error {
 
 	if err != nil {

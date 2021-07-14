@@ -1,8 +1,10 @@
 package service
 
 import (
-	"net/http"
 	"mylab/cpagent/config"
+	"mylab/cpagent/responses"
+	"net/http"
+	"encoding/json"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -12,8 +14,8 @@ func getConfigHandler(deps Dependencies) http.HandlerFunc {
 
 		c, err := getConfigDetails()
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching Config data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Errorln(responses.ConfigDataFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConfigDataFetchError.Error()})
 			return
 		}
 
@@ -21,19 +23,42 @@ func getConfigHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+func updateConfigHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-func getConfigDetails() (c Conf, err error){
-	c = Conf{
+		var c config.Conf
+		err := json.NewDecoder(req.Body).Decode(&c)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			logger.WithField("err", err.Error()).Errorln(responses.ConfigDataDecodeError)
+			return
+		}
+
+		valid, respBytes := validate(c)
+		if !valid {
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = config.SetValues(c)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ConfigDataUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConfigDataUpdateError.Error()})
+			responseCodeAndMsg(rw, http.StatusOK, c)
+
+			return
+		}
+
+		responseCodeAndMsg(rw, http.StatusOK, c)
+	})
+}
+
+func getConfigDetails() (c config.Conf, err error) {
+	c = config.Conf{
 		RoomTemperature: int64(config.GetRoomTemp()),
-		HomingTime: int64(config.GetHomingTime()),
+		HomingTime:      int64(config.GetHomingTime()),
 		NumHomingCycles: int64(config.GetNumHomingCycles()),
 	}
 
 	return
-}
-
-type Conf struct{
-	RoomTemperature int64 `json:"room_temperature"`
-	HomingTime int64 `json:"homing_time"`
-	NumHomingCycles int64 `json:"no_of_homing_cycles"`
 }
