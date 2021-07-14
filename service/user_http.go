@@ -97,7 +97,6 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		var u db.User
-		rw.Header().Add("Content-Type", "application/json")
 		err := json.NewDecoder(req.Body).Decode(&u)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
@@ -125,6 +124,47 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 		return
 	})
 }
+
+
+func updateUserHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		var u db.User
+
+		vars := mux.Vars(req)
+		oldU, err := parseUUID(vars["old_username"])
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = json.NewDecoder(req.Body).Decode(&u)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
+			return
+		}
+
+		valid, respBytes := validate(u)
+		if !valid {
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		//hash password to validate
+		u.Password = MD5Hash(u.Password)
+
+		err = deps.Store.UpdateUser(req.Context(), u, oldU)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.UserUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserUpdateError.Error()})
+			return
+		}
+
+		logger.Infoln(responses.UserUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UserUpdateSuccess})
+		return
+	})
+}
+
 
 func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
