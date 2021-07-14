@@ -218,7 +218,7 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Add Default supervisor user to DB
 	err = s.InsertUser(context.Background(), supervisor)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		logger.WithField("err", err.Error()).Error("Setup Default Supervisor failed")
 		return
 	}
 
@@ -232,7 +232,7 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Add Default main user to DB
 	err = s.InsertUser(context.Background(), mainUser)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		logger.WithField("err", err.Error()).Error("Setup Default Main User failed")
 		return
 	}
 
@@ -246,7 +246,21 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Add Default operator user to DB
 	err = s.InsertUser(context.Background(), operatorUser)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		logger.WithField("err", err.Error()).Error("Setup Default Operator User failed")
+		return
+	}
+
+	// Create a default engineer user
+	engUser := db.User{
+		Username: "engineer",
+		Password: MD5Hash("engineer"),
+		Role:     "engineer",
+	}
+
+	// Add Default engineer user to DB
+	err = s.InsertUser(context.Background(), engUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default Engineer User failed")
 		return
 	}
 
