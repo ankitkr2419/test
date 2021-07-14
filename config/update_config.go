@@ -1,16 +1,19 @@
 package config
 
 import (
+	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-	logger "github.com/sirupsen/logrus"
-
 )
 
-var oldString, newString []string 
-var replaceCountLength int
+const(
+	configPath = "./conf"
+)
+
+var oldString, newString []string
 
 type Conf struct {
 	RoomTemperature int64 `json:"room_temperature" validate:"required,lte=30,gte=20"`
@@ -19,7 +22,30 @@ type Conf struct {
 }
 
 func SetValues(c Conf) (err error) {
-	
+	hT := GetHomingTime()
+	hC := GetNumHomingCycles()
+	rT := GetRoomTemp()
+
+	oldString, newString = []string{}, []string{}
+	oldString = append(oldString,
+		fmt.Sprintf("homing_time: %d", hT),
+		fmt.Sprintf("num_homing_cycles: %d", hC),
+		fmt.Sprintf("room_temp: %d", int64(rT)),
+	)
+	newString = append(newString,
+		fmt.Sprintf("homing_time: %d", c.HomingTime),
+		fmt.Sprintf("num_homing_cycles: %d", c.NumHomingCycles),
+		fmt.Sprintf("room_temp: %d", c.RoomTemperature),
+	)
+
+	err = UpdateConfig(configPath, oldString, newString)
+	if err != nil{
+		return
+	}
+
+	SetHomingTime(c.HomingTime)
+	SetNumHomingCycles(c.NumHomingCycles)
+	SetRoomTemp(c.RoomTemperature)
 	return
 }
 
@@ -48,7 +74,7 @@ func visit(path string, fi os.FileInfo, err error) error {
 
 		// Replace a bunch of strings
 		newContents := string(read)
-		for i:=0; i< replaceCountLength; i++{
+		for i := 0; i < len(oldString); i++ {
 			newContents = strings.Replace(newContents, oldString[i], newString[i], -1)
 		}
 
