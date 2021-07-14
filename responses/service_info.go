@@ -66,6 +66,7 @@ var (
 
 	UserLoginSuccess  = "user successfully logged in."
 	UserCreateSuccess = "user successfully created"
+	UserUpdateSuccess = "user successfully updated"
 	UserLogoutSuccess = "user successfully logged out"
 
 	ProcessesRearrangeSuccess = "rearranging processes success"
