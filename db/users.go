@@ -11,7 +11,7 @@ import (
 
 const (
 	validateUserQuery = `SELECT * FROM users as u
-	        WHERE u.username = $1 AND u.password = $2 AND u.role = $3`
+	        WHERE u.username = $1 AND u.password = $2`
 
 	getUserQuery = `SELECT * from users WHERE username = $1`
 
@@ -21,12 +21,14 @@ const (
 			    role)
 				VALUES  `
 	insertUsersQuery2 = ` ON CONFLICT DO NOTHING;`
+
+	updateUsersQuery = `UPDATE users SET username=$1, password=$2, role= $3 where username=$4 ` + insertUsersQuery2
 )
 
 type User struct {
 	Username  string    `db:"username" json:"username" validate:"required"`
 	Password  string    `db:"password" json:"password" validate:"required"`
-	Role      string    `db:"role" json:"role" validate:"required"`
+	Role      string    `db:"role" json:"role"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -37,8 +39,8 @@ func (s *pgStore) ValidateUser(ctx context.Context, u User) (err error) {
 		validateUserQuery,
 		u.Username,
 		u.Password,
-		u.Role,
 	)
+
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
@@ -66,6 +68,31 @@ func (s *pgStore) InsertUser(ctx context.Context, u User) (err error) {
 	)
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
+		return
+	}
+
+	return
+}
+
+func (s *pgStore) UpdateUser(ctx context.Context, u User, oldName string) (err error) {
+
+	r, err := s.db.Exec(
+		updateUsersQuery,
+		u.Username,
+		u.Password,	
+		u.Role,
+		oldName,	
+	)
+	if err != nil {
+		logger.WithField("error in exec query", err.Error()).Errorln("Query Failed for Update User")
+		return
+	}
+
+	c, _ := r.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		err = errors.New("Record Couldn't be Updated")
+		logger.WithField("err", err.Error()).Error("Possible Duplicate User")
 		return
 	}
 
