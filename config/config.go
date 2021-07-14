@@ -64,6 +64,7 @@ func SetSecretKey(key string) {
 	key = "SECRET_KEY"
 	viper.Set(key, "123456qwerty")
 }
+
 func GetICPosition() int {
 	return ReadEnvInt("ic_position")
 }
@@ -76,8 +77,20 @@ func GetNumHomingCycles() int {
 	return ReadEnvInt("num_homing_cycles")
 }
 
-func GetRoomTemp() float64 {
+func GetRoomTemp(rT int64) float64 {
 	return ReadEnvFloat("room_temp")
+}
+
+func SetHomingTime(hT int64)  {
+	viper.Set("homing_time", hT)
+}
+
+func SetNumHomingCycles(hC int64) {
+	viper.Set("num_homing_cycles", hC)
+}
+
+func SetRoomTemp(rT int64)  {
+	viper.Set("room_temp", rT)
 }
 
 func ReadEnvInt(key string) int {
