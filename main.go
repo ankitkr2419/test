@@ -38,6 +38,12 @@ const (
 	SIM = "simulator"
 )
 
+const(
+	logsPath = "./utils/logs"
+	tecPath = "./utils/tec"
+	configPath = "./conf"
+)
+
 func main() {
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
@@ -45,8 +51,6 @@ func main() {
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
 
-	logsPath := "./utils/logs"
-	tecPath := "./utils/tec"
 	// logging output to file and console
 	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
 		os.MkdirAll(logsPath, 0755)
