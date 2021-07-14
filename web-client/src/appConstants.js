@@ -41,6 +41,8 @@ export const SOCKET_MESSAGE_TYPE = {
   ErrorPCRMonitor: "ErrorPCRMonitor",
   ErrorPCRDead: "ErrorPCRDead",
   temperatureData: "Temperature",
+  rtpcrProgress: "RTPCR_PROGRESS",
+  rtpcrSuccess: "RTPCR_SUCCESS",
   homingProgress: "PROGRESS_HOMING",
   homingSuccess: "SUCCESS_HOMING",
   runRecipeProgress: "PROGRESS_RECIPE",
@@ -56,6 +58,10 @@ export const EXPERIMENT_STATUS = {
   running: "running",
   runFailed: "run-failed",
   stopped: "stopped",
+
+  //while running experiment
+  progressing: "progressing",
+  progressComplete: "progressComplete",
 
   // socket
   success: "success",

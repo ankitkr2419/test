@@ -14,7 +14,10 @@ import {
   createExperimentReset,
 } from "action-creators/experimentActionCreators";
 import { getIsExperimentSaved } from "selectors/experimentSelector";
-import { setIsTemplateRoute } from "action-creators/loginActionCreators";
+import {
+  loginReset,
+  setIsTemplateRoute,
+} from "action-creators/loginActionCreators";
 
 const TemplateContainer = (props) => {
   const {
@@ -48,6 +51,11 @@ const TemplateContainer = (props) => {
 
   // isTemplateDeleted = true means experiment created successfully
   const isExperimentSaved = useSelector(getIsExperimentSaved);
+
+  useEffect(() => {
+    console.info("Reducers reset");
+    dispatch(loginReset());
+  }, []);
 
   // set isTemplateRoute true on mount
   useEffect(() => {

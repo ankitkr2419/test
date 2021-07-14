@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import {
-  loginReset,
-  logoutInitiated,
-} from "action-creators/loginActionCreators";
+import { logoutInitiated } from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -22,7 +19,10 @@ import {
   stopExperiment,
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
-import { getRunExperimentReducer } from "selectors/runExperimentSelector";
+import {
+  getRunExperimentReducer,
+  getTimeNow,
+} from "selectors/runExperimentSelector";
 import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
@@ -88,16 +88,16 @@ const AppHeader = (props) => {
     }
   }, [isExperimentSucceeded]);
 
-  useEffect(() => {
-    if (isExperimentStopped === true) {
-      // disConnectSocket();
-      dispatch(loginReset());
-    }
-  }, [isExperimentStopped, dispatch]);
+  // useEffect(() => {
+  //   if (isExperimentStopped === true) {
+  //     // disConnectSocket();
+  //     dispatch(loginReset());
+  //   }
+  // }, [isExperimentStopped, dispatch]);
 
   // logout user
   const logoutClickHandler = () => {
-    dispatch(logoutInitiated({ deckName: deckName, token: token }));
+    setExitModalVisibility(true);
   };
 
   const startExperiment = () => {
@@ -198,6 +198,10 @@ const AppHeader = (props) => {
     dispatch(runExperiment(experimentId, token));
   };
 
+  const handleBackBtn = () => {
+    history.push("templates");
+  };
+
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} />
@@ -226,94 +230,126 @@ const AppHeader = (props) => {
           {/* <PrintDataModal /> */}
           {/* <ExportDataModal /> */}
           {app === APP_TYPE.RTPCR && (
-            <div className="experiment-info text-right mx-3">
-              <Text
-                size={12}
-                className={`text-default ${isExperimentRunning ? "show" : ""}`}
-              >
-                {`Experiment started at ${runExperimentReducer.get(
-                  "experimentStartedTime"
-                )}`}
-              </Text>
-              <Text
-                size={12}
-                className={`text-error ${isRunFailed ? "show" : ""}`}
-              >
-                Experiment failed to run.
-              </Text>
+            <>
+              <div className="experiment-info text-right mx-3">
+                <Text
+                  size={12}
+                  className={`text-default ${
+                    isExperimentRunning ? "show" : ""
+                  }`}
+                >
+                  {`Experiment started at ${runExperimentReducer.get(
+                    "experimentStartedTime"
+                  )}`}
+                </Text>
+                <Text
+                  size={12}
+                  className={`text-error ${isRunFailed ? "show" : ""}`}
+                >
+                  Experiment failed to run.
+                </Text>
 
-              {isExperimentSucceeded === false && isPlateRoute === true && (
-                <div className="d-flex align-items-center">
+                <Text
+                  size={12}
+                  className={`text-error ${isExperimentStopped ? "show" : ""}`}
+                >
+                  {`Experiment aborted at ${runExperimentReducer.get(
+                    "experimentStoppedTime"
+                  )}.`}
+                </Text>
+
+                {isPlateRoute === true && (
+                  <div className="d-flex align-items-center">
+                    <Button
+                      color="secondary"
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none mr-3`}
+                      onClick={handleBackBtn}
+                      disabled={isExperimentRunning}
+                    >
+                      Back
+                    </Button>
+
+                    <Button
+                      color={isExperimentSucceeded ? "primary" : "secondary"}
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none  mr-3 ${
+                        isExperimentSucceeded ? "d-none" : ""
+                      }`}
+                      onClick={() => setAbortModalVisibility(true)}
+                      disabled={!isExperimentRunning}
+                    >
+                      Abort
+                    </Button>
+                    <Button
+                      color={isExperimentRunning ? "primary" : "secondary"}
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none ${
+                        isExperimentSucceeded ? "d-none" : ""
+                      }`}
+                      outline={
+                        isExperimentRunning === false &&
+                        isExperimentSucceeded === false
+                      }
+                      onClick={startExperiment}
+                      disabled={
+                        isExperimentRunning ||
+                        isExperimentSucceeded ||
+                        isExperimentStopped
+                      }
+                    >
+                      Run
+                    </Button>
+                    <Button
+                      color="success"
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none ${
+                        isExperimentSucceeded ? "" : "d-none"
+                      }`}
+                      onClick={() => setExpSuccessModalVisibility(true)}
+                    >
+                      Result - Successful
+                    </Button>
+                  </div>
+                )}
+
+                {isLoginTypeAdmin && activeWidgetID === "step" && (
                   <Button
-                    color={isExperimentSucceeded ? "primary" : "secondary"}
-                    size="sm"
-                    className="font-weight-light border-2 border-gray shadow-none  mr-3"
-                    onClick={() => setAbortModalVisibility(true)}
-                    disabled={!isExperimentRunning}
-                  >
-                    Abort
-                  </Button>
-                  <Button
-                    color={isExperimentRunning ? "primary" : "secondary"}
+                    color="primary"
                     size="sm"
                     className="font-weight-light border-2 border-gray shadow-none"
-                    outline={
-                      isExperimentRunning === false &&
-                      isExperimentSucceeded === false
-                    }
-                    onClick={startExperiment}
+                    // onClick={startExperiment}
+                  >
+                    Save
+                  </Button>
+                )}
+              </div>
+              <Dropdown
+                isOpen={userDropdownOpen}
+                toggle={toggleUserDropdown}
+                className="ml-2"
+              >
+                <DropdownToggle icon name="user" size={32} />
+                <DropdownMenu right>
+                  <DropdownItem
+                    onClick={logoutClickHandler}
                     disabled={isExperimentRunning}
                   >
-                    Run
-                  </Button>
-                </div>
-              )}
-
-              {isLoginTypeAdmin && activeWidgetID === "step" && (
-                <Button
-                  color="primary"
-                  size="sm"
-                  className="font-weight-light border-2 border-gray shadow-none"
-                  // onClick={startExperiment}
-                >
-                  Save
-                </Button>
-              )}
-              {isExperimentSucceeded === true && (
-                <Button
-                  color="success"
-                  size="sm"
-                  className="font-weight-light border-2 border-gray shadow-none"
-                  onClick={() => setExpSuccessModalVisibility(true)}
-                >
-                  Result - Successful
-                </Button>
-              )}
-            </div>
+                    Log out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </>
           )}
 
-          {isLoginTypeAdmin === true && (
-            <Dropdown
-              isOpen={userDropdownOpen}
-              toggle={toggleUserDropdown}
-              className="ml-2"
-            >
-              <DropdownToggle icon name="user" size={32} />
-              <DropdownMenu right>
-                <DropdownItem onClick={logoutClickHandler}>
-                  Log out
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          )}
-          {isLoginTypeOperator === true && (
+          {/* {isLoginTypeOperator === true && (
             <ButtonIcon
               size={34}
               name="cross"
               onClick={onCrossClick}
               className="ml-2"
             />
-          )}
+          )} */}
 
           {/* MODALS */}
 

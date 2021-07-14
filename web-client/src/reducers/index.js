@@ -32,7 +32,10 @@ import {
   createExperimentTargetReducer,
 } from "reducers/experimentTargetReducer";
 import { listSamplesReducer } from "reducers/samplesReducer";
-import { runExperimentReducer } from "reducers/runExperimentReducer";
+import {
+  runExpProgressReducer,
+  runExperimentReducer,
+} from "reducers/runExperimentReducer";
 import { activeWellReducer } from "reducers/actionWellReducer";
 import { wellGraphReducer } from "reducers/wellGraphReducer";
 import { socketReducer } from "reducers/socketReducer";
@@ -77,6 +80,7 @@ const rootReducer = combineReducers({
   listSamplesReducer,
   addWellsReducer,
   runExperimentReducer,
+  runExpProgressReducer,
   activeWellReducer,
   wellGraphReducer,
   socketReducer,
