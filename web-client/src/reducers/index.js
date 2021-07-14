@@ -56,6 +56,7 @@ import { editProcessReducer } from "reducers/editProcessReducer";
 import { appInfoReducer } from "./appInfoReducer";
 import { processesReducer } from "reducers/processesReducer";
 import { activityLogReducer } from "reducers/activityLogReducer";
+import { calibrationReducer } from "./calibrationReducer";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -100,6 +101,7 @@ const rootReducer = combineReducers({
   appInfoReducer,
   processesReducer,
   activityLogReducer,
+  calibrationReducer,
 });
 
 export default rootReducer;

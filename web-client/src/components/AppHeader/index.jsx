@@ -121,8 +121,11 @@ const AppHeader = (props) => {
 
   /** Hide plates tab if the user is admin */
   const getIsNavLinkHidden = (pathname) => {
-    if (isLoginTypeEngineer === true) {
-      //hide all tabs for engineer
+    if (pathname !== ROUTES.calibration && isLoginTypeEngineer === true) {
+      //hide all tabs for engineer other than Calibration
+      return true;
+    } else if (pathname === ROUTES.calibration && isLoginTypeAdmin === false && isLoginTypeEngineer === false) {
+      //hide Calibration tab for operator/superwiser
       return true;
     } else if (pathname === "/plate" && isLoginTypeAdmin === true) {
       return true;

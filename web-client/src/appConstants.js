@@ -124,6 +124,7 @@ export const API_ENDPOINTS = {
   processes: "processes",
   appInfo: "app-info",
   experiments: "experiments", 
+  configs: "configs",
 };
 
 export const MODAL_MESSAGE = {
