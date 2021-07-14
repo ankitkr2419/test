@@ -63,19 +63,25 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments/{id}/temperature", authenticate(getTemperatureHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//usercreate
 	router.HandleFunc("/users", authenticate(createUserHandler(deps), deps, Combined, supervisor, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	// update user
+	router.HandleFunc("/users/{old_username}", authenticate(updateUserHandler(deps), deps, Combined, supervisor, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 	//userlogin
 	router.HandleFunc("/login/{deck:[A-B]?}", validateUserHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	//userlogout
 	router.HandleFunc("/logout/{deck:[A-B]?}", authenticate(logoutUserHandler(deps), deps, Combined)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
+	// configs
+	router.HandleFunc("/configs", authenticate(getConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/configs", authenticate(updateConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+
 	router.HandleFunc("/motor", authenticate(createMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/consumable-distance", authenticate(createConsumableDistanceHandler(deps), deps, Extraction, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/tiptube", authenticate(createTipTubeHandler(deps), deps, Extraction, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/consumable-distance", authenticate(createConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/tiptube", authenticate(createTipTubeHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 
 	//homing
 	router.HandleFunc("/homing/{deck:[A-B]?}", authenticate(homingHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//manual
-	router.HandleFunc("/manual", authenticate(manualHandler(deps), deps, Extraction, engineer)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/manual", authenticate(manualHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost).Headers(versionHeader, v1)
 	router.HandleFunc("/pause/{deck:[A-B]}", authenticate(pauseHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/resume/{deck:[A-B]}", authenticate(resumeHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/abort/{deck:[A-B]}", authenticate(abortHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
@@ -132,18 +138,18 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/app-info", appInfoHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	//rt-pcr funcs
-	router.HandleFunc("/rt-pcr/homing", rtpcrHomingHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/rt-pcr/reset", rtpcrResetHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/rt-pcr/cycle", rtpcrStartCycleHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/rt-pcr/monitor", rtpcrMonitorHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/rt-pcr/homing", authenticate(rtpcrHomingHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/rt-pcr/reset", authenticate(rtpcrResetHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/rt-pcr/cycle", authenticate(rtpcrStartCycleHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/rt-pcr/monitor", authenticate(rtpcrMonitorHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	// tec funcs
-	router.HandleFunc("/tec/set-temp-and-ramp", setTempAndRampHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
-	router.HandleFunc("/tec/run", runProfileHandler(deps)).Methods(http.MethodPost).Headers(versionHeader, v1)
-	router.HandleFunc("/tec/auto-tune", autoTuneHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/tec/reset-device", resetDeviceHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/tec/run", runTECHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/tec/get-all", getAllTECHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/set-temp-and-ramp", authenticate(setTempAndRampHandler(deps), deps, RTPCR)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/run", authenticate(runProfileHandler(deps), deps, RTPCR)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/auto-tune", authenticate(autoTuneHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/reset-device", authenticate(resetDeviceHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/run", authenticate(runTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tec/get-all", authenticate(getAllTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	return
 }
