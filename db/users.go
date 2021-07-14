@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	validateUserQuery = `SELECT * FROM users as u
-	        WHERE u.username = $1 AND u.password = $2`
+	validateUserQuery = `SELECT role FROM users
+	        WHERE username = $1 AND password = $2`
 
 	getUserQuery = `SELECT * from users WHERE username = $1`
 
@@ -22,7 +22,7 @@ const (
 				VALUES  `
 	insertUsersQuery2 = ` ON CONFLICT DO NOTHING;`
 
-	updateUsersQuery = `UPDATE users SET username=$1, password=$2, role= $3 where username=$4 ` + insertUsersQuery2
+	updateUsersQuery = `UPDATE users SET username=$1, password=$2, role= $3 where username=$4 `
 )
 
 type User struct {
@@ -33,9 +33,9 @@ type User struct {
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
-func (s *pgStore) ValidateUser(ctx context.Context, u User) (err error) {
-
-	r, err := s.db.Exec(
+func (s *pgStore) ValidateUser(ctx context.Context, u User) (User, error) {
+	
+	rows, err := s.db.Query(
 		validateUserQuery,
 		u.Username,
 		u.Password,
@@ -43,18 +43,17 @@ func (s *pgStore) ValidateUser(ctx context.Context, u User) (err error) {
 
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
-		return
+		return User{}, err
 	}
 
-	c, _ := r.RowsAffected()
-	// check row count as no error is returned when row not found for update
-	if c == 0 {
-		err = errors.New("Record Not Found")
-		logger.WithField("err", err.Error()).Error("Error User not found")
-		return
+	if rows.Next() {
+		if err = rows.Scan(&u.Role); err != nil {
+			logger.WithField("err", err.Error()).Error("Error getting user role details")
+			return User{}, err
+		}
 	}
 
-	return
+	return u, nil
 }
 
 func (s *pgStore) InsertUser(ctx context.Context, u User) (err error) {
