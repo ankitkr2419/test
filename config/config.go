@@ -76,6 +76,10 @@ func GetRoomTemp() float64 {
 	return ReadEnvFloat("room_temp")
 }
 
+func SetRoomTemp(temp float64) {
+	viper.Set("room_temp", temp)
+}
+
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))

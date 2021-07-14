@@ -5,6 +5,8 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"math"
+	"mylab/cpagent/config"
 	"mylab/cpagent/responses"
 	"os"
 	"strconv"
@@ -131,17 +133,14 @@ iterateCSV:
 				return err
 			}
 			templateCreated = true
+			AddCycles(store, csvReader)
+
 		case blank:
 			logger.Infoln("Record-> ", record)
 			if len(record) < 2 || record[1] == "" {
 				err = fmt.Errorf("record has unexpected length or empty process name, maybe CSV is over.")
 				logger.Warnln(err, record)
 				break iterateCSV
-			} else {
-				err = addStage(store, record[1:])
-				if err != nil {
-					return err
-				}
 			}
 		default:
 			logger.Infoln("Record-> ", record)
@@ -151,17 +150,53 @@ iterateCSV:
 
 	cStage.RepeatCount = cycleCount
 	err = store.UpdateStage(csvCtx, cStage)
-	if err != nil{
+	if err != nil {
 		return
 	}
 
 	err = store.UpdateStepCount(csvCtx)
-	if err != nil{
+	if err != nil {
 		return
 	}
 
 	done = true
 	return nil
+}
+
+func AddCycles(store Storer, csvReader *csv.Reader) (err error) {
+
+	for {
+
+		subRecord, err := csvReader.Read()
+		if err == io.EOF {
+			logger.Infoln("Reached end of csv file")
+			break
+		}
+		if err != nil {
+			logger.Errorln("error while reading a record from csvReader:", err)
+			return err
+		}
+		startPoint := subRecord[1]
+		logger.Infoln("sub Record-> ", subRecord)
+
+	startPoint:
+		if startPoint == "hold/cycle" {
+			stageRecord, err := csvReader.Read()
+			if err == io.EOF {
+				logger.Infoln("Reached end of csv file")
+				break
+			}
+			if err != nil {
+				logger.Errorln("error while reading a record from csvReader:", err)
+				return err
+			}
+			if stageRecord[0] != dummy {
+				addStage(store, stageRecord)
+			}
+			goto startPoint
+		}
+	}
+	return
 }
 
 func addStage(store Storer, record []string) (err error) {
@@ -172,7 +207,7 @@ func addStage(store Storer, record []string) (err error) {
 		return err
 	}
 
-	switch strings.TrimSpace(strings.ToUpper(record[0])) {
+	switch strings.TrimSpace(strings.ToLower(record[1])) {
 	case hold:
 		if cycleSeen {
 			err = fmt.Errorf("Couldn't create Holding step entry as Cycle entry is alreday present.")
@@ -207,7 +242,7 @@ func addStage(store Storer, record []string) (err error) {
 		logger.Errorln(err)
 		return err
 	}
-	if err != nil{
+	if err != nil {
 		logger.Errorln(err)
 		return err
 	}
@@ -239,6 +274,11 @@ func addTemplate(store Storer, templateDetails []string) (err error) {
 
 	if createdTemplate.Publish, err = strconv.ParseBool(templateDetails[4]); err != nil {
 		logger.Warnln(err, templateDetails[4])
+		return err
+	}
+
+	if createdTemplate.EstimatedTime, err = strconv.ParseInt(templateDetails[5], 10, 64); err != nil {
+		logger.Errorln(err, templateDetails[5])
 		return err
 	}
 
@@ -289,25 +329,25 @@ func addHoldStage(store Storer, record []string) (err error) {
 }
 
 func addHoldStep(store Storer, record []string) (err error) {
-
+	logger.Infoln("hold step record----------", record)
 	step.StageID = hStage.ID
 	step.DataCapture = dataCapture
 
-	if temp, err := strconv.ParseFloat(record[0], 64); err != nil {
+	if temp, err := strconv.ParseFloat(record[1], 64); err != nil {
 		logger.Errorln(err, record[1])
 		return err
 	} else {
 		step.TargetTemperature = float32(temp)
 	}
 
-	if temp, err := strconv.ParseFloat(record[1], 64); err != nil {
+	if temp, err := strconv.ParseFloat(record[2], 64); err != nil {
 		logger.Errorln(err, record[4])
 		return err
 	} else {
 		step.RampRate = float32(temp)
 	}
 
-	if temp, err := strconv.ParseInt(record[2], 10, 32); err != nil {
+	if temp, err := strconv.ParseInt(record[3], 10, 32); err != nil {
 		logger.Errorln(err, record[2])
 		return err
 	} else {
@@ -321,8 +361,41 @@ func addHoldStep(store Storer, record []string) (err error) {
 	}
 
 	logger.Infoln("Step Created for Hold: ", createdStep)
+	err = updateEstimatedTimeForStep(store, createdStep)
+	if err != nil {
+		logger.Errorln("error in updating estimated time for step", err)
+		return
+	}
 
 	return nil
+}
+
+func updateEstimatedTimeForStep(store Storer, step Step) (err error) {
+
+	stage, err := store.ShowStage(csvCtx, step.StageID)
+	template, err := store.ShowTemplate(csvCtx, stage.TemplateID)
+	tp := 0.0
+	config.SetRoomTemp(27)
+	currentTemp := config.GetRoomTemp()
+	estimatedTime := template.EstimatedTime
+	tp += math.Abs(currentTemp-float64(step.TargetTemperature)) / float64(step.RampRate)
+	tp += float64(step.HoldTime)
+
+	switch stage.Type {
+	case cycle:
+		estimatedTime += int64(tp * float64(stage.RepeatCount))
+	case hold:
+		estimatedTime += int64(tp)
+	}
+
+	template.EstimatedTime = estimatedTime
+	err = store.UpdateTemplate(csvCtx, template)
+	if err != nil {
+		logger.Errorln("Couldn't update estimated time", err)
+		return
+	}
+
+	return
 }
 
 func addCycleStep(store Storer, record []string) (err error) {
@@ -330,21 +403,21 @@ func addCycleStep(store Storer, record []string) (err error) {
 	step.StageID = cStage.ID
 	step.DataCapture = dataCapture
 
-	if temp, err := strconv.ParseFloat(record[0], 64); err != nil {
+	if temp, err := strconv.ParseFloat(record[1], 64); err != nil {
 		logger.Errorln(err, record[1])
 		return err
 	} else {
 		step.TargetTemperature = float32(temp)
 	}
 
-	if temp, err := strconv.ParseFloat(record[1], 64); err != nil {
+	if temp, err := strconv.ParseFloat(record[2], 64); err != nil {
 		logger.Errorln(err, record[4])
 		return err
 	} else {
 		step.RampRate = float32(temp)
 	}
 
-	if temp, err := strconv.ParseInt(record[2], 10, 32); err != nil {
+	if temp, err := strconv.ParseInt(record[3], 10, 32); err != nil {
 		logger.Errorln(err, record[2])
 		return err
 	} else {
