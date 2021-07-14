@@ -77,7 +77,7 @@ func GetNumHomingCycles() int {
 	return ReadEnvInt("num_homing_cycles")
 }
 
-func GetRoomTemp(rT int64) float64 {
+func GetRoomTemp() float64 {
 	return ReadEnvFloat("room_temp")
 }
 

@@ -41,7 +41,6 @@ const (
 const(
 	logsPath = "./utils/logs"
 	tecPath = "./utils/tec"
-	configPath = "./conf"
 )
 
 func main() {

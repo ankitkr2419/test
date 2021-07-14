@@ -107,6 +107,7 @@ var (
 	UserMarshallingError      = fmt.Errorf("error in marshalling token")
 	UserInsertError           = fmt.Errorf("error in inserting user")
 	UserUpdateError			  = fmt.Errorf("error in updating user")
+	UsernameBlankError		  = fmt.Errorf("error username is blank")
 	UserAuthDataFetchError    = fmt.Errorf("error in authenticating user")
 	UserAuthDataDeleteError   = fmt.Errorf("error in deleting authenticated user data")
 	UserTokenApplicationError = fmt.Errorf("error in token application type")

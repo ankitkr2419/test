@@ -147,6 +147,9 @@ var (
 	//RTPCR
 	RTPCRHomingSuccess = "Homing Success"
 	RTPCRResetSuccess  = "Reset Success"
+
+	// Configs
+	UpdateConfigSuccess = "Config was updated successfully"
 )
 
 func GetMachineOperationMessage(operation string, state string) (message string) {
