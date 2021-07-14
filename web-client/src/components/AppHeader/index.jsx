@@ -44,6 +44,7 @@ const AppHeader = (props) => {
     isPlateRoute,
     isLoginTypeAdmin,
     isLoginTypeOperator,
+    isLoginTypeEngineer,
     isTemplateRoute,
     token,
     deckName,
@@ -120,7 +121,10 @@ const AppHeader = (props) => {
 
   /** Hide plates tab if the user is admin */
   const getIsNavLinkHidden = (pathname) => {
-    if (pathname === "/plate" && isLoginTypeAdmin === true) {
+    if (isLoginTypeEngineer === true) {
+      //hide all tabs for engineer
+      return true;
+    } else if (pathname === "/plate" && isLoginTypeAdmin === true) {
       return true;
     }
     return false;

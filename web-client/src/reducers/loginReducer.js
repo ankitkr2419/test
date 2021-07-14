@@ -14,6 +14,7 @@ const initialStateOfDecks = () => {
       error: false,
       msg: "",
       isAdmin: false,
+      isEngineer: false,
       isActive: true,
       isDeckBlocked: false,
       token: "",
@@ -24,6 +25,7 @@ const initialStateOfDecks = () => {
       error: false,
       msg: "",
       isAdmin: false,
+      isEngineer: false,
       isActive: false,
       isDeckBlocked: false,
       token: "",
@@ -40,6 +42,7 @@ const loginInitialState = fromJS({
   isTemplateRoute: false,
   deckName: "", //initiated deckName while login process only (temp)
   isAdmin: false, //initiated isAdmin while login process only (temp)
+  isEngineer: false,//initiated isEngineer while login process only (temp)
   decks: initialStateOfDecks(),
 });
 
@@ -73,6 +76,7 @@ export const loginReducer = (state = loginInitialState, action) => {
         isLoggedInForHoming: false,
         deckName: action.payload.body.deckName,
         isAdmin: action.payload.body.role === USER_ROLES.ADMIN,
+        isEngineer: action.payload.body.role === USER_ROLES.ENGINEER,
         decks: updatedDecks,
       });
 
@@ -80,6 +84,7 @@ export const loginReducer = (state = loginInitialState, action) => {
       const token = action.payload.response.token;
       let deckName = state.toJS().deckName; //current deckname
       let isAdminTemp = state.toJS().isAdmin;
+      let isEngineerTemp = state.toJS().isEngineer;
       if (deckName && deckName === DECKNAME.DeckA) {
         //update and login deck A
 
@@ -88,6 +93,7 @@ export const loginReducer = (state = loginInitialState, action) => {
           error: false,
           msg: "",
           isAdmin: isAdminTemp,
+          isEngineer: isEngineerTemp,
           isActive: true,
           token,
         };
@@ -114,6 +120,7 @@ export const loginReducer = (state = loginInitialState, action) => {
           error: false,
           msg: "",
           isAdmin: isAdminTemp,
+          isEngineer: isEngineerTemp,
           isActive: true,
           token,
         };
@@ -203,7 +210,7 @@ export const loginReducer = (state = loginInitialState, action) => {
       let newDecksAfterLogout = getUpdatedDecks(
         state,
         deckShouldLogout,
-        { error: null, isLoggedIn: false, token: "", isDeckBlocked: false },
+        { error: null, isLoggedIn: false, isAdmin: false, isEngineer: false, token: "", isDeckBlocked: false },
         {},
         true
       );
@@ -229,7 +236,7 @@ export const loginReducer = (state = loginInitialState, action) => {
         newdeckStateAferLogoutSuccess = getUpdatedDecks(
           state,
           state.toJS().deckName,
-          { error: false, isLoggedIn: false, token: "", isDeckBlocked: false },
+          { error: false, isLoggedIn: false, isAdmin: false, isEngineer: false, token: "", isDeckBlocked: false },
           {},
           true
         );
