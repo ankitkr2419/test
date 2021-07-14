@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"mylab/cpagent/config"
 	"mylab/cpagent/plc"
 	"time"
 
@@ -191,6 +192,7 @@ func (d *Simulator) Cycle() (err error) {
 }
 func (d *Simulator) HomingRTPCR() (err error) {
 	logger.WithField("HOMING", "Started").Infoln("homing started")
+	time.Sleep(time.Second * time.Duration(config.GetHomingTime()))
 	logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	return
 }
