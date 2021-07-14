@@ -44,12 +44,10 @@ func updateConfigHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.ConfigDataUpdateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConfigDataUpdateError.Error()})
-			responseCodeAndMsg(rw, http.StatusOK, c)
-
 			return
 		}
 
-		responseCodeAndMsg(rw, http.StatusOK, c)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{ Msg: responses.UpdateConfigSuccess})
 	})
 }
 
