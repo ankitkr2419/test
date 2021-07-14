@@ -48,7 +48,8 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		//hash password to validate
 		u.Password = MD5Hash(u.Password)
 
-		err = deps.Store.ValidateUser(req.Context(), u)
+		// Getting back user along with his role
+		u, err = deps.Store.ValidateUser(req.Context(), u)
 		if err != nil {
 			if err.Error() == "Record Not Found" {
 				logger.WithField("err", err.Error()).Error(responses.UserInvalidError)
@@ -129,16 +130,13 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 func updateUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var u db.User
-
+		
 		vars := mux.Vars(req)
-		oldU, err := parseUUID(vars["old_username"])
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
+		oldU := vars["old_username"]
 
-		err = json.NewDecoder(req.Body).Decode(&u)
+		err := json.NewDecoder(req.Body).Decode(&u)
 		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.UserDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
 			return
 		}
