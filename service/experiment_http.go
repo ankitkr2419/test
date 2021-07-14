@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -364,9 +365,19 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// templateRunSuccess has to happen before monitor is called
 	templateRunSuccess = false
 
+	lidTempStartTime := time.Now()
 	err = deps.Plc.SetLidTemp(p.IdealLidTemp)
 	if err != nil {
 		return
+	}
+	lidTempSecs := time.Now().Sub(lidTempStartTime).Seconds()
+
+	// Setting currentExpTemplate Estimated Time more accurately.
+	if currentExpTemplate.EstimatedTime != 0 {
+		// Below formula is copied from estimated_time.go
+		// We are removing variable LidTempTime
+		estimatedLidTime := int64(math.Abs(float64(p.IdealLidTemp/10)-config.GetRoomTemp()) / 0.5)
+		currentExpTemplate.EstimatedTime = currentExpTemplate.EstimatedTime - estimatedLidTime + int64(lidTempSecs)
 	}
 
 	//invoke monitor
