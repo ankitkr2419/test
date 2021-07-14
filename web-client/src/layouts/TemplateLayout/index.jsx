@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer } from "react";
 import { CardBody, Card, Input } from "core-components";
 import { Text } from "shared-components";
 import Wizard from "shared-components/Wizard";
@@ -43,9 +43,7 @@ const TemplateLayout = (props) => {
 
   // Here we have stored id for active widget
   const activeWidgetID = templateLayoutState.get("activeWidgetID");
-  // console.log('activeWidgetID: ',activeWidgetID);
   const templateID = templateLayoutState.get("templateID");
-  // console.log('templateID: ', templateID)
 
   const wizardList = getWizardListByLoginType(
     templateLayoutState.get("wizardList"),
@@ -92,6 +90,11 @@ const TemplateLayout = (props) => {
     });
   }, []);
 
+  // redirect to template initially
+  useEffect(() => {
+    updateSelectedWizard("template");
+  }, []);
+
   if (!isLoggedIn) {
     // history.push(ROUTES.login);
     history.push("splashscreen");
@@ -105,15 +108,15 @@ const TemplateLayout = (props) => {
   return (
     <div className="template-content">
       {/* <div className="d-flex"> */}
-        <Wizard
-          list={wizardList}
-          onClickHandler={updateSelectedWizard}
-          isAdmin={isAdmin}
-          showFinishBtn={activeWidgetID === "step"}
-          finishBtnHandler={finishBtnHandler}
-        />
-        {/* TODO : changes will be made here after ui is finalized. */}
-        {/* {activeWidgetID === "step" && (
+      <Wizard
+        list={wizardList}
+        onClickHandler={updateSelectedWizard}
+        isAdmin={isAdmin}
+        showFinishBtn={activeWidgetID === "step"}
+        finishBtnHandler={finishBtnHandler}
+      />
+      {/* TODO : changes will be made here after ui is finalized. */}
+      {/* {activeWidgetID === "step" && (
           <div>
             <Text
               size={16}

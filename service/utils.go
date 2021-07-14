@@ -10,6 +10,7 @@ import (
 	"mylab/cpagent/responses"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
@@ -40,6 +41,11 @@ const (
 	duplicateC = "duplicate"
 	rearrangeC = "rearrange"
 )
+
+var templateRunSuccess bool
+var expStartTime time.Time
+// TODO: Don't allow Template Update/Deletion if this Template is in Progress
+var currentExpTemplate db.Template
 
 var userLogin sync.Map
 

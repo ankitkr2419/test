@@ -1,8 +1,10 @@
-import temperatureGraphActions from 'actions/temperatureGraphActions';
+import temperatureGraphActions from "actions/temperatureGraphActions";
 
-export const temperatureDataSucceeded = (data) => ({
-	type: temperatureGraphActions.successAction,
-	payload: {
-		data,
-	},
-});
+export const temperatureDataSucceeded = (data) => {
+  return {
+    type: temperatureGraphActions.successAction,
+    payload: {
+      data,
+    },
+  };
+};

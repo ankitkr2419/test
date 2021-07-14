@@ -95,7 +95,7 @@ export const getDefaultWellsList = createSelector(() => {
     status: "", // red, green, orange
     initial: "",
     id: null,
-    isWellActive: false
+    isWellActive: false,
   };
   // Initial plate state added for wells in array from index 1
   for (let i = 0; i !== MAX_NO_OF_WELLS; i += 1) {
@@ -133,7 +133,7 @@ export const updateWellListSelector = createSelector(
     // if no wells selected
     if (action.payload.response !== null) {
       const {
-        payload: { response }
+        payload: { response },
       } = action;
       // get position of selected wells from response
       const positions = response.map((ele) => ele.position);
@@ -150,9 +150,9 @@ export const updateWellListSelector = createSelector(
             return ele.merge({
               isWellFilled: true,
               ...selectedWell,
-              initial: selectedWell.task[0],
+              initial: selectedWell.task.substring(0, 2),
               status: selectedWell.color_code || "green",
-              sample: selectedWell.sample_name
+              sample: selectedWell.sample_name,
             });
           }
           return ele;
@@ -176,7 +176,7 @@ export const setActiveWells = createSelector(
           // find the index present in response data
           if (activeWellsPositions.includes(index) && ele !== null) {
             return ele.merge({
-              isWellActive: true
+              isWellActive: true,
             });
           }
           return ele;

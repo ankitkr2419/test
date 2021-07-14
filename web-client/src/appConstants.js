@@ -41,6 +41,8 @@ export const SOCKET_MESSAGE_TYPE = {
   ErrorPCRMonitor: "ErrorPCRMonitor",
   ErrorPCRDead: "ErrorPCRDead",
   temperatureData: "Temperature",
+  rtpcrProgress: "RTPCR_PROGRESS",
+  rtpcrSuccess: "RTPCR_SUCCESS",
   homingProgress: "PROGRESS_HOMING",
   homingSuccess: "SUCCESS_HOMING",
   runRecipeProgress: "PROGRESS_RECIPE",
@@ -56,6 +58,10 @@ export const EXPERIMENT_STATUS = {
   running: "running",
   runFailed: "run-failed",
   stopped: "stopped",
+
+  //while running experiment
+  progressing: "progressing",
+  progressComplete: "progressComplete",
 
   // socket
   success: "success",
@@ -422,5 +428,12 @@ export const timeConstants = {
   MIN_IN_ONE_HOUR: 60,
 };
 
-//constants for RTPCR
+//constants for RTPCR - plates
 export const MAX_NO_OF_WELLS = 16;
+
+//constants for RTPCR - templates
+export const MIN_VOLUME = 10;
+export const MAX_VOLUME = 250;
+
+export const MIN_LID_TEMP = 30;
+export const MAX_LID_TEMP = 110;

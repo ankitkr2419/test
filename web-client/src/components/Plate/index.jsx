@@ -34,6 +34,11 @@ const Plate = (props) => {
     activeWells,
     experimentTemplate,
     resetSelectedWells,
+    progressStatus,
+    progress,
+    remainingTime,
+    totalTime,
+    temperatureData,
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -111,10 +116,15 @@ const Plate = (props) => {
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
       <Header
+        progressStatus={progressStatus}
+        progress={progress}
+        remainingTime={remainingTime}
+        totalTime={totalTime}
         experimentTemplate={experimentTemplate}
-        isExperimentSucceeded={experimentStatus === EXPERIMENT_STATUS.success}
+        experimentStatus={experimentStatus}
         experimentDetails={experimentDetails}
         experimentId={experimentId}
+        temperatureData={temperatureData}
       />
       <GridWrapper className="plate-body flex-100 scroll-y">
         <Nav className="plate-nav-tabs border-0" tabs>
@@ -137,7 +147,8 @@ const Plate = (props) => {
               disabled={
                 !(
                   experimentStatus === EXPERIMENT_STATUS.success ||
-                  experimentStatus === EXPERIMENT_STATUS.running
+                  experimentStatus === EXPERIMENT_STATUS.running ||
+                  experimentStatus === EXPERIMENT_STATUS.stopped
                 )
               }
             >

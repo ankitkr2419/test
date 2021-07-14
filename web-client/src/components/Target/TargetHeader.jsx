@@ -51,14 +51,14 @@ const TargetHeader = (props) => {
             size={14}
             className="flex-25 text-default text-truncate-multi-line font-weight-light mb-0 px-2 py-1"
           >
-            {`Volume: ${21} μ units.`}
+            {`Volume: ${selectedTemplateDetails.get("volume")} μ units.`}
           </Text>
 
           <Text
             size={14}
             className="flex-25 text-default text-truncate-multi-line font-weight-light mb-0 px-2 py-1"
           >
-            {`Lid Temperature: ${38} °C.`}
+            {`Lid Temperature: ${selectedTemplateDetails.get("lid_temp")} °C.`}
           </Text>
 
           {/* <div className="d-flex"> */}
