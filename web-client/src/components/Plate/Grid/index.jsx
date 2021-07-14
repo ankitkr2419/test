@@ -14,7 +14,7 @@ const GridComponent = ({
   onWellUpdateClickHandler,
   isGroupSelectionOn,
   showGraphOfWell,
-  experimentStatus,
+  experimentStatus
 }) => (
   <div className="d-flex flex-column flex-100 pt-4">
     {/* <Coordinate direction="horizontal">
@@ -28,7 +28,7 @@ const GridComponent = ({
           <CoordinateItem key={i} coordinateValue={value} />
         ))}
       </Coordinate> */}
-    <WellGrid>
+    <WellGrid className="rtpcr-well-grid">
       {wells.map((well, index) => {
         if (well !== null) {
           const {
@@ -42,7 +42,7 @@ const GridComponent = ({
             sample,
             task,
             targets,
-            isWellActive,
+            isWellActive
           } = well.toJS();
           return (
             <>
@@ -99,7 +99,7 @@ GridComponent.propTypes = {
   onWellClickHandler: PropTypes.func.isRequired,
   wells: PropTypes.object.isRequired,
   onWellUpdateClickHandler: PropTypes.func.isRequired,
-  isGroupSelectionOn: PropTypes.bool.isRequired,
+  isGroupSelectionOn: PropTypes.bool.isRequired
 };
 
 export default GridComponent;
