@@ -415,6 +415,14 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 			return
 		}
 		logger.Infoln("Cycle Completed -> ", i)
+		// Home every n number of cycles
+		if (config.GetNumHomingCycles() != 0) &&
+			(int(i)%config.GetNumHomingCycles() == 0) {
+			err = deps.Plc.HomingRTPCR()
+			if err != nil {
+				return
+			}
+		}
 	}
 
 	templateRunSuccess = true

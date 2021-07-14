@@ -106,6 +106,8 @@ var (
 	UserTokenEncodeError      = fmt.Errorf("error in fetching token")
 	UserMarshallingError      = fmt.Errorf("error in marshalling token")
 	UserInsertError           = fmt.Errorf("error in inserting user")
+	UserUpdateError			  = fmt.Errorf("error in updating user")
+	UsernameBlankError		  = fmt.Errorf("error username is blank")
 	UserAuthDataFetchError    = fmt.Errorf("error in authenticating user")
 	UserAuthDataDeleteError   = fmt.Errorf("error in deleting authenticated user data")
 	UserTokenApplicationError = fmt.Errorf("error in token application type")
@@ -146,6 +148,11 @@ var (
 	//RTPCR
 	RTPCRHomingError = fmt.Errorf("error in homing rt-pcr")
 	RTPCRResetError  = fmt.Errorf("error in reseting rt-pcr")
+
+	// Configs
+	ConfigDataDecodeError = fmt.Errorf("Error while decoding config data")
+	ConfigDataFetchError = fmt.Errorf("Error fetching Config data")
+	ConfigDataUpdateError = fmt.Errorf("Error Updating Config data")
 )
 
 // Special errors which are in []byte format
