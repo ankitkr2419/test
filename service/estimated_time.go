@@ -81,8 +81,10 @@ func updateEstimatedTimeByTemplateID(ctx context.Context, s db.Storer, templateI
 		if stage.Type == cycle {
 			estimatedTime += tp * float64(stage.RepeatCount)
 			// Add extra Homing Cycles Time
-			homingCycles :=  int(stage.RepeatCount) / config.GetNumHomingCycles()
-			estimatedTime += float64(homingCycles * config.GetHomingTime())
+			if config.GetNumHomingCycles() != 0{
+				homingCycles :=  int(stage.RepeatCount) / config.GetNumHomingCycles()
+				estimatedTime += float64(homingCycles * config.GetHomingTime())
+			}
 		} else {
 			estimatedTime += tp
 		}
