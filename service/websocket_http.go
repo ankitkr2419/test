@@ -56,7 +56,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 				} else if msg == "read_temp" {
 
-					sendTemperature(deps, rw, c)
+					sendTemperatureAndProgress(deps, rw, c)
 
 				} else if strings.EqualFold(msgs[0], "progress") {
 
@@ -183,15 +183,15 @@ func sendOnSuccess(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn)
 
 }
 
-func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
+func sendTemperatureAndProgress(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	respBytes, err := getTemperatureDetails(deps, experimentValues.experimentID)
+	respBytesTemperature, respBytesProgress, err := getTemperatureAndProgressDetails(deps, experimentValues.experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("error in fetching data")
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = c.WriteMessage(1, respBytes)
+	err = c.WriteMessage(1, respBytesTemperature)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Websocket failed to write")
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -199,6 +199,19 @@ func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Con
 	}
 
 	logger.WithField("data", "Temperature").Info("Websocket send Data")
+
+	if !plc.ExperimentRunning{
+		return
+	}
+
+	err = c.WriteMessage(1, respBytesProgress)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", "Progress_RTPCR").Info("Websocket send Data")
 
 }
 
@@ -324,21 +337,70 @@ func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
 	return
 }
 
-func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes []byte, err error) {
+func getTemperatureAndProgressDetails(deps Dependencies, experimentID uuid.UUID) (respBytesTemperature, respBytesProgress []byte, err error) {
+	var progress, remainingTime, timeTaken int64
+	var pG interface{}
+
 	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error get experiment")
 		return
 	}
 
-	result := experimentTemperature{
+	if !plc.ExperimentRunning{
+		goto skipRtpcrProgress
+	}
+
+	timeTaken = int64(time.Now().Sub(expStartTime).Seconds())
+	// if timeTaken is greater than estimated time then progress should be stuck
+	// that is why cutting 5 secs from EstimatedTime
+	if timeTaken >= currentExpTemplate.EstimatedTime {
+		remainingTime = 5
+		timeTaken = currentExpTemplate.EstimatedTime - 5
+	} else {
+		remainingTime = currentExpTemplate.EstimatedTime - timeTaken
+	}
+
+	if templateRunSuccess {
+		progress = 100
+		remainingTime = 0
+		pG = oprSuccess{
+			Type: "RTPCR_SUCCESS",
+			Data: plc.OperationDetails{
+				Progress: &progress,
+				RecipeID: currentExpTemplate.ID,
+				RemainingTime: plc.ConvertToHMS(remainingTime),
+				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
+			},
+		}
+	} else {
+		progress = int64(float64(timeTaken)/float64(currentExpTemplate.EstimatedTime) * 100 )
+		pG = oprProgress{
+			Type: "RTPCR_PROGRESS",
+			Data: plc.OperationDetails{
+				Progress: &progress,
+				RecipeID: currentExpTemplate.ID,
+				RemainingTime: plc.ConvertToHMS(remainingTime),
+				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
+			},
+		}
+	}
+
+	respBytesProgress, err = json.Marshal(pG)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling progress data")
+		return
+	}
+
+skipRtpcrProgress:
+	eT := experimentTemperature{
 		Type: "Temperature",
 		Data: Temp,
 	}
 
-	respBytes, err = json.Marshal(result)
+	respBytesTemperature, err = json.Marshal(eT)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error marshaling result temp data")
+		logger.WithField("err", err.Error()).Error("Error marshaling result temperature data")
 		return
 	}
 
