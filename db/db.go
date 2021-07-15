@@ -58,7 +58,8 @@ type Storer interface {
 	InsertNotification(context.Context, Notification) error
 	MarkNotificationasRead(context.Context, uuid.UUID) error
 	InsertUser(context.Context, User) error
-	ValidateUser(context.Context, User) error
+	UpdateUser(context.Context, User, string) error
+	ValidateUser(context.Context, User) (User, error)
 	CheckIfICTargetAdded(context.Context, uuid.UUID) (WarnResponse, error)
 	InsertMotor(context.Context, []Motor) error
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
