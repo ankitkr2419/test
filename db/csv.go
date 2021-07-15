@@ -29,6 +29,7 @@ const (
 	extraction  = "EXTRACTION"
 	hold        = "hold"
 	cycle       = "cycle"
+	target      = "TARGET"
 )
 
 var sequenceNumber int64 = 0
@@ -133,6 +134,7 @@ iterateCSV:
 				return err
 			}
 			templateCreated = true
+			AddTargets(store, csvReader)
 			AddCycles(store, csvReader)
 
 		case blank:
@@ -161,6 +163,43 @@ iterateCSV:
 
 	done = true
 	return nil
+}
+
+func AddTargets(store Storer, csvReader *csv.Reader) (err error) {
+
+	subRecord, err := csvReader.Read()
+	if err == io.EOF {
+		logger.Infoln("Reached end of csv file")
+		return
+	}
+	if err != nil {
+		logger.Errorln("error while reading a record from csvReader:", err)
+		return err
+	}
+	if subRecord[0] == target {
+
+		targetDetails, err := store.GetTargetByName(csvCtx, subRecord[1])
+		if err != nil {
+			logger.Errorln("error while fetching target details:", err)
+			return err
+		}
+		tempTarget := []TemplateTarget{TemplateTarget{
+			TemplateID: createdTemplate.ID,
+			TargetID:   targetDetails.ID,
+		}}
+		if threshold, err := strconv.ParseFloat(subRecord[2], 64); err != nil {
+			logger.Errorln(err, subRecord[2])
+			return err
+		} else {
+			tempTarget[0].Threshold = float64(threshold)
+		}
+
+		targetTemp, err := store.UpsertTemplateTarget(csvCtx, tempTarget, createdTemplate.ID)
+		logger.Info("Created template target-> ", targetTemp)
+
+	}
+	return nil
+
 }
 
 func AddCycles(store Storer, csvReader *csv.Reader) (err error) {
@@ -277,7 +316,12 @@ func addTemplate(store Storer, templateDetails []string) (err error) {
 		return err
 	}
 
-	if createdTemplate.EstimatedTime, err = strconv.ParseInt(templateDetails[5], 10, 64); err != nil {
+	if createdTemplate.LidTemp, err = strconv.ParseInt(templateDetails[5], 10, 64); err != nil {
+		logger.Errorln(err, templateDetails[5])
+		return err
+	}
+
+	if createdTemplate.Volume, err = strconv.ParseInt(templateDetails[6], 10, 64); err != nil {
 		logger.Errorln(err, templateDetails[5])
 		return err
 	}

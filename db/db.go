@@ -118,4 +118,5 @@ type Storer interface {
 	AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error)
 	ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error)
 	UpdateEstimatedTime(ctx context.Context, id uuid.UUID, estimatedTime int64) (err error)
+	GetTargetByName(ctx context.Context, name string) (t Target, err error)
 }
