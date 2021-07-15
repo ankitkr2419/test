@@ -22,8 +22,9 @@ const (
 		name,
 		description, 
 		volume, 
-		lid_temp)
-		VALUES ($1, $2, $3, $4) RETURNING id`
+		lid_temp,
+		estimated_time)
+		VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
 	getTemplateQuery = `SELECT *
 		FROM templates WHERE id = $1`
@@ -33,8 +34,9 @@ const (
 		description = $2,
 		volume = $3,
 		lid_temp = $4,
-		updated_at = $5
-		where id = $6 AND publish = false`
+		estimated_time = $5,
+		updated_at = $6
+		where id = $7 AND publish = false`
 
 	deleteTemplateQuery = `DELETE FROM templates WHERE id = $1`
 
@@ -140,7 +142,7 @@ func (s *pgStore) CreateTemplate(ctx context.Context, t Template) (createdTemp T
 
 	var id uuid.UUID
 
-	err = s.db.QueryRow(createTemplateQuery, t.Name, t.Description, t.Volume, t.LidTemp).Scan(&id)
+	err = s.db.QueryRow(createTemplateQuery, t.Name, t.Description, t.Volume, t.LidTemp, t.EstimatedTime).Scan(&id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error creating Template")
 		return
@@ -161,6 +163,7 @@ func (s *pgStore) UpdateTemplate(ctx context.Context, t Template) (err error) {
 		t.Description,
 		t.Volume,
 		t.LidTemp,
+		t.EstimatedTime,
 		time.Now(),
 		t.ID,
 	)
