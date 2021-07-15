@@ -55,3 +55,36 @@ func PrintBinaryInfo() {
 	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
 		Version, User, Machine, Branch, CommitID, BuiltOn)
 }
+
+
+func ShutDownGraceFully(deps Dependencies) (err error) {
+		var err1, err2, err3, err4 error
+		// We received an interrupt signal, shut down.
+		logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
+		if Application == Combined || Application == RTPCR{
+			err1 = deps.Tec.ReachRoomTemp()
+			if err1 != nil {
+				logger.Errorln("Couldn't reach the room temp!")
+				err = err1
+			}
+			err2 = deps.Plc.SwitchOffLidTemp()
+			if err2 != nil {
+				logger.Errorln("Couldn't Switch off the Lid!")
+				err = fmt.Errorf("%v\n%v",err, err2)
+			}
+		}
+		if Application == Combined || Application == Extraction {
+			_, err3 = deps.PlcDeck["A"].SwitchOffMotor()
+			if err3 != nil {
+				logger.Errorln("Couldn't switch off Deck A motor!")
+				err = fmt.Errorf("%v\n%v",err, err3)
+			}
+
+			_, err4 = deps.PlcDeck["B"].SwitchOffMotor()
+			if err4 != nil {
+				logger.Errorln("Couldn't switch off Deck B motor!")
+				err = fmt.Errorf("%v\n%v",err, err4)
+			}
+		}
+		return
+}
