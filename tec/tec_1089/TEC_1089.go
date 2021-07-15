@@ -28,9 +28,9 @@ import (
 	"math"
 
 	"errors"
+	"mylab/cpagent/config"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
-	"mylab/cpagent/config"
 	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
@@ -241,10 +241,15 @@ func (t *TEC1089) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.Fil
 			}
 			logger.Infoln("PLC cycle Completed ->", h.HoldTime)
 			// If this is the last step then 16 seconds needed for Cycle
-			time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
+			//time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
+			err = tec.HoldSleep(h.HoldTime - 16)
 
 		} else {
-			time.Sleep(time.Duration(h.HoldTime) * time.Second)
+			//time.Sleep(time.Duration(h.HoldTime) * time.Second)
+			err = tec.HoldSleep(h.HoldTime)
+		}
+		if err != nil {
+			return
 		}
 		logger.Infoln("Holding Completed ->", h.HoldTime)
 

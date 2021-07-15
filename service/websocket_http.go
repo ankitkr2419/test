@@ -200,7 +200,7 @@ func sendTemperatureAndProgress(deps Dependencies, rw http.ResponseWriter, c *we
 
 	logger.WithField("data", "Temperature").Info("Websocket send Data")
 
-	if !plc.ExperimentRunning{
+	if !plc.ExperimentRunning {
 		return
 	}
 
@@ -347,7 +347,7 @@ func getTemperatureAndProgressDetails(deps Dependencies, experimentID uuid.UUID)
 		return
 	}
 
-	if !plc.ExperimentRunning{
+	if !plc.ExperimentRunning {
 		goto skipRtpcrProgress
 	}
 
@@ -367,19 +367,19 @@ func getTemperatureAndProgressDetails(deps Dependencies, experimentID uuid.UUID)
 		pG = oprSuccess{
 			Type: "RTPCR_SUCCESS",
 			Data: plc.OperationDetails{
-				Progress: &progress,
-				RecipeID: currentExpTemplate.ID,
+				Progress:      &progress,
+				RecipeID:      currentExpTemplate.ID,
 				RemainingTime: plc.ConvertToHMS(remainingTime),
 				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
 			},
 		}
 	} else {
-		progress = int64(float64(timeTaken)/float64(currentExpTemplate.EstimatedTime) * 100 )
+		progress = int64(float64(timeTaken) / float64(currentExpTemplate.EstimatedTime) * 100)
 		pG = oprProgress{
 			Type: "RTPCR_PROGRESS",
 			Data: plc.OperationDetails{
-				Progress: &progress,
-				RecipeID: currentExpTemplate.ID,
+				Progress:      &progress,
+				RecipeID:      currentExpTemplate.ID,
 				RemainingTime: plc.ConvertToHMS(remainingTime),
 				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
 			},
@@ -585,7 +585,7 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 		ExperimentID: experimentValues.experimentID,
 		Temp:         scan.Temp,
 		LidTemp:      scan.LidTemp,
-		Cycle:        scan.Cycle,
+		Cycle:        plc.CurrentCycle,
 	}
 
 	logger.Debugln("ExpTemp: ", expTemp)
