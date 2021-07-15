@@ -1,5 +1,8 @@
 import { fromJS } from "immutable";
-import { calibrationActions } from "actions/calibrationActions";
+import {
+  calibrationActions,
+  updateCalibrationActions,
+} from "actions/calibrationActions";
 
 const calibrationInitialState = fromJS({
   isLoading: false,
@@ -32,6 +35,21 @@ export const calibrationReducer = (state = calibrationInitialState, action) => {
         isLoading: false,
         error: null,
         configs: calibrationInitialState.configs,
+      });
+    case updateCalibrationActions.updateCalibrationInitiated:
+      return state.merge({
+        isLoading: true,
+        error: null,
+      });
+    case updateCalibrationActions.updateCalibrationSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+      });
+    case updateCalibrationActions.updateCalibrationFailure:
+      return state.merge({
+        isLoading: false,
+        error: true,
       });
     default:
       return state;

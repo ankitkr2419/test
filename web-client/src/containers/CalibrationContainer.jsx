@@ -2,7 +2,10 @@ import React, { useEffect } from "react";
 import { ROUTES } from "appConstants";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { calibrationInitiated } from "action-creators/calibrationActionCreators";
+import {
+  calibrationInitiated,
+  updateCalibrationInitiated,
+} from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
 
 const CalibrationContainer = () => {
@@ -27,14 +30,18 @@ const CalibrationContainer = () => {
     }
   }, [dispatch, token]);
 
+  const saveBtnClickHandler = (configData) => {
+    let data = {
+      room_temperature: configData.roomTemperature,
+      homing_time: configData.homingTime,
+      no_of_homing_cycles: configData.noOfHomingCycles,
+    };
+    dispatch(updateCalibrationInitiated({ token, data }));
+  };
+
   if (!isLoggedIn) {
     history.push(ROUTES.splashScreen);
   }
-
-  const saveBtnClickHandler = (data) => {
-    //TODO api call
-    console.log("data: ", data);
-  };
 
   return (
     <CalibrationComponent
