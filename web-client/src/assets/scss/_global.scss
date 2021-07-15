@@ -74,7 +74,8 @@ body {
 .template-content,
 .login-content,
 .activity-content,
-.landing-content {
+.landing-content,
+.calibration-content {
   position: relative;
   @extend .flex-100;
   padding: rem(40px 72px);

@@ -271,6 +271,7 @@ const AppHeader = (props) => {
                       color="secondary"
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none mr-3`}
+                      outline={true}
                       onClick={handleBackBtn}
                       disabled={isExperimentRunning}
                     >

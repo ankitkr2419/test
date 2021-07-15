@@ -31,7 +31,17 @@ const CalibrationContainer = () => {
     history.push(ROUTES.splashScreen);
   }
 
-  return <CalibrationComponent configs={configs} />;
+  const saveBtnClickHandler = (data) => {
+    //TODO api call
+    console.log("data: ", data);
+  };
+
+  return (
+    <CalibrationComponent
+      configs={configs}
+      saveBtnClickHandler={saveBtnClickHandler}
+    />
+  );
 };
 
 export default CalibrationContainer;
