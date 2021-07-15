@@ -12,6 +12,8 @@ import (
 const (
 	getTargetListQuery = `SELECT targets.* FROM targets
 			ORDER BY name ASC`
+	getTargetListNameQuery = `SELECT * FROM targets
+	where name = $1 LIMIT 1`
 
 	insertTargetsQuery1 = `INSERT INTO targets(
 				name,
@@ -33,6 +35,15 @@ func (s *pgStore) ListTargets(ctx context.Context) (t []Target, err error) {
 		return
 	}
 
+	return
+}
+
+func (s *pgStore) GetTargetByName(ctx context.Context, name string) (t Target, err error) {
+	err = s.db.Get(&t, getTargetListNameQuery, name)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing targets by name")
+		return
+	}
 	return
 }
 
