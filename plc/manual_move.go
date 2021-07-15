@@ -40,7 +40,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 	}
 
 	if !d.isTimerInProgress() {
-		response, err = d.switchOffMotor()
+		response, err = d.SwitchOffMotor()
 		if err != nil {
 			return "", err
 		}
@@ -150,7 +150,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	homed.Store(d.name, false)
 
 	logger.Infoln("switching motor off....")
-	response, err = d.switchOffMotor()
+	response, err = d.SwitchOffMotor()
 	if err != nil {
 		logger.Errorln("From deck ", d.name, err)
 		return "", err

@@ -134,6 +134,7 @@ type Extraction interface {
 	TipOperation(to db.TipOperation) (response string, err error)
 	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
 	SetCurrentProcessNumber(step int64)
+	SwitchOffMotor() (response string, err error)
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {

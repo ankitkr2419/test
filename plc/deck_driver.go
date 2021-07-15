@@ -196,7 +196,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
 				logger.Infoln("Completion for deck", d.name, "returned ---> ", results)
-				response, err = d.switchOffMotor()
+				response, err = d.SwitchOffMotor()
 				if err != nil {
 					logger.Errorln("err: from setUp--> ", err, d.name)
 					return
@@ -236,7 +236,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		if len(results) > 0 {
 			if int(results[0]) == SensorCut {
 				logger.Infoln("Sensor returned ---> ", results[0], d.name)
-				response, err = d.switchOffMotor()
+				response, err = d.SwitchOffMotor()
 				if err != nil {
 					logger.Errorln("Sensor err : ", err, d.name)
 					return "", err
@@ -258,7 +258,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 }
 
-func (d *Compact32Deck) switchOffMotor() (response string, err error) {
+func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
 
 	if temp := d.getOnReg(); temp == highestUint16 {
 		err = fmt.Errorf("on/off Register  isn't loaded!")
