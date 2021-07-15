@@ -175,10 +175,10 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 			logger.Infoln("PLC cycle Completed ->", h.HoldTime)
 			// If this is the last step then 16 seconds needed for Cycle
 			// time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
-			err = tec.HoldSleep(h.HoldTime - 16)
+			err = plc.HoldSleep(h.HoldTime - 16)
 
 		} else {
-			err = tec.HoldSleep(h.HoldTime)
+			err = plc.HoldSleep(h.HoldTime)
 
 		}
 		if err != nil {

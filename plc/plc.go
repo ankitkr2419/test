@@ -4,6 +4,10 @@ import (
 	"mylab/cpagent/db"
 
 	"github.com/google/uuid"
+	logger "github.com/sirupsen/logrus"
+	"time"
+	"errors"
+
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
@@ -134,4 +138,23 @@ type Extraction interface {
 
 func SetDeckName(C32 *Compact32Deck, deck string) {
 	C32.name = deck
+}
+
+func HoldSleep(sleepTime int32) (err error) {
+
+	var elaspedTime int32
+	for {
+		logger.Infoln("plc.ExperimentRunning && elaspedTime < sleepTime ", ExperimentRunning, elaspedTime, sleepTime)
+		if ExperimentRunning && elaspedTime < sleepTime {
+			time.Sleep(time.Second * 1)
+			logger.Infoln("sleeping in holdsleep")
+		} else {
+			if !ExperimentRunning {
+				logger.Errorln("experiment has stoped running")
+				return errors.New("experiment has stoped running")
+			}
+			return nil
+		}
+		elaspedTime = elaspedTime + 1
+	}
 }
