@@ -199,6 +199,8 @@ func (d *Simulator) HomingRTPCR() (err error) {
 func (d *Simulator) Reset() (err error) { return }
 
 func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
+	logger.WithField("LID TEMP", "LID TEMP started").Infoln("LID TEMP STARTED")
+
 	// simulate currentLidTemp
 	if plc.ExperimentRunning {
 		time.Sleep(2 * time.Second)
