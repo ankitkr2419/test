@@ -6,14 +6,19 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
 )
+
+const contextKeyUsername = "username"
+const contextKeyUserAuthID = "auth_id"
 
 const (
 	hold  = "hold"
@@ -25,9 +30,22 @@ const (
 	supervisor = "supervisor"
 	engineer   = "engineer"
 	operator   = "operator"
-	deckA      = "A"
-	deckB      = "B"
 )
+
+const (
+	recipeC    = "recipe"
+	processC   = "process"
+	createC    = "create"
+	deleteC    = "delete"
+	updateC    = "update"
+	duplicateC = "duplicate"
+	rearrangeC = "rearrange"
+)
+
+var templateRunSuccess bool
+var expStartTime time.Time
+// TODO: Don't allow Template Update/Deletion if this Template is in Progress
+var currentExpTemplate db.Template
 
 var userLogin sync.Map
 
@@ -54,41 +72,43 @@ func setStepRunInProgress(deck string) {
 }
 
 func loadUtils() {
-	userLogin.Store("A", false)
-	userLogin.Store("B", false)
+	userLogin.Store(plc.DeckA, false)
+	userLogin.Store(plc.DeckB, false)
 	runNext = map[string]bool{
-		"A": false,
-		"B": false,
+		plc.DeckA: false,
+		plc.DeckB: false,
 	}
 
 	stepRunInProgress = map[string]bool{
-		"A": false,
-		"B": false,
+		plc.DeckA: false,
+		plc.DeckB: false,
 	}
 
 	chanA := make(chan struct{}, 1)
 	chanB := make(chan struct{}, 1)
 
 	nextStep = map[string]chan struct{}{
-		"A": chanA,
-		"B": chanB,
+		plc.DeckA: chanA,
+		plc.DeckB: chanB,
 	}
 
 	chanC := make(chan struct{}, 1)
 	chanD := make(chan struct{}, 1)
 
 	abortStepRun = map[string]chan struct{}{
-		"A": chanC,
-		"B": chanD,
+		plc.DeckA: chanC,
+		plc.DeckB: chanD,
 	}
 }
 
 type ErrObj struct {
-	Err string `json:"err"`
+	Err  string `json:"err"`
+	Deck string `json:"deck,omitempty"`
 }
 
 type MsgObj struct {
-	Msg string `json:"msg"`
+	Msg  string `json:"msg"`
+	Deck string `json:"deck,omitempty"`
 }
 
 func validate(i interface{}) (valid bool, respBytes []byte) {
@@ -189,20 +209,62 @@ func MD5Hash(s string) string {
 
 func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Create a default supervisor
-	u := db.User{
+	supervisor := db.User{
 		Username: "supervisor",
 		Password: MD5Hash("supervisor"),
 		Role:     "supervisor",
 	}
 
 	// Add Default supervisor user to DB
-	err = s.InsertUser(context.Background(), u)
+	err = s.InsertUser(context.Background(), supervisor)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		logger.WithField("err", err.Error()).Error("Setup Default Supervisor failed")
 		return
 	}
 
-	logger.Info("Default user added")
+	// Create a default main user
+	mainUser := db.User{
+		Username: "main",
+		Password: MD5Hash("main"),
+		Role:     "admin",
+	}
+
+	// Add Default main user to DB
+	err = s.InsertUser(context.Background(), mainUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default Main User failed")
+		return
+	}
+
+	// Create a default operator user
+	operatorUser := db.User{
+		Username: "operator",
+		Password: MD5Hash("operator"),
+		Role:     "operator",
+	}
+
+	// Add Default operator user to DB
+	err = s.InsertUser(context.Background(), operatorUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default Operator User failed")
+		return
+	}
+
+	// Create a default engineer user
+	engUser := db.User{
+		Username: "engineer",
+		Password: MD5Hash("engineer"),
+		Role:     "engineer",
+	}
+
+	// Add Default engineer user to DB
+	err = s.InsertUser(context.Background(), engUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default Engineer User failed")
+		return
+	}
+
+	logger.Info("Default users added")
 
 	loadUtils()
 	return nil

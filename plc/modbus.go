@@ -10,16 +10,16 @@ const (
 )
 
 const (
-	UP          = uint16(1)
-	DOWN        = uint16(0)
-	FWD         = uint16(1)
-	REV         = uint16(0)
-	ASPIRE      = uint16(0)
-	DISPENSE    = uint16(1)
+	UP            = uint16(1)
+	DOWN          = uint16(0)
+	FWD           = uint16(1)
+	REV           = uint16(0)
+	ASPIRE        = uint16(0)
+	DISPENSE      = uint16(1)
 	TowardsSensor = uint16(1)
 	AgainstSensor = uint16(0)
-	SensorUncut = 2
-	SensorCut   = 3
+	SensorUncut   = 2
+	SensorCut     = 3
 )
 
 // *** NOTE ***
@@ -48,38 +48,54 @@ const (
 var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	// Data Registers
 	"D": map[int]uint16{
+		//updated addresses
+		23: uint16(0x1017), //register for setting rotation pulses
+		44: uint16(0x102C), //start address of register For FAM
+		60: uint16(0x103C), //start address of register For VIC
+
 		100:  uint16(0x1064), // heartbeat register (W)
-		101:  uint16(0x1065), // offset for holding stage config (W)
-		113:  uint16(0x1071), // offset for cycling stage config (W)
-		131:  uint16(0x1083), // Number of cycles to run (W)
-		132:  uint16(0x1084), // Current temperature (R)
-		133:  uint16(0x1085), // Current cycle (R)
-		134:  uint16(0x1085), // Ideal Lid temperature (W)
-		135:  uint16(0x1086), // Current Lid temperature (R)
-		410:  uint16(0x119A), // General regisrter offset for values! (unused for now)
-		2000: uint16(0x17D0), // Well Emission data 96x6 registers (R)
+		// 101:  uint16(0x1065), // offset for holding stage config (W)
+		// 113:  uint16(0x1071), // offset for cycling stage config (W)
+		// 131:  uint16(0x1083), // Number of cycles to run (W)
+		// 132:  uint16(0x1084), // Current temperature (R)
+		// 133:  uint16(0x1085), // Current cycle (R)
+		134:  uint16(0x1086), // Ideal Lid temperature (W)
+		135:  uint16(0x1087), // Current Lid temperature (R)
+		410:  uint16(0x119A), // General register offset for values! (unused for now)
+		// 2000: uint16(0x17D0), // Well Emission data 96x6 registers (R)
 		2577: uint16(0x1A11), // error code (R)
 	},
 	// Coil registers: ON:0xFF00, OFF: 0x0000
 	"M": map[int]uint16{
+
+		//Updated addresses
+		1:  uint16(0x0801), //combined Homing rt-pcr
+		2:  uint16(0x0802), //combined Homing rt-pcr
+		// 14: uint16(0x080E), //combined with M15 ON/OFF rotate button
+		// 15: uint16(0x080F), //combined with M14 ON/OFF rotate button
+		20: uint16(0x0814), //combined with M21 ON/OFF cycle button
+		21: uint16(0x0815), //combined with M20 ON/OFF cycle button
+		25: uint16(0x0819), //reset values
+
 		100: uint16(0x0864), // homing success (R)
 		101: uint16(0x0865), // homing error (R)
-		102: uint16(0x0866), // Start / Stop Cycle (W)
+		// 102: uint16(0x0866), // Start / Stop Cycle (W)
 		103: uint16(0x0867), // UnUsed
 		104: uint16(0x0868), // Restart Cycle (if rebooted during a run! (R)
 		105: uint16(0x0869), // Signal Error (R)
 		106: uint16(0x086A), // Well Emmission register data  ON: PLC write & OFF: Read (RW)
 		107: uint16(0x086B), // Cycle completed (R)
+		109: uint16(0x086D), // Lid Heating On (W)
 	},
 }
 
 var LOOKUP map[string]string = map[string]string{
-	"heartbeat": "D101",
+	"heartbeat": "D100",
 }
 
 /* MODBUS_EXTRACTION Mappings:
  *
- *	"A" => {
+ *	DeckA => {
 		"D" => {
 	 		101 => uint16(0x0065)
 	 		2000 => uint16(0x07D0)
@@ -88,7 +104,7 @@ var LOOKUP map[string]string = map[string]string{
 	 		8: uint16(0x0808)
   		 }
 	}
-	"B" => {
+	DeckB => {
 		"D" => {
 	 		200: uint16(0x10C8)
 			226: uint16(0x10E2)
@@ -99,13 +115,13 @@ var LOOKUP map[string]string = map[string]string{
 	}
 
 
-   So, MODBUS_EXTRACTION["A"]["D"][101] will give us the exact modbus address of 0x0065 for DECK A.
-   And MODBUS_EXTRACTION["B"]["M"][0] will give us the exact modbus address of 0x0800 for DECK B.
+   So, MODBUS_EXTRACTION[DeckA]["D"][101] will give us the exact modbus address of 0x0065 for DECK A.
+   And MODBUS_EXTRACTION[DeckB]["M"][0] will give us the exact modbus address of 0x0800 for DECK B.
 */
 
 var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[string]map[int]uint16{
 	// Deck A
-	"A": map[string]map[int]uint16{
+	DeckA: map[string]map[int]uint16{
 		// Data Registers
 		"D": map[int]uint16{
 			200: uint16(0x10C8), // Motor Speed (W)
@@ -137,7 +153,7 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 		},
 	},
 	// Deck B
-	"B": map[string]map[int]uint16{
+	DeckB: map[string]map[int]uint16{
 		// Data Registers
 		"D": map[int]uint16{
 			200: uint16(0x10C8), // Motor Speed (W)

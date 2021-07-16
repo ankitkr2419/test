@@ -29,6 +29,7 @@ const MlModal = (props) => {
     handleSuccessBtn,
     progressPercentage,
     isProgressBarVisible,
+    disabled,
   } = props;
 
   return (
@@ -99,6 +100,7 @@ const MlModal = (props) => {
                 onClick={handleSuccessBtn}
                 color="primary"
                 className="mr-4"
+                disabled={disabled} //disable if homing in progress
               >
                 {successBtn}
               </Button>
@@ -127,6 +129,7 @@ MlModal.defaultProps = {
   isOpen: false,
   showCrossBtn: true,
   isProgressBarVisible: false,
+  disabled: false,
 };
 
-export default MlModal;
+export default React.memo(MlModal);

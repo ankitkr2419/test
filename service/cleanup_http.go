@@ -1,84 +1,96 @@
 package service
 
 import (
-	"fmt"
+	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	logger "github.com/sirupsen/logrus"
 )
 
 func discardBoxCleanupHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.DiscardBoxInitialisedState)
 
-		var response string
 		var err error
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.DiscardBoxCompletedState)
+			}
+		}()
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		switch deck {
-		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "DiscardBoxCleanup")
-		default:
-			err = fmt.Errorf("Check your deck name")
+
+		_, err = singleDeckOperation(req.Context(), deps, deck, "DiscardBoxCleanup")
+		if err != nil {
+			logger.Errorln(err.Error())
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DiscardBoxMoveError.Error(), Deck: deck})
+			return
 		}
 
-		if err != nil {
-			fmt.Fprintf(rw, err.Error())
-			fmt.Println(err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":%v,"deck":"%v"}`, response, deck)))
-			rw.WriteHeader(http.StatusOK)
-		}
+		logger.Infoln(responses.DiscardBoxMovedSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.DiscardBoxMovedSuccess, Deck: deck})
+		return
 	})
 }
 
 func restoreDeckHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.RestoreDeckInitialisedState)
 
-		var response string
 		var err error
-
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.RestoreDeckCompletedState)
+			}
+		}()
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		switch deck {
-		case "A", "B":
-			response, err = singleDeckOperation(deps, deck, "RestoreDeck")
-		default:
-			err = fmt.Errorf("Check your deck name")
+
+		_, err = singleDeckOperation(req.Context(), deps, deck, "RestoreDeck")
+		if err != nil {
+			logger.Errorln(err.Error())
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RestoreDeckError.Error(), Deck: deck})
+			return
 		}
 
-		if err != nil {
-			fmt.Fprintf(rw, err.Error())
-			fmt.Println(err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":%v,"deck":"%v"}`, response, deck)))
-			rw.WriteHeader(http.StatusOK)
-		}
+		logger.Infoln(responses.RestoreDeckSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RestoreDeckSuccess, Deck: deck})
+		return
 	})
 }
 
 func uvLightHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.UvLightInitialisedState)
+
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
 		uvTime := vars["time"]
+		var err error
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.UvLightCompletedState)
+			}
+		}()
 
-		switch deck {
-		case "A", "B":
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"uv light clean up in progress","deck":"%v"}`, deck)))
-			go deps.PlcDeck[deck].UVLight(uvTime)
-		default:
-			err := fmt.Errorf("Check your deck name")
-			deps.WsErrCh <- err
-		}
-
+		go deps.PlcDeck[deck].UVLight(uvTime)
+		logger.Infoln(responses.UVCleanupProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UVCleanupProgress, Deck: deck})
+		return
 	})
 }

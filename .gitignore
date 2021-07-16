@@ -6,6 +6,10 @@ db/application_test\.yml
 # mylab zip file
 artifact.zip
 
+# log files
+/utils/logs/*.log
+/utils/tec/ComLog.txt
+/utils/output/*
 
 # web-client dependencies
 /web-client/node_modules
@@ -31,3 +35,4 @@ config\.yml
 swaggerui/
 
 rice-box\.go
+coverage.*

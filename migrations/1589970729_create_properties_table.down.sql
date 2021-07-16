@@ -1,1 +1,1 @@
-DROP TABLE properties;
+DROP TABLE IF EXISTS properties;

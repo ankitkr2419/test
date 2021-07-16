@@ -1,10 +1,8 @@
 package plc
 
 import (
-	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
-
 	logger "github.com/sirupsen/logrus"
 
 	"time"
@@ -23,30 +21,66 @@ import (
 8. At last when the timer is done then it would return success.
 
 */
-func (d *Compact32Deck) AddDelay(delay db.Delay) (response string, err error) {
+func (d *Compact32Deck) AddDelay(delay db.Delay, recipeRun bool) (response string, err error) {
 	var t *time.Timer
 
 	var timeElapsedVar int64 = 0
-	var progress int64 = 0
 	timeElapsed := &timeElapsedVar
 
 	// set the timer in progress variable to specify that it is not a motor operation.
 	d.setTimerInProgress()
 	defer d.resetTimerInProgress()
+	if recipeRun {
+		// Calling in defer cause this will need to get executed despite failure
+		defer d.resetRunRecipeData()
+	}
 
 skipToStartTimer:
 	// start the timer
-	t = time.NewTimer(time.Duration(delay.DelayTime) * time.Second)
+	t = time.NewTimer(time.Duration(delay.DelayTime-*timeElapsed) * time.Second)
 	time1 := time.Now()
 	for {
 		select {
 		// wait for the timer to finish
 		case n := <-t.C:
 			logger.Infoln("delay time over ", n)
+			if d.isUVLightInProgress() {
+				// Send 100 % Progress
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
+				// Send Success
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightSuccess)
+				d.ResetRunInProgress()
+			} else if d.isPIDCalibrationInProgress() {
+				// Send 100 % Progress
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidProgress)
+				// Send Success
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidSuccess)
+				d.ResetRunInProgress()
+			}
+			if recipeRun {
+				// timer is over but recipe isn't 
+				for getCurrentProcessNumber(d.name) != -2{
+					time.Sleep(500 * time.Millisecond)
+					_, _, err = d.checkPausedState(t, time1, delay.DelayTime, timeElapsed)
+					if err != nil {
+						return "", err
+					}
+					d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
+					if d.isMachineInAbortedState() || d.isMachineInPausedState() {
+						response, err = d.waitUntilResumed(d.name)
+						if err != nil{
+							return "", err
+						}
+					}
+				}
+				// Send 100 % Progress
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
+				// Send Success is implicit
+			}
 			return "SUCCESS", nil
 		default:
-			// delay of 300 ms for checking the delay over time to avoid too much loop
-			time.Sleep(time.Millisecond * 300)
+			// delay of 500 ms for checking the delay over time to avoid too much loop
+			time.Sleep(time.Millisecond * 500)
 			if d.isMachineInAbortedState() {
 				t.Stop()
 				if d.isUVLightInProgress() || d.isPIDCalibrationInProgress() {
@@ -54,49 +88,6 @@ skipToStartTimer:
 				}
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
-			}
-			if d.isUVLightInProgress() {
-				uvtime := time.Now()
-				uvTimePassed := int64(uvtime.Sub(time1).Seconds()) + *timeElapsed
-				uvRemainingTime := delay.DelayTime - uvTimePassed
-				progress = (uvTimePassed * 100) / delay.DelayTime
-				wsProgressOperation := WSData{
-					Progress: float64(progress),
-					Deck:     d.name,
-					Status:   "PROGRESS_UVLIGHT",
-					OperationDetails: OperationDetails{
-						Message:       fmt.Sprintf("uv light cleanup in progress for deck %s ", d.name),
-						RemainingTime: uvRemainingTime,
-					},
-				}
-
-				wsData, err := json.Marshal(wsProgressOperation)
-				if err != nil {
-					logger.Errorf("error in marshalling web socket data %v", err.Error())
-					d.WsErrCh <- err
-				}
-				d.WsMsgCh <- fmt.Sprintf("progress_uvLight_%v", string(wsData))
-			} else if d.isPIDCalibrationInProgress() {
-				pidtime := time.Now()
-				pidTimePassed := int64(pidtime.Sub(time1).Seconds()) + *timeElapsed
-				pidRemainingTime := delay.DelayTime - pidTimePassed
-				progress = (pidTimePassed * 100) / delay.DelayTime
-				wsProgressOperation := WSData{
-					Progress: float64(progress),
-					Deck:     d.name,
-					Status:   "PROGRESS_PIDCALIBRATION",
-					OperationDetails: OperationDetails{
-						Message:       fmt.Sprintf("pid calibration in progress for deck %s ", d.name),
-						RemainingTime: pidRemainingTime,
-					},
-				}
-
-				wsData, err := json.Marshal(wsProgressOperation)
-				if err != nil {
-					logger.Errorf("error in marshalling web socket data %v", err.Error())
-					d.WsErrCh <- err
-				}
-				d.WsMsgCh <- fmt.Sprintf("progress_pidCalibration_%v", string(wsData))
 			}
 			// if paused then
 			// when timer was paused go again to timer start
@@ -107,11 +98,8 @@ skipToStartTimer:
 			if wasTimerPaused {
 				goto skipToStartTimer
 			}
-
 		}
-
 	}
-
 }
 
 func (d *Compact32Deck) checkPausedState(t *time.Timer, time1 time.Time, delay int64, timeElapsed *int64) (response string, wasTimerPaused bool, err error) {
@@ -132,10 +120,6 @@ func (d *Compact32Deck) checkPausedState(t *time.Timer, time1 time.Time, delay i
 
 		// else wait for the process to be resumed
 		response, err = d.waitUntilResumed(d.name)
-		if err != nil {
-			return
-		}
-
 	}
 	return
 }

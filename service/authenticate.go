@@ -18,16 +18,17 @@ import (
 
 type Token struct {
 	jwt.StandardClaims
-	Role    string            `json:"role"`
-	Deck    string            `json:"deck"`
-	AuthID  uuid.UUID         `json:"auth_id"`
-	Payload map[string]string `json:"payload,omitempty"`
+	Role            string            `json:"role"`
+	Deck            string            `json:"deck"`
+	AuthID          uuid.UUID         `json:"auth_id"`
+	ApplicationType string            `json:"app_type"`
+	Payload         map[string]string `json:"payload,omitempty"`
 }
 
 // Encodes information into token
-func EncodeToken(userID string, authID uuid.UUID, role string, deck string, payload map[string]string) (string, error) {
+func EncodeToken(userID string, authID uuid.UUID, role string, deck string, application string, payload map[string]string) (string, error) {
 	accessKey := config.GetSecretKey()
-	token, tokenErr := generateToken(userID, authID, role, deck, accessKey, payload)
+	token, tokenErr := generateToken(userID, authID, role, deck, accessKey, application, payload)
 
 	if tokenErr != nil {
 		return "", fmt.Errorf("TOKEN ERROR: %v ", tokenErr)
@@ -36,12 +37,13 @@ func EncodeToken(userID string, authID uuid.UUID, role string, deck string, payl
 
 }
 
-func generateToken(userID string, authID uuid.UUID, role, deck, accessKey string, payload map[string]string) (string, error) {
+func generateToken(userID string, authID uuid.UUID, role, deck, accessKey string, application string, payload map[string]string) (string, error) {
 	tokenClaims := &Token{
-		Role:    role,
-		Deck:    deck,
-		AuthID:  authID,
-		Payload: payload,
+		Role:            role,
+		Deck:            deck,
+		AuthID:          authID,
+		ApplicationType: application,
+		Payload:         payload,
 		StandardClaims: jwt.StandardClaims{
 			Subject:  userID,
 			IssuedAt: time.Now().Unix(),
@@ -79,7 +81,7 @@ func decodeToken(token string) (jwt.MapClaims, error) {
 
 // Authenticate ... Authenticate token sent in the request
 // if token is valid set userId in the context
-func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) http.HandlerFunc {
+func authenticate(next http.HandlerFunc, deps Dependencies, appType string, roles ...string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		token := extractToken(req.Header.Get("Authorization"))
@@ -87,13 +89,15 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 			vars := mux.Vars(req)
 			deck := vars["deck"]
 
-			_, err := getUserAuth(token, deck, deps, roles...)
+			user, err := getUserAuth(token, deck, deps, appType, roles...)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error(responses.UserUnauthorised)
 				responseCodeAndMsg(res, http.StatusUnauthorized, ErrObj{Err: err.Error()})
 				return
 			}
-			next(res, req)
+			ctx := context.WithValue(req.Context(), contextKeyUsername, user.Username)
+			ctx = context.WithValue(ctx, contextKeyUserAuthID, user.AuthID)
+			next(res, req.WithContext(ctx))
 
 		} else {
 			logger.WithField("err", "TOKEN EMPTY").Error(responses.UserTokenEmptyError)
@@ -103,7 +107,7 @@ func authenticate(next http.HandlerFunc, deps Dependencies, roles ...string) htt
 	}
 }
 
-func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user db.UserAuth, err error) {
+func getUserAuth(token, deck string, deps Dependencies, appType string, roles ...string) (user db.UserAuth, err error) {
 
 	var validRole bool
 	decodedToken, err := decodeToken(token)
@@ -165,6 +169,38 @@ func getUserAuth(token, deck string, deps Dependencies, roles ...string) (user d
 
 	}
 
+	//Validate Application Type
+	tokenApp, ok := decodedToken["app_type"].(string)
+	if !ok {
+		logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenApplicationTypeError)
+		err = responses.UserTokenApplicationTypeError
+		return
+	}
+
+	if tokenApp == "" {
+		if Application == None {
+			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenApplicationError)
+			err = responses.UserTokenApplicationError
+			return
+		} else {
+			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenAppNotExistError)
+			err = responses.UserTokenAppNotExistError
+			return
+		}
+
+	}
+	if tokenApp == appType || appType == Combined {
+		//proceed futher
+		if tokenApp != Application {
+			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenAppMismatchError)
+			err = responses.UserTokenAppMismatchError
+			return
+		}
+	} else {
+		logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenAppNotExistError)
+		err = responses.UserTokenAppNotExistError
+		return
+	}
 	username, ok := decodedToken["sub"].(string)
 	if !ok {
 		logger.WithField("err", "USERNAME").Error(responses.UserTokenUsernameError)

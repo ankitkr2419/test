@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/google/uuid"
 	"mylab/cpagent/responses"
+
+	"github.com/google/uuid"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -30,8 +31,6 @@ const (
 						WHERE process_id = $1`
 	selectAspireDispenseQuery = `SELECT *
 						FROM aspire_dispense`
-	deleteAspireDispenseQuery = `DELETE FROM processes
-						WHERE id = $1`
 	createAspireDispenseQuery = `INSERT INTO aspire_dispense (
 						category,
 						cartridge_type,
@@ -68,32 +67,58 @@ type AspireDispense struct {
 	ID                   uuid.UUID     `db:"id" json:"id"`
 	Category             Category      `db:"category" json:"category"`
 	CartridgeType        CartridgeType `db:"cartridge_type" json:"cartridge_type"`
-	SourcePosition       int64         `db:"source_position" json:"source_position"`
-	AspireHeight         float64       `db:"aspire_height" json:"aspire_height"`
-	AspireMixingVolume   float64       `db:"aspire_mixing_volume" json:"aspire_mixing_volume"`
-	AspireNoOfCycles     int64         `db:"aspire_no_of_cycles" json:"aspire_no_of_cycles"`
-	AspireVolume         float64       `db:"aspire_volume" json:"aspire_volume"`
+	SourcePosition       int64         `db:"source_position" json:"source_position" validate:"lte=13"`
+	AspireHeight         float64       `db:"aspire_height" json:"aspire_height" validate:"required,lte=60"`
+	AspireMixingVolume   float64       `db:"aspire_mixing_volume" json:"aspire_mixing_volume" validate:"lte=1000"`
+	AspireNoOfCycles     int64         `db:"aspire_no_of_cycles" json:"aspire_no_of_cycles" validate:"lte=100"`
+	AspireVolume         float64       `db:"aspire_volume" json:"aspire_volume" validate:"lte=1000"`
 	AspireAirVolume      float64       `db:"aspire_air_volume" json:"aspire_air_volume"`
-	DispenseHeight       float64       `db:"dispense_height" json:"dispense_height"`
-	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume"`
+	DispenseHeight       float64       `db:"dispense_height" json:"dispense_height" validate:"required,lte=60"`
+	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume" validate:"lte=1000"`
 	DispenseNoOfCycles   int64         `db:"dispense_no_of_cycles" json:"dispense_no_of_cycles"`
-	DestinationPosition  int64         `db:"destination_position" json:"destination_position"`
+	DestinationPosition  int64         `db:"destination_position" json:"destination_position" validate:"lte=13"`
 	ProcessID            uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt            time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt            time.Time     `db:"updated_at" json:"updated_at"`
 }
 
 func (s *pgStore) ShowAspireDispense(ctx context.Context, id uuid.UUID) (dbAspireDispense AspireDispense, err error) {
+	// logging initialised db operation
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseInitialisedState)
 	err = s.db.Get(&dbAspireDispense, getAspireDispenseQuery, id)
+
+	//logging error if there is any otherwise logging success
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.AspireDispenseCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDBFetchError)
 		return
 	}
+
 	return
 }
 
 func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []AspireDispense, err error) {
+
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AspireDispenseListInitialisedState)
+
 	err = s.db.Select(&dbAspireDispense, selectAspireDispenseQuery)
+
+	//logging error if there is any otherwise logging success
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.AspireDispenseListCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching aspire dispense")
 		return
@@ -101,8 +126,10 @@ func (s *pgStore) ListAspireDispense(ctx context.Context) (dbAspireDispense []As
 	return
 }
 
-
 func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, recipeID uuid.UUID) (createdAD AspireDispense, err error) {
+	// logging initialised db operation
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.AspireDispenseInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -114,6 +141,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.AspireDispenseCreateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -123,6 +151,7 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 			return
 		}
 		logger.Infoln(responses.AspireDispenseCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.AspireDispenseCompletedState)
 		return
 	}()
 
@@ -133,14 +162,14 @@ func (s *pgStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, r
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, AspireDispenseProcess, ad, Process{})
 	if err != nil {
 		return
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(AspireDispenseProcess)
+	process.Type = AspireDispenseProcess
 	process.RecipeID = recipeID
 
 	// create the process
@@ -184,17 +213,11 @@ func (s *pgStore) createAspireDispense(ctx context.Context, tx *sql.Tx, ad Aspir
 	return ad, err
 }
 
-func (s *pgStore) DeleteAspireDispense(ctx context.Context, id uuid.UUID) (err error) {
-	_, err = s.db.Exec(deleteAspireDispenseQuery, id)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error deleting aspire dispense")
-		return
-	}
-	return
-}
-
 func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (err error) {
-	_, err = s.db.Exec(
+	// logging initialised db operation
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AspireDispenseInitialisedState)
+
+	result, err := s.db.Exec(
 		updateAspireDispenseQuery,
 		ad.Category,
 		ad.CartridgeType,
@@ -209,11 +232,27 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 		ad.DispenseNoOfCycles,
 		ad.DestinationPosition,
 		time.Now(),
-		ad.ID,
+		ad.ProcessID,
 	)
+	//logging error if there is any otherwise logging success
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AspireDispenseCompletedState)
+		}
+	}()
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating aspire dispense")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
+	}
+
 	return
 }

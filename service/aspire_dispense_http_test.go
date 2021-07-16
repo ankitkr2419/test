@@ -22,11 +22,14 @@ type AspireDispenseHandlerTestSuite struct {
 
 func (suite *AspireDispenseHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestAspireDispenseTestSuite(t *testing.T) {
 	suite.Run(t, new(AspireDispenseHandlerTestSuite))
 }
+
+var invalidUUID = "not-a-uuid"
 
 var testAspireDispenseRecord = db.AspireDispense{
 	ID:                   testUUID,
@@ -47,12 +50,12 @@ var testAspireDispenseRecord = db.AspireDispense{
 
 func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseSuccess() {
 
-	suite.dbMock.On("CreateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(testAspireDispenseRecord, nil)
+	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything, recipeUUID).Return(testAspireDispenseRecord, nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/aspire-dispense",
-		"/aspire-dispense",
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+recipeUUID.String(),
 		string(body),
 		createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -63,14 +66,32 @@ func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseFailure() {
-
-	suite.dbMock.On("CreateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(db.AspireDispense{}, responses.AspireDispenseCreateError)
+func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseInvalidUUID() {
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/aspire-dispense",
-		"/aspire-dispense",
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+invalidUUID,
+		string(body),
+		createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.RecipeIDInvalidError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseFailure() {
+
+	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything, recipeUUID).Return(db.AspireDispense{}, responses.AspireDispenseCreateError)
+
+	body, _ := json.Marshal(testAspireDispenseRecord)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+recipeUUID.String(),
 		string(body),
 		createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -84,7 +105,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseFailure() {
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseSuccess() {
-
 	suite.dbMock.On("ShowAspireDispense", mock.Anything, testProcessUUID).Return(testAspireDispenseRecord, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -103,7 +123,6 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseSuccess() {
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseFailure() {
-
 	suite.dbMock.On("ShowAspireDispense", mock.Anything, testProcessUUID).Return(db.AspireDispense{}, responses.AspireDispenseFetchError)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -121,9 +140,25 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseFailure() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
+func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseInvalidUUID() {
 
-	suite.dbMock.On("UpdateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(nil)
+	recorder := makeHTTPCall(http.MethodGet,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+invalidUUID,
+		"",
+		showAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
+	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 
@@ -143,8 +178,7 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
-
-	suite.dbMock.On("UpdateAspireDispense", mock.Anything, testAspireDispenseRecord).Return(responses.AspireDispenseUpdateError)
+	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(responses.AspireDispenseUpdateError)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 
@@ -159,6 +193,24 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
 	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseInvalidUUID() {
+
+	body, _ := json.Marshal(testAspireDispenseRecord)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/aspire-dispense/{recipe_id}",
+		"/aspire-dispense/"+invalidUUID,
+		string(body),
+		updateAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())

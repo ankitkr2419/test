@@ -4,6 +4,8 @@ export const homingActions = {
   homingActionFailed: "HOMING_ACTION_FAILED",
   homingActionInProgress: "PROGRESS_HOMING",
   homingActionInCompleted: "SUCCESS_HOMING",
+  hideHomingModaal: "HIDE_HOMING_MODAL",
+  showHomingModaal: "SHOW_HOMING_MODAL",
 };
 
 export const deckHomingActions = {

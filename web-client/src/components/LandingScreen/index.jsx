@@ -1,57 +1,105 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import AppFooter from "components/AppFooter";
-import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
-import { homingActionInitiated } from "action-creators/homingActionCreators";
 import { VideoCard, MlModal } from "shared-components";
-import styled from "styled-components";
 
-const LandingScreen = styled.div`
-  .landing-content {
-    padding: 2.313rem 4.5rem;
-    &::after {
-      height: 9.125rem;
-    }
-  }
-`;
+import {
+  MODAL_MESSAGE,
+  MODAL_BTN,
+  ROUTES,
+  CREDS_FOR_HOMING,
+} from "appConstants";
+import {
+  homingActionInitiated,
+  hideHomingModal,
+} from "action-creators/homingActionCreators";
+import { LandingScreen } from "./LandingScreen";
+import { Redirect } from "react-router";
+import { login, logoutInitiated } from "action-creators/loginActionCreators";
 
-const LandingScreenComponent = () => {
+const LandingScreenComponent = (props) => {
   const dispatch = useDispatch();
   const homingReducer = useSelector((state) => state.homingReducer);
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+
+  const { isLoading, isLoggedInForHoming, tokenForHoming } = loginReducerData;
+  let { isLoggedIn, error } = activeDeckObj ? activeDeckObj : {};
 
   const {
+    showHomingModal,
     isHomingActionCompleted,
     homingAllDeckCompletionPercentage,
   } = homingReducer;
 
-  // const [homingStatus, setHomingStatus] = useState(true);
   const [isProgressBarVisible, setIsProgressBarVisible] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const homingConfirmation = () => {
-    dispatch(homingActionInitiated());
+    dispatch(homingActionInitiated({ token: tokenForHoming }));
     setIsProgressBarVisible(!isProgressBarVisible);
+    setDisabled(!disabled);
   };
+
+  const handleCompleteBtn = () => {
+    dispatch(hideHomingModal());
+  };
+
+  useEffect(() => {
+    if (!isHomingActionCompleted) {
+      dispatch(login(CREDS_FOR_HOMING));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isHomingActionCompleted && isLoggedInForHoming && !isLoading) {
+      dispatch(
+        logoutInitiated({
+          deckName: "",
+          token: tokenForHoming,
+          showToast: false,
+        })
+      );
+    }
+  }, [isHomingActionCompleted]);
+
+  useEffect(() => {
+    if (error === false && isHomingActionCompleted) {
+      setDisabled(false);
+    }
+  }, [error, isHomingActionCompleted]);
+
+  /**
+   * if user logged in, go to recipeListing page
+   */
+  if (isLoggedIn && !error) {
+    return <Redirect to={`/${ROUTES.recipeListing}`} />;
+  }
 
   return (
     <LandingScreen>
       <div className="landing-content">
         <VideoCard />
         <MlModal
-          isOpen={!isHomingActionCompleted}
+          isOpen={showHomingModal}
           textBody={MODAL_MESSAGE.homingConfirmation}
-          handleSuccessBtn={homingConfirmation}
-          successBtn={MODAL_BTN.okay}
+          handleSuccessBtn={() =>
+            isHomingActionCompleted ? handleCompleteBtn() : homingConfirmation()
+          }
+          successBtn={
+            isHomingActionCompleted ? MODAL_BTN.complete : MODAL_BTN.okay
+          }
           showCrossBtn={false}
           progressPercentage={homingAllDeckCompletionPercentage}
           isProgressBarVisible={isProgressBarVisible}
+          disabled={disabled}
         />
       </div>
-      <AppFooter loginBtn={true} />
     </LandingScreen>
   );
 };
 
 LandingScreenComponent.propTypes = {};
 
-export default LandingScreenComponent;
+export default React.memo(LandingScreenComponent);

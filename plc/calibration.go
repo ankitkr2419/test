@@ -50,7 +50,7 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	logger.Infoln(responses.PIDCalibrationStarted)
 
 	// Sleep for 15 minutes
-	_, err = d.AddDelay(db.Delay{DelayTime: 15 * 60})
+	_, err = d.AddDelay(db.Delay{DelayTime: 15 * 60}, false)
 	if err != nil {
 		return
 	}

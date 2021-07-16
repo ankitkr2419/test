@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -12,9 +13,24 @@ import (
 
 func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.AspireDispenseInitialisedState)
+
 		vars := mux.Vars(req)
 
 		recipeID, err := parseUUID(vars["recipe_id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.AspireDispenseCompletedState)
+			}
+
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
@@ -22,7 +38,6 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		var adobj db.AspireDispense
-
 		err = json.NewDecoder(req.Body).Decode(&adobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.AspireDispenseDecodeError)
@@ -37,6 +52,13 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, createC))
+			return
+		}
+		
 		var createdTemp db.AspireDispense
 		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj, recipeID)
 		if err != nil {
@@ -51,9 +73,21 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
 
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.AspireDispenseInitialisedState)
+
+		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.AspireDispenseCompletedState)
+			}
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
@@ -76,8 +110,22 @@ func showAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 
 func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.AspireDispenseInitialisedState)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.AspireDispenseCompletedState)
+			}
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
@@ -97,6 +145,13 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.AspireDispenseValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, updateC))
 			return
 		}
 

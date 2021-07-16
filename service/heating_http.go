@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -12,9 +13,24 @@ import (
 
 func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.HeatingInitialisedState)
+
 		vars := mux.Vars(req)
 
 		recipeID, err := parseUUID(vars["recipe_id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.HeatingCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
@@ -36,6 +52,13 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, createC))
+			return
+		}
+
 		var createdTemp db.Heating
 		createdTemp, err = deps.Store.CreateHeating(req.Context(), htObj, recipeID)
 		if err != nil {
@@ -50,9 +73,26 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.HeatingInitialisedState)
+
 		vars := mux.Vars(req)
 
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.HeatingCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
@@ -74,8 +114,23 @@ func showHeatingHandler(deps Dependencies) http.HandlerFunc {
 
 func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.HeatingInitialisedState)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.HeatingCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
@@ -94,6 +149,13 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, updateC))
 			return
 		}
 

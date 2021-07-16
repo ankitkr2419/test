@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -12,9 +13,23 @@ import (
 
 func createDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
 
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.DelayInitialisedState)
+
+		vars := mux.Vars(req)
 		recipeID, err := parseUUID(vars["recipe_id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.DelayCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
@@ -36,6 +51,13 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, createC))
+			return
+		}
+
 		var createdTemp db.Delay
 		createdTemp, err = deps.Store.CreateDelay(req.Context(), delay, recipeID)
 		if err != nil {
@@ -51,9 +73,26 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 
 func showDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.DelayInitialisedState)
+
 		vars := mux.Vars(req)
 
 		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.DelayCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			// This error is already logged
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
@@ -76,8 +115,23 @@ func showDelayHandler(deps Dependencies) http.HandlerFunc {
 
 func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.DelayInitialisedState)
+
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.DelayCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
 			return
@@ -96,6 +150,13 @@ func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.DelayValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, updateC))
 			return
 		}
 

@@ -1,1 +1,1 @@
-DROP TABLE steps;
+DROP TABLE IF EXISTS steps;

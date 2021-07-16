@@ -41,7 +41,7 @@ NOTE: Even if you have npm installed you need to follow this step
 
 Go inside web-client directory
 ```
-npm install
+$ npm install
 ```
 
 ### 4. Install yarn
@@ -74,6 +74,12 @@ And thus your DB_URI should look this way
 DB_URI: "postgresql://(username):(password)@localhost:5432/cpagentdb?sslmode=disable"
 You need to set username and password
 
+NOTE: If you are working on backend then below credentials are highly recommended as these replicate actual machine
+
+username: postgres
+password: password
+dbname: cpagentdb
+
 ### 6. Set config.yml
 Inside conf directory, create a clone file from config.yml.default and name it as config.yml. And let it be. 
 
@@ -95,10 +101,10 @@ If master branch build fails then we must have messed pretty bad, please contact
 # For Building with GUI Support
 Run the below command in the same PWD and a binary should be created
 NOTE: This will create binary for linux platform with amd64 architecture,
-in case your's is different please change build-binary's line number 9 accordingly.
+in case your's is different please change MakeFile's build command accordingly.
 
 ```
-make build
+$ make build
 ```
 
 Please refer README inside web-client directory if you are facing any issue and then escalate it to us.
@@ -107,7 +113,13 @@ Please refer README inside web-client directory if you are facing any issue and 
 # Run
 DEPENDENCY: Make sure that cpagent binary is built
 
-## 1. If there are changes in Migration/DB schema files 
+## When there are changes in Migration/DB schema files 
+
+Only if below make command doesn't work then go for individual statements
+```
+$ make migrate
+```
+
 
 Please drop the cpagentdb database.
 
@@ -119,17 +131,19 @@ Type your password
 
 And then drop your database by typing
 ```
-DROP DATABASE cpagentdb;
+$ DROP DATABASE cpagentdb;
 ```
 
 Recreate the database
 ```
-CREATE DATABASE cpagentdb;
+$ CREATE DATABASE cpagentdb;
 ```
 
 You may close the connection to database
 
-## 2. Run the migrations, make sure your PWD is same as this README's.
+## Run the migrations, 
+
+make sure your PWD is same as this README's.
 
 If you have changed your branch which has differnt DB schema, please goto Step 1
 
@@ -150,27 +164,27 @@ Congrats if your setup runs, else feel free to contact us.
 # Import CSV
 
 After a successfull latest build from master, type the below command in below format to import a Recipe from CSV
+As of version 1.3.0 there is also a provision to add labware details via CSV itself.
 
 ```
-./cpagent import --recipename name_of_the_recipe --csv PATH_TO_CSV
+$ ./cpagent import --csv PATH_TO_CSV
 ```
 
-name_of_the_recipe is name without spaces. These underscores will be replaced by space.
 PATH_TO_CSV contains name of the csv along its extension.
 
 E.g
 ```
-./cpagent import --recipename covidExtract --csv /home/josh/Downloads/CER.csv
+$ ./cpagent import --csv /home/josh/Downloads/CER.csv
 ```
 
 # Create Zipped Artifact
 ```
-make zip
+$ make zip
 ```
 
-# Create Zipped Artifact after Building the Binary
+# Create Build and then a Zipped Artifact
 ```
-make build-and-zip
+$ make build-and-zip
 ```
 
 ### Testing
@@ -184,9 +198,9 @@ $ make test
 
 For PostgreSQL use following commands
 ```
-./cpagent start --plc simulator
-./cpagent migrate
-./cpagent create_migration filename
+$ ./cpagent start --plc simulator
+$ ./cpagent migrate
+$ ./cpagent create_migration filename
 ```
 
 ### RICE

@@ -8,7 +8,7 @@ import {
 } from "action-creators/discardDeckActionCreators";
 
 export function* discardDeck(actions){
-  const { payload: { params : { deckName } }} = actions;
+  const { payload: { params : { deckName, token } }} = actions;
   const { discardDeckSuccess, discardDeckFailed } = discardDeckActions;
 
   try {
@@ -18,7 +18,10 @@ export function* discardDeck(actions){
         body: null,
         reqPath: `${API_ENDPOINTS.discardDeck}/${deckName}`,
         successAction: discardDeckSuccess,
-        failureAction: discardDeckFailed
+        failureAction: discardDeckFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -28,7 +31,7 @@ export function* discardDeck(actions){
 }
 
 export function* discardTip(actions){
-  const { payload: { params : { deckName } }} = actions;
+  const { payload: { params : { deckName, token } }} = actions;
   const { discardTipSuccess, discardTipFailed } = discardTipActions;
 
   try {
@@ -38,7 +41,10 @@ export function* discardTip(actions){
         body: null,
         reqPath: `/discard-tip-and-home/true/${deckName}`, /**static api route**/
         successAction: discardTipSuccess,
-        failureAction: discardTipFailed
+        failureAction: discardTipFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {

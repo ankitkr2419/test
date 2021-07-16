@@ -5,16 +5,18 @@ import (
 	"database/sql"
 	"time"
 
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 type TipDock struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	Type      string    `json:"type" db:"type" validate:"required"`
-	Position  int64     `json:"position" db:"position" validate:"required"`
-	Height    float64   `json:"height" db:"height" validate:"required"`
+	ID       uuid.UUID `json:"id" db:"id"`
+	Type     string    `json:"type" db:"type" validate:"required"`
+	Position int64     `json:"position" db:"position" validate:"required,lte=13"`
+	// since we are not considering the height of labware so we keep the maximum height as 25mm.
+	Height    float64   `json:"height" db:"height" validate:"required,lte=25"`
 	ProcessID uuid.UUID `json:"process_id" db:"process_id"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
@@ -37,8 +39,16 @@ const (
 )
 
 func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.TipDockingInitialisedState)
 
 	err = s.db.Get(&td, getTipDockQuery, pid)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.TipDockingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.TipDockingDBFetchError)
 		return
@@ -47,6 +57,8 @@ func (s *pgStore) ShowTipDocking(ctx context.Context, pid uuid.UUID) (td TipDock
 }
 
 func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uuid.UUID) (createdAD TipDock, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.TipDockingInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -58,6 +70,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.TipDockingCreateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -67,6 +80,7 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 			return
 		}
 		logger.Infoln(responses.TipDockingCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.TipDockingCompletedState)
 		return
 	}()
 
@@ -77,14 +91,14 @@ func (s *pgStore) CreateTipDocking(ctx context.Context, ad TipDock, recipeID uui
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, TipDockingProcess, ad, Process{})
 	if err != nil {
 		return
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(TipDockingProcess)
+	process.Type = TipDockingProcess
 	process.RecipeID = recipeID
 
 	// create the process
@@ -120,7 +134,9 @@ func (s *pgStore) createTipDocking(ctx context.Context, tx *sql.Tx, t TipDock) (
 }
 
 func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
-	_, err = s.db.Exec(
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipDockingInitialisedState)
+
+	result, err := s.db.Exec(
 		updateTipDockQuery,
 		t.Type,
 		t.Position,
@@ -128,9 +144,23 @@ func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 		time.Now(),
 		t.ProcessID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.TipDockingCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating TipDocking")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
+	}
+
 	return
 }

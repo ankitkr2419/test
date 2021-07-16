@@ -52,6 +52,12 @@ var (
 	TipOperationCreateError     = fmt.Errorf("error creating tip operation record")
 	TipOperationFetchError      = fmt.Errorf("error fetching tip operation record")
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
+	TipOperationConvertError    = fmt.Errorf("error converting tip operation to its specific type")
+
+	TipTubeDecodeError    = fmt.Errorf("error decoding tip tube record")
+	TipTubeCreateError    = fmt.Errorf("error creating tip tube record")
+	TipTubeFetchError     = fmt.Errorf("error fetching tip tube record")
+	TipTubeArgumentsError = fmt.Errorf("error invalid tip tube arguments")
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
@@ -64,6 +70,8 @@ var (
 	ProcessTypeInvalid      = fmt.Errorf("error process type is wrong")
 	ProcessesRearrangeError = fmt.Errorf("error rearranging processes")
 	ProcessesDecodeSeqError = fmt.Errorf("error while decoding process sequence data")
+	ProcessDeleteError      = fmt.Errorf("error deleting process record")
+	ProcessUpdateError      = fmt.Errorf("error updating process record")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
 
@@ -79,39 +87,79 @@ var (
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
 
-	SimulatorReservedDelayError = fmt.Errorf("delay is allowed only for simulator")
-	InvalidUrlArgument          = fmt.Errorf("error invalid url argument")
+	SimulatorReservedDelayError = fmt.Errorf("error delay is allowed only for simulator")
+
+	StepRunNotInProgressError  = fmt.Errorf("error step run is not in progress")
+	StepRunAborted             = fmt.Errorf("error step run aborted")
+	DeckNameInvalid            = fmt.Errorf("error deck name is invalid")
+	PleaseHomeMachineError     = fmt.Errorf("error please home the machine first")
+	PickupPositionInvalid      = fmt.Errorf("position is invalid to pickup the tip")
+	WebsocketMarshallingError  = fmt.Errorf("error in marshalling web socket data")
+	UrlArgumentInvalid         = fmt.Errorf("error invalid url argument")
 
 	//user
-	UserDecodeError         = fmt.Errorf("error decoding user record")
-	UserDeckLoginError      = fmt.Errorf("error login in deck")
-	UserInvalidError        = fmt.Errorf("error invalid user")
-	UserAuthError           = fmt.Errorf("error in storing user authentication data")
-	UserTokenEncodeError    = fmt.Errorf("error in fetching token")
-	UserMarshallingError    = fmt.Errorf("error in marshalling token")
-	UserInsertError         = fmt.Errorf("error in inserting user")
-	UserAuthDataFetchError  = fmt.Errorf("error in authenticating user")
-	UserAuthDataDeleteError = fmt.Errorf("error in deleting authenticated user data")
-	UserInvalidDeckError    = fmt.Errorf("error invalid deck")
+	UserDecodeError           = fmt.Errorf("error decoding user record")
+	UserDeckLoginError        = fmt.Errorf("error login in deck")
+	UserInvalidError          = fmt.Errorf("error invalid user")
+	UserAuthError             = fmt.Errorf("error in storing user authentication data")
+	UserTokenEncodeError      = fmt.Errorf("error in fetching token")
+	UserMarshallingError      = fmt.Errorf("error in marshalling token")
+	UserInsertError           = fmt.Errorf("error in inserting user")
+	UserUpdateError			  = fmt.Errorf("error in updating user")
+	UsernameBlankError		  = fmt.Errorf("error username is blank")
+	UserAuthDataFetchError    = fmt.Errorf("error in authenticating user")
+	UserAuthDataDeleteError   = fmt.Errorf("error in deleting authenticated user data")
+	UserTokenApplicationError = fmt.Errorf("error in token application type")
+	UserInvalidDeckError      = fmt.Errorf("error invalid deck")
 
 	//user authenticate
-	UserUnauthorised            = fmt.Errorf("error user unauthorised")
-	UserTokenEmptyError         = fmt.Errorf("error empty token")
-	UserTokenDecodeError        = fmt.Errorf("error in decoding token")
-	UserTokenRoleEmptyError     = fmt.Errorf("error failed to fetch role")
-	UserTokenDeckError          = fmt.Errorf("error failed to fetch deck")
-	UserTokenInvalidRoleError   = fmt.Errorf("error invalid role")
-	UserTokenCrossDeckError     = fmt.Errorf("error wrong token for deck")
-	UserTokenLoggedOutDeckError = fmt.Errorf("error already logged out ")
-	UserTokenUsernameError      = fmt.Errorf("error username not in token ")
-	UserTokenAuthIdError        = fmt.Errorf("error auth_id not in token ")
-	UserTokenAuthIdParseError   = fmt.Errorf("error auth_id parse error ")
-	UserAuthNotFoundError       = fmt.Errorf("error user already logged out")
+	UserUnauthorised              = fmt.Errorf("error user unauthorised")
+	UserTokenEmptyError           = fmt.Errorf("error empty token")
+	UserTokenDecodeError          = fmt.Errorf("error in decoding token")
+	UserTokenRoleEmptyError       = fmt.Errorf("error failed to fetch role")
+	UserTokenDeckError            = fmt.Errorf("error failed to fetch deck")
+	UserTokenInvalidRoleError     = fmt.Errorf("error invalid role")
+	UserTokenCrossDeckError       = fmt.Errorf("error wrong token for deck")
+	UserTokenLoggedOutDeckError   = fmt.Errorf("error already logged out ")
+	UserTokenUsernameError        = fmt.Errorf("error username not in token ")
+	UserTokenApplicationTypeError = fmt.Errorf("error application type not in token ")
+	UserTokenAppMismatchError     = fmt.Errorf("error application type mismatch ")
+	UserTokenAppNotExistError     = fmt.Errorf("error application type does not exist or is incorrect ")
+	UserTokenAuthIdError          = fmt.Errorf("error auth_id not in token ")
+	UserTokenAuthIdParseError     = fmt.Errorf("error auth_id parse error ")
+	UserAuthNotFoundError         = fmt.Errorf("error user already logged out")
+
+	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
+	AuditLogCreateError = fmt.Errorf("error failed saving log")
+
+	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
+
+	WrongDeckError = fmt.Errorf("error invalid deck name")
 
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
+
+	DiscardBoxMoveError    = fmt.Errorf("error discard box moving was unsuccessful")
+	RestoreDeckError       = fmt.Errorf("error restore deck was unsuccessful")
+	DiscardBoolOptionError = fmt.Errorf("Invalid boolean value for tip discard option")
+
+	CUDNotAllowedError = "this %v is in progress, so not allowed to %v"
+
+	//RTPCR
+	RTPCRHomingError = fmt.Errorf("error in homing rt-pcr")
+	RTPCRResetError  = fmt.Errorf("error in reseting rt-pcr")
+
+	// Configs
+	ConfigDataDecodeError = fmt.Errorf("Error while decoding config data")
+	ConfigDataFetchError = fmt.Errorf("Error fetching Config data")
+	ConfigDataUpdateError = fmt.Errorf("Error Updating Config data")
 )
 
 // Special errors which are in []byte format
 var (
 	DataMarshallingError = []byte(`error marshalling data`)
 )
+
+func DefineCUDNotAllowedError(processOrRecipe string, operation string) (err error) {
+	msg := fmt.Sprintf(CUDNotAllowedError, processOrRecipe, operation)
+	return fmt.Errorf(msg)
+}

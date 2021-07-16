@@ -17,7 +17,7 @@ import {
 export function* runUVCleaning(actions) {
   const {
     payload: {
-      params: { time, deckName },
+      params: { time, deckName, token },
     },
   } = actions;
   const { runCleanUpSuccess, runCleanUpFailed } = runCleanUpAction;
@@ -30,6 +30,9 @@ export function* runUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.cleanUp}/${time}/${deckName}`,
         successAction: runCleanUpSuccess,
         failureAction: runCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -41,7 +44,7 @@ export function* runUVCleaning(actions) {
 export function* pauseUVCleaning(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { pauseCleanUpSuccess, pauseCleanUpFailed } = pauseCleanUpAction;
@@ -54,6 +57,9 @@ export function* pauseUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.pause}/${deckName}`,
         successAction: pauseCleanUpSuccess,
         failureAction: pauseCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -65,7 +71,7 @@ export function* pauseUVCleaning(actions) {
 export function* resumeUVCleaning(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { resumeCleanUpSuccess, resumeCleanUpFailed } = resumeCleanUpAction;
@@ -78,6 +84,9 @@ export function* resumeUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.resume}/${deckName}`,
         successAction: resumeCleanUpSuccess,
         failureAction: resumeCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {
@@ -89,7 +98,7 @@ export function* resumeUVCleaning(actions) {
 export function* abortUVCleaning(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { abortCleanUpSuccess, abortCleanUpFailed } = abortCleanUpAction;
@@ -102,6 +111,9 @@ export function* abortUVCleaning(actions) {
         reqPath: `${API_ENDPOINTS.abort}/${deckName}`,
         successAction: abortCleanUpSuccess,
         failureAction: abortCleanUpFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token
       },
     });
   } catch (error) {

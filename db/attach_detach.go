@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"time"
 
+	"mylab/cpagent/responses"
+
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
-	"mylab/cpagent/responses"
 )
 
 type AttachDetach struct {
@@ -34,8 +35,16 @@ const (
 )
 
 func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad AttachDetach, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, ShowOperation, "", responses.AttachDetachInitialisedState)
 
 	err = s.db.Get(&ad, getAttachDetachQuery, processID)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, ShowOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, ShowOperation, "", responses.AttachDetachCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Errorln(responses.AttachDetachDBFetchError)
 		return
@@ -44,6 +53,8 @@ func (s *pgStore) ShowAttachDetach(ctx context.Context, processID uuid.UUID) (ad
 }
 
 func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recipeID uuid.UUID) (createdAD AttachDetach, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.AttachDetachInitialisedState)
+
 	var tx *sql.Tx
 	tx, err = s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -55,6 +66,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recip
 		if err != nil {
 			tx.Rollback()
 			logger.Errorln(responses.AttachDetachCreateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
 			return
 		}
 		tx.Commit()
@@ -64,6 +76,7 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recip
 			return
 		}
 		logger.Infoln(responses.AttachDetachCreateSuccess, createdAD)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.AttachDetachCompletedState)
 		return
 	}()
 
@@ -74,14 +87,14 @@ func (s *pgStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, recip
 	if err != nil {
 		return
 	}
-	
+
 	process, err := s.processOperation(ctx, name, AttachDetachProcess, ad, Process{})
 	if err != nil {
 		return
 	}
 	// process has only a valid name
 	process.SequenceNumber = highestSeqNum + 1
-	process.Type = string(AttachDetachProcess)
+	process.Type = AttachDetachProcess
 	process.RecipeID = recipeID
 
 	// create the process
@@ -116,16 +129,32 @@ func (s *pgStore) createAttachDetach(ctx context.Context, tx *sql.Tx, ad AttachD
 }
 
 func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error) {
-	_, err = s.db.Exec(
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AttachDetachInitialisedState)
+
+	result, err := s.db.Exec(
 		updateAttachDetachQuery,
 		a.Operation,
 		a.OperationType,
 		time.Now(),
 		a.ProcessID,
 	)
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AttachDetachCompletedState)
+		}
+	}()
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating attach detach")
 		return
 	}
+
+	c, _ := result.RowsAffected()
+	// check row count as no error is returned when row not found for update
+	if c == 0 {
+		return responses.ProcessIDInvalidError
+	}
+
 	return
 }

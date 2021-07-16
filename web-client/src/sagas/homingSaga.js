@@ -12,7 +12,12 @@ import {
   discardTipAndHomingActionFailed as discardTipAndHomingActionFailure,
 } from "action-creators/homingActionCreators";
 
-export function* homingAction() {
+export function* homingAction(actions) {
+  const {
+    payload: {
+      params: { token },
+    },
+  } = actions;
   const { homingActionSuccess, homingActionFailed } = homingActions;
   try {
     yield call(callApi, {
@@ -22,6 +27,9 @@ export function* homingAction() {
         reqPath: API_ENDPOINTS.homing,
         successAction: homingActionSuccess,
         failureAction: homingActionFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
       },
     });
   } catch (error) {
@@ -33,7 +41,7 @@ export function* homingAction() {
 export function* deckHoming(actions) {
   const {
     payload: {
-      params: { deckName },
+      params: { deckName, token },
     },
   } = actions;
   const { deckHomingActionSuccess, deckHomingActionFailed } = deckHomingActions;
@@ -46,6 +54,9 @@ export function* deckHoming(actions) {
         reqPath: `${API_ENDPOINTS.homing}/${deckName}`,
         successAction: deckHomingActionSuccess,
         failureAction: deckHomingActionFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
       },
     });
   } catch (error) {
@@ -55,16 +66,13 @@ export function* deckHoming(actions) {
 }
 
 export function* discardTipAndHoming(actions) {
-
   const {
     payload: {
-      params: { discardTip, deckName },
+      params: { discardTip, deckName, token },
     },
   } = actions;
-  const {
-    discardTipAndHomingActionSuccess,
-    discardTipAndHomingActionFailed,
-  } = discardTipAndHomingActions;
+  const { discardTipAndHomingActionSuccess, discardTipAndHomingActionFailed } =
+    discardTipAndHomingActions;
 
   try {
     yield call(callApi, {
@@ -74,6 +82,9 @@ export function* discardTipAndHoming(actions) {
         reqPath: `${API_ENDPOINTS.discardTipAndHoming}/${discardTip}/${deckName}`,
         successAction: discardTipAndHomingActionSuccess,
         failureAction: discardTipAndHomingActionFailed,
+        // showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
       },
     });
   } catch (error) {

@@ -1,7 +1,6 @@
 import React from "react";
 
 import PropTypes from "prop-types";
-import styled from "styled-components";
 import {
   Modal,
   ModalBody,
@@ -16,30 +15,12 @@ import {
 } from "core-components";
 import { Center, Text, ButtonIcon } from "shared-components";
 
-//For Enter Time Form
-const EnterTimeForm = styled.div`
-  .row-small-gutter {
-    margin-left: -0.625rem !important;
-    margin-right: -0.625rem !important;
-  }
-
-  .row-small-gutter > * {
-    padding-left: 0.625rem !important;
-    padding-right: 0.625rem !important;
-  }
-  label {
-    font-size: 0.813rem;
-    line-height: 0.938rem;
-  }
-`;
+import { EnterTimeForm } from './EnterTimeForm';
 
 const TimeModal = (props) => {
   const {
     timeModal,
     toggleTimeModal,
-    hours,
-    mins,
-    secs,
     handleChangeTime,
     submitTime,
     deckName,
@@ -89,7 +70,6 @@ const TimeModal = (props) => {
                           id="hours"
                           placeholder=""
                           min={0}
-                          value={hours}
                           onChange={handleChangeTime}
                         />
                         <Label for="hours" className="font-weight-bold">
@@ -104,7 +84,6 @@ const TimeModal = (props) => {
                           id="minutes"
                           placeholder=""
                           min={0}
-                          value={mins}
                           onChange={handleChangeTime}
                         />
                         <Label for="minutes" className="font-weight-bold px-2">
@@ -119,7 +98,6 @@ const TimeModal = (props) => {
                           id="seconds"
                           placeholder=""
                           min={0}
-                          value={secs}
                           onChange={handleChangeTime}
                         />
                         <Label for="seconds" className="font-weight-bold">
@@ -155,4 +133,4 @@ TimeModal.defaultProps = {
   isOpen: false,
 };
 
-export default TimeModal;
+export default React.memo(TimeModal);

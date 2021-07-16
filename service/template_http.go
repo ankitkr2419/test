@@ -124,8 +124,8 @@ func updateTemplateHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.UpdateTemplate(req.Context(), t)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error update template")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
@@ -182,7 +182,7 @@ func deleteTemplateHandler(deps Dependencies) http.HandlerFunc {
 				// cannot delete template as it is used in experiments
 				rw.WriteHeader(http.StatusForbidden)
 				rw.Header().Add("Content-Type", "application/json")
-				rw.Write([]byte(`{"msg":"This template is used in experiments so cannot be deleted"}`))
+				rw.Write([]byte(`{"err":"This template is used in experiments so cannot be deleted"}`))
 				return
 
 			}
@@ -291,3 +291,5 @@ func listPublishedTemplateHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write(respBytes)
 	})
 }
+
+

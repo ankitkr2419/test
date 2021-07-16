@@ -3,7 +3,9 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -11,11 +13,27 @@ import (
 
 func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.CreateOperation, "", responses.TipTubeInitialisedState)
+
 		var tt db.TipsTubes
 		err := json.NewDecoder(req.Body).Decode(&tt)
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.CreateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.CreateOperation, "", responses.TipTubeCompletedState)
+
+			}
+
+		}()
+
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding Tip or Tube data")
+			logger.WithField("err", err.Error()).Errorln(responses.TipTubeDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipTubeDecodeError.Error()})
 			return
 		}
 
@@ -27,55 +45,95 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.InsertTipsTubes(req.Context(), []db.TipsTubes{tt})
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error while inserting Tip or Tube")
+			logger.WithField("err", err.Error()).Errorln(responses.TipTubeCreateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipTubeCreateError.Error()})
 			return
 		}
 
-		respBytes, err = json.Marshal(tt)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshalling Tip or Tube data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
-		rw.Header().Add("Content-Type", "application/json")
+		logger.Infoln(responses.TipTubeCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, tt)
 	})
 }
 
 func listTipsTubesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.TipTubeInitialisedState)
+
 		vars := mux.Vars(req)
 		tipTubeType := vars["tiptube"]
 
 		var tipsTubes []db.TipsTubes
 		var err error
 
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.TipTubeCompletedState)
+
+			}
+
+		}()
+
 		switch tipTubeType {
 		case "tip", "tube", "":
 			tipsTubes, err = deps.Store.ListTipsTubes(tipTubeType)
 			if err != nil {
-				rw.WriteHeader(http.StatusInternalServerError)
-				logger.WithField("err", err.Error()).Error("Error showing Tip tubes")
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipTubeFetchError.Error()})
+				logger.WithField("err", err.Error()).Error(responses.TipTubeFetchError)
 				return
 			}
 		default:
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", "invalid argument").Error("Invalid Argument")
-			rw.Write([]byte(`{"error":"invalid arguments"}`))
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipTubeArgumentsError.Error()})
 			return
 		}
 
-		respBytes, err := json.Marshal(tipsTubes)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling Tip tubes data")
-			rw.WriteHeader(http.StatusInternalServerError)
+		logger.Infoln(responses.TipTubeFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, tipsTubes)
+	})
+}
+
+func listTipsTubesPositionHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.TipTubeInitialisedState)
+
+		vars := mux.Vars(req)
+		tipTubeType := vars["tiptube"]
+		position, err := strconv.ParseInt(vars["position"], 10, 64)
+		var tipsTubes []db.TipsTubes
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.TipTubeCompletedState)
+
+			}
+
+		}()
+
+		switch tipTubeType {
+		case "tip", "tube", "":
+			tipsTubes, err = deps.Store.ListTipsTubesByPosition(req.Context(), tipTubeType, position)
+			if err != nil {
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipTubeFetchError.Error()})
+				logger.WithField("err", err.Error()).Error(responses.TipTubeFetchError)
+				return
+			}
+		default:
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipTubeArgumentsError.Error()})
 			return
 		}
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+
+		logger.Infoln(responses.TipTubeFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, tipsTubes)
 	})
 }

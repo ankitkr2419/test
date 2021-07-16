@@ -281,7 +281,7 @@ func (m *DBMockStore) InsertUser(ctx context.Context, u User) (err error) {
 
 func (m *DBMockStore) ValidateUser(ctx context.Context, u User) (err error) {
 	args := m.Called(ctx, u)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) CheckIfICTargetAdded(ctx context.Context, id uuid.UUID) (WarnResponse, error) {
@@ -301,7 +301,7 @@ func (m *DBMockStore) InsertConsumableDistance(ctx context.Context, c []Consumab
 
 func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err error) {
 	args := m.Called(ctx, t)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []CartridgeWells) (err error) {
@@ -309,8 +309,8 @@ func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []Ca
 	return args.Error(1)
 }
 
-func (m *DBMockStore) ListCartridges() (c []Cartridge, err error) {
-	args := m.Called(c)
+func (m *DBMockStore) ListCartridges(ctx context.Context) (c []Cartridge, err error) {
+	args := m.Called(ctx)
 	return args.Get(0).([]Cartridge), args.Error(1)
 }
 
@@ -320,12 +320,12 @@ func (m *DBMockStore) ListTipsTubes(ttype string) (t []TipsTubes, err error) {
 }
 
 func (m *DBMockStore) ListConsDistances() (c []ConsumableDistance, err error) {
-	args := m.Called(c)
+	args := m.Called()
 	return args.Get(0).([]ConsumableDistance), args.Error(1)
 }
 
 func (m *DBMockStore) ListMotors() (motor []Motor, err error) {
-	args := m.Called(motor)
+	args := m.Called()
 	return args.Get(0).([]Motor), args.Error(1)
 }
 
@@ -339,8 +339,8 @@ func (m *DBMockStore) ListPiercing(ctx context.Context) (p []Piercing, err error
 	return args.Get(0).([]Piercing), args.Error(1)
 }
 
-func (m *DBMockStore) CreatePiercing(ctx context.Context, p Piercing) (pi Piercing, err error) {
-	args := m.Called(ctx, p)
+func (m *DBMockStore) CreatePiercing(ctx context.Context, p Piercing, id uuid.UUID) (pi Piercing, err error) {
+	args := m.Called(ctx, p, id)
 	return args.Get(0).(Piercing), args.Error(1)
 }
 
@@ -380,7 +380,7 @@ func (m *DBMockStore) ShowProcess(ctx context.Context, id uuid.UUID) (p Process,
 }
 
 func (m *DBMockStore) ListProcesses(ctx context.Context, id uuid.UUID) (p []Process, err error) {
-	args := m.Called(ctx)
+	args := m.Called(ctx, id)
 	return args.Get(0).([]Process), args.Error(1)
 }
 
@@ -414,8 +414,8 @@ func (m *DBMockStore) ListAspireDispense(ctx context.Context) (ad []AspireDispen
 	return args.Get(0).([]AspireDispense), args.Error(1)
 }
 
-func (m *DBMockStore) CreateAspireDispense(ctx context.Context, ad AspireDispense) (a AspireDispense, err error) {
-	args := m.Called(ctx, ad)
+func (m *DBMockStore) CreateAspireDispense(ctx context.Context, ad AspireDispense, id uuid.UUID) (a AspireDispense, err error) {
+	args := m.Called(ctx, ad, id)
 	return args.Get(0).(AspireDispense), args.Error(1)
 }
 
@@ -444,33 +444,33 @@ func (m *DBMockStore) UpdateHeating(ctx context.Context, ht Heating) (err error)
 	return args.Error(0)
 }
 
-func (m *DBMockStore) CreateAttachDetach(ctx context.Context, ad AttachDetach) (createdAttachDetach AttachDetach, err error) {
-	args := m.Called(ctx, ad)
+func (m *DBMockStore) CreateAttachDetach(ctx context.Context, ad AttachDetach, id uuid.UUID) (createdAttachDetach AttachDetach, err error) {
+	args := m.Called(ctx, ad, id)
 	return args.Get(0).(AttachDetach), args.Error(1)
 }
 
-func (m *DBMockStore) CreateDelay(ctx context.Context, d Delay) (createdDelay Delay, err error) {
-	args := m.Called(ctx, d)
+func (m *DBMockStore) CreateDelay(ctx context.Context, d Delay, id uuid.UUID) (createdDelay Delay, err error) {
+	args := m.Called(ctx, d, id)
 	return args.Get(0).(Delay), args.Error(1)
 }
 
-func (m *DBMockStore) CreateHeating(ctx context.Context, h Heating) (createdHeating Heating, err error) {
-	args := m.Called(ctx, h)
+func (m *DBMockStore) CreateHeating(ctx context.Context, h Heating, id uuid.UUID) (createdHeating Heating, err error) {
+	args := m.Called(ctx, h, id)
 	return args.Get(0).(Heating), args.Error(1)
 }
 
-func (m *DBMockStore) CreateShaking(ctx context.Context, sh Shaker) (createdShaking Shaker, err error) {
-	args := m.Called(ctx, sh)
+func (m *DBMockStore) CreateShaking(ctx context.Context, sh Shaker, id uuid.UUID) (createdShaking Shaker, err error) {
+	args := m.Called(ctx, sh, id)
 	return args.Get(0).(Shaker), args.Error(1)
 }
 
-func (m *DBMockStore) CreateTipDocking(ctx context.Context, t TipDock) (createdTipDocking TipDock, err error) {
-	args := m.Called(ctx, t)
+func (m *DBMockStore) CreateTipDocking(ctx context.Context, t TipDock, id uuid.UUID) (createdTipDocking TipDock, err error) {
+	args := m.Called(ctx, t, id)
 	return args.Get(0).(TipDock), args.Error(1)
 }
 
-func (m *DBMockStore) CreateTipOperation(ctx context.Context, t TipOperation) (createdTipOperation TipOperation, err error) {
-	args := m.Called(ctx, t)
+func (m *DBMockStore) CreateTipOperation(ctx context.Context, t TipOperation, id uuid.UUID) (createdTipOperation TipOperation, err error) {
+	args := m.Called(ctx, t, id)
 	return args.Get(0).(TipOperation), args.Error(1)
 }
 
@@ -513,6 +513,7 @@ func (m *DBMockStore) DuplicateProcess(ctx context.Context, id uuid.UUID) (Proce
 	args := m.Called(ctx, id)
 	return args.Get(0).(Process), args.Error(1)
 }
+
 func (m *DBMockStore) RearrangeProcesses(ctx context.Context, id uuid.UUID, ps []ProcessSequence) ([]Process, error) {
 	args := m.Called(ctx, id, ps)
 	return args.Get(0).([]Process), args.Error(1)
@@ -533,7 +534,41 @@ func (m *DBMockStore) UpdateTipOperation(ctx context.Context, t TipOperation) (e
 	return args.Error(0)
 }
 
-func (m *DBMockStore) updateProcessName(ctx context.Context, id uuid.UUID, processType string, process interface{}) (err error) {
-	args := m.Called(ctx, id, processType, process)
+func (m *DBMockStore) InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error) {
+	args := m.Called(ctx, username)
+	return args.Get(0).(uuid.UUID), args.Error(1)
+}
+
+func (m *DBMockStore) ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error) {
+	args := m.Called(ctx, username, authID)
+	return args.Get(0).(UserAuth), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error) {
+	args := m.Called(ctx, userAuth)
 	return args.Error(0)
+}
+
+func (m *DBMockStore) InsertAuditLog(ctx context.Context, al AuditLog) (err error) {
+	args := m.Called(ctx, al)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) ShowAuditLog(ctx context.Context) (al AuditLog, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).(AuditLog), args.Error(1)
+}
+
+func (m *DBMockStore) ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error) {
+	args := m.Called(ctx, ttype, position)
+	return args.Get(0).([]TipsTubes), args.Error(1)
+}
+func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error) {
+	args := m.Called(ctx, activity, state, oprType, deck, description)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) GetTargetByName(ctx context.Context, name string) (t Target, err error) {
+	args := m.Called(ctx, name)
+	return args.Get(0).(Target), args.Error(1)
 }

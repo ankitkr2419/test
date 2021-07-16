@@ -1,7 +1,13 @@
 package plc
 
 import (
+	"mylab/cpagent/db"
+	"context"
 	"github.com/google/uuid"
+	logger "github.com/sirupsen/logrus"
+	"time"
+	"errors"
+
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
@@ -15,9 +21,10 @@ const (
 )
 
 type Step struct {
-	TargetTemp float32 // holding temperature for step
-	RampUpTemp float32 // ramp-up temperature for step
-	HoldTime   int32   // hold time for step
+	TargetTemp  float32 `json:"target_temp"`// holding temperature for step
+	RampUpTemp  float32 `json:"ramp_rate"`// ramp-up temperature for step
+	HoldTime    int32   `json:"hold_time"`// hold time for step
+	DataCapture bool	`json:"data_capture"`
 }
 
 // We can have at most 4 Holding steps and 6 Cycling steps.
@@ -28,11 +35,11 @@ type Stage struct {
 	IdealLidTemp uint16 // ideal lid temp
 }
 
-type Emissions [6]uint16
+type Emissions [4]uint16
 
 type Scan struct {
 	Cycle         uint16 // current running cycle
-	Wells         [96]Emissions
+	Wells         [16]Emissions
 	Temp          float32
 	LidTemp       float32
 	CycleComplete bool
@@ -46,6 +53,11 @@ type Driver interface {
 	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
+	HomingRTPCR() error   		  //Homing of RTPCR
+	Reset() (error)           	  //reseting the values
+	Cycle() (error)           	  // start the cycle
+	SetLidTemp(uint16) error	  // set Lid Temperature
+	SwitchOffLidTemp() error
 }
 
 type WSData struct {
@@ -58,14 +70,23 @@ type WSError struct {
 	Message string `json:"message"`
 	Deck    string `json:"deck"`
 }
+
 type OperationDetails struct {
-	Message        string    `json:"message"`
-	CurrentStep    int       `json:"current_step,omitempty"`
-	TotalProcesses int       `json:"total_processes,omitempty"`
-	RecipeID       uuid.UUID `json:"recipe_id,omitempty"`
-	RemainingTime  int64     `json:"remaining_time,omitempty"`
-	ProcessName    string    `json:"process_name,omitempty"`
-	ProcessType    string    `json:"process_type,omitempty"`
+	Message        string         `json:"message"`
+	CurrentStep    int64          `json:"current_step,omitempty"`
+	TotalProcesses int64          `json:"total_processes,omitempty"`
+	RecipeID       uuid.UUID      `json:"recipe_id,omitempty"`
+	RemainingTime  *TimeHMS       `json:"remaining_time,omitempty"`
+	TotalTime      *TimeHMS       `json:"total_time,omitempty"`
+	ProcessName    string         `json:"process_name,omitempty"`
+	ProcessType    db.ProcessType `json:"process_type,omitempty"`
+	Progress	   *int64		  `json:"progress,omitempty"`
+}
+
+type TimeHMS struct {
+	Hours   uint8 `json:"hours"`
+	Minutes uint8 `json:"minutes"`
+	Seconds uint8 `json:"seconds"`
 }
 
 type Compact32Deck struct {
@@ -87,6 +108,54 @@ type Compact32Driver interface {
 	WriteSingleCoil(address, value uint16) (err error)
 }
 
+type Extraction interface {
+	AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
+	AttachDetach(ad db.AttachDetach) (response string, err error)
+	DiscardBoxCleanup() (response string, err error)
+	RestoreDeck() (response string, err error)
+	UVLight(uvTime string) (response string, err error)
+	AddDelay(delay db.Delay, runRecipe bool) (response string, err error)
+	DiscardTipAndHome(discard bool) (response string, err error)
+	Heating(ht db.Heating) (response string, err error)
+	Homing() (response string, err error)
+	ManualMovement(motorNum, direction, pulses uint16) (response string, err error)
+	Resume() (response string, err error)
+	Pause() (response string, err error)
+	Abort() (response string, err error)
+	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
+	Shaking(shakerData db.Shaker) (response string, err error)
+	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
+	SetRunInProgress()
+	SetPaused()
+	ResetPaused()
+	ResetRunInProgress()
+	IsMachineHomed() bool
+	IsRunInProgress() bool
+	TipOperation(to db.TipOperation) (response string, err error)
+	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
+	SetCurrentProcessNumber(step int64)
+	PIDCalibration(context.Context) error
+}
+
 func SetDeckName(C32 *Compact32Deck, deck string) {
 	C32.name = deck
+}
+
+func HoldSleep(sleepTime int32) (err error) {
+
+	var elaspedTime int32
+	for {
+		logger.Infoln("plc.ExperimentRunning && elaspedTime < sleepTime ", ExperimentRunning, elaspedTime, sleepTime)
+		if ExperimentRunning && elaspedTime < sleepTime {
+			time.Sleep(time.Second * 1)
+			logger.Infoln("sleeping in holdsleep")
+		} else {
+			if !ExperimentRunning {
+				logger.Errorln("experiment has stoped running")
+				return errors.New("experiment has stoped running")
+			}
+			return nil
+		}
+		elaspedTime = elaspedTime + 1
+	}
 }

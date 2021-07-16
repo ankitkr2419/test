@@ -56,11 +56,11 @@ func (d *Compact32Deck) resetAborted() {
 	aborted.Store(d.name, false)
 }
 
-func (d *Compact32Deck) setPaused() {
+func (d *Compact32Deck) SetPaused() {
 	paused.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetPaused() {
+func (d *Compact32Deck) ResetPaused() {
 	paused.Store(d.name, false)
 }
 
@@ -90,6 +90,10 @@ func (d *Compact32Deck) resetPIDCalibrationInProgress() {
 
 func (d *Compact32Deck) setHomingPercent(percent float64) {
 	homingPercent.Store(d.name, percent)
+}
+
+func (d *Compact32Deck) SetCurrentProcessNumber(step int64) {
+	currentProcess.Store(d.name, step)
 }
 
 func (d *Compact32Deck) IsMachineHomed() bool {
@@ -281,10 +285,10 @@ func (d *Compact32Deck) getHomingDeckName() string {
 
 func (d *Compact32Deck) getHomingPercent() float64 {
 	if BothDeckHomingInProgress {
-		if tempA, ok := homingPercent.Load("A"); !ok {
+		if tempA, ok := homingPercent.Load(DeckA); !ok {
 			logger.Errorln("homingPercent isn't loaded!")
 			return -1
-		} else if tempB, ok := homingPercent.Load("B"); !ok {
+		} else if tempB, ok := homingPercent.Load(DeckB); !ok {
 			logger.Errorln("homingPercent isn't loaded!")
 			return -1
 		} else {
@@ -296,6 +300,15 @@ func (d *Compact32Deck) getHomingPercent() float64 {
 		return -1
 	} else {
 		return temp.(float64)
+	}
+}
+
+func getCurrentProcessNumber(deck string) int64 {
+	if temp, ok := currentProcess.Load(deck); !ok {
+		logger.Errorln("currentProcess isn't loaded!")
+		return -1
+	} else {
+		return temp.(int64)
 	}
 }
 

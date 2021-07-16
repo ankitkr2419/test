@@ -2,6 +2,7 @@ package service
 
 import (
 	"mylab/cpagent/responses"
+	"mylab/cpagent/plc"
 	"net/http"
 	"time"
 
@@ -11,9 +12,9 @@ import (
 func safeToUpgradeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		if deps.PlcDeck[deckA].IsRunInProgress() || deps.PlcDeck[deckB].IsRunInProgress() {
+		if deps.PlcDeck[plc.DeckA].IsRunInProgress() || deps.PlcDeck[plc.DeckB].IsRunInProgress() {
 			logger.Errorln(responses.RunInProgressForSomeDeckError)
-			responseCodeAndMsg(rw, http.StatusExpectationFailed, ErrObj{Err: responses.RunInProgressForSomeDeckError.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RunInProgressForSomeDeckError.Error()})
 			return
 		}
 
@@ -29,13 +30,13 @@ func safeToUpgradeHandler(deps Dependencies) http.HandlerFunc {
 // set Run in Progress for dur seconds for both the decks
 func temporarySetRunInProgress(deps Dependencies, dur time.Duration) {
 	logger.Infoln(responses.TempSettingBothDeckRun)
-	
-	deps.PlcDeck[deckA].SetRunInProgress()
-	defer deps.PlcDeck[deckA].ResetRunInProgress()
-	deps.PlcDeck[deckB].SetRunInProgress()
-	defer deps.PlcDeck[deckB].ResetRunInProgress()
+
+	deps.PlcDeck[plc.DeckA].SetRunInProgress()
+	defer deps.PlcDeck[plc.DeckA].ResetRunInProgress()
+	deps.PlcDeck[plc.DeckB].SetRunInProgress()
+	defer deps.PlcDeck[plc.DeckB].ResetRunInProgress()
 
 	time.Sleep(dur * time.Second)
-	
+
 	logger.Infoln(responses.ResettingBothDeckRun)
 }

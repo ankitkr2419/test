@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"time"
 
@@ -18,35 +18,37 @@ import (
 func runRecipeHandler(deps Dependencies, runStepWise bool) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ExecuteOperation, "", responses.RunRecipeInitialisedState)
+
 		var err error
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ExecuteOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ExecuteOperation, "", responses.DelayCompletedState)
+
+			}
+
+		}()
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
 		recipeID, err := parseUUID(vars["id"])
 		if err != nil {
-			fmt.Fprintf(rw, err.Error())
-			rw.WriteHeader(http.StatusBadRequest)
+			logger.Errorln(err)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: deck})
 			return
 		}
 
-		switch deck {
-		case "A", "B":
-			go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
-			rw.WriteHeader(http.StatusOK)
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"recipe run is in progress", "deck": "%v"}`, deck)))
+		go runRecipe(req.Context(), deps, deck, runStepWise, recipeID)
+		logger.Infoln(responses.RecipeRunInProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.RecipeRunInProgress, Deck: deck})
+		return
 
-		default:
-			err = fmt.Errorf("Check your deck name")
-		}
-
-		if err != nil {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"msg":"check your deck name"}`))
-			logger.Errorln(err.Error())
-		}
 	})
 }
 
@@ -58,36 +60,19 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
-		switch deck {
-		case "A", "B":
-			// If runNext is set means this API is called at wrong time
-			if runNext[deck] {
-				rw.WriteHeader(http.StatusBadRequest)
-				rw.Header().Add("Content-Type", "application/json")
-				rw.Write([]byte(fmt.Sprintf(`{"msg":"check if the step-run is in progress", "deck": "%v"}`, deck)))
-				return
-			}
-
-			logger.Infoln("Populating the nextStep channel for deck", deck)
-			nextStep[deck] <- struct{}{}
-
-			rw.WriteHeader(http.StatusOK)
-			rw.Header().Add("Content-Type", "application/json")
-			rw.Write([]byte(fmt.Sprintf(`{"msg":"next step run is in progress", "deck":"%v"}`, deck)))
+		// If runNext is set means this API is called at wrong time
+		if runNext[deck] {
+			err = responses.StepRunNotInProgressError
+			logger.Errorln(err)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error(), Deck: deck})
 			return
-
-		default:
-			err = fmt.Errorf("Check your deck name")
 		}
 
-		if err != nil {
-			rw.Header().Add("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write([]byte(`{"msg":"check your deck name"}`))
-
-			logger.Errorln(err.Error())
-		}
+		populateNextStepChan(deck)
+		logger.Infoln(responses.NextStepRunInProgress)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.NextStepRunInProgress, Deck: deck})
 		return
+
 	})
 }
 
@@ -97,18 +82,18 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		if err != nil {
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
+			go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.ErrorState, db.ExecuteOperation, deck, err.Error())
 		}
 		resetStepRunInProgress(deck)
 	}()
 
 	if !deps.PlcDeck[deck].IsMachineHomed() {
-		err = fmt.Errorf("Please home the machine first!")
+		err = responses.PleaseHomeMachineError
 		return
 	}
 
 	if deps.PlcDeck[deck].IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
-
+		err = responses.PreviousRunInProgressError
 		return
 	}
 
@@ -124,8 +109,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Get Processes associated with recipe
 	processes, err := deps.Store.ListProcesses(ctx, recipe.ID)
 	if err != nil {
-
-		return "", err
+		return
 	}
 
 	var currentCartridgeID int64
@@ -140,18 +124,24 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	if runStepWise {
 		setStepRunInProgress(deck)
-		logger.Infoln("Populating the nextStep channel for 1st process for deck", deck)
-		nextStep[deck] <- struct{}{}
+		populateNextStepChan(deck)
 	}
 
+	err = deps.PlcDeck[deck].RunRecipeWebsocketData(recipe, processes)
 	for i, p := range processes {
 
-		// TODO : percentage calculation from inside the process.
-		sendWSData(deps, deck, recipeID, len(processes), i+1, p.Name, p.Type)
+		deps.PlcDeck[deck].SetCurrentProcessNumber(int64(i))
 
 		if runStepWise {
 
-			logger.Infoln("Waiting to run next process")
+			logger.Infoln(responses.WaitingRunNextProcess)
+
+			// To handle continuous run timer
+			// this delay is supposed to be more than 500 ms
+			// as the delay time in delay.go is 500ms
+			time.Sleep(600 * time.Millisecond)
+			deps.PlcDeck[deck].SetPaused()
+
 			resetRunNext(deck)
 			// To resume the next step admin needs to hits the run-next-step API only
 			err = checkForAbortOrNext(deck)
@@ -159,11 +149,16 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return
 			}
 			setRunNext(deck)
-			logger.Infoln("Next process is in progress")
+			
+			// To handle continuous run timer
+			deps.PlcDeck[deck].ResetPaused()
+
+			logger.Infoln(responses.NextProcessInProgress)
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.InitialisedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.InitialisedState)))
 
 		switch p.Type {
-		case "AspireDispense":
+		case db.AspireDispenseProcess:
 			ad, err := deps.Store.ShowAspireDispense(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -171,9 +166,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			fmt.Println(ad)
 
 			if ad.CartridgeType == db.Cartridge1 {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			// TODO: Pass the complete Tip rather than just name for volume validations
 			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
@@ -181,7 +176,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "Heating":
+		case db.HeatingProcess:
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
 			fmt.Printf("heat object %v", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
@@ -191,7 +186,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(ht)
 
-		case "Shaking":
+		case db.ShakingProcess:
 			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -204,7 +199,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			fmt.Println(sha)
 
-		case "Piercing":
+		case db.PiercingProcess:
 			pi, err := deps.Store.ShowPiercing(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -212,9 +207,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			fmt.Println(pi)
 
 			if pi.Type == db.Cartridge1 {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 
 			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
@@ -222,7 +217,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "AttachDetach":
+		case db.AttachDetachProcess:
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
 			fmt.Printf("attach detach record %v \n", ad)
 			if err != nil {
@@ -233,7 +228,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return "", err
 			}
 
-		case "TipOperation":
+		case db.TipDiscardProcess, db.TipPickupProcess:
 			to, err := deps.Store.ShowTipOperation(ctx, p.ID)
 			if err != nil {
 				return "", err
@@ -260,59 +255,44 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentTip = db.TipsTubes{}
 
 			}
-		case "TipDocking":
+		case db.TipDockingProcess:
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
 				return "", err
 			}
 			fmt.Println(td)
 			if td.Type == string(db.Cartridge1) {
-				currentCartridgeID = recipe.Cartridge1Position
+				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
-				currentCartridgeID = recipe.Cartridge2Position
+				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
-		case "Delay":
+		case db.DelayProcess:
 			delay, err := deps.Store.ShowDelay(ctx, p.ID)
 			if err != nil {
 				return "", err
 			}
 			fmt.Print(delay)
-			response, err = deps.PlcDeck[deck].AddDelay(delay)
+			response, err = deps.PlcDeck[deck].AddDelay(delay, false)
 			if err != nil {
 				return "", err
 			}
 
 		}
+		go deps.Store.AddAuditLog(ctx, db.MachineOperation, db.CompletedState, db.ExecuteOperation, deck, responses.GetMachineOperationMessage(string(p.Type), string(db.CompletedState)))
+
 	}
 
-	plength := len(processes)
-	sendWSData(deps, deck, recipeID, plength, plength+1, processes[plength-1].Name, processes[plength-1].Type)
-
-	// send websocket success data
-	successWsData := plc.WSData{
-		Progress: 100,
-		Deck:     deck,
-		Status:   "SUCCESS_RECIPE",
-		OperationDetails: plc.OperationDetails{
-			Message:        fmt.Sprintf("successfully completed recipe %v for deck %v", recipeID, deck),
-			CurrentStep:    len(processes),
-			RecipeID:       recipeID,
-			TotalProcesses: len(processes),
-		},
-	}
-	wsData, err := json.Marshal(successWsData)
-	if err != nil {
-		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		return
-	}
-	deps.WsMsgCh <- fmt.Sprintf("success_recipe_%v", string(wsData))
+	// -2 means recipe is over but timer isn't
+	deps.PlcDeck[deck].SetCurrentProcessNumber(int64(-2))
+	deps.PlcDeck[deck].ResetRunInProgress()
+	// Sleep so that we can reset Abort in Delay
+	time.Sleep(2 * time.Second)
 
 	// Home the machine
-	deps.PlcDeck[deck].ResetRunInProgress()
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
 		return
@@ -322,51 +302,27 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 }
 
 func getTipIDFromRecipePosition(recipe db.Recipe, position int64) (id int64, err error) {
-	// Currently only 3 positions are allowed for tips deck version 1.2
-	// TODO: Change this for version 1.3
+	// Currently only 5 positions are allowed for tips deck version 1.3
+	// TODO: Change this for next version
 	switch position {
 	case 1:
-		return recipe.Position1, nil
+		return *recipe.Position1, nil
 	case 2:
-		return recipe.Position2, nil
+		return *recipe.Position2, nil
 	case 3:
-		return recipe.Position3, nil
+		return *recipe.Position3, nil
+	case 4:
+		return *recipe.Position4, nil
+	case 5:
+		return *recipe.Position5, nil
 	}
-	err = fmt.Errorf("position is invalid to pickup the tip")
+	err = responses.PickupPositionInvalid
 	return 0, err
 }
 
-func sendWSData(deps Dependencies, deck string, recipeID uuid.UUID, processLength, currentStep int, processName, processType string) {
-	// percentage calculation for each process
-
-	progress := float64(((currentStep - 1) * 100) / processLength)
-
-	wsProgressOperation := plc.WSData{
-		Progress: progress,
-		Deck:     deck,
-		Status:   "PROGRESS_RECIPE",
-		OperationDetails: plc.OperationDetails{
-			Message:        fmt.Sprintf("process %v for deck %v in progress", currentStep, deck),
-			CurrentStep:    currentStep,
-			RecipeID:       recipeID,
-			TotalProcesses: processLength,
-			ProcessName:    processName,
-			ProcessType:    processType,
-		},
-	}
-
-	if processLength < currentStep {
-		wsProgressOperation.OperationDetails.Message = fmt.Sprintf("process %v for deck %v completed", processLength, deck)
-		wsProgressOperation.OperationDetails.CurrentStep = processLength
-	}
-
-	wsData, err := json.Marshal(wsProgressOperation)
-	if err != nil {
-		logger.Errorf("error in marshalling web socket data %v", err.Error())
-	}
-	deps.WsMsgCh <- fmt.Sprintf("progress_recipe_%v", string(wsData))
-
-	return
+func populateNextStepChan(deck string) {
+	logger.Infoln("Populating the nextStep channel for deck", deck)
+	nextStep[deck] <- struct{}{}
 }
 
 func checkForAbortOrNext(deck string) (err error) {
@@ -374,11 +330,11 @@ func checkForAbortOrNext(deck string) (err error) {
 		time.Sleep(200 * time.Millisecond)
 		select {
 		case <-nextStep[deck]:
-			logger.Infoln("Next Step will be Run")
+			logger.Infoln(responses.NextStepWillRun)
 			return nil
 		case <-abortStepRun[deck]:
-			logger.Infoln("Step Run will be Aborted")
-			return fmt.Errorf("step run aborted")
+			logger.Infoln(responses.StepRunWillAbort)
+			return responses.StepRunAborted
 		}
 	}
 }

@@ -1,14 +1,16 @@
 package service
 
 import (
+	"mylab/cpagent/tec"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 )
 
 type Dependencies struct {
 	Store   db.Storer
+	Tec		tec.Driver
 	Plc     plc.Driver
-	PlcDeck map[string]*plc.Compact32Deck
+	PlcDeck map[string]plc.Extraction
 	ExitCh  <-chan error
 	WsErrCh chan error
 	WsMsgCh chan string

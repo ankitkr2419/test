@@ -1,25 +1,14 @@
 package service
 
 import (
-	"encoding/json"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	logger "github.com/sirupsen/logrus"
 )
 
-type PingResponse struct {
-	Message string `json:"message"`
-}
-
 func pingHandler(rw http.ResponseWriter, req *http.Request) {
-	response := PingResponse{Message: "pong"}
-
-	respBytes, err := json.Marshal(response)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error marshalling ping response")
-		rw.WriteHeader(http.StatusInternalServerError)
-	}
-
-	rw.Header().Add("Content-Type", "application/json")
-	rw.Write(respBytes)
+	logger.Infoln("Server was pinged")
+	responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.Pong})
+	return
 }

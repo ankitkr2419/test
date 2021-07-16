@@ -13,7 +13,7 @@ import (
 type Well struct {
 	// emissions plc.Emissions // dye emmissions.
 	control string    // "", positive, negative, internal or no_template
-	goals   [6]string // "", "high", "low"
+	goals   [4]string // "", "high", "low"
 }
 
 type Simulator struct {
@@ -21,19 +21,19 @@ type Simulator struct {
 	plcIO     plcRegistors
 	config    plc.Stage
 	emissions []plc.Emissions
-	ExitCh    chan string
+	ExitCh    chan error
 	ErrCh     chan error
 	wells     []Well
 }
 
 func NewSimulator(exit chan error) plc.Driver {
-	ex := make(chan string)
+	ex := make(chan error)
 
 	s := Simulator{}
 	s.ExitCh = ex
 	s.ErrCh = exit
 	s.pcrHeartBeat()
-
+	s.setWells()
 	go s.HeartBeat()
 
 	return &s
@@ -71,7 +71,7 @@ func (d *Simulator) HeartBeat() {
 
 		// something went wrong. Signal parent process
 		logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-		d.ExitCh <- "dead"
+		d.ExitCh <- errors.New("dead")
 		return
 	}()
 }
@@ -107,14 +107,8 @@ func (d *Simulator) Start() (err error) {
 func (d *Simulator) Stop() (err error) {
 	// Abort running process
 
-	if d.plcIO.m.startStopCycle == 0 {
-		err = errors.New("Cannot stop, not yet started")
-		return
-	}
-
-	d.plcIO.m.startStopCycle = 0
-
-	d.ExitCh <- "abort"
+	plc.ExperimentRunning = false
+	d.ErrCh <- errors.New("PCR Aborted")
 	return
 }
 
@@ -133,7 +127,7 @@ func (d *Simulator) simulate() {
 		select {
 		case msg := <-d.ExitCh:
 			logger.WithField("msg", msg).Info("simulate: ExitCh received data")
-			if msg == "stop" {
+			if msg.Error() == "stop" {
 				d.ErrCh <- errors.New("PCR Stopped")
 
 				// reset to start new experiment
@@ -142,7 +136,7 @@ func (d *Simulator) simulate() {
 				d.wells = []Well{}
 
 			}
-			if msg == "abort" {
+			if msg.Error() == "abort" {
 
 				d.ErrCh <- errors.New("PCR Aborted")
 
@@ -152,10 +146,11 @@ func (d *Simulator) simulate() {
 				d.wells = []Well{}
 
 			}
-			if msg == "pause" {
-				//TBD
-			}
-			if msg == "dead" {
+			// we will handle this later with a different string channel as this is not a error
+			// if msg == "pause" {
+			// 	//TBD
+			// }
+			if msg.Error() == "dead" {
 
 				// heart beat failes, pcr is not responding
 				d.ErrCh <- errors.New("PCR Dead")
@@ -191,30 +186,30 @@ func (d *Simulator) setWells() {
 
 		if i == pc {
 			well.control = "positive"
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				well.goals[i] = "high"
 			}
 
 		} else if i == nc {
 			well.control = "negative"
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				well.goals[i] = ""
 			}
 
 		} else if i == ic {
 			well.control = "internal"
-			well.goals = [6]string{"", "", "", "", "", "high"} //TODO: discuss
+			well.goals = [4]string{"", "", "", "high"} //TODO: discuss
 
 		} else if i == ntc {
 			well.control = "no_template"
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				well.goals[i] = "0"
 			}
 
 		} else {
 			well.control = "" // patient sample
 
-			for i := 0; i < 6; i++ {
+			for i := 0; i < 4; i++ {
 				if i != ic { // for all targets accept ic assign random goals
 					switch goal := jitter(0, 1, 4); goal { // randomization of goals
 					case 1:
@@ -238,37 +233,32 @@ func (d *Simulator) setWells() {
 func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	d.Lock()
 	defer d.Unlock()
+	// simulate currentLidTemp
+	d.plcIO.d.currentLidTemp = jitter(uint16(100*10), 0, 5)
 
-	// Read current cycle
-	scan.Cycle = d.plcIO.d.currentCycle
-
-	// Read cycle temperature.. PLC returns 653 for 65.3 degrees
-	scan.Temp = float32(d.plcIO.d.currentTemp) / 10
-
-	// Read lid temperature
+	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10
 
-	// Read current cycle status
-	if d.plcIO.m.cycleCompleted == 0 { // 0x0000 means cycle is not complete
-		// Values would not have changed.
-		scan.CycleComplete = false
-		return
-	}
-	scan.CycleComplete = true
-
-	// If the invoker has already read this cycle data, don't send it again!
-	if cycle == scan.Cycle {
-		return
+	if plc.CycleComplete {
+		scan.CycleComplete = true
+		if cycle == scan.Cycle {
+			logger.Println("same cycle")
+			return
+		}
 	}
 
-	// Scan all the data from the Wells (96 x 6)
-	for i, data := range d.emissions {
-		scan.Wells[i] = data
+	if plc.DataCapture {
+
+		d.emit()
+		logger.Println("emissions------------------>", d.emissions)
+		// Scan all the data from the Wells (96 x 6)
+		for i, data := range d.emissions {
+			scan.Wells[i] = data
+			logger.Println("scan wells ", scan.Wells[i])
+		}
+		scan.Cycle = plc.CurrentCycle
+
 	}
-
-	// PC reading done
-	d.plcIO.m.emissionFlag = 0
-
 	return
 }
 

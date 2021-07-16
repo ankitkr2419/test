@@ -22,6 +22,8 @@ type TipOperationHandlerTestSuite struct {
 
 func (suite *TipOperationHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestTipOperationTestSuite(t *testing.T) {
@@ -37,12 +39,12 @@ var testTipOperationRecord = db.TipOperation{
 
 func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationSuccess() {
 
-	suite.dbMock.On("CreateTipOperation", mock.Anything, testTipOperationRecord).Return(testTipOperationRecord, nil)
+	suite.dbMock.On("CreateTipOperation", mock.Anything, mock.Anything, recipeUUID).Return(testTipOperationRecord, nil)
 
 	body, _ := json.Marshal(testTipOperationRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/tip-operation",
-		"/tip-operation",
+		"/tip-operation/{recipe_id}",
+		"/tip-operation/"+recipeUUID.String(),
 		string(body),
 		createTipOperationHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -55,12 +57,12 @@ func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationSuccess() {
 
 func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationFailure() {
 
-	suite.dbMock.On("CreateTipOperation", mock.Anything, testTipOperationRecord).Return(testTipOperationRecord, responses.TipOperationCreateError)
+	suite.dbMock.On("CreateTipOperation", mock.Anything, mock.Anything, recipeUUID).Return(testTipOperationRecord, responses.TipOperationCreateError)
 
 	body, _ := json.Marshal(testTipOperationRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/tip-operation",
-		"/tip-operation",
+		"/tip-operation/{recipe_id}",
+		"/tip-operation/"+recipeUUID.String(),
 		string(body),
 		createTipOperationHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -149,6 +151,59 @@ func (suite *TipOperationHandlerTestSuite) TestUpdateTipOperationFailure() {
 	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationInvalidUUID() {
+
+	body, _ := json.Marshal(testTipOperationRecord)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/tip-operation/{recipe_id}",
+		"/tip-operation/"+invalidUUID,
+		string(body),
+		createTipOperationHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.RecipeIDInvalidError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TipOperationHandlerTestSuite) TestShowTipOperationInvalidUUID() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/tip-operation/{recipe_id}",
+		"/tip-operation/"+invalidUUID,
+		"",
+		showTipOperationHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *TipOperationHandlerTestSuite) TestUpdateTipOperationInvalidUUID() {
+
+	body, _ := json.Marshal(testTipOperationRecord)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/tip-operation/{recipe_id}",
+		"/tip-operation/"+invalidUUID,
+		string(body),
+		updateTipOperationHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())

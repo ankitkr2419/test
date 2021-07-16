@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { ButtonIcon, Text, Center, Icon } from 'shared-components';
 import { Modal, ModalBody, Button, CheckBox } from 'core-components';
-
-const CheckBoxGroup = styled.div`
-	height: 340px;
-`;
+import { CheckBoxGroup } from './CheckBoxGroup';
 
 const ExportDataModal = (props) => {
 	const [exportDataModal, setExportDataModal] = useState(false);

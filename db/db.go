@@ -43,7 +43,7 @@ type Storer interface {
 	GetWellTarget(context.Context, int32, uuid.UUID) ([]WellTarget, error)
 	UpsertWellTargets(context.Context, []WellTarget, uuid.UUID, bool) ([]WellTarget, error)
 	ListStageSteps(context.Context, uuid.UUID) ([]StageStep, error)
-	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID, uint16) error
+	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID, uint16, string) error
 	ListConfTargets(context.Context, uuid.UUID) ([]TargetDetails, error)
 	InsertResult(context.Context, []Result) ([]Result, error)
 	ListWellTargets(context.Context, uuid.UUID) ([]WellTarget, error)
@@ -58,7 +58,8 @@ type Storer interface {
 	InsertNotification(context.Context, Notification) error
 	MarkNotificationasRead(context.Context, uuid.UUID) error
 	InsertUser(context.Context, User) error
-	ValidateUser(context.Context, User) error
+	UpdateUser(context.Context, User, string) error
+	ValidateUser(context.Context, User) (User, error)
 	CheckIfICTargetAdded(context.Context, uuid.UUID) (WarnResponse, error)
 	InsertMotor(context.Context, []Motor) error
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
@@ -68,7 +69,7 @@ type Storer interface {
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
-	ListCartridges() ([]Cartridge, error)
+	ListCartridges(ctx context.Context) ([]Cartridge, error)
 	ListCartridgeWells() ([]CartridgeWells, error)
 	ShowPiercing(context.Context, uuid.UUID) (Piercing, error)
 	ShowTipOperation(context.Context, uuid.UUID) (TipOperation, error)
@@ -113,4 +114,10 @@ type Storer interface {
 	InsertUserAuths(ctx context.Context, username string) (authID uuid.UUID, err error)
 	ShowUserAuth(ctx context.Context, username string, authID uuid.UUID) (ua UserAuth, err error)
 	DeleteUserAuth(ctx context.Context, userAuth UserAuth) (err error)
+	InsertAuditLog(ctx context.Context, al AuditLog) (err error)
+	ShowAuditLog(ctx context.Context) (al AuditLog, err error)
+	AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error)
+	ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error)
+	UpdateEstimatedTime(ctx context.Context, id uuid.UUID, estimatedTime int64) (err error)
+	GetTargetByName(ctx context.Context, name string) (t Target, err error)
 }

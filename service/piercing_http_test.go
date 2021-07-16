@@ -22,6 +22,8 @@ type PiercingHandlerTestSuite struct {
 
 func (suite *PiercingHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestPiercingTestSuite(t *testing.T) {
@@ -32,18 +34,17 @@ var testPiercingRecord = db.Piercing{
 	ID:             testUUID,
 	Type:           db.Cartridge1,
 	CartridgeWells: []int64{1, 2},
-	Discard:        "at_pickup_passing",
 	ProcessID:      testProcessUUID,
 }
 
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
 
-	suite.dbMock.On("CreatePiercing", mock.Anything, testPiercingRecord).Return(testPiercingRecord, nil)
+	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything, recipeUUID).Return(testPiercingRecord, nil)
 
 	body, _ := json.Marshal(testPiercingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/piercing",
-		"/piercing",
+		"/piercing/{recipe_id}",
+		"/piercing/"+recipeUUID.String(),
 		string(body),
 		createPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -56,12 +57,12 @@ func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
 
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingFailure() {
 
-	suite.dbMock.On("CreatePiercing", mock.Anything, testPiercingRecord).Return(db.Piercing{}, responses.PiercingCreateError)
+	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything, recipeUUID).Return(db.Piercing{}, responses.PiercingCreateError)
 
 	body, _ := json.Marshal(testPiercingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/piercing",
-		"/piercing",
+		"/piercing/{recipe_id}",
+		"/piercing/"+recipeUUID.String(),
 		string(body),
 		createPiercingHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -150,6 +151,59 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingFailure() {
 	outputBytes, _ := json.Marshal(output)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *PiercingHandlerTestSuite) TestCreatePiercingInvalidUUID() {
+
+	body, _ := json.Marshal(testPiercingRecord)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/piercing/{recipe_id}",
+		"/piercing/"+invalidUUID,
+		string(body),
+		createPiercingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.RecipeIDInvalidError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *PiercingHandlerTestSuite) TestShowPiercingInvalidUUID() {
+
+	recorder := makeHTTPCall(http.MethodGet,
+		"/piercing/{recipe_id}",
+		"/piercing/"+invalidUUID,
+		"",
+		showPiercingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *PiercingHandlerTestSuite) TestUpdatePiercingInvalidUUID() {
+
+	body, _ := json.Marshal(testPiercingRecord)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/piercing/{recipe_id}",
+		"/piercing/"+invalidUUID,
+		string(body),
+		updatePiercingHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output := ErrObj{Err: responses.UUIDParseError.Error()}
+	outputBytes, _ := json.Marshal(output)
+
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 	assert.Equal(suite.T(), outputBytes, recorder.Body.Bytes())
 
 	suite.dbMock.AssertExpectations(suite.T())

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
 
@@ -22,25 +23,36 @@ type RecipeHandlerTestSuite struct {
 
 func (suite *RecipeHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestRecipeTestSuite(t *testing.T) {
 	suite.Run(t, new(RecipeHandlerTestSuite))
 }
 
+var(
+	pos1 int64 = 1
+	pos2 int64 = 2
+	pos3 int64 = 3
+	pos4 int64 = 4
+	car1 int64 = 1
+	car2 int64 = 2
+)
+
 var testRecipeRecord = db.Recipe{
 	ID:                 recipeUUID,
 	Name:               "testRecipeName",
 	Description:        "testDescription",
-	Position1:          1,
-	Position2:          2,
-	Position3:          2,
-	Position4:          3,
-	Position5:          3,
-	Cartridge1Position: 1,
-	Position7:          2,
-	Cartridge2Position: 2,
-	Position9:          4,
+	Position1:          &pos1,
+	Position2:          &pos1,
+	Position3:          &pos1,
+	Position4:          &pos2,
+	Position5:          &pos2,
+	Cartridge1Position: &car1,
+	Position7:          &pos3,
+	Cartridge2Position: &car2,
+	Position9:          &pos4,
 	ProcessCount:       10,
 	IsPublished:        false,
 }
@@ -115,7 +127,7 @@ func (suite *RecipeHandlerTestSuite) TestListRecipesFailure() {
 		"",
 		listRecipesHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ""
+	output := `{"err":"error fetching Recipe list"}`
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 	assert.Equal(suite.T(), output, recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
@@ -150,9 +162,8 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeFailure() {
 		"",
 		showRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := ""
-	assert.Equal(suite.T(), http.StatusNotFound, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), `{"err":"error fetching Recipe record"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -170,8 +181,10 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
 		updateRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
 
+	output, _ := json.Marshal(MsgObj{Msg: responses.RecipeUpdateSuccess})
+
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"recipe updated successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -190,7 +203,7 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeFailure() {
 	)
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), `{"err":"error updating Recipe record"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -208,7 +221,7 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeSuccess() {
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), `{"msg":"recipe deleted successfully"}`, recorder.Body.String())
+	assert.Equal(suite.T(), `{"msg":"Recipe record deleted successfully"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -224,7 +237,7 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeFailure() {
 		deleteRecipeHandler(Dependencies{Store: suite.dbMock}),
 	)
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), "", recorder.Body.String())
+	assert.Equal(suite.T(), `{"err":"error deleting Recipe record"}`, recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

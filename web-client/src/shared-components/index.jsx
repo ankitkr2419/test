@@ -1,5 +1,6 @@
 import ButtonGroup from "./ButtonGroup";
 import ButtonIcon from "./ButtonIcon";
+import ButtonBar from "./ButtonBar";
 import Center from "./Center";
 import GraphCard from "./GraphCard";
 import Icon from "./Icon";
@@ -18,10 +19,15 @@ import ImageIcon from "./ImageIcon";
 import Loader from "./Loader";
 import VideoCard from "./VideoCard";
 import MlModal from "./MlModal";
+import TopHeading from "./TopHeading";
+import ProcessRemaining from "./ProcessRemaining";
+import TemperatureInfo from "./TemperatureInfo";
+import TimeInfo from "./TimeInfo";
 
 export {
   ButtonGroup,
   ButtonIcon,
+  ButtonBar,
   Center,
   GraphCard,
   Icon,
@@ -37,6 +43,7 @@ export {
   TargetListHeader,
   TargetListItem,
   Text,
+  TopHeading,
   StyledUl,
   StyledLi,
   CustomButton,
@@ -44,4 +51,7 @@ export {
   Loader,
   VideoCard,
   MlModal,
+  ProcessRemaining,
+  TimeInfo,
+  TemperatureInfo,
 };
