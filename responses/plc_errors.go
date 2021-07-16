@@ -14,4 +14,7 @@ var (
 	InvalidPLCRunRecipeData  = fmt.Errorf("invalid data stored for run recipe")
 	ExcelSheetRowError       = fmt.Errorf("error in fetching excel sheet rows")
 	ExcelSheetAddRowError    = fmt.Errorf("error in adding excel sheet rows")
+
+	InvalidCurrentStep = fmt.Errorf("invalid current step, maybe process aborted")
+
 )
