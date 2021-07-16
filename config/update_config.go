@@ -19,23 +19,27 @@ type Conf struct {
 	RoomTemperature int64 `json:"room_temperature" validate:"required,lte=30,gte=20"`
 	HomingTime      int64 `json:"homing_time" validate:"required,lte=30,gte=16"`
 	NumHomingCycles int64 `json:"no_of_homing_cycles" validate:"required,lte=100,gte=0"`
+	CycleTime		int64 `json:"cycle_time" validate:"required,lte=30,gte=2"`
 }
 
 func SetValues(c Conf) (err error) {
 	hT := GetHomingTime()
 	hC := GetNumHomingCycles()
 	rT := GetRoomTemp()
+	cT := GetCycleTime()
 
 	oldString, newString = []string{}, []string{}
 	oldString = append(oldString,
 		fmt.Sprintf("homing_time: %d", hT),
 		fmt.Sprintf("num_homing_cycles: %d", hC),
 		fmt.Sprintf("room_temp: %d", int64(rT)),
+		fmt.Sprintf("cycle_time: %d", int64(cT)),
 	)
 	newString = append(newString,
 		fmt.Sprintf("homing_time: %d", c.HomingTime),
 		fmt.Sprintf("num_homing_cycles: %d", c.NumHomingCycles),
 		fmt.Sprintf("room_temp: %d", c.RoomTemperature),
+		fmt.Sprintf("cycle_time: %d", c.CycleTime),
 	)
 
 	err = UpdateConfig(configPath, oldString, newString)
@@ -46,6 +50,7 @@ func SetValues(c Conf) (err error) {
 	SetHomingTime(c.HomingTime)
 	SetNumHomingCycles(c.NumHomingCycles)
 	SetRoomTemp(c.RoomTemperature)
+	SetCycleTime(c.CycleTime)
 	return
 }
 
