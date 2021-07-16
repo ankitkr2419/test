@@ -240,12 +240,9 @@ func (t *TEC1089) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.Fil
 				return
 			}
 			logger.Infoln("PLC cycle Completed ->", h.HoldTime)
-			// If this is the last step then 16 seconds needed for Cycle
-			//time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
-			err = plc.HoldSleep(h.HoldTime - 16)
-
+			// If this is the last step then cyceTime seconds needed for Cycle
+			err = plc.HoldSleep(h.HoldTime - int32(config.GetCycleTime()))
 		} else {
-			//time.Sleep(time.Duration(h.HoldTime) * time.Second)
 			err = plc.HoldSleep(h.HoldTime)
 		}
 		if err != nil {
