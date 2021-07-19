@@ -53,6 +53,8 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/wells/{id}", authenticate(showWellHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/wells/{id}", authenticate(deleteWellHandler(deps), deps, RTPCR)).Methods(http.MethodDelete).Headers(versionHeader, v1)
 	router.HandleFunc("/experiments/{experiment_id}/run", authenticate(runExperimentHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/finish/template/{id}", authenticate(finishTemplateHandler(deps), deps, RTPCR, admin)).Methods(http.MethodPut).Headers(versionHeader, v1)
+	router.HandleFunc("/finished/templates", authenticate(listFinishedTemplateHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	//Websocket router
 	router.HandleFunc("/monitor", wsHandler(deps)).Methods(http.MethodGet)
@@ -135,6 +137,8 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}/{position:[1-9]+}", authenticate(listTipsTubesPositionHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	//TODO: allow only for engineer
+	router.HandleFunc("/pid-calibration/{deck:[A-B]}", pidCalibrationHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/app-info", appInfoHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	//rt-pcr funcs

@@ -567,3 +567,8 @@ func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, st
 	args := m.Called(ctx, activity, state, oprType, deck, description)
 	return args.Error(0)
 }
+
+func (m *DBMockStore) GetTargetByName(ctx context.Context, name string) (t Target, err error) {
+	args := m.Called(ctx, name)
+	return args.Get(0).(Target), args.Error(1)
+}

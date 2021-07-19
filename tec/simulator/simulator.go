@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	"mylab/cpagent/plc"
 	"mylab/cpagent/config"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
 	"time"
 
@@ -164,8 +164,6 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 		plc.AddRowToExcel(file, plc.TECSheet, row)
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
-		time.Sleep(time.Duration(h.HoldTime) * time.Second)
-		logger.Infoln("Holding Completed ->", h.HoldTime)
 
 		if h.DataCapture {
 			// Cycle in Plc
@@ -175,11 +173,16 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 				return
 			}
 			logger.Infoln("PLC cycle Completed ->", h.HoldTime)
-			// If this is the last step then 16 seconds needed for Cycle
-			time.Sleep(time.Duration(h.HoldTime-16) * time.Second)
+			// If this is the last step then cycleTime seconds needed for Cycle
+			err = plc.HoldSleep(h.HoldTime - int32(config.GetCycleTime()))
 
 		} else {
-			time.Sleep(time.Duration(h.HoldTime) * time.Second)
+			err = plc.HoldSleep(h.HoldTime)
+
+		}
+		if err != nil {
+			logger.Errorln("Couldn't complete hold time")
+			return
 		}
 		plc.CurrentCycleTemperature = h.TargetTemp
 		prevTemp = h.TargetTemp

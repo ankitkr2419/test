@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -51,7 +52,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		// Getting back user along with his role
 		u, err = deps.Store.ValidateUser(req.Context(), u)
 		if err != nil || u.Role == "" {
-			if err == nil{
+			if err == nil {
 				err = responses.UserInvalidError
 			}
 			logger.WithField("err", err.Error()).Error(responses.UserInvalidError)
@@ -79,8 +80,9 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserTokenEncodeError.Error()})
 		}
 		response := map[string]string{
-			"msg":   "user logged in successfully",
+			"msg":   fmt.Sprintf(`%s logged in successfully`, u.Role),
 			"token": token,
+			"role":  u.Role,
 		}
 
 		if err != nil {
@@ -125,11 +127,10 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-
 func updateUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var u db.User
-		
+
 		vars := mux.Vars(req)
 		oldU := vars["old_username"]
 
@@ -161,7 +162,6 @@ func updateUserHandler(deps Dependencies) http.HandlerFunc {
 		return
 	})
 }
-
 
 func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {

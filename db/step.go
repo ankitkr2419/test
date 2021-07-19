@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"errors"
+	"mylab/cpagent/config"
 	"time"
 
 	"github.com/google/uuid"
@@ -65,6 +67,11 @@ func (s *pgStore) ListSteps(ctx context.Context, stgID uuid.UUID) (steps []Step,
 
 func (s *pgStore) CreateStep(ctx context.Context, st Step) (createdStep Step, err error) {
 	var lastInsertID uuid.UUID
+
+	if st.DataCapture && (st.HoldTime < int32(config.GetCycleTime())) {
+		err = errors.New("invalid step with invalid hold time")
+		return
+	}
 	err = s.db.QueryRow(
 		createStepQuery,
 		st.StageID,
@@ -89,6 +96,10 @@ func (s *pgStore) CreateStep(ctx context.Context, st Step) (createdStep Step, er
 
 func (s *pgStore) UpdateStep(ctx context.Context, st Step) (err error) {
 
+	if st.DataCapture && (st.HoldTime < int32(config.GetCycleTime())) {
+		err = errors.New("invalid step with invalid hold time")
+		return
+	}
 	_, err = s.db.Exec(
 		updateStepQuery,
 		st.StageID,

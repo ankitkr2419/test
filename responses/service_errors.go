@@ -93,7 +93,6 @@ var (
 	StepRunAborted             = fmt.Errorf("error step run aborted")
 	DeckNameInvalid            = fmt.Errorf("error deck name is invalid")
 	PleaseHomeMachineError     = fmt.Errorf("error please home the machine first")
-	PreviousRunInProgressError = fmt.Errorf("error previous run already in progress... wait or abort it")
 	PickupPositionInvalid      = fmt.Errorf("position is invalid to pickup the tip")
 	WebsocketMarshallingError  = fmt.Errorf("error in marshalling web socket data")
 	UrlArgumentInvalid         = fmt.Errorf("error invalid url argument")

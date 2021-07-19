@@ -14,8 +14,10 @@ type WebsocketOperation string
 
 const (
 	uvlightProgress WebsocketOperation = "PROGRESS_UVLIGHT"
+	pidProgress WebsocketOperation = "PROGRESS_PID"
 	recipeProgress  WebsocketOperation = "PROGRESS_RECIPE"
 	uvlightSuccess  WebsocketOperation = "SUCCESS_UVLIGHT"
+	pidSuccess  WebsocketOperation = "SUCCESS_PID"
 	recipeSuccess   WebsocketOperation = "SUCCESS_RECIPE"
 )
 
@@ -47,6 +49,10 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("uv light cleanup in progress for deck %s ", d.name)
 	case uvlightSuccess:
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("successfully completed UV Light clean up for deck %v", d.name)
+	case pidProgress:
+		wsProgressOp.OperationDetails.Message = fmt.Sprintf("pid tuning in progress for deck %s ", d.name)
+	case pidSuccess:
+		wsProgressOp.OperationDetails.Message = fmt.Sprintf("successfully completed pid tuning for deck %v", d.name)
 	case recipeProgress:
 		currentStep := getCurrentProcessNumber(d.name)
 
@@ -62,6 +68,9 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 			wsProgressOp.Progress = 100
 			defer d.sendWSData(time1, timeElapsed, delayTime, recipeSuccess)
 			break
+		} else if currentStep == -1 {
+			err = responses.InvalidCurrentStep
+			return
 		}
 
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v in progress", currentStep+1, d.name)
