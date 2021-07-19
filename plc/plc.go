@@ -2,7 +2,7 @@ package plc
 
 import (
 	"mylab/cpagent/db"
-
+	"context"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"time"
@@ -135,6 +135,7 @@ type Extraction interface {
 	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
 	SetCurrentProcessNumber(step int64)
 	SwitchOffAllCoils() (response string, err error)
+	PIDCalibration(context.Context) error
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {

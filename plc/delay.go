@@ -2,8 +2,8 @@ package plc
 
 import (
 	"fmt"
-	"mylab/cpagent/db"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/db"
 
 	"time"
 )
@@ -50,10 +50,16 @@ skipToStartTimer:
 				// Send Success
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightSuccess)
 				d.ResetRunInProgress()
+			} else if d.isPIDCalibrationInProgress() {
+				// Send 100 % Progress
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidProgress)
+				// Send Success
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidSuccess)
+				d.ResetRunInProgress()
 			}
 			if recipeRun {
-				// timer is over but recipe isn't 
-				for getCurrentProcessNumber(d.name) != -2{
+				// timer is over but recipe isn't
+				for getCurrentProcessNumber(d.name) != -2 {
 					time.Sleep(500 * time.Millisecond)
 					_, _, err = d.checkPausedState(t, time1, delay.DelayTime, timeElapsed)
 					if err != nil {
@@ -62,7 +68,7 @@ skipToStartTimer:
 					d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
 					if d.isMachineInAbortedState() || d.isMachineInPausedState() {
 						response, err = d.waitUntilResumed(d.name)
-						if err != nil{
+						if err != nil {
 							return "", err
 						}
 					}
@@ -77,7 +83,7 @@ skipToStartTimer:
 			time.Sleep(time.Millisecond * 500)
 			if d.isMachineInAbortedState() {
 				t.Stop()
-				if d.isUVLightInProgress() {
+				if d.isUVLightInProgress() || d.isPIDCalibrationInProgress() {
 					d.resetAborted()
 				}
 				err = fmt.Errorf("Operation was ABORTED!")
@@ -90,7 +96,7 @@ skipToStartTimer:
 			if recipeRun {
 				if !d.IsRunInProgress() && getCurrentProcessNumber(d.name) == -2 {
 					// This means its time to Stop
-					// recipe is over but timer isn't 
+					// recipe is over but timer isn't
 					t.Stop()
 					d.sendWSData(time1, timeElapsed, delay.DelayTime, recipeProgress)
 					// Send Success handled implicitly

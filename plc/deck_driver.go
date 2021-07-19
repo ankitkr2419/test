@@ -47,7 +47,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	//
 
 	// if tip discard is in progress that means avoid moving module up when motor is K5
-	if d.getSyringeModuleState() == InDeck && // Syringe module has to be indeck 
+	if d.getSyringeModuleState() == InDeck && // Syringe module has to be indeck
 		((motorNum == K5_Deck && !d.isTipDiscardInProgress()) || //Tip Discard Special handling
 			motorNum == K7_Magnet_Rev_Fwd || motorNum == K6_Magnet_Up_Down) { //Magnet Special Handling
 		response, err = d.SyringeRestPosition()
@@ -348,6 +348,46 @@ func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
 		return "", err
 	}
 	logger.Infoln("Switched off the UV Light--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) switchOnPIDCalibration() (response string, err error) {
+
+	// PID calibration LH ON
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][4], ON)
+	if err != nil {
+		logger.Errorln("err Switching ON PID calibration LH: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched ON PID calibration LH for deck ", d.name)
+	// PID calibration RH ON
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][8], ON)
+	if err != nil {
+		logger.Errorln("err Switching ON PID calibration RH: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched ON PID calibration RH for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) switchOffPIDCalibration() (response string, err error) {
+
+	// PID calibration LH OFF
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][4], OFF)
+	if err != nil {
+		logger.Errorln("err Switching OFF PID calibration LH: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched OFF PID calibration LH for deck ", d.name)
+	// PID calibration RH OFF
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][8], OFF)
+	if err != nil {
+		logger.Errorln("err Switching OFF PID calibration RH: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched OFF PID calibration RH for deck ", d.name)
 
 	return "SUCCESS", nil
 }

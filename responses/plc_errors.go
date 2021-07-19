@@ -5,6 +5,9 @@ import (
 )
 
 var (
+	PreviousRunInProgressError = fmt.Errorf("previous run already in progress... wait or abort it")
+
+	PIDCalibrationError = fmt.Errorf("error doing pid calibration")
 	ProcessesAbsentError = fmt.Errorf("no process present in the recipe")
 
 	InvalidOperationWebsocket = fmt.Errorf("invalid operation selected for websocket")
