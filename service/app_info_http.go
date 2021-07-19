@@ -74,13 +74,13 @@ func ShutDownGraceFully(deps Dependencies) (err error) {
 			}
 		}
 		if Application == Combined || Application == Extraction {
-			_, err3 = deps.PlcDeck["A"].SwitchOffMotor()
+			_, err3 = deps.PlcDeck["A"].SwitchOffAllCoils()
 			if err3 != nil {
 				logger.Errorln("Couldn't switch off Deck A motor!")
 				err = fmt.Errorf("%v\n%v",err, err3)
 			}
 
-			_, err4 = deps.PlcDeck["B"].SwitchOffMotor()
+			_, err4 = deps.PlcDeck["B"].SwitchOffAllCoils()
 			if err4 != nil {
 				logger.Errorln("Couldn't switch off Deck B motor!")
 				err = fmt.Errorf("%v\n%v",err, err4)
