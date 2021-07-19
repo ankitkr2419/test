@@ -196,7 +196,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		if len(results) > 0 {
 			if int(results[0]) == 1 {
 				logger.Infoln("Completion for deck", d.name, "returned ---> ", results)
-				response, err = d.SwitchOffMotor()
+				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("err: from setUp--> ", err, d.name)
 					return
@@ -236,7 +236,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		if len(results) > 0 {
 			if int(results[0]) == SensorCut {
 				logger.Infoln("Sensor returned ---> ", results[0], d.name)
-				response, err = d.SwitchOffMotor()
+				response, err = d.switchOffMotor()
 				if err != nil {
 					logger.Errorln("Sensor err : ", err, d.name)
 					return "", err
@@ -258,7 +258,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 }
 
-func (d *Compact32Deck) SwitchOffMotor() (response string, err error) {
+func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 
 	if temp := d.getOnReg(); temp == highestUint16 {
 		err = fmt.Errorf("on/off Register  isn't loaded!")
@@ -370,4 +370,35 @@ func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 	logger.Infoln("Read D212 Pulses -> ", binary.BigEndian.Uint16(results))
 
 	return "D212 Reading SUCESS", nil
+}
+
+
+func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
+	var tempErr error
+	_, tempErr = d.switchOffMotor()
+	if tempErr != nil {
+		err = tempErr
+	}
+	_, tempErr = d.switchOffShaker()
+	if tempErr != nil {
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+	_, tempErr = d.switchOffHeater()
+	if tempErr != nil {
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+	_, tempErr = d.switchOffUVLight()
+	if tempErr != nil {
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+
+	// reset completion bit
+	tempErr = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
+	if tempErr != nil {
+		logger.Errorln("error writing Completion Off : ", tempErr, d.name)
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+	
+	// TODO: Switch off PID Calibration
+	return "SUCCESS", err
 }
