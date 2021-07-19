@@ -111,8 +111,6 @@ var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
 func loadUtils() {
 
-	homed.Store(DeckA, false)
-	homed.Store(DeckB, false)
 	wrotePulses.Store(DeckA, uint16(0))
 	wrotePulses.Store(DeckB, uint16(0))
 	executedPulses.Store(DeckA, uint16(0))
@@ -137,6 +135,8 @@ func loadUtils() {
 	magnetState.Store(DeckB, detached)
 	syringeModuleState.Store(DeckA, OutDeck)
 	syringeModuleState.Store(DeckB, OutDeck)
+	homed.Store(DeckA, false)
+	homed.Store(DeckB, false)
 	pIDCalibrationInProgress.Store("A", false)
 	pIDCalibrationInProgress.Store("B", false)
 
