@@ -82,6 +82,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		response := map[string]string{
 			"msg":   fmt.Sprintf(`%s logged in successfully`, u.Role),
 			"token": token,
+			"role":  u.Role,
 		}
 
 		if err != nil {
