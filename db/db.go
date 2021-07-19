@@ -120,4 +120,6 @@ type Storer interface {
 	ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error)
 	UpdateEstimatedTime(ctx context.Context, id uuid.UUID, estimatedTime int64) (err error)
 	GetTargetByName(ctx context.Context, name string) (t Target, err error)
+	FinishTemplate(ctx context.Context, id uuid.UUID) (err error)
+	ListFinishedTemplates(ctx context.Context) (t []Template, err error)
 }
