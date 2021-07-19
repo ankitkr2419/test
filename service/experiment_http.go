@@ -355,7 +355,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		return
 	}
 
-	// Home the TEC
+	// Home the PLC
 	// Reset is implicit in Homing
 	err = deps.Plc.HomingRTPCR()
 	if err != nil {
@@ -364,6 +364,12 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	// templateRunSuccess has to happen before monitor is called
 	templateRunSuccess = false
+
+	// invoke monitor after 2 secs
+	go func(){
+		time.Sleep( 2 * time.Second)
+		go monitorExperiment(deps, file)
+	}()
 
 	lidTempStartTime := time.Now()
 	err = deps.Plc.SetLidTemp(p.IdealLidTemp)
@@ -379,9 +385,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		estimatedLidTime := int64(math.Abs(float64(p.IdealLidTemp/10)-config.GetRoomTemp()) / 0.5)
 		currentExpTemplate.EstimatedTime = currentExpTemplate.EstimatedTime - estimatedLidTime + int64(lidTempSecs)
 	}
-
-	//invoke monitor
-	go monitorExperiment(deps, file)
 
 	// Start line
 	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}

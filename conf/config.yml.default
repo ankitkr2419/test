@@ -32,3 +32,5 @@ homing_time: 15
 num_homing_cycles: 5
 # room Temperature 
 room_temp: 27
+# cycle time 
+cycle_time: 15

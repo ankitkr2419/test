@@ -100,6 +100,7 @@ var deckProcesses map[string][]db.Process
 var wrotePulses, executedPulses, aborted, paused, homed sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
+var pIDCalibrationInProgress sync.Map
 
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
@@ -109,6 +110,7 @@ var homingPercent, currentProcess sync.Map
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
 func loadUtils() {
+
 	wrotePulses.Store(DeckA, uint16(0))
 	wrotePulses.Store(DeckB, uint16(0))
 	executedPulses.Store(DeckA, uint16(0))
@@ -133,9 +135,10 @@ func loadUtils() {
 	magnetState.Store(DeckB, detached)
 	syringeModuleState.Store(DeckA, OutDeck)
 	syringeModuleState.Store(DeckB, OutDeck)
-
 	homed.Store(DeckA, false)
 	homed.Store(DeckB, false)
+	pIDCalibrationInProgress.Store("A", false)
+	pIDCalibrationInProgress.Store("B", false)
 
 	deckRecipe = map[string]db.Recipe{
 		DeckA: db.Recipe{},
