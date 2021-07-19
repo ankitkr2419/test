@@ -11,6 +11,10 @@ export const constants = {
     min: 0,
     max: 100,
   },
+  CYCLE_TIME: {
+    min: 2,
+    max: 30,
+  },
 };
 
 export const isValidRoomTemp = (value) => {
@@ -34,5 +38,13 @@ export const isValidNoOfHomingCycle = (value) => {
     value !== null &&
     value >= constants.NO_OF_HOMING_CYCLE.min &&
     value <= constants.NO_OF_HOMING_CYCLE.max
+  );
+};
+
+export const isValidCycleTime = (value) => {
+  return (
+    value !== null &&
+    value >= constants.CYCLE_TIME.min &&
+    value <= constants.CYCLE_TIME.max
   );
 };

@@ -124,7 +124,7 @@ const SubHeader = (props) => {
           ) : (
             experimentStatus !== EXPERIMENT_STATUS.stopped && (
               <Text className="font-weight-bold">
-                Lid temperature is increasing...
+                Homing is in Progress...
               </Text>
             )
           ))}

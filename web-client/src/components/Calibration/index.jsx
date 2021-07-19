@@ -18,6 +18,7 @@ import {
   isValidRoomTemp,
   isValidHomingTime,
   isValidNoOfHomingCycle,
+  isValidCycleTime,
 } from "./helper";
 import { useCallback } from "react";
 
@@ -27,12 +28,14 @@ const CalibrationComponent = (props) => {
   const [roomTemperature, setRoomTemperature] = useState(0);
   const [homingTime, setHomingTime] = useState(0);
   const [noOfHomingCycles, setNoOfHomingCycles] = useState(0);
+  const [cycleTime, setCycleTime] = useState(0);
 
   //isInvalidData
   const [isInvalidRoomTemp, setIsInvalidRoomTemp] = useState(false);
   const [isInvalidHomingTime, setIsInvalidHomingTime] = useState(false);
   const [isInvalidNoOfHomingCycles, setIsInvalidNoOfHomingCycles] =
     useState(false);
+  const [isInvalidCycleTime, setIsInvalidCycleTime] = useState(false);
 
   //store new data in local state
   useEffect(() => {
@@ -45,6 +48,9 @@ const CalibrationComponent = (props) => {
     if (configs?.no_of_homing_cycles) {
       setNoOfHomingCycles(configs.no_of_homing_cycles);
     }
+    if (configs?.cycle_time) {
+      setCycleTime(configs.cycle_time);
+    }
   }, [configs]);
 
   //validations and api call
@@ -53,9 +59,15 @@ const CalibrationComponent = (props) => {
     if (
       roomTemperature !== null &&
       homingTime !== null &&
-      noOfHomingCycles !== null
+      noOfHomingCycles !== null &&
+      cycleTime !== null
     ) {
-      saveBtnClickHandler({ roomTemperature, homingTime, noOfHomingCycles });
+      saveBtnClickHandler({
+        roomTemperature,
+        homingTime,
+        noOfHomingCycles,
+        cycleTime,
+      });
     }
   };
 
@@ -86,13 +98,22 @@ const CalibrationComponent = (props) => {
     [setIsInvalidNoOfHomingCycles]
   );
 
+  const blurHandlerCycleTime = useCallback(
+    (value) => {
+      if (isValidCycleTime(parseInt(value)) === false) {
+        setIsInvalidCycleTime(true);
+      }
+    },
+    [setIsInvalidCycleTime]
+  );
+
   return (
     <div className="calibration-content px-5">
       <Card default className="my-5">
         <CardBody className="px-5 py-4">
           <Form onSubmit={onSubmit}>
             <Row>
-              <Col>
+              <Col md={6}>
                 <FormGroup>
                   <Label for="username">Room Temperature</Label>
                   <Input
@@ -119,7 +140,7 @@ const CalibrationComponent = (props) => {
                 </FormGroup>
               </Col>
 
-              <Col>
+              <Col md={6}>
                 <FormGroup>
                   <Label for="username">Homing Time</Label>
                   <Input
@@ -146,7 +167,7 @@ const CalibrationComponent = (props) => {
                 </FormGroup>
               </Col>
 
-              <Col>
+              <Col md={6}>
                 <FormGroup>
                   <Label for="username">No. Of Homing Cycles</Label>
                   <Input
@@ -172,6 +193,33 @@ const CalibrationComponent = (props) => {
                   )}
                 </FormGroup>
               </Col>
+              
+              <Col md={6}>
+                <FormGroup>
+                  <Label for="username">Cycle Time</Label>
+                  <Input
+                    type="number"
+                    name="cycleTime"
+                    id="cycleTime"
+                    placeholder={`${constants.CYCLE_TIME.min} - ${constants.CYCLE_TIME.max}`}
+                    value={cycleTime}
+                    onChange={(event) => {
+                      setCycleTime(parseInt(event.target.value));
+                    }}
+                    onBlur={(event) =>
+                      blurHandlerCycleTime(parseInt(event.target.value))
+                    }
+                    onFocus={() => setIsInvalidCycleTime(false)}
+                  />
+                  {(isInvalidCycleTime || cycleTime == null) && (
+                    <div className="flex-70">
+                      <Text Tag="p" size={14} className="text-danger">
+                        {`It should be between ${constants.CYCLE_TIME.min} - ${constants.CYCLE_TIME.max}`}
+                      </Text>
+                    </div>
+                  )}
+                </FormGroup>
+              </Col>
             </Row>
             <div className="text-right pt-4 pb-1 mb-3">
               <Button
@@ -180,9 +228,11 @@ const CalibrationComponent = (props) => {
                   roomTemperature == null ||
                   homingTime == null ||
                   noOfHomingCycles == null ||
+                  cycleTime == null ||
                   isInvalidRoomTemp ||
                   isInvalidHomingTime ||
-                  isInvalidNoOfHomingCycles
+                  isInvalidNoOfHomingCycles ||
+                  isInvalidCycleTime
                 }
               >
                 Save

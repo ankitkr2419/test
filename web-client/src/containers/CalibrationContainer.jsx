@@ -35,6 +35,7 @@ const CalibrationContainer = () => {
       room_temperature: configData.roomTemperature,
       homing_time: configData.homingTime,
       no_of_homing_cycles: configData.noOfHomingCycles,
+      cycle_time: configData.cycleTime,
     };
     dispatch(updateCalibrationInitiated({ token, data }));
   };
