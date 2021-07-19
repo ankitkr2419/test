@@ -85,6 +85,14 @@ func GetCycleTime() int {
 	return ReadEnvInt("cycle_time")
 }
 
+func GetPIDTemp() int64 {
+	return int64(ReadEnvInt("pid_temp"))
+}
+
+func GetPIDMinutes() int64 {
+	return int64(ReadEnvInt("pid_time"))
+}
+
 func SetHomingTime(hT int64) {
 	viper.Set("homing_time", hT)
 }
@@ -99,6 +107,14 @@ func SetRoomTemp(rT int64) {
 
 func SetCycleTime(cT int64) {
 	viper.Set("cycle_time", cT)
+}
+
+func SetPIDTemp(pT int64) {
+	viper.Set("pid_temp", pT)
+}
+
+func SetPIDMinutes(pT int64) {
+	viper.Set("pid_time", pT)
 }
 
 func ReadEnvInt(key string) int {
@@ -145,7 +161,7 @@ func LoadAllConfs() {
 	Load("motor_config")
 
 	// config file to configure consumable distance
-	Load("consumable_config_v1_3")
+	Load("consumable_config_v1_4")
 
 	// config file to configure labware
 	Load("labware_config")
