@@ -65,8 +65,8 @@ type Template struct {
 	Name          string    `db:"name" json:"name" validate:"required"`
 	Description   string    `db:"description" json:"description" validate:"required"`
 	Publish       bool      `db:"publish" json:"publish"`
-	Volume        int64     `db:"volume" json:"volume" `                              //validate:"required,gte=10,lte=250"`
-	LidTemp       int64     `db:"lid_temp" json:"lid_temp" validate:"lte=120,gte=80"` // validate:"required,gte=30,lte=110"`
+	Volume        int64     `db:"volume" json:"volume" validate:"required,gte=10,lte=250"`
+	LidTemp       int64     `db:"lid_temp" json:"lid_temp" validate:"lte=120,gte=80"`
 	EstimatedTime int64     `db:"estimated_time" json:"estimated_time"`
 	Stages        []Stage   `json:"stages,omitempty"`
 	Finished      bool      `db:"finished" json:"finished"`
