@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS templates DROP COLUMN finished;
