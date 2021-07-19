@@ -68,6 +68,9 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 			wsProgressOp.Progress = 100
 			defer d.sendWSData(time1, timeElapsed, delayTime, recipeSuccess)
 			break
+		} else if currentStep == -1 {
+			err = responses.InvalidCurrentStep
+			return
 		}
 
 		wsProgressOp.OperationDetails.Message = fmt.Sprintf("process %v for deck %v in progress", currentStep+1, d.name)

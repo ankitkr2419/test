@@ -216,6 +216,8 @@ func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
 
 func (d *Simulator) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
-	d.plcIO.d.currentLidTemp = jitter(uint16(27), 0, 50)
+	d.plcIO.d.currentLidTemp = jitter(uint16(270), 0, 20)
+	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
+
 	return
 }

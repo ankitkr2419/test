@@ -176,6 +176,12 @@ func (d *Compact32Deck) syringeHoming() (response string, err error) {
 		return
 	}
 
+	fmt.Println("Dispensing until sensor cut")
+	response, err = d.setupMotor(homingSlowSpeed, initialSensorCutSyringePulses, Motors[deckAndNumber]["ramp"], DISPENSE, deckAndNumber.Number)
+	if err != nil {
+		return
+	}
+
 	fmt.Println("Syringe homing is completed")
 
 	return "SYRINGE HOMING COMPLETED", nil

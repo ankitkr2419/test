@@ -299,14 +299,10 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 		<-signals
 
-		// We received an interrupt signal, shut down.
-		logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
-		err = deps.Tec.ReachRoomTemp()
-		if err != nil {
-			logger.Errorln("Couldn't reach the room temp!")
+		err = service.ShutDownGraceFully(deps)
+		if err != nil{
 			os.Exit(-1)
 		}
-		deps.Plc.SwitchOffLidTemp()
 		os.Exit(0)
 	}()
 

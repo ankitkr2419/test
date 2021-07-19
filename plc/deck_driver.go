@@ -411,3 +411,34 @@ func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 
 	return "D212 Reading SUCESS", nil
 }
+
+
+func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
+	var tempErr error
+	_, tempErr = d.switchOffMotor()
+	if tempErr != nil {
+		err = tempErr
+	}
+	_, tempErr = d.switchOffShaker()
+	if tempErr != nil {
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+	_, tempErr = d.switchOffHeater()
+	if tempErr != nil {
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+	_, tempErr = d.switchOffUVLight()
+	if tempErr != nil {
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+
+	// reset completion bit
+	tempErr = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
+	if tempErr != nil {
+		logger.Errorln("error writing Completion Off : ", tempErr, d.name)
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
+	
+	// TODO: Switch off PID Calibration
+	return "SUCCESS", err
+}

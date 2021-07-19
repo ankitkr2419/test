@@ -134,6 +134,7 @@ type Extraction interface {
 	TipOperation(to db.TipOperation) (response string, err error)
 	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
 	SetCurrentProcessNumber(step int64)
+	SwitchOffAllCoils() (response string, err error)
 	PIDCalibration(context.Context) error
 }
 
