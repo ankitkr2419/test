@@ -1,6 +1,9 @@
 package responses
 
 var (
+	PIDCalibrationSuccess       = "pid calibration was successful"
+	PIDCalibrationStarted 		= "pid calibration started"
+	PIDCalibrationHeaterStarted = "heater started for pid calibration"
 	RecipeSafeForCUD         = "recipe is safe for CUDs"
 	ProcessSafeForCUD        = "process is safe for CUDs"
 	SetRunRecipeDataSuccess   = "running recipe's data was successfully stored"
