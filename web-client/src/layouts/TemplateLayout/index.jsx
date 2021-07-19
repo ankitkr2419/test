@@ -16,18 +16,28 @@ import templateLayoutReducer, {
   templateLayoutActions,
   getWizardListByLoginType,
 } from "./templateState";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router";
-import { toast } from "react-toastify";
+import {
+  finishCreateTemplate,
+  finishCreateTemplateReset,
+} from "action-creators/templateActionCreators";
 
 const TemplateLayout = (props) => {
+  const dispatch = useDispatch();
   const history = useHistory();
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-  const { isAdmin, isLoggedIn } = activeDeckObj;
+  const { isAdmin, isLoggedIn, token } = activeDeckObj;
+
+  //finish template reducer details
+  const finishCreateTemplateReducer = useSelector(
+    (state) => state.finishCreateTemplateReducer
+  );
+  const { errorFinishCreateTemplate } = finishCreateTemplateReducer;
 
   // Local state to manage selected wizard
   const [templateLayoutState, templateLayoutDispatch] = useReducer(
@@ -95,14 +105,21 @@ const TemplateLayout = (props) => {
     updateSelectedWizard("template");
   }, []);
 
+  //redirect to template if finish template success
+  useEffect(() => {
+    if (errorFinishCreateTemplate === false) {
+      updateSelectedWizard("template");
+      dispatch(finishCreateTemplateReset());
+    }
+  }, [errorFinishCreateTemplate]);
+
   if (!isLoggedIn) {
     // history.push(ROUTES.login);
     history.push("splashscreen");
   }
 
   const finishBtnHandler = () => {
-    updateSelectedWizard("template");
-    toast.success("Template details Saved");
+    dispatch(finishCreateTemplate(templateID, token));
   };
 
   return (

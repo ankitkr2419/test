@@ -5,6 +5,7 @@ import {
   createTemplateSuccessSaga,
   deleteTemplateSaga,
   updateTemplateSaga,
+  finishCreateTemplateSaga,
 } from "sagas/templateSaga";
 import {
   saveTargetSaga,
@@ -45,7 +46,7 @@ import { processesSaga } from "./processesSaga";
 import { saveNewRecipeSaga } from "./saveNewRecipeSaga";
 import { processSaga } from "./processSaga";
 import { appInfoSaga } from "./appInfoSaga";
-import { activityLogSaga } from './activityLogSaga';
+import { activityLogSaga } from "./activityLogSaga";
 import { calibrationSaga } from "./calibrationSaga";
 
 const allSagas = [
@@ -86,6 +87,7 @@ const allSagas = [
   appInfoSaga(),
   activityLogSaga(),
   calibrationSaga(),
+  finishCreateTemplateSaga(),
 ];
 
 export default function* rootSaga() {

@@ -135,13 +135,13 @@ const TemplateModal = (props) => {
               <Col sm={6}>
                 <FormGroup>
                   <Label for="volume_value" className="font-weight-bold">
-                    Volume (µ units)
+                    Volume (µL)
                   </Label>
                   <Input
                     type="number"
                     name="volume_name"
                     id="volume_name"
-                    placeholder="10-250 (µ units)"
+                    placeholder="10-250 (µL)"
                     value={volume}
                     onChange={(event) => {
                       setVolume(parseInt(event.target.value));
@@ -172,7 +172,7 @@ const TemplateModal = (props) => {
                     type="number"
                     name="lid_temperature_name"
                     id="lid_temperature_name"
-                    placeholder="30-100 (°C)"
+                    placeholder={`${MIN_LID_TEMP} - ${MAX_LID_TEMP} (°C)`}
                     value={lid_temp}
                     onChange={(event) => {
                       setLidTemperature(parseInt(event.target.value));

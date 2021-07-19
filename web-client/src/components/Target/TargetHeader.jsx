@@ -51,7 +51,7 @@ const TargetHeader = (props) => {
             size={14}
             className="flex-25 text-default text-truncate-multi-line font-weight-light mb-0 px-2 py-1"
           >
-            {`Volume: ${selectedTemplateDetails.get("volume")} μ units.`}
+            {`Volume: ${selectedTemplateDetails.get("volume")} μL.`}
           </Text>
 
           <Text

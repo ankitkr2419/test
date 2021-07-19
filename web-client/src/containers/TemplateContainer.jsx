@@ -53,7 +53,6 @@ const TemplateContainer = (props) => {
   const isExperimentSaved = useSelector(getIsExperimentSaved);
 
   useEffect(() => {
-    console.info("Reducers reset");
     dispatch(loginReset());
   }, []);
 

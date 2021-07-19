@@ -5,6 +5,7 @@ import {
   listTemplateActions,
   updateTemplateActions,
   deleteTemplateActions,
+  finishCreateTemplateActions,
 } from "actions/templateActions";
 import {
   createTemplateFailed,
@@ -12,6 +13,7 @@ import {
   fetchTemplates as fetchTemplatesActions,
   updateTemplateFailed,
   deleteTemplateFailed,
+  finishCreateTemplateFailed,
 } from "action-creators/templateActionCreators";
 import { HTTP_METHODS } from "appConstants";
 
@@ -30,6 +32,7 @@ export function* createTemplate(actions) {
         reqPath: "templates",
         successAction,
         failureAction,
+        showPopupFailureMessage: true,
         token,
       },
     });
@@ -53,9 +56,10 @@ export function* fetchTemplates(actions) {
     yield call(callApi, {
       payload: {
         body: null,
-        reqPath: "templates",
+        reqPath: "finished/templates",
         successAction,
         failureAction,
+        showPopupFailureMessage: true,
         token,
       },
     });
@@ -80,6 +84,7 @@ export function* updateTemplate(actions) {
         reqPath: `templates/${templateID}`,
         successAction,
         failureAction,
+        showPopupFailureMessage: true,
         token,
       },
     });
@@ -114,6 +119,31 @@ export function* deleteTemplate(actions) {
   }
 }
 
+export function* finishCreateTemplate(actions) {
+  const {
+    payload: { templateID, token },
+  } = actions;
+
+  const { successAction, failureAction } = finishCreateTemplateActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        reqPath: `finish/template/${templateID}`,
+        successAction,
+        failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("error in finish create template ", error);
+    yield put(finishCreateTemplateFailed(error));
+  }
+}
+
 export function* createTemplateSaga() {
   yield takeEvery(createTemplateActions.createAction, createTemplate);
 }
@@ -132,4 +162,11 @@ export function* updateTemplateSaga() {
 
 export function* deleteTemplateSaga() {
   yield takeEvery(deleteTemplateActions.deleteAction, deleteTemplate);
+}
+
+export function* finishCreateTemplateSaga() {
+  yield takeEvery(
+    finishCreateTemplateActions.createAction,
+    finishCreateTemplate
+  );
 }
