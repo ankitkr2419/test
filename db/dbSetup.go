@@ -48,6 +48,7 @@ type TipsTubesConfig struct {
 		AllowedPositions pq.Int64Array
 		Volume           float64
 		Height           float64
+		TtBase			 float64
 	}
 }
 
@@ -263,6 +264,7 @@ func makeTipsTubesList(configTipsTubes TipsTubesConfig) (allTipsTubes []TipsTube
 		tipstubes.Name = t.Name
 		tipstubes.Volume = t.Volume
 		tipstubes.Height = t.Height
+		tipstubes.TtBase = t.TtBase
 		allTipsTubes = append(allTipsTubes, tipstubes)
 	}
 	return

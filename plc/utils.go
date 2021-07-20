@@ -295,6 +295,7 @@ func selectAllTipsTubes(store db.Storer) (err error) {
 		tipstubes[tiptube.Name]["allowed_positions"] = tiptube.AllowedPositions
 		tipstubes[tiptube.Name]["volume"] = tiptube.Volume
 		tipstubes[tiptube.Name]["height"] = tiptube.Height
+		tipstubes[tiptube.Name]["tt_base"] = tiptube.TtBase
 	}
 	return
 }

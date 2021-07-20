@@ -18,7 +18,8 @@ const (
 							type,
 							allowed_positions,
 							volume,
-							height)
+							height,
+							tt_base)
 							VALUES %s `
 	insertTipsTubesQuery2   = `ON CONFLICT DO NOTHING;`
 	getTipsTubesBytypeQuery = `SELECT *
@@ -35,6 +36,7 @@ type TipsTubes struct {
 	AllowedPositions pq.Int64Array `db:"allowed_positions" json:"allowed_positions"`
 	Volume           float64       `db:"volume" json:"volume"`
 	Height           float64       `db:"height" json:"height"`
+	TtBase           float64       `db:"tt_base" json:"tt_base"`
 	CreatedAt        time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt        time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -61,7 +63,7 @@ func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 			positions = fmt.Sprintf("%s%v,", positions, pos)
 		}
 		positions = positions[:len(positions)-1] + "}"
-		values = append(values, fmt.Sprintf("(%v, '%v', '%v', '%v', %v, %v)", t.ID, t.Name, t.Type, positions, t.Volume, t.Height))
+		values = append(values, fmt.Sprintf("(%v, '%v', '%v', '%v', %v, %v, %v)", t.ID, t.Name, t.Type, positions, t.Volume, t.Height, t.TtBase))
 	}
 
 	stmt := fmt.Sprintf(insertTipsTubesQuery1,
