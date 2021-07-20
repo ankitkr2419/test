@@ -40,6 +40,7 @@ import { useHistory } from "react-router";
 
 const AppHeader = (props) => {
   const {
+    role,
     isUserLoggedIn,
     isPlateRoute,
     isLoginTypeAdmin,
@@ -332,6 +333,7 @@ const AppHeader = (props) => {
                   </Button>
                 )}
               </div>
+              <Text size={10} className="text-capitalize my-auto">{role ? role : ''}</Text>
               <Dropdown
                 isOpen={userDropdownOpen}
                 toggle={toggleUserDropdown}

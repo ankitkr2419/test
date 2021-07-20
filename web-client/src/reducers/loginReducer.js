@@ -13,6 +13,7 @@ const initialStateOfDecks = () => {
       isLoggedIn: false,
       error: false,
       msg: "",
+      role: "",
       isAdmin: false,
       isEngineer: false,
       isActive: true,
@@ -24,6 +25,7 @@ const initialStateOfDecks = () => {
       isLoggedIn: false,
       error: false,
       msg: "",
+      role: "",
       isAdmin: false,
       isEngineer: false,
       isActive: false,
@@ -75,16 +77,17 @@ export const loginReducer = (state = loginInitialState, action) => {
         isLoading: true,
         isLoggedInForHoming: false,
         deckName: action.payload.body.deckName,
-        isAdmin: action.payload.body.role === USER_ROLES.ADMIN,
-        isEngineer: action.payload.body.role === USER_ROLES.ENGINEER,
+        // isAdmin: action.payload.body.role === USER_ROLES.ADMIN,//TODO remove after tested
+        // isEngineer: action.payload.body.role === USER_ROLES.ENGINEER,
         decks: updatedDecks,
       });
 
     case loginActions.successAction:
+      const role = action.payload.response?.role
       const token = action.payload.response.token;
       let deckName = state.toJS().deckName; //current deckname
-      let isAdminTemp = state.toJS().isAdmin;
-      let isEngineerTemp = state.toJS().isEngineer;
+      let isAdminTemp = role === USER_ROLES.ADMIN;
+      let isEngineerTemp = role === USER_ROLES.ENGINEER;
       if (deckName && deckName === DECKNAME.DeckA) {
         //update and login deck A
 
@@ -92,6 +95,7 @@ export const loginReducer = (state = loginInitialState, action) => {
           isLoggedIn: true,
           error: false,
           msg: "",
+          role,
           isAdmin: isAdminTemp,
           isEngineer: isEngineerTemp,
           isActive: true,
@@ -119,6 +123,7 @@ export const loginReducer = (state = loginInitialState, action) => {
           isLoggedIn: true,
           error: false,
           msg: "",
+          role,
           isAdmin: isAdminTemp,
           isEngineer: isEngineerTemp,
           isActive: true,
