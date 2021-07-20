@@ -27,8 +27,7 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 		go deps.PlcDeck[deck].PIDCalibration(req.Context())
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.PIDCalibrationError)
-			// TODO: Add Deck below whenever Deck PR is merged
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PIDCalibrationError.Error()}) //, Deck: deck})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PIDCalibrationError.Error(), Deck: deck})
 			return
 		}
 
