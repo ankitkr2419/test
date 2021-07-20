@@ -291,6 +291,14 @@ func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 
 func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 
+	// Switch on Motor
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	if err != nil {
+		fmt.Println("err starting motor: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched on the shaker motor--> for deck ", d.name)
+
 	// Switch on Shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
 	if err != nil {
@@ -304,6 +312,15 @@ func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 
 func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 
+	// Switch off Motor
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
+	if err != nil {
+		fmt.Println("err offing motor: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched off the shaker motor--> for deck ", d.name)
+
+			
 	// Switch off shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
@@ -439,6 +456,10 @@ func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
 		err = fmt.Errorf("%v\n%v",err, tempErr)
 	}
 	
-	// TODO: Switch off PID Calibration
+	_, tempErr = d.switchOffPIDCalibration()
+	if tempErr != nil {
+		logger.Errorln("error switching off pid calibration bits: ", tempErr, d.name)
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
 	return "SUCCESS", err
 }
