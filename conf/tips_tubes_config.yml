@@ -1,31 +1,37 @@
 TipsTubes:
+# NOTE: height is total height
+# ttBase is the height of tip/tube above deck
   - id : 1
-    name : 'extraction_tip_1000ul'
+    name : 'extraction_tip_1000ul_v1_3'
     type: 'tip'
     allowedPositions: [1,2,3]
     volume: 1000
     height: 98
+    ttBase: 14
   
   - id : 2
-    name : 'pcr_tip_1000ul'
+    name : 'pcr_tip_1000ul_v1_3'
     type: 'tip'
     allowedPositions: [1,2,3]
     volume: 1000
     height: 98
+    ttBase: 14
   
   - id : 3
-    name : 'piercing_tip'
+    name : 'piercing_tip_v1_3'
     type: 'tip'
     allowedPositions: [4,5]
     volume: 0.00
     height: 39
-  
+    ttBase: 14
+
   - id : 4
     name : 'sample_tube'
     type: 'tube'
     allowedPositions: [6]
     volume: 1500
     height: 43.70
+    ttBase: 7.7
   
   - id : 5
     name : 'shaker_tube'
@@ -33,6 +39,7 @@ TipsTubes:
     allowedPositions: [7]
     volume: 5000
     height: 58.88
+    ttBase: 1.5
   
   - id : 6
     name : 'extraction_collection_tube'
@@ -40,10 +47,28 @@ TipsTubes:
     allowedPositions: [9]
     volume: 1500
     height: 43.70
+    ttBase: 7.7
   
   - id : 7
     name : 'pcr_collection_tube'
     type: 'tube'
     allowedPositions: [11]
     volume: 200
-    height: 15.80
+    height: 21
+    ttBase: 1
+
+  - id : 8
+    name : 'automation_tip_1000ul_v1_4'
+    type: 'tip'
+    allowedPositions: [1,2,3]
+    volume: 1000
+    height: 95
+    ttBase: 5.8
+  
+  - id : 9
+    name : 'automation_tip_200ul_v1_4'
+    type: 'tip'
+    allowedPositions: [1,2,3]
+    volume: 200
+    height: 58.3
+    ttBase: 5.8
