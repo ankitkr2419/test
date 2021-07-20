@@ -92,7 +92,7 @@ func (s *pgStore) UpdateMotor(ctx context.Context, motor Motor) (err error) {
 func (s *pgStore) DeleteMotor(ctx context.Context, id int) (err error) {
 	_, err = s.db.Exec(deleteMotorQuery, id)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching Motor data")
+		logger.WithField("err", err.Error()).Error("Error deleting Motor data")
 		return
 	}
 
