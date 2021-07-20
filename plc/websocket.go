@@ -106,6 +106,6 @@ func ConvertToHMS(secs int64) *TimeHMS {
 	t.Hours = uint8(secs / (60 * 60))
 	t.Minutes = uint8(secs/60 - int64(t.Hours)*60)
 	t.Seconds = uint8(secs % 60)
-	logger.Infoln("Converted time: ", t)
+	logger.Debugln("Converted time: ", t)
 	return &t
 }
