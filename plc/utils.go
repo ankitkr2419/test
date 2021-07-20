@@ -236,7 +236,7 @@ func LoadAllPLCFuncs(store db.Storer) (err error) {
 }
 
 func selectAllMotors(store db.Storer) (err error) {
-	allMotors, err := store.ListMotors()
+	allMotors, err := store.ListMotors(context.Background())
 	if err != nil {
 		return
 	}
