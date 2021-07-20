@@ -26,6 +26,7 @@ const (
 	getTipsTubesQuery = `SELECT * FROM tips_and_tubes`
 	getTipByIDQuery   = `SELECT *
 							FROM tips_and_tubes where id=$1`
+	deleteTipTubeQuery = `DELETE from tips_and_tubes where id = $1`
 )
 
 type TipsTubes struct {
@@ -52,6 +53,15 @@ func (s *pgStore) InsertTipsTubes(ctx context.Context, tipstubes []TipsTubes) (e
 	return
 }
 
+func (s *pgStore) DeleteTipTube(ctx context.Context, id int64) (err error) {
+	_, err = s.db.Exec(deleteTipTubeQuery, id)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error deleting TipTube data")
+		return
+	}
+
+	return
+}
 func makeTipsTubesQuery(tipstubes []TipsTubes) string {
 	values := make([]string, 0, len(tipstubes))
 

@@ -23,10 +23,11 @@ const (
 							height,
 							volume)
 							VALUES %s `
-	onConflictDoNothing     = `ON CONFLICT DO NOTHING;`
-	selectAllCartridgeQuery = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id GROUP BY c.id`
+	onConflictDoNothing          = `ON CONFLICT DO NOTHING;`
+	selectAllCartridgeQuery      = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id GROUP BY c.id`
 	selectAllCartridgeWellsQuery = `SELECT *
 							FROM cartridge_wells`
+	deleteCartridgeQuery = `delete from cartridges where id = $1`
 )
 
 type CartridgeType string
@@ -36,11 +37,15 @@ const (
 	Cartridge2 CartridgeType = "cartridge_2"
 )
 
+type CartridgeWell struct {
+	Cartridge      Cartridge        `json:"cartridge"`
+	CartridgeWells []CartridgeWells `json:"cartridge_wells"`
+}
 type Cartridge struct {
 	ID          int64         `db:"id" json:"id"`
 	Type        CartridgeType `db:"type" json:"type"`
 	Description string        `db:"description" json:"description"`
-	WellsCount	int64		  `db:"wells_count" json:"wells_count"`
+	WellsCount  int64         `db:"wells_count" json:"wells_count"`
 	CreatedAt   time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time     `db:"updated_at" json:"updated_at"`
 }
@@ -84,6 +89,16 @@ func (s *pgStore) InsertCartridge(ctx context.Context, cartridges []Cartridge, c
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
 	}
+	return
+}
+
+func (s *pgStore) DeleteCartridge(ctx context.Context, id int64) (err error) {
+	_, err = s.db.Exec(deleteCartridgeQuery, id)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error deleting Cartridge data")
+		return
+	}
+
 	return
 }
 
