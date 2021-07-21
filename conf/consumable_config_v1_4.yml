@@ -191,14 +191,6 @@ ConsumableDistance:
     name: "piercing_height_cartridge_2"
     distance: 7
     description: "syringe module goes here fast with piercing tip for actual piercing of silver foil for cartridge_2. This is below the deck base"
-  # - id: 321
-  #   name: "syringe_module_fast_down_piercing_tip"
-  #   distance: 111.00
-  #   description: "syringe module goes here at fast for picking up the piercing tip ( before turning slow) from the homing position"
-  # - id: 322
-  #   name: "syringe_module_slow_down_piercing_tip"
-  #   distance: 114.00
-  #   description: "syringe module goes here at slow for picking up the piercing tip after coming fast down"
   - id: 323
     name: "piercing_tip_rest_position"
     distance: 65
@@ -213,8 +205,12 @@ ConsumableDistance:
     description: "syringe module goes this much down at slow for picking up the tip after coming fast down"
   - id: 401
     name: "pickup_tip_up"
-    distance: 59
+    distance: 27
     description: "syringe module goes to this position at fast after picking up any tip, or as per requirement"
+  - id: 402
+    name: "above_deck"
+    distance: 10
+    description: "syringe module goes to this position at fast after pickup or aspire operation"
   - id: 601
     name: "magnet_reverse_after_homing"
     distance: 50
