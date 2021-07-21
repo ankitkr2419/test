@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"mylab/cpagent/db"
+	logger "github.com/sirupsen/logrus"
+
 )
 
 /****ALGORITHM******
@@ -43,9 +45,9 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// Tip PickUp	*
 	//***************
 	var deckAndMotor DeckNumber
-	var position, distanceToTravel, restingPos float64
+	var position, distanceToTravel, restingPos, ttBase float64
 	var direction, pulses uint16
-	var tipFast, tipSlow, restingPositionString string
+	var restingPositionString string
 	var ok bool
 	deckAndMotor.Deck = d.name
 
@@ -82,25 +84,53 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// TODO: Handle this in non-harcoded way as tips add up in future
 	// We can do this by being aware of the tip.
 	// So, in future add a field like height of tip above the deck
-	switch pos {
-	// extraction tip
-	case 1, 2, 3:
-		tipFast = "syringe_module_fast_down_1000_tip"
-		tipSlow = "syringe_module_slow_down_1000_tip"
-	// piercing tip
-	case 4, 5:
-		tipFast = "syringe_module_fast_down_piercing_tip"
-		tipSlow = "syringe_module_slow_down_piercing_tip"
-	}
-	fmt.Println("Moving Syringe to tip's base")
-	if position, ok = consDistance[tipFast]; !ok {
-		err = fmt.Errorf(tipFast + " doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+
+	logger.Infoln("Moving Syringe to tip's base")
+	if position, ok = consDistance["deck_base"]; !ok {
+		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
-	// Here tipFast will always be greater
-	// than resting_position
-	distanceToTravel = position - Positions[deckAndMotor]
+
+	// How do we know which tip exists?
+	// By ID of that tip/tube
+	// We need recipe details to get tips tubes
+
+	recipe := deckRecipe[d.name]
+	if recipe.Name == "" {
+		err = fmt.Errorf("no recipe in progress for deck %v", d.name)
+		logger.Errorln("Error: ", err)
+		return "", err
+	}
+
+	var id *int64
+	switch pos{
+	case 1:
+		id = recipe.Position1
+	case 2:
+		id = recipe.Position2
+	case 3:
+		id = recipe.Position3
+	case 4:
+		id = recipe.Position4	
+	case 5:
+		id = recipe.Position5
+	}
+
+	if id == nil{
+		err = fmt.Errorf("no tip exists for position %v", pos)
+		logger.Errorln("Error: ", err)
+		return "", err
+	}
+
+	// convert interface to float64
+	if ttBase, ok = tipstubes[*id]["tt_base"].(float64); !ok {
+		err = fmt.Errorf("tts_base doesn't exist for tip with ID %v", id)
+		logger.Errorln("Error: ", err)
+		return "", err
+	}
+
+	distanceToTravel = position - ttBase - Positions[deckAndMotor]
 
 	// We know Concrete Direction here, its DOWN
 
@@ -117,14 +147,13 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	//
 
 	fmt.Println("Moving Syringe to tip's inside")
-	if position, ok = consDistance[tipSlow]; !ok {
-		err = fmt.Errorf(tipSlow + " doesn't exist for consumable distances")
+	if position, ok = consDistance["slow_inside"]; !ok {
+		err = fmt.Errorf("slow_inside doesn't exist for consumable distances")
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	// Here tipSlow will always be greater
-	// than tipFast
-	distanceToTravel = position - Positions[deckAndMotor]
+
+	distanceToTravel = position
 
 	// We know Concrete Direction here, its DOWN
 
