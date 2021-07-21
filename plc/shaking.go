@@ -8,6 +8,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+const(
+	rpmToPulses = 13.3
+)
+
 // Shaking : function
 /* Algorithm ******************
 1. Validate that rpm 2 and time 2 value is not set before setting rpm 1 and time 1
@@ -93,7 +97,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	logger.Infof("selected shaker %v", results)
 
 	// 4 set shaker register with rpm 1
-	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM1))
+	// NOTE: Calculation of RPM involves multiplying it with 13.3
+	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM1) * rpmToPulses))
 	if err != nil {
 		logger.Errorln("error in setting rpm 1 value : ", err)
 		return "", err
@@ -163,7 +168,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	if shakerData.RPM2 != 0 {
 
 		//set shaker register with rpm 2
-		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM2))
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM2) * rpmToPulses))
 		if err != nil {
 			logger.Errorln("error in setting rpm 2 value : ", err)
 			return "", err
