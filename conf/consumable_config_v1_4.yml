@@ -25,7 +25,7 @@ ConsumableDistance:
     description: "extraction cartridge area end point"
   - id: 7
     name: "cartridge_2_start"
-    distance: 268.85
+    distance: 272.35
     description: "pcr cartridge area start point"
   - id: 8
     name: "cartridge_2_end"
@@ -97,7 +97,7 @@ ConsumableDistance:
     description: "position 10 on deck, here cartridge 2 starts"
   - id: 61
     name: "pos_11"
-    distance: 325.50
+    distance: 330.0
     description: "position 11 on deck, here pcr tube may reside"
   - id: 101
     name: "pcr_tip"
@@ -133,7 +133,7 @@ ConsumableDistance:
     description: "output from extraction process kept here"
   - id: 154
     name: "pcr_collection_tube"
-    distance: 325.50
+    distance: 330.50
     description: "output from pcr process kept here"
   - id: 201
     name: "syringe_start"
@@ -157,8 +157,8 @@ ConsumableDistance:
     description: "syringe module goes this much up at fast after picking up the piercing tip"
   - id: 304
     name: "piercing_height_cartridge_1"
-    distance: 90.00
-    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_1"
+    distance: 9
+    description: syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_1. This is below the deck base"
   - id: 305
     name: "piercing_tip_discard_height"
     distance: 83.9
@@ -189,17 +189,16 @@ ConsumableDistance:
     description: "syringe module goes here at slow for discarding tip"
   - id: 320
     name: "piercing_height_cartridge_2"
-    distance: 88.00
-    description: "syringe module goes 
-    here fast with piercing tip for actual piercing of silver foil for cartridge_2"
-  - id: 321
-    name: "syringe_module_fast_down_piercing_tip"
-    distance: 111.00
-    description: "syringe module goes here at fast for picking up the piercing tip ( before turning slow) from the homing position"
-  - id: 322
-    name: "syringe_module_slow_down_piercing_tip"
-    distance: 114.00
-    description: "syringe module goes here at slow for picking up the piercing tip after coming fast down"
+    distance: 7
+    description: "syringe module goes here fast with piercing tip for actual piercing of silver foil for cartridge_2. This is below the deck base"
+  # - id: 321
+  #   name: "syringe_module_fast_down_piercing_tip"
+  #   distance: 111.00
+  #   description: "syringe module goes here at fast for picking up the piercing tip ( before turning slow) from the homing position"
+  # - id: 322
+  #   name: "syringe_module_slow_down_piercing_tip"
+  #   distance: 114.00
+  #   description: "syringe module goes here at slow for picking up the piercing tip after coming fast down"
   - id: 323
     name: "piercing_tip_rest_position"
     distance: 65
@@ -208,6 +207,10 @@ ConsumableDistance:
     name: "piercing_tip_above_well_position"
     distance: 75
     description: "syringe module goes here at fast with piercing tip"
+  - id: 325
+    name: "slow_inside"
+    distance: 6
+    description: "syringe module goes this much down at slow for picking up the tip after coming fast down"
   - id: 401
     name: "pickup_tip_up"
     distance: 59

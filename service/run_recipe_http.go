@@ -99,6 +99,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	deps.PlcDeck[deck].SetRunInProgress()
 	defer deps.PlcDeck[deck].ResetRunInProgress()
+	defer deps.PlcDeck[deck].SetCurrentProcessNumber(int64(-2))
 
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
@@ -171,7 +172,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			// TODO: Pass the complete Tip rather than just name for volume validations
-			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.ID)
 			if err != nil {
 				return "", err
 			}
@@ -212,7 +213,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
 
-			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
+			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID, currentTip)
 			if err != nil {
 				return "", err
 			}
