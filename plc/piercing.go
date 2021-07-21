@@ -16,10 +16,10 @@ import (
 	2.3 Repeat step 2.1 and 2.2 till well exists
 ********/
 
-func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
+func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsTubes) (response string, err error) {
 
 	var deckAndMotor DeckNumber
-	var position, cartridgeStart, piercingHeight, distanceToTravel float64
+	var position, cartridgeStart, piercingHeight, distanceToTravel, tipHeight, deckBase float64
 	var ok bool
 	var direction, pulses, piercingPulses, afterPiercingRestPulses uint16
 	// []int has direct method to get slice sorted
@@ -55,7 +55,46 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 	// Calculation below considers syringe module as glued with tip
 	// And we go to piercingHeight
-	distanceToTravel = piercingHeight - Positions[deckAndMotor]
+
+
+	// Get Deck Base
+	if deckBase, ok = consDistance["deck_base"]; !ok {
+		err = fmt.Errorf("deck_base doesn't exist for consumables")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	//-----------------
+	// Get Tip Height -
+	//-----------------
+	var tipHeightInter interface{}
+	if tipHeightInter, ok = tipstubes[tip.ID]["height"]; !ok {
+		err = fmt.Errorf("%v tip doesn't exist for tipstubes", tip.ID)
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	if tipHeight, ok = tipHeightInter.(float64); !ok {
+		err = fmt.Errorf("%v tip has unknown ID!", tip.ID)
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	if tipHeightInter, ok = consDistance["slow_inside"]; !ok {
+		err = fmt.Errorf("slow_inside doesn't exist for consumables")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	if position, ok = tipHeightInter.(float64); !ok {
+		err = fmt.Errorf("couldn't type cast slow_inside")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	tipHeight -= position
+
+	distanceToTravel = (deckBase + piercingHeight) - (Positions[deckAndMotor] + tipHeight)
 	// We know concrete direction here
 	// piercingHeight will be less
 
@@ -124,7 +163,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			}
 
 			// piercingHeight will be always less than current position
-			distanceToTravel = Positions[deckAndMotor] - piercingHeight
+			distanceToTravel = Positions[deckAndMotor] - piercingHeight 
 
 			piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 		}
