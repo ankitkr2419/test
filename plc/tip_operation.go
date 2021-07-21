@@ -23,7 +23,7 @@ func (d *Compact32Deck) TipOperation(to db.TipOperation) (response string, err e
 		response, err = d.tipDiscard()
 	}
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue doing Tip Operation. Error: %v", err)
 	}
 
@@ -45,9 +45,8 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// Tip PickUp	*
 	//***************
 	var deckAndMotor DeckNumber
-	var position, distanceToTravel, restingPos, ttBase float64
+	var position, distanceToTravel, tipHeight, ttBase, slowInside, deckBase float64
 	var direction, pulses uint16
-	var restingPositionString string
 	var ok bool
 	deckAndMotor.Deck = d.name
 
@@ -57,10 +56,10 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	deckAndMotor.Number = K5_Deck
 
-	fmt.Println("Moving Deck to pos_" + fmt.Sprintf("%d", pos))
+	logger.Infoln("Moving Deck to pos_" , pos)
 	if position, ok = consDistance["pos_"+fmt.Sprintf("%d", pos)]; !ok {
 		err = fmt.Errorf("pos_" + fmt.Sprintf("%d", pos) + " doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 	distanceToTravel = Positions[deckAndMotor] - position
@@ -71,7 +70,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Deck to tip source. Error: %v", err)
 	}
 
@@ -130,6 +129,12 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 		return "", err
 	}
 
+	if tipHeight, ok = tipstubes[*id]["height"].(float64); !ok {
+		err = fmt.Errorf("tts_base doesn't exist for tip with ID %v", id)
+		logger.Errorln("Error: ", err)
+		return "", err
+	}
+
 	distanceToTravel = position - ttBase - Positions[deckAndMotor]
 
 	// We know Concrete Direction here, its DOWN
@@ -138,7 +143,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to tip's base. Error: %v", err)
 	}
 
@@ -146,14 +151,20 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// 3. Move Syringe Module down slow to tip's inside
 	//
 
-	fmt.Println("Moving Syringe to tip's inside")
-	if position, ok = consDistance["slow_inside"]; !ok {
+	logger.Infoln("Moving Syringe to tip's inside")
+	if slowInside, ok = consDistance["slow_inside"]; !ok {
 		err = fmt.Errorf("slow_inside doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 
-	distanceToTravel = position
+	if deckBase, ok = consDistance["deck_base"]; !ok {
+		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
+		logger.Errorln("Error: ", err)
+		return "", err
+	}
+
+	distanceToTravel = slowInside
 
 	// We know Concrete Direction here, its DOWN
 
@@ -165,19 +176,24 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// Even if err has occured let's store syringeModuleState as inDeck
 	syringeModuleState.Store(d.name, InDeck)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln("Error: ", err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to tip's inside. Error: %v", err)
 	}
 
 	//
-	// 4. Move Syringe Module up with tip to restingPositionString.
+	// 4. Move Syringe Module up with tip to a resting Position.
 	//
 
-	fmt.Println("Moving Syringe Module to ", restingPositionString)
+	if position, ok = consDistance["pickup_tip_up"]; !ok {
+		err = fmt.Errorf("pickup_tip_up doesn't exist for consumable distances")
+		logger.Errorln("Error: ", err)
+		return "", err
+	}
 
-	// Here resting_position will always be lesser
-	// than whatever position earlier
-	distanceToTravel = Positions[deckAndMotor] - restingPos
+	logger.Infoln("Moving Syringe Module to PickupTip")
+
+	// go pickup_tip_up mm above
+	distanceToTravel =  Positions[deckAndMotor] + tipHeight -  (deckBase - position + slowInside)
 
 	// We know Concrete Direction here, its UP
 
@@ -185,8 +201,8 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
-		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", restingPositionString, err)
+		logger.Errorln(err)
+		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", "PickupTip", err)
 	}
 	syringeModuleState.Store(d.name, OutDeck)
 
@@ -220,7 +236,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	if parkingPos, ok = consDistance["syringe_parking"]; !ok {
 		err = fmt.Errorf("syringe_parking doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 
@@ -230,10 +246,10 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	deckAndMotor.Number = K5_Deck
 
-	fmt.Println("Moving Deck to discard_big_hole")
+	logger.Infoln("Moving Deck to discard_big_hole")
 	if position, ok = consDistance["discard_big_hole"]; !ok {
 		err = fmt.Errorf("discard_big_hole doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 	distanceToTravel = Positions[deckAndMotor] - position
@@ -244,7 +260,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Deck to discard_big_hole source. Error: %v", err)
 	}
 
@@ -254,10 +270,10 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	fmt.Println("Moving Syringe to deck's base")
+	logger.Infoln("Moving Syringe to deck's base")
 	if position, ok = consDistance["deck_base"]; !ok {
 		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 
@@ -272,7 +288,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	// Even if err has occured let's store syringeModuleState as inDeck
 	syringeModuleState.Store(d.name, InDeck)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to deck's base. Error: %v", err)
 	}
 
@@ -280,10 +296,10 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	// 3. Move Syringe Module down really slow till enough inside big hole
 	//
 
-	fmt.Println("Moving Syringe to deck base inside")
+	logger.Infoln("Moving Syringe to deck base inside")
 	if position, ok = consDistance["syringe_module_slow_down_for_discard"]; !ok {
 		err = fmt.Errorf("syringe_module_slow_down_for_discard doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 	// Here syringe_module_slow_down_for_discard will always be greater
@@ -297,7 +313,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	// Giving it real slow speed
 	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to discard_big_hole's inside. Error: %v", err)
 	}
 
@@ -307,10 +323,10 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	deckAndMotor.Number = K5_Deck
 
-	fmt.Println("Moving Deck to discard_small_hole")
+	logger.Infoln("Moving Deck to discard_small_hole")
 	if position, ok = consDistance["discard_small_hole"]; !ok {
 		err = fmt.Errorf("discard_small_hole doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 	distanceToTravel = Positions[deckAndMotor] - position
@@ -322,7 +338,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	// We know concrete direction, here its towards sensor/ FWD
 	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Deck to discard_big_hole source. Error: %v", err)
 	}
 
@@ -331,11 +347,11 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	fmt.Println("Moving Syringe Module to drop off the tip")
+	logger.Infoln("Moving Syringe Module to drop off the tip")
 
 	if position, ok = consDistance["deck_base"]; !ok {
 		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln("Error: ", err)
 		return "", err
 	}
 	// Here deck_base will always be lesser
@@ -348,7 +364,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	// Giving it real slow speed
 	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to deck base. Error: %v", err)
 	}
 
@@ -356,7 +372,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	// 6. Move Syringe Module up fast with tip to Resting position.
 	//
 
-	fmt.Println("Moving Syringe Module to Resting Position")
+	logger.Infoln("Moving Syringe Module to Resting Position")
 
 	// Here syringe_parking will always be lesser
 	// than deck_base
@@ -368,7 +384,7 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to resting position. Error: %v", err)
 	}
 	// Use defer d.setIndeck() instead
