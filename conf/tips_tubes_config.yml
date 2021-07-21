@@ -23,7 +23,7 @@ TipsTubes:
     allowedPositions: [4,5]
     volume: 0.00
     height: 39
-    ttBase: 14
+    ttBase: 7.9
 
   - id : 4
     name : 'sample_tube'
