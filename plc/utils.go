@@ -200,7 +200,7 @@ var Positions = map[DeckNumber]float64{
 
 var Motors = make(map[DeckNumber]map[string]uint16)
 var consDistance = make(map[string]float64)
-var tipstubes = make(map[string]map[string]interface{})
+var tipstubes = make(map[int64]map[string]interface{})
 var labwares = make(map[int]string)
 var cartridges = make(map[UniqueCartridge]map[string]float64)
 var Calibs = make(map[DeckNumber]float64)
@@ -289,13 +289,14 @@ func selectAllTipsTubes(store db.Storer) (err error) {
 	}
 
 	for _, tiptube := range allTipsTubes {
-		tipstubes[tiptube.Name] = make(map[string]interface{})
-		tipstubes[tiptube.Name]["id"] = tiptube.ID
-		tipstubes[tiptube.Name]["type"] = tiptube.Type
-		tipstubes[tiptube.Name]["allowed_positions"] = tiptube.AllowedPositions
-		tipstubes[tiptube.Name]["volume"] = tiptube.Volume
-		tipstubes[tiptube.Name]["height"] = tiptube.Height
-		tipstubes[tiptube.Name]["tt_base"] = tiptube.TtBase
+		tipstubes[tiptube.ID] = make(map[string]interface{})
+		tipstubes[tiptube.ID]["name"] = tiptube.Name
+		tipstubes[tiptube.ID]["id"] = tiptube.ID
+		tipstubes[tiptube.ID]["type"] = tiptube.Type
+		tipstubes[tiptube.ID]["allowed_positions"] = tiptube.AllowedPositions
+		tipstubes[tiptube.ID]["volume"] = tiptube.Volume
+		tipstubes[tiptube.ID]["height"] = tiptube.Height
+		tipstubes[tiptube.ID]["tt_base"] = tiptube.TtBase
 	}
 	return
 }
