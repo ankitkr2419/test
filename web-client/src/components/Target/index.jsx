@@ -36,6 +36,7 @@ const TargetComponent = (props) => {
     isNoTargetSelected,
     setThresholdError,
     isThresholdInvalid,
+    onRemoveTarget,
   } = props;
 
   const isTargetDisabled = (ele) => {
@@ -99,7 +100,7 @@ const TargetComponent = (props) => {
               onChange={(selectedTarget) => {
                 onTargetSelect(selectedTarget, index);
               }}
-              value={ele.selectedTarget}
+              value={ele.selectedTarget ? ele.selectedTarget : null}
             />
           )}
           {isLoginTypeOperator === true && (
@@ -125,8 +126,19 @@ const TargetComponent = (props) => {
             onBlur={() => onThresholdBlurHandler(ele.threshold, index)}
             onFocus={() => onThresholdFocusHandler(index)}
             invalid={ele.thresholdError}
-            disabled={isLoginTypeOperator}
+            //disabled for operator always OR for admin it should be disabled till target is selected
+            disabled={
+              isLoginTypeOperator ||
+              (isLoginTypeAdmin === true && ele?.selectedTarget?.label == null)
+            }
           />
+
+          {/**show remove target if target if available */}
+          {isLoginTypeAdmin === true &&
+            Object.keys(ele).length !== 0 &&
+            ele?.selectedTarget?.label !== null && (
+              <button onClick={() => onRemoveTarget(ele)}>X</button>
+            )}
         </TargetListItem>
       )),
     [

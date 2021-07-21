@@ -210,6 +210,13 @@ const TargetContainer = (props) => {
     return true;
   }, [listTargetByTemplateIDReducer]);
 
+  const onRemoveTarget = (ele) => {
+    updateTargetState({
+      type: targetStateActions.DELETE_TARGET,
+      value: ele,
+    });
+  };
+
   return (
     <TargetComponent
       selectedTemplateDetails={selectedTemplateDetails}
@@ -231,6 +238,7 @@ const TargetContainer = (props) => {
       isThresholdInvalid={isAnyThresholdInvalid(
         selectedTargetState.get("targetList")
       )}
+      onRemoveTarget={onRemoveTarget}
     />
   );
 };

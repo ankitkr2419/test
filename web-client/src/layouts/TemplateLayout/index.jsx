@@ -183,6 +183,7 @@ const TemplateLayout = (props) => {
           rightBtnLabel={"Finish"}
           handleRightBtn={finishBtnHandler}
           backBtnHandler={backBtnHandler}
+          btnBarClassname={"template-buttonBar"}
         />
       )}
     </div>
