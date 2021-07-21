@@ -97,7 +97,7 @@ ConsumableDistance:
     description: "position 10 on deck, here cartridge 2 starts"
   - id: 61
     name: "pos_11"
-    distance: 330.0
+    distance: 329.0
     description: "position 11 on deck, here pcr tube may reside"
   - id: 101
     name: "pcr_tip"
@@ -133,7 +133,7 @@ ConsumableDistance:
     description: "output from extraction process kept here"
   - id: 154
     name: "pcr_collection_tube"
-    distance: 330.50
+    distance: 329.0
     description: "output from pcr process kept here"
   - id: 201
     name: "syringe_start"
