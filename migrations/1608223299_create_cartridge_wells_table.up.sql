@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS cartridge_wells(
  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  PRIMARY KEY (id, well_num),
- FOREIGN KEY (id) REFERENCES cartridges(id)
+ FOREIGN KEY (id) REFERENCES cartridges(id) ON DELETE CASCADE ON UPDATE CASCADE
 );

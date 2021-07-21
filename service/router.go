@@ -83,6 +83,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 
 	router.HandleFunc("/consumable-distance", authenticate(createConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tiptube", authenticate(createTipTubeHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/tips-tubes/{id}", authenticate(deleteTipTubeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
 	//homing
 	router.HandleFunc("/homing/{deck:[A-B]?}", authenticate(homingHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
@@ -140,6 +141,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}", authenticate(listTipsTubesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}/{position:[1-9]+}", authenticate(listTipsTubesPositionHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/cartridge", authenticate(createCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/cartridge/{id}", authenticate(deleteCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//TODO: allow only for engineer
 	router.HandleFunc("/pid-calibration/{deck:[A-B]}", pidCalibrationHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)

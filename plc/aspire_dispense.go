@@ -40,7 +40,7 @@ variables: category, cartridgeType string,
   22. Dispense completely
 ********/
 
-func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {
+func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID, tipID int64) (response string, err error) {
 
 	var sourceCartridge, destinationCartridge map[string]float64
 	var sourcePosition, destinationPosition, distanceToTravel, position, tipHeight, deckBase float64
@@ -53,17 +53,32 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64, 
 	// Get Tip Height -
 	//-----------------
 	var tipHeightInter interface{}
-	if tipHeightInter, ok = tipstubes[tipType]["height"]; !ok {
-		err = fmt.Errorf(tipType + " tip doesn't exist for tipstubes")
+	if tipHeightInter, ok = tipstubes[tipID]["height"]; !ok {
+		err = fmt.Errorf("%v tip doesn't exist for tipstubes", tipID)
 		fmt.Println("Error: ", err)
 		return "", err
 	}
 
 	if tipHeight, ok = tipHeightInter.(float64); !ok {
-		err = fmt.Errorf(tipType + " tip has unknown type!")
+		err = fmt.Errorf("%v tip has unknown ID!", tipID)
 		fmt.Println("Error: ", err)
 		return "", err
 	}
+
+	// Get tt_base
+	if tipHeightInter, ok = consDistance["slow_inside"]; !ok {
+		err = fmt.Errorf("slow_inside doesn't exist for consumables")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	if position, ok = tipHeightInter.(float64); !ok {
+		err = fmt.Errorf("couldn't type cast slow_inside")
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	tipHeight -= position
 
 	/*** GET THE CARTRIDGES
 	E.g :

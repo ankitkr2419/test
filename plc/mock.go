@@ -124,8 +124,8 @@ func (p *PLCMockStore) Abort() (response string, err error) {
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
-	args := p.Called(pi, cartridgeID)
+func (p *PLCMockStore) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsTubes) (response string, err error) {
+	args := p.Called(pi, cartridgeID, tip)
 	return args.Get(0).(string), args.Error(1)
 }
 

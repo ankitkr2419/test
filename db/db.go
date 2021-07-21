@@ -125,4 +125,7 @@ type Storer interface {
 
 	UpdateMotor(ctx context.Context, motor Motor) (err error)
 	DeleteMotor(ctx context.Context, id int) (err error)
+	DeleteCartridge(ctx context.Context, id int64) (err error)
+
+	DeleteTipTube(ctx context.Context, id int64) (err error)
 }
