@@ -12,11 +12,17 @@ const ButtonBar = (props) => {
     handleLeftBtn,
     handleRightBtn,
     btnBarClassname,
+    isRTPCR,
+    backBtnHandler,
   } = props;
 
   const history = useHistory();
 
   const handleBackBtn = () => {
+    if(isRTPCR){
+      backBtnHandler();
+      return;
+    }
     history.goBack();
   };
 

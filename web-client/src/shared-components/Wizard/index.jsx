@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
  */
 
 const Wizard = (props) => {
-  const { list, onClickHandler, showFinishBtn, finishBtnHandler } = props;
+  const { list, onClickHandler } = props;
 
   const widgetList = useMemo(
     () => (
@@ -24,18 +24,6 @@ const Wizard = (props) => {
             </StepLink>
           </StepItem>
         ))}
-        {showFinishBtn && (
-          <li className="ml-auto">
-            <button
-              className="btn btn-primary"
-              onClick={finishBtnHandler}
-              style={{ color: "#707070", backgroundColor: "#fff" }}
-              //TODO move styles to class
-            >
-              Finish
-            </button>
-          </li>
-        )}
       </>
     ),
     [list, onClickHandler]
