@@ -38,49 +38,17 @@ variables: category, cartridgeType string,
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
   22. Dispense completely
-  23. move syringe module to tip_pick_up
 
 ********/
 
-func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID, tipID int64) (response string, err error) {
+func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64) (response string, err error) {
 
 	var sourceCartridge, destinationCartridge map[string]float64
-	var sourcePosition, destinationPosition, distanceToTravel, position, tipHeight, ttBase, deckBase, aboveDeck, slowInside, pickUpTip float64
+	var sourcePosition, destinationPosition, distanceToTravel, position, deckBase, aboveDeck, pickUpTip float64
 	var ok bool
 	var direction, pulses uint16
 	var deckAndMotor DeckNumber
 	deckAndMotor.Deck = d.name
-
-	//-----------------
-	// Get Tip Height -
-	//-----------------
-	var tipHeightInter interface{}
-	if tipHeightInter, ok = tipstubes[tipID]["height"]; !ok {
-		err = fmt.Errorf("%v tip doesn't exist for tipstubes", tipID)
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	if tipHeight, ok = tipHeightInter.(float64); !ok {
-		err = fmt.Errorf("%v tip has unknown ID!", tipID)
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	// Get tt_base
-	if ttBase, ok = tipstubes[tipID]["tt_base"].(float64); !ok {
-		err = fmt.Errorf("%v tip doesn't exist for tipstubes", tipID)
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	if slowInside, ok = consDistance["slow_inside"]; !ok {
-		err = fmt.Errorf("slow_inside doesn't exist for consumables")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	tipHeight -= slowInside
 
 	/*** GET THE CARTRIDGES
 	E.g :
@@ -254,11 +222,6 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID, tipID 
 		return "", err
 	}
 
-
-	// The last step
-	// If operation was aborted and syringe Module is stuck with tip
-	defer d.setIndeck(deckBase, tipHeight-ttBase+ slowInside)
-
 	if val, ok := syringeModuleState.Load(d.name); !ok {
 		err = fmt.Errorf("failed to load syringe module for deck: %s", d.name)
 		return "", err
@@ -268,7 +231,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID, tipID 
 		}
 	}
 
-	distanceToTravel = (Positions[deckAndMotor] + tipHeight + aboveDeck) - deckBase
+	distanceToTravel = (Positions[deckAndMotor] + tipHeight[d.name] + aboveDeck) - deckBase
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
@@ -284,7 +247,7 @@ skipToAspireInside:
 	//
 	//   13. setup the syringe module motor with aspire height
 	//
-	distanceToTravel = (Positions[deckAndMotor] + tipHeight) - (ad.AspireHeight + deckBase)
+	distanceToTravel = (Positions[deckAndMotor] + tipHeight[d.name]) - (ad.AspireHeight + deckBase)
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
@@ -342,7 +305,7 @@ skipAspireCycles:
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	distanceToTravel = (Positions[deckAndMotor] + tipHeight + aboveDeck) - deckBase 
+	distanceToTravel = (Positions[deckAndMotor] + tipHeight[d.name] + aboveDeck) - deckBase 
 	
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
@@ -408,7 +371,7 @@ skipAspireCycles:
 
 	// We know the concrete direction here onwards
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
-	distanceToTravel = deckBase - (Positions[deckAndMotor] + tipHeight + aboveDeck)
+	distanceToTravel = deckBase - (Positions[deckAndMotor] + tipHeight[d.name] + aboveDeck)
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
@@ -466,27 +429,6 @@ skipDispenseCycles:
 	if err != nil {
 		return
 	}
-
-	//
-	//   23. move syringe module to tip_pick_up
-	//
-
-	logger.Infoln("Moving Syringe Module to PickupTip")
-
-	// go pickup_tip_up mm above
-	distanceToTravel =  Positions[deckAndMotor] + (tipHeight - slowInside) - (deckBase - pickUpTip)
-
-	// We know Concrete Direction here, its UP
-
-	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
-
-	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
-	if err != nil {
-		logger.Errorln(err)
-		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", "pick_up_tip" , err)
-	}
-
-	syringeModuleState.Store(d.name, OutDeck)
 	
 	return "ASPIRE and DISPENSE was successful", nil
 }
@@ -505,7 +447,7 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 		fmt.Println("Error: ", err)
 		return "", err
 	}
-	distanceToTravel = Positions[syringeModuleDeckAndMotor] - position
+	distanceToTravel = Positions[syringeModuleDeckAndMotor] + tipHeight[d.name] - position
 
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
@@ -516,15 +458,33 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 		fmt.Println(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
-	syringeModuleState.Store(d.name, OutDeck)
 
 	return
 }
 
-func (d *Compact32Deck) setIndeck(deckBase, tipHeight float64) {
+func (d *Compact32Deck) setSyringeState() (err error){
+	var deckBase, indeckSafe float64
+	var ok bool
+
+	if deckBase, ok = consDistance["deck_base"]; !ok {
+		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
+		logger.Errorln("Error: ", err)
+		return
+	}
+
+	if indeckSafe, ok = consDistance["indeck_safe"]; !ok {
+		err = fmt.Errorf("deck_base doesn't exist for consumable distances")
+		logger.Errorln("Error: ", err)
+		return
+	}
+
 	deckAndMotor := DeckNumber{Deck: d.name, Number: K9_Syringe_Module_LHRH}
 	// In case the operation was aborted after syringe module went inside the deck!
-	if (Positions[deckAndMotor] + tipHeight) > deckBase {
+	// If syringe + tipHeight is below certain level then that is inDeck
+	if (Positions[deckAndMotor] + tipHeight[d.name]) >= (deckBase - indeckSafe) {
 		syringeModuleState.Store(d.name, InDeck)
+	} else {
+		syringeModuleState.Store(d.name, OutDeck)
 	}
+	return
 }
