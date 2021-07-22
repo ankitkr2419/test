@@ -72,6 +72,16 @@ const TargetComponent = (props) => {
     }
   }, [listTargetReducer, selectedTargetState, isLoginTypeAdmin]);
 
+  const incrementThreshold = (ele, index) => {
+    let val = ele.threshold ? ele.threshold + 1 : 1;
+    onThresholdChange(val, index);
+  };
+
+  const decrementThreshold = (ele, index) => {
+    let val = ele.threshold ? ele.threshold - 1 : 0;
+    onThresholdChange(val, index);
+  };
+
   const getTargetRows = useMemo(
     () =>
       selectedTargetState.map((ele, index) => (
@@ -133,11 +143,39 @@ const TargetComponent = (props) => {
             }
           />
 
-          {/**show remove target if target if available */}
           {isLoginTypeAdmin === true &&
             Object.keys(ele).length !== 0 &&
             ele?.selectedTarget?.label !== null && (
-              <button onClick={() => onRemoveTarget(ele)}>X</button>
+              <>
+                {/** -1 */}
+                <Button
+                  color="secondary"
+                  className="ml-2"
+                  style={{ width: "auto" }}
+                  onClick={() => decrementThreshold(ele, index)}
+                >
+                  -
+                </Button>
+                {/** +1 */}
+                <Button
+                  color="secondary"
+                  className="ml-2"
+                  style={{ width: "auto" }}
+                  onClick={() => incrementThreshold(ele, index)}
+                >
+                  +
+                </Button>
+
+                {/**show remove target if target is available */}
+                <Button
+                  color="secondary"
+                  className="ml-2"
+                  style={{ width: "auto" }}
+                  onClick={() => onRemoveTarget(ele)}
+                >
+                  X
+                </Button>
+              </>
             )}
         </TargetListItem>
       )),
