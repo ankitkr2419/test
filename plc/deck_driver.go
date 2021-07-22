@@ -46,6 +46,12 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// and syringe tips are inside of deck positions.
 	//
 
+	defer func(){
+		if motorNum == K9_Syringe_Module_LHRH{
+			d.setSyringeState()
+		}
+	}()
+
 	// if tip discard is in progress that means avoid moving module up when motor is K5
 	if d.getSyringeModuleState() == InDeck && // Syringe module has to be indeck
 		((motorNum == K5_Deck && !d.isTipDiscardInProgress()) || //Tip Discard Special handling
