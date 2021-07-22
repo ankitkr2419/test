@@ -163,5 +163,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tec/run", authenticate(runTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/get-all", authenticate(getAllTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
+	// report
+	router.HandleFunc("/email-report", emailReport(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	return
 }
