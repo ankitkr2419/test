@@ -171,8 +171,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			} else {
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
-			// TODO: Pass the complete Tip rather than just name for volume validations
-			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.ID)
+
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
@@ -213,7 +213,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
 
-			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID, currentTip)
+			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
@@ -252,9 +252,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				if err != nil {
 					return "", err
 				}
+				logger.Infoln("Current Tip -> ", currentTip)
 			case db.DiscardTip:
 				currentTip = db.TipsTubes{}
-
+				logger.Infoln("Tip Discarded from Syringe Module")
 			}
 		case db.TipDockingProcess:
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
