@@ -1,5 +1,5 @@
 CREATE TYPE magnet_operation_type  AS ENUM ('attach','detach');
-CREATE TYPE magnet_operation_subtype AS ENUM ('lysis', 'wash', 'illusion','full_detach', 'semi_detach');
+CREATE TYPE magnet_operation_subtype AS ENUM ('lysis', 'wash', 'elusion','full_detach', 'semi_detach');
 
 
 CREATE TABLE IF NOT EXISTS attach_detach(
