@@ -1,11 +1,12 @@
 package service
 
 import (
-	"mylab/cpagent/responses"
-	"net/http"
-
+	"encoding/json"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
+	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
+	"net/http"
 )
 
 func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
@@ -20,7 +21,7 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error(responses.PreviousRunInProgressError)
 			return
 		}
-	
+
 		deps.PlcDeck[deck].SetRunInProgress()
 		defer deps.PlcDeck[deck].ResetRunInProgress()
 
@@ -33,5 +34,91 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.PIDCalibrationSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PIDCalibrationSuccess})
+	})
+}
+
+func shakerHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		// TODO: Logging this API
+		vars := mux.Vars(req)
+		deck := vars["deck"]
+		var err error
+
+		var shObj db.Shaker
+		err = json.NewDecoder(req.Body).Decode(&shObj)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.ShakingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ShakingDecodeError.Error()})
+			return
+		}
+
+		valid, respBytes := validate(shObj)
+		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		if deps.PlcDeck[deck].IsRunInProgress() {
+			logger.WithField("err", err.Error()).Error(responses.PreviousRunInProgressError)
+			return
+		}
+
+		deps.PlcDeck[deck].SetRunInProgress()
+		defer deps.PlcDeck[deck].ResetRunInProgress()
+
+		go deps.PlcDeck[deck].Shaking(shObj)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ShakingError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ShakingError.Error(), Deck: deck})
+			return
+		}
+
+		logger.Infoln(responses.ShakingSuccess)
+		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: responses.ShakingSuccess})
+	})
+}
+
+func heaterHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		// TODO: Logging this API
+		vars := mux.Vars(req)
+		deck := vars["deck"]
+		var err error
+
+		var hObj db.Heating
+		err = json.NewDecoder(req.Body).Decode(&hObj)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.HeatingDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.HeatingDecodeError.Error()})
+			return
+		}
+
+		valid, respBytes := validate(hObj)
+		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		if deps.PlcDeck[deck].IsRunInProgress() {
+			logger.WithField("err", err.Error()).Error(responses.PreviousRunInProgressError)
+			return
+		}
+
+		deps.PlcDeck[deck].SetRunInProgress()
+		defer deps.PlcDeck[deck].ResetRunInProgress()
+
+		go deps.PlcDeck[deck].Heating(hObj)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.HeatingError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.HeatingError.Error(), Deck: deck})
+			return
+		}
+
+		logger.Infoln(responses.HeatingSuccess)
+		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: responses.HeatingSuccess})
 	})
 }
