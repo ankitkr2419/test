@@ -69,6 +69,12 @@ const (
 	minimumUVLightOnTime int64 = 2 * 60
 )
 
+// here we are hardcoding the shaker no in future this is to be fetched dynamically.
+// 3 is the value that needs to be passed for heating both the shakers.
+const(
+	shaker = uint16(3)
+)
+
 // Special Speeds
 const (
 	homingFastSpeed     = uint16(2000)

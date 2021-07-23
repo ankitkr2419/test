@@ -21,14 +21,11 @@ import (
 9. Let the shaker run at the specified rpm1 till the time1 duration is completed.
 10. After this run the shaker with rpm 2 till the time1 duration is completed if rpm 2
 	is specified.
-11. After all this process is done switch the shaker and the heater off.
+11. After all this process is done switch the shaker and the heater off(Called in defer)
 */
 func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err error) {
 
-	var shakerNo = 3
-
 	var motorNum = K8_Shaker
-
 	var results []byte
 
 	// 1. validate that rpm 1 is definately set and futher
@@ -84,14 +81,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		return "", err
 	}
 
-	// 3 set shaker selection register
-	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][220], uint16(shakerNo))
-	if err != nil {
-		logger.Errorln("error in setting shaker selection : ", err)
-		return "", err
-	}
-	logger.Infof("selected shaker %v", results)
-
 	// 4 set shaker register with rpm 1
 	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM1))
 	if err != nil {
@@ -125,6 +114,11 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		logger.Infoln("switched on heater")
 		d.setHeaterInProgress()
 	}
+
+	// Step 11:  Switch Off Heater & Shaker (Call in defer)
+	defer d.switchOffHeater()
+	defer d.switchOffShaker()
+
 
 	// 7. Else if not follow up then just start the heater and then start the shaker.
 	// 8. If withTemp is false then proceed with the normal flow by starting the shaker.
@@ -182,19 +176,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			logger.Errorln("err adding delay: ", err)
 			return "", err
 		}
-	}
-
-	// 11. After all this process is done switch the shaker and the heater off.
-	//switch off both shaker and heater
-	response, err = d.switchOffHeater()
-	if err != nil {
-		logger.Errorln("err in switching off heater---> error:  ", err)
-		return "", err
-	}
-	response, err = d.switchOffShaker()
-	if err != nil {
-		logger.Errorln("error in switching shaker off -----> error: ", err)
-		return "", err
 	}
 
 	return "SUCCESS", nil
