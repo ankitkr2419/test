@@ -232,6 +232,18 @@ ConsumableDistance:
     name: "magnet_back_step_2"
     distance: 40
     description: "This field sets the backward distance for the magnet second step Detach"
+  - id: 610
+    name: "lysis"
+    distance: 60
+    description: "This is how much magnet travels down for lysis attachment"
+  - id: 611
+    name: "wash"
+    distance: 65
+    description: "This is how much magnet travels down for wash attachment"
+  - id: 612
+    name: "elusion"
+    distance: 70
+    description: "This is how much magnet travels down for elusion attachment"
   - id: 1001
     name: "syringe_module_a_lh_zero"
     distance: 0
