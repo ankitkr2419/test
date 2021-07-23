@@ -26,7 +26,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 
 			time.Sleep(2 * time.Second)
 			if !d.IsMachineHomed() {
-				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+				d.ExitCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 				time.Sleep(5 * time.Second)
 				response, err = d.Homing()
 			}
