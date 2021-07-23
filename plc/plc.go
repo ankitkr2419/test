@@ -109,7 +109,7 @@ type Compact32Driver interface {
 }
 
 type Extraction interface {
-	AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
+	AspireDispense(ad db.AspireDispense, cartridgeID int64) (response string, err error)
 	AttachDetach(ad db.AttachDetach) (response string, err error)
 	DiscardBoxCleanup() (response string, err error)
 	RestoreDeck() (response string, err error)

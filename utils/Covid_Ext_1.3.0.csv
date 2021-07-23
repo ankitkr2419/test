@@ -40,7 +40,7 @@ DUMMY,Add/Edit recipe Details Below,,,,,,,,,,,,,,,
 RECIPE,Covid Extraction,Covid Extrcation Test Only,00:30:00,FALSE,,,,,,,,,,,,
 DUMMY,,,,,,,,,,,,,,,,
 DUMMY,Add/Edit labware below,,,,,,,,,,,,,,,
-POSITION,1,1,,3,,4,5,1,6,,,,,,,
+POSITION,8,8,,3,,4,5,1,6,,,,,,,
 DUMMY,,,,,,,,,,,,,,,,
 DUMMY,Add/Edit recipe Processes below,Below Row is so that csv updator doesn't need to go up to see the row fields,,,,,,,,,,,,,,
 DUMMY,AspireDispense,"category[WW, WS,SW,DD,DS,SD,DW,WD] 

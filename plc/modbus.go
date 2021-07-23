@@ -132,8 +132,8 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			210: uint16(0x10D2), // Shaker Temperature present value LH (R)
 			212: uint16(0x10D4), // Pulses Executed (R)
 			214: uint16(0x10D6), // Heartbeat. PC=2, PLC=1, time=200ms (W/R)
-			216: uint16(0x10D8), // Shaker RPM present value (R)
-			218: uint16(0x10DA), // Shaker RPM set value (Note 1) (W)
+			216: uint16(0x10D8), // Shaker Pulses present value (R)
+			218: uint16(0x10DA), // Shaker Pulses set value (Note 1) (W)
 			220: uint16(0x10DC), // Shaker selection (Note 2) (W)
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
@@ -164,8 +164,8 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			210: uint16(0x10D2), // Shaker Temperature present value LH (R)
 			212: uint16(0x10D4), // Pulses Executed (R)
 			214: uint16(0x10D6), // Heartbeat. PC=2, PLC=1, time=200ms (W/R)
-			216: uint16(0x10D8), // Shaker RPM present value (R)
-			218: uint16(0x10DA), // Shaker RPM set value (Note 1) (W)
+			216: uint16(0x10D8), // Shaker Pulses present value (R)
+			218: uint16(0x10DA), // Shaker Pulses set value (Note 1) (W)
 			220: uint16(0x10DC), // Shaker selection (Note 2) (W)
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
@@ -186,14 +186,9 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 	},
 	/*
 	   ***Note 1: Shaker RPM***
-	   1 = 500 RPM
-	   2 = 600 RPM
-	   3 = 700 RPM
-	   4 = 800 RPM
-	   5 = 900 RPM
-	   6 = 1000 RPM
-	   7 = 1100 RPM
-	   8 = 1200 RPM
+	   1 = 500 RPM  = 6500 Pulses
+	   2 = 800 RPM  = 10500 Pulses
+	   3 = 1100 RPM = 14500 Pulses
 
 	   ***Note 2: Shaker selection***
 	   1 = LH shaker ON
