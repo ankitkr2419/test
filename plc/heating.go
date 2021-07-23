@@ -81,6 +81,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		logger.Errorln("error in switching heater on ", err)
 		return "", err
 	}
+	logger.Infoln("heating with temperature", ht.Temperature, "started")
 
 	// Step 9:  Switch heater OFF (Called in defer)
 	defer d.switchOffHeater()
@@ -126,6 +127,8 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		logger.Errorln("error in adding delay ", err.Error())
 		return
 	}
+
+	logger.Infoln("heating with temperature", ht.Temperature, "completed")
 
 	return
 }

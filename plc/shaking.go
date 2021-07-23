@@ -135,6 +135,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		logger.Errorln("err in switching on shaker---> error: ", err)
 		return "", err
 	}
+	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "started")
 
 	d.setShakerInProgress()
 	defer d.resetShakerInProgress()
@@ -168,6 +169,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			fmt.Printf("err in switching on shaker---> error: %v\n ", err)
 			return "", err
 		}
+		logger.Infoln("shaking with rpm 2", shakerData.RPM2, "started")
+
 
 		//wait for time 2 duration
 		delay.DelayTime = shakerData.Time2
@@ -176,6 +179,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			logger.Errorln("err adding delay: ", err)
 			return "", err
 		}
+		logger.Infoln("shaking with rpm 2", shakerData.RPM2, "completed")
+
 	}
 
 	return "SUCCESS", nil
