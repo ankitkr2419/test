@@ -110,7 +110,7 @@ type Compact32Driver interface {
 }
 
 type Extraction interface {
-	AspireDispense(ad db.AspireDispense, cartridgeID, tipID int64) (response string, err error)
+	AspireDispense(ad db.AspireDispense, cartridgeID int64) (response string, err error)
 	AttachDetach(ad db.AttachDetach) (response string, err error)
 	DiscardBoxCleanup() (response string, err error)
 	RestoreDeck() (response string, err error)
@@ -123,7 +123,7 @@ type Extraction interface {
 	Resume() (response string, err error)
 	Pause() (response string, err error)
 	Abort() (response string, err error)
-	Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsTubes) (response string, err error)
+	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
 	Shaking(shakerData db.Shaker) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 	SetRunInProgress()

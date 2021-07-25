@@ -34,6 +34,7 @@ type ConsumableDistance struct {
 func (s *pgStore) InsertConsumableDistance(ctx context.Context, consumabledistances []ConsumableDistance) (err error) {
 	stmt := makeConsumableQuery(consumabledistances)
 
+	logger.Debugln("Consumables Query: ", stmt)
 	_, err = s.db.Exec(
 		stmt,
 	)
