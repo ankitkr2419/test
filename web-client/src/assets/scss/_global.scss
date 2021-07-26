@@ -39,7 +39,7 @@ body {
   .text-default {
     width: rem(192px);
     position: absolute;
-    top: rem(-16px);
+    top: rem(-14px);
     right: 0;
     line-height: rem(14px);
     @include fade(hide);
@@ -58,7 +58,7 @@ body {
     color: red;
     width: rem(192px);
     position: absolute;
-    top: rem(-16px);
+    top: rem(-14px);
     right: 0;
     line-height: rem(14px);
     @include fade(hide);

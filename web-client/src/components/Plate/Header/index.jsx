@@ -10,7 +10,7 @@ import { EXPERIMENT_STATUS } from "appConstants";
 const StyledSubHeader = styled.div`
   background-color: #f2f2f2;
   height: 68px;
-  padding: 10px 16px 10px 76px;
+  padding: 8px 32px;
   color: #707070;
 
   h6 {
@@ -19,7 +19,7 @@ const StyledSubHeader = styled.div`
   }
 `;
 
-const SubHeader = (props) => {
+const SubHeader = props => {
   const {
     progressStatus,
     progress,
@@ -28,7 +28,7 @@ const SubHeader = (props) => {
     experimentTemplate,
     experimentStatus,
     experimentDetails,
-    temperatureData,
+    temperatureData
   } = props;
 
   let lidTemperature = 0;
@@ -78,8 +78,8 @@ const SubHeader = (props) => {
   };
 
   return (
-    <StyledSubHeader className="plate-subheader d-flex flex-column">
-      <div className="d-flex align-items-center mb-auto">
+    <StyledSubHeader className="plate-subheader d-flex flex-column justify-content-center">
+      <div className="d-flex align-items-center">
         <Text Tag="h6" className="text-capitalize mb-0 mr-auto">
           {templateName}
         </Text>
@@ -123,7 +123,7 @@ const SubHeader = (props) => {
             </div>
           ) : (
             experimentStatus !== EXPERIMENT_STATUS.stopped && (
-              <Text className="font-weight-bold">
+              <Text className="font-weight-bold mb-0">
                 Homing is in Progress...
               </Text>
             )
@@ -149,9 +149,9 @@ const SubHeader = (props) => {
 SubHeader.propTypes = {
   experimentTemplate: PropTypes.shape({
     templateId: PropTypes.string,
-    templateName: PropTypes.string,
+    templateName: PropTypes.string
   }).isRequired,
-  isExperimentSucceeded: PropTypes.bool,
+  isExperimentSucceeded: PropTypes.bool
 };
 
 export default SubHeader;

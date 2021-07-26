@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 const options = {
   legend: {
-    display: false,
+    display: false
   },
   scales: {
     xAxes: [
@@ -16,7 +16,7 @@ const options = {
           labelString: "Time (minutes)",
           fontSize: 15,
           fontStyle: "bold",
-          padding: 10,
+          padding: 10
         },
         offset: true,
         type: "linear",
@@ -26,9 +26,9 @@ const options = {
           suggestedMin: 0,
           min: 0,
           fontSize: 15,
-          fontStyle: "bold",
-        },
-      },
+          fontStyle: "bold"
+        }
+      }
     ],
     yAxes: [
       {
@@ -37,18 +37,18 @@ const options = {
           labelString: "Temperature (°C)",
           fontSize: 15,
           fontStyle: "bold",
-          padding: 10,
+          padding: 10
         },
         ticks: {
           fontSize: 15,
-          fontStyle: "bold",
-        },
-      },
-    ],
-  },
+          fontStyle: "bold"
+        }
+      }
+    ]
+  }
 };
 
-const TemperatureGraphContainer = (props) => {
+const TemperatureGraphContainer = props => {
   // Extracting temperature graph data, Which is populated from websocket
   const temperatureChartData = useSelector(getTemperatureChartData);
   // console.log("temperatureChartData: ", temperatureChartData);
@@ -60,12 +60,12 @@ const TemperatureGraphContainer = (props) => {
 };
 
 const GraphCard = styled.div`
-  width: 830px;
-  height: 280px;
+  width: 960px;
+  height: 326px;
   background: #ffffff 0% 0% no-repeat padding-box;
   border: 1px solid #707070;
   padding: 8px;
-  margin: 0 0 32px 0;
+  margin: 0 0 16px 0;
 `;
 
 export default React.memo(TemperatureGraphContainer);
