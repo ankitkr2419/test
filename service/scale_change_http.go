@@ -24,21 +24,32 @@ func updateScaleHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		expId, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidExperimentID.Error()})
+
 			return
 		}
+
 		var t Scale
 		err = json.NewDecoder(req.Body).Decode(&t)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
 			logger.WithField("err", err.Error()).Error("Error while decoding scale data")
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ScaleDecodeError.Error()})
+
+			return
+		}
+
+		if t.XAxisMin == 0 || t.XAxisMax == 0 || t.XAxisMin > t.XAxisMax || t.YAxisMin > t.YAxisMax {
+			logger.WithField("err", "INVALID AXIS").Error("Error invalid scale range")
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidScaleRange.Error()})
+
 			return
 		}
 
 		e, err := deps.Store.ShowExperiment(req.Context(), expId)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ExperimentFetchError.Error()})
+
 			return
 		}
 
@@ -46,13 +57,16 @@ func updateScaleHandler(deps Dependencies) http.HandlerFunc {
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), expId)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConfTargetFetchError.Error()})
+
 			return
 		}
 
 		DBResult, err := deps.Store.GetResult(context.Background(), expId)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching result data")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ResultFetchError.Error()})
+
 			return
 		}
 		result := UpdateScale(DBResult, config.ActiveWells("activeWells"), targetDetails, e.RepeatCycle, t)
