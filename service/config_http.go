@@ -1,10 +1,10 @@
 package service
 
 import (
+	"encoding/json"
 	"mylab/cpagent/config"
 	"mylab/cpagent/responses"
 	"net/http"
-	"encoding/json"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -47,7 +47,7 @@ func updateConfigHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{ Msg: responses.UpdateConfigSuccess})
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UpdateConfigSuccess})
 	})
 }
 
@@ -56,6 +56,7 @@ func getConfigDetails() (c config.Conf, err error) {
 		RoomTemperature: int64(config.GetRoomTemp()),
 		HomingTime:      int64(config.GetHomingTime()),
 		NumHomingCycles: int64(config.GetNumHomingCycles()),
+		CycleTime:       int64(config.GetCycleTime()),
 	}
 
 	return
