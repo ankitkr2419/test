@@ -65,7 +65,7 @@ type Storer interface {
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
 	InsertTipsTubes(context.Context, []TipsTubes) error
 	InsertCartridge(context.Context, []Cartridge, []CartridgeWells) error
-	ListMotors() ([]Motor, error)
+	ListMotors(context.Context) ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
@@ -122,4 +122,10 @@ type Storer interface {
 	GetTargetByName(ctx context.Context, name string) (t Target, err error)
 	FinishTemplate(ctx context.Context, id uuid.UUID) (err error)
 	ListFinishedTemplates(ctx context.Context) (t []Template, err error)
+
+	UpdateMotor(ctx context.Context, motor Motor) (err error)
+	DeleteMotor(ctx context.Context, id int) (err error)
+	DeleteCartridge(ctx context.Context, id int64) (err error)
+
+	DeleteTipTube(ctx context.Context, id int64) (err error)
 }

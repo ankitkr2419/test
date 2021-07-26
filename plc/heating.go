@@ -103,6 +103,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		logger.Errorln("error in switching heater on ", err)
 		return "", err
 	}
+	defer d.switchOffHeater()
 	d.setHeaterInProgress()
 	defer d.resetHeaterInProgress()
 
@@ -146,13 +147,6 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		return
 	}
 
-	// Step 11:
-	// Switch Heater OFF
-	response, err = d.switchOffHeater()
-	if err != nil {
-		logger.Errorln("error in switching off heater ", err.Error())
-		return
-	}
 	return
 }
 
@@ -207,7 +201,8 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 				if !tempCheck {
 					goto skipToMonitor
 				}
-				if (setTemp1 >= temperature) && (setTemp2 >= temperature) {
+				// Play of 2 degrees as heater would not heat up that much sometimes
+				if (setTemp1 >= temperature - 2) && (setTemp2 >= temperature - 2) {
 					return "SUCCESS", nil
 				}
 
