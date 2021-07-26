@@ -6,6 +6,7 @@ import { validateThreshold } from "components/Target/targetHelper";
 import GraphLegend from "./GraphLegend";
 
 const GraphFilters = ({
+  className,
   targets,
   onThresholdChangeHandler,
   toggleGraphFilterActive,
