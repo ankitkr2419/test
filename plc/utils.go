@@ -85,7 +85,6 @@ const (
 // Magnet States
 const (
 	detached = iota
-	semiDetached
 	attached
 )
 
