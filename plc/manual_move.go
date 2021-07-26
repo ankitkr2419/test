@@ -11,7 +11,7 @@ const(
 	manualRamp = 100
 )
 
-func (d *Compact32Deck) ManualMovement(motorNum, direction, mm uint16) (response string, err error) {
+func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (response string, err error) {
 
 	if d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
@@ -24,7 +24,7 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, mm uint16) (response
 
 	deckAndMotor := DeckNumber{ Deck: d.name, Number: motorNum}
 
-	response, err = d.setupMotor(manualSpeed, mm * Motors[deckAndMotor]["steps"], manualRamp, direction, motorNum)
+	response, err = d.setupMotor(manualSpeed, uint16(mm * float32(Motors[deckAndMotor]["steps"])), manualRamp, direction, motorNum)
 	if err != nil {
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
