@@ -391,6 +391,15 @@ button:focus {
   }
 }
 
+.list-target-actions {
+  > .btn {
+    width: rem(32px);
+    height: rem(32px);
+    border-radius: rem(16px);
+    padding: rem(4px);
+  }
+}
+
 // Table
 .table {
   tbody tr {
