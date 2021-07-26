@@ -167,5 +167,6 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tec/run", authenticate(runTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/get-all", authenticate(getAllTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
+	router.HandleFunc("/rtpcr/graph-update-scale/{id}", authenticate(updateScaleHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	return
 }

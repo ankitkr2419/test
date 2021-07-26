@@ -350,6 +350,12 @@ func getTemperatureAndProgressDetails(deps Dependencies, experimentID uuid.UUID)
 		return
 	}
 
+	e, err := deps.Store.ShowExperiment(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+		return
+	}
+
 	if !plc.ExperimentRunning {
 		goto skipRtpcrProgress
 	}
@@ -374,6 +380,7 @@ func getTemperatureAndProgressDetails(deps Dependencies, experimentID uuid.UUID)
 				RecipeID:      currentExpTemplate.ID,
 				RemainingTime: plc.ConvertToHMS(remainingTime),
 				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
+				TotalCycles:   int64(e.RepeatCycle),
 			},
 		}
 	} else {
@@ -385,6 +392,7 @@ func getTemperatureAndProgressDetails(deps Dependencies, experimentID uuid.UUID)
 				RecipeID:      currentExpTemplate.ID,
 				RemainingTime: plc.ConvertToHMS(remainingTime),
 				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
+				TotalCycles:   int64(e.RepeatCycle),
 			},
 		}
 	}
