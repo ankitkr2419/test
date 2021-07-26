@@ -13,7 +13,7 @@ import (
 type Manual struct {
 	Deck      string  `json:"deck"`
 	MotorNum  int     `json:"motor_number"`
-	MM        float32 `json:"mm"`
+	Distance  float32 `json:"distance"`
 	Direction uint16  `json:"direction"`
 }
 
@@ -36,8 +36,8 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			err = fmt.Errorf("Select motor num in only in between 5-10")
 		case m.Direction != plc.TowardsSensor && m.Direction != plc.AgainstSensor:
 			err = fmt.Errorf("Select motor direction in only as 0 or 1")
-		case m.MM > 100:
-			err = fmt.Errorf("Consider pulses only less than or equal to 10000")
+		case m.Distance > 100 || m.Distance <= 0:
+			err = fmt.Errorf("Consider distance only less than or equal to 100 mm")
 		}
 
 		if err != nil {
@@ -45,7 +45,7 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), m.Direction, m.MM)
+		response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), m.Direction, m.Distance)
 
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: m.Deck})
