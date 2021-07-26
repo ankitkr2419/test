@@ -17,7 +17,12 @@ const (
 		cycle)
 		VALUES `
 
-	getExpTempQuery = `SELECT * FROM experiment_temperatures
+	getExpTempQuery = `SELECT experiment_id,
+		round(temp::numeric,2) as temp,
+		round(lid_temp::numeric,2) as lid_temp,
+		cycle,
+		created_at,
+		updated_at FROM experiment_temperatures
 		WHERE
 		experiment_id = $1
 		ORDER BY created_at ASC`
