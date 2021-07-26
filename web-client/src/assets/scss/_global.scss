@@ -70,6 +70,15 @@ body {
   }
 }
 
+.user-dropdown-wrapper {
+  .user {
+    color: $gray-44;
+    bottom: rem(-8px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
 // Page Content Class
 .template-content,
 .login-content,

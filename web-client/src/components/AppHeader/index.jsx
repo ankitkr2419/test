@@ -11,17 +11,17 @@ import {
   DropdownItem,
   Nav,
   NavItem,
-  NavLink,
+  NavLink
 } from "core-components";
 // import { getExperimentId } from 'selectors/experimentSelector';
 import {
   runExperiment,
-  stopExperiment,
+  stopExperiment
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
 import {
   getRunExperimentReducer,
-  getTimeNow,
+  getTimeNow
 } from "selectors/runExperimentSelector";
 import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
 // import PrintDataModal from './PrintDataModal';
@@ -31,14 +31,14 @@ import {
   EXPERIMENT_STATUS,
   MODAL_BTN,
   MODAL_MESSAGE,
-  ROUTES,
+  ROUTES
 } from "appConstants";
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
 import { useHistory } from "react-router";
 
-const AppHeader = (props) => {
+const AppHeader = props => {
   const {
     role,
     isUserLoggedIn,
@@ -50,7 +50,7 @@ const AppHeader = (props) => {
     token,
     deckName,
     app,
-    activeWidgetID,
+    activeWidgetID
   } = props;
 
   const dispatch = useDispatch();
@@ -75,8 +75,7 @@ const AppHeader = (props) => {
   const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
     useState(false);
 
-  const toggleUserDropdown = () =>
-    setUserDropdownOpen((prevState) => !prevState);
+  const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
 
   // useEffect(() => {
   // 	if (isExperimentRunning === true) {
@@ -121,11 +120,15 @@ const AppHeader = (props) => {
   };
 
   /** Hide plates tab if the user is admin */
-  const getIsNavLinkHidden = (pathname) => {
+  const getIsNavLinkHidden = pathname => {
     if (pathname !== ROUTES.calibration && isLoginTypeEngineer === true) {
       //hide all tabs for engineer other than Calibration
       return true;
-    } else if (pathname === ROUTES.calibration && isLoginTypeAdmin === false && isLoginTypeEngineer === false) {
+    } else if (
+      pathname === ROUTES.calibration &&
+      isLoginTypeAdmin === false &&
+      isLoginTypeEngineer === false
+    ) {
       //hide Calibration tab for operator/superwiser
       return true;
     } else if (pathname === "/plate" && isLoginTypeAdmin === true) {
@@ -134,7 +137,7 @@ const AppHeader = (props) => {
     return false;
   };
 
-  const getIsNavLinkDisabled = (pathname) => {
+  const getIsNavLinkDisabled = pathname => {
     switch (pathname) {
       /* Disable plate navlink if user logged in is admin. Admin just has access to templates
 		and activity log. Also user can't navigate to plate directly from templates route
@@ -180,7 +183,7 @@ const AppHeader = (props) => {
   };
 
   // Exit modal confirmation click handler
-  const confirmationClickHandler = (isConfirmed) => {
+  const confirmationClickHandler = isConfirmed => {
     setExitModalVisibility(false);
     if (isConfirmed) {
       if (isExperimentRunning === true) {
@@ -216,11 +219,11 @@ const AppHeader = (props) => {
       {isUserLoggedIn && app === APP_TYPE.RTPCR && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map(
-            (ele) =>
+            ele =>
               !getIsNavLinkHidden(ele.path) && (
                 <NavItem key={ele.name}>
                   <NavLink
-                    onClick={(event) => {
+                    onClick={event => {
                       onNavLinkClickHandler(event, ele.path);
                     }}
                     to={ele.path}
@@ -333,22 +336,25 @@ const AppHeader = (props) => {
                   </Button>
                 )}
               </div>
-              <Text size={10} className="text-capitalize my-auto">{role ? role : ''}</Text>
-              <Dropdown
-                isOpen={userDropdownOpen}
-                toggle={toggleUserDropdown}
-                className="ml-2"
-              >
-                <DropdownToggle icon name="user" size={32} />
-                <DropdownMenu right>
-                  <DropdownItem
-                    onClick={logoutClickHandler}
-                    disabled={isExperimentRunning}
-                  >
-                    Log out
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+              <div className="user-dropdown-wrapper position-relative ml-2">
+                <Text
+                  size={10}
+                  className="user position-absolute font-weight-bold text-capitalize my-auto"
+                >
+                  {role ? role : ""}
+                </Text>
+                <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
+                  <DropdownToggle icon name="user" size={32} />
+                  <DropdownMenu right>
+                    <DropdownItem
+                      onClick={logoutClickHandler}
+                      disabled={isExperimentRunning}
+                    >
+                      Log out
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
             </>
           )}
 
@@ -432,11 +438,11 @@ const AppHeader = (props) => {
 };
 
 AppHeader.propTypes = {
-  isUserLoggedIn: PropTypes.bool,
+  isUserLoggedIn: PropTypes.bool
 };
 
 AppHeader.defaultProps = {
-  isUserLoggedIn: false,
+  isUserLoggedIn: false
 };
 
 export default React.memo(AppHeader);
