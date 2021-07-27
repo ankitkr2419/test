@@ -76,7 +76,7 @@ const WellGraph = ({
       setThresholdError={setThresholdError}
       resetThresholdError={resetThresholdError}
     />
-    <GraphRange />
+    {/*<GraphRange />*/}
     {isThresholdInvalid && (
       <Text Tag="p" size={14} className="text-danger px-2 mb-1">
         Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}

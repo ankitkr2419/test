@@ -17,7 +17,8 @@ import WellGridHeader from "./Grid/WellGridHeader";
 import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
-import { Text } from "shared-components";
+import { ButtonIcon, Text } from "shared-components";
+import { saveToPdf } from "utils/pdfHelper";
 
 const Plate = (props) => {
   const {
@@ -111,6 +112,10 @@ const Plate = (props) => {
   // helper function to toggle the graphs
   const toggleTempGraphSwitch = (graphType) => {
     setShowTempGraph(graphType === "temperature");
+  };
+
+  const downloadClickHandler = (e) => {
+    saveToPdf(showTempGraph);
   };
 
   return (
@@ -207,7 +212,7 @@ const Plate = (props) => {
                   <Button
                     outline={showTempGraph}
                     color={!showTempGraph ? "primary" : "secondary"}
-                    className="mr-3"
+                    className="mr-3 Amplification"
                     onClick={() => toggleTempGraphSwitch("amplification")}
                   >
                     Amplification
@@ -215,10 +220,17 @@ const Plate = (props) => {
                   <Button
                     outline={!showTempGraph}
                     color={showTempGraph ? "primary" : "secondary"}
+                    className="Temperature"
                     onClick={() => toggleTempGraphSwitch("temperature")}
                   >
                     Temperature
                   </Button>
+                  <ButtonIcon
+                    name="download-1"
+                    size={28}
+                    className="bg-white border-secondary ml-auto downloadButton"
+                    onClick={downloadClickHandler}
+                  />
                 </div>
                 <ExperimentGraphContainer
                   showTempGraph={showTempGraph}
