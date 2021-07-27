@@ -79,12 +79,12 @@ func (m *DBMockStore) CreateStep(ctx context.Context, stg Step) (s Step, err err
 
 func (m *DBMockStore) UpdateStep(ctx context.Context, s Step) (err error) {
 	args := m.Called(ctx, s)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) DeleteStep(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ShowStep(ctx context.Context, id uuid.UUID) (s Step, err error) {
@@ -134,7 +134,7 @@ func (m *DBMockStore) InsertDyes(ctx context.Context, d []Dye) (dyes []Dye, err 
 
 func (m *DBMockStore) InsertTargets(ctx context.Context, t []Target) (err error) {
 	args := m.Called(ctx, t)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ListSamples(ctx context.Context) (s []Sample, err error) {
@@ -149,12 +149,12 @@ func (m *DBMockStore) CreateSample(ctx context.Context, stg Sample) (s Sample, e
 
 func (m *DBMockStore) UpdateSample(ctx context.Context, s Sample) (err error) {
 	args := m.Called(ctx, s)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) DeleteSample(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ShowSample(ctx context.Context, id uuid.UUID) (s Sample, err error) {
@@ -179,7 +179,7 @@ func (m *DBMockStore) UpsertWells(ctx context.Context, w []Well, id uuid.UUID) (
 
 func (m *DBMockStore) DeleteWell(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ShowWell(ctx context.Context, id uuid.UUID) (w Well, err error) {
@@ -189,7 +189,7 @@ func (m *DBMockStore) ShowWell(ctx context.Context, id uuid.UUID) (w Well, err e
 
 func (m *DBMockStore) UpdateStepCount(ctx context.Context) (err error) {
 	args := m.Called(ctx)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) GetWellTarget(ctx context.Context, i int32, wellID uuid.UUID) (w []WellTarget, err error) {
@@ -201,13 +201,15 @@ func (m *DBMockStore) UpsertWellTargets(ctx context.Context, w []WellTarget, id 
 	args := m.Called(ctx, w, id, s)
 	return args.Get(0).([]WellTarget), args.Error(1)
 }
+
 func (m *DBMockStore) ListStageSteps(ctx context.Context, id uuid.UUID) (s []StageStep, err error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).([]StageStep), args.Error(1)
 }
-func (m *DBMockStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID, i uint16) (err error) {
-	args := m.Called(ctx, t, id, i)
-	return args.Error(1)
+
+func (m *DBMockStore) UpdateStartTimeExperiments(ctx context.Context, t time.Time, experimentID uuid.UUID, repeatCycle uint16, state string) (err error) {
+	args := m.Called(ctx, t, experimentID, repeatCycle, state)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ListConfTargets(ctx context.Context, id uuid.UUID) (t []TargetDetails, err error) {
@@ -226,7 +228,7 @@ func (m *DBMockStore) ListWellTargets(ctx context.Context, wellID uuid.UUID) (w 
 
 func (m *DBMockStore) UpdateStopTimeExperiments(ctx context.Context, t time.Time, id uuid.UUID, s string) (err error) {
 	args := m.Called(ctx, t, id, s)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) GetResult(ctx context.Context, id uuid.UUID) (result []Result, err error) {
@@ -236,12 +238,12 @@ func (m *DBMockStore) GetResult(ctx context.Context, id uuid.UUID) (result []Res
 
 func (m *DBMockStore) UpdateColorWell(ctx context.Context, s string, id uuid.UUID) (err error) {
 	args := m.Called(ctx, s, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) PublishTemplate(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ListPublishedTemplates(ctx context.Context) (t []Template, err error) {
@@ -256,7 +258,7 @@ func (m *DBMockStore) ListExperimentTemperature(ctx context.Context, id uuid.UUI
 
 func (m *DBMockStore) InsertExperimentTemperature(ctx context.Context, r ExperimentTemperature) (err error) {
 	args := m.Called(ctx, r)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ListNotification(ctx context.Context, id uuid.UUID) (result []Notification, err error) {
@@ -266,22 +268,22 @@ func (m *DBMockStore) ListNotification(ctx context.Context, id uuid.UUID) (resul
 
 func (m *DBMockStore) InsertNotification(ctx context.Context, r Notification) (err error) {
 	args := m.Called(ctx, r)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) MarkNotificationasRead(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) InsertUser(ctx context.Context, u User) (err error) {
 	args := m.Called(ctx, u)
-	return args.Error(1)
+	return args.Error(0)
 }
 
-func (m *DBMockStore) ValidateUser(ctx context.Context, u User) (err error) {
+func (m *DBMockStore) ValidateUser(ctx context.Context, u User) (us User, err error) {
 	args := m.Called(ctx, u)
-	return args.Error(0)
+	return args.Get(0).(User), args.Error(1)
 }
 
 func (m *DBMockStore) CheckIfICTargetAdded(ctx context.Context, id uuid.UUID) (WarnResponse, error) {
@@ -291,12 +293,12 @@ func (m *DBMockStore) CheckIfICTargetAdded(ctx context.Context, id uuid.UUID) (W
 
 func (m *DBMockStore) InsertMotor(ctx context.Context, motors []Motor) (err error) {
 	args := m.Called(ctx, motors)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) InsertConsumableDistance(ctx context.Context, c []ConsumableDistance) (err error) {
 	args := m.Called(ctx, c)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err error) {
@@ -306,7 +308,7 @@ func (m *DBMockStore) InsertTipsTubes(ctx context.Context, t []TipsTubes) (err e
 
 func (m *DBMockStore) InsertCartridge(ctx context.Context, c []Cartridge, w []CartridgeWells) (err error) {
 	args := m.Called(ctx, c, w)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ListCartridges(ctx context.Context) (c []Cartridge, err error) {
@@ -324,8 +326,8 @@ func (m *DBMockStore) ListConsDistances() (c []ConsumableDistance, err error) {
 	return args.Get(0).([]ConsumableDistance), args.Error(1)
 }
 
-func (m *DBMockStore) ListMotors() (motor []Motor, err error) {
-	args := m.Called()
+func (m *DBMockStore) ListMotors(ctx context.Context) (motor []Motor, err error) {
+	args := m.Called(ctx)
 	return args.Get(0).([]Motor), args.Error(1)
 }
 
@@ -346,7 +348,7 @@ func (m *DBMockStore) CreatePiercing(ctx context.Context, p Piercing, id uuid.UU
 
 func (m *DBMockStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	args := m.Called(ctx, p)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ShowRecipe(ctx context.Context, id uuid.UUID) (p Recipe, err error) {
@@ -366,12 +368,12 @@ func (m *DBMockStore) CreateRecipe(ctx context.Context, p Recipe) (pi Recipe, er
 
 func (m *DBMockStore) DeleteRecipe(ctx context.Context, id uuid.UUID) (err error) {
 	args := m.Called(ctx, id)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) UpdateRecipe(ctx context.Context, p Recipe) (err error) {
 	args := m.Called(ctx, p)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *DBMockStore) ShowProcess(ctx context.Context, id uuid.UUID) (p Process, err error) {
@@ -563,6 +565,7 @@ func (m *DBMockStore) ListTipsTubesByPosition(ctx context.Context, ttype string,
 	args := m.Called(ctx, ttype, position)
 	return args.Get(0).([]TipsTubes), args.Error(1)
 }
+
 func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error) {
 	args := m.Called(ctx, activity, state, oprType, deck, description)
 	return args.Error(0)
@@ -571,4 +574,44 @@ func (m *DBMockStore) AddAuditLog(ctx context.Context, activity ActivityType, st
 func (m *DBMockStore) GetTargetByName(ctx context.Context, name string) (t Target, err error) {
 	args := m.Called(ctx, name)
 	return args.Get(0).(Target), args.Error(1)
+}
+
+func (m *DBMockStore) DeleteCartridge(ctx context.Context, id int64) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) DeleteMotor(ctx context.Context, id int) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) DeleteTipTube(ctx context.Context, id int64) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) FinishTemplate(ctx context.Context, id uuid.UUID) (err error) {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) ListFinishedTemplates(ctx context.Context) (t []Template, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Template), args.Error(1)
+}
+
+func (m *DBMockStore) UpdateEstimatedTime(ctx context.Context, id uuid.UUID, et int64) (err error) {
+	args := m.Called(ctx, id, et)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) UpdateMotor(ctx context.Context, motor Motor) (err error) {
+	args := m.Called(ctx, motor)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) UpdateUser(ctx context.Context, u User, oldName string) (err error) {
+	args := m.Called(ctx, u, oldName)
+	return args.Error(0)
 }
