@@ -8,6 +8,8 @@ var (
 	PreviousRunInProgressError = fmt.Errorf("previous run already in progress... wait or abort it")
 
 	PIDCalibrationError = fmt.Errorf("error doing pid calibration")
+	ShakingError = fmt.Errorf("error doing shaking")
+	HeatingError = fmt.Errorf("error doing heating")
 	ProcessesAbsentError = fmt.Errorf("no process present in the recipe")
 
 	InvalidOperationWebsocket = fmt.Errorf("invalid operation selected for websocket")

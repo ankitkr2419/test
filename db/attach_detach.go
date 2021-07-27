@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"strings"
 
 	"mylab/cpagent/responses"
 
@@ -14,7 +15,7 @@ import (
 type AttachDetach struct {
 	ID            uuid.UUID `db:"id" json:"id"`
 	Operation     string    `db:"operation" json:"operation"  validate:"required"`
-	OperationType string    `db:"operation_type" json:"operation_type"`
+	Height		  int64     `db:"height" json:"height"`
 	ProcessID     uuid.UUID `db:"process_id" json:"process_id"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
@@ -24,12 +25,12 @@ const (
 	getAttachDetachQuery    = `SELECT * FROM attach_detach where process_id = $1`
 	createAttachDetachQuery = `INSERT INTO attach_detach (
 		operation,
-		operation_type,
+		height,
 		process_id)
 		VALUES ($1, $2, $3) RETURNING id`
 	updateAttachDetachQuery = `UPDATE attach_detach SET (
 			operation,
-			operation_type,
+			height,
 			updated_at) = 
 			($1, $2, $3) WHERE process_id = $4`
 )
@@ -114,8 +115,8 @@ func (s *pgStore) createAttachDetach(ctx context.Context, tx *sql.Tx, ad AttachD
 
 	err = tx.QueryRow(
 		createAttachDetachQuery,
-		ad.Operation,
-		ad.OperationType,
+		strings.ToLower(ad.Operation),
+		ad.Height,
 		ad.ProcessID,
 	).Scan(&lastInsertID)
 
@@ -133,8 +134,8 @@ func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err e
 
 	result, err := s.db.Exec(
 		updateAttachDetachQuery,
-		a.Operation,
-		a.OperationType,
+		strings.ToLower(a.Operation),
+		a.Height,
 		time.Now(),
 		a.ProcessID,
 	)
