@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
+	logger "github.com/sirupsen/logrus"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -186,7 +188,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckSuccess() {
 
 	//first need to login to test logout
 	userLogin.Store(plc.DeckA, true)
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
@@ -207,7 +209,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckSuccess() {
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, "", map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
@@ -230,7 +232,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
 	//first need to login to test logout
 	userLogin.Store(plc.DeckA, true)
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
@@ -256,7 +258,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckDeleteFailure() {
 	//first need to login to test logout
 	userLogin.Store(plc.DeckA, true)
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 

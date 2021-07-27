@@ -84,9 +84,9 @@ func (suite *Compact32DriverTestSuite) TestConfigureRunStaging() {
 
 	p := plc.Stage{
 		Holding: []plc.Step{
-			plc.Step{65.3, 2.1, 5},
-			plc.Step{85.3, 2.2, 3},
-			plc.Step{95, 2, 5},
+			plc.Step{TargetTemp: 65.3, RampUpTemp: 2.1, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 85.3, RampUpTemp: 2.2, HoldTime: 3, DataCapture: false},
+			plc.Step{TargetTemp: 95, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
 		},
 	}
 
@@ -117,16 +117,16 @@ func (suite *Compact32DriverTestSuite) TestConfigureRunSuccess() {
 
 	p := plc.Stage{
 		Holding: []plc.Step{
-			plc.Step{65.3, 2.1, 5},
-			plc.Step{85.3, 2.2, 3},
-			plc.Step{95, 2, 5},
+			plc.Step{TargetTemp: 65.3, RampUpTemp: 2.1, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 85.3, RampUpTemp: 2.2, HoldTime: 3, DataCapture: false},
+			plc.Step{TargetTemp: 95, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
 		},
 		Cycle: []plc.Step{
-			plc.Step{55, 2, 5},
-			plc.Step{65, 2, 5},
-			plc.Step{75, 2, 5},
-			plc.Step{85, 2, 5},
-			plc.Step{95, 2, 5},
+			plc.Step{TargetTemp: 55, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 65, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 75, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 85, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 95, RampUpTemp: 2, HoldTime: 5, DataCapture: true},
 		},
 		CycleCount: 45,
 	}
@@ -192,7 +192,7 @@ func (suite *Compact32DriverTestSuite) TestMonitorCycleNotComplete() {
 	assert.Equal(suite.T(), float32(95.3), scan.LidTemp)
 
 	// Emissions should NOT be populated!
-	assert.Equal(suite.T(), scan.Wells[0], plc.Emissions{0, 0, 0, 0, 0, 0})
+	assert.Equal(suite.T(), scan.Wells[0], plc.Emissions{0, 0, 0, 0})
 }
 
 func (suite *Compact32DriverTestSuite) TestMonitorEmissionSuccess() {
@@ -236,5 +236,5 @@ func (suite *Compact32DriverTestSuite) TestMonitorEmissionSuccess() {
 	assert.Equal(suite.T(), float32(65.5), scan.Temp)
 	assert.Equal(suite.T(), float32(95.3), scan.LidTemp)
 
-	assert.Equal(suite.T(), scan.Wells[0], plc.Emissions{0, 2, 4, 6, 8, 10})
+	assert.Equal(suite.T(), scan.Wells[0], plc.Emissions{0, 2, 4, 6})
 }

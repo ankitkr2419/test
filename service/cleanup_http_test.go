@@ -25,7 +25,7 @@ func (suite *CleanupHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
 }
 
-func TestcleanupTestSuite(t *testing.T) {
+func TestCleanupTestSuite(t *testing.T) {
 	suite.Run(t, new(CleanupHandlerTestSuite))
 }
 

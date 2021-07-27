@@ -1,7 +1,7 @@
 package plc
 
 import (
-	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
 	"net/http"
 	"net/http/httptest"
