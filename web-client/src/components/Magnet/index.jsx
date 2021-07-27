@@ -44,7 +44,7 @@ const MagnetComponent = (props) => {
   useEffect(() => {
     if (editReducerData?.operation) {
       setIsAttach(isAttachFromAPI === "attach");
-      setHeight(editReducerData?.operation?.height);
+      setHeight(editReducerData.height);
     }
   }, [isAttachFromAPI]);
 
@@ -58,7 +58,7 @@ const MagnetComponent = (props) => {
   const handleHeightBlur = (event) => {
     if (event.target.value === "") {
       if (editReducerData?.operation) {
-        setHeight(editReducerData?.operation?.height);
+        setHeight(editReducerData.height);
       } else {
         setHeight(0);
       }
@@ -66,7 +66,7 @@ const MagnetComponent = (props) => {
   };
 
   const saveBtnHandler = () => {
-    const heightIsInt = height.match(/^[0-9]\d*$/);
+    const heightIsInt = `${height}`.match(/^[0-9]\d*$/);
     if (isAttach && !heightIsInt) {
       toast.error("Please enter valid height");
       return;
