@@ -1,9 +1,9 @@
 package plc
 
 import (
-	"mylab/cpagent/db"
-
+	"context"
 	"github.com/stretchr/testify/mock"
+	"mylab/cpagent/db"
 )
 
 type PLCMockStore struct {
@@ -104,8 +104,8 @@ func (p *PLCMockStore) Homing() (response string, err error) {
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
-	args := p.Called(motorNum, direction, pulses)
+func (p *PLCMockStore) ManualMovement(motorNum, direction uint16, mm float32) (response string, err error) {
+	args := p.Called(motorNum, direction, mm)
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -144,6 +144,16 @@ func (p *PLCMockStore) TipOperation(to db.TipOperation) (response string, err er
 	return args.Get(0).(string), args.Error(1)
 }
 
+func (p *PLCMockStore) PIDCalibration(ctx context.Context) (err error) {
+	args := p.Called(ctx)
+	return args.Error(0)
+}
+
+func (p *PLCMockStore) SwitchOffAllCoils() (response string, err error) {
+	args := p.Called()
+	return args.Get(0).(string), args.Error(1)
+}
+
 func (m *MockCompact32Driver) WriteSingleRegister(address, value uint16) (results []byte, err error) {
 	args := m.Called(address, value)
 	return args.Get(0).([]byte), args.Error(1)
@@ -177,6 +187,7 @@ func (m *MockCompact32Driver) ReadSingleRegister(address uint16) (value uint16, 
 	args := m.Called(address)
 	return args.Get(0).(uint16), args.Error(1)
 }
+
 func (m *MockCompact32Driver) WriteSingleCoil(address, value uint16) (err error) {
 	args := m.Called(address, value)
 	return args.Error(0)
