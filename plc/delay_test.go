@@ -79,9 +79,9 @@ func testWebSocket(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case msg := <-testdeck.WsMsgCh:
-			fmt.Println(msg)
+			logger.Infoln(msg)
 		case err := <-testdeck.WsErrCh:
-			fmt.Println(err.Error())
+			logger.Errorln(err)
 		}
 	}
 }

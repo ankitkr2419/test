@@ -150,7 +150,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	}
 	response, err = d.AddDelay(delay, false)
 	if err != nil {
-		fmt.Println("err adding delay: ", err)
+		logger.Errorln("error adding delay: ", err)
 		return "", err
 	}
 
@@ -170,7 +170,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		//switch on the shaker
 		response, err = d.switchOnShaker()
 		if err != nil {
-			fmt.Printf("err in switching on shaker---> error: %v\n ", err)
+			logger.Errorln("err in switching on shaker :", err)
 			return "", err
 		}
 		logger.Infoln("shaking with rpm 2", shakerData.RPM2, "started")

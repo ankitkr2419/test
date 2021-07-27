@@ -285,7 +285,7 @@ func selectAllConsDistances(store db.Storer) (err error) {
 			Calibs[deckAndNumber] = cd.Distance
 		}
 	}
-	fmt.Println("Calibs:--->", Calibs)
+	logger.Infoln("Calibs:--->", Calibs)
 	return
 }
 

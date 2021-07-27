@@ -309,7 +309,7 @@ func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 	// Switch on Motor
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
 	if err != nil {
-		fmt.Println("err starting motor: ", err)
+		logger.Errorln("error starting motor: ", err)
 		return "", err
 	}
 	logger.Infoln("Switched on the shaker motor--> for deck ", d.name)
@@ -317,7 +317,7 @@ func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 	// Switch on Shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
 	if err != nil {
-		fmt.Println("err starting shaker: ", err)
+		logger.Errorln("error starting shaker: ", err)
 		return "", err
 	}
 	logger.Infoln("Switched on the shaker--> for deck ", d.name)
@@ -330,7 +330,7 @@ func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 	// Switch off Motor
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
 	if err != nil {
-		fmt.Println("err offing motor: ", err)
+		logger.Errorln("error offing motor: ", err)
 		return "", err
 	}
 	logger.Infoln("Switched off the shaker motor--> for deck ", d.name)
@@ -338,10 +338,10 @@ func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 	// Switch off shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
-		fmt.Println("err Switching off the shaker: ", err)
+		logger.Errorln("error Switching off the shaker: ", err)
 		return "", err
 	}
-	fmt.Println("Switched off the shaker--> for deck ", d.name)
+	logger.Infoln("Switched off the shaker--> for deck ", d.name)
 	return "SUCCESS", nil
 
 }
@@ -366,13 +366,13 @@ func (d *Compact32Deck) switchOnHeater() (response string, err error) {
 
 	logger.Infoln("result from shaker selection", result)
 
-	// Switch off Heater
+	// Switch on Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], ON)
 	if err != nil {
-		fmt.Println("err Switching on the heater: ", err)
+		logger.Errorln("error Switching on the heater: ", err)
 		return "", err
 	}
-	fmt.Println("Switched on the heater--> for deck ", d.name)
+	logger.Infoln("Switched on the heater--> for deck ", d.name)
 
 	return "SUCCESS", nil
 }
@@ -449,7 +449,7 @@ func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 		return "", err
 	}
 
-	fmt.Printf("Read D212AddressBytesUint16. res : %+v \n", results)
+	logger.Infof("Read D212AddressBytesUint16. res : %+v \n", results)
 	if len(results) > 0 {
 		executedPulses.Store(d.name, binary.BigEndian.Uint16(results))
 	} else {

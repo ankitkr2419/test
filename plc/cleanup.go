@@ -30,11 +30,11 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	fmt.Println("Deck is moving to discard_box_open_position")
+	logger.Infoln("Deck is moving to discard_box_open_position")
 
 	if position, ok = consDistance["discard_box_open_position"]; !ok {
 		err = fmt.Errorf("discard_box_open_position doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -45,11 +45,11 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	// We know concrete direction here, its REV
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], REV, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was an issue moving deck REV to discard_box_open_position. Error: %v", err)
 	}
 
-	fmt.Println("Moved Deck to Cleanup Discard Box Successfully")
+	logger.Infoln("Moved Deck to Cleanup Discard Box Successfully")
 
 	return "DISCARD BOX CLEANUP SUCCESS", nil
 }
@@ -74,11 +74,11 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	fmt.Println("Deck is moving to deck_start")
+	logger.Infoln("Deck is moving to deck_start")
 
 	if position, ok = consDistance["deck_start"]; !ok {
 		err = fmt.Errorf("deck_start doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -89,11 +89,11 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	// We know concrete direction here, its FWD
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], FWD, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was an issue moving deck FWD to deck_start. Error: %v", err)
 	}
 
-	fmt.Println("Moved Deck back to homing position")
+	logger.Infoln("Moved Deck back to homing position")
 
 	return "DECK RESTORED SUCCESS", nil
 }

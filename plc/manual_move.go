@@ -190,7 +190,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	// Switch off shaker
 	response, err = d.switchOffShaker()
 	if err != nil {
-		fmt.Println("From deck ", d.name, err)
+		logger.Errorln("From deck ", d.name, err)
 		return "", err
 	}
 

@@ -144,7 +144,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 	for {
 		select {
 		case n := <-stopMonitor:
-			fmt.Printf("stop the montoring %v", n)
+			logger.Infoln("stop the montoring :", n)
 			return "SUCCESS", nil
 
 		default:

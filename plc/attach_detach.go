@@ -2,6 +2,7 @@ package plc
 
 import (
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
 )
@@ -13,14 +14,14 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
 	case "attach":
 		response, err = d.attach(ad.Height)
 		if err != nil {
-			fmt.Printf("error in attach process %v \n", err.Error())
+			logger.Errorln("error in attach process :", err)
 		}
 		magnetState.Store(d.name, attached)
 		return
 	case "detach":
 		response, err = d.detach()
 		if err != nil {
-			fmt.Printf("error in attach process %v \n", err.Error())
+			logger.Errorln("error in detach process: ", err)
 		}
 		return
 	}
@@ -49,7 +50,7 @@ func (d *Compact32Deck) detach() (response string, err error) {
 	// position to move the magnet backward for step 1.
 	if magnetBackPosition, ok = consDistance["magnet_backward_step_1"]; !ok {
 		err = fmt.Errorf("magnet_backward_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -71,7 +72,7 @@ func (d *Compact32Deck) detach() (response string, err error) {
 	// position to move the magnet Upward for step 2.
 	if magnetUpPosition, ok = consDistance["magnet_up_step_1"]; !ok {
 		err = fmt.Errorf("magnet_up_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
@@ -92,7 +93,7 @@ func (d *Compact32Deck) detach() (response string, err error) {
 	// position to move the magnet backward for step 2.
 	if magnetBackPosition, ok = consDistance["magnet_back_step_2"]; !ok {
 		err = fmt.Errorf("magnet_back_step_2 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for backward step 2
@@ -142,7 +143,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	// We are using shaker_tube to maintain consistency
 	if deckPosition, ok = consDistance["shaker_tube"]; !ok {
 		err = fmt.Errorf("shaker_tube doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -154,7 +155,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 
 	response, err = d.setupMotor(Motors[deckAndNumber]["fast"], pulses, Motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
 	if err != nil {
-		fmt.Printf("error in moving deck to required position")
+		logger.Errorln("error in moving deck to required position")
 		return
 	}
 
@@ -162,7 +163,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	// position to move the magnet downward for step 1.
 	if magnetDownFirstPosition, ok = consDistance["magnet_down_step_1"]; !ok {
 		err = fmt.Errorf("magnet_down_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet down step 1
@@ -182,7 +183,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	// position to move the magnet forward for step 1.
 	if magnetFwdFirstPosition, ok = consDistance["magnet_forward_step_1"]; !ok {
 		err = fmt.Errorf("magnet_forward_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
@@ -222,7 +223,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	// position to move the magnet Downward for step 2.
 	if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2"]; !ok {
 		err = fmt.Errorf("magnet_forward_step_2 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1

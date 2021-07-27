@@ -111,7 +111,7 @@ func (suite *UserHandlerTestSuite) TestValidateUsersWhenUserAuthInsertFailed() {
 	suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, errors.New("failed to insert user auth"))
 
 	body, _ := json.Marshal(testUser)
-	fmt.Print(string(body))
+	logger.Infoln(string(body))
 	recorder := makeHTTPCall(
 		http.MethodPost,
 		"/login",
