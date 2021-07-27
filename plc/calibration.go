@@ -1,12 +1,12 @@
 package plc
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"mylab/cpagent/db"
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
-	"context"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -20,8 +20,8 @@ import (
 
 func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// TODO: Logging this PLC Operation
-	defer func(){
-		if err != nil{
+	defer func() {
+		if err != nil {
 			logger.Errorln(err)
 			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 		}
@@ -29,7 +29,6 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 
 	d.setPIDCalibrationInProgress()
 	defer d.resetPIDCalibrationInProgress()
-
 
 	// Stop Heater
 	_, err = d.switchOffHeater()
@@ -42,10 +41,9 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(config.GetPIDTemp()*10))
 	if err != nil {
 		logger.Errorln("Error failed to write temperature: ", err)
-		return  err
+		return err
 	}
 	logger.Infoln("result from temperature set ", result, config.GetPIDTemp())
-
 
 	// Start Heater
 	_, err = d.switchOnHeater()

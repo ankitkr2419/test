@@ -56,7 +56,6 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	// Calculation below considers syringe module as glued with tip
 	// And we go to piercingHeight
 
-
 	// Get Deck Base
 	if deckBase, ok = consDistance["deck_base"]; !ok {
 		err = fmt.Errorf("deck_base doesn't exist for consumables")
@@ -134,7 +133,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			}
 
 			// piercingHeight will be always less than current position
-			distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase - pickUpTip) 
+			distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase - pickUpTip)
 
 			piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 		}

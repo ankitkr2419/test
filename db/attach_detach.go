@@ -3,8 +3,8 @@ package db
 import (
 	"context"
 	"database/sql"
-	"time"
 	"strings"
+	"time"
 
 	"mylab/cpagent/responses"
 
@@ -13,12 +13,12 @@ import (
 )
 
 type AttachDetach struct {
-	ID            uuid.UUID `db:"id" json:"id"`
-	Operation     string    `db:"operation" json:"operation"  validate:"required"`
-	Height		  int64     `db:"height" json:"height"`
-	ProcessID     uuid.UUID `db:"process_id" json:"process_id"`
-	CreatedAt     time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
+	ID        uuid.UUID `db:"id" json:"id"`
+	Operation string    `db:"operation" json:"operation"  validate:"required"`
+	Height    int64     `db:"height" json:"height"`
+	ProcessID uuid.UUID `db:"process_id" json:"process_id"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 const (

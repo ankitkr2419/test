@@ -84,7 +84,7 @@ func (p *PLCMockStore) SetCurrentProcessNumber(step int64) {
 	return
 }
 
-func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error){
+func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error) {
 	args := p.Called(recipe, processes)
 	return args.Error(0)
 }

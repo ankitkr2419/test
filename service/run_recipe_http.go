@@ -150,7 +150,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return
 			}
 			setRunNext(deck)
-			
+
 			// To handle continuous run timer
 			deps.PlcDeck[deck].ResetPaused()
 

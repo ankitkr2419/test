@@ -179,7 +179,7 @@ func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err erro
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err
 		}
-		
+
 		if !d.isMachineInPausedState() {
 			// when resumed go again to timer start
 			return "Resumed", nil

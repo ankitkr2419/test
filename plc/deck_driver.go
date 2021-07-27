@@ -46,8 +46,8 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// and syringe tips are inside of deck positions.
 	//
 
-	defer func(){
-		if motorNum == K9_Syringe_Module_LHRH{
+	defer func() {
+		if motorNum == K9_Syringe_Module_LHRH {
 			d.setSyringeState()
 		}
 	}()
@@ -335,7 +335,6 @@ func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 	}
 	logger.Infoln("Switched off the shaker motor--> for deck ", d.name)
 
-			
 	// Switch off shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
@@ -462,7 +461,6 @@ func (d *Compact32Deck) readExecutedPulses() (response string, err error) {
 	return "D212 Reading SUCESS", nil
 }
 
-
 func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
 	var tempErr error
 	_, tempErr = d.switchOffMotor()
@@ -471,28 +469,28 @@ func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
 	}
 	_, tempErr = d.switchOffShaker()
 	if tempErr != nil {
-		err = fmt.Errorf("%v\n%v",err, tempErr)
+		err = fmt.Errorf("%v\n%v", err, tempErr)
 	}
 	_, tempErr = d.switchOffHeater()
 	if tempErr != nil {
-		err = fmt.Errorf("%v\n%v",err, tempErr)
+		err = fmt.Errorf("%v\n%v", err, tempErr)
 	}
 	_, tempErr = d.switchOffUVLight()
 	if tempErr != nil {
-		err = fmt.Errorf("%v\n%v",err, tempErr)
+		err = fmt.Errorf("%v\n%v", err, tempErr)
 	}
 
 	// reset completion bit
 	tempErr = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
 	if tempErr != nil {
 		logger.Errorln("error writing Completion Off : ", tempErr, d.name)
-		err = fmt.Errorf("%v\n%v",err, tempErr)
+		err = fmt.Errorf("%v\n%v", err, tempErr)
 	}
-	
+
 	_, tempErr = d.switchOffPIDCalibration()
 	if tempErr != nil {
 		logger.Errorln("error switching off pid calibration bits: ", tempErr, d.name)
-		err = fmt.Errorf("%v\n%v",err, tempErr)
+		err = fmt.Errorf("%v\n%v", err, tempErr)
 	}
 	return "SUCCESS", err
 }

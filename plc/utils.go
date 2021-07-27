@@ -71,7 +71,7 @@ const (
 
 // here we are hardcoding the shaker no in future this is to be fetched dynamically.
 // 3 is the value that needs to be passed for heating both the shakers.
-const(
+const (
 	shaker = uint16(3)
 )
 
@@ -106,8 +106,10 @@ var wrotePulses, executedPulses, aborted, paused, homed sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
 var pIDCalibrationInProgress sync.Map
+
 // tipHeight is the Height of tip from syringe's base
 var tipHeight map[string]float64
+
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
 var homingPercent, currentProcess sync.Map

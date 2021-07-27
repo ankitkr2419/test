@@ -8,7 +8,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const(
+const (
 	rpmToPulses = 13.3
 )
 
@@ -87,7 +87,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	// 4 set shaker register with rpm 1
 	// NOTE: Calculation of RPM involves multiplying it with 13.3
-	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM1) * rpmToPulses))
+	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM1)*rpmToPulses))
 	if err != nil {
 		logger.Errorln("error in setting rpm 1 value : ", err)
 		return "", err
@@ -123,7 +123,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	// Step 11:  Switch Off Heater & Shaker (Call in defer)
 	defer d.switchOffHeater()
 	defer d.switchOffShaker()
-
 
 	// 7. Else if not follow up then just start the heater and then start the shaker.
 	// 8. If withTemp is false then proceed with the normal flow by starting the shaker.
@@ -163,7 +162,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	if shakerData.RPM2 != 0 {
 
 		//set shaker register with rpm 2
-		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM2) * rpmToPulses))
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM2)*rpmToPulses))
 		if err != nil {
 			logger.Errorln("error in setting rpm 2 value : ", err)
 			return "", err
@@ -175,7 +174,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			return "", err
 		}
 		logger.Infoln("shaking with rpm 2", shakerData.RPM2, "started")
-
 
 		//wait for time 2 duration
 		delay.DelayTime = shakerData.Time2

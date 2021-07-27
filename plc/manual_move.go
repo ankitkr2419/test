@@ -6,9 +6,9 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const(
+const (
 	manualSpeed = 2000
-	manualRamp = 100
+	manualRamp  = 100
 )
 
 func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (response string, err error) {
@@ -22,9 +22,9 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	deckAndMotor := DeckNumber{ Deck: d.name, Number: motorNum}
+	deckAndMotor := DeckNumber{Deck: d.name, Number: motorNum}
 
-	response, err = d.setupMotor(manualSpeed, uint16(mm * float32(Motors[deckAndMotor]["steps"])), manualRamp, direction, motorNum)
+	response, err = d.setupMotor(manualSpeed, uint16(mm*float32(Motors[deckAndMotor]["steps"])), manualRamp, direction, motorNum)
 	if err != nil {
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
@@ -256,4 +256,3 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 
 	return "RESUMED with pulses.", nil
 }
-

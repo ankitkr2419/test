@@ -305,8 +305,8 @@ skipAspireCycles:
 	//
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-	distanceToTravel = (Positions[deckAndMotor] + tipHeight[d.name] + aboveDeck) - deckBase 
-	
+	distanceToTravel = (Positions[deckAndMotor] + tipHeight[d.name] + aboveDeck) - deckBase
+
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
@@ -429,7 +429,7 @@ skipDispenseCycles:
 	if err != nil {
 		return
 	}
-	
+
 	return "ASPIRE and DISPENSE was successful", nil
 }
 
@@ -462,7 +462,7 @@ func (d *Compact32Deck) SyringeRestPosition() (response string, err error) {
 	return
 }
 
-func (d *Compact32Deck) setSyringeState() (err error){
+func (d *Compact32Deck) setSyringeState() (err error) {
 	var deckBase, indeckSafe float64
 	var ok bool
 
