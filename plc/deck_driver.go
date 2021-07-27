@@ -31,7 +31,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	//
 
 	if d.getMagnetState() != detached && motorNum == K5_Deck {
-		response, err = d.fullDetach()
+		response, err = d.detach()
 		if err != nil {
 			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue Detaching Magnet before moving the deck. Error: %v", err)
@@ -45,6 +45,12 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	// or Magnet RevFwd or Magnet UpDown motor as suggested by @Sanket
 	// and syringe tips are inside of deck positions.
 	//
+
+	defer func(){
+		if motorNum == K9_Syringe_Module_LHRH{
+			d.setSyringeState()
+		}
+	}()
 
 	// if tip discard is in progress that means avoid moving module up when motor is K5
 	if d.getSyringeModuleState() == InDeck && // Syringe module has to be indeck
@@ -291,6 +297,23 @@ func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 
 func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 
+	d.switchOffShaker()
+
+	//select shaker
+	_, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][222], shaker)
+	if err != nil {
+		logger.Errorln("Error failed to write temperature: ", err)
+		return "", err
+	}
+
+	// Switch on Motor
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	if err != nil {
+		fmt.Println("err starting motor: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched on the shaker motor--> for deck ", d.name)
+
 	// Switch on Shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
 	if err != nil {
@@ -304,6 +327,15 @@ func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 
 func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 
+	// Switch off Motor
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
+	if err != nil {
+		fmt.Println("err offing motor: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched off the shaker motor--> for deck ", d.name)
+
+			
 	// Switch off shaker
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], OFF)
 	if err != nil {
@@ -316,6 +348,24 @@ func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 }
 
 func (d *Compact32Deck) switchOnHeater() (response string, err error) {
+
+	d.switchOffHeater()
+
+	//validation for shaker
+	if shaker > 3 || shaker < 1 {
+		err = fmt.Errorf("%v not in valid range of 1-3", shaker)
+		logger.Errorln("Error shaker number not in valid range: ", err)
+		return "", err
+	}
+
+	//select shaker for heating
+	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][222], shaker)
+	if err != nil {
+		logger.Errorln("Error failed to write temperature: ", err)
+		return "", err
+	}
+
+	logger.Infoln("result from shaker selection", result)
 
 	// Switch off Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], ON)
@@ -439,6 +489,10 @@ func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
 		err = fmt.Errorf("%v\n%v",err, tempErr)
 	}
 	
-	// TODO: Switch off PID Calibration
+	_, tempErr = d.switchOffPIDCalibration()
+	if tempErr != nil {
+		logger.Errorln("error switching off pid calibration bits: ", tempErr, d.name)
+		err = fmt.Errorf("%v\n%v",err, tempErr)
+	}
 	return "SUCCESS", err
 }

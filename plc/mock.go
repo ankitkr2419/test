@@ -49,8 +49,8 @@ func (p *PLCMockStore) ResetRunInProgress() {
 	return
 }
 
-func (p *PLCMockStore) AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {
-	args := p.Called(ad, cartridgeID, tipType)
+func (p *PLCMockStore) AspireDispense(ad db.AspireDispense, cartridgeID int64) (response string, err error) {
+	args := p.Called(ad, cartridgeID)
 	return args.Get(0).(string), args.Error(1)
 }
 

@@ -99,6 +99,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 	deps.PlcDeck[deck].SetRunInProgress()
 	defer deps.PlcDeck[deck].ResetRunInProgress()
+	defer deps.PlcDeck[deck].SetCurrentProcessNumber(int64(-2))
 
 	// Get the recipe
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
@@ -170,8 +171,8 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			} else {
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
-			// TODO: Pass the complete Tip rather than just name for volume validations
-			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.Name)
+
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
@@ -251,9 +252,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				if err != nil {
 					return "", err
 				}
+				logger.Infoln("Current Tip -> ", currentTip)
 			case db.DiscardTip:
 				currentTip = db.TipsTubes{}
-
+				logger.Infoln("Tip Discarded from Syringe Module")
 			}
 		case db.TipDockingProcess:
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
