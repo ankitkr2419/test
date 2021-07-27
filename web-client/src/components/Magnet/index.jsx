@@ -3,8 +3,14 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 
-import { Card, CardBody, Radio } from "core-components";
-import { ButtonIcon, ButtonBar, ImageIcon, Icon } from "shared-components";
+import { Card, CardBody, Radio, Input } from "core-components";
+import {
+  ButtonIcon,
+  ButtonBar,
+  ImageIcon,
+  Icon,
+  Text,
+} from "shared-components";
 
 import magnetProcessGraphics from "assets/images/magnet-process-graphics.svg";
 import TopHeading from "shared-components/TopHeading";
@@ -12,11 +18,13 @@ import { PageBody, MagnetBox, TopContent } from "./Style";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { Redirect, useHistory } from "react-router";
 import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
+import { toast } from "react-toastify";
 
 const MagnetComponent = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [isAttach, setIsAttach] = useState(false);
+  const [height, setHeight] = useState(0);
 
   const editReducer = useSelector((state) => state.editProcessReducer);
   const editReducerData = editReducer.toJS();
@@ -36,6 +44,7 @@ const MagnetComponent = (props) => {
   useEffect(() => {
     if (editReducerData?.operation) {
       setIsAttach(isAttachFromAPI === "attach");
+      setHeight(editReducerData?.operation?.height);
     }
   }, [isAttachFromAPI]);
 
@@ -46,10 +55,26 @@ const MagnetComponent = (props) => {
     }
   }, [errorInAPICall, isAttachFromAPI]);
 
+  const handleHeightBlur = (event) => {
+    if (event.target.value === "") {
+      if (editReducerData?.operation) {
+        setHeight(editReducerData?.operation?.height);
+      } else {
+        setHeight(0);
+      }
+    }
+  };
+
   const saveBtnHandler = () => {
+    const heightIsInt = height.match(/^[0-9]\d*$/);
+    if (isAttach && !heightIsInt) {
+      toast.error("Please enter valid height");
+      return;
+    }
     const body = {
       operation: isAttach ? "attach" : "detach",
       operation_type: "wash", // will change in future
+      height: parseInt(height),
     };
     const requestBody = {
       body: body,
@@ -88,6 +113,22 @@ const MagnetComponent = (props) => {
               <CardBody className="p-5 overflow-hidden">
                 <div className="process-box mx-auto py-5 d-flex">
                   <div className="magnet-large-btn d-flex justify-content-around align-items-center flex-column">
+                    <div style={{ width: "8rem" }} className="d-flex">
+                      <Text className={isAttach ? "" : "text-muted"}>
+                        Height
+                      </Text>
+                      <Input
+                        type="number"
+                        name="height"
+                        id="height"
+                        placeholder=""
+                        value={height}
+                        disabled={!isAttach}
+                        onChange={(e) => setHeight(e.target.value)}
+                        onBlur={(e) => handleHeightBlur(e)}
+                      />
+                    </div>
+
                     <Radio
                       id="attach"
                       name="magnet-action"
