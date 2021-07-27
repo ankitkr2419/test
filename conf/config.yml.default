@@ -34,3 +34,7 @@ num_homing_cycles: 5
 room_temp: 27
 # cycle time 
 cycle_time: 15
+# pid temp 
+pid_temp: 71
+# pid time
+pid_time: 30

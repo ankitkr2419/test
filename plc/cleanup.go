@@ -174,15 +174,17 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err error) {
 	for {
 		time.Sleep(time.Millisecond * 300)
-		if !d.isMachineInPausedState() {
-			// when resumed go again to timer start
-			return "Resumed", nil
-		}
 
 		if d.isMachineInAbortedState() {
 			err = fmt.Errorf("Operation was Aborted!")
 			return "", err
 		}
+		
+		if !d.isMachineInPausedState() {
+			// when resumed go again to timer start
+			return "Resumed", nil
+		}
+
 	}
 }
 

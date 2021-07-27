@@ -89,13 +89,13 @@ var (
 
 	SimulatorReservedDelayError = fmt.Errorf("error delay is allowed only for simulator")
 
-	StepRunNotInProgressError  = fmt.Errorf("error step run is not in progress")
-	StepRunAborted             = fmt.Errorf("error step run aborted")
-	DeckNameInvalid            = fmt.Errorf("error deck name is invalid")
-	PleaseHomeMachineError     = fmt.Errorf("error please home the machine first")
-	PickupPositionInvalid      = fmt.Errorf("position is invalid to pickup the tip")
-	WebsocketMarshallingError  = fmt.Errorf("error in marshalling web socket data")
-	UrlArgumentInvalid         = fmt.Errorf("error invalid url argument")
+	StepRunNotInProgressError = fmt.Errorf("error step run is not in progress")
+	StepRunAborted            = fmt.Errorf("error step run aborted")
+	DeckNameInvalid           = fmt.Errorf("error deck name is invalid")
+	PleaseHomeMachineError    = fmt.Errorf("error please home the machine first")
+	PickupPositionInvalid     = fmt.Errorf("position is invalid to pickup the tip")
+	WebsocketMarshallingError = fmt.Errorf("error in marshalling web socket data")
+	UrlArgumentInvalid        = fmt.Errorf("error invalid url argument")
 
 	//user
 	UserDecodeError           = fmt.Errorf("error decoding user record")
@@ -105,8 +105,8 @@ var (
 	UserTokenEncodeError      = fmt.Errorf("error in fetching token")
 	UserMarshallingError      = fmt.Errorf("error in marshalling token")
 	UserInsertError           = fmt.Errorf("error in inserting user")
-	UserUpdateError			  = fmt.Errorf("error in updating user")
-	UsernameBlankError		  = fmt.Errorf("error username is blank")
+	UserUpdateError           = fmt.Errorf("error in updating user")
+	UsernameBlankError        = fmt.Errorf("error username is blank")
 	UserAuthDataFetchError    = fmt.Errorf("error in authenticating user")
 	UserAuthDataDeleteError   = fmt.Errorf("error in deleting authenticated user data")
 	UserTokenApplicationError = fmt.Errorf("error in token application type")
@@ -149,9 +149,16 @@ var (
 	RTPCRResetError  = fmt.Errorf("error in reseting rt-pcr")
 
 	// Configs
-	ConfigDataDecodeError = fmt.Errorf("Error while decoding config data")
-	ConfigDataFetchError = fmt.Errorf("Error fetching Config data")
-	ConfigDataUpdateError = fmt.Errorf("Error Updating Config data")
+	ConfigDataDecodeError = fmt.Errorf("error while decoding config data")
+	ConfigDataFetchError  = fmt.Errorf("error fetching Config data")
+	ConfigDataUpdateError = fmt.Errorf("error Updating Config data")
+
+	InvalidExperimentID  = fmt.Errorf("Invalid experiment id")
+	ScaleDecodeError     = fmt.Errorf("error while decoding scale data")
+	InvalidScaleRange    = fmt.Errorf("error invalid scale range")
+	ExperimentFetchError = fmt.Errorf("error fetching experiment data")
+	ConfTargetFetchError = fmt.Errorf("error fetching target data")
+	ResultFetchError     = fmt.Errorf("error fetching result data")
 )
 
 // Special errors which are in []byte format

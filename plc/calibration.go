@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/config"
 	"mylab/cpagent/responses"
 	"context"
 
@@ -29,6 +30,23 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	d.setPIDCalibrationInProgress()
 	defer d.resetPIDCalibrationInProgress()
 
+
+	// Stop Heater
+	_, err = d.switchOffHeater()
+	if err != nil {
+		return
+	}
+
+	// Set Temperature
+	//Set Temperature for heater
+	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(config.GetPIDTemp()*10))
+	if err != nil {
+		logger.Errorln("Error failed to write temperature: ", err)
+		return  err
+	}
+	logger.Infoln("result from temperature set ", result, config.GetPIDTemp())
+
+
 	// Start Heater
 	_, err = d.switchOnHeater()
 	if err != nil {
@@ -47,8 +65,8 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	defer d.switchOffPIDCalibration()
 	logger.Infoln(responses.PIDCalibrationStarted)
 
-	// Sleep for 15 minutes
-	_, err = d.AddDelay(db.Delay{DelayTime: 15 * 60}, false)
+	// Sleep for given minutes
+	_, err = d.AddDelay(db.Delay{DelayTime: config.GetPIDMinutes() * 60}, false)
 	if err != nil {
 		return
 	}

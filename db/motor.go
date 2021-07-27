@@ -23,6 +23,16 @@ const (
 	insertMotorQuery2 = `ON CONFLICT DO NOTHING;`
 	selectMotorsQuery = `SELECT * 
 						FROM motors`
+	updateMotorQuery = `update motors set
+		deck = $1,
+		number = $2,
+		name = $3,
+		ramp = $4,
+		steps = $5,
+		slow = $6,
+		fast = $7, 
+		updated_at = $8 where id = $9 `
+	deleteMotorQuery = `DELETE FROM motors WHERE id = $1`
 )
 
 type Motor struct {
@@ -51,6 +61,44 @@ func (s *pgStore) InsertMotor(ctx context.Context, motors []Motor) (err error) {
 	return
 }
 
+func (s *pgStore) ListMotors(ctx context.Context) (motors []Motor, err error) {
+	err = s.db.Select(&motors, selectMotorsQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching motors data")
+		return
+	}
+
+	return
+}
+
+func (s *pgStore) UpdateMotor(ctx context.Context, motor Motor) (err error) {
+	_, err = s.db.Exec(updateMotorQuery, motor.Deck,
+		motor.Number,
+		motor.Name,
+		motor.Ramp,
+		motor.Steps,
+		motor.Slow,
+		motor.Fast,
+		time.Now(),
+		motor.ID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error updating Motor data")
+		return
+	}
+	return
+
+}
+
+func (s *pgStore) DeleteMotor(ctx context.Context, id int) (err error) {
+	_, err = s.db.Exec(deleteMotorQuery, id)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error deleting Motor data")
+		return
+	}
+
+	return
+}
+
 func makeMotorQuery(motor []Motor) string {
 	values := make([]string, 0, len(motor))
 
@@ -64,13 +112,4 @@ func makeMotorQuery(motor []Motor) string {
 	stmt += insertMotorQuery2
 
 	return stmt
-}
-
-func (s *pgStore) ListMotors() (motor []Motor, err error) {
-	err = s.db.Select(&motor, selectMotorsQuery)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing motor details")
-		return
-	}
-	return
 }
