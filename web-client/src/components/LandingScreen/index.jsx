@@ -25,7 +25,7 @@ const LandingScreenComponent = (props) => {
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
   const { isLoading, isLoggedInForHoming, tokenForHoming } = loginReducerData;
-  let { isLoggedIn, error } = activeDeckObj ? activeDeckObj : {};
+  let { isLoggedIn, error, isEngineer } = activeDeckObj ? activeDeckObj : {};
 
   const {
     showHomingModal,
@@ -74,7 +74,7 @@ const LandingScreenComponent = (props) => {
    * if user logged in, go to recipeListing page
    */
   if (isLoggedIn && !error) {
-    return <Redirect to={`/${ROUTES.recipeListing}`} />;
+    return <Redirect to={isEngineer ? ROUTES.calibration : `/${ROUTES.recipeListing}`} />;
   }
 
   return (
