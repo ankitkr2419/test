@@ -45,7 +45,7 @@ func (suite *Compact32DriverTestSuite) TestHeartBeatPLCFailure() {
 	go suite.C32.HeartBeat()
 	err := <-suite.C32.ExitCh
 
-	assert.Equal(suite.T(), err, errors.New("PLC Dead"))
+	assert.Equal(suite.T(), err, errors.New("PCR Dead"))
 	suite.driver.AssertExpectations(suite.T())
 }
 
