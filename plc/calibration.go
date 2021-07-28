@@ -2,7 +2,6 @@ package plc
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
@@ -70,22 +69,6 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	}
 
 	logger.Infoln(responses.PIDCalibrationSuccess)
-
-	// send success ws data
-	successWsData := WSData{
-		Progress: 100,
-		Deck:     d.name,
-		Status:   "SUCCESS_PIDCALIBRATION",
-		OperationDetails: OperationDetails{
-			Message: fmt.Sprintf("successfully completed PID calibration for deck %v", d.name),
-		},
-	}
-	wsData, err := json.Marshal(successWsData)
-	if err != nil {
-		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		return
-	}
-	d.WsMsgCh <- fmt.Sprintf("success_pidCalibration_%v", string(wsData))
 
 	return
 }
