@@ -45,7 +45,7 @@ func (suite *Compact32DriverTestSuite) TestHeartBeatPLCFailure() {
 	go suite.C32.HeartBeat()
 	err := <-suite.C32.ExitCh
 
-	assert.Equal(suite.T(), err, errors.New("PLC is not responding and maybe dead. Abort!!"))
+	assert.Equal(suite.T(), err, errors.New("PLC Dead"))
 	suite.driver.AssertExpectations(suite.T())
 }
 
@@ -185,11 +185,10 @@ func (suite *Compact32DriverTestSuite) TestMonitorCycleNotComplete() {
 		nil,
 	)
 
-	scan, _ := suite.C32.Monitor(uint16(1))
+	scan, _ := suite.C32.Monitor(uint16(0))
 
-	assert.Equal(suite.T(), uint16(32), scan.Cycle)
-	assert.Equal(suite.T(), float32(65.5), scan.Temp)
-	assert.Equal(suite.T(), float32(95.3), scan.LidTemp)
+	assert.Equal(suite.T(), plc.CurrentCycleTemperature, scan.Temp)
+	assert.Equal(suite.T(), plc.CurrentLidTemp, scan.LidTemp)
 
 	// Emissions should NOT be populated!
 	assert.Equal(suite.T(), scan.Wells[0], plc.Emissions{0, 0, 0, 0})

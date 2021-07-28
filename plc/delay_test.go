@@ -50,7 +50,7 @@ func (suite *DelayTestSuite) SetupTest() {
 	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{testTTObj}, nil)
 	suite.dbMock.On("ListCartridges", mock.Anything).Return(testCartridgeObj, nil)
 	suite.dbMock.On("ListCartridgeWells").Return(testCartridgeWellsObj, nil)
-	suite.dbMock.On("ListMotors").Return(testMotorObj, nil)
+	suite.dbMock.On("ListMotors", mock.Anything).Return(testMotorObj, nil)
 	suite.dbMock.On("ListConsDistances").Return(testConsDistanceObj, nil)
 
 	LoadAllPLCFuncs(suite.dbMock)

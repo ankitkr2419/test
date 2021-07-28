@@ -5,6 +5,7 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"reflect"
 	"testing"
@@ -89,7 +90,7 @@ func (suite *AuthenticateTestSuite) TestAuthenticateSuccess() {
 func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleSuccess() {
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
 	deps := Dependencies{Store: suite.dbMock}
-	token, _ := EncodeToken("test", testUUID, "admin", plc.DeckA, Application, map[string]string{})
+	token, _ := EncodeToken("test", testUUID, "admin", plc.DeckA, Combined, map[string]string{})
 	recorder := makeHTTPCallWithHeader(
 		http.MethodPost,
 		"/test/authenticate",
@@ -105,7 +106,7 @@ func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleSuccess() {
 func (suite *AuthenticateTestSuite) TestAuthenticateWithDeckSuccess() {
 
 	deps := Dependencies{Store: suite.dbMock}
-	token, _ := EncodeToken("test", testUUID, "admin", plc.DeckA, Application, map[string]string{})
+	token, _ := EncodeToken("test", testUUID, "admin", plc.DeckA, Combined, map[string]string{})
 	recorder := makeHTTPCallWithHeader(
 		http.MethodPost,
 		"/test/authenticate/{deck:[A-B]?}",
@@ -134,9 +135,9 @@ func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleFailed() {
 		map[string]string{"Authorization": "Bearer " + token},
 		authenticate(testHandlerFunc(deps), deps, admin),
 	)
-	output := fmt.Sprintf(`{"err":"error invalid role"}`)
+
 	assert.Equal(suite.T(), http.StatusUnauthorized, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), responses.UserTokenAppNotExistError.Error(), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 
 }

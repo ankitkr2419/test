@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	// "github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,12 +17,19 @@ import (
 // functionality from testify - including assertion methods.
 type CleanupHandlerTestSuite struct {
 	suite.Suite
-
 	dbMock *db.DBMockStore
+	plcDeck map[string]plc.Extraction
 }
 
 func (suite *CleanupHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	driverA := &plc.PLCMockStore{}
+	driverB := &plc.PLCMockStore{}
+	suite.plcDeck = map[string]plc.Extraction{
+		plc.DeckA: driverA,
+		plc.DeckB: driverB,
+	}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
 func TestCleanupTestSuite(t *testing.T) {
@@ -33,12 +40,13 @@ func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupSuccess() {
 
 	deck := plc.DeckB
 	//TODO: On Mock return success
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("DiscardBoxCleanup").Return("Discard Box Cleanup Success", nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/discard-box/cleanup/{deck:[A-B]}",
 		"/discard-box/cleanup/"+deck,
 		"",
-		discardBoxCleanupHandler(Dependencies{Store: suite.dbMock}),
+		discardBoxCleanupHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
 	msg := MsgObj{Msg: responses.DiscardBoxMovedSuccess, Deck: deck}
@@ -54,12 +62,14 @@ func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupFailure() {
 
 	deck := plc.DeckB
 	//TODO: On Mock return error
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("DiscardBoxCleanup").Return("Discard Box Cleanup Failure", responses.DiscardBoxMoveError)
+
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/discard-box/cleanup/{deck:[A-B]}",
 		"/discard-box/cleanup/"+deck,
 		"",
-		discardBoxCleanupHandler(Dependencies{Store: suite.dbMock}),
+		discardBoxCleanupHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
 	err := ErrObj{Err: responses.DiscardBoxMoveError.Error(), Deck: deck}
@@ -75,12 +85,13 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckSuccess() {
 
 	deck := plc.DeckB
 	//TODO: On Mock return success
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("RestoreDeck").Return("Restore Deck Success", nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/restore-deck/{deck:[A-B]}",
 		"/restore-deck/"+deck,
 		"",
-		restoreDeckHandler(Dependencies{Store: suite.dbMock}),
+		restoreDeckHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
 	msg := MsgObj{Msg: responses.RestoreDeckSuccess, Deck: deck}
@@ -97,11 +108,13 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckFailure() {
 	deck := plc.DeckB
 	//TODO: On Mock return error
 
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("RestoreDeck").Return("", responses.RestoreDeckError)
+
 	recorder := makeHTTPCall(http.MethodGet,
 		"/restore-deck/{deck:[A-B]}",
 		"/restore-deck/"+deck,
 		"",
-		restoreDeckHandler(Dependencies{Store: suite.dbMock}),
+		restoreDeckHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
 	err := ErrObj{Err: responses.RestoreDeckError.Error(), Deck: deck}
@@ -119,11 +132,13 @@ func (suite *CleanupHandlerTestSuite) TestUVCleanupSuccess() {
 	time := "01:20:00"
 	//TODO: On Mock return success
 
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("UVLight", time).Return("UV Success", nil).Maybe()
+
 	recorder := makeHTTPCall(http.MethodGet,
 		"/uv/{time}/{deck:[A-B]}",
 		"/uv/"+time+"/"+deck,
 		"",
-		uvLightHandler(Dependencies{Store: suite.dbMock}),
+		uvLightHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
 	msg := MsgObj{Msg: responses.UVCleanupProgress, Deck: deck}
