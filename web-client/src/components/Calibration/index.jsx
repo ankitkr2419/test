@@ -12,7 +12,12 @@ import {
 } from "core-components";
 import { Text } from "shared-components";
 
-import { getFormikInitialState } from "./helper";
+import {
+  isValueWithinRange,
+  formikInitialState,
+  validateAllFields,
+  getRequestBody,
+} from "./helper";
 import { useCallback } from "react";
 import { useFormik } from "formik";
 
@@ -20,32 +25,22 @@ const CalibrationComponent = (props) => {
   let { configs, saveBtnClickHandler } = props;
 
   const formik = useFormik({
-    initialValues: getFormikInitialState(),
+    initialValues: formikInitialState,
     enableReinitialize: true,
   });
 
   //store new data in local state
   useEffect(() => {
-    if (configs?.room_temperature) {
-      formik.setFieldValue(`roomTemperature.value`, configs.room_temperature);
-    }
-    if (configs?.homing_time) {
-      formik.setFieldValue(`homingTime.value`, configs.homing_time);
-    }
-    if (configs?.no_of_homing_cycles) {
-      formik.setFieldValue(
-        `noOfHomingCycles.value`,
-        configs.no_of_homing_cycles
-      );
-    }
-    if (configs?.cycle_time) {
-      formik.setFieldValue(`cycleTime.value`, configs.cycle_time);
-    }
-    if (configs?.pid_temperature) {
-      formik.setFieldValue(`pidTemperature.value`, configs.pid_temperature);
-    }
-    if (configs?.pid_minutes) {
-      formik.setFieldValue(`pidMinutes.value`, configs.pid_minutes);
+    if (configs) {
+      Object.keys(formik.values).map((element) => {
+        const { apiKey, name } = formik.values[element];
+        const newValue = configs[apiKey] ? configs[apiKey] : 0;
+        const validRange = isValueWithinRange(name, newValue);
+
+        // set formik fields
+        formik.setFieldValue(`${name}.isInvalid`, !validRange);
+        formik.setFieldValue(`${name}.value`, newValue);
+      });
     }
   }, [configs]);
 
@@ -53,65 +48,16 @@ const CalibrationComponent = (props) => {
   const onSubmit = (e) => {
     e.preventDefault();
 
-    const {
-      roomTemperature,
-      homingTime,
-      noOfHomingCycles,
-      cycleTime,
-      pidTemperature,
-      pidMinutes,
-    } = formik.values;
-
-    if (
-      roomTemperature.value !== null &&
-      homingTime.value !== null &&
-      noOfHomingCycles.value !== null &&
-      cycleTime.value !== null &&
-      pidTemperature !== null &&
-      pidMinutes !== null
-    ) {
-      saveBtnClickHandler({
-        roomTemperature: parseInt(roomTemperature.value),
-        homingTime: parseInt(homingTime.value),
-        noOfHomingCycles: parseInt(noOfHomingCycles.value),
-        cycleTime: parseInt(cycleTime.value),
-        pidTemperature: parseInt(pidTemperature.value),
-        pidMinutes: parseInt(pidMinutes.value),
-      });
+    if (validateAllFields(formik.values) === true) {
+      const requestBody = getRequestBody(formik.values);
+      saveBtnClickHandler(requestBody);
     }
   };
 
-  const handleBlurChange = useCallback((name, value, min, max) => {
-    if (!value || value < min || value > max) {
-      formik.setFieldValue(`${name}.isInvalid`, true);
-    }
+  const handleBlurChange = useCallback((name, value) => {
+    const validRange = isValueWithinRange(name, value);
+    formik.setFieldValue(`${name}.isInvalid`, !validRange);
   }, []);
-
-  const isBtnDisabled = useCallback(() => {
-    const {
-      roomTemperature,
-      homingTime,
-      noOfHomingCycles,
-      cycleTime,
-      pidTemperature,
-      pidMinutes,
-    } = formik.values;
-
-    return (
-      !roomTemperature.value ||
-      !homingTime.value ||
-      !noOfHomingCycles.value ||
-      !cycleTime.value ||
-      !pidTemperature.value ||
-      !pidMinutes.value ||
-      roomTemperature.isInvalid ||
-      homingTime.isInvalid ||
-      noOfHomingCycles.isInvalid ||
-      cycleTime.isInvalid ||
-      pidTemperature.isInvalid ||
-      pidMinutes.isInvalid
-    );
-  });
 
   return (
     <div className="calibration-content px-5">
@@ -123,6 +69,7 @@ const CalibrationComponent = (props) => {
                 const element = formik.values[key];
                 const { type, name, label, min, max, value, isInvalid } =
                   element;
+
                 return (
                   <Col md={6}>
                     <FormGroup>
@@ -140,12 +87,7 @@ const CalibrationComponent = (props) => {
                           );
                         }}
                         onBlur={(event) =>
-                          handleBlurChange(
-                            name,
-                            parseInt(event.target.value),
-                            min,
-                            max
-                          )
+                          handleBlurChange(name, event.target.value)
                         }
                         onFocus={() =>
                           formik.setFieldValue(`${name}.isInvalid`, false)
@@ -164,7 +106,10 @@ const CalibrationComponent = (props) => {
               })}
             </Row>
             <div className="text-right pt-4 pb-1 mb-3">
-              <Button color="primary" disabled={isBtnDisabled()}>
+              <Button
+                color="primary"
+                disabled={!validateAllFields(formik.values)}
+              >
                 Save
               </Button>
             </div>
