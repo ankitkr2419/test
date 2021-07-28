@@ -33,6 +33,8 @@ const CalibrationRtpcrContainer = () => {
       homing_time: configData.homingTime,
       no_of_homing_cycles: configData.noOfHomingCycles,
       cycle_time: configData.cycleTime,
+      pid_temperature: configData.pidTemperature,
+      pid_minutes: configData.pidMinutes,
     };
     dispatch(updateCalibrationInitiated({ token, data }));
   };

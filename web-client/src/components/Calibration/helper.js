@@ -1,50 +1,58 @@
-export const constants = {
-  ROOM_TEMPERATURE: {
-    min: 20,
-    max: 30,
-  },
-  HOMING_TIME: {
-    min: 16,
-    max: 30,
-  },
-  NO_OF_HOMING_CYCLE: {
-    min: 0,
-    max: 100,
-  },
-  CYCLE_TIME: {
-    min: 2,
-    max: 30,
-  },
-};
-
-export const isValidRoomTemp = (value) => {
-  return (
-    value !== null &&
-    value >= constants.ROOM_TEMPERATURE.min &&
-    value <= constants.ROOM_TEMPERATURE.max
-  );
-};
-
-export const isValidHomingTime = (value) => {
-  return (
-    value !== null &&
-    value >= constants.HOMING_TIME.min &&
-    value <= constants.HOMING_TIME.max
-  );
-};
-
-export const isValidNoOfHomingCycle = (value) => {
-  return (
-    value !== null &&
-    value >= constants.NO_OF_HOMING_CYCLE.min &&
-    value <= constants.NO_OF_HOMING_CYCLE.max
-  );
-};
-
-export const isValidCycleTime = (value) => {
-  return (
-    value !== null &&
-    value >= constants.CYCLE_TIME.min &&
-    value <= constants.CYCLE_TIME.max
-  );
+export const getFormikInitialState = () => {
+  return {
+    roomTemperature: {
+      type: "number",
+      name: "roomTemperature",
+      label: "Room Temperature",
+      value: null,
+      min: 20,
+      max: 30,
+      isInvalid: false,
+    },
+    homingTime: {
+      type: "number",
+      name: "homingTime",
+      label: "Homing Time",
+      min: 16,
+      max: 30,
+      value: null,
+      isInvalid: false,
+    },
+    noOfHomingCycles: {
+      type: "number",
+      name: "noOfHomingCycles",
+      label: "No. Of Homing Cycles",
+      min: 0,
+      max: 100,
+      value: null,
+      isInvalid: false,
+    },
+    cycleTime: {
+      type: "number",
+      name: "cycleTime",
+      label: "Cycle Time",
+      min: 2,
+      max: 30,
+      value: null,
+      isInvalid: false,
+    },
+    pidTemperature: {
+      type: "number",
+      name: "pidTemperature",
+      label: "PID Temperature",
+      min: 50,
+      max: 75,
+      value: null,
+      isInvalid: false,
+    },
+    pidMinutes: {
+      type: "number",
+      name: "pidMinutes",
+      label: "PID Minutes",
+      min: 20,
+      max: 40,
+      value: null,
+      isInvalid: false,
+    },
+  };
 };
