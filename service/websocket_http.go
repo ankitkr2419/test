@@ -84,6 +84,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					errortype = "ErrorPCRDead"
 					msg = "Unable to connect to Hardware"
 
+				} else {
+					errortype = "ErrorPCR"
+					msg = err.Error()
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")

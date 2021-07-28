@@ -119,7 +119,7 @@ type Extraction interface {
 	DiscardTipAndHome(discard bool) (response string, err error)
 	Heating(ht db.Heating) (response string, err error)
 	Homing() (response string, err error)
-	ManualMovement(motorNum, direction, pulses uint16) (response string, err error)
+	ManualMovement(motorNum, direction uint16, distance float32) (response string, err error)
 	Resume() (response string, err error)
 	Pause() (response string, err error)
 	Abort() (response string, err error)

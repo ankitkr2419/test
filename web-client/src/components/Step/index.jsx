@@ -216,6 +216,8 @@ const StepComponent = (props) => {
 			/>
 			{isCreateStepModalVisible && (
 				<AddStepModal
+					holdSteps={holdSteps}
+					cycleSteps={cycleSteps}
 					isCreateStepModalVisible={isCreateStepModalVisible}
 					toggleCreateStepModal={toggleCreateStepModal}
 					updateStepFormStateWrapper={updateStepFormStateWrapper}
