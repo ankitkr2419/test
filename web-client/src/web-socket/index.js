@@ -35,6 +35,10 @@ import {
 } from "action-creators/discardDeckActionCreators";
 
 import { toast } from "react-toastify";
+import {
+  runPidInProgress,
+  runPidInSuccess,
+} from "action-creators/calibrationActionCreators";
 
 let webSocket = null;
 export const connectSocket = (dispatch) => {
@@ -55,6 +59,12 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.temperatureData:
           dispatch(temperatureDataSucceeded(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.PIDProgress:
+          dispatch(runPidInProgress(data));
+          break;
+        case SOCKET_MESSAGE_TYPE.PIDSuccess:
+          dispatch(runPidInSuccess(data));
           break;
         case SOCKET_MESSAGE_TYPE.rtpcrProgress:
           dispatch(runExperimentInProgress(data));

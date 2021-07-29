@@ -3,6 +3,8 @@ import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import CalibrationExtractionComponent from "components/CalibrationExtraction";
 import { logoutInitiated } from "action-creators/loginActionCreators";
+import { runPid } from "action-creators/calibrationActionCreators";
+import { DECKNAME } from "appConstants";
 
 const CalibrationExtractionContainer = () => {
   const dispatch = useDispatch();
@@ -16,10 +18,23 @@ const CalibrationExtractionContainer = () => {
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
   const { name, token } = activeDeckObj;
 
+  const pidProgessReducer = useSelector((state) => state.pidProgessReducer);
+  const pidProgessReducerData = pidProgessReducer.toJS();
+  const { progressStatus, deckName, progress, remainingTime, totalTime } =
+    pidProgessReducerData;
+
+  console.log("pidProgessReducerData: ", pidProgessReducerData);
+
   const handleLogout = () => {
     dispatch(
       logoutInitiated({ deckName: name, token: token, showToast: true })
     );
+  };
+
+  const handleBtnClick = () => {
+    const deckName =
+      name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
+    dispatch(runPid(token, deckName));
   };
 
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
@@ -35,7 +50,9 @@ const CalibrationExtractionContainer = () => {
     <CalibrationExtractionComponent
       toggleConfirmModal={toggleConfirmModal}
       handleLogout={handleLogout}
+      handleBtnClick={handleBtnClick}
       showConfirmationModal={showConfirmationModal}
+      progressData={pidProgessReducerData}
       deckName={name}
     />
   );

@@ -41,6 +41,8 @@ export const SOCKET_MESSAGE_TYPE = {
   ErrorPCRMonitor: "ErrorPCRMonitor",
   ErrorPCRDead: "ErrorPCRDead",
   temperatureData: "Temperature",
+  PIDProgress: "PROGRESS_PID",
+  PIDSuccess: "SUCCESS_PID",
   rtpcrProgress: "RTPCR_PROGRESS",
   rtpcrSuccess: "RTPCR_SUCCESS",
   homingProgress: "PROGRESS_HOMING",
@@ -52,6 +54,15 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipProgress: "DISCARD_TIP_PROGRESS",
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
+};
+
+export const PID_STATUS = {
+  running: "running",
+  runFailed: "run-failed",
+  stopped: "stopped",
+
+  progressing: "progressing",
+  progressComplete: "progressComplete",
 };
 
 export const EXPERIMENT_STATUS = {
@@ -85,7 +96,7 @@ export const ROUTES = {
   tipDiscard: "tip-discard",
   delay: "delay",
   tipPosition: "tip-position",
-  calibration: "calibration",//rtpcr flow: engineer homepage
+  calibration: "calibration", //rtpcr flow: engineer homepage
 };
 
 export const API_ENDPOINTS = {
@@ -123,8 +134,9 @@ export const API_ENDPOINTS = {
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
   appInfo: "app-info",
-  experiments: "experiments", 
+  experiments: "experiments",
   configs: "configs",
+  pidCalibration: "pid-calibration",
 };
 
 export const MODAL_MESSAGE = {

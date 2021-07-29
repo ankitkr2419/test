@@ -11,17 +11,26 @@ import {
   Row,
   Col,
 } from "core-components";
-import { ButtonIcon, MlModal } from "shared-components";
+import { ButtonIcon, Icon, MlModal, Text } from "shared-components";
 import { MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import PidComponent from "./PidComponent";
+import MotorComponent from "./MotorComponent";
 const CalibrationExtractionComponent = (props) => {
-  const { deckName, handleLogout, showConfirmationModal, toggleConfirmModal } =
-    props;
+  const {
+    deckName,
+    progressData,
+    handleBtnClick,
+    handleLogout,
+    showConfirmationModal,
+    toggleConfirmModal,
+  } = props;
+
   return (
     <div className="calibration-content px-5">
       <ButtonIcon
         name="logout"
         size={28}
-        className="ml-2 bg-white border-primary"
+        className="ml-auto bg-white border-primary"
         onClick={toggleConfirmModal}
       />
 
@@ -30,6 +39,13 @@ const CalibrationExtractionComponent = (props) => {
           <p>Extraction Flow: Calibration</p>
         </CardBody>
       </Card>
+
+      <PidComponent
+        progressData={progressData}
+        handleBtnClick={handleBtnClick}
+      />
+
+      <MotorComponent />
 
       {showConfirmationModal && (
         <MlModal
