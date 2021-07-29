@@ -18,7 +18,8 @@ import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
-import { saveToPdf } from "utils/pdfHelper";
+import { saveToPdf, saveToPdf2 } from "utils/pdfHelper";
+import PreviewReportModal from "components/modals/PreviewReportModal";
 
 const Plate = (props) => {
   const {
@@ -55,6 +56,9 @@ const Plate = (props) => {
 
   // local state to manage toggling of graphSidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // local state to manage previewReport modal
+  const [previewReportModal, setPreviewReportModal] = useState(false);
 
   useEffect(() => {
     if (
@@ -115,11 +119,40 @@ const Plate = (props) => {
   };
 
   const downloadClickHandler = (e) => {
-    saveToPdf(showTempGraph);
+    // saveToPdf(showTempGraph);
+    togglePreviewReportModal();
+  };
+
+  const togglePreviewReportModal = () => {
+    setPreviewReportModal(!previewReportModal);
+  };
+
+  const onDownloadConfirmed = () => {
+    saveToPdf2();
   };
 
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
+      {previewReportModal && (
+        <PreviewReportModal
+          isOpen={previewReportModal}
+          toggleModal={togglePreviewReportModal}
+          onDownloadConfirmed={onDownloadConfirmed}
+          experimentStatus={experimentStatus}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          resetSelectedWells={resetSelectedWells}
+          isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+          progressStatus={progressStatus}
+          progress={progress}
+          remainingTime={remainingTime}
+          totalTime={totalTime}
+          experimentTemplate={experimentTemplate}
+          experimentDetails={experimentDetails}
+          experimentId={experimentId}
+          temperatureData={temperatureData}
+        />
+      )}
       <Header
         progressStatus={progressStatus}
         progress={progress}

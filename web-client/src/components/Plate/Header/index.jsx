@@ -70,11 +70,12 @@ const SubHeader = props => {
   }
 
   const showProgressBar = () => {
-    return (
-      experimentStatus === EXPERIMENT_STATUS.success ||
-      experimentStatus === EXPERIMENT_STATUS.running ||
-      experimentStatus === EXPERIMENT_STATUS.stopped
-    );
+    return experimentStatus === EXPERIMENT_STATUS.running;
+    // return (
+    //   experimentStatus === EXPERIMENT_STATUS.success ||
+    //   experimentStatus === EXPERIMENT_STATUS.running ||
+    //   experimentStatus === EXPERIMENT_STATUS.stopped
+    // );
   };
 
   return (
