@@ -25,7 +25,6 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	stopMonitor := make(chan bool, 1)
 
-
 	// Step 1 : Validation for temperature
 	// validation for temperature
 	if (ht.Temperature*10) > 1200 || (ht.Temperature*10) <= 200 {
@@ -145,7 +144,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 	for {
 		select {
 		case n := <-stopMonitor:
-			fmt.Printf("stop the montoring %v", n)
+			logger.Infoln("stop the montoring :", n)
 			return "SUCCESS", nil
 
 		default:
@@ -185,7 +184,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 					goto skipToMonitor
 				}
 				// Play of 2 degrees as heater would not heat up that much sometimes
-				if (setTemp1 >= temperature - 2) && (setTemp2 >= temperature - 2) {
+				if (setTemp1 >= temperature-2) && (setTemp2 >= temperature-2) {
 					return "SUCCESS", nil
 				}
 

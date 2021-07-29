@@ -31,7 +31,7 @@ func TestRecipeTestSuite(t *testing.T) {
 	suite.Run(t, new(RecipeHandlerTestSuite))
 }
 
-var(
+var (
 	pos1 int64 = 1
 	pos2 int64 = 2
 	pos3 int64 = 3

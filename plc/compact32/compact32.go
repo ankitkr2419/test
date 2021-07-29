@@ -48,16 +48,16 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 	if test {
 		p := plc.Stage{
 			Holding: []plc.Step{
-				plc.Step{65.3, 3.2, 1, false},
-				plc.Step{85.3, 3.1, 1, false},
-				plc.Step{95, 2.8, 1, false},
+				plc.Step{TargetTemp: 65.3, RampUpTemp: 2.1, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 85.3, RampUpTemp: 2.2, HoldTime: 3, DataCapture: false},
+				plc.Step{TargetTemp: 95, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
 			},
 			Cycle: []plc.Step{
-				plc.Step{55, 3, 1, false},
-				plc.Step{65, 3, 1, false},
-				plc.Step{75, 3, 1, false},
-				plc.Step{85, 3, 1, false},
-				plc.Step{95, 3, 1, false},
+				plc.Step{TargetTemp: 55, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 65, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 75, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 85, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 95, RampUpTemp: 2, HoldTime: 5, DataCapture: true},
 			},
 			CycleCount: 3,
 		}

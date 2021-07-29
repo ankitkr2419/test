@@ -34,7 +34,7 @@ type User struct {
 }
 
 func (s *pgStore) ValidateUser(ctx context.Context, u User) (User, error) {
-	
+
 	rows, err := s.db.Query(
 		validateUserQuery,
 		u.Username,
@@ -78,9 +78,9 @@ func (s *pgStore) UpdateUser(ctx context.Context, u User, oldName string) (err e
 	r, err := s.db.Exec(
 		updateUsersQuery,
 		u.Username,
-		u.Password,	
+		u.Password,
 		u.Role,
-		oldName,	
+		oldName,
 	)
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Errorln("Query Failed for Update User")

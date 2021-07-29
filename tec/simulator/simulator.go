@@ -101,16 +101,16 @@ func (t *Simulator) GetAllTEC() (err error) {
 func (t *Simulator) TestRun(plcDeps plc.Driver) (err error) {
 	p := plc.Stage{
 		Holding: []plc.Step{
-			plc.Step{65.3, 10, 5, false},
-			plc.Step{85.3, 10, 5, false},
-			plc.Step{95, 10, 5, false},
+			plc.Step{TargetTemp: 65.3,  RampUpTemp: 10,HoldTime:  5, DataCapture: false},
+			plc.Step{TargetTemp: 85.3,  RampUpTemp: 10,HoldTime:  5, DataCapture: false},
+			plc.Step{TargetTemp: 95,  RampUpTemp: 10, HoldTime: 5, DataCapture: false},
 		},
 		Cycle: []plc.Step{
-			// plc.Step{60, 10, 10},
-			plc.Step{95, 10, 5, false},
-			plc.Step{85, 10, 5, false},
-			plc.Step{75, 10, 5, false},
-			plc.Step{65, 10, 5, false},
+			// plc.Step{60, 10, 10}
+			plc.Step{TargetTemp: 95, RampUpTemp: 10, HoldTime: 5,DataCapture: false},
+			plc.Step{TargetTemp: 85, RampUpTemp: 10, HoldTime: 5,DataCapture: false},
+			plc.Step{TargetTemp: 75, RampUpTemp: 10, HoldTime: 5,DataCapture: false},
+			plc.Step{TargetTemp: 65, RampUpTemp: 10, HoldTime: 5,DataCapture: true},
 		},
 		CycleCount: 3,
 	}
