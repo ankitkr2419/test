@@ -44,6 +44,7 @@ const (
 
 var templateRunSuccess bool
 var expStartTime time.Time
+
 // TODO: Don't allow Template Update/Deletion if this Template is in Progress
 var currentExpTemplate db.Template
 

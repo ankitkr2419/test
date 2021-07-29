@@ -48,7 +48,7 @@ type TipsTubesConfig struct {
 		AllowedPositions pq.Int64Array
 		Volume           float64
 		Height           float64
-		TtBase			 float64
+		TtBase           float64
 	}
 }
 

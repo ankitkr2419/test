@@ -2,10 +2,9 @@ package plc
 
 import (
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
-	logger "github.com/sirupsen/logrus"
-
 )
 
 /****ALGORITHM******
@@ -57,7 +56,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	deckAndMotor.Number = K5_Deck
 
-	logger.Infoln("Moving Deck to pos_" , pos)
+	logger.Infoln("Moving Deck to pos_", pos)
 	if position, ok = consDistance["pos_"+fmt.Sprintf("%d", pos)]; !ok {
 		err = fmt.Errorf("pos_" + fmt.Sprintf("%d", pos) + " doesn't exist for consumable distances")
 		logger.Errorln("Error: ", err)
@@ -104,7 +103,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	}
 
 	var id *int64
-	switch pos{
+	switch pos {
 	case 1:
 		id = recipe.Position1
 	case 2:
@@ -112,12 +111,12 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	case 3:
 		id = recipe.Position3
 	case 4:
-		id = recipe.Position4	
+		id = recipe.Position4
 	case 5:
 		id = recipe.Position5
 	}
 
-	if id == nil{
+	if id == nil {
 		err = fmt.Errorf("no tip exists for position %v", pos)
 		logger.Errorln("Error: ", err)
 		return "", err
@@ -179,7 +178,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// 3.1 Update Tip Height
 	// Even if error occurs we must be of the opinion that tip has been picked up
 	// Set tipHeight to pickedTipHeight minus the slow_inside
-	
+
 	if err != nil {
 		logger.Errorln("Error: ", err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to tip's inside. Error: %v", err)
@@ -198,7 +197,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	logger.Infoln("Moving Syringe Module to PickupTip")
 
 	// go pickup_tip_up mm above
-	distanceToTravel =  Positions[deckAndMotor] + tipHeight[d.name] -  (deckBase - position)
+	distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase - position)
 
 	// We know Concrete Direction here, its UP
 

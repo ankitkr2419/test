@@ -38,9 +38,9 @@ const (
 	SIM = "simulator"
 )
 
-const(
+const (
 	logsPath = "./utils/logs"
-	tecPath = "./utils/tec"
+	tecPath  = "./utils/tec"
 )
 
 func main() {
@@ -300,7 +300,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		<-signals
 
 		err = service.ShutDownGraceFully(deps)
-		if err != nil{
+		if err != nil {
 			os.Exit(-1)
 		}
 		os.Exit(0)

@@ -11,7 +11,6 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-
 func listRecipesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 

@@ -53,15 +53,15 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		44: uint16(0x102C), //start address of register For FAM
 		60: uint16(0x103C), //start address of register For VIC
 
-		100:  uint16(0x1064), // heartbeat register (W)
+		100: uint16(0x1064), // heartbeat register (W)
 		// 101:  uint16(0x1065), // offset for holding stage config (W)
 		// 113:  uint16(0x1071), // offset for cycling stage config (W)
 		// 131:  uint16(0x1083), // Number of cycles to run (W)
 		// 132:  uint16(0x1084), // Current temperature (R)
 		// 133:  uint16(0x1085), // Current cycle (R)
-		134:  uint16(0x1086), // Ideal Lid temperature (W)
-		135:  uint16(0x1087), // Current Lid temperature (R)
-		410:  uint16(0x119A), // General register offset for values! (unused for now)
+		134: uint16(0x1086), // Ideal Lid temperature (W)
+		135: uint16(0x1087), // Current Lid temperature (R)
+		410: uint16(0x119A), // General register offset for values! (unused for now)
 		// 2000: uint16(0x17D0), // Well Emission data 96x6 registers (R)
 		2577: uint16(0x1A11), // error code (R)
 	},
@@ -69,8 +69,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	"M": map[int]uint16{
 
 		//Updated addresses
-		1:  uint16(0x0801), //combined Homing rt-pcr
-		2:  uint16(0x0802), //combined Homing rt-pcr
+		1: uint16(0x0801), //combined Homing rt-pcr
+		2: uint16(0x0802), //combined Homing rt-pcr
 		// 14: uint16(0x080E), //combined with M15 ON/OFF rotate button
 		// 15: uint16(0x080F), //combined with M14 ON/OFF rotate button
 		20: uint16(0x0814), //combined with M21 ON/OFF cycle button

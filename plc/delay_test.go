@@ -1,7 +1,7 @@
 package plc
 
 import (
-	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
 	"net/http"
 	"net/http/httptest"
@@ -50,7 +50,7 @@ func (suite *DelayTestSuite) SetupTest() {
 	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{testTTObj}, nil)
 	suite.dbMock.On("ListCartridges", mock.Anything).Return(testCartridgeObj, nil)
 	suite.dbMock.On("ListCartridgeWells").Return(testCartridgeWellsObj, nil)
-	suite.dbMock.On("ListMotors").Return(testMotorObj, nil)
+	suite.dbMock.On("ListMotors", mock.Anything).Return(testMotorObj, nil)
 	suite.dbMock.On("ListConsDistances").Return(testConsDistanceObj, nil)
 
 	LoadAllPLCFuncs(suite.dbMock)
@@ -79,9 +79,9 @@ func testWebSocket(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case msg := <-testdeck.WsMsgCh:
-			fmt.Println(msg)
+			logger.Infoln(msg)
 		case err := <-testdeck.WsErrCh:
-			fmt.Println(err.Error())
+			logger.Errorln(err)
 		}
 	}
 }
