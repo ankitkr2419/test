@@ -1,9 +1,9 @@
 package plc
 
 import (
-	"mylab/cpagent/db"
-
+	"context"
 	"github.com/stretchr/testify/mock"
+	"mylab/cpagent/db"
 )
 
 type PLCMockStore struct {
@@ -49,8 +49,8 @@ func (p *PLCMockStore) ResetRunInProgress() {
 	return
 }
 
-func (p *PLCMockStore) AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error) {
-	args := p.Called(ad, cartridgeID, tipType)
+func (p *PLCMockStore) AspireDispense(ad db.AspireDispense, cartridgeID int64) (response string, err error) {
+	args := p.Called(ad, cartridgeID)
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -84,7 +84,7 @@ func (p *PLCMockStore) SetCurrentProcessNumber(step int64) {
 	return
 }
 
-func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error){
+func (p *PLCMockStore) RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error) {
 	args := p.Called(recipe, processes)
 	return args.Error(0)
 }
@@ -104,8 +104,8 @@ func (p *PLCMockStore) Homing() (response string, err error) {
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
-	args := p.Called(motorNum, direction, pulses)
+func (p *PLCMockStore) ManualMovement(motorNum, direction uint16, mm float32) (response string, err error) {
+	args := p.Called(motorNum, direction, mm)
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -124,8 +124,8 @@ func (p *PLCMockStore) Abort() (response string, err error) {
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsTubes) (response string, err error) {
-	args := p.Called(pi, cartridgeID, tip)
+func (p *PLCMockStore) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
+	args := p.Called(pi, cartridgeID)
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -141,6 +141,16 @@ func (p *PLCMockStore) TipDocking(td db.TipDock, cartridgeID int64) (response st
 
 func (p *PLCMockStore) TipOperation(to db.TipOperation) (response string, err error) {
 	args := p.Called(to)
+	return args.Get(0).(string), args.Error(1)
+}
+
+func (p *PLCMockStore) PIDCalibration(ctx context.Context) (err error) {
+	args := p.Called(ctx)
+	return args.Error(0)
+}
+
+func (p *PLCMockStore) SwitchOffAllCoils() (response string, err error) {
+	args := p.Called()
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -177,6 +187,7 @@ func (m *MockCompact32Driver) ReadSingleRegister(address uint16) (value uint16, 
 	args := m.Called(address)
 	return args.Get(0).(uint16), args.Error(1)
 }
+
 func (m *MockCompact32Driver) WriteSingleCoil(address, value uint16) (err error) {
 	args := m.Called(address, value)
 	return args.Error(0)

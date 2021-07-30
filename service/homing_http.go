@@ -27,7 +27,7 @@ func homingHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case "":
-			fmt.Println("At both deck!!!")
+			logger.Infoln("At both deck!!!")
 			msg = "homing in progress for both decks"
 			plc.SetBothDeckHomingInProgress()
 			go bothDeckOperation(ctx, deps, "Homing")
@@ -68,10 +68,10 @@ func bothDeckOperation(ctx context.Context, deps Dependencies, operation string)
 	for {
 		switch {
 		case deckAErr != nil:
-			fmt.Printf("Error %s deck A", operation)
+			logger.Errorln("Error deck A: ", operation)
 			return "", deckAErr
 		case deckBErr != nil:
-			fmt.Printf("Error %s deck B", operation)
+			logger.Errorln("Error deck B: ", operation)
 			return "", deckBErr
 		case deckAResponse != "" && deckBResponse != "":
 			operationSuccessMsg := fmt.Sprintf("%s Success for both Decks!", operation)
@@ -90,7 +90,7 @@ func bothDeckOperation(ctx context.Context, deps Dependencies, operation string)
 				return "", err
 			}
 			deps.WsMsgCh <- fmt.Sprintf("success_homing_%v", string(wsData))
-			fmt.Println(operationSuccessMsg)
+			logger.Infoln(operationSuccessMsg)
 			return operationSuccessMsg, nil
 		default:
 			// Only check every 400 milli second
@@ -120,10 +120,10 @@ func singleDeckOperation(ctx context.Context, deps Dependencies, deck, operation
 	//  this will make Call to any method generic
 	// TODO : Handle Panics with recover()
 
-	fmt.Println("Result from Operation ", operation, result)
+	logger.Infoln("Result from Operation ", operation, result)
 
 	if len(result) != 2 {
-		fmt.Println("result is different in this reflect Call !", result)
+		logger.Errorln("result is different in this reflect Call !", result)
 		err := fmt.Errorf("unexpected length result")
 
 		return "", err
@@ -133,7 +133,7 @@ func singleDeckOperation(ctx context.Context, deps Dependencies, deck, operation
 	if len(result) == 2 {
 		errRes := result[1].Interface()
 		if errRes != nil {
-			fmt.Println(errRes)
+			logger.Warnln(errRes)
 			err := fmt.Errorf("%v", errRes)
 			return "", err
 		}

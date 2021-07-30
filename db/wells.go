@@ -64,9 +64,9 @@ type WellConfig struct {
 type Well struct {
 	ID           uuid.UUID    `db:"id" json:"id"`
 	Position     int32        `db:"position" json:"position" validate:"required"`
-	ExperimentID uuid.UUID    `db:"experiment_id" json:"experiment_id"validate:"required"`
-	SampleID     uuid.UUID    `db:"sample_id" json:"sample_id"validate:"required"`
-	Task         string       `db:"task" json:"task"validate:"required"`
+	ExperimentID uuid.UUID    `db:"experiment_id" json:"experiment_id" validate:"required"`
+	SampleID     uuid.UUID    `db:"sample_id" json:"sample_id" validate:"required"`
+	Task         string       `db:"task" json:"task" validate:"required"`
 	ColorCode    string       `db:"color_code" json:"color_code"`
 	Targets      []WellTarget `json:"targets" validate:"required"`
 	SampleName   string       `db:"sample_name" json:"sample_name"`

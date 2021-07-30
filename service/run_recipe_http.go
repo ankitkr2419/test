@@ -150,7 +150,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				return
 			}
 			setRunNext(deck)
-			
+
 			// To handle continuous run timer
 			deps.PlcDeck[deck].ResetPaused()
 
@@ -164,48 +164,47 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			if err != nil {
 				return "", err
 			}
-			fmt.Println(ad)
+			logger.Infoln("Aspire Dispense Object: ", ad)
 
 			if ad.CartridgeType == db.Cartridge1 {
 				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
-			// TODO: Pass the complete Tip rather than just name for volume validations
-			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID, currentTip.ID)
+
+			response, err = deps.PlcDeck[deck].AspireDispense(ad, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
 
 		case db.HeatingProcess:
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
-			fmt.Printf("heat object %v", heat)
+			logger.Infoln("Heating object :", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat)
 			if err != nil {
-
 				return "", err
 			}
-			fmt.Println(ht)
+			logger.Infoln("Heating Response: ", ht)
 
 		case db.ShakingProcess:
 			shaker, err := deps.Store.ShowShaking(ctx, p.ID)
 			if err != nil {
 				return "", err
 			}
-			fmt.Printf("shaker object %v", shaker)
+			logger.Infoln("shaker object :", shaker)
 
 			sha, err := deps.PlcDeck[deck].Shaking(shaker)
 			if err != nil {
 				return "", err
 			}
-			fmt.Println(sha)
+			logger.Infoln("Shaking Response: ", sha)
 
 		case db.PiercingProcess:
 			pi, err := deps.Store.ShowPiercing(ctx, p.ID)
 			if err != nil {
 				return "", err
 			}
-			fmt.Println(pi)
+			logger.Infoln("Piercing Object: ", pi)
 
 			if pi.Type == db.Cartridge1 {
 				currentCartridgeID = *recipe.Cartridge1Position
@@ -213,14 +212,14 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
 
-			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID, currentTip)
+			response, err = deps.PlcDeck[deck].Piercing(pi, currentCartridgeID)
 			if err != nil {
 				return "", err
 			}
 
 		case db.AttachDetachProcess:
 			ad, err := deps.Store.ShowAttachDetach(ctx, p.ID)
-			fmt.Printf("attach detach record %v \n", ad)
+			logger.Infoln("attach detach Object: ", ad)
 			if err != nil {
 				return "", err
 			}
@@ -234,7 +233,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			if err != nil {
 				return "", err
 			}
-			fmt.Println(to)
+			logger.Infoln("Tip Operation Object: ", to)
 
 			response, err = deps.PlcDeck[deck].TipOperation(to)
 			if err != nil {
@@ -252,16 +251,17 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 				if err != nil {
 					return "", err
 				}
+				logger.Infoln("Current Tip -> ", currentTip)
 			case db.DiscardTip:
 				currentTip = db.TipsTubes{}
-
+				logger.Infoln("Tip Discarded from Syringe Module")
 			}
 		case db.TipDockingProcess:
 			td, err := deps.Store.ShowTipDocking(ctx, p.ID)
 			if err != nil {
 				return "", err
 			}
-			fmt.Println(td)
+			logger.Infoln("Tip Docking Object: ",td)
 			if td.Type == string(db.Cartridge1) {
 				currentCartridgeID = *recipe.Cartridge1Position
 			} else {
@@ -276,7 +276,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			if err != nil {
 				return "", err
 			}
-			fmt.Print(delay)
+			logger.Infoln("Delay Object: ", delay)
 			response, err = deps.PlcDeck[deck].AddDelay(delay, false)
 			if err != nil {
 				return "", err

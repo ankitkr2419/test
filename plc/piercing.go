@@ -2,6 +2,7 @@ package plc
 
 import (
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
 	"sort"
@@ -16,10 +17,10 @@ import (
 	2.3 Repeat step 2.1 and 2.2 till well exists
 ********/
 
-func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsTubes) (response string, err error) {
+func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
 
 	var deckAndMotor DeckNumber
-	var position, cartridgeStart, piercingHeight, distanceToTravel, tipHeight, deckBase float64
+	var position, cartridgeStart, piercingHeight, distanceToTravel, deckBase, pickUpTip float64
 	var ok bool
 	var direction, pulses, piercingPulses, afterPiercingRestPulses uint16
 	// []int has direct method to get slice sorted
@@ -35,14 +36,14 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsT
 	//
 	if cartridgeStart, ok = consDistance[string(pi.Type)+"_start"]; !ok {
 		err = fmt.Errorf(string(pi.Type) + "_start doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
 	// piercingHeight is dependent on cartridge type
 	if piercingHeight, ok = consDistance["piercing_height_"+string(pi.Type)]; !ok {
 		err = fmt.Errorf("piercing_height_" + string(pi.Type) + " doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -56,45 +57,14 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsT
 	// Calculation below considers syringe module as glued with tip
 	// And we go to piercingHeight
 
-
 	// Get Deck Base
 	if deckBase, ok = consDistance["deck_base"]; !ok {
 		err = fmt.Errorf("deck_base doesn't exist for consumables")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
-	//-----------------
-	// Get Tip Height -
-	//-----------------
-	var tipHeightInter interface{}
-	if tipHeightInter, ok = tipstubes[tip.ID]["height"]; !ok {
-		err = fmt.Errorf("%v tip doesn't exist for tipstubes", tip.ID)
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	if tipHeight, ok = tipHeightInter.(float64); !ok {
-		err = fmt.Errorf("%v tip has unknown ID!", tip.ID)
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	if tipHeightInter, ok = consDistance["slow_inside"]; !ok {
-		err = fmt.Errorf("slow_inside doesn't exist for consumables")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	if position, ok = tipHeightInter.(float64); !ok {
-		err = fmt.Errorf("couldn't type cast slow_inside")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
-
-	tipHeight -= position
-
-	distanceToTravel = (deckBase + piercingHeight) - (Positions[deckAndMotor] + tipHeight)
+	distanceToTravel = (deckBase + piercingHeight) - (Positions[deckAndMotor] + tipHeight[d.name])
 	// We know concrete direction here
 	// piercingHeight will be less
 
@@ -117,7 +87,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsT
 		uniqueCartridge.WellNum = int64(wellNumber)
 		if position, ok = cartridges[uniqueCartridge]["distance"]; !ok {
 			err = fmt.Errorf("distance doesn't exist for well number %d", wellNumber)
-			fmt.Println("Error: ", err)
+			logger.Errorln(err)
 			return "", err
 		}
 
@@ -131,11 +101,11 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsT
 
 		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
-			fmt.Println(err)
+			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Deck to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
-		fmt.Println("Completed Move Deck to reach the wellNum ", wellNumber)
+		logger.Infoln("Completed Move Deck to reach the wellNum ", wellNumber)
 
 		// 2.2 Pierce and come back up
 
@@ -143,27 +113,28 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsT
 		deckAndMotor.Number = K9_Syringe_Module_LHRH
 
 		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
-		// TODO: Use defer d.setIndeck as in aspire_dispense
-		// Even if err has occured let's store syringeModuleState as inDeck
-		syringeModuleState.Store(d.name, InDeck)
 		if err != nil {
-			fmt.Println(err)
+			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module DOWN to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
-		fmt.Println("Pierced WellNumber: ", wellNumber)
+		logger.Infoln("Pierced WellNumber: ", wellNumber)
 
 		// change piercingPulses just before going up after piercing the first well
 		if i == 0 {
 			// For wells other than first piercing height will be less
-			if piercingHeight, ok = consDistance["piercing_tip_above_well_position"]; !ok {
-				err = fmt.Errorf("piercing_tip_above_well_position doesn't exist for consumable distances")
-				fmt.Println("Error: ", err)
+
+			//
+			//  move syringe module above pickup_piercing_tip_up(17 mm) from the deck
+			//
+			if pickUpTip, ok = consDistance["pickup_piercing_tip_up"]; !ok {
+				err = fmt.Errorf("pickup_piercing_tip_up doesn't exist for consumable distances")
+				logger.Errorln(err)
 				return "", err
 			}
 
 			// piercingHeight will be always less than current position
-			distanceToTravel = Positions[deckAndMotor] - piercingHeight 
+			distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase - pickUpTip)
 
 			piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 		}
@@ -175,14 +146,11 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64, tip db.TipsT
 		// WE know concrete direction here, its UP
 		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 		if err != nil {
-			fmt.Println(err)
+			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module UP to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
-		// TODO: Use defer d.setIndeck as in aspire_dispense
-		// Only after successful coming out do we say its OutDeck completely
-		syringeModuleState.Store(d.name, OutDeck)
 
-		fmt.Println("Got Up from WellNumber: ", wellNumber)
+		logger.Infoln("Got Up from WellNumber: ", wellNumber)
 
 		// 2.3 Repeat step 2.1 and  2.2 till another well exists
 	}
