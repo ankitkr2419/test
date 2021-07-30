@@ -61,10 +61,10 @@ export const connectSocket = (dispatch) => {
           dispatch(temperatureDataSucceeded(data));
           break;
         case SOCKET_MESSAGE_TYPE.PIDProgress:
-          dispatch(runPidInProgress(data));
+          dispatch(runPidInProgress(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.PIDSuccess:
-          dispatch(runPidInSuccess(data));
+          dispatch(runPidInSuccess(JSON.parse(data)));
           break;
         case SOCKET_MESSAGE_TYPE.rtpcrProgress:
           dispatch(runExperimentInProgress(data));

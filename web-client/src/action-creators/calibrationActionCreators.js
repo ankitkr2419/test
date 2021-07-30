@@ -3,6 +3,7 @@ import {
   updateCalibrationActions,
   pidProgressActions,
   pidActions,
+  motorActions,
 } from "actions/calibrationActions";
 
 //fetch calibration configurations
@@ -37,7 +38,6 @@ export const updateCalibrationFailed = ({ error }) => ({
 });
 
 //websocket PID action creators
-
 export const runPidInProgress = (progressDetails) => ({
   type: pidProgressActions.pidProgressAction,
   payload: { progressDetails },
@@ -62,4 +62,15 @@ export const runPidFailed = (errorResponse) => ({
     ...errorResponse,
     error: true,
   },
+});
+
+// action creators for motor
+export const motorInitiated = (token, body) => ({
+  type: motorActions.motorActionInitiated,
+  payload: { token, body },
+});
+
+export const motorFailed = ({ error }) => ({
+  type: motorActions.motorActionFailure,
+  payload: { error },
 });

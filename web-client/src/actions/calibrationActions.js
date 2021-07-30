@@ -9,6 +9,12 @@ export const pidActions = {
   pidActionFailure: "PID_FAILURE",
 };
 
+export const motorActions = {
+  motorActionInitiated: "MOTOR_INITIATED",
+  motorActionSuccess: "MOTOR_SUCCEEDED",
+  motorActionFailure: "MOTOR_FAILURE",
+};
+
 export const calibrationActions = {
   calibrationInitiated: "CALIBRATION_INITIATED",
   calibrationSuccess: "CALIBRATION_SUCCESS",

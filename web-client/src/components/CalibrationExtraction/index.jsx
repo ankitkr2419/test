@@ -1,28 +1,20 @@
 import React from "react";
-import {
-  Button,
-  Form,
-  FormGroup,
-  FormError,
-  Input,
-  Label,
-  Card,
-  CardBody,
-  Row,
-  Col,
-} from "core-components";
+import { Card, CardBody } from "core-components";
 import { ButtonIcon, Icon, MlModal, Text } from "shared-components";
 import { MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 import PidComponent from "./PidComponent";
 import MotorComponent from "./MotorComponent";
+
 const CalibrationExtractionComponent = (props) => {
   const {
     deckName,
     progressData,
     handleBtnClick,
     handleLogout,
+    handleMotorBtn,
     showConfirmationModal,
     toggleConfirmModal,
+    formik,
   } = props;
 
   return (
@@ -34,18 +26,17 @@ const CalibrationExtractionComponent = (props) => {
         onClick={toggleConfirmModal}
       />
 
-      <Card default className="my-5">
+      <Card default className="my-3">
         <CardBody className="px-5 py-4">
-          <p>Extraction Flow: Calibration</p>
+          {/* <p>Extraction Flow: Calibration</p> */}
+          <PidComponent
+            progressData={progressData}
+            handleBtnClick={handleBtnClick}
+          />
+
+          <MotorComponent formik={formik} handleMotorBtn={handleMotorBtn} />
         </CardBody>
       </Card>
-
-      <PidComponent
-        progressData={progressData}
-        handleBtnClick={handleBtnClick}
-      />
-
-      <MotorComponent />
 
       {showConfirmationModal && (
         <MlModal

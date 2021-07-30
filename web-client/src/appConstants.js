@@ -137,6 +137,7 @@ export const API_ENDPOINTS = {
   experiments: "experiments",
   configs: "configs",
   pidCalibration: "pid-calibration",
+  manual: "manual",
 };
 
 export const MODAL_MESSAGE = {
@@ -453,3 +454,11 @@ export const MAX_VOLUME = 250;
 
 export const MIN_LID_TEMP = 80;
 export const MAX_LID_TEMP = 120;
+
+//constants for motor
+export const MIN_MOTOR_NUMBER = 5;
+export const MAX_MOTOR_NUMBER = 10;
+export const MIN_MOTOR_DISTANCE = 0;
+export const MAX_MOTOR_DISTANCE = 100;
+export const MIN_MOTOR_DIRECTION = 0;
+export const MAX_MOTOR_DIRECTION = 1;

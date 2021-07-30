@@ -4,6 +4,7 @@ import {
   pidProgressActions,
   pidActions,
   updateCalibrationActions,
+  motorActions,
 } from "actions/calibrationActions";
 import { PID_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
@@ -75,8 +76,8 @@ export const pidProgessReducer = (state = pidProgressInitialState, action) => {
         progressStatus: PID_STATUS.progressing,
         deckName: progressDetails.deck,
         progress: progressDetails.progress,
-        remainingTime: progressDetails.remaining_time,
-        totalTime: progressDetails.total_time,
+        remainingTime: progressDetails.operation_details.remaining_time,
+        totalTime: progressDetails.operation_details.total_time,
       });
 
     case pidProgressActions.pidProgressActionSuccess:
@@ -84,10 +85,10 @@ export const pidProgessReducer = (state = pidProgressInitialState, action) => {
 
       return state.merge({
         progressStatus: PID_STATUS.progressComplete,
-        deckName: progressDetails.deck,
+        deckName: progressSucceeded.deck,
         progress: progressSucceeded.progress,
-        remainingTime: progressSucceeded.remaining_time,
-        totalTime: progressSucceeded.total_time,
+        remainingTime: progressSucceeded.operation_details.remaining_time,
+        totalTime: progressSucceeded.operation_details.total_time,
       });
 
     case loginActions.loginReset:
@@ -124,6 +125,40 @@ export const pidReducer = (state = pidInitialState, action) => {
 
     case loginActions.loginReset:
       return pidProgressInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const motorInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  data: {},
+});
+
+export const motorReducer = (state = motorInitialState, action) => {
+  switch (action.type) {
+    case motorActions.motorActionInitiated:
+      return state.merge({
+        isLoading: true,
+      });
+
+    case motorActions.motorActionSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        data: action.payload,
+      });
+
+    case motorActions.motorActionFailure:
+      return state.merge({
+        isLoading: false,
+        error: true,
+      });
+
+    case loginActions.loginReset:
+      return motorInitialState;
 
     default:
       return state;

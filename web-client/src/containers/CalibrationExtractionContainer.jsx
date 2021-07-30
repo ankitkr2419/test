@@ -3,14 +3,24 @@ import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import CalibrationExtractionComponent from "components/CalibrationExtraction";
 import { logoutInitiated } from "action-creators/loginActionCreators";
-import { runPid } from "action-creators/calibrationActionCreators";
+import {
+  motorInitiated,
+  runPid,
+} from "action-creators/calibrationActionCreators";
 import { DECKNAME } from "appConstants";
+import { useFormik } from "formik";
+import { formikInitialState } from "components/CalibrationExtraction/helpers";
 
 const CalibrationExtractionContainer = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
   const [showConfirmationModal, setConfirmModal] = useState(false);
+
+  const formik = useFormik({
+    initialValues: formikInitialState,
+    enableReinitialize: true,
+  });
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -20,10 +30,6 @@ const CalibrationExtractionContainer = () => {
 
   const pidProgessReducer = useSelector((state) => state.pidProgessReducer);
   const pidProgessReducerData = pidProgessReducer.toJS();
-  const { progressStatus, deckName, progress, remainingTime, totalTime } =
-    pidProgessReducerData;
-
-  console.log("pidProgessReducerData: ", pidProgessReducerData);
 
   const handleLogout = () => {
     dispatch(
@@ -31,10 +37,25 @@ const CalibrationExtractionContainer = () => {
     );
   };
 
-  const handleBtnClick = () => {
+  const handlePidBtn = () => {
     const deckName =
       name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
     dispatch(runPid(token, deckName));
+  };
+
+  const handleMotorBtn = (e) => {
+    e.preventDefault();
+
+    const { motorNumber, direction, distance } = formik.values;
+
+    const body = {
+      deck: name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort,
+      motor_number: motorNumber.value,
+      direction: direction.value,
+      distance: distance.value,
+    };
+
+    dispatch(motorInitiated(token, body));
   };
 
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
@@ -50,10 +71,12 @@ const CalibrationExtractionContainer = () => {
     <CalibrationExtractionComponent
       toggleConfirmModal={toggleConfirmModal}
       handleLogout={handleLogout}
-      handleBtnClick={handleBtnClick}
+      handleBtnClick={handlePidBtn}
+      handleMotorBtn={handleMotorBtn}
       showConfirmationModal={showConfirmationModal}
       progressData={pidProgessReducerData}
       deckName={name}
+      formik={formik}
     />
   );
 };
