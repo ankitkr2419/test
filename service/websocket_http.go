@@ -65,6 +65,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				} else if strings.EqualFold(msgs[0], "success") {
 
 					successOperation(deps, rw, c, msgs)
+				} else if strings.EqualFold(msgs[0], "heater") {
+
+					monitorOperation(deps, rw, c, msgs)
 				}
 
 			case err = <-deps.ExitCh:

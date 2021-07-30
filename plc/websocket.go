@@ -13,6 +13,7 @@ import (
 type WebsocketOperation string
 
 const (
+	heater          WebsocketOperation = "HEATER_HEATER"
 	uvlightProgress WebsocketOperation = "PROGRESS_UVLIGHT"
 	pidProgress     WebsocketOperation = "PROGRESS_PID"
 	recipeProgress  WebsocketOperation = "PROGRESS_RECIPE"
@@ -97,6 +98,31 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 		return err
 	}
 	d.WsMsgCh <- fmt.Sprintf("%v_%v", ops, string(wsData))
+
+	return
+}
+
+func (d *Compact32Deck) sendHeaterData() (err error) {
+	hData := HeaterData{
+		Deck:     d.name,
+		HeaterOn: d.isHeaterInProgress(),
+	}
+
+	var wsData []byte
+
+	hData.Shaker1Temp, hData.Shaker2Temp, err = d.readTempValues()
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.FetchHeaterTempError)
+		return err
+	}
+
+	wsData, err = json.Marshal(hData)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.WebsocketMarshallingError)
+		d.WsErrCh <- err
+		return err
+	}
+	d.WsMsgCh <- fmt.Sprintf("%v_%v", heater, string(wsData))
 
 	return
 }

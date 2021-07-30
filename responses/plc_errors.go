@@ -11,6 +11,7 @@ var (
 	ShakingError         = fmt.Errorf("error doing shaking")
 	HeatingError         = fmt.Errorf("error doing heating")
 	ProcessesAbsentError = fmt.Errorf("no process present in the recipe")
+	FetchHeaterTempError = fmt.Errorf("error fetching heater temperature")
 
 	InvalidOperationWebsocket = fmt.Errorf("invalid operation selected for websocket")
 
