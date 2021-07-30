@@ -247,6 +247,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	}
 
 	go monitorForPLCTimeout(&deps, exit)
+	go sendHeaterDataToEng(&deps.PlcDeck)
 
 	err = service.LoadAllServiceFuncs(store)
 	if err != nil {
@@ -328,4 +329,9 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 			time.Sleep(5 * time.Second)
 		}
 	}
+}
+
+func sendHeaterDataToEng(plcDeckMap *map[string]plc.Extraction) {
+	go (*plcDeckMap)[plc.DeckA].HeaterData()
+	go (*plcDeckMap)[plc.DeckB].HeaterData()
 }
