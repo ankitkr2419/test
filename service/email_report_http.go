@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	// "github.com/jung-kurt/gofpdf"
 
 	"encoding/base64"
 	"io/ioutil"
@@ -25,18 +24,6 @@ func emailReport(deps Dependencies) http.HandlerFunc {
 }
 
 func EmailReport() (err error) {
-	/*
-		//  PDF Generation
-		  pdf := gofpdf.New("P", "mm", "A4", "")
-		    pdf.AddPage()
-		    pdf.SetFont("Arial", "B", 16)
-		    pdf.Cell(40, 10, "Hello, world!")
-		    err := pdf.OutputFileAndClose("hello.pdf")
-		    if err != nil{
-		        panic(err)
-		    }
-	*/
-
 
 	m := mail.NewV3Mail()
 
