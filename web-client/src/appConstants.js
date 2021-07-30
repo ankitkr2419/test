@@ -95,6 +95,9 @@ export const ROUTES = {
   magnet: "magnet",
   tipDiscard: "tip-discard",
   delay: "delay",
+  templates: "templates",
+  plate: "plate",
+  activity: "activity",
   tipPosition: "tip-position",
   calibration: "calibration", //rtpcr flow: engineer homepage
 };
@@ -210,6 +213,7 @@ export const USER_ROLES = {
 };
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
+  calRedirect: "Cannot redirect to calibration while adding/editing processes!",
 };
 
 export const LABWARE_ITEMS_NAME = [

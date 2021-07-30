@@ -26,7 +26,7 @@ const CalibrationExtractionContainer = () => {
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-  const { name, token } = activeDeckObj;
+  const { isAdmin, name, token } = activeDeckObj;
 
   const pidProgessReducer = useSelector((state) => state.pidProgessReducer);
   const pidProgessReducerData = pidProgessReducer.toJS();
@@ -77,6 +77,7 @@ const CalibrationExtractionContainer = () => {
       progressData={pidProgessReducerData}
       deckName={name}
       formik={formik}
+      isAdmin={isAdmin}
     />
   );
 };

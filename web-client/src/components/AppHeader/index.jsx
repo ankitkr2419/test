@@ -32,15 +32,18 @@ import {
   MODAL_BTN,
   MODAL_MESSAGE,
   ROUTES,
+  TOAST_MESSAGE,
 } from "appConstants";
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 
 const AppHeader = (props) => {
   const {
     role,
+    isDeckBlocked,
     isUserLoggedIn,
     isPlateRoute,
     isLoginTypeAdmin,
@@ -120,16 +123,36 @@ const AppHeader = (props) => {
     setAbortModalVisibility(false);
   };
 
-  /** Hide plates tab if the user is admin */
+  /** Hide plates tab accordingly */
   const getIsNavLinkHidden = (pathname) => {
-    if (pathname !== ROUTES.calibration && isLoginTypeEngineer === true) {
-      //hide all tabs for engineer other than Calibration
-      return true;
-    } else if (pathname === ROUTES.calibration && isLoginTypeAdmin === false && isLoginTypeEngineer === false) {
-      //hide Calibration tab for operator/superwiser
-      return true;
-    } else if (pathname === "/plate" && isLoginTypeAdmin === true) {
-      return true;
+    // type : rtpcr
+    if (app === APP_TYPE.RTPCR) {
+      if (isLoginTypeEngineer === true && pathname !== ROUTES.calibration) {
+        // hide all for engineer except for calibrations
+        return true;
+      } else if (
+        isLoginTypeOperator === true &&
+        pathname === ROUTES.calibration
+      ) {
+        // hide only calibrations for operator
+        return true;
+      } else if (isLoginTypeAdmin === true && pathname === ROUTES.plate) {
+        // hide only plates for operator
+        return true;
+      }
+    }
+    // type extraction
+    else {
+      if (isLoginTypeEngineer === true && pathname !== ROUTES.calibration) {
+        // hide all for engineer except for calibrations
+        return true;
+      } else if (isLoginTypeOperator === true) {
+        // hide everything for operator in extraction
+        return true;
+      } else if (isLoginTypeAdmin === true && pathname !== ROUTES.calibration) {
+        // hide everything except calibrations for admin in extractions
+        return true;
+      }
     }
     return false;
   };
@@ -160,6 +183,16 @@ const AppHeader = (props) => {
         }
         return false;
 
+      case "/calibration":
+        if (
+          app === APP_TYPE.EXTRACTION &&
+          isLoginTypeAdmin === true &&
+          isDeckBlocked === true
+        ) {
+          return true;
+        }
+        return false;
+
       default:
         return false;
     }
@@ -167,18 +200,13 @@ const AppHeader = (props) => {
 
   const onNavLinkClickHandler = (event, pathname) => {
     if (getIsNavLinkDisabled(pathname)) {
+      if (pathname === `/${ROUTES.calibration}`) {
+        toast.warning(TOAST_MESSAGE.calRedirect);
+      }
       event.preventDefault();
     }
   };
-
-  const onCrossClick = () => {
-    if (isExperimentRunning === true) {
-      setWarningModalVisibility(true);
-    } else {
-      setExitModalVisibility(true);
-    }
-  };
-
+  
   // Exit modal confirmation click handler
   const confirmationClickHandler = (isConfirmed) => {
     setExitModalVisibility(false);
@@ -213,7 +241,7 @@ const AppHeader = (props) => {
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} />
-      {isUserLoggedIn && app === APP_TYPE.RTPCR && (
+      {isUserLoggedIn && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map(
             (ele) =>
@@ -221,10 +249,10 @@ const AppHeader = (props) => {
                 <NavItem key={ele.name}>
                   <NavLink
                     onClick={(event) => {
-                      onNavLinkClickHandler(event, ele.path);
+                      onNavLinkClickHandler(event, `/${ele.path}`);
                     }}
                     to={ele.path}
-                    disabled={getIsNavLinkDisabled(ele.path)}
+                    disabled={getIsNavLinkDisabled(`/${ele.path}`)}
                   >
                     {ele.name}
                   </NavLink>
@@ -333,7 +361,9 @@ const AppHeader = (props) => {
                   </Button>
                 )}
               </div>
-              <Text size={10} className="text-capitalize my-auto">{role ? role : ''}</Text>
+              <Text size={10} className="text-capitalize my-auto">
+                {role ? role : ""}
+              </Text>
               <Dropdown
                 isOpen={userDropdownOpen}
                 toggle={toggleUserDropdown}

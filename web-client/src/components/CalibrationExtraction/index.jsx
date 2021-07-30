@@ -4,6 +4,8 @@ import { ButtonIcon, Icon, MlModal, Text } from "shared-components";
 import { MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 import PidComponent from "./PidComponent";
 import MotorComponent from "./MotorComponent";
+import { HeadingTitle } from "./HeadingTitle";
+import { useHistory } from "react-router";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -15,16 +17,33 @@ const CalibrationExtractionComponent = (props) => {
     showConfirmationModal,
     toggleConfirmModal,
     formik,
+    isAdmin,
   } = props;
 
+  const history = useHistory();
+
   return (
-    <div className="calibration-content px-5">
-      <ButtonIcon
-        name="logout"
-        size={28}
-        className="ml-auto bg-white border-primary"
-        onClick={toggleConfirmModal}
-      />
+    <div className="calibration-content px-5 pt-3">
+      <div className="d-flex align-items-center pb-4">
+        {isAdmin && (
+          <div style={{ cursor: "pointer" }} onClick={() => history.goBack()}>
+            <Icon name="angle-left" size={32} className="text-white" />
+            <HeadingTitle
+              Tag="h5"
+              className="text-white font-weight-bold ml-3 mb-0"
+            >
+              {`Go back to recipe listing`}
+            </HeadingTitle>
+          </div>
+        )}
+
+        <ButtonIcon
+          name="logout"
+          size={28}
+          className="ml-auto bg-white border-primary"
+          onClick={toggleConfirmModal}
+        />
+      </div>
 
       <Card default className="my-3">
         <CardBody className="px-5 py-4">
