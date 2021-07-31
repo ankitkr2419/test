@@ -122,6 +122,7 @@ type Storer interface {
 	GetTargetByName(ctx context.Context, name string) (t Target, err error)
 	FinishTemplate(ctx context.Context, id uuid.UUID) (err error)
 	ListFinishedTemplates(ctx context.Context) (t []Template, err error)
+	DeleteUnfinishedTemplates(ctx context.Context) (err error)
 
 	UpdateMotor(ctx context.Context, motor Motor) (err error)
 	DeleteMotor(ctx context.Context, id int) (err error)

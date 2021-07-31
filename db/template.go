@@ -57,6 +57,8 @@ const (
 	updateEstimatedTime = `UPDATE templates SET
 	estimated_time = $1
 	where id = $2`
+
+	deleteUnfinishedTemplatesQuery = `DELETE FROM templates WHERE finished = false`
 )
 
 // TODO: Add validate for Lid and Volume once UI is ready
@@ -280,6 +282,20 @@ func (s *pgStore) FinishTemplate(ctx context.Context, id uuid.UUID) (err error) 
 
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error finishing Template")
+		return
+	}
+
+	return
+}
+
+
+func (s *pgStore) DeleteUnfinishedTemplates(ctx context.Context) (err error) {
+	_, err = s.db.Exec(
+		deleteUnfinishedTemplatesQuery,
+	)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error Deleting unfinished Template(s)")
 		return
 	}
 
