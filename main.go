@@ -43,147 +43,176 @@ const (
 	tecPath  = "./utils/tec"
 )
 
+var cliCommand = []cli.Command{
+	{
+		Name:  "start",
+		Usage: "start server [--plc {simulator|compact32}] [--test] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "plc",
+				Value: "compact32",
+				Usage: "Choose the PLC. simulator|compact32",
+			},
+			&cli.BoolFlag{
+				Name:  "test",
+				Usage: "Run in test mode!",
+			},
+			&cli.BoolFlag{
+				Name:  "no-extraction",
+				Usage: "Run without extraction",
+			},
+			&cli.BoolFlag{
+				Name:  "no-rtpcr",
+				Usage: "Run withour rtpcr",
+			},
+			&cli.IntFlag{
+				Name:  "delay",
+				Value: 50,
+				Usage: "Input a delay in range (0, 100]",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			if c.String("plc") != SIM && c.Int("delay") != 50 {
+				return responses.SimulatorReservedDelayError
+			}
+			err := simulator.UpdateDelay(c.Int("delay"))
+			if err != nil {
+				logger.Error("Re-check delay argument")
+				return err
+			}
+			return getDependenciesAndStartApp(c.String("plc"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction"))
+		},
+	},
+	{
+		Name:  "create_migration",
+		Usage: "create migration file",
+		Action: func(c *cli.Context) error {
+			logger.Infoln("Creating migration -->", c.Args().Get(0))
+			return db.CreateMigrationFile(c.Args().Get(0))
+		},
+	},
+	{
+		Name:  "migrate",
+		Usage: "run db migrations",
+		Action: func(c *cli.Context) error {
+			logger.Infoln("Running migrations")
+			return db.RunMigrations()
+		},
+	},
+	{
+		Name:  "rollback",
+		Usage: "rollback migrations",
+		Action: func(c *cli.Context) error {
+			logger.Infoln("Rolling back migrations by ", c.Args().Get(0), " steps")
+			return db.RollbackMigrations(c.Args().Get(0))
+		},
+	},
+	{
+		Name:  "import",
+		Usage: "import --csv CSV_ABSOLUTE_PATH ",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "csv",
+				Value: "recipe.csv",
+				Usage: "put recipe's csv complete file path",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			logger.Infoln("Importing CSV named -->", c.String("csv"))
+			return db.ImportCSV(c.String("csv"))
+		},
+	},
+	{
+		Name:  "version",
+		Usage: "version",
+		Action: func(c *cli.Context) {
+			logger.Infoln("Printing Version Information")
+			service.PrintBinaryInfo()
+		},
+	},
+}
+
 func main() {
-	logger.SetFormatter(&logger.TextFormatter{
-		FullTimestamp:   true,
-		ForceColors:     true,
-		TimestampFormat: "02-01-2006 15:04:05",
-	})
 
-	// logging output to file and console
-	if _, err := os.Stat(logsPath); os.IsNotExist(err) {
-		os.MkdirAll(logsPath, 0755)
-		// ignore error and try creating log output file
-	}
-	if _, err := os.Stat(tecPath); os.IsNotExist(err) {
-		os.MkdirAll(tecPath, 0755)
-		// ignore error and try creating log output file
-	}
-
-	filename := fmt.Sprintf("%v/output_%v.log", logsPath, time.Now().Unix())
-	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
+	err := setLoggersAndFiles()
 	if err != nil {
-		logger.Errorln(responses.WriteToFileError)
+		panic(err)
 	}
-	mw := io.MultiWriter(os.Stdout, f)
-	logger.SetOutput(mw)
 
 	config.LoadAllConfs()
 
 	cliApp := cli.NewApp()
 	cliApp.Name = config.AppName()
-	cliApp.Version = "1.0.0"
-	cliApp.Commands = []cli.Command{
-		{
-			Name:  "start",
-			Usage: "start server [--plc {simulator|compact32}] [--test] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "plc",
-					Value: "compact32",
-					Usage: "Choose the PLC. simulator|compact32",
-				},
-				&cli.BoolFlag{
-					Name:  "test",
-					Usage: "Run in test mode!",
-				},
-				&cli.BoolFlag{
-					Name:  "no-extraction",
-					Usage: "Run without extraction",
-				},
-				&cli.BoolFlag{
-					Name:  "no-rtpcr",
-					Usage: "Run withour rtpcr",
-				},
-				&cli.IntFlag{
-					Name:  "delay",
-					Value: 50,
-					Usage: "Input a delay in range (0, 100]",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				if c.String("plc") != SIM && c.Int("delay") != 50 {
-					return responses.SimulatorReservedDelayError
-				}
-				err := simulator.UpdateDelay(c.Int("delay"))
-				if err != nil {
-					logger.Error("Re-check delay argument")
-					return err
-				}
-				return startApp(c.String("plc"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction"))
-			},
-		},
-		{
-			Name:  "create_migration",
-			Usage: "create migration file",
-			Action: func(c *cli.Context) error {
-				logger.Infoln("Creating migration -->", c.Args().Get(0))
-				return db.CreateMigrationFile(c.Args().Get(0))
-			},
-		},
-		{
-			Name:  "migrate",
-			Usage: "run db migrations",
-			Action: func(c *cli.Context) error {
-				logger.Infoln("Running migrations")
-				return db.RunMigrations()
-			},
-		},
-		{
-			Name:  "rollback",
-			Usage: "rollback migrations",
-			Action: func(c *cli.Context) error {
-				logger.Infoln("Rolling back migrations by ", c.Args().Get(0), " steps")
-				return db.RollbackMigrations(c.Args().Get(0))
-			},
-		},
-		{
-			Name:  "import",
-			Usage: "import --csv CSV_ABSOLUTE_PATH ",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "csv",
-					Value: "recipe.csv",
-					Usage: "put recipe's csv complete file path",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				logger.Infoln("Importing CSV named -->", c.String("csv"))
-				return db.ImportCSV(c.String("csv"))
-			},
-		},
-		{
-			Name:  "version",
-			Usage: "version",
-			Action: func(c *cli.Context) {
-				logger.Infoln("Printing Version Information")
-				service.PrintBinaryInfo()
-			},
-		},
-	}
+	cliApp.Version = service.Version
+	cliApp.Commands = cliCommand
 
 	if err := cliApp.Run(os.Args); err != nil {
 		panic(err)
 	}
 }
 
-func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
+func setLoggersAndFiles() (err error) {
+	logger.SetFormatter(&logger.TextFormatter{
+		FullTimestamp:   true,
+		ForceColors:     true,
+		TimestampFormat: "02-01-2006 15:04:05",
+	})
+
+	if _, err = os.Stat(logsPath); os.IsNotExist(err) {
+		os.MkdirAll(logsPath, 0755)
+		// ignore error and try creating log output file
+	}
+	if _, err = os.Stat(tecPath); os.IsNotExist(err) {
+		os.MkdirAll(tecPath, 0755)
+		// ignore error and try creating log output file
+	}
+
+	// All terminal logs will be noted in below file
+	filename := fmt.Sprintf("%v/output_%v.log", logsPath, time.Now().Unix())
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
+	if err != nil {
+		logger.Errorln(responses.WriteToFileError)
+	}
+	// logging output to file and console
+	mw := io.MultiWriter(os.Stdout, f)
+	logger.SetOutput(mw)
+	return
+}
+
+func getDependenciesAndStartApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	logger.Println("run in test mode --->", test)
+	var deps *service.Dependencies
+
+	if deps, err = getAllDependencies(plcName, test, noRTPCR, noExtraction); err != nil {
+		logger.Errorln("Getting Dependencies failed!")
+		return
+	}
+
+	return startApp(deps)
+}
+
+func getAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps *service.Dependencies, err error) {
 	var store db.Storer
 	var driver plc.Driver
 	var tecDriver tec.Driver
 	var handler *modbus.RTUClientHandler
-	var driverDeckA plc.Extraction
-	var driverDeckB plc.Extraction
+	var driverDeckA, driverDeckB plc.Extraction
 
 	if plcName != SIM && plcName != C32 {
 		logger.Errorln(responses.UnsupportedPLCError)
-		return
+		return nil, responses.UnsupportedPLCError
 	}
 
 	exit := make(chan error)
 	websocketMsg := make(chan string)
 	websocketErr := make(chan error)
+
+	defer func() {
+		if err == nil {
+			// NOTE: monitorForPLCTimeout uses the same exit channel that is why it is to be here
+			go monitorForPLCTimeout(deps, exit)
+		}
+	}()
 
 	switch {
 	case noExtraction && noRTPCR:
@@ -220,7 +249,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		service.Application = service.Combined
 	default:
 		logger.Errorln(responses.UnknownCase)
-		return responses.UnknownCase
+		return nil, responses.UnknownCase
 	}
 
 	// PLC work in a completely separate go-routine!
@@ -236,7 +265,7 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		plc.DeckB: driverDeckB,
 	}
 
-	deps := service.Dependencies{
+	return &service.Dependencies{
 		Store:   store,
 		Tec:     tecDriver,
 		Plc:     driver,
@@ -244,32 +273,23 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 		ExitCh:  exit,
 		WsErrCh: websocketErr,
 		WsMsgCh: websocketMsg,
-	}
+	}, nil
+}
 
-	go monitorForPLCTimeout(&deps, exit)
-	go sendHeaterDataToEng(&deps.PlcDeck)
+func startApp(deps *service.Dependencies) (err error) {
 
-	err = service.LoadAllServiceFuncs(store)
+	// sending complete deps to Heater cause a change in deps has to be reflected consistently
+	go sendHeaterDataToEng(deps)
+
+	err = loadAllSetups(deps.Store)
 	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.ServiceAllLoadError)
-		return
-	}
-
-	err = db.LoadAllDBSetups(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.DBAllSetupError)
-		return
-	}
-
-	err = plc.LoadAllPLCFuncs(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.PLCAllLoadError)
+		logger.Errorln("loading All Setups failed!")
 		return
 	}
 
 	var addr = flag.String("addr", "0.0.0.0:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
-	router := service.InitRouter(deps)
+	router := service.InitRouter(*deps)
 
 	// to embed react build with go rice
 	router.PathPrefix("/").Handler(http.FileServer(rice.MustFindBox("./web-client/build").HTTPBox()))
@@ -294,22 +314,31 @@ func startApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 
 	idleConnsClosed := make(chan struct{})
 
-	go func() {
-
-		signals := make(chan os.Signal, 1)
-		signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
-		<-signals
-
-		err = service.ShutDownGraceFully(deps)
-		if err != nil {
-			os.Exit(-1)
-		}
-		os.Exit(0)
-	}()
+	go waitForGracefulShutdown(deps, idleConnsClosed)
 
 	server.Run(*addr)
 	<-idleConnsClosed
 
+	return
+}
+
+func loadAllSetups(store db.Storer) (err error) {
+	err = service.LoadAllServiceFuncs(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.ServiceAllLoadError)
+		return
+	}
+
+	err = db.LoadAllDBSetups(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.DBAllSetupError)
+		return
+	}
+
+	err = plc.LoadAllPLCFuncs(store)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.PLCAllLoadError)
+	}
 	return
 }
 
@@ -331,7 +360,20 @@ func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
 	}
 }
 
-func sendHeaterDataToEng(plcDeckMap *map[string]plc.Extraction) {
-	go (*plcDeckMap)[plc.DeckA].HeaterData()
-	go (*plcDeckMap)[plc.DeckB].HeaterData()
+func sendHeaterDataToEng(deps *service.Dependencies) {
+	go deps.PlcDeck[plc.DeckA].HeaterData()
+	go deps.PlcDeck[plc.DeckB].HeaterData()
+}
+
+func waitForGracefulShutdown(deps *service.Dependencies, idleConnsClosed chan struct{}) {
+
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+	<-signals
+
+	err := service.ShutDownGraceFully(*deps)
+	if err != nil {
+		os.Exit(-1)
+	}
+	os.Exit(0)
 }
