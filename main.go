@@ -144,9 +144,6 @@ func getDependenciesAndStartApp(plcName string, test, noRTPCR, noExtraction bool
 
 func startApp(deps *service.Dependencies) (err error) {
 
-	// sending complete deps to Heater cause a change in deps has to be reflected consistently
-	go service.SendHeaterDataToEng(deps)
-
 	err = service.LoadAllSetups(deps.Store)
 	if err != nil {
 		logger.Errorln("loading All Setups failed!")

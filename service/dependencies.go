@@ -47,6 +47,10 @@ func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps 
 		if err == nil {
 			// NOTE: monitorForPLCTimeout uses the same exit channel that is why it is to be here
 			go monitorForPLCTimeout(deps, exit)
+			if !noExtraction{
+				// sending complete deps to Heater cause a change in deps has to be reflected consistently
+				go SendHeaterDataToEng(deps)
+			}
 		}
 	}()
 
