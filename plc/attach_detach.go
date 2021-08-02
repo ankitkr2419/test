@@ -2,35 +2,26 @@ package plc
 
 import (
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
 )
 
 func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err error) {
 
-	// TODO : Remove this State storing to attach/detach individual process
 	// Operation attach and detach
 	switch ad.Operation {
 	case "attach":
-		response, err = d.attach(ad.OperationType)
+		response, err = d.attach(ad.Height)
 		if err != nil {
-			fmt.Printf("error in attach process %v \n", err.Error())
+			logger.Errorln("error in attach process :", err)
 		}
 		magnetState.Store(d.name, attached)
 		return
 	case "detach":
-		response, err = d.detach(ad.OperationType)
+		response, err = d.detach()
 		if err != nil {
-			fmt.Printf("error in attach process %v \n", err.Error())
-		}
-
-		// NOTE: Below string literal "semi_detach" is dependent on db schema
-		// operation_type is its'd db variable
-		// Make sure that db changes are reflected at here as well
-		if ad.OperationType == "semi_detach" {
-			magnetState.Store(d.name, semiDetached)
-		} else {
-			magnetState.Store(d.name, detached)
+			logger.Errorln("error in detach process: ", err)
 		}
 		return
 	}
@@ -42,10 +33,10 @@ func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err e
  ****** ALGORITHM *******
 1. First move to 12.5 mm backward for the magnet to detach
 2. Then if it is semi-detach then stay there
-3. If it is full-detach then move up to 0.5 mm from the 0 position of the magnet.
+3. move up to 0.5 mm from the 0 position of the magnet.
 4. Then move the magnet 20 mm back to avoid any chances of possible collision with the tips.
 */
-func (d *Compact32Deck) detach(operationType string) (response string, err error) {
+func (d *Compact32Deck) detach() (response string, err error) {
 
 	// TODO: Check if already detached, then avoid all below claculations
 	var magnetBackPosition, magnetUpPosition float64
@@ -59,7 +50,7 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 	// position to move the magnet backward for step 1.
 	if magnetBackPosition, ok = consDistance["magnet_backward_step_1"]; !ok {
 		err = fmt.Errorf("magnet_backward_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -76,17 +67,12 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 		return
 	}
 
-	// if operation type is semi detach then return after doing the first backward step.
-	if operationType == "semi_detach" {
-		return "Success", nil
-	}
-
 	// step 2 to go with the normal flow of full detach.
 	// to calculate the relative position of the magnet from its current
 	// position to move the magnet Upward for step 2.
 	if magnetUpPosition, ok = consDistance["magnet_up_step_1"]; !ok {
 		err = fmt.Errorf("magnet_up_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
@@ -107,7 +93,7 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 	// position to move the magnet backward for step 2.
 	if magnetBackPosition, ok = consDistance["magnet_back_step_2"]; !ok {
 		err = fmt.Errorf("magnet_back_step_2 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for backward step 2
@@ -123,6 +109,8 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 		return
 	}
 
+	magnetState.Store(d.name, detached)
+
 	return "Success", nil
 
 }
@@ -135,7 +123,7 @@ func (d *Compact32Deck) detach(operationType string) (response string, err error
 4. Move the magnet down to 75 mm down behind shaker for attach
 5. At last move 5.5 mm forward for the magnet to attach
 */
-func (d *Compact32Deck) attach(operationType string) (response string, err error) {
+func (d *Compact32Deck) attach(height int64) (response string, err error) {
 
 	// TODO: Check if already attached, then avoid all below claculations
 	var deckPosition, magnetDownFirstPosition, magnetFwdFirstPosition, magnetDownSecPosition, magnetFwdSecPosition float64
@@ -155,7 +143,7 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 	// We are using shaker_tube to maintain consistency
 	if deckPosition, ok = consDistance["shaker_tube"]; !ok {
 		err = fmt.Errorf("shaker_tube doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -167,7 +155,7 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 
 	response, err = d.setupMotor(Motors[deckAndNumber]["fast"], pulses, Motors[deckAndNumber]["ramp"], direction, deckAndNumber.Number)
 	if err != nil {
-		fmt.Printf("error in moving deck to required position")
+		logger.Errorln("error in moving deck to required position")
 		return
 	}
 
@@ -175,7 +163,7 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 	// position to move the magnet downward for step 1.
 	if magnetDownFirstPosition, ok = consDistance["magnet_down_step_1"]; !ok {
 		err = fmt.Errorf("magnet_down_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet down step 1
@@ -195,7 +183,7 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 	// position to move the magnet forward for step 1.
 	if magnetFwdFirstPosition, ok = consDistance["magnet_forward_step_1"]; !ok {
 		err = fmt.Errorf("magnet_forward_step_1 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
@@ -211,15 +199,13 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 		return
 	}
 
-	// TODO: Set the height according to the operation type (wash,lysis,illusion)
-	// For now it has to be kept same for all.
+	// Setting magnet attched here cause there has been sigificant movement from magnet
+	magnetState.Store(d.name, attached)
+
 	// step 3 to calculate the relative position of the magnet from its current
 	// position to move the magnet Downward for step 2.
-	if magnetDownSecPosition, ok = consDistance["magnet_down_step_2"]; !ok {
-		err = fmt.Errorf("magnet_down_step_2 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
-		return "", err
-	}
+	magnetDownSecPosition = float64(height)
+
 	// distance and direction setup for magnet for forward step 1
 	distanceToTravel = Positions[deckMagnetUpDown] - magnetDownSecPosition
 
@@ -237,7 +223,7 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 	// position to move the magnet Downward for step 2.
 	if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2"]; !ok {
 		err = fmt.Errorf("magnet_forward_step_2 doesn't exist for consuamble distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	// distance and direction setup for magnet for forward step 1
@@ -254,15 +240,4 @@ func (d *Compact32Deck) attach(operationType string) (response string, err error
 	}
 
 	return "Success", nil
-}
-
-func (d *Compact32Deck) fullDetach() (response string, err error) {
-	// Calling AttachDetach below as this handles magnetState implicitly
-	// WARNING: Be careful of below string literals "detach" and "full_detach",
-	// any changes in db schema of magnets should be reflected in these as well.
-	response, err = d.AttachDetach(db.AttachDetach{Operation: "detach", OperationType: "full_detach"})
-	if err != nil {
-		fmt.Printf("error in magnet detach process %v \n", err.Error())
-	}
-	return
 }

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const(
+const (
 	configPath = "./conf"
 )
 
@@ -19,7 +19,9 @@ type Conf struct {
 	RoomTemperature int64 `json:"room_temperature" validate:"required,lte=30,gte=20"`
 	HomingTime      int64 `json:"homing_time" validate:"required,lte=30,gte=16"`
 	NumHomingCycles int64 `json:"no_of_homing_cycles" validate:"required,lte=100,gte=0"`
-	CycleTime		int64 `json:"cycle_time" validate:"required,lte=30,gte=2"`
+	CycleTime       int64 `json:"cycle_time" validate:"required,lte=30,gte=2"`
+	PIDTemperature  int64 `json:"pid_temperature" validate:"required,lte=75,gte=50"`
+	PIDMinutes      int64 `json:"pid_minutes" validate:"required,lte=40,gte=20"`
 }
 
 func SetValues(c Conf) (err error) {
@@ -27,6 +29,8 @@ func SetValues(c Conf) (err error) {
 	hC := GetNumHomingCycles()
 	rT := GetRoomTemp()
 	cT := GetCycleTime()
+	pT := GetPIDTemp()
+	mT := GetPIDMinutes()
 
 	oldString, newString = []string{}, []string{}
 	oldString = append(oldString,
@@ -34,16 +38,20 @@ func SetValues(c Conf) (err error) {
 		fmt.Sprintf("num_homing_cycles: %d", hC),
 		fmt.Sprintf("room_temp: %d", int64(rT)),
 		fmt.Sprintf("cycle_time: %d", int64(cT)),
+		fmt.Sprintf("pid_temp: %d", int64(pT)),
+		fmt.Sprintf("pid_time: %d", int64(mT)),
 	)
 	newString = append(newString,
 		fmt.Sprintf("homing_time: %d", c.HomingTime),
 		fmt.Sprintf("num_homing_cycles: %d", c.NumHomingCycles),
 		fmt.Sprintf("room_temp: %d", c.RoomTemperature),
 		fmt.Sprintf("cycle_time: %d", c.CycleTime),
+		fmt.Sprintf("pid_temp: %d", c.PIDTemperature),
+		fmt.Sprintf("pid_time: %d", c.PIDMinutes),
 	)
 
 	err = UpdateConfig(configPath, oldString, newString)
-	if err != nil{
+	if err != nil {
 		return
 	}
 
@@ -51,6 +59,8 @@ func SetValues(c Conf) (err error) {
 	SetNumHomingCycles(c.NumHomingCycles)
 	SetRoomTemp(c.RoomTemperature)
 	SetCycleTime(c.CycleTime)
+	SetPIDTemp(c.PIDTemperature)
+	SetPIDMinutes(c.PIDMinutes)
 	return
 }
 

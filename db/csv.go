@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	csv_version = "1.3.0"
+	csv_version = "1.4.0"
 	version     = "VERSION"
 	csv_type    = "TYPE"
 	position    = "POSITION"
@@ -816,10 +816,19 @@ func createAspireDispenseProcess(record []string, store Storer) (err error) {
 
 func createAttachDetachProcess(record []string, store Storer) (err error) {
 	logger.Info("Inside attach detach create Process. Record: ", record)
+
+	var height int64
+
+	if strings.EqualFold(record[0], "attach") {
+		if height, err = strconv.ParseInt(record[1], 10, 64); err != nil {
+			logger.Errorln(err, record[1])
+			return err
+		}
+	}
+
 	a := AttachDetach{
 		Operation: record[0],
-		// TODO: Remove this hardcoding in future when magnet_operation_subtype will be used
-		OperationType: "lysis",
+		Height:    height,
 	}
 
 	createdProcess, err := store.CreateAttachDetach(csvCtx, a, createdRecipe.ID)

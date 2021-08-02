@@ -105,7 +105,7 @@ func ValidateExperiment(wells []Well) (valid bool, resp WarnResponse) {
 			if v == 0 {
 				// When it is neither NC, PC or NTC
 				count++
-				if count == 3{
+				if count == 3 {
 					resp.Code = "Warning"
 					resp.Message = "Absence of NC,PC or NTC"
 					return

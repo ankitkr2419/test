@@ -65,6 +65,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				} else if strings.EqualFold(msgs[0], "success") {
 
 					successOperation(deps, rw, c, msgs)
+				} else if strings.EqualFold(msgs[0], "heater") {
+
+					monitorOperation(deps, rw, c, msgs)
 				}
 
 			case err = <-deps.ExitCh:
@@ -84,6 +87,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					errortype = "ErrorPCRDead"
 					msg = "Unable to connect to Hardware"
 
+				} else {
+					errortype = "ErrorPCR"
+					msg = err.Error()
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
