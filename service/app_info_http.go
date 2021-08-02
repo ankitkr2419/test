@@ -56,7 +56,7 @@ func PrintBinaryInfo() {
 		Version, User, Machine, Branch, CommitID, BuiltOn)
 }
 
-func ShutDownGraceFully(deps Dependencies) (err error) {
+func shutDownGraceFully(deps Dependencies) (err error) {
 	var err1, err2, err3, err4 error
 	// We received an interrupt signal, shut down.
 	logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
