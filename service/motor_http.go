@@ -25,6 +25,7 @@ func createMotorHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
+		go db.SetMotorsValues([]db.Motor{m})
 
 		err = deps.Store.InsertMotor(req.Context(), []db.Motor{m})
 		if err != nil {
