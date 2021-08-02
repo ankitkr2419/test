@@ -1,46 +1,25 @@
 package main
 
 import (
-	"io"
-
 	rice "github.com/GeertJohan/go.rice"
 
 	"flag"
-	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
-	"mylab/cpagent/plc"
-	"mylab/cpagent/plc/compact32"
+
 	"mylab/cpagent/plc/simulator"
 	"mylab/cpagent/responses"
 	"mylab/cpagent/service"
-	"mylab/cpagent/tec"
-	tecSim "mylab/cpagent/tec/simulator"
-	"mylab/cpagent/tec/tec_1089"
+
 	"net/http"
 	"os"
-	"os/signal"
 	"strconv"
-	"syscall"
-	"time"
-
-	"github.com/goburrow/modbus"
 
 	"github.com/rs/cors"
 
 	logger "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/urfave/negroni"
-)
-
-const (
-	C32 = "compact32"
-	SIM = "simulator"
-)
-
-const (
-	logsPath = "./utils/logs"
-	tecPath  = "./utils/tec"
 )
 
 var cliCommand = []cli.Command{
@@ -72,7 +51,7 @@ var cliCommand = []cli.Command{
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if c.String("plc") != SIM && c.Int("delay") != 50 {
+			if c.String("plc") != service.SIM && c.Int("delay") != 50 {
 				return responses.SimulatorReservedDelayError
 			}
 			err := simulator.UpdateDelay(c.Int("delay"))
@@ -134,7 +113,7 @@ var cliCommand = []cli.Command{
 
 func main() {
 
-	err := setLoggersAndFiles()
+	err := service.SetLoggersAndFiles()
 	if err != nil {
 		panic(err)
 	}
@@ -151,39 +130,11 @@ func main() {
 	}
 }
 
-func setLoggersAndFiles() (err error) {
-	logger.SetFormatter(&logger.TextFormatter{
-		FullTimestamp:   true,
-		ForceColors:     true,
-		TimestampFormat: "02-01-2006 15:04:05",
-	})
-
-	if _, err = os.Stat(logsPath); os.IsNotExist(err) {
-		os.MkdirAll(logsPath, 0755)
-		// ignore error and try creating log output file
-	}
-	if _, err = os.Stat(tecPath); os.IsNotExist(err) {
-		os.MkdirAll(tecPath, 0755)
-		// ignore error and try creating log output file
-	}
-
-	// All terminal logs will be noted in below file
-	filename := fmt.Sprintf("%v/output_%v.log", logsPath, time.Now().Unix())
-	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
-	if err != nil {
-		logger.Errorln(responses.WriteToFileError)
-	}
-	// logging output to file and console
-	mw := io.MultiWriter(os.Stdout, f)
-	logger.SetOutput(mw)
-	return
-}
-
 func getDependenciesAndStartApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	logger.Println("run in test mode --->", test)
 	var deps *service.Dependencies
 
-	if deps, err = getAllDependencies(plcName, test, noRTPCR, noExtraction); err != nil {
+	if deps, err = service.GetAllDependencies(plcName, test, noRTPCR, noExtraction); err != nil {
 		logger.Errorln("Getting Dependencies failed!")
 		return
 	}
@@ -191,97 +142,12 @@ func getDependenciesAndStartApp(plcName string, test, noRTPCR, noExtraction bool
 	return startApp(deps)
 }
 
-func getAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps *service.Dependencies, err error) {
-	var store db.Storer
-	var driver plc.Driver
-	var tecDriver tec.Driver
-	var handler *modbus.RTUClientHandler
-	var driverDeckA, driverDeckB plc.Extraction
-
-	if plcName != SIM && plcName != C32 {
-		logger.Errorln(responses.UnsupportedPLCError)
-		return nil, responses.UnsupportedPLCError
-	}
-
-	exit := make(chan error)
-	websocketMsg := make(chan string)
-	websocketErr := make(chan error)
-
-	defer func() {
-		if err == nil {
-			// NOTE: monitorForPLCTimeout uses the same exit channel that is why it is to be here
-			go monitorForPLCTimeout(deps, exit)
-		}
-	}()
-
-	switch {
-	case noExtraction && noRTPCR:
-		logger.Infoln("application neither supports extraction nor rtpcr")
-		service.Application = service.None
-	case noExtraction && plcName == C32:
-		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
-		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
-		service.Application = service.RTPCR
-	case noExtraction && plcName == SIM:
-		driver = simulator.NewSimulator(exit)
-		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
-		service.Application = service.RTPCR
-	case noRTPCR && plcName == C32:
-		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
-		service.Application = service.Extraction
-	case noRTPCR && plcName == SIM:
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
-		service.Application = service.Extraction
-		// Only cases that remain are of combined RTPCR and Extraction
-	case plcName == C32:
-		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
-		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
-		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
-		service.Application = service.Combined
-	case plcName == SIM:
-		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
-		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
-		service.Application = service.Combined
-	default:
-		logger.Errorln(responses.UnknownCase)
-		return nil, responses.UnknownCase
-	}
-
-	// PLC work in a completely separate go-routine!
-
-	store, err = db.Init()
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.DatabaseInitError)
-		return
-	}
-
-	plcDeckMap := map[string]plc.Extraction{
-		plc.DeckA: driverDeckA,
-		plc.DeckB: driverDeckB,
-	}
-
-	return &service.Dependencies{
-		Store:   store,
-		Tec:     tecDriver,
-		Plc:     driver,
-		PlcDeck: plcDeckMap,
-		ExitCh:  exit,
-		WsErrCh: websocketErr,
-		WsMsgCh: websocketMsg,
-	}, nil
-}
-
 func startApp(deps *service.Dependencies) (err error) {
 
 	// sending complete deps to Heater cause a change in deps has to be reflected consistently
-	go sendHeaterDataToEng(deps)
+	go service.SendHeaterDataToEng(deps)
 
-	err = loadAllSetups(deps.Store)
+	err = service.LoadAllSetups(deps.Store)
 	if err != nil {
 		logger.Errorln("loading All Setups failed!")
 		return
@@ -314,66 +180,10 @@ func startApp(deps *service.Dependencies) (err error) {
 
 	idleConnsClosed := make(chan struct{})
 
-	go waitForGracefulShutdown(deps, idleConnsClosed)
+	go service.WaitForGracefulShutdown(deps, idleConnsClosed)
 
 	server.Run(*addr)
 	<-idleConnsClosed
 
 	return
-}
-
-func loadAllSetups(store db.Storer) (err error) {
-	err = service.LoadAllServiceFuncs(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.ServiceAllLoadError)
-		return
-	}
-
-	err = db.LoadAllDBSetups(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.DBAllSetupError)
-		return
-	}
-
-	err = plc.LoadAllPLCFuncs(store)
-	if err != nil {
-		logger.WithField("err", err.Error()).Errorln(responses.PLCAllLoadError)
-	}
-	return
-}
-
-func monitorForPLCTimeout(deps *service.Dependencies, exit chan error) {
-	for {
-		select {
-		case err := <-deps.ExitCh:
-			logger.Errorln(err)
-			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
-			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
-			plcDeckMap := map[string]plc.Extraction{
-				plc.DeckA: driverDeckA,
-				plc.DeckB: driverDeckB,
-			}
-			deps.PlcDeck = plcDeckMap
-		default:
-			time.Sleep(5 * time.Second)
-		}
-	}
-}
-
-func sendHeaterDataToEng(deps *service.Dependencies) {
-	go deps.PlcDeck[plc.DeckA].HeaterData()
-	go deps.PlcDeck[plc.DeckB].HeaterData()
-}
-
-func waitForGracefulShutdown(deps *service.Dependencies, idleConnsClosed chan struct{}) {
-
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
-	<-signals
-
-	err := service.ShutDownGraceFully(*deps)
-	if err != nil {
-		os.Exit(-1)
-	}
-	os.Exit(0)
 }
