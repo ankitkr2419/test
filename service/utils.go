@@ -209,6 +209,14 @@ func MD5Hash(s string) string {
 }
 
 func LoadAllServiceFuncs(s db.Storer) (err error) {
+
+	// Delete Unfinished Templates
+	err = s.DeleteUnfinishedTemplates(context.Background())
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Cleanup of unfinished templates failed")
+		return
+	}
+
 	// Create a default supervisor
 	supervisor := db.User{
 		Username: "supervisor",
