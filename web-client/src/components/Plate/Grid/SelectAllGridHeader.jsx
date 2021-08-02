@@ -18,8 +18,8 @@ const SelectAllGridHeader = ({
 }) => (
   <StyledSelectAllGridHeader className={className}>
     <Switch
-      id="selection"
-      name="selection"
+      id="selectAll"
+      name="selectAll"
       label="Select all wells"
       checked={isAllWellsSelected}
       onChange={() => toggleAllWellSelectedOption(isAllWellsSelected)}

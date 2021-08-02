@@ -170,11 +170,13 @@ const Plate = (props) => {
               </div>
               <div className="wells-wrapper flex-100 scroll-y">
                 <div className="d-flex align-items-center mb-4">
-                  {/* <WellGridHeader
+                  <WellGridHeader
                     className="mr-4"
+                    wells={wells}
                     isGroupSelectionOn={isMultiSelectionOptionOn}
                     toggleMultiSelectOption={toggleMultiSelectOption}
-                  /> */}
+                    experimentStatus={experimentStatus}
+                  />
                   <SelectAllGridHeader
                     isAllWellsSelected={isAllWellsSelected}
                     toggleAllWellSelectedOption={toggleAllWellSelectedOption}
