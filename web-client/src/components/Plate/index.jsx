@@ -34,10 +34,7 @@ const Plate = (props) => {
     activeWells,
     experimentTemplate,
     resetSelectedWells,
-    progressStatus,
-    progress,
-    remainingTime,
-    totalTime,
+    headerData,
     temperatureData,
   } = props;
 
@@ -116,10 +113,7 @@ const Plate = (props) => {
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
       <Header
-        progressStatus={progressStatus}
-        progress={progress}
-        remainingTime={remainingTime}
-        totalTime={totalTime}
+        data={headerData}
         experimentTemplate={experimentTemplate}
         experimentStatus={experimentStatus}
         experimentDetails={experimentDetails}
