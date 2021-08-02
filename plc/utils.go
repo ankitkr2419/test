@@ -102,7 +102,7 @@ const (
 
 var deckRecipe map[string]db.Recipe
 var deckProcesses map[string][]db.Process
-var wrotePulses, executedPulses, aborted, paused, homed sync.Map
+var wrotePulses, executedPulses, aborted, paused, homed, EngineerOrAdminLogged sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
 var pIDCalibrationInProgress sync.Map
@@ -147,6 +147,8 @@ func loadUtils() {
 	homed.Store(DeckB, false)
 	pIDCalibrationInProgress.Store("A", false)
 	pIDCalibrationInProgress.Store("B", false)
+	EngineerOrAdminLogged.Store("A", false)
+	EngineerOrAdminLogged.Store("B", false)
 
 	deckRecipe = map[string]db.Recipe{
 		DeckA: db.Recipe{},
@@ -245,6 +247,7 @@ func LoadAllPLCFuncs(store db.Storer) (err error) {
 	}
 
 	loadUtils()
+
 	return nil
 }
 

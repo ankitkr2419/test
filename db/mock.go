@@ -615,3 +615,8 @@ func (m *DBMockStore) UpdateUser(ctx context.Context, u User, oldName string) (e
 	args := m.Called(ctx, u, oldName)
 	return args.Error(0)
 }
+
+func (m *DBMockStore) DeleteUnfinishedTemplates(ctx context.Context) (err error) {
+	args := m.Called(ctx)
+	return args.Error(0)
+}
