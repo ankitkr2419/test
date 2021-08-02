@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, Icon, MlModal, Text } from "shared-components";
-import { MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import { MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PidComponent from "./PidComponent";
 import MotorComponent from "./MotorComponent";
 import { HeadingTitle } from "./HeadingTitle";
@@ -26,7 +26,10 @@ const CalibrationExtractionComponent = (props) => {
     <div className="calibration-content px-5 pt-3">
       <div className="d-flex align-items-center pb-4">
         {isAdmin && (
-          <div style={{ cursor: "pointer" }} onClick={() => history.goBack()}>
+          <div
+            style={{ cursor: "pointer" }}
+            onClick={() => history.push(ROUTES.recipeListing)}
+          >
             <Icon name="angle-left" size={32} className="text-white" />
             <HeadingTitle
               Tag="h5"

@@ -2,18 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import CalibrationExtractionComponent from "components/CalibrationExtraction";
-import { logoutInitiated } from "action-creators/loginActionCreators";
+import {
+  deckBlockInitiated,
+  logoutInitiated,
+} from "action-creators/loginActionCreators";
 import {
   motorInitiated,
   runPid,
 } from "action-creators/calibrationActionCreators";
-import { DECKNAME } from "appConstants";
+import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
 import { formikInitialState } from "components/CalibrationExtraction/helpers";
 
 const CalibrationExtractionContainer = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
 
   const [showConfirmationModal, setConfirmModal] = useState(false);
 
@@ -30,6 +32,14 @@ const CalibrationExtractionContainer = () => {
 
   const pidProgessReducer = useSelector((state) => state.pidProgessReducer);
   const pidProgessReducerData = pidProgessReducer.toJS();
+  const progressData = pidProgessReducerData.decks.find(
+    (deckObj) => deckObj.deckName === name
+  );
+
+  /**another deck must be blocked**/
+  useEffect(() => {
+    dispatch(deckBlockInitiated({ deckName: name }));
+  }, []);
 
   const handleLogout = () => {
     dispatch(
@@ -60,13 +70,6 @@ const CalibrationExtractionContainer = () => {
 
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
 
-  //api call to get configurations
-  // useEffect(() => {
-  //   if (token) {
-  //     //TODO initial api's if required
-  //   }
-  // }, [dispatch, token]);
-
   return (
     <CalibrationExtractionComponent
       toggleConfirmModal={toggleConfirmModal}
@@ -74,7 +77,7 @@ const CalibrationExtractionContainer = () => {
       handleBtnClick={handlePidBtn}
       handleMotorBtn={handleMotorBtn}
       showConfirmationModal={showConfirmationModal}
-      progressData={pidProgessReducerData}
+      progressData={progressData}
       deckName={name}
       formik={formik}
       isAdmin={isAdmin}

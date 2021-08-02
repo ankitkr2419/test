@@ -214,6 +214,8 @@ export const USER_ROLES = {
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
   calRedirect: "Cannot redirect to calibration while adding/editing processes!",
+  deckBlockForProcess: "Decks cannot be switched while adding/editing processes!",
+  deckBlockForCalibration: "Decks cannot be switched in calibration!"
 };
 
 export const LABWARE_ITEMS_NAME = [

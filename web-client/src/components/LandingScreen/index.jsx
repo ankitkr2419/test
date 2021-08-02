@@ -73,8 +73,13 @@ const LandingScreenComponent = (props) => {
   /**
    * if user logged in, go to recipeListing page
    */
+
   if (isLoggedIn && !error) {
-    return <Redirect to={isEngineer ? ROUTES.calibration : `/${ROUTES.recipeListing}`} />;
+    return (
+      <Redirect
+        to={isEngineer ? `/${ROUTES.calibration}` : `/${ROUTES.recipeListing}`}
+      />
+    );
   }
 
   return (

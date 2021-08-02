@@ -6,7 +6,7 @@ import {
   updateCalibrationActions,
   motorActions,
 } from "actions/calibrationActions";
-import { PID_STATUS } from "appConstants";
+import { DECKNAME, PID_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
 
 const calibrationInitialState = fromJS({
@@ -61,10 +61,22 @@ export const calibrationReducer = (state = calibrationInitialState, action) => {
   }
 };
 
+const initialStateOfDecks = [
+  {
+    name: DECKNAME.DeckAShort,
+    deckName: DECKNAME.DeckA,
+  },
+  {
+    name: DECKNAME.DeckBShort,
+    deckName: DECKNAME.DeckB,
+  },
+];
+
 const pidProgressInitialState = fromJS({
   isLoading: false,
   error: null,
   configs: {},
+  decks: initialStateOfDecks,
 });
 
 export const pidProgessReducer = (state = pidProgressInitialState, action) => {
@@ -72,23 +84,45 @@ export const pidProgessReducer = (state = pidProgressInitialState, action) => {
     case pidProgressActions.pidProgressAction:
       const { progressDetails } = action.payload;
 
+      const updatedDeckStateInProgress = state.toJS().decks.map((deckObj) => {
+        return deckObj.name === progressDetails.deck
+          ? {
+              ...deckObj,
+              isActive: true,
+              progressStatus: PID_STATUS.progressing,
+              progress: progressDetails.progress,
+              remainingTime: progressDetails.operation_details.remaining_time,
+              totalTime: progressDetails.operation_details.total_time,
+            }
+          : {
+              ...deckObj,
+              isActive: false,
+            };
+      });
       return state.merge({
-        progressStatus: PID_STATUS.progressing,
-        deckName: progressDetails.deck,
-        progress: progressDetails.progress,
-        remainingTime: progressDetails.operation_details.remaining_time,
-        totalTime: progressDetails.operation_details.total_time,
+        decks: updatedDeckStateInProgress,
       });
 
     case pidProgressActions.pidProgressActionSuccess:
       const { progressSucceeded } = action.payload;
 
+      const updatedDeckStateSuccess = state.toJS().decks.map((deckObj) => {
+        return deckObj.name === progressSucceeded.deck
+          ? {
+              ...deckObj,
+              isActive: true,
+              progressStatus: PID_STATUS.progressComplete,
+              progress: progressSucceeded.progress,
+              remainingTime: progressSucceeded.operation_details.remaining_time,
+              totalTime: progressSucceeded.operation_details.total_time,
+            }
+          : {
+              ...deckObj,
+              isActive: false,
+            };
+      });
       return state.merge({
-        progressStatus: PID_STATUS.progressComplete,
-        deckName: progressSucceeded.deck,
-        progress: progressSucceeded.progress,
-        remainingTime: progressSucceeded.operation_details.remaining_time,
-        totalTime: progressSucceeded.operation_details.total_time,
+        decks: updatedDeckStateSuccess,
       });
 
     case loginActions.loginReset:

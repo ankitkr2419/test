@@ -103,7 +103,7 @@ const AppLayoutContainer = (props) => {
           isPlateRoute={loginReducer.get("isPlateRoute")}
           isUserLoggedIn={activeDeckObj.isLoggedIn}
           isLoginTypeAdmin={activeDeckObj.isAdmin}
-          isLoginTypeOperator={activeDeckObj.isOperator}
+          isLoginTypeOperator={!activeDeckObj.isAdmin}
           isLoginTypeEngineer={activeDeckObj.isEngineer}
           isTemplateRoute={loginReducer.get("isTemplateRoute")}
           token={activeDeckObj.token}
