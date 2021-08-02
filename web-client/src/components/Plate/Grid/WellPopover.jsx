@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Popover, PopoverHeader, PopoverBody } from "core-components";
 import { Text, Center, ButtonIcon } from "shared-components";
@@ -30,13 +30,16 @@ const WellPopover = (props) => {
     ...rest
   } = props;
 
+  const [showOnMap, setShowOnMap] = useState(true);
+
   const simulateOutSideClick = () => document.body.click();
 
   // on show graph button click handler
   const onShowClickHandler = () => {
     // close the popover
     simulateOutSideClick();
-    showGraphOfWell(index);
+    showGraphOfWell(index, showOnMap);
+    setShowOnMap(!showOnMap);
   };
 
   // on edit click handler
@@ -109,7 +112,7 @@ const WellPopover = (props) => {
             onClick={onShowClickHandler}
             disabled={experimentStatus === null}
           >
-            Show on Graph
+            {showOnMap ? "Show on Graph" : "Hide from Graph"}
           </Button>
           <Button
             onClick={onEditClick}

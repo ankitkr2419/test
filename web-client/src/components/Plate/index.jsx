@@ -93,10 +93,10 @@ const Plate = (props) => {
   };
 
   // hleper function to open sidebar and show graph of selected well
-  const showGraphOfWell = (index) => {
+  const showGraphOfWell = (index, show) => {
     // set selected well index
-    setSelectedWell(index, true);
-    setIsSidebarOpen(true);
+    setSelectedWell(index, show);
+    // setIsSidebarOpen(true);
   };
 
   const [activeTab, setActiveTab] = useState("wells");
