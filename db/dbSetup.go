@@ -2,11 +2,20 @@ package db
 
 import (
 	"context"
+	"io/ioutil"
 
 	"github.com/lib/pq"
+	"gopkg.in/yaml.v2"
 
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+)
+
+const (
+	cartridgeConfFile     = "./conf/cartridges_config.yml"
+	cartridgeWellConfFile = "./conf/cartridge_wells_config.yml"
+	tipTubeConfFile       = "./conf/tips_tubes_config.yml"
+	motorConfFile         = "./conf/motor_config.yml"
 )
 
 // Config is used to get data from config file
@@ -48,7 +57,7 @@ type TipsTubesConfig struct {
 		AllowedPositions pq.Int64Array
 		Volume           float64
 		Height           float64
-		TtBase			 float64
+		TtBase           float64
 	}
 }
 
@@ -332,4 +341,170 @@ func LoadAllDBSetups(s Storer) (err error) {
 	}
 
 	return nil
+}
+
+func SetCartridgeValues(c CartridgeWell) (err error) {
+
+	var cartridgesConfig CartridgesConfig
+	var wellsConfig CartridgeWellsConfig
+	err = viper.Unmarshal(&cartridgesConfig)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgesConfig")
+		return
+	}
+	err = viper.Unmarshal(&wellsConfig)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal cartridgesConfig")
+		return
+	}
+	carConf := CartridgesConfig{}
+	carConf.Cartridges = make([]struct {
+		ID          int64
+		Type        CartridgeType
+		Description string
+	}, len(c.Cartridge))
+
+	carWellConf := CartridgeWellsConfig{}
+	carWellConf.CartridgeWells = make([]struct {
+		ID       int64
+		WellNum  int64
+		Distance float64
+		Height   float64
+		Volume   float64
+	}, len(c.CartridgeWells))
+
+	for i, v := range c.Cartridge {
+		carConf.Cartridges[i].ID = v.ID
+		carConf.Cartridges[i].Type = v.Type
+		carConf.Cartridges[i].Description = v.Description
+		cartridgesConfig.Cartridges = append(cartridgesConfig.Cartridges, carConf.Cartridges[i])
+	}
+
+	for i, v := range c.CartridgeWells {
+		carWellConf.CartridgeWells[i].ID = v.ID
+		carWellConf.CartridgeWells[i].WellNum = v.WellNum
+		carWellConf.CartridgeWells[i].Distance = v.Distance
+		carWellConf.CartridgeWells[i].Height = v.Height
+		carWellConf.CartridgeWells[i].Volume = v.Volume
+
+		wellsConfig.CartridgeWells = append(wellsConfig.CartridgeWells, carWellConf.CartridgeWells[i])
+	}
+
+	res, err := yaml.Marshal(cartridgesConfig)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	err = ioutil.WriteFile(cartridgeConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+
+	res, err = yaml.Marshal(wellsConfig)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	err = ioutil.WriteFile(cartridgeWellConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+
+	return
+
+}
+
+func SetTipsTubesValues(tt []TipsTubes) (err error) {
+
+	var config TipsTubesConfig
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+
+	tipTubeConf := TipsTubesConfig{}
+	tipTubeConf.TipsTubes = make([]struct {
+		ID               int64
+		Name             string
+		Type             string
+		AllowedPositions pq.Int64Array
+		Volume           float64
+		Height           float64
+		TtBase           float64
+	}, 1)
+	for i, v := range tt {
+		tipTubeConf.TipsTubes[i].ID = v.ID
+		tipTubeConf.TipsTubes[i].Name = v.Name
+		tipTubeConf.TipsTubes[i].Type = v.Type
+		tipTubeConf.TipsTubes[i].AllowedPositions = v.AllowedPositions
+		tipTubeConf.TipsTubes[i].Volume = v.Volume
+		tipTubeConf.TipsTubes[i].Height = v.Height
+		tipTubeConf.TipsTubes[i].TtBase = v.TtBase
+
+		config.TipsTubes = append(config.TipsTubes, tipTubeConf.TipsTubes[i])
+	}
+	res, err := yaml.Marshal(config)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	err = ioutil.WriteFile(tipTubeConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+	return
+
+}
+
+func SetMotorsValues(m []Motor) (err error) {
+	var config MotorConfig
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+
+	motorConf := MotorConfig{}
+	motorConf.Motor = make([]struct {
+		ID     int
+		Deck   string
+		Number int
+		Name   string
+		Ramp   int
+		Steps  int
+		Slow   int
+		Fast   int
+	}, 1)
+	for i, v := range m {
+		motorConf.Motor[i].ID = v.ID
+		motorConf.Motor[i].Deck = v.Deck
+		motorConf.Motor[i].Number = v.Number
+		motorConf.Motor[i].Name = v.Name
+		motorConf.Motor[i].Ramp = v.Ramp
+		motorConf.Motor[i].Steps = v.Steps
+		motorConf.Motor[i].Slow = v.Slow
+		motorConf.Motor[i].Fast = v.Fast
+
+		config.Motor = append(config.Motor, motorConf.Motor[i])
+	}
+	res, err := yaml.Marshal(config)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	err = ioutil.WriteFile(motorConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+	return
+	return
 }
