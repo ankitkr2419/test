@@ -61,7 +61,7 @@ LOOP:
 
 	// something went wrong. Signal parent process
 	logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-	d.ExitCh <- errors.New("PLC is not responding and maybe dead. Abort!!")
+	d.ExitCh <- errors.New("PCR Dead")
 	return
 }
 
@@ -229,7 +229,7 @@ func (d *Compact32) Stop() (err error) {
 	// if err != nil {
 	// 	logger.Error("WriteSingleCoil:M102 : Stop Cycle")
 	// }
-	d.ExitCh <- errors.New("PCR ABORTED")
+	d.ExitCh <- errors.New("PCR Aborted")
 	return nil
 }
 
