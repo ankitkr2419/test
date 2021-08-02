@@ -12,6 +12,13 @@ import (
 const (
 	HOLDING_STAGE = "hold"
 	CYCLE_STAGE   = "cycle"
+	baudRate = 9600
+	dataBits = 8
+	parity = "E"
+	stopBits = 1
+	station_1_SlaveID = 1
+	station_2_SlaveID = 2
+	timeoutMs = 50
 )
 
 type Compact32 struct {
@@ -24,12 +31,12 @@ type Compact32 struct {
 func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
-	handler.BaudRate = 9600
-	handler.DataBits = 8
-	handler.Parity = "E"
-	handler.StopBits = 1
-	handler.SlaveId = 1 // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
-	handler.Timeout = 500 * time.Millisecond
+	handler.BaudRate = baudRate
+	handler.DataBits = dataBits
+	handler.Parity = parity
+	handler.StopBits = stopBits
+	handler.SlaveId = station_1_SlaveID // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
+	handler.Timeout = timeoutMs * time.Millisecond
 
 	handler.Connect()
 	driver := Compact32ModbusDriver{}
@@ -100,12 +107,12 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) (plc.Extraction, *modbus.RTUClientHandler) {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
-	handler.BaudRate = 9600
-	handler.DataBits = 8
-	handler.Parity = "E"
-	handler.StopBits = 1
-	handler.SlaveId = byte(1)
-	handler.Timeout = 50 * time.Millisecond
+	handler.BaudRate = baudRate
+	handler.DataBits = dataBits
+	handler.Parity = parity
+	handler.StopBits = stopBits
+	handler.SlaveId = station_1_SlaveID
+	handler.Timeout = timeoutMs * time.Millisecond
 
 	handler.Connect()
 	driver := Compact32ModbusDriver{}
@@ -126,12 +133,12 @@ func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan 
 func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) plc.Extraction {
 	/* Modbus RTU/ASCII */
 	handler2 := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
-	handler2.BaudRate = 9600
-	handler2.DataBits = 8
-	handler2.Parity = "E"
-	handler2.StopBits = 1
-	handler2.SlaveId = byte(2)
-	handler2.Timeout = 50 * time.Millisecond
+	handler.BaudRate = baudRate
+	handler.DataBits = dataBits
+	handler.Parity = parity
+	handler.StopBits = stopBits
+	handler.SlaveId = station_2_SlaveID
+	handler.Timeout = timeoutMs * time.Millisecond
 
 	handler2.Connect()
 	driver := Compact32ModbusDriver{}
