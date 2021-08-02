@@ -85,11 +85,17 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			"role":  u.Role,
 		}
 
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.UserMarshallingError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserMarshallingError.Error()})
-			return
+		logger.WithFields(logger.Fields{
+			"Username": u.Username,
+			"Role": u.Role,
+			"Deck": deck,
+		}).Infoln("User logged in successfully")
+		if deck != "" && (u.Role == admin || u.Role == engineer) {
+			deps.PlcDeck[deck].SetEngineerOrAdminLogged(true)
+		} else if deck != "" {
+			deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 		}
+
 		logger.Infoln(responses.UserLoginSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, response)
 	})
@@ -207,6 +213,7 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 		}
 		if deck != "" {
 			userLogin.Store(deck, false)
+			deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 		}
 
 		logger.Infoln(responses.UserLogoutSuccess)

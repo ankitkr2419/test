@@ -15,10 +15,7 @@ const PreviewReportModal = (props) => {
     setIsSidebarOpen,
     resetSelectedWells,
     isMultiSelectionOptionOn,
-    progressStatus,
-    progress,
-    remainingTime,
-    totalTime,
+    data,
     experimentTemplate,
     experimentDetails,
     experimentId,
@@ -92,10 +89,7 @@ const PreviewReportModal = (props) => {
           </div>
           <div id="page-3">
             <Header
-              progressStatus={progressStatus}
-              progress={progress}
-              remainingTime={remainingTime}
-              totalTime={totalTime}
+              data={data}
               experimentTemplate={experimentTemplate}
               experimentStatus={experimentStatus}
               experimentDetails={experimentDetails}

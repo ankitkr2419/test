@@ -2,6 +2,7 @@ package plc
 
 import (
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
 	"sort"
@@ -35,14 +36,14 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	//
 	if cartridgeStart, ok = consDistance[string(pi.Type)+"_start"]; !ok {
 		err = fmt.Errorf(string(pi.Type) + "_start doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
 	// piercingHeight is dependent on cartridge type
 	if piercingHeight, ok = consDistance["piercing_height_"+string(pi.Type)]; !ok {
 		err = fmt.Errorf("piercing_height_" + string(pi.Type) + " doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -56,11 +57,10 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	// Calculation below considers syringe module as glued with tip
 	// And we go to piercingHeight
 
-
 	// Get Deck Base
 	if deckBase, ok = consDistance["deck_base"]; !ok {
 		err = fmt.Errorf("deck_base doesn't exist for consumables")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -87,7 +87,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		uniqueCartridge.WellNum = int64(wellNumber)
 		if position, ok = cartridges[uniqueCartridge]["distance"]; !ok {
 			err = fmt.Errorf("distance doesn't exist for well number %d", wellNumber)
-			fmt.Println("Error: ", err)
+			logger.Errorln(err)
 			return "", err
 		}
 
@@ -101,11 +101,11 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
-			fmt.Println(err)
+			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Deck to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
-		fmt.Println("Completed Move Deck to reach the wellNum ", wellNumber)
+		logger.Infoln("Completed Move Deck to reach the wellNum ", wellNumber)
 
 		// 2.2 Pierce and come back up
 
@@ -114,11 +114,11 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 		if err != nil {
-			fmt.Println(err)
+			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module DOWN to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
-		fmt.Println("Pierced WellNumber: ", wellNumber)
+		logger.Infoln("Pierced WellNumber: ", wellNumber)
 
 		// change piercingPulses just before going up after piercing the first well
 		if i == 0 {
@@ -129,12 +129,12 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 			//
 			if pickUpTip, ok = consDistance["pickup_piercing_tip_up"]; !ok {
 				err = fmt.Errorf("pickup_piercing_tip_up doesn't exist for consumable distances")
-				fmt.Println("Error: ", err)
+				logger.Errorln(err)
 				return "", err
 			}
 
 			// piercingHeight will be always less than current position
-			distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase - pickUpTip) 
+			distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase - pickUpTip)
 
 			piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 		}
@@ -146,11 +146,11 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		// WE know concrete direction here, its UP
 		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 		if err != nil {
-			fmt.Println(err)
+			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module UP to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
-		fmt.Println("Got Up from WellNumber: ", wellNumber)
+		logger.Infoln("Got Up from WellNumber: ", wellNumber)
 
 		// 2.3 Repeat step 2.1 and  2.2 till another well exists
 	}

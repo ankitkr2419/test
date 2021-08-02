@@ -10,29 +10,38 @@ const StyledWellGridHeader = styled.header`
 `;
 
 const WellGridHeader = ({
+  wells,
   className,
   isGroupSelectionOn,
-  toggleMultiSelectOption
-}) => (
-  <StyledWellGridHeader className={className}>
-    <Switch
-      id="selection"
-      name="selection"
-      label="Group Selection to view graph"
-      checked={isGroupSelectionOn}
-      onChange={toggleMultiSelectOption}
-    />
-  </StyledWellGridHeader>
-);
+  toggleMultiSelectOption,
+  experimentStatus,
+}) => {
+  const filledWells = wells
+    .toJS()
+    .filter((wellObj) => wellObj && wellObj.isWellFilled === true);
+
+  return (
+    <StyledWellGridHeader className={className}>
+      <Switch
+        id="selection"
+        name="selection"
+        label="Group Selection to view on graph"
+        checked={isGroupSelectionOn}
+        onChange={toggleMultiSelectOption}
+        disabled={filledWells.length === 0 || experimentStatus === null}
+      />
+    </StyledWellGridHeader>
+  );
+};
 
 WellGridHeader.propTypes = {
   className: PropTypes.string,
   isGroupSelectionOn: PropTypes.bool.isRequired,
-  toggleMultiSelectOption: PropTypes.func.isRequired
+  toggleMultiSelectOption: PropTypes.func.isRequired,
 };
 
 WellGridHeader.defaultProps = {
-  className: ""
+  className: "",
 };
 
 export default WellGridHeader;

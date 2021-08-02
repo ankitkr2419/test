@@ -71,7 +71,7 @@ const (
 
 // here we are hardcoding the shaker no in future this is to be fetched dynamically.
 // 3 is the value that needs to be passed for heating both the shakers.
-const(
+const (
 	shaker = uint16(3)
 )
 
@@ -102,12 +102,14 @@ const (
 
 var deckRecipe map[string]db.Recipe
 var deckProcesses map[string][]db.Process
-var wrotePulses, executedPulses, aborted, paused, homed sync.Map
+var wrotePulses, executedPulses, aborted, paused, homed, EngineerOrAdminLogged sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
 var pIDCalibrationInProgress sync.Map
+
 // tipHeight is the Height of tip from syringe's base
 var tipHeight map[string]float64
+
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
 var homingPercent, currentProcess sync.Map
@@ -145,6 +147,8 @@ func loadUtils() {
 	homed.Store(DeckB, false)
 	pIDCalibrationInProgress.Store("A", false)
 	pIDCalibrationInProgress.Store("B", false)
+	EngineerOrAdminLogged.Store("A", false)
+	EngineerOrAdminLogged.Store("B", false)
 
 	deckRecipe = map[string]db.Recipe{
 		DeckA: db.Recipe{},
@@ -243,6 +247,7 @@ func LoadAllPLCFuncs(store db.Storer) (err error) {
 	}
 
 	loadUtils()
+
 	return nil
 }
 
@@ -283,7 +288,7 @@ func selectAllConsDistances(store db.Storer) (err error) {
 			Calibs[deckAndNumber] = cd.Distance
 		}
 	}
-	fmt.Println("Calibs:--->", Calibs)
+	logger.Infoln("Calibs:--->", Calibs)
 	return
 }
 

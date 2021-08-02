@@ -366,8 +366,8 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	templateRunSuccess = false
 
 	// invoke monitor after 2 secs
-	go func(){
-		time.Sleep( 2 * time.Second)
+	go func() {
+		time.Sleep(2 * time.Second)
 		go monitorExperiment(deps, file)
 	}()
 

@@ -1,12 +1,11 @@
 package plc
 
 import (
-	"encoding/json"
-	"fmt"
-	"mylab/cpagent/db"
-	"mylab/cpagent/config"
-	"mylab/cpagent/responses"
 	"context"
+	"fmt"
+	"mylab/cpagent/config"
+	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -20,8 +19,8 @@ import (
 
 func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// TODO: Logging this PLC Operation
-	defer func(){
-		if err != nil{
+	defer func() {
+		if err != nil {
 			logger.Errorln(err)
 			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 		}
@@ -29,7 +28,6 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 
 	d.setPIDCalibrationInProgress()
 	defer d.resetPIDCalibrationInProgress()
-
 
 	// Stop Heater
 	_, err = d.switchOffHeater()
@@ -42,10 +40,9 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(config.GetPIDTemp()*10))
 	if err != nil {
 		logger.Errorln("Error failed to write temperature: ", err)
-		return  err
+		return err
 	}
 	logger.Infoln("result from temperature set ", result, config.GetPIDTemp())
-
 
 	// Start Heater
 	_, err = d.switchOnHeater()
@@ -72,22 +69,6 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	}
 
 	logger.Infoln(responses.PIDCalibrationSuccess)
-
-	// send success ws data
-	successWsData := WSData{
-		Progress: 100,
-		Deck:     d.name,
-		Status:   "SUCCESS_PIDCALIBRATION",
-		OperationDetails: OperationDetails{
-			Message: fmt.Sprintf("successfully completed PID calibration for deck %v", d.name),
-		},
-	}
-	wsData, err := json.Marshal(successWsData)
-	if err != nil {
-		logger.Errorf("error in marshalling web socket data %v", err.Error())
-		return
-	}
-	d.WsMsgCh <- fmt.Sprintf("success_pidCalibration_%v", string(wsData))
 
 	return
 }

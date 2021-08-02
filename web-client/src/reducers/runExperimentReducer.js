@@ -14,6 +14,7 @@ const runProgressInitialState = fromJS({
   progress: 0,
   remainingTime: null,
   totalTime: null,
+  totalCycles: 0,
 });
 
 export const runExpProgressReducer = (
@@ -29,6 +30,7 @@ export const runExpProgressReducer = (
         progress: progressDetails.progress,
         remainingTime: progressDetails.remaining_time,
         totalTime: progressDetails.total_time,
+        totalCycles: progressDetails.total_cycles,
       });
 
     case runExperimentInProgressActions.runExperimentProgressSuccessAction:
@@ -39,6 +41,7 @@ export const runExpProgressReducer = (
         progress: progressSucceeded.progress,
         remainingTime: progressSucceeded.remaining_time,
         totalTime: progressSucceeded.total_time,
+        totalCycles: progressSucceeded.total_cycles,
       });
 
     case loginActions.loginReset:

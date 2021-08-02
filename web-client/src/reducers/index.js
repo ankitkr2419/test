@@ -4,7 +4,7 @@ import {
   listTemplatesReducer,
   deleteTemplateReducer,
   updateTemplateReducer,
-  finishCreateTemplateReducer
+  finishCreateTemplateReducer,
 } from "reducers/templateReducer";
 import {
   listTargetReducer,
@@ -57,7 +57,11 @@ import { editProcessReducer } from "reducers/editProcessReducer";
 import { appInfoReducer } from "./appInfoReducer";
 import { processesReducer } from "reducers/processesReducer";
 import { activityLogReducer } from "reducers/activityLogReducer";
-import { calibrationReducer } from "./calibrationReducer";
+import {
+  calibrationReducer,
+  pidProgessReducer,
+  pidReducer,
+} from "./calibrationReducer";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -103,6 +107,8 @@ const rootReducer = combineReducers({
   processesReducer,
   activityLogReducer,
   calibrationReducer,
+  pidProgessReducer,
+  pidReducer,
   finishCreateTemplateReducer,
 });
 

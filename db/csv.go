@@ -828,7 +828,7 @@ func createAttachDetachProcess(record []string, store Storer) (err error) {
 
 	a := AttachDetach{
 		Operation: record[0],
-		Height: height,
+		Height:    height,
 	}
 
 	createdProcess, err := store.CreateAttachDetach(csvCtx, a, createdRecipe.ID)

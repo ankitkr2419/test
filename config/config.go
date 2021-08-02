@@ -60,6 +60,7 @@ func GetSecretKey() string {
 	checkIfSet(key)
 	return viper.GetString(key)
 }
+
 func SetSecretKey(key string) {
 	key = "SECRET_KEY"
 	viper.Set(key, "123456qwerty")
@@ -91,6 +92,12 @@ func GetPIDTemp() int64 {
 
 func GetPIDMinutes() int64 {
 	return int64(ReadEnvInt("pid_time"))
+}
+
+func GetSendGridAPIKey() string {
+	key := "SENDGRID_API_KEY"
+	checkIfSet(key)
+	return viper.GetString(key)
 }
 
 func SetHomingTime(hT int64) {

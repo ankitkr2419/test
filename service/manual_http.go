@@ -105,7 +105,7 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
-		fmt.Println("Inside ABORT... value of deck:", deck, len(deck))
+		logger.Infoln("Inside ABORT... value of deck:", deck, len(deck))
 
 		response, err = singleDeckOperation(req.Context(), deps, deck, "Abort")
 

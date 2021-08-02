@@ -2,9 +2,9 @@ package simulator
 
 import (
 	"encoding/binary"
+	"mylab/cpagent/responses"
 	"sync"
 	"time"
-	"mylab/cpagent/responses"
 )
 
 type SimulatorDriver struct {
@@ -12,7 +12,7 @@ type SimulatorDriver struct {
 	DeckName string
 }
 
-// Below delay should be 50 for almost real simulation, 
+// Below delay should be 50 for almost real simulation,
 // all other delay's are its proportinate
 var delay time.Duration = 50
 
