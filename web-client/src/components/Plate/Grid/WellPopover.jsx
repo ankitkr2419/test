@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { Button, Popover, PopoverHeader, PopoverBody } from "core-components";
 import { Text, Center, ButtonIcon } from "shared-components";
 import styled from "styled-components";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const StyledText = styled(Text)`
   color: ${(props) => {
@@ -25,6 +26,7 @@ const WellPopover = (props) => {
     onEditClickHandler,
     showGraphOfWell,
     isEditBtnDisabled,
+    experimentStatus,
     ...rest
   } = props;
 
@@ -102,10 +104,21 @@ const WellPopover = (props) => {
 					</li> */}
         </ul>
         <Center>
-          <Button className="mb-4" onClick={onShowClickHandler}>
+          <Button
+            className="mb-4"
+            onClick={onShowClickHandler}
+            disabled={experimentStatus === null}
+          >
             Show on Graph
           </Button>
-          <Button onClick={onEditClick} disabled={isEditBtnDisabled}>
+          <Button
+            onClick={onEditClick}
+            disabled={
+              experimentStatus === EXPERIMENT_STATUS.success ||
+              experimentStatus === EXPERIMENT_STATUS.running ||
+              experimentStatus === EXPERIMENT_STATUS.stopped
+            }
+          >
             Edit Info
           </Button>
         </Center>
