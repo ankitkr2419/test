@@ -212,9 +212,11 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
 			return
 		}
-		if (deck == plc.DeckA || deck== plc.DeckB) && ( Application == Combined || Application == Extraction) {
+		if (deck == plc.DeckA || deck== plc.DeckB) {
 			userLogin.Store(deck, false)
-			deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
+			if  Application == Combined || Application == Extraction {
+				deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
+			}
 		}
 
 		logger.Infoln(responses.UserLogoutSuccess)
