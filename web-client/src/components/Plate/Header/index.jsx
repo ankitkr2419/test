@@ -87,7 +87,7 @@ const SubHeader = props => {
         {TEMP_ARR_LEN > 0 && (
           <div className="d-flex align-items-center">
             <Text className="mb-0">
-              Cycle - {cycleValue} / {totalCycles}{" "}
+              Cycle - {cycleValue} / {totalCycles ? totalCycles : 0}{" "}
             </Text>
             <Text className="mb-0 mx-2">|</Text>
             <Text className="mb-0">
