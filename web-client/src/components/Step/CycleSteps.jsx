@@ -63,7 +63,7 @@ const CycleSteps = ({
 			</thead>
 			<tbody>
 				{cycleSteps.map((step, index) => {
-					const stepId = step.get('id');
+					const stepId = step.get('step_id');
 					const classes = selectedStepId === stepId ? 'active' : '';
 					return (
 						<tr
