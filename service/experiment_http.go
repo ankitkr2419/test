@@ -152,7 +152,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		// create  new file for each experiment with experiment id in file name.
-		file := plc.GetExcelFile(tec.LogsPath, fmt.Sprintf("output_%v", expID))
+		file := db.GetExcelFile(tec.LogsPath, fmt.Sprintf("output_%v", expID))
 
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
@@ -228,13 +228,13 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			heading = append(heading, v)
 		}
 
-		plc.AddMergeRowToExcel(file, plc.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
+		db.AddMergeRowToExcel(file, db.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
 
 		row := []interface{}{"well positions"}
 		for _, v := range config.ActiveWells("activeWells") {
 			row = append(row, v)
 		}
-		plc.AddRowToExcel(file, plc.RTPCRSheet, row)
+		db.AddRowToExcel(file, db.RTPCRSheet, row)
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
@@ -388,17 +388,17 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	// Start line
 	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
-	plc.AddRowToExcel(file, plc.TECSheet, headers)
+	db.AddRowToExcel(file, db.TECSheet, headers)
 
 	timeStarted := time.Now()
 	row := []interface{}{"Experiment Started at: ", timeStarted.String()}
-	plc.AddRowToExcel(file, plc.TempLogs, row)
+	db.AddRowToExcel(file, db.TempLogs, row)
 
 	row = []interface{}{"Holding Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
-	plc.AddRowToExcel(file, plc.TempLogs, row)
+	db.AddRowToExcel(file, db.TempLogs, row)
 
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
@@ -409,7 +409,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
@@ -431,10 +431,10 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	templateRunSuccess = true
 
 	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	row = []interface{}{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	return
 }

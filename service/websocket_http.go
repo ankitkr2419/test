@@ -443,7 +443,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 		}
 		//Add to excel
 		row := []interface{}{time.Now().Format("2006-01-02 15:04:05"), scan.Temp, scan.LidTemp}
-		plc.AddRowToExcel(file, plc.TempLogs, row)
+		db.AddRowToExcel(file, db.TempLogs, row)
 
 		// writes temp on every step against time in DB
 		err = WriteExperimentTemperature(deps, scan)

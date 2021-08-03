@@ -1,8 +1,9 @@
 package tec
 
 import (
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"mylab/cpagent/plc"
+
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 )
 
 const LogsPath = "./utils/output"
