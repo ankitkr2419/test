@@ -234,7 +234,7 @@ func (d *Simulator) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	d.Lock()
 	defer d.Unlock()
 	// simulate currentLidTemp
-	d.plcIO.d.currentLidTemp = jitter(uint16(100*10), 0, 50)
+	d.plcIO.d.currentLidTemp = jitter(uint16(plc.CurrentLidTemp*10), 1, 30)
 
 	scan.Temp = plc.CurrentCycleTemperature
 	scan.LidTemp = float32(d.plcIO.d.currentLidTemp) / 10

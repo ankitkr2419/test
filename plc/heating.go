@@ -273,7 +273,7 @@ func (d *Compact32Deck) HeaterData() (err error) {
 				}
 				logger.WithFields(logger.Fields{
 					"heater":  err,
-					"attempt": retryCounter + 1,
+					"attempt": retryCounter,
 				}).Warnln("Attempt failed. Heater Value couldn't be read. Retrying...")
 				time.Sleep(10 * time.Second) // sleep it off for a bit
 			} else {
