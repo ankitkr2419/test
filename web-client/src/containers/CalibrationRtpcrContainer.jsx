@@ -37,6 +37,8 @@ const CalibrationRtpcrContainer = () => {
       pid_minutes: configData.pidMinutes,
     };
     dispatch(updateCalibrationInitiated({ token, data }));
+    //populate with new data
+    dispatch(calibrationInitiated(token));
   };
 
   return (

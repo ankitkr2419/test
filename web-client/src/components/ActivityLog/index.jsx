@@ -148,7 +148,7 @@ const ActivityComponent = (props) => {
                     /> */}
                     <ButtonIcon
                       size={28}
-                      name="mail"
+                      name="published"
                       onClick={mailActivityReportHandler}
                     />
                   </td>
