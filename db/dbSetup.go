@@ -505,6 +505,6 @@ func SetMotorsValues(m []Motor) (err error) {
 		logger.Errorln("error in writing to file", err)
 		return
 	}
-	return
+
 	return
 }
