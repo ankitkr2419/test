@@ -27,7 +27,7 @@ type Dependencies struct {
 	// define other service dependencies
 }
 
-func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps *Dependencies, err error) {
+func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps Dependencies, err error) {
 	var store db.Storer
 	var driver plc.Driver
 	var tecDriver tec.Driver
@@ -36,7 +36,7 @@ func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps 
 
 	if plcName != SIM && plcName != C32 {
 		logger.Errorln(responses.UnsupportedPLCError)
-		return nil, responses.UnsupportedPLCError
+		return Dependencies{}, responses.UnsupportedPLCError
 	}
 
 	exit := make(chan error)
@@ -46,7 +46,7 @@ func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps 
 	defer func() {
 		if err == nil {
 			// NOTE: monitorForPLCTimeout uses the same exit channel that is why it is to be here
-			go monitorForPLCTimeout(deps, exit)
+			go monitorForPLCTimeout(&deps, exit)
 			if !noExtraction{
 				// sending complete deps to Heater cause a change in deps has to be reflected consistently
 				go SendHeaterDataToEng(deps)
@@ -89,7 +89,7 @@ func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps 
 		Application = Combined
 	default:
 		logger.Errorln(responses.UnknownCase)
-		return nil, responses.UnknownCase
+		return Dependencies{}, responses.UnknownCase
 	}
 
 	// PLC work in a completely separate go-routine!
@@ -105,7 +105,7 @@ func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps 
 		plc.DeckB: driverDeckB,
 	}
 
-	return &Dependencies{
+	return Dependencies{
 		Store:   store,
 		Tec:     tecDriver,
 		Plc:     driver,

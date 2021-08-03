@@ -132,7 +132,7 @@ func main() {
 
 func getDependenciesAndStartApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
 	logger.Println("run in test mode --->", test)
-	var deps *service.Dependencies
+	var deps service.Dependencies
 
 	if deps, err = service.GetAllDependencies(plcName, test, noRTPCR, noExtraction); err != nil {
 		logger.Errorln("Getting Dependencies failed!")
@@ -142,7 +142,7 @@ func getDependenciesAndStartApp(plcName string, test, noRTPCR, noExtraction bool
 	return startApp(deps)
 }
 
-func startApp(deps *service.Dependencies) (err error) {
+func startApp(deps service.Dependencies) (err error) {
 
 	err = service.LoadAllSetups(deps.Store)
 	if err != nil {
@@ -152,7 +152,7 @@ func startApp(deps *service.Dependencies) (err error) {
 
 	var addr = flag.String("addr", "0.0.0.0:"+strconv.Itoa(config.AppPort()), "http service address")
 	// mux router
-	router := service.InitRouter(*deps)
+	router := service.InitRouter(deps)
 
 	// to embed react build with go rice
 	router.PathPrefix("/").Handler(http.FileServer(rice.MustFindBox("./web-client/build").HTTPBox()))
