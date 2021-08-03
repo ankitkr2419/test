@@ -56,7 +56,10 @@ import { processListReducer } from "reducers/processListReducer";
 import { editProcessReducer } from "reducers/editProcessReducer";
 import { appInfoReducer } from "./appInfoReducer";
 import { processesReducer } from "reducers/processesReducer";
-import { activityLogReducer } from "reducers/activityLogReducer";
+import {
+  activityLogReducer,
+  mailReportReducer,
+} from "reducers/activityLogReducer";
 import {
   calibrationReducer,
   pidProgessReducer,
@@ -106,6 +109,7 @@ const rootReducer = combineReducers({
   appInfoReducer,
   processesReducer,
   activityLogReducer,
+  mailReportReducer,
   calibrationReducer,
   pidProgessReducer,
   pidReducer,

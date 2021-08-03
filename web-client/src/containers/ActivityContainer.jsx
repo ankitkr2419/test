@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ActivityComponent from "components/ActivityLog";
 import { useSelector, useDispatch } from "react-redux";
-import { activityLogInitiated } from "action-creators/activityLogActionCreators";
+import {
+  activityLogInitiated,
+  mailReportInitiated,
+} from "action-creators/activityLogActionCreators";
+import { toast } from "react-toastify";
+import { TOAST_MESSAGE } from "appConstants";
 
 const ActivityContainer = () => {
   const dispatch = useDispatch();
@@ -17,6 +22,10 @@ const ActivityContainer = () => {
   const activityLogData = activityLogReducer.toJS();
   const { activityLogs } = activityLogData;
 
+  //get status of mail from reducer
+  const mailReportReducer = useSelector((state) => state.mailReportReducer);
+  const { isLoading, error } = mailReportReducer.toJS();
+
   //search activity by experiment name
   const [searchText, setSearchText] = useState("");
 
@@ -25,8 +34,21 @@ const ActivityContainer = () => {
     dispatch(activityLogInitiated(token));
   }, []);
 
+  // check if mail is sent or not and show toast msg acc.
+  useEffect(() => {
+    if (isLoading === false && error === true) {
+      toast.success(TOAST_MESSAGE.sendingMailSuccess);
+    } else if (isLoading === false && error === false) {
+      toast.success(TOAST_MESSAGE.sendingMailSuccess);
+    }
+  }, [isLoading, error]);
+
   const onSearchTextChanged = (text) => {
     setSearchText(text);
+  };
+
+  const mailActivityReportHandler = () => {
+    // dispatch(mailReportInitiated({ report, token })); //API call to send an email
   };
 
   return (
@@ -34,6 +56,7 @@ const ActivityContainer = () => {
       experiments={activityLogs}
       searchText={searchText}
       onSearchTextChanged={onSearchTextChanged}
+      mailActivityReportHandler={mailActivityReportHandler}
     />
   );
 };
