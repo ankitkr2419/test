@@ -157,7 +157,7 @@ func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
 
 	err = s.updateProcessName(ctx, tx, d.ProcessID, DelayProcess, d)
 	if err != nil {
-		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		logger.WithField("err:", err.Error()).Errorln(responses.DelayUpdateNameError)
 		return
 	}
 	result, err := tx.Exec(

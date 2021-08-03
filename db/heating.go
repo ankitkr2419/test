@@ -162,7 +162,7 @@ func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 
 	err = s.updateProcessName(ctx, tx, ht.ProcessID, HeatingProcess, ht)
 	if err != nil {
-		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		logger.WithField("err:", err.Error()).Errorln(responses.HeatingUpdateNameError)
 		return
 	}
 

@@ -177,7 +177,7 @@ func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 
 	err = s.updateProcessName(ctx, tx, p.ProcessID, PiercingProcess, p)
 	if err != nil {
-		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		logger.WithField("err:", err.Error()).Errorln(responses.PiercingUpdateNameError)
 		return
 	}
 

@@ -157,7 +157,7 @@ func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 	}()
 	err = s.updateProcessName(ctx, tx, t.ProcessID, TipDockingProcess, t)
 	if err != nil {
-		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		logger.WithField("err:", err.Error()).Errorln(responses.TipDockingUpdateNameError)
 		return
 	}
 

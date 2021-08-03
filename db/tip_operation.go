@@ -193,13 +193,13 @@ func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err e
 	if t.Type == PickupTip {
 		err = s.updateProcessName(ctx, tx, t.ProcessID, TipPickupProcess, t)
 		if err != nil {
-			logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+			logger.WithField("err:", err.Error()).Errorln(responses.TipOperationUpdateNameError)
 			return
 		}
 	} else {
 		err = s.updateProcessName(ctx, tx, t.ProcessID, TipDiscardProcess, t)
 		if err != nil {
-			logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+			logger.WithField("err:", err.Error()).Errorln(responses.TipOperationUpdateNameError)
 			return
 		}
 	}

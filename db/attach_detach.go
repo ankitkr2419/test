@@ -155,7 +155,7 @@ func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err e
 
 	err = s.updateProcessName(ctx, tx, a.ProcessID, AttachDetachProcess, a)
 	if err != nil {
-		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		logger.WithField("err:", err.Error()).Errorln(responses.AttachDetachUpdateNameError)
 		return
 	}
 

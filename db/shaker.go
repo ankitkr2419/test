@@ -180,7 +180,7 @@ func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
 	}()
 	err = s.updateProcessName(ctx, tx, sh.ProcessID, ShakingProcess, sh)
 	if err != nil {
-		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		logger.WithField("err:", err.Error()).Errorln(responses.ShakingUpdateNameError)
 		return
 	}
 
