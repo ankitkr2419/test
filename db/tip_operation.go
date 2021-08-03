@@ -167,10 +167,42 @@ func (s *pgStore) createTipOperation(ctx context.Context, tx *sql.Tx, to TipOper
 
 func (s *pgStore) UpdateTipOperation(ctx context.Context, t TipOperation) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipOperationInitialisedState)
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.TipOperationInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.TipOperationUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.TipOperationUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.TipOperationCompletedState)
+		return
+	}()
 
 	// TODO: Remove this default Discard for tip operation whenever support for at_pickup_passing added
 	t.Discard = at_discard_box
-
+	if t.Type == PickupTip {
+		err = s.updateProcessName(ctx, tx, t.ProcessID, TipPickupProcess, t)
+		if err != nil {
+			logger.WithField("err:", err.Error()).Errorln(responses.TipOperationUpdateNameError)
+			return
+		}
+	} else {
+		err = s.updateProcessName(ctx, tx, t.ProcessID, TipDiscardProcess, t)
+		if err != nil {
+			logger.WithField("err:", err.Error()).Errorln(responses.TipOperationUpdateNameError)
+			return
+		}
+	}
 	result, err := s.db.Exec(
 		updateTipOperationQuery,
 		t.Type,
