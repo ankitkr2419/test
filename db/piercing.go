@@ -154,6 +154,32 @@ func (s *pgStore) createPiercing(ctx context.Context, tx *sql.Tx, pi Piercing) (
 
 func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.PiercingInitialisedState)
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.PiercingInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.PiercingUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.PiercingUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.PiercingCompletedState)
+		return
+	}()
+
+	err = s.updateProcessName(ctx, tx, p.ProcessID, PiercingProcess, p)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		return
+	}
 
 	result, err := s.db.Exec(
 		updatePiercingQuery,

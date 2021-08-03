@@ -139,7 +139,34 @@ func (s *pgStore) createHeating(ctx context.Context, tx *sql.Tx, h Heating) (cre
 func (s *pgStore) UpdateHeating(ctx context.Context, ht Heating) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.HeatingInitialisedState)
 
-	result, err := s.db.Exec(
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.HeatingInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.HeatingUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.HeatingUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.HeatingCompletedState)
+		return
+	}()
+
+	err = s.updateProcessName(ctx, tx, ht.ProcessID, HeatingProcess, ht)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		return
+	}
+
+	result, err := tx.Exec(
 		updateHeatingQuery,
 		ht.Temperature,
 		ht.FollowTemp,

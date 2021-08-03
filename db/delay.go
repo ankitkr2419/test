@@ -134,7 +134,33 @@ func (s *pgStore) createDelay(ctx context.Context, tx *sql.Tx, d Delay) (created
 }
 
 func (s *pgStore) UpdateDelay(ctx context.Context, d Delay) (err error) {
-	result, err := s.db.Exec(
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.DelayInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.DelayUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.DelayUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.DelayCompletedState)
+		return
+	}()
+
+	err = s.updateProcessName(ctx, tx, d.ProcessID, DelayProcess, d)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		return
+	}
+	result, err := tx.Exec(
 		updateDelayQuery,
 		d.DelayTime,
 		time.Now(),

@@ -135,8 +135,33 @@ func (s *pgStore) createTipDocking(ctx context.Context, tx *sql.Tx, t TipDock) (
 
 func (s *pgStore) UpdateTipDock(ctx context.Context, t TipDock) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.TipDockingInitialisedState)
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.TipDockingInitiateDBTxError)
+		return
+	}
 
-	result, err := s.db.Exec(
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.TipDockingUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.TipDockingUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.TipDockingCompletedState)
+		return
+	}()
+	err = s.updateProcessName(ctx, tx, t.ProcessID, TipDockingProcess, t)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		return
+	}
+
+	result, err := tx.Exec(
 		updateTipDockQuery,
 		t.Type,
 		t.Position,
