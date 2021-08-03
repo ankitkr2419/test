@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -90,9 +91,9 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			"Role": u.Role,
 			"Deck": deck,
 		}).Infoln("User logged in successfully")
-		if deck != "" && (u.Role == admin || u.Role == engineer) {
+		if deck != "" && (u.Role == admin || u.Role == engineer) && ( Application == Combined || Application == Extraction)  {
 			deps.PlcDeck[deck].SetEngineerOrAdminLogged(true)
-		} else if deck != "" {
+		} else if deck != "" && ( Application == Combined || Application == Extraction)  {
 			deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 		}
 
@@ -211,7 +212,7 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
 			return
 		}
-		if deck != "" {
+		if (deck == plc.DeckA || deck== plc.DeckB) && ( Application == Combined || Application == Extraction) {
 			userLogin.Store(deck, false)
 			deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 		}
