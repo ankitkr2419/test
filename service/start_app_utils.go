@@ -44,18 +44,18 @@ func monitorForPLCTimeout(deps *Dependencies, exit chan error) {
 	}
 }
 
-func SendHeaterDataToEng(deps *Dependencies) {
+func SendHeaterDataToEng(deps Dependencies) {
 	go deps.PlcDeck[plc.DeckA].HeaterData()
 	go deps.PlcDeck[plc.DeckB].HeaterData()
 }
 
-func WaitForGracefulShutdown(deps *Dependencies, idleConnsClosed chan struct{}) {
+func WaitForGracefulShutdown(deps Dependencies, idleConnsClosed chan struct{}) {
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 	<-signals
 
-	err := shutDownGraceFully(*deps)
+	err := shutDownGraceFully(deps)
 	if err != nil {
 		os.Exit(-1)
 	}
