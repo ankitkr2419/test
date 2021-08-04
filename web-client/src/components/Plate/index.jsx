@@ -18,7 +18,6 @@ import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
-import { saveToPdf, saveToPdf2 } from "utils/pdfHelper";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 
 const Plate = (props) => {
@@ -63,6 +62,15 @@ const Plate = (props) => {
       activeTab !== "graph"
     ) {
       setActiveTab("graph");
+    }
+
+    //toggle preview report modal to generate report
+    if (
+      experimentStatus === EXPERIMENT_STATUS.success ||
+      experimentStatus === EXPERIMENT_STATUS.stopped ||
+      experimentStatus === EXPERIMENT_STATUS.runFailed
+    ) {
+      togglePreviewReportModal();
     }
   }, [experimentStatus]);
 
@@ -115,17 +123,8 @@ const Plate = (props) => {
     setShowTempGraph(graphType === "temperature");
   };
 
-  const downloadClickHandler = (e) => {
-    // saveToPdf(showTempGraph);
-    togglePreviewReportModal();
-  };
-
   const togglePreviewReportModal = () => {
     setPreviewReportModal(!previewReportModal);
-  };
-
-  const onDownloadConfirmed = () => {
-    saveToPdf2();
   };
 
   return (
@@ -134,7 +133,6 @@ const Plate = (props) => {
         <PreviewReportModal
           isOpen={previewReportModal}
           toggleModal={togglePreviewReportModal}
-          onDownloadConfirmed={onDownloadConfirmed}
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
@@ -251,12 +249,6 @@ const Plate = (props) => {
                   >
                     Temperature
                   </Button>
-                  <ButtonIcon
-                    name="download-1"
-                    size={28}
-                    className="bg-white border-secondary ml-auto downloadButton"
-                    onClick={downloadClickHandler}
-                  />
                 </div>
                 <ExperimentGraphContainer
                   showTempGraph={showTempGraph}
