@@ -62,6 +62,7 @@ import {
 } from "reducers/activityLogReducer";
 import {
   calibrationReducer,
+  updateCalibrationReducer,
   pidProgessReducer,
   pidReducer,
 } from "./calibrationReducer";
@@ -111,6 +112,7 @@ const rootReducer = combineReducers({
   activityLogReducer,
   mailReportReducer,
   calibrationReducer,
+  updateCalibrationReducer,
   pidProgessReducer,
   pidReducer,
   finishCreateTemplateReducer,

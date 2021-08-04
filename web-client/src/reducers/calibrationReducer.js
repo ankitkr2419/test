@@ -41,6 +41,21 @@ export const calibrationReducer = (state = calibrationInitialState, action) => {
         error: null,
         configs: calibrationInitialState.configs,
       });
+    default:
+      return state;
+  }
+};
+
+const updateCalibrationInitialState = fromJS({
+  isLoading: false,
+  error: null,
+});
+
+export const updateCalibrationReducer = (
+  state = updateCalibrationInitialState,
+  action
+) => {
+  switch (action.type) {
     case updateCalibrationActions.updateCalibrationInitiated:
       return state.merge({
         isLoading: true,
