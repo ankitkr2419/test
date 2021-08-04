@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	reportPath = "./utils/output"
+	expOutputPath = "./utils/output"
 )
 
 func emailReport(deps Dependencies) http.HandlerFunc {
@@ -78,9 +78,9 @@ func EmailReport(experimentID uuid.UUID) (err error) {
 	// attach a xlsx report
 	a_xlsx := mail.NewAttachment()
 
-	files, err := ioutil.ReadDir(reportPath)
+	files, err := ioutil.ReadDir(expOutputPath)
 	if err != nil {
-		logger.Errorln("Failed to read files from ", reportPath, err)
+		logger.Errorln("Failed to read files from ", expOutputPath, err)
 	}
 
 	var fileName string
@@ -95,7 +95,7 @@ func EmailReport(experimentID uuid.UUID) (err error) {
 	return responses.ExperimentFetchError
 
 fileFound:
-	dat, err := ioutil.ReadFile(fmt.Sprintf("%v/%v", reportPath, fileName))
+	dat, err := ioutil.ReadFile(fmt.Sprintf("%v/%v", expOutputPath, fileName))
 	if err != nil {
 		logger.Errorln(err)
 		return
