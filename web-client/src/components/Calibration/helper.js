@@ -1,4 +1,4 @@
-import { EMAIL_REGEX, NAME_REGEX } from "appConstants";
+import { EMAIL_REGEX_OR_EMPTY_STR, NAME_REGEX } from "appConstants";
 
 export const formikInitialState = {
   name: {
@@ -108,12 +108,14 @@ export const isValueValid = (name, value) => {
 
   if (type === "number" && (value < min || value > max)) {
     return false;
-  } else if (type === "email" && !value && value.match(EMAIL_REGEX) === null) {
-    return false;
-  } else if (type === "text" && value === "") {
-    //&& value.match(NAME_REGEX) === null) {
+  } else if (type === "email" && value.match(EMAIL_REGEX_OR_EMPTY_STR) === null) {
     return false;
   }
+  //TODO : remove after dis.
+  // else if (type === "text") {
+  //   //&& value.match(NAME_REGEX) === null) {
+  //   return false;
+  // }
   return true;
 };
 
