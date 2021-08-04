@@ -7,6 +7,9 @@ export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 
 export const ROOT_URL_PATH = "/";
 
+export const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+export const NAME_REGEX = /^[^\\\/&]*$/;
+
 export const CREDS_FOR_HOMING = {
   email: "main",
   password: "main",
