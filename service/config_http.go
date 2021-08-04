@@ -57,6 +57,8 @@ func getConfigDetails() (c config.Conf, err error) {
 		HomingTime:      int64(config.GetHomingTime()),
 		NumHomingCycles: int64(config.GetNumHomingCycles()),
 		CycleTime:       int64(config.GetCycleTime()),
+		PIDMinutes:      int64(config.GetPIDMinutes()),
+		PIDTemperature:  int64(config.GetPIDTemp()),
 	}
 
 	return
