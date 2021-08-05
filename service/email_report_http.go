@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"mylab/cpagent/config"
 	"net/http"
+	"mime/multipart"
 
 	"github.com/gorilla/mux"
 	"github.com/sendgrid/sendgrid-go"
@@ -19,6 +20,8 @@ import (
 
 const (
 	expOutputPath = "./utils/output"
+	reportOutputPath = "./utils/reports"
+	pdf = "pdf"
 )
 
 func emailReport(deps Dependencies) http.HandlerFunc {
@@ -32,7 +35,7 @@ func emailReport(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = EmailReport(expID)
+		err = emailTheReport(expID)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Email couldn't be sent: " + err.Error()})
 		}
@@ -40,7 +43,80 @@ func emailReport(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func EmailReport(experimentID uuid.UUID) (err error) {
+
+func uploadReport(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+
+
+				// Parse input, multipart/form-data
+				err := req.ParseMultipartForm(15 << 20) // 15 MB Max File Size
+				if err != nil {
+					logger.WithField("err", err.Error()).Error("Error while parsing the Report form")
+					Message := "Invalid Form Data! Error while parsing the Report form"
+					responseCodeAndMsg(rw, http.StatusBadRequest, Message)
+					return
+				}
+
+
+				vars := mux.Vars(req)
+				expID, err := parseUUID(vars["experiment_id"])
+				if err != nil {
+					logger.Errorln("Invalid Experiment ID: ", expID)
+					responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidExperimentID.Error()})
+					return
+				}
+
+		formdata := req.MultipartForm
+		report := formdata.File["report"]
+		if report == nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ReportAbsent.Error()})
+		}
+
+		err = uploadTheReport(expID, report)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Report couldn't be uploaded: " + err.Error()})
+		}
+		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: "Report uploaded successfully"})
+	})
+}
+
+
+func uploadTheReport(expID uuid.UUID, report []*multipart.FileHeader) error {
+
+		reportPDF, err := report[0].Open()
+		defer reportPDF.Close()
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while decoding report Data, probably invalid report")
+			return err
+		}
+
+		extension := strings.Split(report[0].Filename, ".")
+		if extension[len(extension)-1] != pdf {
+			err = fmt.Errorf("Incorrect extension of file!")
+			logger.WithField("err", err.Error()).Error("Error while getting report Extension. Re-check the report file extension!")
+
+			return err
+		}
+
+		tempFile, err := ioutil.TempFile(reportOutputPath, expID.String()+"_*."+ pdf)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while Creating a Temporary File")
+			return err
+		}
+		defer tempFile.Close()
+
+		imageBytes, err := ioutil.ReadAll(reportPDF)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while reading report File")
+			return err
+		}
+		tempFile.Write(imageBytes)
+	
+	return nil
+}
+
+func emailTheReport(experimentID uuid.UUID) (err error) {
 
 	m := mail.NewV3Mail()
 
