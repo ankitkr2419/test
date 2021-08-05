@@ -38,7 +38,7 @@ const (
 )
 
 type CartridgeWell struct {
-	Cartridge      Cartridge        `json:"cartridge"`
+	Cartridge      []Cartridge      `json:"cartridges"`
 	CartridgeWells []CartridgeWells `json:"cartridge_wells"`
 }
 type Cartridge struct {
