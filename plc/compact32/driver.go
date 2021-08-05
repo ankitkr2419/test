@@ -469,7 +469,8 @@ func (d *Compact32) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.OFF)
 	if err != nil {
-		logger.Errorln("WriteSingleCoil:M109 : Stop Lid Heating")
+		logger.Errorln("Stop Lid Heating error")
+		return
 	}
 	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
 	return
