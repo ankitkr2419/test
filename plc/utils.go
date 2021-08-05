@@ -6,9 +6,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 
-	"os"
 	"sync"
-	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
@@ -365,11 +363,6 @@ func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *ui
 }
 
 func GetExcelFile(path, fileName string) (f *excelize.File) {
-	// logging output to file and console
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.MkdirAll(path, 0755)
-		// ignore error and try creating log output file
-	}
 
 	f = excelize.NewFile()
 
@@ -384,7 +377,7 @@ func GetExcelFile(path, fileName string) (f *excelize.File) {
 	f.SetSheetFormatPr(TempLogs, excelize.DefaultColWidth(40))
 	f.SetSheetFormatPr(TECSheet, excelize.DefaultColWidth(40))
 
-	f.Path = fmt.Sprintf("%v/%s_%v.xlsx", path, fileName, time.Now().Unix())
+	f.Path = fmt.Sprintf("%v/%s.xlsx", path, fileName)
 	logger.Infoln("file saved in path---------->", f.Path)
 
 	return
