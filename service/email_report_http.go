@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mylab/cpagent/responses"
 	"strings"
+	"os"
 
 	"encoding/base64"
 	"github.com/google/uuid"
@@ -108,6 +109,15 @@ func uploadTheReport(expID uuid.UUID, report []*multipart.FileHeader) error {
 		return err
 	}
 	tempFile.Write(imageBytes)
+	logger.Infoln("Filename : ", tempFile.Name())
+
+	err = os.Chmod(tempFile.Name(), 0766)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error while changing File permission")
+		return err
+	}
+
+	os.Rename(tempFile.Name(),ReportOutputPath + "/"+ expID.String()+"."+pdf )
 
 	return nil
 }
@@ -146,7 +156,6 @@ func emailTheReport(experimentID uuid.UUID) (err error) {
 	a_pdf.SetFilename(fmt.Sprintf("Experiment_%v.%v", experimentID.String(), pdf))
 	a_pdf.SetDisposition("attachment")
 
-	// attach a xlsx report
 	a_xlsx := mail.NewAttachment()
 
 
@@ -163,7 +172,7 @@ func emailTheReport(experimentID uuid.UUID) (err error) {
 	a_xlsx.SetFilename(fmt.Sprintf("Experiment_%v.xlsx", experimentID))
 	a_xlsx.SetDisposition("attachment")
 
-	// m.AddAttachment(a_pdf)
+	m.AddAttachment(a_pdf)
 	m.AddAttachment(a_xlsx)
 
 	request := sendgrid.GetRequest(config.GetSendGridAPIKey(), "/v3/mail/send", "https://api.sendgrid.com")
