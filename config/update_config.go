@@ -44,8 +44,8 @@ func SetValues(c Conf) (err error) {
 		fmt.Sprintf("cycle_time: %d", int64(cT)),
 		fmt.Sprintf("pid_temp: %d", int64(pT)),
 		fmt.Sprintf("pid_time: %d", int64(mT)),
-		fmt.Sprintf("receiver_email: %s", rE),
-		fmt.Sprintf("receiver_name: %s", rN),
+		fmt.Sprintf("receiver_email: %q", rE),
+		fmt.Sprintf("receiver_name: %q", rN),
 	)
 	newString = append(newString,
 		fmt.Sprintf("homing_time: %d", c.HomingTime),
