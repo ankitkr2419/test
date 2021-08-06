@@ -159,6 +159,8 @@ var (
 	ExperimentFetchError = fmt.Errorf("error fetching experiment data")
 	ConfTargetFetchError = fmt.Errorf("error fetching target data")
 	ResultFetchError     = fmt.Errorf("error fetching result data")
+
+	ReportAbsent = fmt.Errorf("report is absent in form data!")
 )
 
 // Special errors which are in []byte format

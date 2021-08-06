@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"mylab/cpagent/responses"
 	"strings"
+	"os"
 
 	"encoding/base64"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
+	"mime/multipart"
 	"mylab/cpagent/config"
 	"net/http"
 
@@ -18,7 +20,10 @@ import (
 )
 
 const (
-	expOutputPath = "./utils/output"
+	ExpOutputPath    = "./utils/output"
+	ReportOutputPath = "./utils/reports"
+	pdf              = "pdf"
+	xlsx             = "xlsx"
 )
 
 func emailReport(deps Dependencies) http.HandlerFunc {
@@ -32,7 +37,7 @@ func emailReport(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		err = EmailReport(expID)
+		err = emailTheReport(expID)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Email couldn't be sent: " + err.Error()})
 		}
@@ -40,7 +45,84 @@ func emailReport(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func EmailReport(experimentID uuid.UUID) (err error) {
+func uploadReport(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		// Parse input, multipart/form-data
+		err := req.ParseMultipartForm(15 << 20) // 15 MB Max File Size
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while parsing the Report form")
+			Message := "Invalid Form Data! Error while parsing the Report form"
+			responseCodeAndMsg(rw, http.StatusBadRequest, Message)
+			return
+		}
+
+		vars := mux.Vars(req)
+		expID, err := parseUUID(vars["experiment_id"])
+		if err != nil {
+			logger.Errorln("Invalid Experiment ID: ", expID)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidExperimentID.Error()})
+			return
+		}
+
+		formdata := req.MultipartForm
+		report := formdata.File["report"]
+		if report == nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ReportAbsent.Error()})
+		}
+
+		err = uploadTheReport(expID, report)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Report couldn't be uploaded: " + err.Error()})
+		}
+		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: "Report uploaded successfully"})
+	})
+}
+
+func uploadTheReport(expID uuid.UUID, report []*multipart.FileHeader) error {
+
+	reportPDF, err := report[0].Open()
+	defer reportPDF.Close()
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error while decoding report Data, probably invalid report")
+		return err
+	}
+
+	extension := strings.Split(report[0].Filename, ".")
+	if extension[len(extension)-1] != pdf {
+		err = fmt.Errorf("Incorrect extension of file!")
+		logger.WithField("err", err.Error()).Error("Error while getting report Extension. Re-check the report file extension!")
+
+		return err
+	}
+
+	tempFile, err := ioutil.TempFile(ReportOutputPath, expID.String()+"."+pdf)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error while Creating a Temporary File")
+		return err
+	}
+	defer tempFile.Close()
+
+	imageBytes, err := ioutil.ReadAll(reportPDF)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error while reading report File")
+		return err
+	}
+	tempFile.Write(imageBytes)
+	logger.Infoln("Filename : ", tempFile.Name())
+
+	err = os.Chmod(tempFile.Name(), 0766)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error while changing File permission")
+		return err
+	}
+
+	os.Rename(tempFile.Name(),ReportOutputPath + "/"+ expID.String()+"."+pdf )
+
+	return nil
+}
+
+func emailTheReport(experimentID uuid.UUID) (err error) {
 
 	m := mail.NewV3Mail()
 
@@ -61,53 +143,36 @@ func EmailReport(experimentID uuid.UUID) (err error) {
 
 	// attach PDF
 
-	// TODO: Uncomment below code once @ankush's pdf is put in report folder
-	// a_pdf := mail.NewAttachment()
-	// dat, err := ioutil.ReadFile("/home/josh/Desktop/Programs/GO/PDF/hello.pdf")
-	// if err != nil{
-	// 	logger.Errorln(err)
-	// 	return
-	// }
-
-	// encoded := base64.StdEncoding.EncodeToString([]byte(dat))
-	// a_pdf.SetContent(encoded)
-	// a_pdf.SetType("application/pdf")
-	// a_pdf.SetFilename("Experiment_Report.pdf")
-	// a_pdf.SetDisposition("attachment")
-
-	// attach a xlsx report
-	a_xlsx := mail.NewAttachment()
-
-	files, err := ioutil.ReadDir(expOutputPath)
-	if err != nil {
-		logger.Errorln("Failed to read files from ", expOutputPath, err)
-	}
-
-	var fileName string
-
-	for _, f := range files {
-		fName := strings.SplitN(f.Name(), "_", 3)
-		if fName[1] == experimentID.String() {
-			fileName = f.Name()
-			goto fileFound
-		}
-	}
-	return responses.ExperimentFetchError
-
-fileFound:
-	dat, err := ioutil.ReadFile(fmt.Sprintf("%v/%v", expOutputPath, fileName))
+	a_pdf := mail.NewAttachment()
+	dat, err := ioutil.ReadFile(fmt.Sprintf("%v/%v.%v", ReportOutputPath, experimentID.String(), pdf))
 	if err != nil {
 		logger.Errorln(err)
 		return
 	}
 
 	encoded := base64.StdEncoding.EncodeToString([]byte(dat))
+	a_pdf.SetContent(encoded)
+	a_pdf.SetType("application/pdf")
+	a_pdf.SetFilename(fmt.Sprintf("Experiment_%v.%v", experimentID.String(), pdf))
+	a_pdf.SetDisposition("attachment")
+
+	a_xlsx := mail.NewAttachment()
+
+
+	fileName := fmt.Sprintf("%v/output_%v.%v", ExpOutputPath, experimentID.String(), xlsx)
+	dat, err = ioutil.ReadFile(fmt.Sprintf(fileName))
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
+	encoded = base64.StdEncoding.EncodeToString([]byte(dat))
 	a_xlsx.SetContent(encoded)
 	a_xlsx.SetType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	a_xlsx.SetFilename(fmt.Sprintf("Experiment_%v.xlsx", experimentID))
 	a_xlsx.SetDisposition("attachment")
 
-	// m.AddAttachment(a_pdf)
+	m.AddAttachment(a_pdf)
 	m.AddAttachment(a_xlsx)
 
 	request := sendgrid.GetRequest(config.GetSendGridAPIKey(), "/v3/mail/send", "https://api.sendgrid.com")
