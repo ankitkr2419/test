@@ -42,6 +42,7 @@ func listCartridgesHandler(deps Dependencies) http.HandlerFunc {
 func createCartridgeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var m db.CartridgeWell
+
 		err := json.NewDecoder(req.Body).Decode(&m)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
@@ -49,13 +50,14 @@ func createCartridgeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		go db.SetCartridgeValues(m)
 		valid, respBytes := validate(m)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		err = deps.Store.InsertCartridge(req.Context(), []db.Cartridge{m.Cartridge}, m.CartridgeWells)
+		err = deps.Store.InsertCartridge(req.Context(), m.Cartridge, m.CartridgeWells)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			logger.WithField("err", err.Error()).Error("Error while inserting Cartridge")

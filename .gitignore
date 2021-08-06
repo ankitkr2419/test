@@ -10,6 +10,7 @@ artifact.zip
 /utils/logs/*.log
 /utils/tec/ComLog.txt
 /utils/output/*
+/utils/reports/*
 
 # web-client dependencies
 /web-client/node_modules
