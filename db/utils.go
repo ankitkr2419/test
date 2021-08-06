@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"mylab/cpagent/responses"
 	"os"
 	"strconv"
@@ -185,114 +184,150 @@ func SetExperimentExcelFile(file *excelize.File) {
 	return
 }
 
-func (s *pgStore) SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) {
+func (s *pgStore) SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) (err error) {
 	for _, v := range dbSheets {
 		file.NewSheet(v)
 		file.SetSheetFormatPr(v, excelize.DefaultColWidth(40))
 	}
-	s.addWellSampleHeadings(file, experimentID)
-	s.addExperimentHeadings(file, experimentID)
-	s.addStagesAndStepsHeadings(file, experimentID)
-	s.addTemplateHeadings(file, experimentID)
-	s.addTargetDetailsHeadings(file, experimentID)
+	err = s.addWellSampleHeadings(file, experimentID)
+	err = s.addExperimentHeadings(file, experimentID)
+	err = s.addStagesAndStepsHeadings(file, experimentID)
+	err = s.addTemplateHeadings(file, experimentID)
+	err = s.addTargetDetailsHeadings(file, experimentID)
+	return
 }
 
-func (s *pgStore) addWellSampleHeadings(file *excelize.File, expID uuid.UUID) {
+func (s *pgStore) addWellSampleHeadings(file *excelize.File, expID uuid.UUID) (err error) {
 	var heading []interface{}
 
 	//add headings for sheet wells and samples
 	rows, err := s.db.Query(getWellsListQuery, expID)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch wells and samples", err.Error())
+		return
 	}
 	columnNames, err := rows.Columns() // []string{"id", "name"}
 	if err != nil {
-		// handle err
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch columns for wells and samples", err.Error())
+		return
 	}
 	for _, v := range columnNames {
 		heading = append(heading, v)
 	}
-	AddRowToExcel(file, WellSample, heading)
+	err = AddRowToExcel(file, WellSample, heading)
+	if err != nil {
+		logger.Errorln("Failed to add row for wells and samples", err.Error())
+		return
+	}
+	return
+
 }
 
-func (s *pgStore) addExperimentHeadings(file *excelize.File, expID uuid.UUID) {
+func (s *pgStore) addExperimentHeadings(file *excelize.File, expID uuid.UUID) (err error) {
 	var heading []interface{}
 
 	//add headings for sheet wells and samples
 	rows, err := s.db.Query(getExperimentQuery, expID)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch experiment details", err.Error())
+		return
 	}
 	columnNames, err := rows.Columns() // []string{"id", "name"}
 	if err != nil {
-		// handle err
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch columns for experiments", err.Error())
+		return
 	}
 	for _, v := range columnNames {
 		heading = append(heading, v)
 	}
-	AddRowToExcel(file, ExperimentSheet, heading)
+	err = AddRowToExcel(file, ExperimentSheet, heading)
+	if err != nil {
+		logger.Errorln("Failed to add row for experiments", err.Error())
+		return
+	}
+	return
+
 }
 
-func (s *pgStore) addStagesAndStepsHeadings(file *excelize.File, expID uuid.UUID) {
+func (s *pgStore) addStagesAndStepsHeadings(file *excelize.File, expID uuid.UUID) (err error) {
 	var heading []interface{}
 
 	//add headings for sheet wells and samples
 	rows, err := s.db.Query(getStageStepQuery, expID)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch stages and steps", err.Error())
+		return
 	}
 	columnNames, err := rows.Columns() // []string{"id", "name"}
 	if err != nil {
-		// handle err
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch columns for stages and steps", err.Error())
+		return
 	}
 	for _, v := range columnNames {
 		heading = append(heading, v)
 	}
-	AddRowToExcel(file, StepsStageSheet, heading)
+	err = AddRowToExcel(file, StepsStageSheet, heading)
+	if err != nil {
+		logger.Errorln("Failed to add row for stages and steps", err.Error())
+		return
+	}
+	return
 }
 
-func (s *pgStore) addTargetDetailsHeadings(file *excelize.File, expID uuid.UUID) {
+func (s *pgStore) addTargetDetailsHeadings(file *excelize.File, expID uuid.UUID) (err error) {
 	var heading []interface{}
 
 	//add headings for sheet wells and samples
 	rows, err := s.db.Query(getwellsConfigured, expID)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch target details", err.Error())
+		return
 	}
 	columnNames, err := rows.Columns() // []string{"id", "name"}
 	if err != nil {
-		// handle err
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch columns for target details", err.Error())
+		return
 	}
 	for _, v := range columnNames {
 		heading = append(heading, v)
 	}
-	AddRowToExcel(file, TargetSheet, heading)
+	err = AddRowToExcel(file, TargetSheet, heading)
+	if err != nil {
+		logger.Errorln("Failed to add row for target details", err.Error())
+		return
+	}
+	return
+
 }
 
-func (s *pgStore) addTemplateHeadings(file *excelize.File, expID uuid.UUID) {
+func (s *pgStore) addTemplateHeadings(file *excelize.File, expID uuid.UUID) (err error) {
 	var heading []interface{}
 	var createdTemp Experiment
 
-	err := s.db.Get(&createdTemp, getExperimentQuery, expID)
+	err = s.db.Get(&createdTemp, getExperimentQuery, expID)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorln("Failed to experiment details", err.Error())
+		return
 	}
 	//add headings for sheet wells and samples
 	rows, err := s.db.Query(getTemplateQuery, createdTemp.TemplateID)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch template details", err.Error())
+		return
 	}
 	columnNames, err := rows.Columns() // []string{"id", "name"}
 	if err != nil {
-		// handle err
-		log.Fatal(err)
+		logger.Errorln("Failed to fetch columns for template", err.Error())
+		return
 	}
 	for _, v := range columnNames {
 		heading = append(heading, v)
 	}
-	AddRowToExcel(file, TemplateSheet, heading)
+	err = AddRowToExcel(file, TemplateSheet, heading)
+	if err != nil {
+		logger.Errorln("Failed to add row for template", err.Error())
+		return
+	}
+	return
+
 }
