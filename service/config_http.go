@@ -5,6 +5,7 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/responses"
 	"net/http"
+	"regexp"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -38,6 +39,12 @@ func updateConfigHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
+		} 
+		
+		if !isEmailValid(c.ReceiverEmail){
+			logger.Errorln(responses.InvalidEmailIDError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidEmailIDError.Error()})
+			return
 		}
 
 		err = config.SetValues(c)
@@ -62,4 +69,11 @@ func getConfigDetails() (c config.Conf, err error) {
 	}
 
 	return
+}
+
+
+// isEmailValid checks if the email provided is valid by regex.
+func isEmailValid(e string) bool {
+    emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+    return emailRegex.MatchString(e)
 }

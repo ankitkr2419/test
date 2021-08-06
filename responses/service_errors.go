@@ -159,6 +159,8 @@ var (
 	ExperimentFetchError = fmt.Errorf("error fetching experiment data")
 	ConfTargetFetchError = fmt.Errorf("error fetching target data")
 	ResultFetchError     = fmt.Errorf("error fetching result data")
+
+	InvalidEmailIDError  = fmt.Errorf("error fetching result data")
 )
 
 // Special errors which are in []byte format
