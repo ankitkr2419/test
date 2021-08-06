@@ -136,6 +136,15 @@ func SetPIDMinutes(pT int64) {
 	viper.Set("pid_time", pT)
 }
 
+func SetReceiverEmail(rE string) {
+	viper.Set("receiver_email", rE)
+}
+
+func SetReceiverName(rN string) {
+	viper.Set("receiver_name", rN)
+}
+
+
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))

@@ -10,6 +10,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+const(
+	emailRegex = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+)
+
 func getConfigHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
@@ -74,6 +78,6 @@ func getConfigDetails() (c config.Conf, err error) {
 
 // isEmailValid checks if the email provided is valid by regex.
 func isEmailValid(e string) bool {
-    emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+    emailRegex := regexp.MustCompile(emailRegex)
     return emailRegex.MatchString(e)
 }
