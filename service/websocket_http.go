@@ -489,6 +489,26 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 		}
 		// adding delay of 0.5s to reduce the cpu usage
 	}
+
+	e, err := deps.Store.ShowExperiment(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+		return
+	}
+
+	db.AddRowToExcel(file, db.ExperimentSheet, []interface{}{e.ID,
+		e.Description,
+		e.TemplateID,
+		e.OperatorName,
+		e.StartTime.String(),
+		e.EndTime.String(),
+		e.Result,
+		e.RepeatCycle,
+		e.CreatedAt,
+		e.UpdatedAt,
+		e.TemplateName,
+		e.WellCount})
+
 	logger.Info("Stop monitoring experiment")
 }
 

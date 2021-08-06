@@ -154,11 +154,18 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		// create  new file for each experiment with experiment id in file name.
 		file := db.GetExcelFile(tec.LogsPath, fmt.Sprintf("output_%v", expID))
 
+		db.SetExperimentExcelFile(file)
+		deps.Store.SetExcelHeadings(file, expID)
+
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching wells data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+
+		for _, v := range wells {
+			db.AddRowToExcel(file, db.WellSample, []interface{}{v.ID, v.Position, v.ExperimentID, v.SampleID, v.Task, v.ColorCode, v.SampleName})
 		}
 
 		// validate of NC,PC or NTC set for wells
@@ -179,6 +186,25 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		for _, v := range ss {
+			db.AddRowToExcel(file, db.StepsStageSheet, []interface{}{
+				v.Stage.ID,
+				v.Stage.Type,
+				v.Stage.RepeatCount,
+				v.Stage.TemplateID,
+				v.Stage.StepCount,
+				v.Stage.CreatedAt.String(),
+				v.Stage.UpdatedAt.String(),
+				v.Step.ID,
+				v.Step.StageID,
+				v.Step.RampRate,
+				v.Step.TargetTemperature,
+				v.Step.HoldTime,
+				v.Step.DataCapture,
+				v.Step.CreatedAt.String(),
+				v.Step.UpdatedAt.String()})
+		}
+
 		plcStage := makePLCStage(ss)
 
 		t, err := deps.Store.ShowTemplate(req.Context(), e.TemplateID)
@@ -188,6 +214,17 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		db.AddRowToExcel(file, db.TemplateSheet, []interface{}{
+			t.ID,
+			t.Name,
+			t.Description,
+			t.Publish,
+			t.CreatedAt.String(),
+			t.UpdatedAt.String(),
+			t.Volume,
+			t.LidTemp,
+			t.EstimatedTime,
+			t.Finished})
 		// Set currentExpTemplate to current running Template
 		currentExpTemplate = t
 
@@ -211,6 +248,17 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+
+		for _, v := range targetDetails {
+			db.AddRowToExcel(file, db.TargetSheet, []interface{}{
+				v.ExperimentID,
+				v.TemplateID,
+				v.TargetID,
+				v.Threshold,
+				v.DyePosition,
+				v.TargetName,
+			})
 		}
 
 		var ICTargetID uuid.UUID
