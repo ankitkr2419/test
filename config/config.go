@@ -61,6 +61,18 @@ func GetSecretKey() string {
 	return viper.GetString(key)
 }
 
+func GetReceiverName() string {
+	key := "receiver_name"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
+func GetReceiverEmail() string {
+	key := "receiver_email"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
 func SetSecretKey(key string) {
 	key = "SECRET_KEY"
 	viper.Set(key, "123456qwerty")
@@ -123,6 +135,15 @@ func SetPIDTemp(pT int64) {
 func SetPIDMinutes(pT int64) {
 	viper.Set("pid_time", pT)
 }
+
+func SetReceiverEmail(rE string) {
+	viper.Set("receiver_email", rE)
+}
+
+func SetReceiverName(rN string) {
+	viper.Set("receiver_name", rN)
+}
+
 
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
