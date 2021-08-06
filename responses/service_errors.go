@@ -161,6 +161,8 @@ var (
 	ResultFetchError     = fmt.Errorf("error fetching result data")
 
 	InvalidEmailIDError  = fmt.Errorf("error fetching result data")
+	
+	ReportAbsent = fmt.Errorf("report is absent in form data!")
 )
 
 // Special errors which are in []byte format

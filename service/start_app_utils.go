@@ -75,7 +75,12 @@ func SetLoggersAndFiles() (err error) {
 	}
 	if _, err = os.Stat(tecPath); os.IsNotExist(err) {
 		os.MkdirAll(tecPath, 0755)
-		// ignore error and try creating log output file
+	}
+	if _, err = os.Stat(ReportOutputPath); os.IsNotExist(err) {
+		os.MkdirAll(ReportOutputPath, 0755)
+	}
+	if _, err = os.Stat(ExpOutputPath); os.IsNotExist(err) {
+		os.MkdirAll(ExpOutputPath, 0755)
 	}
 
 	// All terminal logs will be noted in below file
