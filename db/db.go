@@ -130,5 +130,5 @@ type Storer interface {
 	DeleteCartridge(ctx context.Context, id int64) (err error)
 
 	DeleteTipTube(ctx context.Context, id int64) (err error)
-	SetExcelHeadings(file *excelize.File, experimentID uuid.UUID)
+	SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) (err error)
 }
