@@ -72,13 +72,12 @@ type Well struct {
 	SampleName   string       `db:"sample_name" json:"sample_name"`
 }
 
-func (s *pgStore) ListWells(ctx context.Context, experimentID uuid.UUID) (Wells []Well, err error) {
-	err = s.db.Select(&Wells, getWellsListQuery, experimentID)
+func (s *pgStore) ListWells(ctx context.Context, experimentID uuid.UUID) (wells []Well, err error) {
+	err = s.db.Select(&wells, getWellsListQuery, experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing Wells")
 		return
 	}
-
 	return
 }
 
