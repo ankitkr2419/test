@@ -8,7 +8,6 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/tec"
 	"net/http"
 	"time"
 
@@ -152,7 +151,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		// create  new file for each experiment with experiment id in file name.
-		file := db.GetExcelFile(tec.LogsPath, fmt.Sprintf("output_%v", expID))
+		file := db.GetExcelFile(tecPath, fmt.Sprintf("output_%v", expID))
 
 		db.SetExperimentExcelFile(file)
 		deps.Store.SetExcelHeadings(file, expID)
