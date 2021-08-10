@@ -7,6 +7,7 @@ import {
   updateTemplateReset,
   fetchTemplates,
 } from "action-creators/templateActionCreators";
+import { getTemplateById } from "reducers/templateReducer";
 import TemplateModal from "components/TemplateModal/TemplateModal";
 import { templateModalActions } from "components/TemplateModal/templateModalState";
 
@@ -29,6 +30,10 @@ const TemplateModalContainer = (props) => {
   } = templateModalState.toJS();
 
   const dispatch = useDispatch();
+
+  // extracting selected template
+  const allTemplates = useSelector((state) => state.listTemplatesReducer);
+  const selectedTemplateDetails = getTemplateById(allTemplates, templateID);
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -218,6 +223,7 @@ const TemplateModalContainer = (props) => {
       resetFormValues={resetFormValues}
       isTemplateEdited={isTemplateEdited}
       resetModalState={resetModalState}
+      selectedTemplateDetails={selectedTemplateDetails}
     />
   );
 };
