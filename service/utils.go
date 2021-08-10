@@ -281,6 +281,7 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 
 func ValidateDyeTarget(wc db.WellConfig, deps Dependencies) (valid bool, msg string) {
 
+	valid = true
 	//max number of dyes 6. TODO take from config
 	dyes := make(map[string]bool, 6)
 	for _, v := range wc.Targets {
@@ -288,8 +289,8 @@ func ValidateDyeTarget(wc db.WellConfig, deps Dependencies) (valid bool, msg str
 		if err != nil {
 			return false, err.Error()
 		}
-		for dyeKey, present := range dyes {
-			if dyeKey == dye && present {
+		for dyeKey := range dyes {
+			if dyeKey == dye {
 				return false, "invalid configuration for targets"
 			}
 		}
