@@ -208,6 +208,38 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 	return
 }
 
+func analyseResultForThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16, tc ThresholdCals) (finalResult []graph) {
+
+	// ex: for 8 active wells * 6 targets * no of cycle
+	for _, aw := range wells {
+		var wellResult graph
+		wellResult.WellPosition = aw
+
+		for _, t := range targets {
+			wellResult.TargetID = t.TargetID
+			for _, r := range result {
+				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
+					wellResult.ExperimentID = r.ExperimentID
+					wellResult.TargetID = r.TargetID
+					wellResult.Threshold = r.Threshold
+					wellResult.TotalCycles = cycles
+
+					// if cycle found do not add again!
+					if !found(r.Cycle, wellResult.Cycle) {
+						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
+						wellResult.FValue = append(wellResult.FValue, scaleThreshold(float32(r.FValue)))
+					}
+				}
+			}
+			finalResult = append(finalResult, wellResult)
+			wellResult.Cycle = []uint16{}
+			wellResult.FValue = []float32{}
+		}
+
+	}
+	return
+}
+
 func found(key uint16, search []uint16) (found bool) {
 	for _, v := range search {
 		if v == key {

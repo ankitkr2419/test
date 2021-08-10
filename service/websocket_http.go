@@ -274,6 +274,37 @@ func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets 
 
 }
 
+
+func getGraphByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, t_cycles uint16, tc ThresholdCals) (respBytes []byte, err error) {
+
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching result data")
+		return
+	}
+
+	Finalresult := make([]graph, 0)
+
+	if len(DBResult) > 0 {
+		// analyseResult returns data required for ploting graph
+		Finalresult = analyseResultForThreshold(DBResult, wells, targets, t_cycles, tc)
+	}
+
+	Result := resultGraph{
+		Type: "ThresholdGraph",
+		Data: Finalresult,
+	}
+
+	respBytes, err = json.Marshal(Result)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
+		return
+	}
+
+	return
+}
+
+
 func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 
 	// list wells from DB
