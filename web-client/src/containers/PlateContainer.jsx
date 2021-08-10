@@ -26,8 +26,6 @@ const PlateContainer = () => {
   const runExpProgressReducer = useSelector(
     (state) => state.runExpProgressReducer
   );
-  const { progressStatus, progress, remainingTime, totalTime } =
-    runExpProgressReducer.toJS();
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -111,10 +109,7 @@ const PlateContainer = () => {
       toggleAllWellSelectedOption={toggleAllWellSelectedOption}
       activeWells={activeWells}
       experimentTemplate={experimentTemplate}
-      progressStatus={progressStatus}
-      progress={progress}
-      remainingTime={remainingTime}
-      totalTime={totalTime}
+      headerData={runExpProgressReducer.toJS()}
       temperatureData={temperatureData}
     />
   );

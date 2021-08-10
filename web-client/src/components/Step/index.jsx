@@ -127,7 +127,7 @@ const StepComponent = (props) => {
 	};
 
 	const editStep = ({
-		id,
+		step_id,
 		ramp_rate,
 		target_temp,
 		hold_time,
@@ -138,7 +138,7 @@ const StepComponent = (props) => {
 		updateStepFormState({
 			type: stepStateActions.UPDATE_STATE,
 			value: {
-				stepId: id,
+				stepId: step_id,
 				rampRate: ramp_rate,
 				targetTemperature: target_temp,
 				holdTime: hold_time.toString(),

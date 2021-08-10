@@ -5,7 +5,7 @@ import {
   TargetList,
   TargetListHeader,
   TargetListItem,
-  Text,
+  Text
 } from "shared-components";
 
 import { covertToSelectOption } from "utils/helpers";
@@ -14,7 +14,7 @@ import { checkIfIdPresentInList, validateThreshold } from "./targetHelper";
 import { MIN_THRESHOLD, MAX_THRESHOLD } from "./targetConstants";
 import { TargetActions } from "./Style";
 
-const TargetComponent = (props) => {
+const TargetComponent = props => {
   const {
     // master target list
     listTargetReducer,
@@ -36,10 +36,10 @@ const TargetComponent = (props) => {
     isNoTargetSelected,
     setThresholdError,
     isThresholdInvalid,
-    onRemoveTarget,
+    onRemoveTarget
   } = props;
 
-  const isTargetDisabled = (ele) => {
+  const isTargetDisabled = ele => {
     if (ele.selectedTarget === undefined || ele.threshold === undefined) {
       return true;
     }
@@ -58,7 +58,7 @@ const TargetComponent = (props) => {
 
   // reset threshold error flag to false on focus on input field
   const onThresholdFocusHandler = useCallback(
-    (index) => {
+    index => {
       setThresholdError(false, index);
     },
     [setThresholdError]
@@ -67,7 +67,7 @@ const TargetComponent = (props) => {
   const getFilteredOptionsList = useMemo(() => {
     if (isLoginTypeAdmin === true) {
       return listTargetReducer.filter(
-        (ele) => !checkIfIdPresentInList(ele.get("id"), selectedTargetState)
+        ele => !checkIfIdPresentInList(ele.get("id"), selectedTargetState)
       );
     }
   }, [listTargetReducer, selectedTargetState, isLoginTypeAdmin]);
@@ -88,7 +88,7 @@ const TargetComponent = (props) => {
         <TargetListItem key={index}>
           {isLoginTypeOperator === true && (
             <CheckBox
-              onChange={(event) => {
+              onChange={event => {
                 onCheckedHandler(event, index);
               }}
               className="mr-2"
@@ -100,14 +100,14 @@ const TargetComponent = (props) => {
           {isLoginTypeAdmin === true && (
             // if it's a admin he can select targets from master targets
             <Select
-              className="flex-100 px-2"
+              className="flex-50 px-2"
               options={covertToSelectOption(
                 getFilteredOptionsList,
                 "name",
                 "id"
               )}
               placeholder="Please select target."
-              onChange={(selectedTarget) => {
+              onChange={selectedTarget => {
                 onTargetSelect(selectedTarget, index);
               }}
               value={ele.selectedTarget ? ele.selectedTarget : null}
@@ -116,7 +116,7 @@ const TargetComponent = (props) => {
           {isLoginTypeOperator === true && (
             // for operator will show in disabled state
             <Input
-              className="flex-100 mr-2"
+              className="flex-50 mr-2"
               type="text"
               placeholder="Type here..."
               defaultValue={ele.selectedTarget && ele.selectedTarget.label}
@@ -124,13 +124,13 @@ const TargetComponent = (props) => {
             />
           )}
           <Input
-            className="flex-40 pl-2"
+            className="flex-20 pl-2"
             type="number"
             name={`threshold${index}`}
             index={`threshold${index}`}
             placeholder={`${MIN_THRESHOLD} - ${MAX_THRESHOLD}`}
             value={ele.threshold === undefined ? "" : ele.threshold}
-            onChange={(event) => {
+            onChange={event => {
               onThresholdChange(event.target.value, index);
             }}
             onBlur={() => onThresholdBlurHandler(ele.threshold, index)}
@@ -146,21 +146,18 @@ const TargetComponent = (props) => {
           {isLoginTypeAdmin === true &&
             Object.keys(ele).length !== 0 &&
             ele?.selectedTarget?.label !== null && (
-              <>
+              <div className="list-target-actions d-flex align-items-center justify-content-center flex-30">
                 {/** -1 */}
                 <Button
-                  color="secondary"
-                  className="ml-2"
-                  style={{ width: "auto" }}
+                  className="ml-2 p-0"
                   onClick={() => decrementThreshold(ele, index)}
                 >
-                  -
+                  −
                 </Button>
                 {/** +1 */}
                 <Button
-                  color="secondary"
-                  className="ml-2"
-                  style={{ width: "auto" }}
+                  color="color"
+                  className="ml-2 p-0"
                   onClick={() => incrementThreshold(ele, index)}
                 >
                   +
@@ -168,14 +165,13 @@ const TargetComponent = (props) => {
 
                 {/**show remove target if target is available */}
                 <Button
-                  color="secondary"
-                  className="ml-2"
-                  style={{ width: "auto" }}
+                  color="color"
+                  className="ml-2 p-0"
                   onClick={() => onRemoveTarget(ele)}
                 >
-                  X
+                  ×
                 </Button>
-              </>
+              </div>
             )}
         </TargetListItem>
       )),
@@ -188,7 +184,7 @@ const TargetComponent = (props) => {
       isLoginTypeAdmin,
       getFilteredOptionsList,
       onThresholdBlurHandler,
-      onThresholdFocusHandler,
+      onThresholdFocusHandler
     ]
   );
   return (
@@ -281,7 +277,7 @@ TargetComponent.propTypes = {
   onNextClick: PropTypes.func,
   isViewStagesEnabled: PropTypes.bool,
   navigateToStageWizard: PropTypes.func,
-  editTemplate: PropTypes.func,
+  editTemplate: PropTypes.func
 };
 
 export default TargetComponent;
