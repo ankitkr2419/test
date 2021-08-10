@@ -55,7 +55,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments/{experiment_id}/run", authenticate(runExperimentHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/finish/template/{id}", authenticate(finishTemplateHandler(deps), deps, RTPCR, admin)).Methods(http.MethodPut).Headers(versionHeader, v1)
 	router.HandleFunc("/finished/templates", authenticate(listFinishedTemplateHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
-
+	router.HandleFunc("/samples/", authenticate(findSamplesHandler(deps), deps, RTPCR)).Queries("text", "{text}").Methods(http.MethodGet).Headers(versionHeader, v1)
 	//Websocket router
 	router.HandleFunc("/monitor", wsHandler(deps)).Methods(http.MethodGet)
 
@@ -167,6 +167,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tec/run", authenticate(runTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tec/get-all", authenticate(getAllTECHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
+	// report
+	router.HandleFunc("/email-report/{experiment_id}", emailReport(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/upload-report/{experiment_id}", uploadReport(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/rtpcr/graph-update-scale/{id}", authenticate(updateScaleHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	return
 }

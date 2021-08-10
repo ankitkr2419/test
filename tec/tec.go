@@ -2,6 +2,7 @@ package tec
 
 import (
 	"mylab/cpagent/plc"
+
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 )
 
@@ -31,4 +32,3 @@ type Driver interface {
 	GetAllTEC() error
 	RunProfile(plc.Driver, TempProfile) error
 }
-

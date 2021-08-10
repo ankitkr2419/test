@@ -145,11 +145,11 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 
 func (d *Compact32) HomingRTPCR() (err error) {
 
-	defer func(){
+	defer func() {
 		homingCount = 0
 	}()
 
-	if homingCount == 2{
+	if homingCount == 2 {
 		err = errors.New("homing failed even after 2 tries")
 		logger.WithField("HOMING", err.Error()).Errorln("homing failed")
 		d.ExitCh <- errors.New("PCR Aborted")
@@ -187,7 +187,7 @@ func (d *Compact32) HomingRTPCR() (err error) {
 		homingCount++
 		// Try Homing Again
 		err = d.HomingRTPCR()
-		if err != nil{
+		if err != nil {
 			return
 		}
 	}
@@ -251,7 +251,7 @@ func (d *Compact32) Cycle() (err error) {
 	}
 	logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
 	err = plc.HoldSleep(15)
-	if err != nil{
+	if err != nil {
 		logger.Errorln("Error while running cycle: ", err)
 		return
 	}
@@ -295,7 +295,7 @@ func (d *Compact32) Cycle() (err error) {
 // Monitor periodically. If CycleComplete == true, Scan will be populated
 func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
-	logger.Println("---------------------------MONITOR------------------------")
+	logger.Infoln("---------------------------MONITOR------------------------")
 	// Read current cycle
 
 	scan.Temp = plc.CurrentCycleTemperature
@@ -469,7 +469,8 @@ func (d *Compact32) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.OFF)
 	if err != nil {
-		logger.Errorln("WriteSingleCoil:M109 : Stop Lid Heating")
+		logger.Errorln("Stop Lid Heating error")
+		return
 	}
 	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
 	return

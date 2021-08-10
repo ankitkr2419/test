@@ -5,6 +5,5 @@ import (
 )
 
 var (
-	FileCreationError     = fmt.Errorf("error creating new file")
+	FileCreationError = fmt.Errorf("error creating new file")
 )
-

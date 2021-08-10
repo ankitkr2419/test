@@ -10,11 +10,11 @@ func autoTuneHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		err = deps.Tec.AutoTune()
-		if err != nil{
+		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Auto Tune Started success"} )
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Auto Tune Started success"})
 	})
 }

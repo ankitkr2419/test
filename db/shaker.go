@@ -157,7 +157,34 @@ func (s *pgStore) createShaking(ctx context.Context, tx *sql.Tx, sh Shaker) (cre
 func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.ShakingInitialisedState)
 
-	result, err := s.db.Exec(
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.ShakingInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.ShakingUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.ShakingUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.ShakingCompletedState)
+
+		return
+	}()
+	err = s.updateProcessName(ctx, tx, sh.ProcessID, ShakingProcess, sh)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.ShakingUpdateNameError)
+		return
+	}
+
+	result, err := tx.Exec(
 		updateShakingQuery,
 		sh.WithTemp,
 		sh.Temperature,

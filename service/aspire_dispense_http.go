@@ -58,7 +58,7 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, createC))
 			return
 		}
-		
+
 		var createdTemp db.AspireDispense
 		createdTemp, err = deps.Store.CreateAspireDispense(req.Context(), adobj, recipeID)
 		if err != nil {

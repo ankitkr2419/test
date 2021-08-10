@@ -32,8 +32,8 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		logger.Infoln(responses.PIDCalibrationSuccess)
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PIDCalibrationSuccess})
+		logger.Infoln(responses.PIDCalibrationStarted)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PIDCalibrationStarted})
 	})
 }
 

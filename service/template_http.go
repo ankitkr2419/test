@@ -72,7 +72,7 @@ func createTemplateHandler(deps Dependencies) http.HandlerFunc {
 			{
 				Type:        cycle,
 				TemplateID:  createdTemp.ID,
-				RepeatCount: 0,
+				RepeatCount: db.RepeatCountDefault,
 			},
 		}
 

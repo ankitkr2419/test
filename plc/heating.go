@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"time"
 
 	logger "github.com/sirupsen/logrus"
@@ -24,7 +25,6 @@ import (
 func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	stopMonitor := make(chan bool, 1)
-
 
 	// Step 1 : Validation for temperature
 	// validation for temperature
@@ -134,7 +134,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 }
 
 func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64, tempCheck bool, stopMonitor chan bool) (response string, err error) {
-	var setTemp, setTemp1, setTemp2, prevTemp1, prevTemp2 float64
+	var setTemp, shaker1Temp, shaker2Temp, prevTemp1, prevTemp2 float64
 	var heatingFailCounter1, heatingFailCounter2 int
 
 	var registerAddress uint16 = 0
@@ -145,7 +145,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 	for {
 		select {
 		case n := <-stopMonitor:
-			fmt.Printf("stop the montoring %v", n)
+			logger.Infoln("stop the montoring :", n)
 			return "SUCCESS", nil
 
 		default:
@@ -185,51 +185,41 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 					goto skipToMonitor
 				}
 				// Play of 2 degrees as heater would not heat up that much sometimes
-				if (setTemp1 >= temperature - 2) && (setTemp2 >= temperature - 2) {
+				if (shaker1Temp >= temperature-2) && (shaker2Temp >= temperature-2) {
 					return "SUCCESS", nil
 				}
 
 			skipToMonitor:
 
-				if (setTemp1 - prevTemp1) < 1 {
+				if (shaker1Temp - prevTemp1) < 1 {
 					heatingFailCounter1 += 1
 				} else {
 					heatingFailCounter1 = 0
 				}
 
-				if (setTemp2 - prevTemp2) < 1 {
+				if (shaker2Temp - prevTemp2) < 1 {
 					heatingFailCounter2 += 1
 				} else {
 					heatingFailCounter2 = 0
 				}
 
-				prevTemp1 = setTemp1
-				prevTemp2 = setTemp2
+				prevTemp1 = shaker1Temp
+				prevTemp2 = shaker2Temp
 
 				if heatingFailCounter1 >= 15 || heatingFailCounter2 >= 15 {
 					err = fmt.Errorf("temperature not upgrading")
 					return "", err
 				}
 
-				results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
+				shaker1Temp, shaker2Temp, err = d.readTempValues()
 				if err != nil {
-					logger.Errorln("Error failed to read shaker 1 temperature \n", err)
+					logger.Errorln("Error failed to read temperature values for shaker heaters: ", err)
 					return "", err
 				}
-				setTemp1 = float64(binary.BigEndian.Uint16(results)) / 10
 
-				logger.Infoln("temp 1 reading", setTemp1)
-
-				results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
-				if err != nil {
-					logger.Errorln("Error failed to read shaker 2 temperature \n", err)
-					return "", err
-				}
-				setTemp2 = float64(binary.BigEndian.Uint16(results)) / 10
-				logger.Infoln("temp 2 reading", setTemp2)
 				response, err = d.AddDelay(delay, false)
 				if err != nil {
-					logger.Errorln("Error failed to add delay in monitor temperature \n", err)
+					logger.Errorln("Error failed to add delay in monitor temperature: ", err)
 					return "", err
 				}
 			}
@@ -237,7 +227,58 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 	}
 }
 
+func (d *Compact32Deck) readTempValues() (shaker1Temp, shaker2Temp float64, err error) {
+
+	defer func() {
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.FetchHeaterTempError)
+			d.WsErrCh <- err
+		}
+	}()
+
+	results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
+	if err != nil {
+		logger.Errorln("Error failed to read shaker 1 temperature")
+		return
+	}
+	shaker1Temp = float64(binary.BigEndian.Uint16(results)) / 10
+
+	logger.Infoln("temp 1 reading", shaker1Temp)
+
+	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
+	if err != nil {
+		logger.Errorln("Error failed to read shaker 2 temperature")
+		return
+	}
+	shaker2Temp = float64(binary.BigEndian.Uint16(results)) / 10
+	logger.Infoln("temp 2 reading", shaker2Temp)
+	return
+}
+
 func (d *Compact32Deck) stopMonitorTemperature(stop chan bool) {
 	logger.Infoln("stop monitor temperature")
 	stop <- true
+}
+
+func (d *Compact32Deck) HeaterData() (err error) {
+	retryCounter := 0
+	for {
+		time.Sleep(5 * time.Second)
+		if d.isEngineerOrAdminLogged() {
+			err = d.sendHeaterData()
+			if err != nil {
+				retryCounter++
+				if retryCounter > 3 {
+					return err
+				}
+				logger.WithFields(logger.Fields{
+					"heater":  err,
+					"attempt": retryCounter,
+				}).Warnln("Attempt failed. Heater Value couldn't be read. Retrying...")
+				time.Sleep(10 * time.Second) // sleep it off for a bit
+			} else {
+				retryCounter = 0
+			}
+		}
+	}
 }

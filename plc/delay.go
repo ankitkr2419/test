@@ -93,6 +93,9 @@ skipToStartTimer:
 			if d.isUVLightInProgress() {
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
 			}
+			if d.isPIDCalibrationInProgress() {
+				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidProgress)
+			}
 			if recipeRun {
 				if !d.IsRunInProgress() && getCurrentProcessNumber(d.name) == -2 {
 					// This means its time to Stop
