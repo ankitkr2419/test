@@ -27,7 +27,7 @@ type Dependencies struct {
 	// define other service dependencies
 }
 
-func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps Dependencies, err error) {
+func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction bool) (deps Dependencies, err error) {
 	var store db.Storer
 	var driver plc.Driver
 	var tecDriver tec.Driver
@@ -37,6 +37,11 @@ func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps 
 	if plcName != SIM && plcName != C32 {
 		logger.Errorln(responses.UnsupportedPLCError)
 		return Dependencies{}, responses.UnsupportedPLCError
+	}
+
+	if tecName != SIM && tecName != C32 {
+		logger.Errorln(responses.UnsupportedTECError)
+		return Dependencies{}, responses.UnsupportedTECError
 	}
 
 	exit := make(chan error)
@@ -57,39 +62,54 @@ func GetAllDependencies(plcName string, test, noRTPCR, noExtraction bool) (deps 
 	switch {
 	case noExtraction && noRTPCR:
 		logger.Infoln("application neither supports extraction nor rtpcr")
+
 		Application = None
-	case noExtraction && plcName == C32:
-		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
-		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
+
+	case noExtraction :
+		if plcName == C32{
+			driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
+		} else {
+			driver = simulator.NewSimulator(exit)
+		}
+		
+		if tecName == C32{
+			tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
+		} else {
+			tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
+		}
+
 		Application = RTPCR
-	case noExtraction && plcName == SIM:
-		driver = simulator.NewSimulator(exit)
-		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
-		Application = RTPCR
-	case noRTPCR && plcName == C32:
-		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+
+	case noRTPCR:
+		if plcName == C32{
+			driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
+			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+		} else {
+			driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
+			driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
+		}
+
 		Application = Extraction
-	case noRTPCR && plcName == SIM:
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
-		Application = Extraction
-		// Only cases that remain are of combined RTPCR and Extraction
-	case plcName == C32:
-		driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
-		driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-		driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
-		tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
-		Application = Combined
-	case plcName == SIM:
-		driver = simulator.NewSimulator(exit)
-		driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
-		driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
-		tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
-		Application = Combined
+
 	default:
-		logger.Errorln(responses.UnknownCase)
-		return Dependencies{}, responses.UnknownCase
+		// Only cases that remain are of combined RTPCR and Extraction
+		if plcName == C32{
+			driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
+			driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
+			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+		} else {
+			driver = simulator.NewSimulator(exit)
+			driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
+			driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
+		}
+
+		if tecName == C32{
+			tecDriver = tec_1089.NewTEC1089Driver(websocketMsg, websocketErr, exit, test, driver)
+		} else{
+			tecDriver = tecSim.NewSimulatorDriver(websocketMsg, websocketErr, exit, test)
+		}	
+
+		Application = Combined
 	}
 
 	// PLC work in a completely separate go-routine!
