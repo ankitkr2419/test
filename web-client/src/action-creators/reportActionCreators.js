@@ -1,9 +1,10 @@
 import { saveReportActions } from "actions/reportActions";
 
-export const saveReportInitiated = (token, data) => ({
+export const saveReportInitiated = (token, experimentId, data) => ({
   type: saveReportActions.saveReportInitiated,
   payload: {
     token,
+    experimentId,
     data,
   },
 });

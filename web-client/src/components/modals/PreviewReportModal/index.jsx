@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, ModalBody } from "core-components";
+import { Modal, ModalBody, Button } from "core-components";
 import { Text, ButtonIcon } from "shared-components";
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import Header from "components/Plate/Header";
@@ -41,13 +41,6 @@ const PreviewReportModal = (props) => {
   //also synce local loading with save report api isLoading when report is generated
   const [isReportGenerated, setIsReportGenerated] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    //makeing sure that report is rendered before generating report out of it
-    setTimeout(() => {
-      generateReport();
-    }, 4000);
-  }, []);
 
   //sync local loading with api isLoading when report generated
   useEffect(() => {
@@ -55,6 +48,11 @@ const PreviewReportModal = (props) => {
       setLoading(isLoading);
     }
   }, [isLoading, isReportGenerated]);
+
+  const onDownloadConfirmed = () => {
+    setLoading(true);
+    generateReport();
+  };
 
   const generateReport = () => {
     //access html element we want to export contents from
@@ -66,49 +64,49 @@ const PreviewReportModal = (props) => {
     html2canvas(page1).then((canvas1) => {
       html2canvas(page2).then((canvas2) => {
         // html2canvas(page3).then((canvas3) => {
-          const img1 = canvas1.toDataURL("image/png");
-          const img2 = canvas2.toDataURL("image/png");
-          // const img3 = canvas3.toDataURL("image/png");
+        const img1 = canvas1.toDataURL("image/png");
+        const img2 = canvas2.toDataURL("image/png");
+        // const img3 = canvas3.toDataURL("image/png");
+        const doc = new jsPDF("l", "pt", [1024, 700]); //create custom pdf instance with its properties [width, height] in pt units //NOTE: (1 pt = 1.3281472327365 px)
+        //add contents into pdf
+        doc.addImage(
+          img1,
+          "png",
+          30, //page1.offsetLeft,
+          100, //page1.offsetTop,
+          page1.clientWidth,
+          page1.clientHeight
+        );
+        doc.addPage();
+        doc.addImage(
+          img2,
+          "png",
+          30, //page2.offsetLeft,//left
+          100, //page2.offsetTop//top
+          page2.clientWidth,
+          page2.clientHeight
+        );
+        // doc.save("chart.pdf"); //save file locally with default filename //kept for testing
+        setIsReportGenerated(true);
+        let pdfInBlobFormat = doc.output("blob"); //generate blob file
 
-          //create custom pdf instance with its properties [width, height] in pt units
-          //NOTE: (1 pt = 1.3281472327365 px)
-          const doc = new jsPDF("l", "pt", [1024, 700]);
+        //save to server
+        sendReportToServer(pdfInBlobFormat);
 
-          //add contents into pdf
-          doc.addImage(
-            img1,
-            "png",
-            30, //page1.offsetLeft,
-            100, //page1.offsetTop,
-            page1.clientWidth,
-            page1.clientHeight
-          );
-          doc.addPage();
-          doc.addImage(
-            img2,
-            "png",
-            30, //page2.offsetLeft,//left
-            100, //page2.offsetTop//top
-            page2.clientWidth,
-            page2.clientHeight
-          );
-
-          //save file locally with default filename
-          doc.save("chart.pdf");
-
-          //change state
-          setIsReportGenerated(true);
-
-          //generate form data to send to api
-          // var pdf = doc.output();
-          // var data = new FormData();
-          // data.append("data: ", pdf);
-
-          //TODO call api
-          // dispatch(saveReportInitiated(token, data));
-        }); //page 3 finish
+        // }); //page 3 finish
       }); //page 2 finish
-    // }); //page 1 finish
+    }); //page 1 finish
+  };
+
+  const sendReportToServer = (pdfInBlobFormat) => {
+    //create file from blob
+    var file = new File([pdfInBlobFormat], "report.pdf", {
+      lastModified: new Date().getTime(),
+    });
+    //send report file to api
+    var data = new FormData();
+    data.append("report", file);
+    dispatch(saveReportInitiated(token, experimentId, data));
   };
 
   const showPageOne = () => {
@@ -145,7 +143,9 @@ const PreviewReportModal = (props) => {
     );
   };
 
-  {/*TODO remove if not needed*/}
+  {
+    /*TODO remove if not needed*/
+  }
   // const showPageThree = () => {
   //   return (
   //     <div id="page-3">
@@ -172,6 +172,14 @@ const PreviewReportModal = (props) => {
           >
             Report
           </Text>
+          <Button
+            onClick={onDownloadConfirmed}
+            color="primary"
+            className={"ml-auto"}
+            size="md"
+          >
+            Download
+          </Button>
         </div>
 
         {loading === false && (
@@ -196,7 +204,7 @@ const PreviewReportModal = (props) => {
         >
           {showPageOne()}
           {showPageTwo()}
-          {/* {showPageThree()} */} 
+          {/* {showPageThree()} */}
         </div>
       </ModalBody>
     </Modal>

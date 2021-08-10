@@ -141,6 +141,7 @@ export const API_ENDPOINTS = {
   configs: "configs",
   pidCalibration: "pid-calibration",
   manual: "manual",
+  uploadReport: "upload-report",
 };
 
 export const MODAL_MESSAGE = {

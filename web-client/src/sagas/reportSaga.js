@@ -6,21 +6,22 @@ import { saveReportFailed } from "action-creators/reportActionCreators";
 
 export function* saveReport(actions) {
   const {
-    payload: { token, data },
+    payload: { token, experimentId, data },
   } = actions;
   const { saveReportSuccess, saveReportFailure } = saveReportActions;
 
   try {
     yield call(callApi, {
       payload: {
-        // method: HTTP_METHODS.GET,//TODO to add remaining fields when its confirmed by backend
-        body: null,
-        // reqPath: `${API_ENDPOINTS.}`,
+        method: HTTP_METHODS.POST,
+        body: data,
+        reqPath: `${API_ENDPOINTS.uploadReport}/${experimentId}`,
         successAction: saveReportSuccess,
         failureAction: saveReportFailure,
         showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token,
+        isMultipartFormData: true
       },
     });
   } catch (error) {

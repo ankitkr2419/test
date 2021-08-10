@@ -63,15 +63,6 @@ const Plate = (props) => {
     ) {
       setActiveTab("graph");
     }
-
-    //toggle preview report modal to generate report
-    if (
-      experimentStatus === EXPERIMENT_STATUS.success ||
-      experimentStatus === EXPERIMENT_STATUS.stopped ||
-      experimentStatus === EXPERIMENT_STATUS.runFailed
-    ) {
-      togglePreviewReportModal();
-    }
   }, [experimentStatus]);
 
   /**
@@ -125,6 +116,10 @@ const Plate = (props) => {
 
   const togglePreviewReportModal = () => {
     setPreviewReportModal(!previewReportModal);
+  };
+
+  const downloadClickHandler = (e) => {
+    togglePreviewReportModal();
   };
 
   return (
@@ -249,6 +244,12 @@ const Plate = (props) => {
                   >
                     Temperature
                   </Button>
+                  <ButtonIcon
+                    name="download-1"
+                    size={28}
+                    className="bg-white border-secondary ml-auto downloadButton"
+                    onClick={downloadClickHandler}
+                  />
                 </div>
                 <ExperimentGraphContainer
                   showTempGraph={showTempGraph}
