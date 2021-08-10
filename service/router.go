@@ -55,7 +55,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/experiments/{experiment_id}/run", authenticate(runExperimentHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/finish/template/{id}", authenticate(finishTemplateHandler(deps), deps, RTPCR, admin)).Methods(http.MethodPut).Headers(versionHeader, v1)
 	router.HandleFunc("/finished/templates", authenticate(listFinishedTemplateHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
-
+	router.HandleFunc("/samples/", authenticate(findSamplesHandler(deps), deps, RTPCR)).Queries("text", "{text}").Methods(http.MethodGet).Headers(versionHeader, v1)
 	//Websocket router
 	router.HandleFunc("/monitor", wsHandler(deps)).Methods(http.MethodGet)
 

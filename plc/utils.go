@@ -2,25 +2,16 @@ package plc
 
 import (
 	"context"
-	"fmt"
 	"mylab/cpagent/db"
-	"mylab/cpagent/responses"
 
 	"sync"
 
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
 )
 
 var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
 var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
-
-const (
-	TECSheet   = "tec"
-	RTPCRSheet = "rtpcr"
-	TempLogs   = "temperature logs"
-)
 
 type DeckNumber struct {
 	Deck   string
@@ -359,105 +350,5 @@ func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *ui
 	} else {
 		*distanceToTravel *= -1
 		*direction = 0
-	}
-}
-
-func GetExcelFile(path, fileName string) (f *excelize.File) {
-
-	f = excelize.NewFile()
-
-	index := f.NewSheet(TECSheet)
-	f.NewSheet(RTPCRSheet)
-	f.NewSheet(TempLogs)
-	f.SetActiveSheet(index)
-	f.DeleteSheet("Sheet1")
-
-	f.NewStyle(`{"alignment":{"horizontal":"center"}]}`)
-	f.SetSheetFormatPr(RTPCRSheet, excelize.DefaultColWidth(25))
-	f.SetSheetFormatPr(TempLogs, excelize.DefaultColWidth(40))
-	f.SetSheetFormatPr(TECSheet, excelize.DefaultColWidth(40))
-
-	f.Path = fmt.Sprintf("%v/%s.xlsx", path, fileName)
-	logger.Infoln("file saved in path---------->", f.Path)
-
-	return
-}
-
-func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err error) {
-
-	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
-	rows, err := file.Rows(sheet)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
-	rowCount := 1
-	for rows.Next() {
-		rowCount = rowCount + 1
-	}
-
-	for i, v := range values {
-		cell, err := excelize.CoordinatesToCellName(i+1, rowCount)
-		if err != nil {
-			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		}
-		file.SetCellStyle(sheet, cell, cell, styleID)
-		file.SetCellValue(sheet, cell, v)
-
-	}
-
-	if err = file.SaveAs(file.Path); err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
-
-	return
-}
-
-func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{}, space int) {
-
-	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
-
-	rows, err := file.Rows(sheet)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
-	rowCount := 1
-	for rows.Next() {
-		rowCount = rowCount + 1
-	}
-	//first cell is always the start cell
-	startCell, err := excelize.CoordinatesToCellName(1, rowCount)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-	}
-	file.SetCellValue(sheet, startCell, values[0])
-	j := 1
-	for i, v := range values {
-		if i == 0 {
-			continue
-		}
-		startCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
-		if err != nil {
-			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		}
-		logger.Println("cell, value---------------->", startCell, v)
-		file.SetCellStyle(sheet, startCell, startCell, styleID)
-		file.SetCellValue(sheet, startCell, v)
-
-		j = j + space - 1
-
-		endCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
-		if err != nil {
-			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		}
-		file.MergeCell(sheet, startCell, endCell)
-
-	}
-
-	if err = file.SaveAs(file.Path); err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
 	}
 }

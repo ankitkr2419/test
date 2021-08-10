@@ -79,7 +79,7 @@ func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 	for _, v := range wellFval {
 		row = append(row, v)
 	}
-	plc.AddRowToExcel(file, plc.RTPCRSheet, row)
+	db.AddRowToExcel(file, db.RTPCRSheet, row)
 
 	return
 }

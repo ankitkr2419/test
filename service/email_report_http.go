@@ -40,6 +40,7 @@ func emailReport(deps Dependencies) http.HandlerFunc {
 		err = emailTheReport(expID)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Email couldn't be sent: " + err.Error()})
+			return
 		}
 		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: "Email sent success"})
 	})
@@ -69,11 +70,13 @@ func uploadReport(deps Dependencies) http.HandlerFunc {
 		report := formdata.File["report"]
 		if report == nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ReportAbsent.Error()})
+			return
 		}
 
 		err = uploadTheReport(expID, report)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Report couldn't be uploaded: " + err.Error()})
+			return
 		}
 		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: "Report uploaded successfully"})
 	})

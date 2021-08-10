@@ -35,7 +35,7 @@ type Stage struct {
 	IdealLidTemp uint16 // ideal lid temp
 }
 
-type Emissions [4]uint16
+type Emissions [6]uint16
 
 type Scan struct {
 	Cycle         uint16 // current running cycle
