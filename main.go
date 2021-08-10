@@ -25,12 +25,17 @@ import (
 var cliCommand = []cli.Command{
 	{
 		Name:  "start",
-		Usage: "start server [--plc {simulator|compact32}] [--test] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
+		Usage: "start [--plc {simulator|compact32}] [--tec {simulator|compact32}] [--test] [--no-extraction] [--no-rtpcr] [--delay range:(0,100] ]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "plc",
 				Value: "compact32",
 				Usage: "Choose the PLC. simulator|compact32",
+			},
+			&cli.StringFlag{
+				Name:  "tec",
+				Value: "simulator",
+				Usage: "Choose the TEC. simulator|compact32",
 			},
 			&cli.BoolFlag{
 				Name:  "test",
@@ -59,7 +64,7 @@ var cliCommand = []cli.Command{
 				logger.Error("Re-check delay argument")
 				return err
 			}
-			return getDependenciesAndStartApp(c.String("plc"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction"))
+			return getDependenciesAndStartApp(c.String("plc"), c.String("tec"), c.Bool("test"), c.Bool("no-rtpcr"), c.Bool("no-extraction"))
 		},
 	},
 	{
@@ -130,11 +135,11 @@ func main() {
 	}
 }
 
-func getDependenciesAndStartApp(plcName string, test, noRTPCR, noExtraction bool) (err error) {
+func getDependenciesAndStartApp(plcName, tecName string, test, noRTPCR, noExtraction bool) (err error) {
 	logger.Println("run in test mode --->", test)
 	var deps service.Dependencies
 
-	if deps, err = service.GetAllDependencies(plcName, test, noRTPCR, noExtraction); err != nil {
+	if deps, err = service.GetAllDependencies(plcName, tecName, test, noRTPCR, noExtraction); err != nil {
 		logger.Errorln("Getting Dependencies failed!")
 		return
 	}
