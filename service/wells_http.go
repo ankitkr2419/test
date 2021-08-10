@@ -78,6 +78,13 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		valid, message := ValidateDyeTarget(wc, deps)
+		if !valid {
+			logger.Errorln("INVALID REQUEST", message)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: message})
+			return
+		}
+
 		// create sample if sample_id not present
 		if !isvalidID(wc.Sample.ID) {
 			wc.Sample, err = deps.Store.CreateSample(req.Context(), wc.Sample)
