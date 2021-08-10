@@ -131,4 +131,5 @@ type Storer interface {
 
 	DeleteTipTube(ctx context.Context, id int64) (err error)
 	SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) (err error)
+	ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error)
 }
