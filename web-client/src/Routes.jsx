@@ -24,9 +24,8 @@ import ShakingContainer from "containers/ShakingContainer";
 import HeatingContainer from "containers/HeatingContainer";
 import MagnetContainer from "containers/MagnetContainer";
 import DelayContainer from "containers/DelayContainer";
-import LoginContainer from 'containers/LoginContainer';
+import LoginContainer from "containers/LoginContainer";
 import TipPositionContainer from "containers/TipPositionContainer";
-import CalibrationContainer from "containers/CalibrationContainer";
 
 export const routeDefinitions = [
   {
@@ -34,12 +33,12 @@ export const routeDefinitions = [
     component: AppLayoutContainer,
     key: 1,
     routes: [
-			{
-				path: `${ROOT_URL_PATH}login`,
-				exact: true,
-				component: LoginContainer,
-				key: 2,
-			},
+      {
+        path: `${ROOT_URL_PATH}login`,
+        exact: true,
+        component: LoginContainer,
+        key: 2,
+      },
       {
         path: `${ROOT_URL_PATH}splashscreen`,
         exact: true,

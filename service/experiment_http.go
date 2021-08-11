@@ -151,7 +151,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		// create  new file for each experiment with experiment id in file name.
-		file := db.GetExcelFile(tecPath, fmt.Sprintf("output_%v", expID))
+		file := db.GetExcelFile(ExpOutputPath, fmt.Sprintf("output_%v", expID))
 
 		db.SetExperimentExcelFile(file)
 		deps.Store.SetExcelHeadings(file, expID)
