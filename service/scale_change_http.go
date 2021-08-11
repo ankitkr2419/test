@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
+	"net/url"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -30,12 +31,12 @@ func updateScaleHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		var t Scale
-		err = json.NewDecoder(req.Body).Decode(&t)
+		queryString := req.URL.Query()
+
+		t, err := makeScaleData(queryString)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error while decoding scale data")
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ScaleDecodeError.Error()})
-
 			return
 		}
 
@@ -114,4 +115,26 @@ func UpdateScale(result []db.Result, wells []int32, targets []db.TargetDetails, 
 func scaleValue(value float32, minScale, maxScale float32) (retValue float32) {
 
 	return ((value-pcrMin)/(pcrMax-pcrMin))*(maxScale-minScale) + minScale
+}
+
+func makeScaleData(queryString url.Values) (scale Scale, err error) {
+	scale.XAxisMin, err = strconv.Atoi(queryString["x_axis_min"][0])
+	if err != nil {
+		return
+	}
+	scale.XAxisMax, err = strconv.Atoi(queryString["x_axis_max"][0])
+	if err != nil {
+		return
+	}
+	YAxisMin, err := strconv.ParseFloat(queryString["y_axis_min"][0], 32)
+	if err != nil {
+		return
+	}
+	YAxisMax, err := strconv.ParseFloat(queryString["y_axis_max"][0], 32)
+	if err != nil {
+		return
+	}
+	scale.YAxisMin = float32(YAxisMin)
+	scale.YAxisMax = float32(YAxisMax)
+	return
 }

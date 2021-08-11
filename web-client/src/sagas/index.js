@@ -2,7 +2,6 @@ import { all } from "redux-saga/effects";
 import {
   createTemplateSaga,
   fetchTemplatesSaga,
-  createTemplateSuccessSaga,
   deleteTemplateSaga,
   updateTemplateSaga,
   finishCreateTemplateSaga,
@@ -53,7 +52,6 @@ import { reportSaga } from "./reportSaga";
 const allSagas = [
   createTemplateSaga(),
   fetchTemplatesSaga(),
-  createTemplateSuccessSaga(),
   saveTargetSaga(),
   fetchMasterTargetsSaga(),
   fetchTargetsByTemplateIDSaga(),
