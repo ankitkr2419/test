@@ -13,7 +13,7 @@ import (
 type Well struct {
 	// emissions plc.Emissions // dye emmissions.
 	control string    // "", positive, negative, internal or no_template
-	goals   [4]string // "", "high", "low"
+	goals   [6]string // "", "high", "low"
 }
 
 type Simulator struct {
@@ -186,30 +186,30 @@ func (d *Simulator) setWells() {
 
 		if i == pc {
 			well.control = "positive"
-			for i := 0; i < 4; i++ {
+			for i := 0; i < 6; i++ {
 				well.goals[i] = "high"
 			}
 
 		} else if i == nc {
 			well.control = "negative"
-			for i := 0; i < 4; i++ {
+			for i := 0; i < 6; i++ {
 				well.goals[i] = ""
 			}
 
 		} else if i == ic {
 			well.control = "internal"
-			well.goals = [4]string{"", "", "", "high"} //TODO: discuss
+			well.goals = [6]string{"", "", "", "", "", "high"} //TODO: discuss
 
 		} else if i == ntc {
 			well.control = "no_template"
-			for i := 0; i < 4; i++ {
+			for i := 0; i < 6; i++ {
 				well.goals[i] = "0"
 			}
 
 		} else {
 			well.control = "" // patient sample
 
-			for i := 0; i < 4; i++ {
+			for i := 0; i < 6; i++ {
 				if i != ic { // for all targets accept ic assign random goals
 					switch goal := jitter(0, 1, 4); goal { // randomization of goals
 					case 1:
