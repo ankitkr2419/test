@@ -12,7 +12,7 @@ import { HTTP_METHODS } from 'appConstants';
 
 export function* createExperiment(actions) {
 	const {
-		payload: { body },
+		payload: { body, token },
 	} = actions;
 
 	const { successAction, failureAction } = createExperimentActions;
@@ -25,6 +25,7 @@ export function* createExperiment(actions) {
 				reqPath: 'experiments',
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {

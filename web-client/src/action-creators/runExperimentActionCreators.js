@@ -1,9 +1,10 @@
 import { runExperimentActions, stopExperimentActions, experimentCompleteActions } from 'actions/runExperimentActions';
 
-export const runExperiment = experimentId => ({
+export const runExperiment = (experimentId, token) => ({
 	type: runExperimentActions.runExperiment,
 	payload: {
 		experimentId,
+		token,
 	},
 });
 
@@ -16,10 +17,11 @@ export const runExperimentFailed = errorResponse => ({
 });
 
 // abort experiment, Will call stop api call
-export const stopExperiment = experimentId => ({
+export const stopExperiment = (experimentId, token) => ({
 	type: stopExperimentActions.stopExperiment,
 	payload: {
 		experimentId,
+		token,
 	},
 });
 

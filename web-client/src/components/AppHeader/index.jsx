@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import { loginReset } from "action-creators/loginActionCreators";
+import {
+  loginReset,
+  logoutInitiated,
+} from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -20,16 +23,18 @@ import {
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
-import { EXPERIMENT_STATUS, MODAL_BTN, ROUTES } from "appConstants";
-import { getRedirectObj, NAV_ITEMS, PATH_TO_SHOW_CROSS_BTN } from "./constants";
+// import PrintDataModal from './PrintDataModal';
+// import ExportDataModal from './ExportDataModal';
+import {
+  APP_TYPE,
+  EXPERIMENT_STATUS,
+  MODAL_BTN,
+  MODAL_MESSAGE,
+  ROUTES,
+} from "appConstants";
+import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
-import { useHistory, useLocation } from "react-router";
-
-/**
- * Please note : Commented code has features/elements that may be needed in the future.
- * Therefore, please do not "un-comment" or delete without confirmation.
- */
 
 const AppHeader = (props) => {
   const {
@@ -38,12 +43,12 @@ const AppHeader = (props) => {
     isLoginTypeAdmin,
     isLoginTypeOperator,
     isTemplateRoute,
-    currentDeckName,
+    token,
+    deckName,
+    app,
   } = props;
 
-  const location = useLocation();
   const dispatch = useDispatch();
-  const history = useHistory();
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -57,26 +62,20 @@ const AppHeader = (props) => {
   const toggleUserDropdown = () =>
     setUserDropdownOpen((prevState) => !prevState);
 
-  // useEffect(() => {
-  // 	if (isExperimentRunning === true) {
-  // 		// connectSocket(dispatch);
-  // 	}
-  // }, [isExperimentRunning, dispatch]);
-
   useEffect(() => {
     if (isExperimentStopped === true) {
-      // disConnectSocket();
       dispatch(loginReset());
     }
   }, [isExperimentStopped, dispatch]);
 
+  // logout user
   const logoutClickHandler = () => {
-    dispatch(loginReset());
+    dispatch(logoutInitiated({ deckName: deckName, token: token }));
   };
 
   const startExperiment = () => {
     if (isExperimentRunning === false && isExperimentSucceeded === false) {
-      dispatch(runExperiment(experimentId));
+      dispatch(runExperiment(experimentId, token));
     }
   };
 
@@ -122,18 +121,22 @@ const AppHeader = (props) => {
   };
 
   // Exit modal confirmation click handler
-  const confirmationClickHandler = () => {
+  const confirmationClickHandler = (isConfirmed) => {
     setExitModalVisibility(false);
-    const currentPathname = location.pathname;
-    const redirectPath = getRedirectObj(currentPathname).redirectPath;
-    history.push(redirectPath);
+    if (isConfirmed === true) {
+      if (isExperimentRunning === true) {
+        // user aborted experiment
+        dispatch(stopExperiment(experimentId, token));
+      } else {
+        dispatch(logoutInitiated({ deckName: deckName, token: token }));
+      }
+    }
   };
 
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} />
-      {/* {Tab items} */}
-      {/* {isUserLoggedIn && (
+      {isUserLoggedIn && app === APP_TYPE.RTPCR && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map((ele) => (
             <NavItem key={ele.name}>
@@ -149,61 +152,60 @@ const AppHeader = (props) => {
             </NavItem>
           ))}
         </Nav>
-      )} */}
+      )}
       {isUserLoggedIn && (
-        <div className="d-flex align-items-center ml-auto">
-          <div className="experiment-info text-right mx-3">
-            <Text
-              size={12}
-              className={`text-default mb-1 ${
-                isExperimentRunning ? "show" : ""
-              }`}
-            >
-              {`Experiment started at ${runExperimentReducer.get(
-                "experimentStartedTime"
-              )}`}
-            </Text>
-            <Text
-              size={12}
-              className={`text-error mb-1 ${isRunFailed ? "show" : ""}`}
-            >
-              Experiment failed to run.
-            </Text>
-            {isExperimentSucceeded === false && isPlateRoute === true && (
-              <Button
-                color={isExperimentRunning ? "primary" : "secondary"}
-                size="sm"
-                className="font-weight-light border-2 border-gray shadow-none"
-                outline={
-                  isExperimentRunning === false &&
-                  isExperimentSucceeded === false
-                }
-                onClick={startExperiment}
+        <div className="header-elements d-flex align-items-center">
+          {/* <PrintDataModal /> */}
+          {/* <ExportDataModal /> */}
+          {app === APP_TYPE.RTPCR && (
+            <div className="experiment-info text-right mx-3">
+              <Text
+                size={12}
+                className={`text-default mb-1 ${
+                  isExperimentRunning ? "show" : ""
+                }`}
               >
-                Run
-              </Button>
-            )}
-            {isExperimentSucceeded === true && (
-              <Button
-                color="success"
-                size="sm"
-                className="font-weight-light border-2 border-gray shadow-none"
+                {`Experiment started at ${runExperimentReducer.get(
+                  "experimentStartedTime"
+                )}`}
+              </Text>
+              <Text
+                size={12}
+                className={`text-error mb-1 ${isRunFailed ? "show" : ""}`}
               >
-                Result - Successful
-              </Button>
-            )}
-          </div>
+                Experiment failed to run.
+              </Text>
+              {isExperimentSucceeded === false && isPlateRoute === true && (
+                <Button
+                  color={isExperimentRunning ? "primary" : "secondary"}
+                  size="sm"
+                  className="font-weight-light border-2 border-gray shadow-none"
+                  outline={
+                    isExperimentRunning === false &&
+                    isExperimentSucceeded === false
+                  }
+                  onClick={startExperiment}
+                >
+                  Run
+                </Button>
+              )}
+              {isExperimentSucceeded === true && (
+                <Button
+                  color="success"
+                  size="sm"
+                  className="font-weight-light border-2 border-gray shadow-none"
+                >
+                  Result - Successful
+                </Button>
+              )}
+            </div>
+          )}
 
-          {/* Purposely commented code. 
-              This may be needed in future.
-           */}
-
-          {/* {User profile icon} */}
-          {/* {isLoginTypeAdmin && (
+          {isLoginTypeAdmin === true && (
             <Dropdown
               isOpen={userDropdownOpen}
               toggle={toggleUserDropdown}
-              className="mr-0"
+              className="ml-2"
             >
               <DropdownToggle icon name="user" size={32} />
               <DropdownMenu right>
@@ -212,41 +214,26 @@ const AppHeader = (props) => {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
-          )} */}
-
-          {/* {isLoginTypeOperator && (
+          )}
+          {isLoginTypeOperator === true && (
             <ButtonIcon
               size={34}
               name="cross"
               onClick={onCrossClick}
               className="ml-2"
             />
-          )} */}
-
-          {/* { Cross Button on Processes pages } */}
-          {PATH_TO_SHOW_CROSS_BTN.includes(location.pathname) ? (
-            <ButtonIcon
-              size={34}
-              name="cross"
-              onClick={onCrossClick}
-              className="ml-2"
-            />
-          ) : null}
-
+          )}
           {isExitModalVisible && (
             <MlModal
               isOpen={isExitModalVisible}
+              textBody={MODAL_MESSAGE.exitConfirmation}
               successBtn={MODAL_BTN.yes}
               failureBtn={MODAL_BTN.no}
               handleSuccessBtn={confirmationClickHandler}
-              handleCrossBtn={() => {
-                setExitModalVisibility(false);
-              }}
-              textHead={currentDeckName}
-              textBody={getRedirectObj(location.pathname).msg}
+              handleCrossBtn={() => setExitModalVisibility(false)}
             />
           )}
-          {/* <ActionBtnList className="bg-dark d-flex float-right justify-content-between align-items-center list-unstyled mb-0">
+          <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
             <ActionBtnListItem>
               <Icon name="setting" size={18} />
             </ActionBtnListItem>
@@ -256,7 +243,7 @@ const AppHeader = (props) => {
             <ActionBtnListItem>
               <Icon name="menu" size={18} />
             </ActionBtnListItem>
-          </ActionBtnList> */}
+          </ActionBtnList>
         </div>
       )}
     </Header>
