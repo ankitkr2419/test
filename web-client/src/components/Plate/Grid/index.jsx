@@ -47,7 +47,7 @@ const GridComponent = ({
               <React.Fragment key={index}>
                 <Well
                   isRunning={isRunning}
-                  isSelected={isAllWellsSelected || isSelected || isMultiSelected}
+                  isSelected={isSelected || isMultiSelected}
                   status={status}
                   taskInitials={initial}
                   id={`PopoverWell${index}`}

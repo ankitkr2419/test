@@ -21,7 +21,7 @@ const SelectAllGridHeader = ({
       name="selection"
       label="Select all wells"
       checked={isAllWellsSelected}
-      onChange={toggleAllWellSelectedOption}
+      onChange={() => toggleAllWellSelectedOption(isAllWellsSelected)}
     />
   </StyledSelectAllGridHeader>
 );
