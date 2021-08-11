@@ -12,7 +12,12 @@ const headers = ActivityData.headers;
 // const experiments = ActivityData.experiments;//TODO remove if not needed
 
 const ActivityComponent = (props) => {
-  let { experiments, searchText, onSearchTextChanged } = props;
+  let {
+    experiments,
+    searchText,
+    onSearchTextChanged,
+    mailActivityReportHandler,
+  } = props;
 
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [showDeleteActivityModal, setShowDeleteActivityModal] = useState(false);
@@ -135,11 +140,16 @@ const ActivityComponent = (props) => {
                     {experiment.result ? experiment.result : "NA"}
                   </td>
                   <td className="td-actions">
-                    <ButtonIcon size={28} name="expand" />
+                    {/* <ButtonIcon size={28} name="expand" />
                     <ButtonIcon
                       size={28}
                       name="trash"
                       onClick={deleteActivityClickHandler}
+                    /> */}
+                    <ButtonIcon
+                      size={28}
+                      name="published"
+                      onClick={mailActivityReportHandler}
                     />
                   </td>
                 </tr>

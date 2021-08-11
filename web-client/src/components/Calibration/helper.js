@@ -1,4 +1,24 @@
+import { EMAIL_REGEX_OR_EMPTY_STR, NAME_REGEX } from "appConstants";
+
 export const formikInitialState = {
+  name: {
+    type: "text",
+    name: "name",
+    apiKey: "name",
+    label: "Name",
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Please enter a valid name",
+  },
+  email: {
+    type: "email",
+    name: "email",
+    apiKey: "email",
+    label: "Email",
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Email is invalid",
+  },
   roomTemperature: {
     type: "number",
     name: "roomTemperature",
@@ -8,6 +28,7 @@ export const formikInitialState = {
     min: 20,
     max: 30,
     isInvalid: false,
+    isInvalidMsg: "Room temperature should be between 20 - 30",
   },
   homingTime: {
     type: "number",
@@ -18,6 +39,7 @@ export const formikInitialState = {
     max: 30,
     value: null,
     isInvalid: false,
+    isInvalidMsg: "Homing time should be between 16 - 30",
   },
   noOfHomingCycles: {
     type: "number",
@@ -28,6 +50,7 @@ export const formikInitialState = {
     max: 100,
     value: null,
     isInvalid: false,
+    isInvalidMsg: "No. of homing cycles should be between 0 - 100",
   },
   cycleTime: {
     type: "number",
@@ -38,6 +61,7 @@ export const formikInitialState = {
     max: 30,
     value: null,
     isInvalid: false,
+    isInvalidMsg: "Cycle time should be between 2 - 30",
   },
   pidTemperature: {
     type: "number",
@@ -48,6 +72,7 @@ export const formikInitialState = {
     max: 75,
     value: null,
     isInvalid: false,
+    isInvalidMsg: "PID temperature should be between 50 - 75",
   },
   pidMinutes: {
     type: "number",
@@ -58,6 +83,7 @@ export const formikInitialState = {
     max: 40,
     value: null,
     isInvalid: false,
+    isInvalidMsg: "PID minutes should be between 20 - 40",
   },
 };
 
@@ -68,7 +94,7 @@ export const validateAllFields = (state) => {
       value === null ||
       value === "" ||
       isInvalid === true ||
-      isValueWithinRange(name, value) === false
+      isValueValid(name, value) === false
     ) {
       return false;
     }
@@ -76,12 +102,20 @@ export const validateAllFields = (state) => {
   return true;
 };
 
-export const isValueWithinRange = (name, value) => {
+export const isValueValid = (name, value) => {
   const element = formikInitialState[name];
-  const { min, max } = element;
-  if (value < min || value > max) {
+  const { type, min, max } = element;
+
+  if (type === "number" && (value < min || value > max)) {
+    return false;
+  } else if (type === "email" && value.match(EMAIL_REGEX_OR_EMPTY_STR) === null) {
     return false;
   }
+  //TODO : remove after dis.
+  // else if (type === "text") {
+  //   //&& value.match(NAME_REGEX) === null) {
+  //   return false;
+  // }
   return true;
 };
 
@@ -89,8 +123,8 @@ export const getRequestBody = (state) => {
   const body = {};
   for (const key in state) {
     const element = state[key];
-    const { name, value } = element;
-    body[name] = parseInt(value);
+    const { type, name, value } = element;
+    body[name] = type === "number" ? parseInt(value) : value;
   }
   return body;
 };

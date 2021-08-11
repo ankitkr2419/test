@@ -20,15 +20,29 @@ const CalibrationRtpcrContainer = () => {
   const calibrationReducerData = calibrationReducer.toJS();
   const { configs } = calibrationReducerData;
 
-  //api call to get configurations
+  //get calibration configurations from reducer
+  const updateCalibrationReducer = useSelector((state) => state.updateCalibrationReducer);
+  const updateCalibrationReducerData = updateCalibrationReducer.toJS();
+  const { isLoading, error } = updateCalibrationReducerData;
+
+  //initially populate with previous data
   useEffect(() => {
     if (token) {
+      dispatch(calibrationInitiated(token)); 
+    }
+  }, [dispatch, token])
+
+  //after update API call is successful populate fields with new data
+  useEffect(() => {
+    if (token && error === false && isLoading === false) {
       dispatch(calibrationInitiated(token));
     }
-  }, [dispatch, token]);
+  }, [dispatch, isLoading, error, token]);
 
   const saveBtnClickHandler = (configData) => {
     let data = {
+      name: configData.name,
+      email: configData.email,
       room_temperature: configData.roomTemperature,
       homing_time: configData.homingTime,
       no_of_homing_cycles: configData.noOfHomingCycles,

@@ -7,6 +7,10 @@ export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 
 export const ROOT_URL_PATH = "/";
 
+export const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+export const EMAIL_REGEX_OR_EMPTY_STR = /^$|^.*@.*\..*$/;
+export const NAME_REGEX = /^[^\\\/&]*$/;
+
 export const CREDS_FOR_HOMING = {
   email: "main",
   password: "main",
@@ -141,6 +145,7 @@ export const API_ENDPOINTS = {
   configs: "configs",
   pidCalibration: "pid-calibration",
   manual: "manual",
+  sendMail: "", // Not confirmed, change after API is created
   uploadReport: "upload-report",
 };
 
@@ -215,8 +220,11 @@ export const USER_ROLES = {
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
   calRedirect: "Cannot redirect to calibration while adding/editing processes!",
-  deckBlockForProcess: "Decks cannot be switched while adding/editing processes!",
-  deckBlockForCalibration: "Decks cannot be switched in calibration!"
+  deckBlockForProcess:
+    "Decks cannot be switched while adding/editing processes!",
+  deckBlockForCalibration: "Decks cannot be switched in calibration!",
+  sendingMailSuccess: "Mail sent successfully!",
+  sendingMailFailure: "Something went wrong!",
 };
 
 export const LABWARE_ITEMS_NAME = [
