@@ -147,6 +147,7 @@ export const API_ENDPOINTS = {
   manual: "manual",
   emailReport: "email-report",
   graphUpdate: "rtpcr/graph-update-scale",
+  uploadReport: "upload-report",
 };
 
 export const MODAL_MESSAGE = {

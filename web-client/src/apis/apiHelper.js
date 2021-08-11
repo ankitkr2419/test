@@ -92,7 +92,8 @@ export function* callApi(actions) {
       params = null,
       showPopupSuccessMessage = false,
       showPopupFailureMessage = false,
-      token
+      token,
+      isMultipartFormData
     },
   } = actions;
   
@@ -102,8 +103,16 @@ export function* callApi(actions) {
     const fetchOptions = {
       method,
       headers: defaultHeaders(token),
-      body: body && JSON.stringify(body),
+      body: body && (isMultipartFormData ? body : JSON.stringify(body)),
     };
+
+    /**
+     * if want to send multipart form data, we need to delete content type explicitly 
+     * and browser will set it automatically for us
+     */
+    if(isMultipartFormData) { 
+      delete fetchOptions.headers['Content-Type']; 
+    }
 
     const response = yield fetch(fetchUrl, fetchOptions);
 

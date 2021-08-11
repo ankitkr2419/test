@@ -84,7 +84,6 @@ const AppHeader = (props) => {
   useEffect(() => {
     if (isExperimentSucceeded) {
       setExpSuccessModalVisibility(true);
-      // dispatch(loginReset());
     }
   }, [isExperimentSucceeded]);
 
