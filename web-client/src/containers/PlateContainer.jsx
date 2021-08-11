@@ -111,6 +111,7 @@ const PlateContainer = () => {
       experimentTemplate={experimentTemplate}
       headerData={runExpProgressReducer.toJS()}
       temperatureData={temperatureData}
+      token={token}
     />
   );
 };

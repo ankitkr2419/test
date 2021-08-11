@@ -146,6 +146,7 @@ export const API_ENDPOINTS = {
   pidCalibration: "pid-calibration",
   manual: "manual",
   sendMail: "", // Not confirmed, change after API is created
+  graphUpdate: "rtpcr/graph-update-scale",
 };
 
 export const MODAL_MESSAGE = {

@@ -38,6 +38,7 @@ const Plate = (props) => {
     resetSelectedWells,
     headerData,
     temperatureData,
+    token,
   } = props;
 
   // getExperimentStatus will return us current experiment status
@@ -259,6 +260,9 @@ const Plate = (props) => {
                   />
                 </div>
                 <ExperimentGraphContainer
+                  token={token}
+                  experimentId={experimentId}
+                  headerData={headerData}
                   showTempGraph={showTempGraph}
                   experimentStatus={experimentStatus}
                   isSidebarOpen={isSidebarOpen}

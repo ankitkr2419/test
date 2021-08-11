@@ -1,7 +1,18 @@
 import {
+  expandLogActions,
   activityLogActions,
   mailReportActions,
 } from "actions/activityLogActions";
+
+export const expandLogInitiated = ({ params, experimentId, token }) => ({
+  type: expandLogActions.expandLogInitiated,
+  payload: { params, experimentId, token },
+});
+
+export const expandLogFailed = ({ error }) => ({
+  type: expandLogActions.expandLogFailure,
+  payload: { error },
+});
 
 export const mailReportInitiated = ({ body, token }) => ({
   type: mailReportActions.mailReportInitiated,

@@ -26,6 +26,7 @@ import MagnetContainer from "containers/MagnetContainer";
 import DelayContainer from "containers/DelayContainer";
 import LoginContainer from "containers/LoginContainer";
 import TipPositionContainer from "containers/TipPositionContainer";
+import CalibrationContainer from "containers/CalibrationContainer";
 
 export const routeDefinitions = [
   {

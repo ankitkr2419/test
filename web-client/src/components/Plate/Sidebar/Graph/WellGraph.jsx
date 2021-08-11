@@ -5,14 +5,15 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 import {
   MIN_THRESHOLD,
-  MAX_THRESHOLD
+  MAX_THRESHOLD,
 } from "components/Target/targetConstants";
 import GraphFilters from "./GraphFilters";
 import GraphRange from "./GraphRange";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const options = {
   legend: {
-    display: false
+    display: false,
   },
   scales: {
     xAxes: [
@@ -22,14 +23,14 @@ const options = {
           labelString: "Cycles",
           fontSize: 15,
           fontStyle: "bold",
-          padding: 5
+          padding: 5,
         },
         offset: true,
         ticks: {
           fontSize: 15,
-          fontStyle: "bold"
-        }
-      }
+          fontStyle: "bold",
+        },
+      },
     ],
     yAxes: [
       {
@@ -38,15 +39,15 @@ const options = {
           labelString: "F-value",
           fontSize: 15,
           fontStyle: "bold",
-          padding: 10
+          padding: 10,
         },
         ticks: {
           fontSize: 15,
-          fontStyle: "bold"
-        }
-      }
-    ]
-  }
+          fontStyle: "bold",
+        },
+      },
+    ],
+  },
   //TODO: will be added later after testing & studying about it properly.
   // This is for animation.
 
@@ -56,38 +57,52 @@ const options = {
   // },
 };
 
-const WellGraph = ({
-  data,
-  experimentGraphTargetsList,
-  onThresholdChangeHandler,
-  toggleGraphFilterActive,
-  isThresholdInvalid,
-  setThresholdError,
-  resetThresholdError
-}) => (
-  <div>
-    <GraphCard>
-      <LineChart data={data} options={options} />
-    </GraphCard>
-    <GraphFilters
-      targets={experimentGraphTargetsList}
-      onThresholdChangeHandler={onThresholdChangeHandler}
-      toggleGraphFilterActive={toggleGraphFilterActive}
-      setThresholdError={setThresholdError}
-      resetThresholdError={resetThresholdError}
-    />
-    {/*<GraphRange />*/}
-    {isThresholdInvalid && (
-      <Text Tag="p" size={14} className="text-danger px-2 mb-1">
-        Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
-      </Text>
-    )}
-    {/* TODO: Un-comment after discussion with client/backend-team */}
-    {/* <Text size={14} className="text-default text-center mb-0">
+const WellGraph = (props) => {
+  const {
+    data,
+    headerData,
+    experimentGraphTargetsList,
+    onThresholdChangeHandler,
+    toggleGraphFilterActive,
+    isThresholdInvalid,
+    setThresholdError,
+    resetThresholdError,
+    handleRangeChangeBtn,
+  } = props;
+
+  const { totalCycles, progressStatus } = headerData;
+
+
+  return (
+    <div>
+      <GraphCard>
+        <LineChart data={data} options={options} />
+      </GraphCard>
+      <GraphFilters
+        targets={experimentGraphTargetsList}
+        onThresholdChangeHandler={onThresholdChangeHandler}
+        toggleGraphFilterActive={toggleGraphFilterActive}
+        setThresholdError={setThresholdError}
+        resetThresholdError={resetThresholdError}
+      />
+
+        <GraphRange
+          handleRangeChangeBtn={handleRangeChangeBtn}
+          headerData={headerData}
+        />
+
+      {isThresholdInvalid && (
+        <Text Tag="p" size={14} className="text-danger px-2 mb-1">
+          Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
+        </Text>
+      )}
+      {/* TODO: Un-comment after discussion with client/backend-team */}
+      {/* <Text size={14} className="text-default text-center mb-0">
       Note: Click on the threshold number to change it.
     </Text> */}
-  </div>
-);
+    </div>
+  );
+};
 
 const GraphCard = styled.div`
   width: 960px;
@@ -102,7 +117,7 @@ WellGraph.propTypes = {
   experimentGraphTargetsList: PropTypes.object.isRequired,
   onThresholdChangeHandler: PropTypes.func.isRequired,
   toggleGraphFilterActive: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
 };
 
 export default React.memo(WellGraph);

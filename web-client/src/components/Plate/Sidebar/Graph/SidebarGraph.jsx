@@ -6,6 +6,7 @@ import WellGraph from "./WellGraph";
 
 const SidebarGraph = (props) => {
   const {
+    headerData,
     showTempGraph,
     lineChartData,
     onThresholdChangeHandler,
@@ -14,6 +15,8 @@ const SidebarGraph = (props) => {
     setThresholdError,
     resetThresholdError,
     isThresholdInvalid,
+    experimentStatus,
+    handleRangeChangeBtn,
   } = props;
 
   let cyclesCount = 0;
@@ -32,19 +35,22 @@ const SidebarGraph = (props) => {
       {!showTempGraph && (
         <WellGraph
           data={data}
+          headerData={headerData}
           experimentGraphTargetsList={experimentGraphTargetsList}
           onThresholdChangeHandler={onThresholdChangeHandler}
           toggleGraphFilterActive={toggleGraphFilterActive}
           setThresholdError={setThresholdError}
           resetThresholdError={resetThresholdError}
           isThresholdInvalid={isThresholdInvalid}
+          handleRangeChangeBtn={handleRangeChangeBtn}
+          experimentStatus={experimentStatus}
         />
       )}
       {/* show temperature graph if showTempGraph flag is on */}
       {showTempGraph && <TemperatureGraphContainer />}
     </>
-
-  )};
+  );
+};
 
 SidebarGraph.propTypes = {
   isExperimentRunning: PropTypes.bool.isRequired,

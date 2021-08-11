@@ -9,9 +9,13 @@ import { EXPERIMENT_STATUS } from "appConstants";
 import { parseFloatWrapper } from "utils/helpers";
 import { isAnyThresholdInvalid } from "components/Target/targetHelper";
 import { getTemperatureChartData } from "selectors/temperatureGraphSelector";
+import { expandLogInitiated } from "action-creators/activityLogActionCreators";
 
 const ExperimentGraphContainer = (props) => {
   const {
+    token,
+    experimentId,
+    headerData,
     showTempGraph,
     setIsSidebarOpen,
     isSidebarOpen,
@@ -64,8 +68,27 @@ const ExperimentGraphContainer = (props) => {
     dispatch(updateExperimentTargetFilters(index, "thresholdError", false));
   };
 
+  const handleRangeChangeBtn = ({ xMax, xMin, yMax, yMin }) => {
+    const requestBody = {
+      x_axis_min: xMin,
+      x_axis_max: xMax,
+      y_axis_min: yMin,
+      y_axis_max: yMax,
+    };
+
+    //dispatch API
+    // dispatch(
+    //   expandLogInitiated({
+    //     params: requestBody,
+    //     experimentId: experimentId,
+    //     token: token,
+    //   })
+    // );
+  };
+
   return (
     <SidebarGraph
+      headerData={headerData}
       showTempGraph={showTempGraph}
       experimentStatus={experimentStatus}
       lineChartData={lineChartData}
@@ -77,6 +100,7 @@ const ExperimentGraphContainer = (props) => {
       setThresholdError={setThresholdError}
       resetThresholdError={resetThresholdError}
       isThresholdInvalid={isAnyThresholdInvalid(experimentGraphTargetsList)}
+      handleRangeChangeBtn={handleRangeChangeBtn}
     />
   );
 };
