@@ -6,7 +6,14 @@ import { ButtonBarBox, PrevBtn } from "./Styles";
 import { useHistory } from "react-router";
 
 const ButtonBar = (props) => {
-  const { leftBtnLabel, rightBtnLabel, handleLeftBtn, handleRightBtn } = props;
+  const {
+    leftBtnLabel,
+    rightBtnLabel,
+    handleLeftBtn,
+    handleRightBtn,
+    btnBarClassname,
+  } = props;
+
   const history = useHistory();
 
   const handleBackBtn = () => {
@@ -14,7 +21,9 @@ const ButtonBar = (props) => {
   };
 
   return (
-    <ButtonBarBox className="d-flex justify-content-start align-items-center mt-5">
+    <ButtonBarBox
+      className={`d-flex justify-content-start align-items-center ${btnBarClassname}`}
+    >
       <PrevBtn onClick={handleBackBtn}>
         <Icon name="angle-left" size={30} />
       </PrevBtn>

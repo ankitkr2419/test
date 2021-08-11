@@ -2,7 +2,9 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -48,14 +50,14 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		//hash password to validate
 		u.Password = MD5Hash(u.Password)
 
-		err = deps.Store.ValidateUser(req.Context(), u)
-		if err != nil {
-			if err.Error() == "Record Not Found" {
-				logger.WithField("err", err.Error()).Error(responses.UserInvalidError)
-				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserInvalidError.Error()})
-				return
+		// Getting back user along with his role
+		u, err = deps.Store.ValidateUser(req.Context(), u)
+		if err != nil || u.Role == "" {
+			if err == nil {
+				err = responses.UserInvalidError
 			}
-			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error(responses.UserInvalidError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserInvalidError.Error()})
 			return
 		}
 
@@ -68,10 +70,10 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		if deck != "" {
-			token, err = EncodeToken(u.Username, authID, u.Role, deck, map[string]string{})
+			token, err = EncodeToken(u.Username, authID, u.Role, deck, Application, map[string]string{})
 			userLogin.Store(deck, true)
 		} else {
-			token, err = EncodeToken(u.Username, authID, u.Role, "", map[string]string{})
+			token, err = EncodeToken(u.Username, authID, u.Role, "", Application, map[string]string{})
 		}
 
 		if err != nil {
@@ -79,15 +81,22 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserTokenEncodeError.Error()})
 		}
 		response := map[string]string{
-			"msg":   "user logged in successfully",
+			"msg":   fmt.Sprintf(`%s logged in successfully`, u.Role),
 			"token": token,
+			"role":  u.Role,
 		}
 
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.UserMarshallingError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserMarshallingError.Error()})
-			return
+		logger.WithFields(logger.Fields{
+			"Username": u.Username,
+			"Role": u.Role,
+			"Deck": deck,
+		}).Infoln("User logged in successfully")
+		if deck != "" && (u.Role == admin || u.Role == engineer) && ( Application == Combined || Application == Extraction)  {
+			deps.PlcDeck[deck].SetEngineerOrAdminLogged(true)
+		} else if deck != "" && ( Application == Combined || Application == Extraction)  {
+			deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 		}
+
 		logger.Infoln(responses.UserLoginSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, response)
 	})
@@ -97,7 +106,6 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		var u db.User
-		rw.Header().Add("Content-Type", "application/json")
 		err := json.NewDecoder(req.Body).Decode(&u)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
@@ -122,6 +130,42 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.UserCreateSuccess)
 		responseCodeAndMsg(rw, http.StatusCreated, MsgObj{Msg: responses.UserCreateSuccess})
+		return
+	})
+}
+
+func updateUserHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		var u db.User
+
+		vars := mux.Vars(req)
+		oldU := vars["old_username"]
+
+		err := json.NewDecoder(req.Body).Decode(&u)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.UserDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
+			return
+		}
+
+		valid, respBytes := validate(u)
+		if !valid {
+			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		//hash password to validate
+		u.Password = MD5Hash(u.Password)
+
+		err = deps.Store.UpdateUser(req.Context(), u, oldU)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.UserUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserUpdateError.Error()})
+			return
+		}
+
+		logger.Infoln(responses.UserUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UserUpdateSuccess})
 		return
 	})
 }
@@ -155,7 +199,7 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 			deck = "cloudUser"
 		}
 
-		userAuth, err := getUserAuth(token, deck, deps, validRoles...)
+		userAuth, err := getUserAuth(token, deck, deps, Application, validRoles...)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.UserAuthDataFetchError)
 			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserAuthDataFetchError.Error()})
@@ -168,8 +212,11 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
 			return
 		}
-		if deck != "" {
+		if (deck == plc.DeckA || deck== plc.DeckB) {
 			userLogin.Store(deck, false)
+			if  Application == Combined || Application == Extraction {
+				deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
+			}
 		}
 
 		logger.Infoln(responses.UserLogoutSuccess)

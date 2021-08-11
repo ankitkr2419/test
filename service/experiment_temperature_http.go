@@ -17,7 +17,7 @@ func getTemperatureHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		respBytes, err := getTemperatureDetails(deps, experimentID)
+		respBytes, _, err := getTemperatureAndProgressDetails(deps, experimentID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experimentTemperature data")
 			rw.WriteHeader(http.StatusInternalServerError)

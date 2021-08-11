@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS templates ADD COLUMN finished boolean DEFAULT FALSE;

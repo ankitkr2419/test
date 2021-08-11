@@ -4,10 +4,7 @@ import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import { appInfoAction } from "actions/appInfoActions";
 import { appInfoFailed } from "action-creators/appInfoActionCreators";
 
-export function* appInfo(actions) {
-    const {
-        payload: {},
-    } = actions;
+export function* appInfo() {
     const { appInfoSuccess, appInfoFailure } = appInfoAction;
 
     try {

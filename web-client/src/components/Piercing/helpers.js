@@ -14,7 +14,9 @@ export const getWellsInitialArray = (n, type, editReducerData = null) => {
   return wellsArray;
 };
 
-export const updatedWellsArray = (wellsArray, editReducerData = null) => {
+//this is called when data from edit-reducer is recieved
+//i.e. during edit process.
+export const getWellsArrayForEdit = (wellsArray, editReducerData = null) => {
   const selectedWells = editReducerData && editReducerData.cartridge_wells;
 
   wellsArray.map((wellObj, i) => {
@@ -29,4 +31,19 @@ export const updatedWellsArray = (wellsArray, editReducerData = null) => {
     return wellObj;
   });
   return wellsArray;
+};
+
+//this function updates and renders wellsArray after selecting or de-selecting wells
+export const updateWellsArray = (wellsObjArray, currentWellObj) => {
+  const updatedWellObjArray = wellsObjArray.map((wellObj) => {
+    if (wellObj.id === currentWellObj.id) {
+      return {
+        ...wellObj,
+        isSelected: !wellObj.isSelected,  //toggle
+      };
+    }
+    return wellObj;
+  });
+
+  return updatedWellObjArray;
 };

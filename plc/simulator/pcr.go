@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"mylab/cpagent/config"
 	"mylab/cpagent/plc"
 	"time"
 
@@ -35,12 +36,14 @@ func (d *Simulator) holdingStage() {
 
 func (d *Simulator) cycleStage() {
 	logger.Info("Starting cycleStage: ")
-
+	plc.HeatingCycleComplete = false
 	d.plcIO.d.currentCycle = 0
 	d.plcIO.m.emissionFlag = 0
+	logger.Println("cycle count", d.config.CycleCount)
 
 	for i := uint16(0); i < d.config.CycleCount; i++ { //for each cycle
 		// Check for Stop signal
+		logger.Println("perform cycle", i)
 		if d.plcIO.m.startStopCycle == 0 {
 			d.ErrCh <- errors.New("recieved stop signal")
 			break
@@ -49,23 +52,26 @@ func (d *Simulator) cycleStage() {
 		d.plcIO.m.cycleCompleted = 0
 		d.plcIO.d.currentCycle++
 		d.performSteps(d.config.Cycle)
+		logger.Println("emission flag", d.plcIO.m.emissionFlag)
 
 		if d.plcIO.m.emissionFlag == 1 { // Means PC did not set it to 0
 			d.ErrCh <- errors.New("client not reading the emission data, stopping PCR")
 			break // stop cycle as client is not reading the data
 		}
+		logger.Println("perform cycle done", i)
 
 		// populate emmission data 96X6
 		d.emit()
 
 		d.plcIO.m.cycleCompleted = 1 // cycle completed
-		d.plcIO.m.emissionFlag = 1   // PLC writing done
+		plc.HeatingCycleComplete = true
+		d.plcIO.m.emissionFlag = 1 // PLC writing done
 
 		// takes 1 to 3 seconds for cooling down
 		time.Sleep(time.Duration(jitter(1, 1, 3)) * time.Second)
 	}
 
-	d.ExitCh <- "stop"
+	d.ExitCh <- errors.New("stop")
 }
 
 func (d *Simulator) performSteps(steps []plc.Step) {
@@ -80,9 +86,6 @@ func (d *Simulator) performSteps(steps []plc.Step) {
 			// taking some time to increase the temperature
 			//time.Sleep(200 * time.Millisecond)
 			time.Sleep(time.Duration(jitter(0, 1, 3)) * time.Second) // sleep for 1 to 3 seconds
-
-			// simulate currentLidTemp
-			d.plcIO.d.currentLidTemp = jitter(uint16(d.config.IdealLidTemp*10), 0, 5)
 
 			// simulate currentTemp
 			d.plcIO.d.currentTemp = d.plcIO.d.currentTemp + uint16(stp.RampUpTemp*10)
@@ -110,7 +113,7 @@ func (d *Simulator) emit() {
 		for i := range emission {
 			emission[i] = calculate(d.plcIO.d.currentCycle, well.goals[i])
 		}
-		logger.WithField("emission", emission).Debug("EMISSIONS:")
+		logger.WithField("emission", emission).Info("EMISSIONS:")
 		emissions = append(emissions, emission)
 	}
 	d.emissions = emissions
@@ -178,6 +181,43 @@ func jitter(n uint16, min, max int) uint16 {
 	return final
 }
 
-func (d *Simulator) Cycle() (err error)       { return }
-func (d *Simulator) HomingRTPCR() (err error) { return }
-func (d *Simulator) Reset() (err error)       { return }
+func (d *Simulator) Cycle() (err error) {
+
+	if plc.ExperimentRunning {
+		logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
+		err = plc.HoldSleep(16)
+		if err != nil {
+			logger.Errorln("Error while running cycle: ", err)
+			return
+		}
+		plc.DataCapture = true
+	}
+	return
+}
+func (d *Simulator) HomingRTPCR() (err error) {
+	logger.WithField("HOMING", "Started").Infoln("homing started")
+	time.Sleep(time.Second * time.Duration(config.GetHomingTime()))
+	logger.WithField("HOMING", "Completed").Infoln("homing completed")
+	return
+}
+func (d *Simulator) Reset() (err error) { return }
+
+func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
+	logger.WithField("LID TEMP", "LID TEMP started").Infoln("LID TEMP STARTED")
+
+	// simulate currentLidTemp
+	if plc.ExperimentRunning {
+		time.Sleep(2 * time.Second)
+		plc.CurrentLidTemp = float32(expectedLidTemp)/10
+		logger.Infoln("Current Lid Temp: ", plc.CurrentLidTemp)
+	}
+	return
+}
+
+func (d *Simulator) SwitchOffLidTemp() (err error) {
+	// Off Lid Heating
+	plc.CurrentLidTemp = float32(config.GetRoomTemp())
+	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
+
+	return
+}

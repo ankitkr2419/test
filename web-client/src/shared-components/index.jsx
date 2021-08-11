@@ -20,6 +20,7 @@ import Loader from "./Loader";
 import VideoCard from "./VideoCard";
 import MlModal from "./MlModal";
 import TopHeading from "./TopHeading";
+import ProcessRemaining from "./ProcessRemaining";
 import TemperatureInfo from "./TemperatureInfo";
 import TimeInfo from "./TimeInfo";
 
@@ -50,6 +51,7 @@ export {
   Loader,
   VideoCard,
   MlModal,
+  ProcessRemaining,
   TimeInfo,
   TemperatureInfo,
 };

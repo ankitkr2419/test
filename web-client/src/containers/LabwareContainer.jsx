@@ -7,6 +7,7 @@ import {
   getTipsActionInitiated,
   getTubesActionInitiated,
 } from "action-creators/saveNewRecipeActionCreators";
+import { deckBlockInitiated } from "action-creators/loginActionCreators";
 
 const LabwareContainer = () => {
   const dispatch = useDispatch();
@@ -19,6 +20,11 @@ const LabwareContainer = () => {
   const token = activeDeckObj.token;
 
   const params = { deckName: currentDeckName, token: token };
+
+  useEffect(() => {
+    dispatch(deckBlockInitiated({ deckName: activeDeckObj.name }));
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(getCartridgeActionInitiated(params));
     dispatch(getTipsActionInitiated(params));

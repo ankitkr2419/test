@@ -63,7 +63,7 @@ func updateExpTempTargetsHandler(deps Dependencies) http.HandlerFunc {
 			}
 		}
 
-		var createdET []db.ExpTemplateTarget
+		var createdET []db.ExpTempTargeTDye
 		createdET, err = deps.Store.UpsertExpTemplateTarget(req.Context(), t, expID)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)

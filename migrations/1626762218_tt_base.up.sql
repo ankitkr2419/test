@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS tips_and_tubes ADD COLUMN tt_base decimal DEFAULT 0;

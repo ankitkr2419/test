@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Fade } from "reactstrap";
 import { Text, Icon, ButtonIcon } from "shared-components";
@@ -12,32 +12,36 @@ const RecipeCard = (props) => {
     isAdmin,
     isPublished,
     handleCarousalModal,
+    selectedRecipeData,
     returnRecipeDetails,
     toggleRunRecipesModal,
     handlePublishModalClick,
     handleEditRecipe,
     handleDeleteRecipe,
+    toggle,
   } = props;
-
-  const [toggle, setToggle] = useState(true);
 
   const handleClickOnCard = () => {
     if (isAdmin) {
-      setToggle(!toggle);
+      const param = toggle ? {} : { recipeId };
+      returnRecipeDetails(param);
     } else {
       handleCarousalModal();
       returnRecipeDetails({ recipeId, recipeName, processCount });
     }
   };
 
-  const handleRunRecipeByAdmin = () => {
+  const handleRunRecipeByAdmin = (e) => {
+    e.stopPropagation();
     toggleRunRecipesModal();
     returnRecipeDetails({ recipeId, recipeName, processCount, isAdmin });
   };
 
   return (
     <div onClick={handleClickOnCard}>
-      <RecipeCardStyle>
+      <RecipeCardStyle
+        className={toggle ? `${isAdmin ? "admin-" : ""}selected` : ""}
+      >
         <div className="recipe-heading d-flex justify-content-between align-items-center">
           <div className="font-weight-bold">{recipeName}</div>
           {isAdmin && isPublished ? (
@@ -46,38 +50,30 @@ const RecipeCard = (props) => {
             </Text>
           ) : null}
         </div>
-        {toggle ? (
-          <>
-            <Text Tag="span" className="recipe-name">
-              Total Processes -
-            </Text>
-            <Text
-              Tag="span"
-              className="text-primary font-weight-bold recipe-value ml-2"
-            >
-              {processCount}
-            </Text>
-          </>
-        ) : (
+        {isAdmin && toggle ? (
           <Fade in tag="h5" className="m-0">
-            <div className="recipe-action d-flex justify-content-between align-items-center">
+            <div className="recipe-action d-flex justify-content-between align-items-center pt-2">
               <div className="d-flex justify-content-between align-items-center">
                 <ButtonIcon
-                  size={14}
+                  size={25}
                   name="play"
                   className="border-gray text-primary mr-2"
                   onClick={handleRunRecipeByAdmin}
                 />
                 <ButtonIcon
-                  size={14}
+                  size={25}
                   name="edit-pencil"
                   className="border-gray text-primary mr-2"
                   onClick={handleEditRecipe}
                 />
                 <ButtonIcon
-                  size={14}
-                  name={isPublished ? 'published' : `publish`}
-                  className={`border-gray ${isPublished ? "published-icon text-white bg-primary": "text-primary"}`}
+                  size={25}
+                  name={isPublished ? "published" : `publish`}
+                  className={`border-gray ${
+                    isPublished
+                      ? "published-icon text-white bg-primary"
+                      : "text-primary"
+                  }`}
                   onClick={() => handlePublishModalClick(recipeId, isPublished)}
                 />
               </div>
@@ -89,6 +85,18 @@ const RecipeCard = (props) => {
               />
             </div>
           </Fade>
+        ) : (
+          <>
+            <Text Tag="span" className="recipe-name">
+              Total Processes -
+            </Text>
+            <Text
+              Tag="span"
+              className="text-primary font-weight-bold recipe-value ml-2"
+            >
+              {processCount}
+            </Text>
+          </>
         )}
       </RecipeCardStyle>
     </div>

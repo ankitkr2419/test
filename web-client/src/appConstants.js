@@ -7,6 +7,14 @@ export const TARGET_CAPACITY = process.env.REACT_APP_TARGET_CAPACITY || 6;
 
 export const ROOT_URL_PATH = "/";
 
+export const CREDS_FOR_HOMING = {
+  email: "main",
+  password: "main",
+  role: "admin",
+  deckName: "",
+  showToast: false,
+};
+
 export const HTTP_METHODS = {
   GET: "GET",
   POST: "POST",
@@ -134,6 +142,7 @@ export const MODAL_BTN = {
   next: "Next",
   yes: "Yes",
   no: "No",
+  complete: "Complete",
 };
 
 export const DECKCARD_BTN = {
@@ -381,7 +390,25 @@ export const APP_TYPE = {
   NONE: "none",
 };
 
-//constants for shaking
+// common constants used for aspire-dispense process and tip-position process
+export const NUMBER_OF_WELLS = 13;
+
+// constants for aspire-dispense process
+export const ASPIRE_WELLS = 0;
+export const DISPENSE_WELLS = 1;
+
+// constants for tip position process
+export const TIP_HEIGHT_MAX_ALLOWED_VALUE = 25;
+export const TIP_HEIGHT_MIN_ALLOWED_VALUE = 0;
+export const TIP_POSTION_ERROR_MSG =
+  "Invalid request sent! Please check input values.";
+export const CARTRIDGE_1_WELLS = 0;
+export const CARTRIDGE_2_WELLS = 1;
+export const TAB_TYPE_CARTRIDGE_1 = "1";
+export const TAB_TYPE_DECK = "2";
+export const TAB_TYPE_CARTRIDGE_2 = "3";
+
+//constants for shaking process
 export const MAX_TEMP_ALLOWED = 120;
 export const MIN_TEMP_ALLOWED = 20;
 export const MAX_TIME_ALLOWED = 3660; // 1 hour 1 min

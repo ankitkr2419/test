@@ -1,16 +1,13 @@
 package service
 
 import (
-	"encoding/csv"
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/responses"
-	"os"
 	"strconv"
-	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
@@ -45,6 +42,7 @@ func makePLCStage(ss []db.StageStep) plc.Stage {
 		step.RampUpTemp = s.RampRate
 		step.TargetTemp = s.TargetTemperature
 		step.HoldTime = s.HoldTime
+		step.DataCapture = s.DataCapture
 
 		switch s.Type {
 		case "hold":
@@ -61,27 +59,8 @@ func makePLCStage(ss []db.StageStep) plc.Stage {
 }
 
 // makeResult return result from plc.scan
-func makeResult(scan plc.Scan) (result []db.Result) {
-	tecLogsPath := "./utils/rtpcr"
-	// logging output to file and console
-	if _, err := os.Stat(tecLogsPath); os.IsNotExist(err) {
-		os.MkdirAll(tecLogsPath, 0755)
-		// ignore error and try creating log output file
-	}
-
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tecLogsPath, time.Now().Unix()))
-	if err != nil {
-		logger.Errorln(responses.FileCreationError)
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-	// Start line
-	err = writer.Write([]string{"ExperimentID", "Well Position", "Cycle", "Dye Position", "TargetID", "FValue", "Temperature"})
-	if err != nil {
-		return
-	}
+func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
+	var wellFval []uint16
 	for _, w := range experimentValues.activeWells {
 		var r db.Result
 		r.WellPosition = w
@@ -91,12 +70,16 @@ func makeResult(scan plc.Scan) (result []db.Result) {
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
 			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
-
+			wellFval = append(wellFval, r.FValue)
 			result = append(result, r)
-			writer.Write([]string{r.ExperimentID.String(), fmt.Sprintf("%d", r.WellPosition), fmt.Sprintf("%d", r.Cycle), fmt.Sprintf("%d", t.DyePosition), t.TargetID.String(), fmt.Sprintf("%d", r.FValue), fmt.Sprintf("%f", scan.Temp)})
-
 		}
+
 	}
+	row := []interface{}{fmt.Sprintf("cycle %d", scan.Cycle)}
+	for _, v := range wellFval {
+		row = append(row, v)
+	}
+	db.AddRowToExcel(file, db.RTPCRSheet, row)
 
 	return
 }
@@ -215,7 +198,6 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 					}
 
 				}
-
 			}
 			finalResult = append(finalResult, wellResult)
 			wellResult.Cycle = []uint16{}

@@ -2,18 +2,16 @@ package service
 
 import (
 	"context"
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"math"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/tec"
-	"mylab/cpagent/responses"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -152,12 +150,21 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		// create  new file for each experiment with experiment id in file name.
+		file := db.GetExcelFile(ExpOutputPath, fmt.Sprintf("output_%v", expID))
+
+		db.SetExperimentExcelFile(file)
+		deps.Store.SetExcelHeadings(file, expID)
 
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching wells data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+
+		for _, v := range wells {
+			db.AddRowToExcel(file, db.WellSample, []interface{}{v.ID, v.Position, v.ExperimentID, v.SampleID, v.Task, v.ColorCode, v.SampleName})
 		}
 
 		// validate of NC,PC or NTC set for wells
@@ -177,32 +184,64 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		for _, v := range ss {
+			db.AddRowToExcel(file, db.StepsStageSheet, []interface{}{
+				v.Stage.ID,
+				v.Stage.Type,
+				v.Stage.RepeatCount,
+				v.Stage.TemplateID,
+				v.Stage.StepCount,
+				v.Stage.CreatedAt.String(),
+				v.Stage.UpdatedAt.String(),
+				v.Step.ID,
+				v.Step.StageID,
+				v.Step.RampRate,
+				v.Step.TargetTemperature,
+				v.Step.HoldTime,
+				v.Step.DataCapture,
+				v.Step.CreatedAt.String(),
+				v.Step.UpdatedAt.String()})
+		}
+
 		plcStage := makePLCStage(ss)
 
-		// err = deps.Plc.ConfigureRun(plcStage)
-		// if err != nil {
-		// 	logger.WithField("err", err.Error()).Error("Error in ConfigureRun")
-		// 	rw.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
+		t, err := deps.Store.ShowTemplate(req.Context(), e.TemplateID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching template data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-		// err = tec.Run(plcStage)
+		db.AddRowToExcel(file, db.TemplateSheet, []interface{}{
+			t.ID,
+			t.Name,
+			t.Description,
+			t.Publish,
+			t.CreatedAt.String(),
+			t.UpdatedAt.String(),
+			t.Volume,
+			t.LidTemp,
+			t.EstimatedTime,
+			t.Finished})
+		// Set currentExpTemplate to current running Template
+		currentExpTemplate = t
 
-		// err = deps.Plc.Start()
-		// if err != nil {
-		// 	logger.WithField("err", err.Error()).Error("Error in plc start")
-		// 	rw.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
+		// Lid Temp is multiplied by 10 for PLC can't handle floats
+		plcStage.IdealLidTemp = uint16(t.LidTemp * 10)
+		e.Result = "running"
 
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount)
+		// Set expStartTime to current Time
+		expStartTime = time.Now()
+
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), expStartTime, expID, plcStage.CycleCount, e.Result)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		// retruns all targets configured for experiment
+		// returns all targets configured for experiment
 		targetDetails, err := deps.Store.ListConfTargets(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
@@ -210,14 +249,39 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		for _, v := range targetDetails {
+			db.AddRowToExcel(file, db.TargetSheet, []interface{}{
+				v.ExperimentID,
+				v.TemplateID,
+				v.TargetID,
+				v.Threshold,
+				v.DyePosition,
+				v.TargetName,
+			})
+		}
+
 		var ICTargetID uuid.UUID
+		var dyePositions []int32
 
 		for _, t := range targetDetails {
 			if t.DyePosition == int32(config.GetICPosition()) {
 				ICTargetID = t.TargetID
 			}
+			dyePositions = append(dyePositions, t.DyePosition)
 
 		}
+		heading := []interface{}{"Dye Position"}
+		for _, v := range dyePositions {
+			heading = append(heading, v)
+		}
+
+		db.AddMergeRowToExcel(file, db.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
+
+		row := []interface{}{"well positions"}
+		for _, v := range config.ActiveWells("activeWells") {
+			row = append(row, v)
+		}
+		db.AddRowToExcel(file, db.RTPCRSheet, row)
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
@@ -230,13 +294,10 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error upsert wells")
 			return
 		}
-		//experimentRunning set true
-		experimentRunning = true
-		go startExp(deps, plcStage)
 
-		//invoke monitor
-		// ASK: Do we need this?
-		go monitorExperiment(deps)
+		//experimentRunning set true
+		plc.ExperimentRunning = true
+		go startExp(deps, plcStage, file)
 
 		if !isValid {
 			respBytes, err := json.Marshal(response)
@@ -267,90 +328,160 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		// instruct plc to stop the experiment: stops if experiment is already running else returns error
-		err = deps.Plc.Stop()
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error in plc stop")
-			rw.WriteHeader(http.StatusInternalServerError)
+
+		if plc.ExperimentRunning {
+			e, err := deps.Store.ShowExperiment(req.Context(), expID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if e.Result != "running" {
+				logger.WithField("err", "invalid running experiment").Error("this experiment id not running")
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "this experiment is not running"})
+				return
+			}
+			// instruct plc to stop the experiment: stops if experiment is already running else returns error
+			err = deps.Plc.Stop()
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error in plc stop")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
+			if err != nil {
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "error fetching data"})
+				return
+			}
+		} else {
+			logger.WithField("err", "experiment not running").Error("No experiment running")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "no experiment is running"})
 			return
 		}
-
-		err = deps.Store.UpdateStopTimeExperiments(req.Context(), time.Now(), expID, "aborted")
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(`{"msg":"experiment stopped"}`))
-
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "experiment stopped"})
 	})
 }
 
-func startExp(deps Dependencies, p plc.Stage) (err error) {
-	// logging output to file and console
-	if _, err := os.Stat(tec.LogsPath); os.IsNotExist(err) {
-		os.MkdirAll(tec.LogsPath, 0755)
-		// ignore error and try creating log output file
-	}
-
-	file, err := os.Create(fmt.Sprintf("%v/output_%v.csv", tec.LogsPath, time.Now().Unix()))
-	if err != nil {
-		logger.WithField("Err", err).Errorln(responses.FileCreationError)
-		return	
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	// Home the TEC
-	// Reset is implicit in Homing
-	deps.Plc.HomingRTPCR()
-
-	// Start line
-	err = writer.Write([]string{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"})
-	if err != nil {
-		return
-	}
-	err = writer.Write([]string{"Holding Stage About to start"})
-	if err != nil {
-		return
-	}
-	tec.TempMonStarted = true
-
+func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	//Go back to Room Temp at the end
+
+	// Experiment Running should stop at the end
+	// And then Homing should happen
 	defer func() {
-		tec.TempMonStarted = false
-		experimentRunning = false
+		plc.ExperimentRunning = false
+		err = deps.Plc.HomingRTPCR()
 		if err != nil {
+			deps.WsErrCh <- err
 			return
 		}
+
+	}()
+
+	// Send error on websocket
+	// Reach Room Temp and SwitchOffLid
+	defer func() {
+
+		if err != nil {
+			deps.WsErrCh <- err
+		} else {
+			deps.WsMsgCh <- "stop"
+		}
+		err = deps.Plc.SwitchOffLidTemp()
+		if err != nil {
+			deps.WsErrCh <- err
+		}
 		err = deps.Tec.ReachRoomTemp()
+		if err != nil {
+			deps.WsErrCh <- err
+		}
 		return
 	}()
-	// Run Holding Stage
-	logger.Infoln("Holding Stage Started")
-	deps.Tec.RunStage(p.Holding, writer, 0)
 
-	// Cycle in Plc
-	deps.Plc.Cycle()
-
-	// Run Cycle Stage
-	err = writer.Write([]string{"Cycle Stage About to start"})
+	err = deps.Tec.ReachRoomTemp()
 	if err != nil {
 		return
 	}
+
+	// Home the PLC
+	// Reset is implicit in Homing
+	err = deps.Plc.HomingRTPCR()
+	if err != nil {
+		return
+	}
+
+	// templateRunSuccess has to happen before monitor is called
+	templateRunSuccess = false
+
+	// invoke monitor after 2 secs
+	go func() {
+		time.Sleep(2 * time.Second)
+		go monitorExperiment(deps, file)
+	}()
+
+	lidTempStartTime := time.Now()
+	err = deps.Plc.SetLidTemp(p.IdealLidTemp)
+	if err != nil {
+		return
+	}
+	lidTempSecs := time.Now().Sub(lidTempStartTime).Seconds()
+
+	// Setting currentExpTemplate Estimated Time more accurately.
+	if currentExpTemplate.EstimatedTime != 0 {
+		// Below formula is copied from estimated_time.go
+		// We are removing variable LidTempTime
+		estimatedLidTime := int64(math.Abs(float64(p.IdealLidTemp/10)-config.GetRoomTemp()) / 0.5)
+		currentExpTemplate.EstimatedTime = currentExpTemplate.EstimatedTime - estimatedLidTime + int64(lidTempSecs)
+	}
+
+	// Start line
+	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
+	db.AddRowToExcel(file, db.TECSheet, headers)
+
+	timeStarted := time.Now()
+	row := []interface{}{"Experiment Started at: ", timeStarted.String()}
+	db.AddRowToExcel(file, db.TempLogs, row)
+
+	row = []interface{}{"Holding Stage About to start"}
+	db.AddRowToExcel(file, db.TECSheet, row)
+
+	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
+	db.AddRowToExcel(file, db.TempLogs, row)
+
+	// Run Holding Stage
+	logger.Infoln("Holding Stage Started")
+	err = deps.Tec.RunStage(p.Holding, deps.Plc, file, 0)
+	if err != nil {
+		return
+	}
+
+	// Run Cycle Stage
+	row = []interface{}{"Cycle Stage About to start"}
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
-		deps.Tec.RunStage(p.Cycle, writer, i)
+		err = deps.Tec.RunStage(p.Cycle, deps.Plc, file, i)
+		if err != nil {
+			return
+		}
 		logger.Infoln("Cycle Completed -> ", i)
-		// Cycle in Plc
-		deps.Plc.Cycle()
+		// Home every n number of cycles
+		if (config.GetNumHomingCycles() != 0) &&
+			(int(i)%config.GetNumHomingCycles() == 0) {
+			err = deps.Plc.HomingRTPCR()
+			if err != nil {
+				return
+			}
+		}
 	}
+
+	templateRunSuccess = true
+
+	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
+	db.AddRowToExcel(file, db.TECSheet, row)
+
+	row = []interface{}{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()}
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	return
 }

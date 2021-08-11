@@ -13,6 +13,7 @@ import (
 
 	"strconv"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	logger "github.com/sirupsen/logrus"
@@ -55,7 +56,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 
 				} else if msg == "read_temp" {
 
-					sendTemperature(deps, rw, c)
+					sendTemperatureAndProgress(deps, rw, c)
 
 				} else if strings.EqualFold(msgs[0], "progress") {
 
@@ -64,6 +65,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				} else if strings.EqualFold(msgs[0], "success") {
 
 					successOperation(deps, rw, c, msgs)
+				} else if strings.EqualFold(msgs[0], "heater") {
+
+					monitorOperation(deps, rw, c, msgs)
 				}
 
 			case err = <-deps.ExitCh:
@@ -71,7 +75,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				if err.Error() == "PCR Aborted" {
 
 					// on pre-emptive stop
-					experimentRunning = false
+					plc.ExperimentRunning = false
 					errortype = "ErrorPCRAborted"
 					msg = "Experiment aborted by user"
 
@@ -83,6 +87,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					errortype = "ErrorPCRDead"
 					msg = "Unable to connect to Hardware"
 
+				} else {
+					errortype = "ErrorPCR"
+					msg = err.Error()
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
@@ -182,15 +189,15 @@ func sendOnSuccess(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn)
 
 }
 
-func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
+func sendTemperatureAndProgress(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	respBytes, err := getTemperatureDetails(deps, experimentValues.experimentID)
+	respBytesTemperature, respBytesProgress, err := getTemperatureAndProgressDetails(deps, experimentValues.experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("error in fetching data")
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = c.WriteMessage(1, respBytes)
+	err = c.WriteMessage(1, respBytesTemperature)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Websocket failed to write")
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -198,6 +205,19 @@ func sendTemperature(deps Dependencies, rw http.ResponseWriter, c *websocket.Con
 	}
 
 	logger.WithField("data", "Temperature").Info("Websocket send Data")
+
+	if !plc.ExperimentRunning {
+		return
+	}
+
+	err = c.WriteMessage(1, respBytesProgress)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Websocket failed to write")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.WithField("data", "Progress_RTPCR").Info("Websocket send Data")
 
 }
 
@@ -323,48 +343,122 @@ func getExperimentDetails(deps Dependencies) (respBytes []byte, err error) {
 	return
 }
 
-func getTemperatureDetails(deps Dependencies, experimentID uuid.UUID) (respBytes []byte, err error) {
+func getTemperatureAndProgressDetails(deps Dependencies, experimentID uuid.UUID) (respBytesTemperature, respBytesProgress []byte, err error) {
+	var progress, remainingTime, timeTaken int64
+	var pG interface{}
+
 	Temp, err := deps.Store.ListExperimentTemperature(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error get experiment")
 		return
 	}
 
-	result := experimentTemperature{
+	e, err := deps.Store.ShowExperiment(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+		return
+	}
+
+	if !plc.ExperimentRunning {
+		goto skipRtpcrProgress
+	}
+
+	timeTaken = int64(time.Now().Sub(expStartTime).Seconds())
+	// if timeTaken is greater than estimated time then progress should be stuck
+	// that is why cutting 5 secs from EstimatedTime
+	if timeTaken >= currentExpTemplate.EstimatedTime {
+		remainingTime = 5
+		timeTaken = currentExpTemplate.EstimatedTime - 5
+	} else {
+		remainingTime = currentExpTemplate.EstimatedTime - timeTaken
+	}
+
+	if templateRunSuccess {
+		progress = 100
+		remainingTime = 0
+		pG = oprSuccess{
+			Type: "RTPCR_SUCCESS",
+			Data: plc.OperationDetails{
+				Progress:      &progress,
+				RecipeID:      currentExpTemplate.ID,
+				RemainingTime: plc.ConvertToHMS(remainingTime),
+				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
+				TotalCycles:   int64(e.RepeatCycle),
+			},
+		}
+	} else {
+		progress = int64(float64(timeTaken) / float64(currentExpTemplate.EstimatedTime) * 100)
+		pG = oprProgress{
+			Type: "RTPCR_PROGRESS",
+			Data: plc.OperationDetails{
+				Progress:      &progress,
+				RecipeID:      currentExpTemplate.ID,
+				RemainingTime: plc.ConvertToHMS(remainingTime),
+				TotalTime:     plc.ConvertToHMS(currentExpTemplate.EstimatedTime),
+				TotalCycles:   int64(e.RepeatCycle),
+			},
+		}
+	}
+
+	respBytesProgress, err = json.Marshal(pG)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling progress data")
+		return
+	}
+
+skipRtpcrProgress:
+	eT := experimentTemperature{
 		Type: "Temperature",
 		Data: Temp,
 	}
 
-	respBytes, err = json.Marshal(result)
+	respBytesTemperature, err = json.Marshal(eT)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error marshaling result temp data")
+		logger.WithField("err", err.Error()).Error("Error marshaling result temperature data")
 		return
 	}
 
 	return
 }
 
-func monitorExperiment(deps Dependencies) {
+func monitorExperiment(deps Dependencies, file *excelize.File) {
 
 	var cycle uint16
-	var previousCycle uint16
 
-	cycle = 0
-
+	cycle = 1
+	var err error
+	defer func() {
+		if err != nil {
+			deps.WsErrCh <- err
+		}
+	}()
 	// experimentRunning is set when experiment started & if stopped then set to false
-	for experimentRunning {
+	for plc.ExperimentRunning {
+		time.Sleep(1 * time.Second)
+
+		scan, err := deps.Plc.Monitor(cycle)
+		if err != nil {
+			logger.Errorln("error in inner monitor", err.Error())
+			return
+		}
+		//Add to excel
+		row := []interface{}{time.Now().Format("2006-01-02 15:04:05"), scan.Temp, scan.LidTemp}
+		db.AddRowToExcel(file, db.TempLogs, row)
+
+		// writes temp on every step against time in DB
+		err = WriteExperimentTemperature(deps, scan)
+		if err != nil {
+			logger.Errorln("Write Exp Temp Error")
+			return
+		} else {
+			deps.WsMsgCh <- "read_temp"
+		}
 		// scan.CycleComplete returns value for same cycle even when read ones, so using previousCycle to not collect already read cycle data
-		if plc.HeatingCycleComplete {
+		if plc.DataCapture && scan.Cycle != 0 {
 
-			scan, err := deps.Plc.Monitor(cycle)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error("Error in plc monitor")
-				deps.WsErrCh <- err
-				return
-			}
-			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle)
+			logger.Info("Received Emmissions from PLC for cycle: ", scan.Cycle, scan)
 
-			DBResult, err := WriteResult(deps, scan)
+			DBResult, err := WriteResult(deps, scan, file)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error in dbresult")
 				return
@@ -374,52 +468,54 @@ func monitorExperiment(deps Dependencies) {
 				logger.WithField("err", err.Error()).Error("Error in ct values")
 				return
 			}
-			logger.Println("before read.............................")
-
 			deps.WsMsgCh <- "read"
-			logger.Println("after read.............................")
 			if scan.Cycle == experimentValues.plcStage.CycleCount {
 				err = deps.Store.UpdateStopTimeExperiments(context.Background(), time.Now(), experimentValues.experimentID, "successful")
 				if err != nil {
 					logger.WithField("err", err.Error()).Error("Error updating stop time")
-					deps.WsErrCh <- err
 					return
 				}
-				deps.WsMsgCh <- "stop"
-				fmt.Println("exit chan 2--------------------------------")
-
-				experimentRunning = false
-				break
+				// now emissions are completed only temperatures are to be noted till it reaches
+				// room temp
+				plc.CycleComplete = false
+				plc.DataCapture = false
+				continue
 			}
-
-			cycle++
-			previousCycle++
-			// writes temp on every step against time in DB
-			err = WriteExperimentTemperature(deps, scan)
-			if err != nil {
-				fmt.Println("Write Exp Temp Error")
-				return
-			} else {
-				deps.WsMsgCh <- "read_temp"
-			}
+			plc.DataCapture = false
 		}
-
+		if plc.CycleComplete {
+			plc.CycleComplete = false
+			cycle++
+		}
 		// adding delay of 0.5s to reduce the cpu usage
-		time.Sleep(500 * time.Millisecond)
-
 	}
+
+	e, err := deps.Store.ShowExperiment(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+		return
+	}
+
+	db.AddRowToExcel(file, db.ExperimentSheet, []interface{}{e.ID,
+		e.Description,
+		e.TemplateID,
+		e.OperatorName,
+		e.StartTime.String(),
+		e.EndTime.String(),
+		e.Result,
+		e.RepeatCycle,
+		e.CreatedAt,
+		e.UpdatedAt,
+		e.TemplateName,
+		e.WellCount})
+
 	logger.Info("Stop monitoring experiment")
 }
 
-func WriteResult(deps Dependencies, scan plc.Scan) (DBResult []db.Result, err error) {
+func WriteResult(deps Dependencies, scan plc.Scan, file *excelize.File) (DBResult []db.Result, err error) {
 
 	// makeResult returns data in DB result format
-	result := makeResult(scan)
-
-	// for cycle one , preceed default data [0,0] for cycle 0 ,needed to plot the graph
-	if scan.Cycle == 1 {
-		addResultForZerothCycle(deps, result)
-	}
+	result := makeResult(scan, file)
 
 	// insert current cycle result into Database
 	DBResult, err = deps.Store.InsertResult(context.Background(), result)
@@ -523,8 +619,10 @@ func WriteExperimentTemperature(deps Dependencies, scan plc.Scan) (err error) {
 		ExperimentID: experimentValues.experimentID,
 		Temp:         scan.Temp,
 		LidTemp:      scan.LidTemp,
-		Cycle:        scan.Cycle,
+		Cycle:        plc.CurrentCycle,
 	}
+
+	logger.Debugln("ExpTemp: ", expTemp)
 
 	// insert every cycle  result temp into Database
 	err = deps.Store.InsertExperimentTemperature(context.Background(), expTemp)

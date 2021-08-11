@@ -1,7 +1,7 @@
 package service
 
 import (
-	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/tec"
 
 	"encoding/json"
@@ -20,14 +20,14 @@ func runProfileHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		fmt.Println("\n", t, "\n")
+		logger.Infoln("TempProfile: ", t)
 
-		err = deps.Tec.RunProfile(t)
-		if err != nil{
+		err = deps.Tec.RunProfile(deps.Plc, t)
+		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Profile Run success"} )
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Profile Run success"})
 	})
 }

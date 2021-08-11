@@ -12,6 +12,13 @@ import (
 const (
 	HOLDING_STAGE = "hold"
 	CYCLE_STAGE   = "cycle"
+	baudRate = 9600
+	dataBits = 8
+	parity = "E"
+	stopBits = 1
+	station_1_SlaveID = 1
+	station_2_SlaveID = 2
+	timeoutMs = 50
 )
 
 type Compact32 struct {
@@ -24,12 +31,12 @@ type Compact32 struct {
 func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) plc.Driver {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
-	handler.BaudRate = 9600
-	handler.DataBits = 8
-	handler.Parity = "E"
-	handler.StopBits = 1
-	handler.SlaveId = 1 // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
-	handler.Timeout = 500 * time.Millisecond
+	handler.BaudRate = baudRate
+	handler.DataBits = dataBits
+	handler.Parity = parity
+	handler.StopBits = stopBits
+	handler.SlaveId = station_1_SlaveID // THis is hard-coded as the PLC RS485 is configured as SlaveID-5
+	handler.Timeout = timeoutMs * time.Millisecond
 
 	handler.Connect()
 	driver := Compact32ModbusDriver{}
@@ -48,16 +55,16 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 	if test {
 		p := plc.Stage{
 			Holding: []plc.Step{
-				plc.Step{65.3, 3.2, 1},
-				plc.Step{85.3, 3.1, 1},
-				plc.Step{95, 2.8, 1},
+				plc.Step{TargetTemp: 65.3, RampUpTemp: 2.1, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 85.3, RampUpTemp: 2.2, HoldTime: 3, DataCapture: false},
+				plc.Step{TargetTemp: 95, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
 			},
 			Cycle: []plc.Step{
-				plc.Step{55, 3, 1},
-				plc.Step{65, 3, 1},
-				plc.Step{75, 3, 1},
-				plc.Step{85, 3, 1},
-				plc.Step{95, 3, 1},
+				plc.Step{TargetTemp: 55, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 65, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 75, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 85, RampUpTemp: 2, HoldTime: 5, DataCapture: false},
+				plc.Step{TargetTemp: 95, RampUpTemp: 2, HoldTime: 5, DataCapture: true},
 			},
 			CycleCount: 3,
 		}
@@ -88,7 +95,10 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 		}
 		C32.Stop()
 	}
-
+	err := C32.SwitchOffLidTemp()
+	if err != nil {
+		logger.Warnln("Failed to switch off lid temp", err)
+	}
 	return &C32 // plc Driver
 }
 
@@ -97,12 +107,12 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan error, test bool) (plc.Extraction, *modbus.RTUClientHandler) {
 	/* Modbus RTU/ASCII */
 	handler := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
-	handler.BaudRate = 9600
-	handler.DataBits = 8
-	handler.Parity = "E"
-	handler.StopBits = 1
-	handler.SlaveId = byte(1)
-	handler.Timeout = 50 * time.Millisecond
+	handler.BaudRate = baudRate
+	handler.DataBits = dataBits
+	handler.Parity = parity
+	handler.StopBits = stopBits
+	handler.SlaveId = station_1_SlaveID
+	handler.Timeout = timeoutMs * time.Millisecond
 
 	handler.Connect()
 	driver := Compact32ModbusDriver{}
@@ -123,12 +133,12 @@ func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan 
 func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) plc.Extraction {
 	/* Modbus RTU/ASCII */
 	handler2 := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
-	handler2.BaudRate = 9600
-	handler2.DataBits = 8
-	handler2.Parity = "E"
-	handler2.StopBits = 1
-	handler2.SlaveId = byte(2)
-	handler2.Timeout = 50 * time.Millisecond
+	handler.BaudRate = baudRate
+	handler.DataBits = dataBits
+	handler.Parity = parity
+	handler.StopBits = stopBits
+	handler.SlaveId = station_2_SlaveID
+	handler.Timeout = timeoutMs * time.Millisecond
 
 	handler2.Connect()
 	driver := Compact32ModbusDriver{}

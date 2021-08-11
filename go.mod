@@ -1,8 +1,10 @@
 module mylab/cpagent
 
-go 1.14
+go 1.15
 
 require (
+	github.com/360EntSecGroup-Skylar/excelize v1.4.1
+	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/universal-translator v0.17.0 // indirect
@@ -13,9 +15,12 @@ require (
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/websocket v1.4.2
 	github.com/jmoiron/sqlx v1.2.0
+	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/lib/pq v1.7.0
 	github.com/rs/cors v1.7.0
+	github.com/sendgrid/rest v2.6.4+incompatible // indirect
+	github.com/sendgrid/sendgrid-go v3.10.0+incompatible
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1
@@ -23,4 +28,6 @@ require (
 	github.com/urfave/negroni v1.0.0
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0
+	gopkg.in/yaml.v2 v2.2.7
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )

@@ -122,6 +122,7 @@ const LabWareComponent = (props) => {
                     handleRightBtn={handleSaveBtn}
                     leftBtnLabel={"Modify"}
                     rightBtnLabel={"Save"}
+                    btnBarClassname={"btn-bar-adjust-labware"}
                   />
                 ) : (
                   <ButtonBar
@@ -130,6 +131,7 @@ const LabWareComponent = (props) => {
                       updateAllTicks(formik);
                     }}
                     rightBtnLabel={"Preview"}
+                    btnBarClassname={"btn-bar-adjust-labware"}
                   />
                 )}
               </div>

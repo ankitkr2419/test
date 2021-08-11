@@ -9,6 +9,7 @@ import Coordinate from "components/Plate/Grid/Coordinate";
 
 export const WellComponent = (props) => {
   const { wellsObjArray, wellClickHandler } = props;
+
   return (
     <div className="mb-3 border-bottom-line">
       <FormGroup row>
@@ -29,9 +30,10 @@ export const WellComponent = (props) => {
           </Coordinate>
           <div className="d-flex align-items-center well-box mt-2">
             {wellsObjArray &&
-              wellsObjArray.map((wellObj, index) => {
+              wellsObjArray.map((wellObj) => {
                 return (
                   <Well
+                    key={wellObj.id}
                     id={wellObj.id}
                     isRunning={wellObj.isRunning}
                     isSelected={wellObj.isSelected}
@@ -64,7 +66,6 @@ export const WellComponent = (props) => {
 WellComponent.propTypes = {
   isSelected: PropTypes.bool,
   isRunning: PropTypes.bool,
-  onClickHandler: PropTypes.func.isRequired,
   isDisabled: PropTypes.bool,
 };
 

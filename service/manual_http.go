@@ -11,10 +11,10 @@ import (
 )
 
 type Manual struct {
-	Deck      string `json:"deck"`
-	MotorNum  int    `json:"motor_number"`
-	Pulses    int    `json:"pulses"`
-	Direction int    `json:"direction"`
+	Deck      string  `json:"deck"`
+	MotorNum  int     `json:"motor_number"`
+	Distance  float32 `json:"distance"`
+	Direction uint16  `json:"direction"`
 }
 
 func manualHandler(deps Dependencies) http.HandlerFunc {
@@ -34,10 +34,10 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			err = fmt.Errorf("Use A or B deck only")
 		case m.MotorNum <= 4 || m.MotorNum > 10:
 			err = fmt.Errorf("Select motor num in only in between 5-10")
-		case m.Direction != 0 && m.Direction != 1:
+		case m.Direction != plc.TowardsSensor && m.Direction != plc.AgainstSensor:
 			err = fmt.Errorf("Select motor direction in only as 0 or 1")
-		case m.Pulses > 10000:
-			err = fmt.Errorf("Consider pulses only less than or equal to 10000")
+		case m.Distance > 100 || m.Distance <= 0:
+			err = fmt.Errorf("Consider distance only less than or equal to 100 mm")
 		}
 
 		if err != nil {
@@ -45,7 +45,7 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), uint16(m.Direction), uint16(m.Pulses))
+		response, err = deps.PlcDeck[m.Deck].ManualMovement(uint16(m.MotorNum), m.Direction, m.Distance)
 
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error(), Deck: m.Deck})
@@ -105,7 +105,7 @@ func abortHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
-		fmt.Println("Inside ABORT... value of deck:", deck, len(deck))
+		logger.Infoln("Inside ABORT... value of deck:", deck, len(deck))
 
 		response, err = singleDeckOperation(req.Context(), deps, deck, "Abort")
 

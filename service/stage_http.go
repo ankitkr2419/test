@@ -70,6 +70,8 @@ func updateStageHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		go updateEstimatedTimeByTemplateID(req.Context(), deps.Store, t.TemplateID)
+
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
 		rw.Write([]byte(`{"msg":"stage updated successfully"}`))
@@ -117,12 +119,21 @@ func deleteStageHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		stage, err := deps.Store.ShowStage(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error while shaowing stage")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		err = deps.Store.DeleteStage(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error while deleting stage")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		go updateEstimatedTimeByTemplateID(req.Context(), deps.Store, stage.TemplateID)
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")

@@ -24,4 +24,17 @@ activeWells: [7,1,5,32,51,87]
 
 redlowerlimit: 5
 redupperlimit: 25
-orangelowerlimit: 25
+orangelowerlimit: 
+
+# homing time in seconds
+homing_time: 15
+# homing_every_n_cycles 
+num_homing_cycles: 5
+# room Temperature 
+room_temp: 27
+# cycle time 
+cycle_time: 15
+# pid temp 
+pid_temp: 71
+# pid time
+pid_time: 30

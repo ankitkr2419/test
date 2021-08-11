@@ -12,5 +12,11 @@ MIGRATION_FOLDER_PATH: "./migrations"
 # MIGRATION_FOLDER_PATH: "./../migrations" //for application_test.yml
 DB_URI_SQLITE: "./dbname"
 MODBUS_TTY: "/dev/tty.usbserial-A50285BI"
+#MODBUS_TTY: "/dev/ttyS4"
+#MODBUS_TTY: "/dev/ttyUSB0"
 #// Secret key for jwt authentication
 SECRET_KEY: "123456qwerty"
+SENDGRID_API_KEY: "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"
+receiver_email: "santosh.kavhar@joshsoftware.com"
+receiver_name: "Santosh Kavhar"
+
