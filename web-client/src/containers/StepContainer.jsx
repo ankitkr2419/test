@@ -28,6 +28,13 @@ import { HOLD_STAGE, CYCLE_STAGE } from 'components/Step/stepConstants';
 
 const StepContainer = (props) => {
 	const dispatch = useDispatch();
+
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { token } = activeDeckObj;
+
 	// local state for storing step id for row selection
 	const [selectedStepId, setSelectedStepId] = useState(null);
 
@@ -59,26 +66,26 @@ const StepContainer = (props) => {
 	const fetchUpdatedSteps = useCallback(() => {
 		// if the stage type is hold fetch hold steps
 		if (stageType === HOLD_STAGE) {
-			dispatch(fetchHoldSteps(holdStageId));
+			dispatch(fetchHoldSteps(holdStageId, token));
 		}
 		// if the stage type is cycle fetch cycle steps
 		if (stageType === CYCLE_STAGE) {
-			dispatch(fetchCycleSteps(cycleStageId));
+			dispatch(fetchCycleSteps(cycleStageId, token));
 		}
 	}, [holdStageId, cycleStageId, stageType, dispatch]);
 
 	const addStep = (step) => {
 		// creating step though api
-		dispatch(addStepAction(step));
+		dispatch(addStepAction(step, token));
 	};
 
 	const deleteStep = (stepId) => {
 		// deleting step though api
-		dispatch(deleteStepAction(stepId));
+		dispatch(deleteStepAction(stepId, token));
 	};
 
 	const saveStep = (stepId, step) => {
-		dispatch(updateStepAction(stepId, step));
+		dispatch(updateStepAction(stepId, step, token));
 	};
 
 	// Here will update selected step id
@@ -101,7 +108,7 @@ const StepContainer = (props) => {
 			name: 'Cycle',
 			type: cycleStage.get('type'),
 			repeat_count: parseInt(repeatCount, 10),
-		}));
+		}, token));
 	};
 
 	// useEffect section
@@ -109,14 +116,14 @@ const StepContainer = (props) => {
 	useEffect(() => {
 		if (isStageUpdated === true) {
 			dispatch(updateStageReset());
-			dispatch(fetchStages(cycleStage.get('template_id')));
+			dispatch(fetchStages(cycleStage.get('template_id'),token));
 		}
 	}, [isStageUpdated, cycleStage, dispatch]);
 
 	useEffect(() => {
 		// fetch hold and cycle steps list from server on mount
-		dispatch(fetchHoldSteps(holdStageId));
-		dispatch(fetchCycleSteps(cycleStageId));
+		dispatch(fetchHoldSteps(holdStageId, token));
+		dispatch(fetchCycleSteps(cycleStageId, token));
 	}, [holdStageId, cycleStageId, dispatch]);
 
 	useEffect(() => {

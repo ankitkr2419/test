@@ -17,6 +17,13 @@ import { getActiveLoadedWells } from 'selectors/activeWellSelector';
 
 const PlateContainer = () => {
 	const dispatch = useDispatch();
+
+	//get login reducer details
+	const loginReducer = useSelector((state) => state.loginReducer);
+	const loginReducerData = loginReducer.toJS();
+	let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+	const { token } = activeDeckObj;
+
 	// experiment targets
 	const experimentTargets = useSelector(getExperimentTargets);
 	const experimentTargetsList = experimentTargets.get('list');
@@ -43,9 +50,9 @@ const PlateContainer = () => {
 	useEffect(() => {
 		if (experimentId !== null) {
 			// fetching configured wells data
-			dispatch(fetchWells(experimentId));
+			dispatch(fetchWells(experimentId, token));
 			// fetching experiment targets to show while configuring sample and graph filter
-			dispatch(fetchExperimentTargets(experimentId));
+			dispatch(fetchExperimentTargets(experimentId, token));
 		}
 		return () => {
 			// isPlateRoute use in appHeader to manage visibility of header buttons

@@ -6,10 +6,11 @@ import {
 	listCycleStepActions,
 } from 'actions/stepActions';
 
-export const addStep = body => ({
+export const addStep = (body, token) => ({
 	type: addStepActions.addAction,
 	payload: {
 		body,
+		token
 	},
 });
 
@@ -25,10 +26,11 @@ export const addStepReset = () => ({
 	type: addStepActions.addStepReset,
 });
 
-export const fetchHoldSteps = stageId => ({
+export const fetchHoldSteps = (stageId, token) => ({
 	type: listHoldStepActions.listAction,
 	payload: {
 		stageId,
+		token
 	},
 });
 
@@ -40,10 +42,11 @@ export const fetchHoldStepsFailed = errorResponse => ({
 	},
 });
 
-export const fetchCycleSteps = stageId => ({
+export const fetchCycleSteps = (stageId, token) => ({
 	type: listCycleStepActions.listAction,
 	payload: {
 		stageId,
+		token
 	},
 });
 
@@ -55,11 +58,12 @@ export const fetchCycleStepsFailed = errorResponse => ({
 	},
 });
 
-export const updateStep = (stepId, body) => ({
+export const updateStep = (stepId, body, token) => ({
 	type: updateStepActions.updateAction,
 	payload: {
 		stepId,
 		body,
+		token
 	},
 });
 
@@ -75,10 +79,11 @@ export const updateStepReset = () => ({
 	type: updateStepActions.updateStepReset,
 });
 
-export const deleteStep = stepId => ({
+export const deleteStep = (stepId, token) => ({
 	type: deleteStepActions.deleteAction,
 	payload: {
 		stepId,
+		token
 	},
 });
 

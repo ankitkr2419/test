@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import { Card, CardBody, Button } from 'core-components';
 import { ButtonGroup, Text } from 'shared-components';
 import LoginForm from './LoginForm';
+import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer";
 
 const LoginComponent = (props) => {
 	const {
 		isAdminFormVisible,
 		setIsAdminFormVisibility,
-		loginAsOperator,
+		operatorLoginModalOpen,
+    toggleOperatorLoginModal,
+		deckName,
 		loginAsAdmin,
 		isLoginError,
 	} = props;
@@ -58,9 +61,16 @@ const LoginComponent = (props) => {
 							isLoginError={isLoginError}
 						/>
 					)}
+					{operatorLoginModalOpen && (
+            <OperatorLoginModalContainer
+              operatorLoginModalOpen={operatorLoginModalOpen}
+              toggleOperatorLoginModal={toggleOperatorLoginModal}
+              deckName={deckName}
+            />
+          )}
 					<div className='mt-auto mb-5 pb-4'>
 						{isAdminFormVisible === false && (
-							<Button onClick={loginAsOperator} color='primary'>
+							<Button onClick={toggleOperatorLoginModal} color='primary'>
 								Login as Operator
 							</Button>
 						)}
@@ -84,7 +94,6 @@ const LoginComponent = (props) => {
 LoginComponent.propTypes = {
 	isAdminFormVisible: PropTypes.bool.isRequired,
 	setIsAdminFormVisibility: PropTypes.func.isRequired,
-	loginAsOperator: PropTypes.func.isRequired,
 	loginAsAdmin: PropTypes.func.isRequired,
 	isLoginError: PropTypes.bool.isRequired,
 };

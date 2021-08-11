@@ -23,6 +23,11 @@ body {
   overflow-y: auto;
 }
 
+.header-elements {
+  position: absolute;
+  right: 15px;
+}
+
 // Page Header CSS
 .experiment-info {
   position: relative;
@@ -684,10 +689,10 @@ button:focus {
 }
 
 .recipe-action {
-	.icon-play,
-	.icon-edit-pencil,
-	.icon-publish,
-	.icon-published {
-			font-size: 14px !important;
-	}
+  .icon-play,
+  .icon-edit-pencil,
+  .icon-publish,
+  .icon-published {
+    font-size: 14px !important;
+  }
 }

@@ -2,10 +2,11 @@ import {
 	listSampleActions,
 } from 'actions/sampleActions';
 
-export const fetchSamples = searchText => ({
+export const fetchSamples = (searchText, token) => ({
 	type: listSampleActions.listAction,
 	payload: {
 		searchText,
+		token,
 	},
 });
 
