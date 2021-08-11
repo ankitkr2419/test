@@ -66,6 +66,7 @@ import {
   pidProgessReducer,
   pidReducer,
 } from "./calibrationReducer";
+import { reportReducer } from "reducers/reportReducer";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -116,6 +117,7 @@ const rootReducer = combineReducers({
   pidProgessReducer,
   pidReducer,
   finishCreateTemplateReducer,
+  reportReducer,
 });
 
 export default rootReducer;

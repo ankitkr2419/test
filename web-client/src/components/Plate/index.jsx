@@ -18,7 +18,6 @@ import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
-import { saveToPdf, saveToPdf2 } from "utils/pdfHelper";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 
 const Plate = (props) => {
@@ -115,17 +114,12 @@ const Plate = (props) => {
     setShowTempGraph(graphType === "temperature");
   };
 
-  const downloadClickHandler = (e) => {
-    // saveToPdf(showTempGraph);
-    togglePreviewReportModal();
-  };
-
   const togglePreviewReportModal = () => {
     setPreviewReportModal(!previewReportModal);
   };
 
-  const onDownloadConfirmed = () => {
-    saveToPdf2();
+  const downloadClickHandler = (e) => {
+    togglePreviewReportModal();
   };
 
   return (
@@ -134,7 +128,6 @@ const Plate = (props) => {
         <PreviewReportModal
           isOpen={previewReportModal}
           toggleModal={togglePreviewReportModal}
-          onDownloadConfirmed={onDownloadConfirmed}
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}

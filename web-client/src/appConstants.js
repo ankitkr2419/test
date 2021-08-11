@@ -146,6 +146,7 @@ export const API_ENDPOINTS = {
   pidCalibration: "pid-calibration",
   manual: "manual",
   sendMail: "", // Not confirmed, change after API is created
+  uploadReport: "upload-report",
 };
 
 export const MODAL_MESSAGE = {
