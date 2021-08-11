@@ -203,14 +203,12 @@ const AppHeader = props => {
   // Exit modal confirmation click handler
   const confirmationClickHandler = isConfirmed => {
     setExitModalVisibility(false);
-    if (isConfirmed === true) {
-      if (isExperimentRunning === true) {
-        // show warning that user needs to abort first in order to log out.
-        setWarningModalVisibility(true);
-      } else {
-        // user log out
-        dispatch(logoutInitiated({ deckName: deckName, token: token }));
-      }
+    if (isExperimentRunning === true) {
+      // show warning that user needs to abort first in order to log out.
+      setWarningModalVisibility(true);
+    } else {
+      // user log out
+      dispatch(logoutInitiated({ deckName: deckName, token: token }));
     }
   };
 
