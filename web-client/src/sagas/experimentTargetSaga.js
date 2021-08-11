@@ -12,7 +12,7 @@ import { HTTP_METHODS } from 'appConstants';
 
 export function* createExperimentTarget(actions) {
 	const {
-		payload: { body, experimentId },
+		payload: { body, experimentId, token },
 	} = actions;
 
 	const { successAction, failureAction } = createExperimentTargetActions;
@@ -25,6 +25,7 @@ export function* createExperimentTarget(actions) {
 				reqPath: `experiments/${experimentId}/targets`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {
@@ -35,7 +36,7 @@ export function* createExperimentTarget(actions) {
 
 export function* fetchExperimentTargets(actions) {
 	const {
-		payload: { experimentId },
+		payload: { experimentId, token },
 	} = actions;
 
 	const { successAction, failureAction } = listExperimentTargetActions;
@@ -46,6 +47,7 @@ export function* fetchExperimentTargets(actions) {
 				reqPath: `experiments/${experimentId}/targets`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {

@@ -5,7 +5,7 @@ import { runExperimentFailed } from 'action-creators/runExperimentActionCreators
 
 export function* runExperiment(actions) {
 	const {
-		payload: { experimentId },
+		payload: { experimentId, token },
 	} = actions;
 
 	const { successAction, failureAction } = runExperimentActions;
@@ -16,6 +16,7 @@ export function* runExperiment(actions) {
 				reqPath: `experiments/${experimentId}/run`,
 				successAction,
 				failureAction,
+				token,
 			},
 		});
 	} catch (error) {
@@ -26,7 +27,7 @@ export function* runExperiment(actions) {
 
 export function* stopExperiment(actions) {
 	const {
-		payload: { experimentId },
+		payload: { experimentId, token },
 	} = actions;
 
 	const { successAction, failureAction } = stopExperimentActions;
@@ -37,6 +38,7 @@ export function* stopExperiment(actions) {
 				reqPath: `experiments/${experimentId}/stop`,
 				successAction,
 				failureAction,
+				token,
 			},
 		});
 	} catch (error) {

@@ -12,7 +12,10 @@ import {
 	fetchTargetsByTemplateIDFailed,
 } from 'action-creators/targetActionCreators';
 
-export function* fetchMasterTargets() {
+export function* fetchMasterTargets(actions) {
+	const {
+		payload: { token }
+	} = actions;
 	const { successAction, failureAction } = listTargetActions;
 	try {
 		yield call(callApi, {
@@ -21,6 +24,7 @@ export function* fetchMasterTargets() {
 				reqPath: 'targets',
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {
@@ -31,7 +35,7 @@ export function* fetchMasterTargets() {
 
 export function* fetchTargetsByTemplateID(actions) {
 	const {
-		payload: { templateID },
+		payload: { templateID, token },
 	} = actions;
 	const { successAction, failureAction } = listTargetByTemplateIDActions;
 	try {
@@ -41,6 +45,7 @@ export function* fetchTargetsByTemplateID(actions) {
 				reqPath: `templates/${templateID}/targets`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {
@@ -51,7 +56,7 @@ export function* fetchTargetsByTemplateID(actions) {
 
 export function* saveTarget(actions) {
 	const {
-		payload: { templateID, body },
+		payload: { templateID, body, token },
 	} = actions;
 
 	const { successAction, failureAction } = saveTargetActions;
@@ -64,6 +69,7 @@ export function* saveTarget(actions) {
 				reqPath: `templates/${templateID}/targets`,
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {
