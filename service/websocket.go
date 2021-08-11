@@ -66,8 +66,8 @@ type experimentTemperature struct {
 }
 
 type oprSuccess struct {
-	Type string `json:"type"`
-	Data string `json:"data"`
+	Type string      `json:"type"`
+	Data interface{} `json:"data"`
 }
 
 type oprProgress struct {

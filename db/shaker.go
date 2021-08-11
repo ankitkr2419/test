@@ -17,8 +17,8 @@ type Shaker struct {
 	Temperature float64   `json:"temperature" db:"temperature" validate:"required_with=WithTemp,gte=20,lte=120"`
 	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
 	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
-	RPM1        int64     `json:"rpm_1" db:"rpm_1" validate:"required,gte=500"`
-	RPM2        int64     `json:"rpm_2" db:"rpm_2"`
+	RPM1        int64     `json:"rpm_1" db:"rpm_1" validate:"required,gte=500,lte=1200"`
+	RPM2        int64     `json:"rpm_2" db:"rpm_2" validate:"required,gte=500,lte=1200"`
 	Time1       int64     `json:"time_1" db:"time_1" validate:"required"`
 	Time2       int64     `json:"time_2" db:"time_2"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
@@ -157,7 +157,34 @@ func (s *pgStore) createShaking(ctx context.Context, tx *sql.Tx, sh Shaker) (cre
 func (s *pgStore) UpdateShaking(ctx context.Context, sh Shaker) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.ShakingInitialisedState)
 
-	result, err := s.db.Exec(
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.ShakingInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.ShakingUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.ShakingUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.ShakingCompletedState)
+
+		return
+	}()
+	err = s.updateProcessName(ctx, tx, sh.ProcessID, ShakingProcess, sh)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.ShakingUpdateNameError)
+		return
+	}
+
+	result, err := tx.Exec(
 		updateShakingQuery,
 		sh.WithTemp,
 		sh.Temperature,

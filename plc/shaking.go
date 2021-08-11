@@ -8,6 +8,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+const (
+	rpmToPulses = 13.3
+)
+
 // Shaking : function
 /* Algorithm ******************
 1. Validate that rpm 2 and time 2 value is not set before setting rpm 1 and time 1
@@ -21,14 +25,11 @@ import (
 9. Let the shaker run at the specified rpm1 till the time1 duration is completed.
 10. After this run the shaker with rpm 2 till the time1 duration is completed if rpm 2
 	is specified.
-11. After all this process is done switch the shaker and the heater off.
+11. After all this process is done switch the shaker and the heater off(Called in defer)
 */
 func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err error) {
 
-	var shakerNo = 3
-
 	var motorNum = K8_Shaker
-
 	var results []byte
 
 	// 1. validate that rpm 1 is definately set and futher
@@ -84,16 +85,9 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		return "", err
 	}
 
-	// 3 set shaker selection register
-	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][220], uint16(shakerNo))
-	if err != nil {
-		logger.Errorln("error in setting shaker selection : ", err)
-		return "", err
-	}
-	logger.Infof("selected shaker %v", results)
-
 	// 4 set shaker register with rpm 1
-	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM1))
+	// NOTE: Calculation of RPM involves multiplying it with 13.3
+	results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM1)*rpmToPulses))
 	if err != nil {
 		logger.Errorln("error in setting rpm 1 value : ", err)
 		return "", err
@@ -126,6 +120,10 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		d.setHeaterInProgress()
 	}
 
+	// Step 11:  Switch Off Heater & Shaker (Call in defer)
+	defer d.switchOffHeater()
+	defer d.switchOffShaker()
+
 	// 7. Else if not follow up then just start the heater and then start the shaker.
 	// 8. If withTemp is false then proceed with the normal flow by starting the shaker.
 	//check if aborted
@@ -141,6 +139,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		logger.Errorln("err in switching on shaker---> error: ", err)
 		return "", err
 	}
+	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "started")
 
 	d.setShakerInProgress()
 	defer d.resetShakerInProgress()
@@ -151,7 +150,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	}
 	response, err = d.AddDelay(delay, false)
 	if err != nil {
-		fmt.Println("err adding delay: ", err)
+		logger.Errorln("error adding delay: ", err)
 		return "", err
 	}
 
@@ -163,7 +162,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	if shakerData.RPM2 != 0 {
 
 		//set shaker register with rpm 2
-		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(shakerData.RPM2))
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], uint16(float64(shakerData.RPM2)*rpmToPulses))
 		if err != nil {
 			logger.Errorln("error in setting rpm 2 value : ", err)
 			return "", err
@@ -171,9 +170,10 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		//switch on the shaker
 		response, err = d.switchOnShaker()
 		if err != nil {
-			fmt.Printf("err in switching on shaker---> error: %v\n ", err)
+			logger.Errorln("err in switching on shaker :", err)
 			return "", err
 		}
+		logger.Infoln("shaking with rpm 2", shakerData.RPM2, "started")
 
 		//wait for time 2 duration
 		delay.DelayTime = shakerData.Time2
@@ -182,19 +182,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			logger.Errorln("err adding delay: ", err)
 			return "", err
 		}
-	}
+		logger.Infoln("shaking with rpm 2", shakerData.RPM2, "completed")
 
-	// 11. After all this process is done switch the shaker and the heater off.
-	//switch off both shaker and heater
-	response, err = d.switchOffHeater()
-	if err != nil {
-		logger.Errorln("err in switching off heater---> error:  ", err)
-		return "", err
-	}
-	response, err = d.switchOffShaker()
-	if err != nil {
-		logger.Errorln("error in switching shaker off -----> error: ", err)
-		return "", err
 	}
 
 	return "SUCCESS", nil

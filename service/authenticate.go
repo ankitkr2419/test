@@ -182,10 +182,14 @@ func getUserAuth(token, deck string, deps Dependencies, appType string, roles ..
 			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenApplicationError)
 			err = responses.UserTokenApplicationError
 			return
+		} else {
+			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenAppNotExistError)
+			err = responses.UserTokenAppNotExistError
+			return
 		}
-	}
 
-	if tokenApp == appType || Application == Combined {
+	}
+	if tokenApp == appType || appType == Combined {
 		//proceed futher
 		if tokenApp != Application {
 			logger.WithField("err", "APPLICATIONTYPE").Error(responses.UserTokenAppMismatchError)
@@ -197,7 +201,6 @@ func getUserAuth(token, deck string, deps Dependencies, appType string, roles ..
 		err = responses.UserTokenAppNotExistError
 		return
 	}
-
 	username, ok := decodedToken["sub"].(string)
 	if !ok {
 		logger.WithField("err", "USERNAME").Error(responses.UserTokenUsernameError)

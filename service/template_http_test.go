@@ -178,10 +178,10 @@ func (suite *TemplateHandlerTestSuite) TestPublishTemplateSuccess() {
 
 	step := db.Step{TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true, StageID: testUUID}
 	ss1 := db.StageStep{
-		stage1, step,
+		Stage: stage1,Step: step,
 	}
 	ss2 := db.StageStep{
-		stage2, step,
+		Stage: stage2,Step: step,
 	}
 	suite.dbMock.On("ListStageSteps", mock.Anything, mock.Anything).Return([]db.StageStep{
 		ss1, ss2,
@@ -265,10 +265,10 @@ func (suite *TemplateHandlerTestSuite) TestPublishTemplateFail() {
 
 	step := db.Step{TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true, StageID: testUUID}
 	ss1 := db.StageStep{
-		stage1, step,
+		Stage: stage1, Step: step,
 	}
 	ss2 := db.StageStep{
-		stage2, step,
+		Stage: stage2, Step: step,
 	}
 	suite.dbMock.On("ListStageSteps", mock.Anything, mock.Anything).Return([]db.StageStep{
 		ss1, ss2,

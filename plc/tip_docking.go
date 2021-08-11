@@ -2,6 +2,7 @@ package plc
 
 import (
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
 )
@@ -37,7 +38,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 
 	if position, ok = consDistance["resting_position"]; !ok {
 		err = fmt.Errorf("resting_position doesn't exist for consumable distances")
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 	distanceToTravel = Positions[syringeModuleDeckAndMotor] - position
@@ -48,7 +49,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 
 	response, err = d.setupMotor(Motors[syringeModuleDeckAndMotor]["fast"], pulses, Motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 	}
 
@@ -70,20 +71,20 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 		// distance to cartridge start + distance to the specified well
 		if cartridgePosition, ok = consDistance[td.Type+"_start"]; !ok {
 			err = fmt.Errorf(td.Type + "_start doesn't exist for consumable distances")
-			fmt.Println("Error: ", err)
+			logger.Errorln(err)
 			return "", err
 		}
 		uniqueCartridge.WellNum = td.Position
 
 		if cartridge, ok = cartridges[uniqueCartridge]; !ok {
 			err = fmt.Errorf("cartridge doesn't exist")
-			fmt.Println("Error: ", err)
+			logger.Errorln(err)
 			return "", err
 		}
 		wellPosition, ok = cartridge["distance"]
 		if !ok {
 			err = fmt.Errorf(" Cartridge well doesn't exist for tip docking")
-			fmt.Println("Error: ", err)
+			logger.Errorln(err)
 			return "", err
 		}
 
@@ -97,11 +98,11 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 
 		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
-			fmt.Println(err)
+			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
 		}
 
-		fmt.Println("deck moved to required position for docking")
+		logger.Infoln("deck moved to required position for docking")
 		goto skipToPositionSyringeHeight
 	}
 	//
@@ -112,7 +113,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 	deckPosition = "pos_" + fmt.Sprintf("%d", td.Position)
 	if position, ok = consDistance[deckPosition]; !ok {
 		err = fmt.Errorf("%s doesn't exist for consumable distances", deckPosition)
-		fmt.Println("Error: ", err)
+		logger.Errorln(err)
 		return "", err
 	}
 
@@ -125,7 +126,7 @@ func (d *Compact32Deck) TipDocking(td db.TipDock, cartridgeID int64) (response s
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)
 	}
 
@@ -145,12 +146,12 @@ skipToPositionSyringeHeight:
 	//
 	response, err = d.setupMotor(Motors[syringeModuleDeckAndMotor]["fast"], pulses, Motors[syringeModuleDeckAndMotor]["ramp"], direction, syringeModuleDeckAndMotor.Number)
 	if err != nil {
-		fmt.Println(err)
+		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module for tip docking. Error: %v", err)
 	}
 
 	// 7. Return success
-	fmt.Println("tip docked successfully")
+	logger.Infoln("tip docked successfully")
 	return "Success", nil
 
 }

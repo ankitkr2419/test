@@ -1,9 +1,13 @@
 package plc
 
 import (
+	"context"
+	"errors"
 	"mylab/cpagent/db"
+	"time"
 
 	"github.com/google/uuid"
+	logger "github.com/sirupsen/logrus"
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
@@ -17,10 +21,10 @@ const (
 )
 
 type Step struct {
-	TargetTemp  float32 `json:"target_temp"`// holding temperature for step
-	RampUpTemp  float32 `json:"ramp_rate"`// ramp-up temperature for step
-	HoldTime    int32   `json:"hold_time"`// hold time for step
-	DataCapture bool	`json:"data_capture"`
+	TargetTemp  float32 `json:"target_temp"` // holding temperature for step
+	RampUpTemp  float32 `json:"ramp_rate"`   // ramp-up temperature for step
+	HoldTime    int32   `json:"hold_time"`   // hold time for step
+	DataCapture bool    `json:"data_capture"`
 }
 
 // We can have at most 4 Holding steps and 6 Cycling steps.
@@ -31,7 +35,7 @@ type Stage struct {
 	IdealLidTemp uint16 // ideal lid temp
 }
 
-type Emissions [4]uint16
+type Emissions [6]uint16
 
 type Scan struct {
 	Cycle         uint16 // current running cycle
@@ -49,11 +53,18 @@ type Driver interface {
 	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
-	HomingRTPCR() error   		  //Homing of RTPCR
-	Reset() (error)           	  //reseting the values
-	Cycle() (error)           	  // start the cycle
-	SetLidTemp(uint16) error	  // set Lid Temperature
+	HomingRTPCR() error           //Homing of RTPCR
+	Reset() error                 //reseting the values
+	Cycle() error                 // start the cycle
+	SetLidTemp(uint16) error      // set Lid Temperature
 	SwitchOffLidTemp() error
+}
+
+type HeaterData struct {
+	Shaker1Temp float64 `json:"shaker_1_temp"`
+	Shaker2Temp float64 `json:"shaker_2_temp"`
+	Deck        string  `json:"deck"`
+	HeaterOn    bool    `json:"heater_on"`
 }
 
 type WSData struct {
@@ -62,6 +73,7 @@ type WSData struct {
 	Status           string           `json:"status"`
 	OperationDetails OperationDetails `json:"operation_details"`
 }
+
 type WSError struct {
 	Message string `json:"message"`
 	Deck    string `json:"deck"`
@@ -76,6 +88,8 @@ type OperationDetails struct {
 	TotalTime      *TimeHMS       `json:"total_time,omitempty"`
 	ProcessName    string         `json:"process_name,omitempty"`
 	ProcessType    db.ProcessType `json:"process_type,omitempty"`
+	Progress       *int64         `json:"progress,omitempty"`
+	TotalCycles    int64          `json:"total_cycles,omitempty"`
 }
 
 type TimeHMS struct {
@@ -104,7 +118,7 @@ type Compact32Driver interface {
 }
 
 type Extraction interface {
-	AspireDispense(ad db.AspireDispense, cartridgeID int64, tipType string) (response string, err error)
+	AspireDispense(ad db.AspireDispense, cartridgeID int64) (response string, err error)
 	AttachDetach(ad db.AttachDetach) (response string, err error)
 	DiscardBoxCleanup() (response string, err error)
 	RestoreDeck() (response string, err error)
@@ -113,7 +127,7 @@ type Extraction interface {
 	DiscardTipAndHome(discard bool) (response string, err error)
 	Heating(ht db.Heating) (response string, err error)
 	Homing() (response string, err error)
-	ManualMovement(motorNum, direction, pulses uint16) (response string, err error)
+	ManualMovement(motorNum, direction uint16, distance float32) (response string, err error)
 	Resume() (response string, err error)
 	Pause() (response string, err error)
 	Abort() (response string, err error)
@@ -129,8 +143,31 @@ type Extraction interface {
 	TipOperation(to db.TipOperation) (response string, err error)
 	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
 	SetCurrentProcessNumber(step int64)
+	SwitchOffAllCoils() (response string, err error)
+	PIDCalibration(context.Context) error
+	SetEngineerOrAdminLogged(value bool)
+	HeaterData() error
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {
 	C32.name = deck
+}
+
+func HoldSleep(sleepTime int32) (err error) {
+
+	var elaspedTime int32
+	for {
+		logger.Infoln("plc.ExperimentRunning && elaspedTime < sleepTime ", ExperimentRunning, elaspedTime, sleepTime)
+		if ExperimentRunning && elaspedTime < sleepTime {
+			time.Sleep(time.Second * 1)
+			logger.Infoln("sleeping in holdsleep")
+		} else {
+			if !ExperimentRunning {
+				logger.Errorln("experiment has stoped running")
+				return errors.New("experiment has stoped running")
+			}
+			return nil
+		}
+		elaspedTime = elaspedTime + 1
+	}
 }

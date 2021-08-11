@@ -12,12 +12,16 @@ import (
 const (
 	getTargetListQuery = `SELECT targets.* FROM targets
 			ORDER BY name ASC`
+	getTargetListNameQuery = `SELECT * FROM targets
+	where name = $1 LIMIT 1`
 
 	insertTargetsQuery1 = `INSERT INTO targets(
 				name,
 				dye_id)
 				VALUES %s `
 	insertTargetsQuery2 = `ON CONFLICT DO NOTHING;`
+
+	fetchTargetDyeQuery = `SELECT d.Name as dye FROM targets as t ,dyes as d WHERE t.dye_id = d.id AND t.id = $1`
 )
 
 type Target struct {
@@ -26,6 +30,14 @@ type Target struct {
 	DyeID uuid.UUID `db:"dye_id" json:"dye_id" validate:"required"`
 }
 
+func (s *pgStore) ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error) {
+	err = s.db.Get(&dye, fetchTargetDyeQuery, targetID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing targets dye")
+		return
+	}
+	return
+}
 func (s *pgStore) ListTargets(ctx context.Context) (t []Target, err error) {
 	err = s.db.Select(&t, getTargetListQuery)
 	if err != nil {
@@ -33,6 +45,15 @@ func (s *pgStore) ListTargets(ctx context.Context) (t []Target, err error) {
 		return
 	}
 
+	return
+}
+
+func (s *pgStore) GetTargetByName(ctx context.Context, name string) (t Target, err error) {
+	err = s.db.Get(&t, getTargetListNameQuery, name)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing targets by name")
+		return
+	}
 	return
 }
 

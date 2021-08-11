@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 )
 
@@ -32,8 +33,8 @@ type Storer interface {
 	ListExperiments(context.Context) ([]Experiment, error)
 	CreateExperiment(context.Context, Experiment) (Experiment, error)
 	ShowExperiment(context.Context, uuid.UUID) (Experiment, error)
-	ListExpTemplateTargets(context.Context, uuid.UUID) ([]ExpTemplateTarget, error)
-	UpsertExpTemplateTarget(context.Context, []ExpTemplateTarget, uuid.UUID) ([]ExpTemplateTarget, error)
+	ListExpTemplateTargets(context.Context, uuid.UUID) ([]ExpTempTargeTDye, error)
+	UpsertExpTemplateTarget(context.Context, []ExpTemplateTarget, uuid.UUID) ([]ExpTempTargeTDye, error)
 	CreateSample(context.Context, Sample) (Sample, error)
 	FindSamples(context.Context, string) ([]Sample, error)
 	ListWells(context.Context, uuid.UUID) ([]Well, error)
@@ -43,7 +44,7 @@ type Storer interface {
 	GetWellTarget(context.Context, int32, uuid.UUID) ([]WellTarget, error)
 	UpsertWellTargets(context.Context, []WellTarget, uuid.UUID, bool) ([]WellTarget, error)
 	ListStageSteps(context.Context, uuid.UUID) ([]StageStep, error)
-	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID, uint16) error
+	UpdateStartTimeExperiments(context.Context, time.Time, uuid.UUID, uint16, string) error
 	ListConfTargets(context.Context, uuid.UUID) ([]TargetDetails, error)
 	InsertResult(context.Context, []Result) ([]Result, error)
 	ListWellTargets(context.Context, uuid.UUID) ([]WellTarget, error)
@@ -58,13 +59,14 @@ type Storer interface {
 	InsertNotification(context.Context, Notification) error
 	MarkNotificationasRead(context.Context, uuid.UUID) error
 	InsertUser(context.Context, User) error
-	ValidateUser(context.Context, User) error
+	UpdateUser(context.Context, User, string) error
+	ValidateUser(context.Context, User) (User, error)
 	CheckIfICTargetAdded(context.Context, uuid.UUID) (WarnResponse, error)
 	InsertMotor(context.Context, []Motor) error
 	InsertConsumableDistance(context.Context, []ConsumableDistance) error
 	InsertTipsTubes(context.Context, []TipsTubes) error
 	InsertCartridge(context.Context, []Cartridge, []CartridgeWells) error
-	ListMotors() ([]Motor, error)
+	ListMotors(context.Context) ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
 	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
@@ -117,4 +119,17 @@ type Storer interface {
 	ShowAuditLog(ctx context.Context) (al AuditLog, err error)
 	AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error)
 	ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error)
+	UpdateEstimatedTime(ctx context.Context, id uuid.UUID, estimatedTime int64) (err error)
+	GetTargetByName(ctx context.Context, name string) (t Target, err error)
+	FinishTemplate(ctx context.Context, id uuid.UUID) (err error)
+	ListFinishedTemplates(ctx context.Context) (t []Template, err error)
+	DeleteUnfinishedTemplates(ctx context.Context) (err error)
+
+	UpdateMotor(ctx context.Context, motor Motor) (err error)
+	DeleteMotor(ctx context.Context, id int) (err error)
+	DeleteCartridge(ctx context.Context, id int64) (err error)
+
+	DeleteTipTube(ctx context.Context, id int64) (err error)
+	SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) (err error)
+	ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error)
 }
