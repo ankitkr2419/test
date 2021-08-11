@@ -145,7 +145,7 @@ export const API_ENDPOINTS = {
   configs: "configs",
   pidCalibration: "pid-calibration",
   manual: "manual",
-  sendMail: "", // Not confirmed, change after API is created
+  emailReport: "email-report",
   graphUpdate: "rtpcr/graph-update-scale",
 };
 

@@ -37,16 +37,15 @@ export function* fetchActivityLog(actions) {
 
 export function* sendMail(actions) {
   const {
-    payload: { token, body },
+    payload: { token, experimentId },
   } = actions;
   const { mailReportSuccess, mailReportFailure } = mailReportActions;
 
   try {
     yield call(callApi, {
       payload: {
-        method: HTTP_METHODS.POST, // To be discussed
-        body: body,
-        reqPath: `${API_ENDPOINTS.sendMail}`,
+        method: HTTP_METHODS.GET,
+        reqPath: `${API_ENDPOINTS.emailReport}/${experimentId}`,
         successAction: mailReportSuccess,
         failureAction: mailReportFailure,
         token,

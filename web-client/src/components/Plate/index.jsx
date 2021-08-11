@@ -38,6 +38,7 @@ const Plate = (props) => {
     resetSelectedWells,
     headerData,
     temperatureData,
+    mailBtnHandler,
     token,
   } = props;
 
@@ -253,9 +254,15 @@ const Plate = (props) => {
                     Temperature
                   </Button>
                   <ButtonIcon
+                    name="published"
+                    size={28}
+                    className="bg-white border-secondary ml-auto"
+                    onClick={mailBtnHandler}
+                  />
+                  <ButtonIcon
                     name="download-1"
                     size={28}
-                    className="bg-white border-secondary ml-auto downloadButton"
+                    className="bg-white border-secondary ml-3 downloadButton"
                     onClick={downloadClickHandler}
                   />
                 </div>
