@@ -22,6 +22,7 @@ const ExperimentGraphContainer = (props) => {
     experimentStatus,
     isMultiSelectionOptionOn,
     resetSelectedWells,
+    isInsidePreviewModal,
   } = props;
   const dispatch = useDispatch();
   // get targets from experiment target reducer(graph : target filters)
@@ -101,6 +102,7 @@ const ExperimentGraphContainer = (props) => {
       resetThresholdError={resetThresholdError}
       isThresholdInvalid={isAnyThresholdInvalid(experimentGraphTargetsList)}
       handleRangeChangeBtn={handleRangeChangeBtn}
+      isInsidePreviewModal={isInsidePreviewModal}
     />
   );
 };

@@ -37,7 +37,7 @@ export function* fetchActivityLog(actions) {
 
 export function* sendMail(actions) {
   const {
-    payload: { token, experimentId },
+    payload: { token, experimentId, showToast },
   } = actions;
   const { mailReportSuccess, mailReportFailure } = mailReportActions;
 
@@ -48,6 +48,8 @@ export function* sendMail(actions) {
         reqPath: `${API_ENDPOINTS.emailReport}/${experimentId}`,
         successAction: mailReportSuccess,
         failureAction: mailReportFailure,
+        showPopupSuccessMessage: showToast,
+        showPopupFailureMessage: showToast,
         token,
       },
     });

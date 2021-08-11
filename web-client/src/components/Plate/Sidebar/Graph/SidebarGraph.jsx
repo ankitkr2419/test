@@ -17,6 +17,7 @@ const SidebarGraph = (props) => {
     isThresholdInvalid,
     experimentStatus,
     handleRangeChangeBtn,
+    isInsidePreviewModal,
   } = props;
 
   let cyclesCount = 0;
@@ -44,6 +45,7 @@ const SidebarGraph = (props) => {
           isThresholdInvalid={isThresholdInvalid}
           handleRangeChangeBtn={handleRangeChangeBtn}
           experimentStatus={experimentStatus}
+          isInsidePreviewModal={isInsidePreviewModal}
         />
       )}
       {/* show temperature graph if showTempGraph flag is on */}

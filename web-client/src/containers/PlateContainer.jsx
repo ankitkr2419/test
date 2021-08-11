@@ -20,6 +20,7 @@ import { setIsPlateRoute } from "action-creators/loginActionCreators";
 import { getActiveLoadedWells } from "selectors/activeWellSelector";
 import { MAX_NO_OF_WELLS } from "appConstants";
 import { mailReportInitiated } from "action-creators/activityLogActionCreators";
+import { toast } from "react-toastify";
 
 const PlateContainer = () => {
   const dispatch = useDispatch();
@@ -96,8 +97,15 @@ const PlateContainer = () => {
   };
 
   const mailBtnHandler = () => {
-    //dispatch
-    dispatch(mailReportInitiated({ token, experimentId })); //API call to send an email
+    //API call to send an email
+    dispatch(
+      mailReportInitiated({
+        token: token,
+        experimentId: experimentId,
+        showToast: true,
+      })
+    );
+    toast.info("Sending mail...");
   };
 
   return (

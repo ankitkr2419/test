@@ -204,7 +204,7 @@ const AppHeader = (props) => {
   // Exit modal confirmation click handler
   const confirmationClickHandler = (isConfirmed) => {
     setExitModalVisibility(false);
-    if (isConfirmed === true) {
+    if (isConfirmed) {
       if (isExperimentRunning === true) {
         // show warning that user needs to abort first in order to log out.
         setWarningModalVisibility(true);

@@ -261,6 +261,7 @@ const Plate = (props) => {
                 </div>
                 <ExperimentGraphContainer
                   token={token}
+                  isInsidePreviewModal={false}
                   experimentId={experimentId}
                   headerData={headerData}
                   showTempGraph={showTempGraph}

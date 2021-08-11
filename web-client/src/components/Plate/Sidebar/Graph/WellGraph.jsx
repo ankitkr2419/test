@@ -68,10 +68,8 @@ const WellGraph = (props) => {
     setThresholdError,
     resetThresholdError,
     handleRangeChangeBtn,
+    isInsidePreviewModal,
   } = props;
-
-  const { totalCycles, progressStatus } = headerData;
-
 
   return (
     <div>
@@ -86,10 +84,12 @@ const WellGraph = (props) => {
         resetThresholdError={resetThresholdError}
       />
 
+      {isInsidePreviewModal === false && (
         <GraphRange
           handleRangeChangeBtn={handleRangeChangeBtn}
           headerData={headerData}
         />
+      )}
 
       {isThresholdInvalid && (
         <Text Tag="p" size={14} className="text-danger px-2 mb-1">

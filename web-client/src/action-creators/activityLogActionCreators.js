@@ -14,9 +14,9 @@ export const expandLogFailed = ({ error }) => ({
   payload: { error },
 });
 
-export const mailReportInitiated = ({ token, experimentId }) => ({
+export const mailReportInitiated = (payload) => ({
   type: mailReportActions.mailReportInitiated,
-  payload: { token, experimentId },
+  payload: payload,
 });
 
 export const mailReportFailed = ({ error }) => ({
