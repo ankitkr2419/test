@@ -24,7 +24,9 @@ const SidebarGraph = (props) => {
   } = props;
 
   let cyclesCount = 0;
+  // default values : just to make graph look good.
   let xAxisLabels = [1, 2, 3, 4, 5, 6];
+
   let chartData = lineChartData.toJS();
 
   // below case can happen if user selects all filter we might get empty chart data

@@ -24,6 +24,7 @@ export function* addWells(actions) {
         successAction,
         failureAction,
         token,
+        showPopupFailureMessage: true,
       },
     });
     // on success of wells created will clear selected wells
