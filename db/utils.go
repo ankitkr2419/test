@@ -2,12 +2,16 @@ package db
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"strconv"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
-const ContextKeyUsername = "username"
+const (
+	ContextKeyUsername = "username"
+	RepeatCountDefault = 15
+)
 
 type ProcessSequence struct {
 	ID             uuid.UUID `db:"id" json:"process_id" validate:"required"`

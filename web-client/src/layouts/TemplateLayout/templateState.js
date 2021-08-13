@@ -16,8 +16,6 @@ export const templateInitialState = fromJS({
   activeWidgetID: "template",
   // Pre-filled template initial list with saved wizard list
   wizardList,
-  // templateID: '948297f7-4166-49af-bad0-4a1742d9ca8a',
-  // stageId: 'd57185b8-952b-4369-a4a3-6317de7f35dd',
   templateID: null,
   lidTemperature: null,
 });

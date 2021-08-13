@@ -10,14 +10,15 @@ import (
 )
 
 const (
-	getExpTempTargetListQuery = `SELECT e.experiment_id,
-		e.template_id,
-		e.target_id,
-		e.threshold,
-		t.name as target_name
-		FROM experiment_template_targets as e , targets as t
-		WHERE
-		e.target_id = t.id AND e.experiment_id = $1`
+	getExpTempTargetListQuery = `SELECT d.name as dye,
+	e.experiment_id,
+	e.template_id,
+	e.target_id,
+	e.threshold,
+	t.name as target_name
+	FROM experiment_template_targets as e , targets as t, dyes as d
+	WHERE
+	e.target_id = t.id AND e.experiment_id = $1 AND t.dye_id=d.id`
 
 	upsertExpTempTargetQuery = `INSERT INTO experiment_template_targets (
 		experiment_id,
@@ -33,6 +34,11 @@ const (
 		experiment_template_targets.template_id = $2 `
 )
 
+type ExpTempTargeTDye struct {
+	DyeName string `db:"dye" json:"dye"`
+	ExpTemplateTarget
+}
+
 //ExpTemplateTarget is used to store target mapped to template with respect to experiment
 type ExpTemplateTarget struct {
 	ExperimentID uuid.UUID `db:"experiment_id" json:"experiment_id" validate:"required"`
@@ -42,7 +48,7 @@ type ExpTemplateTarget struct {
 	TargetName   string    `db:"target_name" json:"target_name"`
 }
 
-func (s *pgStore) ListExpTemplateTargets(ctx context.Context, experimentID uuid.UUID) (t []ExpTemplateTarget, err error) {
+func (s *pgStore) ListExpTemplateTargets(ctx context.Context, experimentID uuid.UUID) (t []ExpTempTargeTDye, err error) {
 	err = s.db.Select(&t, getExpTempTargetListQuery, experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing experiment template targets")
@@ -51,7 +57,7 @@ func (s *pgStore) ListExpTemplateTargets(ctx context.Context, experimentID uuid.
 	return
 }
 
-func (s *pgStore) UpsertExpTemplateTarget(ctx context.Context, t []ExpTemplateTarget, ExperimentID uuid.UUID) (createdETT []ExpTemplateTarget, err error) {
+func (s *pgStore) UpsertExpTemplateTarget(ctx context.Context, t []ExpTemplateTarget, ExperimentID uuid.UUID) (createdETT []ExpTempTargeTDye, err error) {
 	stmt := makeInsertQuery(t)
 
 	tx, err := s.db.Begin()

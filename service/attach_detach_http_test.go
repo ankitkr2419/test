@@ -32,7 +32,7 @@ func TestAttachDetachTestSuite(t *testing.T) {
 var testAttachDetachRecord = db.AttachDetach{
 	ID:            testUUID,
 	Operation:     "attach",
-	OperationType: "wash",
+	Height: 	   60,
 	ProcessID:     testProcessUUID,
 }
 

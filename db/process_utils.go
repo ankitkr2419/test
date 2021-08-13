@@ -30,7 +30,7 @@ const (
 	duplicate processOperation = "duplicate"
 )
 
-// const for rearrange process sequence updation 
+// const for rearrange process sequence updation
 const highNum = 10000
 
 const (

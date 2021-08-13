@@ -72,6 +72,12 @@ var testConsDistanceObj = []db.ConsumableDistance{
 		Distance:    1,
 		Description: "testing 2",
 	},
+	db.ConsumableDistance{
+		ID:          11,
+		Name:        "deck_base",
+		Distance:    135,
+		Description: "testing ",
+	},
 }
 
 var testMotorObj = []db.Motor{
@@ -102,7 +108,7 @@ func (suite *AspireDispenseTestSuite) SetupTest() {
 	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{testTTObj}, nil)
 	suite.dbMock.On("ListCartridges", mock.Anything).Return(testCartridgeObj, nil)
 	suite.dbMock.On("ListCartridgeWells").Return(testCartridgeWellsObj, nil)
-	suite.dbMock.On("ListMotors").Return(testMotorObj, nil)
+	suite.dbMock.On("ListMotors", mock.Anything).Return(testMotorObj, nil)
 	suite.dbMock.On("ListConsDistances").Return(testConsDistanceObj, nil)
 
 	LoadAllPLCFuncs(suite.dbMock)
@@ -149,7 +155,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseSuccess() {
 		suite.driverMock.On("ReadCoils", mock.Anything, mock.Anything).Return([]uint8{uint8(i)}, nil)
 	}
 
-	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1)
 
 	assert.Equal(suite.T(), "ASPIRE and DISPENSE was successful", res)
 	assert.Nil(suite.T(), err)
@@ -160,7 +166,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseTipTubeNotExists() {
 
 	testdeck.DeckDriver = suite.driverMock
 
-	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip1")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1)
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -172,7 +178,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseCartridgeNotExists() {
 
 	testdeck.DeckDriver = suite.driverMock
 
-	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 3, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 3)
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -186,7 +192,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongCategory() {
 	var wrongCatergory db.Category = "wrongCatergory"
 	testAspireDispenseRecord.Category = wrongCatergory
 
-	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1)
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -200,7 +206,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongSourcePosition() {
 
 	testAspireDispenseRecord.SourcePosition = 10
 
-	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1)
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -215,7 +221,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongDestinationPosition
 
 	testAspireDispenseRecord.DestinationPosition = 10
 
-	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1)
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
@@ -230,7 +236,7 @@ func (suite *AspireDispenseTestSuite) TestAspireDispenseWrongDeck() {
 	testdeck.name = "C"
 	aborted.Store("C", false)
 
-	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1, "testTip")
+	res, err := testdeck.AspireDispense(testAspireDispenseRecord, 1)
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)

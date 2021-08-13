@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"errors"
+	"mylab/cpagent/config"
 	"time"
 
 	"github.com/google/uuid"
@@ -43,14 +45,14 @@ const (
 )
 
 type Step struct {
-	ID                uuid.UUID `db:"id" json:"id"`
+	ID                uuid.UUID `db:"id" json:"step_id"`
 	StageID           uuid.UUID `db:"stage_id" json:"stage_id"`
 	RampRate          float32   `db:"ramp_rate" json:"ramp_rate"`
 	TargetTemperature float32   `db:"target_temp" json:"target_temp"`
 	HoldTime          int32     `db:"hold_time" json:"hold_time"`
 	DataCapture       bool      `db:"data_capture" json:"data_capture"`
-	CreatedAt         time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt         time.Time `db:"updated_at" json:"updated_at"`
+	CreatedAt         time.Time `db:"created_at" json:"step_created_at"`
+	UpdatedAt         time.Time `db:"updated_at" json:"step_updated_at"`
 }
 
 func (s *pgStore) ListSteps(ctx context.Context, stgID uuid.UUID) (steps []Step, err error) {
@@ -65,6 +67,11 @@ func (s *pgStore) ListSteps(ctx context.Context, stgID uuid.UUID) (steps []Step,
 
 func (s *pgStore) CreateStep(ctx context.Context, st Step) (createdStep Step, err error) {
 	var lastInsertID uuid.UUID
+
+	if st.DataCapture && (st.HoldTime < int32(config.GetCycleTime())) {
+		err = errors.New("invalid step with invalid hold time")
+		return
+	}
 	err = s.db.QueryRow(
 		createStepQuery,
 		st.StageID,
@@ -89,6 +96,10 @@ func (s *pgStore) CreateStep(ctx context.Context, st Step) (createdStep Step, er
 
 func (s *pgStore) UpdateStep(ctx context.Context, st Step) (err error) {
 
+	if st.DataCapture && (st.HoldTime < int32(config.GetCycleTime())) {
+		err = errors.New("invalid step with invalid hold time")
+		return
+	}
 	_, err = s.db.Exec(
 		updateStepQuery,
 		st.StageID,

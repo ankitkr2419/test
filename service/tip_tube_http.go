@@ -43,6 +43,7 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		go db.SetTipsTubesValues([]db.TipsTubes{tt})
 		err = deps.Store.InsertTipsTubes(req.Context(), []db.TipsTubes{tt})
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipTubeCreateError)
@@ -135,5 +136,28 @@ func listTipsTubesPositionHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.TipTubeFetchSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, tipsTubes)
+	})
+}
+
+func deleteTipTubeHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = deps.Store.DeleteTipTube(req.Context(), id)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error while deleting TipTube")
+			return
+		}
+		response := MsgObj{
+			Msg: "TipTube deleted successfully",
+		}
+		responseCodeAndMsg(rw, http.StatusOK, response)
+
 	})
 }

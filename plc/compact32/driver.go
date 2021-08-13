@@ -12,6 +12,8 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+var homingCount int
+
 // Interface Implementation Methods
 func (d *Compact32) HeartBeat() {
 	var err error
@@ -59,7 +61,7 @@ LOOP:
 
 	// something went wrong. Signal parent process
 	logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
-	d.ExitCh <- errors.New("PLC is not responding and maybe dead. Abort!!")
+	d.ExitCh <- errors.New("PCR Dead")
 	return
 }
 
@@ -143,6 +145,16 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 
 func (d *Compact32) HomingRTPCR() (err error) {
 
+	defer func() {
+		homingCount = 0
+	}()
+
+	if homingCount == 2 {
+		err = errors.New("homing failed even after 2 tries")
+		logger.WithField("HOMING", err.Error()).Errorln("homing failed")
+		d.ExitCh <- errors.New("PCR Aborted")
+		return
+	}
 	//First Home
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][1], plc.ON)
 	if err != nil {
@@ -158,24 +170,26 @@ func (d *Compact32) HomingRTPCR() (err error) {
 
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][100], plc.OFF)
 	if err != nil {
-		logger.Error("WriteSingleCoil:M2 : Start Cycle")
+		logger.Error("WriteSingleCoil:M100 : Start Cycle")
 		return
 	}
 	logger.WithField("HOMING", "homing started").Infoln("HOMING STARTED")
 	time.Sleep(time.Second * time.Duration(config.GetHomingTime()))
 	result, err := d.Driver.ReadCoils(plc.MODBUS["M"][100], uint16(1))
 	if err != nil {
-		logger.Error("WriteSingleCoil:M100 : Start Cycle")
+		logger.Error("WriteSingleCoil:M100 ", err)
 		return
 	}
 	logger.Infoln("homing result", result)
 	if result[0] == 101 {
 		logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	} else {
-		err = errors.New("homing failed")
-		logger.WithField("HOMING", err.Error()).Errorln("homing failed")
-		d.ExitCh <- errors.New("PCR Aborted")
-		return
+		homingCount++
+		// Try Homing Again
+		err = d.HomingRTPCR()
+		if err != nil {
+			return
+		}
 	}
 	// Also Reset
 	return d.Reset()
@@ -215,7 +229,7 @@ func (d *Compact32) Stop() (err error) {
 	// if err != nil {
 	// 	logger.Error("WriteSingleCoil:M102 : Stop Cycle")
 	// }
-	d.ExitCh <- errors.New("PCR ABORTED")
+	d.ExitCh <- errors.New("PCR Aborted")
 	return nil
 }
 
@@ -236,7 +250,12 @@ func (d *Compact32) Cycle() (err error) {
 		return
 	}
 	logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
-	time.Sleep(time.Second * 15)
+	err = plc.HoldSleep(15)
+	if err != nil {
+		logger.Errorln("Error while running cycle: ", err)
+		return
+	}
+
 	plc.DataCapture = true
 	// for {
 	// 	cycleCompletion, err := d.Driver.ReadCoils(plc.MODBUS["M"][27], uint16(1))
@@ -276,7 +295,7 @@ func (d *Compact32) Cycle() (err error) {
 // Monitor periodically. If CycleComplete == true, Scan will be populated
 func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 
-	logger.Println("---------------------------MONITOR------------------------")
+	logger.Infoln("---------------------------MONITOR------------------------")
 	// Read current cycle
 
 	scan.Temp = plc.CurrentCycleTemperature
@@ -450,7 +469,8 @@ func (d *Compact32) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.OFF)
 	if err != nil {
-		logger.Errorln("WriteSingleCoil:M109 : Stop Lid Heating")
+		logger.Errorln("Stop Lid Heating error")
+		return
 	}
 	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
 	return

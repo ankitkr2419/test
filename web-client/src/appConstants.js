@@ -423,4 +423,9 @@ export const timeConstants = {
 };
 
 //constants for RTPCR
+/**
+ * Maximum number of wells that can be present in a plate.
+ * Maximum number of wells are 16.
+ * 96 was the old version, this is changed in future implementations.
+ */
 export const MAX_NO_OF_WELLS = 16;

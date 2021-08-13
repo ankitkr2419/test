@@ -211,3 +211,22 @@ For embedding react build with Go binary
 $ rice embed
 $ go build
 ```
+
+
+### NOTE (For Mac Users Only):
+If you want to run this binary locally then do the following changes:
+
+1. In Makefile
+comment out linux realted builds
+e.g Comment this line in Makefile
+`
+ GOARCH=amd64 GOOS=linux
+`
+2. In case you see build error related to `-lrt`
+remove `-lrt` from `TEC_1089.go` file
+
+3. If you see build error related to `ComPort.c`
+Comment out the lines that are causing trouble
+
+4. For connecting to the database
+Please refer mac guides or thy this out https://www.codementor.io/@engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb

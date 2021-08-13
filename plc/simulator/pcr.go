@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"mylab/cpagent/config"
 	"mylab/cpagent/plc"
 	"time"
 
@@ -184,30 +185,39 @@ func (d *Simulator) Cycle() (err error) {
 
 	if plc.ExperimentRunning {
 		logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
-		time.Sleep(time.Second * 16)
+		err = plc.HoldSleep(16)
+		if err != nil {
+			logger.Errorln("Error while running cycle: ", err)
+			return
+		}
 		plc.DataCapture = true
 	}
 	return
 }
 func (d *Simulator) HomingRTPCR() (err error) {
 	logger.WithField("HOMING", "Started").Infoln("homing started")
+	time.Sleep(time.Second * time.Duration(config.GetHomingTime()))
 	logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	return
 }
 func (d *Simulator) Reset() (err error) { return }
 
 func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
+	logger.WithField("LID TEMP", "LID TEMP started").Infoln("LID TEMP STARTED")
+
 	// simulate currentLidTemp
 	if plc.ExperimentRunning {
 		time.Sleep(2 * time.Second)
-		d.plcIO.d.currentLidTemp = jitter(uint16(expectedLidTemp), 0, 30)
-		logger.Infoln("Current Lid Temp: ", d.plcIO.d.currentLidTemp)
+		plc.CurrentLidTemp = float32(expectedLidTemp)/10
+		logger.Infoln("Current Lid Temp: ", plc.CurrentLidTemp)
 	}
 	return
 }
 
 func (d *Simulator) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
-	d.plcIO.d.currentLidTemp = jitter(uint16(27), 0, 50)
+	plc.CurrentLidTemp = float32(config.GetRoomTemp())
+	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
+
 	return
 }

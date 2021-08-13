@@ -76,12 +76,6 @@ const AppHeader = (props) => {
   const toggleUserDropdown = () =>
     setUserDropdownOpen((prevState) => !prevState);
 
-  // useEffect(() => {
-  // 	if (isExperimentRunning === true) {
-  // 		// connectSocket(dispatch);
-  // 	}
-  // }, [isExperimentRunning, dispatch]);
-
   useEffect(() => {
     if (isExperimentSucceeded) {
       setExpSuccessModalVisibility(true);
@@ -90,7 +84,6 @@ const AppHeader = (props) => {
 
   useEffect(() => {
     if (isExperimentStopped === true) {
-      // disConnectSocket();
       dispatch(loginReset());
     }
   }, [isExperimentStopped, dispatch]);
@@ -174,7 +167,7 @@ const AppHeader = (props) => {
   // Exit modal confirmation click handler
   const confirmationClickHandler = (isConfirmed) => {
     setExitModalVisibility(false);
-    if (isConfirmed) {
+    if (isConfirmed === true) {
       if (isExperimentRunning === true) {
         // show warning that user needs to abort first in order to log out.
         setWarningModalVisibility(true);

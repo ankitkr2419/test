@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/tec"
 	"net/http"
 	"time"
 
@@ -151,13 +151,20 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 		// create  new file for each experiment with experiment id in file name.
-		file := plc.GetExcelFile(tec.LogsPath, fmt.Sprintf("output_%v", expID))
+		file := db.GetExcelFile(ExpOutputPath, fmt.Sprintf("output_%v", expID))
+
+		db.SetExperimentExcelFile(file)
+		deps.Store.SetExcelHeadings(file, expID)
 
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching wells data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+
+		for _, v := range wells {
+			db.AddRowToExcel(file, db.WellSample, []interface{}{v.ID, v.Position, v.ExperimentID, v.SampleID, v.Task, v.ColorCode, v.SampleName})
 		}
 
 		// validate of NC,PC or NTC set for wells
@@ -178,19 +185,56 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		for _, v := range ss {
+			db.AddRowToExcel(file, db.StepsStageSheet, []interface{}{
+				v.Stage.ID,
+				v.Stage.Type,
+				v.Stage.RepeatCount,
+				v.Stage.TemplateID,
+				v.Stage.StepCount,
+				v.Stage.CreatedAt.String(),
+				v.Stage.UpdatedAt.String(),
+				v.Step.ID,
+				v.Step.StageID,
+				v.Step.RampRate,
+				v.Step.TargetTemperature,
+				v.Step.HoldTime,
+				v.Step.DataCapture,
+				v.Step.CreatedAt.String(),
+				v.Step.UpdatedAt.String()})
+		}
+
 		plcStage := makePLCStage(ss)
 
-		// t, err := deps.Store.ShowTemplate(req.Context(), e.TemplateID)
-		// if err != nil {
-		// 	logger.WithField("err", err.Error()).Error("Error fetching template data")
-		// 	rw.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
+		t, err := deps.Store.ShowTemplate(req.Context(), e.TemplateID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching template data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		db.AddRowToExcel(file, db.TemplateSheet, []interface{}{
+			t.ID,
+			t.Name,
+			t.Description,
+			t.Publish,
+			t.CreatedAt.String(),
+			t.UpdatedAt.String(),
+			t.Volume,
+			t.LidTemp,
+			t.EstimatedTime,
+			t.Finished})
+		// Set currentExpTemplate to current running Template
+		currentExpTemplate = t
 
 		// Lid Temp is multiplied by 10 for PLC can't handle floats
-		plcStage.IdealLidTemp = uint16(100 * 10)
+		plcStage.IdealLidTemp = uint16(t.LidTemp * 10)
 		e.Result = "running"
-		err = deps.Store.UpdateStartTimeExperiments(req.Context(), time.Now(), expID, plcStage.CycleCount, e.Result)
+
+		// Set expStartTime to current Time
+		expStartTime = time.Now()
+
+		err = deps.Store.UpdateStartTimeExperiments(req.Context(), expStartTime, expID, plcStage.CycleCount, e.Result)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -203,6 +247,17 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			logger.WithField("err", err.Error()).Error("Error fetching target data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+
+		for _, v := range targetDetails {
+			db.AddRowToExcel(file, db.TargetSheet, []interface{}{
+				v.ExperimentID,
+				v.TemplateID,
+				v.TargetID,
+				v.Threshold,
+				v.DyePosition,
+				v.TargetName,
+			})
 		}
 
 		var ICTargetID uuid.UUID
@@ -220,13 +275,13 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			heading = append(heading, v)
 		}
 
-		plc.AddMergeRowToExcel(file, plc.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
+		db.AddMergeRowToExcel(file, db.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
 
 		row := []interface{}{"well positions"}
 		for _, v := range config.ActiveWells("activeWells") {
 			row = append(row, v)
 		}
-		plc.AddRowToExcel(file, plc.RTPCRSheet, row)
+		db.AddRowToExcel(file, db.RTPCRSheet, row)
 
 		setExperimentValues(config.ActiveWells("activeWells"), ICTargetID, targetDetails, expID, plcStage)
 
@@ -273,13 +328,14 @@ func stopExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		e, err := deps.Store.ShowExperiment(req.Context(), expID)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+
 		if plc.ExperimentRunning {
+			e, err := deps.Store.ShowExperiment(req.Context(), expID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 			if e.Result != "running" {
 				logger.WithField("err", "invalid running experiment").Error("this experiment id not running")
 				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "this experiment is not running"})
@@ -346,35 +402,50 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		return
 	}
 
-	// Home the TEC
+	// Home the PLC
 	// Reset is implicit in Homing
 	err = deps.Plc.HomingRTPCR()
 	if err != nil {
 		return
 	}
 
-	// TODO: Lid Temp reaching
+	// templateRunSuccess has to happen before monitor is called
+	templateRunSuccess = false
+
+	// invoke monitor after 2 secs
+	go func() {
+		time.Sleep(2 * time.Second)
+		go monitorExperiment(deps, file)
+	}()
+
+	lidTempStartTime := time.Now()
 	err = deps.Plc.SetLidTemp(p.IdealLidTemp)
 	if err != nil {
 		return
 	}
+	lidTempSecs := time.Now().Sub(lidTempStartTime).Seconds()
 
-	//invoke monitor
-	go monitorExperiment(deps, file)
+	// Setting currentExpTemplate Estimated Time more accurately.
+	if currentExpTemplate.EstimatedTime != 0 {
+		// Below formula is copied from estimated_time.go
+		// We are removing variable LidTempTime
+		estimatedLidTime := int64(math.Abs(float64(p.IdealLidTemp/10)-config.GetRoomTemp()) / 0.5)
+		currentExpTemplate.EstimatedTime = currentExpTemplate.EstimatedTime - estimatedLidTime + int64(lidTempSecs)
+	}
 
 	// Start line
 	headers := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
-	plc.AddRowToExcel(file, plc.TECSheet, headers)
+	db.AddRowToExcel(file, db.TECSheet, headers)
 
 	timeStarted := time.Now()
 	row := []interface{}{"Experiment Started at: ", timeStarted.String()}
-	plc.AddRowToExcel(file, plc.TempLogs, row)
+	db.AddRowToExcel(file, db.TempLogs, row)
 
 	row = []interface{}{"Holding Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	row = []interface{}{"timestamp", "current Temperature", "lid Temperature"}
-	plc.AddRowToExcel(file, plc.TempLogs, row)
+	db.AddRowToExcel(file, db.TempLogs, row)
 
 	// Run Holding Stage
 	logger.Infoln("Holding Stage Started")
@@ -385,7 +456,7 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
@@ -394,13 +465,23 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 			return
 		}
 		logger.Infoln("Cycle Completed -> ", i)
+		// Home every n number of cycles
+		if (config.GetNumHomingCycles() != 0) &&
+			(int(i)%config.GetNumHomingCycles() == 0) {
+			err = deps.Plc.HomingRTPCR()
+			if err != nil {
+				return
+			}
+		}
 	}
 
+	templateRunSuccess = true
+
 	row = []interface{}{"Experiment Completed at: ", time.Now().String()}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	row = []interface{}{"Total Time Taken by Experiment: ", time.Now().Sub(timeStarted).String()}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	return
 }

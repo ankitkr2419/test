@@ -85,7 +85,7 @@ func ValidateExperiment(wells []Well) (valid bool, resp WarnResponse) {
 
 	if len(wells) == 0 {
 		resp.Code = "Warning"
-		resp.Message = "Absence of NC,PC or NTC"
+		resp.Message = "No wells selected"
 		return
 	} else {
 		for _, w := range wells {
@@ -100,12 +100,16 @@ func ValidateExperiment(wells []Well) (valid bool, resp WarnResponse) {
 				tasksCount["NTC"] = tasksCount["NTC"] + 1
 			}
 		}
-		//ASK: Is this a BUG?
+		count := 0
 		for _, v := range tasksCount {
 			if v == 0 {
-				resp.Code = "Warning"
-				resp.Message = "Absence of NC,PC or NTC"
-				return
+				// When it is neither NC, PC or NTC
+				count++
+				if count == 3 {
+					resp.Code = "Warning"
+					resp.Message = "Absence of NC,PC or NTC"
+					return
+				}
 			}
 		}
 	}
