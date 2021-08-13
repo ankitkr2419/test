@@ -70,7 +70,7 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
+		logger.Infoln("targetssssss", targets)
 		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
@@ -78,14 +78,15 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		respBytes, err := getGraphByThreshold(deps, expID, wellPositions, targets, e.RepeatCycle, tc)
+		respBytes, err := getWellsDataByThreshold(deps, expID, wellPositions, targets, e.RepeatCycle, tc)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling Result data")
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		logger.Infoln(expID, tc, respBytes)
-		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: "Set Threhold was success"})
+		rw.Write(respBytes)
+		rw.Header().Add("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusAccepted)
 	})
 }

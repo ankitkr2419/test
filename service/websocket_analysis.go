@@ -209,17 +209,17 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 	return
 }
 
-func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []db.Well, wellTargets []db.WellTarget) (DBWellTargets []db.WellTarget) {
+func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []db.Well, wellTargets []db.WellTarget) []db.WellTarget {
+	logger.Infoln(DBWells)
 	for _, r := range result {
 		for i, t := range wellTargets {
 			for _, w := range DBWells {
-				if r.WellPosition == w.Position && r.TargetID == t.TargetID {
-					logger.Infoln(r.FValue, t.CT, w.Position, t.TargetName)
+				if r.WellPosition == w.Position && r.TargetID == t.TargetID && w.Position == t.WellPosition {
 					if t.CT == "" && threshold <= float32(r.FValue) {
-						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
+						wellTargets[i].CT = strconv.Itoa(int(r.FValue))
 					} else if t.CT != "" && t.CT != undetermine && r.Threshold >= float32(r.FValue) {
 						// if ct value again crosses threshold then only set it as undertermine
-						DBWellTargets[i].CT = undetermine
+						wellTargets[i].CT = undetermine
 					}
 				}
 			}
@@ -227,7 +227,7 @@ func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []
 	}
 	// ex: for 8 active wells * 6 targets * no of cycle
 
-	return
+	return wellTargets
 }
 
 func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16) (thresholdLine map[db.TargetDetails]float32) {

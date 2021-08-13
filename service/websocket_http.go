@@ -274,7 +274,7 @@ func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets 
 
 }
 
-func getGraphByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, t_cycles uint16, tc ThresholdCals) (respBytes []byte, err error) {
+func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, tCycles uint16, tc ThresholdCals) (graphResult []byte, err error) {
 
 	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
 	if err != nil {
@@ -290,6 +290,7 @@ func getGraphByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int3
 		}
 		wellTargets = append(wellTargets, wellTarget...)
 	}
+
 	dbWells, err := deps.Store.ListWells(context.Background(), experimentID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error fetching data")
@@ -297,13 +298,11 @@ func getGraphByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int3
 		deps.WsErrCh <- err
 		return
 	}
-	Finalresult := make([]db.WellTarget, 0)
-
+	wellTarget := make([]db.WellTarget, 0)
 	if len(DBResult) > 0 {
 		for _, v := range targets {
 			if tc.AutoThreshold {
-				targetThreshold := getAutoThreshold(DBResult, wells, targets, t_cycles)
-				logger.Infoln("threshold", targetThreshold)
+				targetThreshold := getAutoThreshold(DBResult, wells, targets, tCycles)
 				for i, tl := range targetThreshold {
 					if i.TargetID == v.TargetID {
 						v.Threshold = tl
@@ -311,22 +310,21 @@ func getGraphByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int3
 				}
 			}
 			// analyseResult returns data required for ploting graph
-			Finalresult = append(Finalresult, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
+			wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
 		}
 	}
+	_, err = deps.Store.UpsertWellTargets(context.Background(), wellTarget, experimentID, false)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error upserting well target data")
+		return
+	}
 
-	logger.Infoln(Finalresult)
-
-	// Result := resultGraph{
-	// 	Type: "ThresholdGraph",
-	// 	Data: Finalresult,
-	// }
-
-	// respBytes, err = json.Marshal(Result)
-	// if err != nil {
-	// 	logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
-	// 	return
-	// }
+	experimentValues.experimentID = experimentID
+	graphResult, err = getColorCodedWells(deps)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
+		return
+	}
 
 	return
 }
