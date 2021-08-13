@@ -97,7 +97,8 @@ func UpdateScale(result []db.Result, wells []int32, targets []db.TargetDetails, 
 						// if cycle found do not add again!
 						if !found(r.Cycle, wellResult.Cycle) {
 							wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
-							wellResult.FValue = append(wellResult.FValue, scaleValue(float32(r.FValue), s.YAxisMin, s.YAxisMax))
+							//this change is made beacuse the UI needs the actual values
+							wellResult.FValue = append(wellResult.FValue, scaleThreshold(float32(r.FValue)))
 						}
 					}
 
