@@ -22,7 +22,7 @@ const getWellGraphData = state => state.wellGraphReducer;
 const nullableCheck = arr => arr.every(item => item === 0);
 const getThresholdLineData = (value, count) => {
 	const arr = [];
-	for (let x = 0; x <= count; x += 1) {
+	for (let x = 0; x < count; x += 1) {
 		arr.push(value);
 	}
 	return arr;
@@ -33,7 +33,7 @@ export const getXAxis = createSelector(
 	count => count,
 	(count) => {
 		const arr = [];
-		for (let x = 0; x <= count; x += 1) {
+		for (let x = 0; x < count; x += 1) {
 			arr.push(x+1);	// x-axis should start from 1
 		}
 		return arr;
