@@ -48,6 +48,25 @@ const options = {
       },
     ],
   },
+
+  // pan: {
+  //   enabled: true,
+  //   mode: "x",
+  //   speed: 10,
+  //   threshold: 10,
+  // },
+  // zoom: {
+  //   enabled: true,
+  //   drag: true,
+  //   mode: "xy",
+  //   speed: 0.01,
+  //   // sensitivity: 0.1,
+  //   limits: {
+  //     max: 10,
+  //     min: 0.5,
+  //   },
+  // },
+
   //TODO: will be added later after testing & studying about it properly.
   // This is for animation.
 
@@ -68,6 +87,7 @@ const WellGraph = (props) => {
     setThresholdError,
     resetThresholdError,
     handleRangeChangeBtn,
+    handleResetBtn,
     isInsidePreviewModal,
   } = props;
 
@@ -87,6 +107,7 @@ const WellGraph = (props) => {
       {isInsidePreviewModal === false && (
         <GraphRange
           handleRangeChangeBtn={handleRangeChangeBtn}
+          handleResetBtn={handleResetBtn}
           headerData={headerData}
         />
       )}

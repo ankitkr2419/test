@@ -7,7 +7,7 @@ import { formikInitialState, getRequestBody, disbleApplyBtn } from "./helper";
 import { EXPERIMENT_STATUS } from "appConstants";
 
 const GraphRange = (props) => {
-  const { className, handleRangeChangeBtn, headerData } = props;
+  const { className, handleRangeChangeBtn, handleResetBtn, headerData } = props;
 
   const { totalCycles, progressStatus } = headerData;
 
@@ -35,7 +35,7 @@ const GraphRange = (props) => {
         Range
       </Text>
       <div className="d-flex align-items-center flex-wrap flex-90">
-        <FormGroup className="d-flex align-items-center flex-40 px-2">
+        <FormGroup className="d-flex align-items-center flex-35 px-2">
           <Label className="flex-20 text-right mb-0 p-1">X Axis</Label>
 
           <Input
@@ -69,7 +69,7 @@ const GraphRange = (props) => {
             onFocus={() => formik.setFieldValue(`xMax.isInvalid`, false)}
           />
         </FormGroup>
-        <FormGroup className="d-flex align-items-center flex-40 px-2">
+        <FormGroup className="d-flex align-items-center flex-35 px-2">
           <Label className="flex-20 text-right mb-0 p-1">Y Axis</Label>
           <Input
             name="yMin"
@@ -100,12 +100,23 @@ const GraphRange = (props) => {
           color="primary"
           size="sm"
           // outline
-          className="mb-3"
+          className="mb-3 ml-3"
           onClick={() => handleRangeChangeBtn(getRequestBody(formik.values))}
           disabled={disbleApplyBtn(formik.values, progressStatus)}
         >
           Apply
         </Button>
+        <Button
+          color="primary"
+          size="sm"
+          // outline
+          className="mb-3 ml-3"
+          onClick={handleResetBtn}
+          disabled={disbleApplyBtn(formik.values, progressStatus)}
+        >
+          Reset
+        </Button>
+
       </div>
     </div>
   );

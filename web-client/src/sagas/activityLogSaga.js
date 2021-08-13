@@ -91,5 +91,4 @@ export function* expand(actions) {
 export function* activityLogSaga() {
   yield takeEvery(activityLogActions.activityLogInitiated, fetchActivityLog);
   yield takeEvery(mailReportActions.mailReportInitiated, sendMail);
-  yield takeEvery(expandLogActions.expandLogInitiated, expand);
 }
