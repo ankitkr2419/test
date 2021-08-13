@@ -23,6 +23,7 @@ export function* addWells(actions) {
         reqPath: `experiments/${experimentId}/wells`,
         successAction,
         failureAction,
+        showPopupFailureMessage: true,
         token,
         showPopupFailureMessage: true,
       },
