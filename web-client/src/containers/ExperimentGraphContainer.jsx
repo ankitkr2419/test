@@ -105,12 +105,10 @@ const ExperimentGraphContainer = (props) => {
 
   const handleResetBtn = () => {
     setDataFromAPI(false);
-
-    const queryStr = `x_axis_min=${1}&x_axis_max=${data[0].total_cycles}&y_axis_min=${0}&y_axis_max=${data[0].threshold}`;
-
+    
     dispatch(
       updateGraphInitiated({
-        query: queryStr,
+        query: "",
         experimentId: experimentId,
         token: token,
       })

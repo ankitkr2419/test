@@ -41,8 +41,8 @@ const CalibrationRtpcrContainer = () => {
 
   const saveBtnClickHandler = (configData) => {
     let data = {
-      name: configData.name,
-      email: configData.email,
+      receiver_name: configData.name,
+      receiver_email: configData.email,
       room_temperature: configData.roomTemperature,
       homing_time: configData.homingTime,
       no_of_homing_cycles: configData.noOfHomingCycles,
@@ -50,6 +50,7 @@ const CalibrationRtpcrContainer = () => {
       pid_temperature: configData.pidTemperature,
       pid_minutes: configData.pidMinutes,
     };
+
     dispatch(updateCalibrationInitiated({ token, data }));
   };
 

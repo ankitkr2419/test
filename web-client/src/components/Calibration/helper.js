@@ -4,7 +4,7 @@ export const formikInitialState = {
   name: {
     type: "text",
     name: "name",
-    apiKey: "name",
+    apiKey: "receiver_name",
     label: "Name",
     value: null,
     isInvalid: false,
@@ -13,7 +13,7 @@ export const formikInitialState = {
   email: {
     type: "email",
     name: "email",
-    apiKey: "email",
+    apiKey: "receiver_email",
     label: "Email",
     value: null,
     isInvalid: false,
