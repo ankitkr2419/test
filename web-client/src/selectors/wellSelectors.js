@@ -1,5 +1,10 @@
 import { createSelector } from "reselect";
 
+/**
+ * Maximum number of wells that can be present in a plate.
+ * Maximum number of wells are 16.
+ * 96 was the old version, this is changed in future implementations.
+ */
 const PLATE_CAPACITY = 96;
 
 const getWellListSelector = (state) => state.wellListReducer;
@@ -12,6 +17,7 @@ export const getWells = createSelector(
 
 /**
  * return array of selected position
+ * array wells that have isSelected or isMultiSelected field set to true
  */
 export const getWellsPosition = createSelector(
   (wellListReducer) => wellListReducer,
@@ -30,7 +36,12 @@ export const getWellsPosition = createSelector(
       })
       .filter((ele) => ele !== null)
 );
-//  returns array of indexes of filled wells
+
+/**
+ * returns array of indexes of filled wells
+ * Here filled wells means that the wells that are selected 
+ * and filled with information for - targets, samples and tasks
+*/
 export const getFilledWellsPosition = createSelector(
   (wellListReducer) => wellListReducer,
   (wellListReducer) =>
@@ -163,7 +174,9 @@ export const updateWellListSelector = createSelector(
   }
 );
 
-// configuring active wells with existing wells data
+/**
+ * configuring active wells with existing wells data
+ */
 export const setActiveWells = createSelector(
   (state) => state,
   (state, action) => action,
