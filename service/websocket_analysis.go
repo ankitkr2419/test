@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"math"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -208,35 +209,81 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 	return
 }
 
-func analyseResultForThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16, tc ThresholdCals) (finalResult []graph) {
-
-	// ex: for 8 active wells * 6 targets * no of cycle
-	for _, aw := range wells {
-		var wellResult graph
-		wellResult.WellPosition = aw
-
-		for _, t := range targets {
-			wellResult.TargetID = t.TargetID
-			for _, r := range result {
-				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
-					wellResult.ExperimentID = r.ExperimentID
-					wellResult.TargetID = r.TargetID
-					wellResult.Threshold = r.Threshold
-					wellResult.TotalCycles = cycles
-
-					// if cycle found do not add again!
-					if !found(r.Cycle, wellResult.Cycle) {
-						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
-						wellResult.FValue = append(wellResult.FValue, scaleThreshold(float32(r.FValue)))
+func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []db.Well, wellTargets []db.WellTarget) (DBWellTargets []db.WellTarget) {
+	for _, r := range result {
+		for i, t := range wellTargets {
+			for _, w := range DBWells {
+				if r.WellPosition == w.Position && r.TargetID == t.TargetID {
+					logger.Infoln(r.FValue, t.CT, w.Position, t.TargetName)
+					if t.CT == "" && threshold <= float32(r.FValue) {
+						DBWellTargets[i].CT = strconv.Itoa(int(r.FValue))
+					} else if t.CT != "" && t.CT != undetermine && r.Threshold >= float32(r.FValue) {
+						// if ct value again crosses threshold then only set it as undertermine
+						DBWellTargets[i].CT = undetermine
 					}
 				}
 			}
-			finalResult = append(finalResult, wellResult)
-			wellResult.Cycle = []uint16{}
+		}
+	}
+	// ex: for 8 active wells * 6 targets * no of cycle
+
+	return
+}
+
+func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16) (thresholdLine map[db.TargetDetails]float32) {
+
+	formulaWellTarget := make(map[TargetCycleWell]float32, cycles)
+	var finalSum float32
+	thresholdLine = make(map[db.TargetDetails]float32, len(targets))
+	// ex: for 8 active wells * 6 targets * no of cycle
+
+	for _, t := range targets {
+
+		var wellResult graph
+		var key TargetCycleWell
+
+		wellResult.TargetID = t.TargetID
+		for _, aw := range wells {
+			var sum uint16
+			var avg, std float32
+			wellResult.WellPosition = aw
+			for _, r := range result {
+				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
+					sum = sum + r.FValue
+					wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
+				}
+			}
+			key = TargetCycleWell{
+				Target: wellResult.TargetID,
+				Well:   wellResult.WellPosition,
+			}
+			avg = float32(sum / cycles)
+			std = calculateStandardDeviation(wellResult.FValue, avg)
+			formulaWellTarget[key] = avg + 10*std
 			wellResult.FValue = []float32{}
 		}
 
+		for _, v := range formulaWellTarget {
+			finalSum = finalSum + v
+		}
+
+		thresholdLine[t] = finalSum / float32(len(formulaWellTarget))
 	}
+
+	return
+}
+
+func calculateStandardDeviation(array []float32, average float32) (deviation float32) {
+
+	var deviatedSum float32
+	for _, v := range array {
+		value := v - average
+		deviatedSum = deviatedSum + value*value
+	}
+
+	deviatedAverage := deviatedSum / float32(len(array)-1)
+
+	deviation = float32(math.Sqrt(float64(deviatedAverage)))
 	return
 }
 

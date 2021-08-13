@@ -1,12 +1,15 @@
 package service
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
+
 	// "mylab/cpagent/db"
-	"github.com/gorilla/mux"
 	"mylab/cpagent/responses"
 	"net/http"
+
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -18,6 +21,10 @@ type ThresholdCals struct {
 	AutoBaseline  bool    `json:"auto_baseline"`
 	StartCycle    int64   `json:"start_cycle"`
 	EndCycle      int64   `json:"end_cycle"`
+}
+type TargetCycleWell struct {
+	Target uuid.UUID
+	Well   int32
 }
 
 func setThresholdHandler(deps Dependencies) http.HandlerFunc {
@@ -47,7 +54,7 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		if len(wells) == 0 {
-			err = fmt.Errorf("No wells to log error")
+			err = fmt.Errorf("No wells configured")
 			logger.Errorln(err)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 		}
@@ -78,7 +85,7 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		logger.Infoln(expID, tc)
+		logger.Infoln(expID, tc, respBytes)
 		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: "Set Threhold was success"})
 	})
 }
