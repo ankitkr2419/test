@@ -5,21 +5,23 @@
 
 int32_t Address;
 int8_t Buf[25];
-int32_t Inst = 1;         
+int32_t Inst = 1;
+int ComPortNr = 0;
+int BaudRate = 57600;         
 
 int initiateTEC()
 {
     MeParFloatFields Fields;
     MeParLongFields Longs;
 
-    ComPort_Open(0, 57600);
+    ComPort_Open(ComPortNr, BaudRate);
     
     Address = 2;
 
     if(MeCom_GetIdentString(Address, Buf)) 
     {
-               ConsoleIO_SetColor(ConsoleIO_Green);
-               printf("Ident String: %s\n", Buf);
+        ConsoleIO_SetColor(ConsoleIO_Green);
+        printf("Ident String: %s\n", Buf);
     }
 
     Fields.Value = 4;
@@ -243,12 +245,16 @@ getTemp:
     if(MeCom_TEC_Mon_ObjectTemperature(Address, Inst, &Fields, MeGet))
     {
         // TEC will only be valid for temperatures above Room Temp
-        if (Fields.Value < 20) {
-            // sleep for 200ms
-            usleep(200 * 1000);
-            goto getTemp;
+        if (Fields.Value >= 10) {
+            return Fields.Value; 
         }
-        return Fields.Value;    
+        // sleep for 200ms
+        usleep(200 * 1000);
+        if (isnan(Fields.Value) ) {
+            printf("TEC Object Temperature value is NaN");
+            return -1;
+        }
+        goto getTemp;
     } else {
         printf("TEC Object Temperature value couldn't be read");
         return -1;
