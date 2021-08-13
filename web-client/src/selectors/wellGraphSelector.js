@@ -34,7 +34,7 @@ export const getXAxis = createSelector(
 	(count) => {
 		const arr = [];
 		for (let x = 0; x <= count; x += 1) {
-			arr.push(x);
+			arr.push(x+1);	// x-axis should start from 1
 		}
 		return arr;
 	},

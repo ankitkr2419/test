@@ -1,16 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table } from 'core-components';
 import { ButtonIcon } from 'shared-components';
 import './activity.scss';
 import ActivityData from './ActivityData.json';
 import SearchBar from './SearchBar';
+import MlModal from "shared-components/MlModal";
+import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 
 const headers = ActivityData.headers;
 const experiments = ActivityData.experiments;
 
 const ActivityComponent = (props) => {
+
+	const [activityIdToDelete, setActivityIdToDelete] = useState(null);
+	const [showDeleteActivityModal, setShowDeleteActivityModal] = useState(false)
+
+	const deleteActivityClickHandler = (activityId) => {
+		setActivityIdToDelete(activityId);
+		toggleDeleteActivityModal();
+	} 
+
+	const toggleDeleteActivityModal = () => {
+		setShowDeleteActivityModal(!showDeleteActivityModal);
+	}
+	
+	const onConfirmedDeleteActivity = () => {
+		//TODO remove console
+		console.log('activity Id confirmed to delete: ', activityIdToDelete);
+		
+		toggleDeleteActivityModal();
+		
+		//TODO: API call here
+	}
+
 	return (
 		<div className='activity-content h-100 py-0'>
+			{/**Delete activity confirmation modal */}
+      {showDeleteActivityModal && (
+        <MlModal
+          isOpen={showDeleteActivityModal}
+          textHead={""}
+          textBody={MODAL_MESSAGE.deleteActivityConfirmation}
+          handleSuccessBtn={onConfirmedDeleteActivity}
+          handleCrossBtn={toggleDeleteActivityModal}
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
+        />
+      )}
 			<SearchBar id='search' name='search' placeholder='Search' />
 			<div className='table-responsive'>
 				<Table striped className='table-log'>
@@ -53,7 +89,7 @@ const ActivityComponent = (props) => {
 								</td>
 								<td className='td-actions'>
 									<ButtonIcon size={28} name='expand' />
-									<ButtonIcon size={28} name='trash' />
+									<ButtonIcon size={28} name='trash' onClick={() => deleteActivityClickHandler(experiment.id)}/>
 								</td>
 							</tr>
 						))}
