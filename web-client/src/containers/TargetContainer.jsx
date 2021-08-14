@@ -143,6 +143,14 @@ const TargetContainer = (props) => {
     [selectedTargetState]
   );
 
+  const onVolumeChange = useCallback((volume) => {
+    //save to local state
+    updateTargetState({
+      type: targetStateActions.ADD_VOLUME_VALUE,
+      value: volume,
+    });
+  }, []);
+
   const onThresholdChange = useCallback((selectedThreshold, index) => {
     // save to local state
     updateTargetState({
@@ -172,6 +180,8 @@ const TargetContainer = (props) => {
       selectedTargetState.get("targetList"),
       templateID
     );
+    //volume will be added to API call later.
+    const volume = selectedTargetState.get("volume");
     dispatch(saveTarget(templateID, checkedTargets, token));
   }, [selectedTargetState, templateID, dispatch]);
 
@@ -209,6 +219,7 @@ const TargetContainer = (props) => {
       onCheckedHandler={onCheckedHandler}
       onTargetSelect={onTargetSelect}
       onThresholdChange={onThresholdChange}
+      onVolumeChange={onVolumeChange}
       onSaveClick={onSaveClick}
       isLoginTypeAdmin={isLoginTypeAdmin}
       isLoginTypeOperator={isLoginTypeOperator}

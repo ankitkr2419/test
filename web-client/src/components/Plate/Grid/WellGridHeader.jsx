@@ -16,7 +16,7 @@ const WellGridHeader = ({ className, isGroupSelectionOn, toggleMultiSelectOption
 			id="selection"
 			name="selection"
 			label="Group Selection to view graph"
-			value={isGroupSelectionOn}
+			checked={isGroupSelectionOn}
 			onChange={toggleMultiSelectOption}
 		/>
 	</StyledWellGridHeader>

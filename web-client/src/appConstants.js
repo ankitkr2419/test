@@ -119,6 +119,8 @@ export const API_ENDPOINTS = {
 };
 
 export const MODAL_MESSAGE = {
+  abortExpInfo: "Can't log out while experiment is still running.",
+  abortExpWarning: "Are you sure you want to abort experiment?",
   setPosition: "Please check the position of tip and magnet!",
   homingConfirmation: "Homing Confirmation",
   experimentSuccess: "Experiment was successful",
@@ -131,6 +133,9 @@ export const MODAL_MESSAGE = {
   deleteProcessConfirmation: "Are you sure you want to delete this process?",
   deleteRecipeConfirmation: "Are you sure you want to delete this recipe?",
   exitConfirmation: "Are you sure you want to exit?",
+  deleteTemplateConfirmation: "Are you sure you want to delete this template?",
+  deleteStepConfirmation: "Are you sure you want to delete this step?",
+  deleteActivityConfirmation: "Are you sure you want to delete this activity?",
 };
 
 export const MODAL_BTN = {
@@ -139,6 +144,7 @@ export const MODAL_BTN = {
   next: "Next",
   yes: "Yes",
   no: "No",
+  viewResults: "View Results",
   complete: "Complete",
 };
 
@@ -414,3 +420,6 @@ export const timeConstants = {
   SEC_IN_ONE_HOUR: 3600,
   MIN_IN_ONE_HOUR: 60,
 };
+
+//constants for RTPCR
+export const MAX_NO_OF_WELLS = 96; // TODO: change to 16 after new UI.

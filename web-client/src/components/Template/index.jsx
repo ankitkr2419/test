@@ -10,6 +10,8 @@ import {
   ImageIcon,
 } from "shared-components";
 import imgNoTemplate from "assets/images/no-template-available.svg";
+import MlModal from "shared-components/MlModal";
+import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 
 const TemplateComponent = (props) => {
   const {
@@ -27,10 +29,26 @@ const TemplateComponent = (props) => {
 
   // Local state to store template name
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
+  const [showDeleteTemplateModal, setShowDeleteTemplateModal] = useState(false);
 
-  const deleteClickHandler = () => {
+  const deleteClickHandler = (e) => {
+    e.stopPropagation();
+    toggleDeleteTemplateModal();
+  };
+
+  const toggleDeleteTemplateModal = () => {
+    //if we are hiding delete modal, then clear selected template data to hide edit/delete buttons
+    if (showDeleteTemplateModal) {
+      setSelectedTemplateId(null);
+    }
+    //update state to toggle delete confirmation modal
+    setShowDeleteTemplateModal(!showDeleteTemplateModal);
+  };
+
+  const onConfirmedDeleteTemplate = () => {
     // Delete api call
     deleteTemplate(selectedTemplateId);
+    toggleDeleteTemplateModal();
   };
 
   const editClickHandler = () => {
@@ -95,6 +113,19 @@ const TemplateComponent = (props) => {
             No templates available
           </Text>
         </Center>
+      )}
+
+      {/**Delete template confirmation modal */}
+      {showDeleteTemplateModal && (
+        <MlModal
+          isOpen={showDeleteTemplateModal}
+          textHead={""}
+          textBody={MODAL_MESSAGE.deleteTemplateConfirmation}
+          handleSuccessBtn={onConfirmedDeleteTemplate}
+          handleCrossBtn={toggleDeleteTemplateModal}
+          successBtn={MODAL_BTN.yes}
+          failureBtn={MODAL_BTN.no}
+        />
       )}
 
       {/* templates size check before iteration */}

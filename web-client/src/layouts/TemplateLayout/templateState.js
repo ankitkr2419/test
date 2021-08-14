@@ -6,6 +6,7 @@ export const templateLayoutActions = {
   SET_ACTIVE_WIDGET: "SET_ACTIVE_WIDGET",
   SET_TEMPLATE_ID: "SET_TEMPLATE_ID",
   SET_STAGE_ID: "SET_STAGE_ID",
+  SET_LID_TEMPERATURE: "SET_LID_TEMPERATURE",
   RESET_WIZARD_LIST: "RESET_WIZARD_LIST",
 };
 
@@ -16,6 +17,7 @@ export const templateInitialState = fromJS({
   // Pre-filled template initial list with saved wizard list
   wizardList,
   templateID: null,
+  lidTemperature: null,
 });
 
 // getUpdateList will update all disabled to true and set false to selected wizard
@@ -52,6 +54,8 @@ const templateLayoutReducer = (state, action) => {
       return state.set("wizardList", fromJS(wizardList));
     case templateLayoutActions.SET_TEMPLATE_ID:
       return state.setIn(["templateID"], action.value);
+    case templateLayoutActions.SET_LID_TEMPERATURE:
+      return state.setIn(["lidTemperature"], action.value);
     default:
       throw new Error("Invalid action type");
   }
