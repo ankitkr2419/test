@@ -7,6 +7,7 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { useSelector, useDispatch } from "react-redux";
 import { saveReportInitiated } from "action-creators/reportActionCreators";
+import { graphs } from "components/Plate/plateConstant";
 
 const PreviewReportModal = (props) => {
   const dispatch = useDispatch();
@@ -138,7 +139,7 @@ const PreviewReportModal = (props) => {
         {/** temp graph */}
         <Text className="font-weight-bold text-center mb-4">Temperature</Text>
         <ExperimentGraphContainer
-          showTempGraph={true}
+          activeGraph={graphs.Temperature}
           isInsidePreviewModal={true}
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
@@ -156,7 +157,7 @@ const PreviewReportModal = (props) => {
         {/** amplification graph */}
         <Text className="font-weight-bold text-center mb-4">Amplification</Text>
         <ExperimentGraphContainer
-          showTempGraph={false}
+          activeGraph={graphs.Amplification}
           isInsidePreviewModal={true}
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}

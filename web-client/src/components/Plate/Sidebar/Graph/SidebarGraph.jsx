@@ -4,11 +4,13 @@ import { getXAxis } from "selectors/wellGraphSelector";
 import TemperatureGraphContainer from "containers/TemperatureGraphContainer";
 import WellGraph from "./WellGraph";
 import { EXPERIMENT_STATUS } from "appConstants";
+import { graphs } from "components/Plate/plateConstant";
+import AnalyseDataGraphContainer from "containers/AnalyseDataGraphContainer";
 
 const SidebarGraph = (props) => {
   const {
     headerData,
-    showTempGraph,
+    activeGraph,
     lineChartData,
     onThresholdChangeHandler,
     toggleGraphFilterActive,
@@ -54,8 +56,8 @@ const SidebarGraph = (props) => {
 
   return (
     <>
-      {/* show the well data graph if showTempGraph flag is off */}
-      {!showTempGraph && (
+      {/* show the well data graph */}
+      {activeGraph === graphs.Amplification && (
         <WellGraph
           data={data}
           headerData={headerData}
@@ -71,8 +73,11 @@ const SidebarGraph = (props) => {
           isInsidePreviewModal={isInsidePreviewModal}
         />
       )}
-      {/* show temperature graph if showTempGraph flag is on */}
-      {showTempGraph && <TemperatureGraphContainer />}
+      {/* show temperature graph */}
+      {activeGraph === graphs.Temperature && <TemperatureGraphContainer />}
+
+      {/** show analyse data graph */}
+      {activeGraph === graphs.AnalyseData && <AnalyseDataGraphContainer />}
     </>
   );
 };

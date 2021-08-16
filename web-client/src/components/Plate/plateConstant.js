@@ -7,3 +7,9 @@ export const taskOptions = [
 	{ label: 'PC', value: 'PC' },
 	{ label: 'NTC', value: 'NTC' },
 ];
+
+export const graphs = {
+  Amplification: 1,
+  Temperature: 2,
+  AnalyseData: 3,
+};

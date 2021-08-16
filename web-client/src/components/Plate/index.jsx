@@ -19,6 +19,7 @@ import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
+import { graphs } from "./plateConstant";
 
 const Plate = (props) => {
   const {
@@ -49,8 +50,8 @@ const Plate = (props) => {
   // local state to maintain well data which is selected for updation
   const [updateWell, setUpdateWell] = useState(null);
 
-  // local state to toggle between emission graph and temperature graph
-  const [showTempGraph, setShowTempGraph] = useState(false);
+  // local state to maintain active graph
+  const [activeGraph, setActiveGraph] = useState(graphs.Amplification);
 
   // local state to manage toggling of graphSidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -112,8 +113,10 @@ const Plate = (props) => {
   };
 
   // helper function to toggle the graphs
-  const toggleTempGraphSwitch = (graphType) => {
-    setShowTempGraph(graphType === "temperature");
+  const onChangeActiveGraph = (graphType) => {
+    if(activeGraph !== graphType) {
+      setActiveGraph(graphType);
+    }
   };
 
   const togglePreviewReportModal = () => {
@@ -231,20 +234,28 @@ const Plate = (props) => {
               <div className="graph-wrapper flex-100 scroll-y">
                 <div className="d-flex align-items-center mb-3">
                   <Button
-                    outline={showTempGraph}
-                    color={!showTempGraph ? "primary" : "secondary"}
+                    outline={activeGraph !== graphs.Amplification}
+                    color={activeGraph === graphs.Amplification ? "primary" : "secondary"}
                     className="mr-3 Amplification"
-                    onClick={() => toggleTempGraphSwitch("amplification")}
+                    onClick={() => onChangeActiveGraph(graphs.Amplification)}
                   >
                     Amplification
                   </Button>
                   <Button
-                    outline={!showTempGraph}
-                    color={showTempGraph ? "primary" : "secondary"}
-                    className="Temperature"
-                    onClick={() => toggleTempGraphSwitch("temperature")}
+                    outline={activeGraph !== graphs.Temperature}
+                    color={activeGraph === graphs.Temperature ? "primary" : "secondary"}
+                    className="mr-3 Temperature"
+                    onClick={() => onChangeActiveGraph(graphs.Temperature)}
                   >
                     Temperature
+                  </Button>
+                  <Button
+                    outline={activeGraph !== graphs.AnalyseData}
+                    color={activeGraph === graphs.AnalyseData ? "primary" : "secondary"}
+                    className="mr-3 AnalyseData"
+                    onClick={() => onChangeActiveGraph(graphs.AnalyseData)}
+                  >
+                    Analyse Data
                   </Button>
                   <ButtonIcon
                     name="published"
@@ -264,7 +275,7 @@ const Plate = (props) => {
                   isInsidePreviewModal={false}
                   experimentId={experimentId}
                   headerData={headerData}
-                  showTempGraph={showTempGraph}
+                  activeGraph={activeGraph}
                   experimentStatus={experimentStatus}
                   isSidebarOpen={isSidebarOpen}
                   setIsSidebarOpen={setIsSidebarOpen}
@@ -276,19 +287,6 @@ const Plate = (props) => {
           </TabPane>
         </TabContent>
       </GridWrapper>
-      {/* <SampleSideBarContainer
-        experimentId={experimentId}
-        positions={positions}
-        experimentTargetsList={experimentTargetsList}
-        updateWell={updateWell}
-      />
-      <ExperimentGraphContainer
-        experimentStatus={experimentStatus}
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        resetSelectedWells={resetSelectedWells}
-        isMultiSelectionOptionOn={isMultiSelectionOptionOn}
-      /> */}
     </div>
   );
 };
