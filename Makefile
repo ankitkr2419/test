@@ -28,3 +28,6 @@ build-and-zip: build zip
 
 migrate:
 	utils/db-migrate.sh
+
+upgrade-tec-api:
+	utils/upgrade-tec-api.sh
