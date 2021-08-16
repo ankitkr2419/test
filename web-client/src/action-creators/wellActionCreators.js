@@ -71,3 +71,10 @@ export const resetMultiSelectedWells = () => ({
 export const toggleMultiSelectOption = () => ({
   type: listWellActions.toggleMultiSelectOption,
 });
+
+export const selectAllWellsOption = (isAllWellsSelected) => ({
+  type: listWellActions.selectAllWellsOption,
+  payload: {
+    isAllWellsSelected,
+  },
+});

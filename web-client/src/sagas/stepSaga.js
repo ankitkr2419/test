@@ -120,7 +120,9 @@ export function* deleteStep(actions) {
         reqPath: `steps/${stepId}`,
         successAction,
         failureAction,
-        token
+        token,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
       },
     });
   } catch (error) {
