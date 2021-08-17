@@ -35,6 +35,11 @@ export function* createExperiment(actions) {
 }
 
 export function* fetchExperiments(actions) {
+
+	const {
+		payload: { token },
+	} = actions;
+
 	const { successAction, failureAction } = listExperimentActions;
 	try {
 		yield call(callApi, {
@@ -43,6 +48,7 @@ export function* fetchExperiments(actions) {
 				reqPath: 'experiments',
 				successAction,
 				failureAction,
+				token
 			},
 		});
 	} catch (error) {

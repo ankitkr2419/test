@@ -7,7 +7,13 @@ import { formikInitialState, getRequestBody, disbleApplyBtn } from "./helper";
 import { EXPERIMENT_STATUS } from "appConstants";
 
 const GraphRange = (props) => {
-  const { className, handleRangeChangeBtn, handleResetBtn, headerData } = props;
+  const {
+    className,
+    handleRangeChangeBtn,
+    handleResetBtn,
+    headerData,
+    isExpanded,
+  } = props;
 
   const { totalCycles, progressStatus } = headerData;
 
@@ -102,7 +108,7 @@ const GraphRange = (props) => {
           // outline
           className="mb-3 ml-3"
           onClick={() => handleRangeChangeBtn(getRequestBody(formik.values))}
-          disabled={disbleApplyBtn(formik.values, progressStatus)}
+          disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
           Apply
         </Button>
@@ -112,7 +118,7 @@ const GraphRange = (props) => {
           // outline
           className="mb-3 ml-3"
           onClick={handleResetBtn}
-          disabled={disbleApplyBtn(formik.values, progressStatus)}
+          disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
           Reset
         </Button>

@@ -7,3 +7,9 @@ export const updateGraphActions = {
   updateGraphSucceeded: "UPDATE_GRAPH_SUCCESS",
   updateGraphFailure: "UPDATE_GRAPH_FAILED",
 };
+
+export const resetGraphActions = {
+  resetGraphInitiated: "RESET_GRAPH_INITIATED",
+  resetGraphSucceeded: "RESET_GRAPH_SUCCESS",
+  resetGraphFailure: "RESET_GRAPH_FAILED",
+};

@@ -19,13 +19,14 @@ const StyledSubHeader = styled.div`
   }
 `;
 
-const SubHeader = props => {
+const SubHeader = (props) => {
   const {
     data,
     experimentTemplate,
     experimentStatus,
     experimentDetails,
-    temperatureData
+    temperatureData,
+    isExpanded,
   } = props;
 
   const { totalCycles, progressStatus, progress, remainingTime, totalTime } =
@@ -35,7 +36,7 @@ const SubHeader = props => {
   let temperature = 0;
   let cycleValue = 0;
 
-  const TEMP_ARR_LEN = temperatureData.length;
+  const TEMP_ARR_LEN = temperatureData?.length;
   if (TEMP_ARR_LEN > 0) {
     // temperatureData is an array, and this array gets updated everytime new data is pushed.
     // we need the latest index of array
@@ -47,7 +48,7 @@ const SubHeader = props => {
   }
 
   const { templateName } = experimentTemplate;
-  const { start_time, end_time, well_count } = experimentDetails.toJS();
+  const { start_time, end_time, well_count } = experimentDetails;
 
   let totalHours = 0;
   let totalMins = 0;
@@ -133,7 +134,7 @@ const SubHeader = props => {
               </Text>
             )
           ))}
-        {experimentStatus === EXPERIMENT_STATUS.success && (
+        {(isExpanded === true || experimentStatus === EXPERIMENT_STATUS.success) && (
           <div className="d-flex align-items-center ml-auto">
             <Text Tag="h6" className="mb-0 ml-5">
               {formatDate(start_time)}
@@ -154,9 +155,9 @@ const SubHeader = props => {
 SubHeader.propTypes = {
   experimentTemplate: PropTypes.shape({
     templateId: PropTypes.string,
-    templateName: PropTypes.string
+    templateName: PropTypes.string,
   }).isRequired,
-  isExperimentSucceeded: PropTypes.bool
+  isExperimentSucceeded: PropTypes.bool,
 };
 
 export default SubHeader;

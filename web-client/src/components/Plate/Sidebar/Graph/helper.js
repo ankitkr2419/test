@@ -14,8 +14,13 @@ export const getRequestBody = (state) => ({
   yMin: state.yMin.value,
 });
 
-export const disbleApplyBtn = (state, status) => {
+export const disbleApplyBtn = (state, status, isExpanded) => {
   const { xMax, xMin, yMax, yMin } = state;
+
+  if (isExpanded === true) {
+    return false;
+  }
+
   return (
     xMax.isInvalid ||
     xMin.isInvalid ||

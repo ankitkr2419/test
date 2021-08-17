@@ -21,6 +21,7 @@ const SidebarGraph = (props) => {
     handleResetBtn,
     isInsidePreviewModal,
     isDataFromAPI,
+    isExpanded,
   } = props;
 
   let cyclesCount = 0;
@@ -69,6 +70,7 @@ const SidebarGraph = (props) => {
           handleResetBtn={handleResetBtn}
           experimentStatus={experimentStatus}
           isInsidePreviewModal={isInsidePreviewModal}
+          isExpanded={isExpanded}
         />
       )}
       {/* show temperature graph if showTempGraph flag is on */}

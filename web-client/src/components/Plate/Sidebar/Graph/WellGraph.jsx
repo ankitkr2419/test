@@ -89,6 +89,7 @@ const WellGraph = (props) => {
     handleRangeChangeBtn,
     handleResetBtn,
     isInsidePreviewModal,
+    isExpanded,
   } = props;
 
   return (
@@ -109,6 +110,7 @@ const WellGraph = (props) => {
           handleRangeChangeBtn={handleRangeChangeBtn}
           handleResetBtn={handleResetBtn}
           headerData={headerData}
+          isExpanded
         />
       )}
 

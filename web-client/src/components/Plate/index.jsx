@@ -39,12 +39,21 @@ const Plate = (props) => {
     temperatureData,
     mailBtnHandler,
     token,
+    isExpanded,
   } = props;
 
   // getExperimentStatus will return us current experiment status
   const runExperimentDetails = useSelector(getRunExperimentReducer);
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
+
   const experimentStatus = runExperimentDetails.get("experimentStatus");
-  const experimentDetails = runExperimentDetails.get("data");
+
+  let experimentDetails =
+    isExpanded === true
+      ? createExperimentReducer.toJS()
+      : runExperimentDetails.get("data").toJS();
 
   // local state to maintain well data which is selected for updation
   const [updateWell, setUpdateWell] = useState(null);
@@ -77,9 +86,13 @@ const Plate = (props) => {
     const { isSelected, isWellFilled, isMultiSelected } = well.toJS();
     /**
      * if well is not filled and if multi selection option is not checked
-     * 				then we can make well selected
+     * 				then we can make well selected and isExpanded === false
      */
-    if (isMultiSelectionOptionOn === false && isWellFilled === false) {
+    if (
+      isMultiSelectionOptionOn === false &&
+      isWellFilled === false &&
+      isExpanded === false
+    ) {
       setSelectedWell(index, !isSelected);
     }
 
@@ -149,6 +162,7 @@ const Plate = (props) => {
         experimentDetails={experimentDetails}
         experimentId={experimentId}
         temperatureData={temperatureData}
+        isExpanded={isExpanded}
       />
       <GridWrapper className="plate-body flex-100 scroll-y">
         <Nav className="plate-nav-tabs border-0" tabs>
@@ -172,7 +186,8 @@ const Plate = (props) => {
                 !(
                   experimentStatus === EXPERIMENT_STATUS.success ||
                   experimentStatus === EXPERIMENT_STATUS.running ||
-                  experimentStatus === EXPERIMENT_STATUS.stopped
+                  experimentStatus === EXPERIMENT_STATUS.stopped ||
+                  isExpanded === true
                 )
               }
             >
@@ -206,11 +221,13 @@ const Plate = (props) => {
                     isGroupSelectionOn={isMultiSelectionOptionOn}
                     toggleMultiSelectOption={toggleMultiSelectOption}
                     experimentStatus={experimentStatus}
+                    isExpanded={isExpanded}
                   />
                   <SelectAllGridHeader
                     isAllWellsSelected={isAllWellsSelected}
                     toggleAllWellSelectedOption={toggleAllWellSelectedOption}
                     experimentStatus={experimentStatus}
+                    isExpanded={isExpanded}
                   />
                 </div>
                 <GridComponent
@@ -222,6 +239,7 @@ const Plate = (props) => {
                   onWellUpdateClickHandler={onWellUpdateClickHandler}
                   showGraphOfWell={showGraphOfWell}
                   experimentStatus={experimentStatus}
+                  isExpanded={isExpanded}
                 />
               </div>
             </div>
@@ -270,6 +288,7 @@ const Plate = (props) => {
                   setIsSidebarOpen={setIsSidebarOpen}
                   resetSelectedWells={resetSelectedWells}
                   isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+                  isExpanded={isExpanded}
                 />
               </div>
             </div>

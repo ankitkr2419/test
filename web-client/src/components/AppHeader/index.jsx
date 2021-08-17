@@ -61,6 +61,9 @@ const AppHeader = (props) => {
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
   const wellListReducer = useSelector(getWells);
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
 
   const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -68,6 +71,7 @@ const AppHeader = (props) => {
   const isExperimentStopped = experimentStatus === EXPERIMENT_STATUS.stopped;
   const isRunFailed = experimentStatus === EXPERIMENT_STATUS.runFailed;
   const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
+  const isExpanded = createExperimentReducer.get("isExpanded");
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
@@ -157,7 +161,9 @@ const AppHeader = (props) => {
 		and activity log. Also user can't navigate to plate directly from templates route
 		without selecting a template. isTemplateRoute is true untill user selects a template */
       case "/plate":
-        if (isLoginTypeAdmin === true || isTemplateRoute === true) {
+        if (isLoginTypeAdmin === false && isExpanded === true) {
+          return false;
+        } else if (isLoginTypeAdmin === true || isTemplateRoute === true) {
           return true;
         }
         return false;
@@ -302,9 +308,9 @@ const AppHeader = (props) => {
                     <Button
                       color={isExperimentSucceeded ? "primary" : "secondary"}
                       size="sm"
-                      className={`font-weight-light border-2 border-gray shadow-none  mr-3 ${
-                        isExperimentSucceeded ? "d-none" : ""
-                      }`}
+                      className={`font-weight-light border-2 border-gray shadow-none  mr-3 
+                      ${(/*isExperimentSucceeded ||  */ isExpanded) ? "d-none" : ""}`
+                      }
                       onClick={() => setAbortModalVisibility(true)}
                       disabled={!isExperimentRunning}
                     >
@@ -314,7 +320,7 @@ const AppHeader = (props) => {
                       color={isExperimentRunning ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none ${
-                        isExperimentSucceeded ? "d-none" : ""
+                        (/* isExperimentSucceeded || */ isExpanded) ? "d-none" : ""
                       }`}
                       outline={
                         isExperimentRunning === false &&
@@ -332,9 +338,8 @@ const AppHeader = (props) => {
                     <Button
                       color="success"
                       size="sm"
-                      className={`font-weight-light border-2 border-gray shadow-none ${
-                        isExperimentSucceeded ? "" : "d-none"
-                      }`}
+                      className={`font-weight-light border-2 border-gray shadow-none`} 
+                      // ${(/*isExperimentSucceeded*/) ? "" : "d-none"}`}
                       onClick={() => setExpSuccessModalVisibility(true)}
                     >
                       Result - Successful

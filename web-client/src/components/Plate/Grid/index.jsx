@@ -1,8 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { YCoordinates, XCoordinates } from "components/Plate/plateConstant";
-import Coordinate from "./Coordinate";
-import CoordinateItem from "./CoordinateItem";
 import WellGrid from "./WellGrid";
 import Well from "./Well";
 import WellPopover from "./WellPopover";
@@ -15,6 +12,7 @@ const GridComponent = ({
   isGroupSelectionOn,
   showGraphOfWell,
   experimentStatus,
+  isExpanded,
 }) => (
   <div className="d-flex flex-column flex-100 pt-4">
     {/* <Coordinate direction="horizontal">
@@ -61,7 +59,8 @@ const GridComponent = ({
                   isWellFilled === false &&
                   (experimentStatus === EXPERIMENT_STATUS.success ||
                     experimentStatus === EXPERIMENT_STATUS.running ||
-                    experimentStatus === EXPERIMENT_STATUS.stopped)
+                    experimentStatus === EXPERIMENT_STATUS.stopped ||
+                    isExpanded === true)
                 }
                 position={index}
               />
@@ -79,6 +78,7 @@ const GridComponent = ({
                   }}
                   showGraphOfWell={showGraphOfWell}
                   experimentStatus={experimentStatus}
+                  isExpanded={isExpanded}
                 />
               )}
             </>

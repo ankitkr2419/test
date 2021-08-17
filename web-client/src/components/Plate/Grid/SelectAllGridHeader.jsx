@@ -15,6 +15,7 @@ const SelectAllGridHeader = ({
   isAllWellsSelected,
   toggleAllWellSelectedOption,
   experimentStatus,
+  isExpanded,
 }) => (
   <StyledSelectAllGridHeader className={className}>
     <Switch
@@ -26,7 +27,8 @@ const SelectAllGridHeader = ({
       disabled={
         experimentStatus === EXPERIMENT_STATUS.success ||
         experimentStatus === EXPERIMENT_STATUS.running ||
-        experimentStatus === EXPERIMENT_STATUS.stopped
+        experimentStatus === EXPERIMENT_STATUS.stopped ||
+        isExpanded === true
       }
     />
   </StyledSelectAllGridHeader>

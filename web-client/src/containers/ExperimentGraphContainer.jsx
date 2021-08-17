@@ -8,9 +8,8 @@ import { updateExperimentTargetFilters } from "action-creators/experimentTargetA
 import { EXPERIMENT_STATUS } from "appConstants";
 import { parseFloatWrapper } from "utils/helpers";
 import { isAnyThresholdInvalid } from "components/Target/targetHelper";
-import { getTemperatureChartData } from "selectors/temperatureGraphSelector";
-import { expandLogInitiated } from "action-creators/activityLogActionCreators";
 import {
+  resetGraphInitiated,
   updateGraphInitiated,
   wellGraphSucceeded,
 } from "action-creators/wellGraphActionCreators";
@@ -27,6 +26,7 @@ const ExperimentGraphContainer = (props) => {
     isMultiSelectionOptionOn,
     resetSelectedWells,
     isInsidePreviewModal,
+    isExpanded,
   } = props;
   const dispatch = useDispatch();
 
@@ -105,10 +105,9 @@ const ExperimentGraphContainer = (props) => {
 
   const handleResetBtn = () => {
     setDataFromAPI(false);
-    
+
     dispatch(
-      updateGraphInitiated({
-        query: "",
+      resetGraphInitiated({
         experimentId: experimentId,
         token: token,
       })
@@ -133,6 +132,7 @@ const ExperimentGraphContainer = (props) => {
       handleResetBtn={handleResetBtn}
       isInsidePreviewModal={isInsidePreviewModal}
       isDataFromAPI={isDataFromAPI}
+      isExpanded={isExpanded}
     />
   );
 };
