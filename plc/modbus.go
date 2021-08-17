@@ -93,8 +93,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		104: uint16(0x0868), // Restart Cycle (if rebooted during a run! (R)
 		105: uint16(0x0869), // Signal Error (R)
 		106: uint16(0x086A), // Well Emmission register data  ON: PLC write & OFF: Read (RW)
-		107: uint16(0x086B), // Cycle completed (R)
-		109: uint16(0x086D), // Lid Heating On (W)
+		133: uint16(0x0885), // Cycle completed (R)
+		197: uint16(0x08C5), // Lid Heating On (W)
 	},
 }
 
