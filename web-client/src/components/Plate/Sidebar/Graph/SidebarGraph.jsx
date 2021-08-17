@@ -40,7 +40,7 @@ const SidebarGraph = (props) => {
 
   // if data is fetched from API, then keep xAxis labels same as fetched.
   // Also we hide threshold, that is, remove the last objects from data array.
-  if (isDataFromAPI === true) {
+  if (lineChartData && lineChartData.size !== 0 && isDataFromAPI === true) {
     xAxisLabels = lineChartData?.first().cycles.toJS();
 
     chartData = chartData.filter(
