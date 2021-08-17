@@ -348,6 +348,7 @@ int autoTune(){
 int resetDevice(){
     if (MeCom_ResetDevice(Address)){
         printf("TEC Reset SUCCESS");
+        initiateTEC();
     } else {
         printf("TEC Reset FAIL");
         return -1;
