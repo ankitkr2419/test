@@ -250,7 +250,7 @@ func (d *Compact32) Cycle() (err error) {
 		return
 	}
 	logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
-	err = plc.HoldSleep(15)
+	err = plc.HoldSleep(int32(config.GetCycleTime()))
 	if err != nil {
 		logger.Errorln("Error while running cycle: ", err)
 		return
@@ -335,10 +335,10 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		}
 	}
 	if plc.DataCapture {
-		start := 800
+		base := 800
 		var data []byte
-		for i := 0; i < 6; i++ {
-			start = start + (16 * i)
+		for i := 0; i < 4; i++ {
+			start := base + i*16
 			data, err = d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
 			if err != nil {
 				logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")
@@ -399,7 +399,7 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 	plc.CurrentLidTemp = float32(currentLidTemp) / 10
 
 	// Start Lid Heating
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.ON)
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][197], plc.ON)
 	if err != nil {
 		logger.Errorln("WriteSingleCoil:M109 : Start Lid Heating")
 		return
@@ -467,7 +467,7 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 
 func (d *Compact32) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][109], plc.OFF)
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][197], plc.OFF)
 	if err != nil {
 		logger.Errorln("Stop Lid Heating error")
 		return
