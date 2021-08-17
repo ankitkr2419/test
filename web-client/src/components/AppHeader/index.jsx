@@ -34,7 +34,7 @@ import {
   ROUTES,
   TOAST_MESSAGE,
 } from "appConstants";
-import { NAV_ITEMS } from "./constants";
+import { NAV_ITEMS, getBtnPropObj } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
 import { useHistory } from "react-router";
@@ -72,6 +72,8 @@ const AppHeader = (props) => {
   const isRunFailed = experimentStatus === EXPERIMENT_STATUS.runFailed;
   const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
   const isExpanded = createExperimentReducer.get("isExpanded");
+  const result = createExperimentReducer.get("result");
+  const btnProps = getBtnPropObj(result);
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
@@ -90,13 +92,6 @@ const AppHeader = (props) => {
       setExpSuccessModalVisibility(true);
     }
   }, [isExperimentSucceeded]);
-
-  // useEffect(() => {
-  //   if (isExperimentStopped === true) {
-  //     // disConnectSocket();
-  //     dispatch(loginReset());
-  //   }
-  // }, [isExperimentStopped, dispatch]);
 
   // logout user
   const logoutClickHandler = () => {
@@ -309,8 +304,11 @@ const AppHeader = (props) => {
                       color={isExperimentSucceeded ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none  mr-3 
-                      ${(/*isExperimentSucceeded ||  */ isExpanded) ? "d-none" : ""}`
-                      }
+                      ${
+                        /*isExperimentSucceeded ||  */ isExpanded
+                          ? "d-none"
+                          : ""
+                      }`}
                       onClick={() => setAbortModalVisibility(true)}
                       disabled={!isExperimentRunning}
                     >
@@ -320,7 +318,9 @@ const AppHeader = (props) => {
                       color={isExperimentRunning ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none ${
-                        (/* isExperimentSucceeded || */ isExpanded) ? "d-none" : ""
+                        /* isExperimentSucceeded || */ isExpanded
+                          ? "d-none"
+                          : ""
                       }`}
                       outline={
                         isExperimentRunning === false &&
@@ -336,13 +336,13 @@ const AppHeader = (props) => {
                       Run
                     </Button>
                     <Button
-                      color="success"
+                      color={btnProps.color}
                       size="sm"
-                      className={`font-weight-light border-2 border-gray shadow-none`} 
+                      className={`font-weight-light border-2 border-gray shadow-none`}
                       // ${(/*isExperimentSucceeded*/) ? "" : "d-none"}`}
                       onClick={() => setExpSuccessModalVisibility(true)}
                     >
-                      Result - Successful
+                      {btnProps.msg}
                     </Button>
                   </div>
                 )}
