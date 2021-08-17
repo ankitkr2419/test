@@ -274,6 +274,61 @@ func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets 
 
 }
 
+func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, tCycles uint16, tc ThresholdCals) (graphResult []byte, err error) {
+
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching result data")
+		return
+	}
+
+	var wellTargets []db.WellTarget
+	for _, i := range wells {
+		wellTarget, err := deps.Store.GetWellTarget(context.Background(), i, experimentID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching well targets")
+		}
+		wellTargets = append(wellTargets, wellTarget...)
+	}
+
+	dbWells, err := deps.Store.ListWells(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching data")
+		// send error
+		deps.WsErrCh <- err
+		return
+	}
+	wellTarget := make([]db.WellTarget, 0)
+	if len(DBResult) > 0 {
+		for _, v := range targets {
+			if tc.AutoThreshold {
+				targetThreshold := getAutoThreshold(DBResult, wells, targets, tCycles)
+				for i, tl := range targetThreshold {
+					if i.TargetID == v.TargetID {
+						v.Threshold = tl
+					}
+				}
+			}
+			// analyseResult returns data required for ploting graph
+			wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
+		}
+	}
+	_, err = deps.Store.UpsertWellTargets(context.Background(), wellTarget, experimentID, false)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error upserting well target data")
+		return
+	}
+
+	experimentValues.experimentID = experimentID
+	graphResult, err = getColorCodedWells(deps)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
+		return
+	}
+
+	return
+}
+
 func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 
 	// list wells from DB
