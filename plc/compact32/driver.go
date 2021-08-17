@@ -335,9 +335,9 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 		}
 	}
 	if plc.DataCapture {
-		start := 44
+		start := 800
 		var data []byte
-		for i := 0; i < 2; i++ {
+		for i := 0; i < 6; i++ {
 			start = start + (16 * i)
 			data, err = d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
 			if err != nil {
@@ -350,9 +350,9 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 			// 	break LOOP
 			// }
 			offset := 0 // offset of data. increment every 2 bytes!
-			for j := 0; j < 4; j++ {
+			for j := 0; j < 16; j++ {
 				scan.Wells[j][i] = binary.BigEndian.Uint16(data[offset : offset+2])
-				offset += 8
+				offset += 2
 			}
 		}
 		scan.Cycle = plc.CurrentCycle
