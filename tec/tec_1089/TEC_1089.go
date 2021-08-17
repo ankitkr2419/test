@@ -1,8 +1,17 @@
 package tec_1089
 
 /*
+typedef struct Config
+{
+    float CurrentLimitation;
+    float VoltageLimitation;
+    float CurrentErrorThreshold;
+    float VoltageErrorThreshold;
+    float PeltierMaxCurrent;
+    float PeltierDeltaTemperature;
+} Config;
 int setTempAndRamp(double, double);
-int initiateTEC();
+int initiateTEC(Config);
 int checkForErrorState();
 int autoTune();
 int resetDevice();
@@ -65,7 +74,17 @@ var errorCheckStopped, tecInProgress bool
 var prevTemp float32 = 27.0
 
 func (t *TEC1089) InitiateTEC() (err error) {
-	C.initiateTEC()
+
+	cfg := C.struct_Config{}
+
+	cfg.CurrentLimitation = C.float(config.GetCurrentLimitation())
+	cfg.VoltageLimitation = C.float(config.GetVoltageLimitation())
+	cfg.CurrentErrorThreshold = C.float(config.GetCurrentErrorThreshold())
+	cfg.VoltageErrorThreshold = C.float(config.GetVoltageErrorThreshold()) 
+	cfg.PeltierMaxCurrent= C.float(config.GetPeltierMaxCurrent())
+	cfg.PeltierDeltaTemperature= C.float(config.GetPeltierDeltaTemperature())
+
+	C.initiateTEC(cfg)
 
 	go startErrorCheck()
 
@@ -118,7 +137,10 @@ func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
 	tecInProgress = true
+	logger.Warnln("TEC Start Time: ", time.Now())
 	tempVal := C.setTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	logger.Warnln("TEC End Time: ", time.Now())
+
 	tecInProgress = false
 	// Handle Failure, Try again 3 times in interval of 200ms
 	i := 0
