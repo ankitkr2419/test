@@ -26,6 +26,7 @@ redlowerlimit: 5
 redupperlimit: 25
 orangelowerlimit: 
 
+## For PLC
 # homing time in seconds
 homing_time: 15
 # homing_every_n_cycles 
@@ -38,3 +39,24 @@ cycle_time: 15
 pid_temp: 71
 # pid time
 pid_time: 30
+
+
+## For TEC
+# For TEC-1089
+CurrentLimitation: 4
+VoltageLimitation: 20
+CurrentErrorThreshold: 4.8
+VoltageErrorThreshold: 21
+PeltierMaxCurrent: 7
+PeltierDeltaTemperature: 75
+
+
+# For TEC-1090
+# CurrentLimitation: 6.5
+# VoltageLimitation: 28
+# CurrentErrorThreshold: 6.8
+# VoltageErrorThreshold: 30
+# PeltierMaxCurrent: 7
+# PeltierDeltaTemperature: 75
+# 
+
