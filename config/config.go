@@ -27,55 +27,6 @@ func Load(configFile string) {
 	viper.AutomaticEnv()
 }
 
-func AppName() string {
-	if appName == "" {
-		appName = ReadEnvString("APP_NAME")
-	}
-	return appName
-}
-
-func AppPort() int {
-	if appPort == 0 {
-		appPort = ReadEnvInt("APP_PORT")
-	}
-	return appPort
-}
-
-func ActiveWells(key string) (activeWells []int32) {
-	checkIfSet(key)
-	wells := viper.GetIntSlice(key)
-	for _, w := range wells {
-		activeWells = append(activeWells, int32(w))
-	}
-	return
-}
-
-func GetColorLimits(key string) uint16 {
-	checkIfSet(key)
-	return uint16(viper.GetInt(key))
-}
-
-func GetSecretKey() string {
-	key := "SECRET_KEY"
-	checkIfSet(key)
-	return viper.GetString(key)
-}
-func SetSecretKey(key string) {
-	key = "SECRET_KEY"
-	viper.Set(key, "123456qwerty")
-}
-func GetICPosition() int {
-	return ReadEnvInt("ic_position")
-}
-
-func GetHomingTime() int {
-	return ReadEnvInt("homing_time")
-}
-
-func GetRoomTemp() float64 {
-	return ReadEnvFloat("room_temp")
-}
-
 func ReadEnvInt(key string) int {
 	checkIfSet(key)
 	v, err := strconv.Atoi(viper.GetString(key))
@@ -120,7 +71,7 @@ func LoadAllConfs() {
 	Load("motor_config")
 
 	// config file to configure consumable distance
-	Load("consumable_config_v1_3")
+	Load("consumable_config_v1_4")
 
 	// config file to configure labware
 	Load("labware_config")

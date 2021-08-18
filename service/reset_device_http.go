@@ -10,11 +10,11 @@ func resetDeviceHandler(deps Dependencies) http.HandlerFunc {
 		var err error
 
 		err = deps.Tec.ResetDevice()
-		if err != nil{
+		if err != nil {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Reset Device success"} )
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Reset Device success"})
 	})
 }

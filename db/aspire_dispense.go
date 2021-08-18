@@ -217,7 +217,33 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 	// logging initialised db operation
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AspireDispenseInitialisedState)
 
-	result, err := s.db.Exec(
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.AspireDispenseUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+		logger.Infoln(responses.AspireDispenseUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AspireDispenseCompletedState)
+		return
+	}()
+
+	err = s.updateProcessName(ctx, tx, ad.ProcessID, AspireDispenseProcess, ad)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AspireDispenseUpdateNameError)
+		return
+	}
+
+	result, err := tx.Exec(
 		updateAspireDispenseQuery,
 		ad.Category,
 		ad.CartridgeType,
@@ -234,14 +260,6 @@ func (s *pgStore) UpdateAspireDispense(ctx context.Context, ad AspireDispense) (
 		time.Now(),
 		ad.ProcessID,
 	)
-	//logging error if there is any otherwise logging success
-	defer func() {
-		if err != nil {
-			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
-		} else {
-			go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AspireDispenseCompletedState)
-		}
-	}()
 
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error updating aspire dispense")

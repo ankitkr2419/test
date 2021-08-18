@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"math"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -79,7 +80,7 @@ func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 	for _, v := range wellFval {
 		row = append(row, v)
 	}
-	plc.AddRowToExcel(file, plc.RTPCRSheet, row)
+	db.AddRowToExcel(file, db.RTPCRSheet, row)
 
 	return
 }
@@ -205,6 +206,138 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 		}
 
 	}
+	return
+}
+
+func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []db.Well, wellTargets []db.WellTarget) []db.WellTarget {
+	logger.Infoln(DBWells)
+	for _, r := range result {
+		for i, t := range wellTargets {
+			for _, w := range DBWells {
+				if r.WellPosition == w.Position && r.TargetID == t.TargetID && w.Position == t.WellPosition {
+					if t.CT == "" && threshold <= float32(r.FValue) {
+						wellTargets[i].CT = strconv.Itoa(int(r.FValue))
+					} else if t.CT != "" && t.CT != undetermine && r.Threshold >= float32(r.FValue) {
+						// if ct value again crosses threshold then only set it as undertermine
+						wellTargets[i].CT = undetermine
+					}
+				}
+			}
+		}
+	}
+	// ex: for 8 active wells * 6 targets * no of cycle
+
+	return wellTargets
+}
+
+func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16) (thresholdLine map[db.TargetDetails]float32) {
+
+	formulaWellTarget := make(map[TargetWell]float32, cycles)
+	var finalSum float32
+	thresholdLine = make(map[db.TargetDetails]float32, len(targets))
+	// ex: for 8 active wells * 6 targets * no of cycle
+
+	for _, t := range targets {
+
+		var wellResult graph
+		var key TargetWell
+
+		wellResult.TargetID = t.TargetID
+		for _, aw := range wells {
+			var sum uint16
+			var avg, std float32
+			wellResult.WellPosition = aw
+			for _, r := range result {
+				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
+					sum = sum + r.FValue
+					wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
+				}
+			}
+			key = TargetWell{
+				Target: wellResult.TargetID,
+				Well:   wellResult.WellPosition,
+			}
+			avg = float32(sum / cycles)
+			std = calculateStandardDeviation(wellResult.FValue, avg)
+			formulaWellTarget[key] = avg + 10*std
+			wellResult.FValue = []float32{}
+		}
+
+		for _, v := range formulaWellTarget {
+			finalSum = finalSum + v
+		}
+
+		thresholdLine[t] = finalSum / float32(len(formulaWellTarget))
+	}
+
+	return
+}
+
+func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDetails, bl Baseline) (baselineValues []graph) {
+
+	var wellResult graph
+	var tempGraph []graph
+	// ex: for 8 active wells * 6 targets * no of cycle
+	var targetSum float32
+	targetAverage := make(map[uuid.UUID]float32, len(targets))
+	for _, t := range targets {
+
+		wellResult.TargetID = t.TargetID
+		for _, aw := range wells {
+			var sum uint16
+			var avg float32
+			wellResult.WellPosition = aw
+			for _, r := range result {
+				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
+					wellResult.ExperimentID = r.ExperimentID
+					wellResult.TargetID = r.TargetID
+					wellResult.Threshold = r.Threshold
+					wellResult.TotalCycles = bl.EndCycle
+					if r.Cycle <= bl.EndCycle && r.Cycle >= bl.StartCycle {
+						sum = sum + r.FValue
+						wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
+						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
+					}
+				}
+			}
+			avg = float32(sum / bl.EndCycle)
+			targetSum = targetSum + avg
+			logger.Infoln("targetSum", targetSum)
+			tempGraph = append(tempGraph, wellResult)
+			wellResult.Cycle = []uint16{}
+			wellResult.FValue = []float32{}
+		}
+
+		targetAverage[t.TargetID] = targetSum / float32(len(wells))
+		logger.Infoln("targetAvg", targetAverage)
+
+	}
+	for _, v := range tempGraph {
+		v.FValue = calculateBaselineValues(v.FValue, targetAverage[v.TargetID])
+		baselineValues = append(baselineValues, v)
+	}
+	return
+}
+
+func calculateBaselineValues(array []float32, average float32) (deviation []float32) {
+	for _, v := range array {
+		value := v - average
+		deviation = append(deviation, value)
+	}
+	return
+}
+
+func calculateStandardDeviation(array []float32, average float32) (deviation float32) {
+
+	var deviatedSum float32
+	for _, v := range array {
+		value := v - average
+		deviatedSum = deviatedSum + value*value
+	}
+
+	deviatedAverage := deviatedSum / float32(len(array)-1)
+
+	deviation = float32(math.Sqrt(float64(deviatedAverage)))
 	return
 }
 

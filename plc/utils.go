@@ -2,27 +2,16 @@ package plc
 
 import (
 	"context"
-	"fmt"
 	"mylab/cpagent/db"
-	"mylab/cpagent/responses"
 
-	"os"
 	"sync"
-	"time"
 
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	logger "github.com/sirupsen/logrus"
 )
 
 var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
 var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
-
-const (
-	TECSheet   = "tec"
-	RTPCRSheet = "rtpcr"
-	TempLogs   = "temperature logs"
-)
 
 type DeckNumber struct {
 	Deck   string
@@ -69,6 +58,12 @@ const (
 	minimumUVLightOnTime int64 = 2 * 60
 )
 
+// here we are hardcoding the shaker no in future this is to be fetched dynamically.
+// 3 is the value that needs to be passed for heating both the shakers.
+const (
+	shaker = uint16(3)
+)
+
 // Special Speeds
 const (
 	homingFastSpeed     = uint16(2000)
@@ -79,7 +74,6 @@ const (
 // Magnet States
 const (
 	detached = iota
-	semiDetached
 	attached
 )
 
@@ -97,9 +91,13 @@ const (
 
 var deckRecipe map[string]db.Recipe
 var deckProcesses map[string][]db.Process
-var wrotePulses, executedPulses, aborted, paused, homed sync.Map
+var wrotePulses, executedPulses, aborted, paused, homed, EngineerOrAdminLogged sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
+var pIDCalibrationInProgress sync.Map
+
+// tipHeight is the Height of tip from syringe's base
+var tipHeight map[string]float64
 
 // Special variables for both deck operation
 var BothDeckHomingInProgress bool
@@ -109,6 +107,7 @@ var homingPercent, currentProcess sync.Map
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
 func loadUtils() {
+
 	wrotePulses.Store(DeckA, uint16(0))
 	wrotePulses.Store(DeckB, uint16(0))
 	executedPulses.Store(DeckA, uint16(0))
@@ -133,9 +132,12 @@ func loadUtils() {
 	magnetState.Store(DeckB, detached)
 	syringeModuleState.Store(DeckA, OutDeck)
 	syringeModuleState.Store(DeckB, OutDeck)
-
 	homed.Store(DeckA, false)
 	homed.Store(DeckB, false)
+	pIDCalibrationInProgress.Store("A", false)
+	pIDCalibrationInProgress.Store("B", false)
+	EngineerOrAdminLogged.Store("A", false)
+	EngineerOrAdminLogged.Store("B", false)
 
 	deckRecipe = map[string]db.Recipe{
 		DeckA: db.Recipe{},
@@ -145,6 +147,11 @@ func loadUtils() {
 	deckProcesses = map[string][]db.Process{
 		DeckA: []db.Process{},
 		DeckB: []db.Process{},
+	}
+
+	tipHeight = map[string]float64{
+		DeckA: 0,
+		DeckB: 0,
 	}
 
 	BothDeckHomingInProgress = false
@@ -197,7 +204,7 @@ var Positions = map[DeckNumber]float64{
 
 var Motors = make(map[DeckNumber]map[string]uint16)
 var consDistance = make(map[string]float64)
-var tipstubes = make(map[string]map[string]interface{})
+var tipstubes = make(map[int64]map[string]interface{})
 var labwares = make(map[int]string)
 var cartridges = make(map[UniqueCartridge]map[string]float64)
 var Calibs = make(map[DeckNumber]float64)
@@ -229,11 +236,12 @@ func LoadAllPLCFuncs(store db.Storer) (err error) {
 	}
 
 	loadUtils()
+
 	return nil
 }
 
 func selectAllMotors(store db.Storer) (err error) {
-	allMotors, err := store.ListMotors()
+	allMotors, err := store.ListMotors(context.Background())
 	if err != nil {
 		return
 	}
@@ -269,7 +277,7 @@ func selectAllConsDistances(store db.Storer) (err error) {
 			Calibs[deckAndNumber] = cd.Distance
 		}
 	}
-	fmt.Println("Calibs:--->", Calibs)
+	logger.Infoln("Calibs:--->", Calibs)
 	return
 }
 
@@ -286,12 +294,14 @@ func selectAllTipsTubes(store db.Storer) (err error) {
 	}
 
 	for _, tiptube := range allTipsTubes {
-		tipstubes[tiptube.Name] = make(map[string]interface{})
-		tipstubes[tiptube.Name]["id"] = tiptube.ID
-		tipstubes[tiptube.Name]["type"] = tiptube.Type
-		tipstubes[tiptube.Name]["allowed_positions"] = tiptube.AllowedPositions
-		tipstubes[tiptube.Name]["volume"] = tiptube.Volume
-		tipstubes[tiptube.Name]["height"] = tiptube.Height
+		tipstubes[tiptube.ID] = make(map[string]interface{})
+		tipstubes[tiptube.ID]["name"] = tiptube.Name
+		tipstubes[tiptube.ID]["id"] = tiptube.ID
+		tipstubes[tiptube.ID]["type"] = tiptube.Type
+		tipstubes[tiptube.ID]["allowed_positions"] = tiptube.AllowedPositions
+		tipstubes[tiptube.ID]["volume"] = tiptube.Volume
+		tipstubes[tiptube.ID]["height"] = tiptube.Height
+		tipstubes[tiptube.ID]["tt_base"] = tiptube.TtBase
 	}
 	return
 }
@@ -340,110 +350,5 @@ func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *ui
 	} else {
 		*distanceToTravel *= -1
 		*direction = 0
-	}
-}
-
-func GetExcelFile(path, fileName string) (f *excelize.File) {
-	// logging output to file and console
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.MkdirAll(path, 0755)
-		// ignore error and try creating log output file
-	}
-
-	f = excelize.NewFile()
-
-	index := f.NewSheet(TECSheet)
-	f.NewSheet(RTPCRSheet)
-	f.NewSheet(TempLogs)
-	f.SetActiveSheet(index)
-	f.DeleteSheet("Sheet1")
-
-	f.NewStyle(`{"alignment":{"horizontal":"center"}]}`)
-	f.SetSheetFormatPr(RTPCRSheet, excelize.DefaultColWidth(25))
-	f.SetSheetFormatPr(TempLogs, excelize.DefaultColWidth(40))
-	f.SetSheetFormatPr(TECSheet, excelize.DefaultColWidth(40))
-
-	f.Path = fmt.Sprintf("%v/%s_%v.xlsx", path, fileName, time.Now().Unix())
-	logger.Infoln("file saved in path---------->", f.Path)
-
-	return
-}
-
-func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err error) {
-
-	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
-	rows, err := file.Rows(sheet)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
-	rowCount := 1
-	for rows.Next() {
-		rowCount = rowCount + 1
-	}
-
-	for i, v := range values {
-		cell, err := excelize.CoordinatesToCellName(i+1, rowCount)
-		if err != nil {
-			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		}
-		file.SetCellStyle(sheet, cell, cell, styleID)
-		file.SetCellValue(sheet, cell, v)
-
-	}
-
-	if err = file.SaveAs(file.Path); err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
-
-	return
-}
-
-func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{}, space int) {
-
-	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
-
-	rows, err := file.Rows(sheet)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
-	}
-	rowCount := 1
-	for rows.Next() {
-		rowCount = rowCount + 1
-	}
-	//first cell is always the start cell
-	startCell, err := excelize.CoordinatesToCellName(1, rowCount)
-	if err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-	}
-	file.SetCellValue(sheet, startCell, values[0])
-	j := 1
-	for i, v := range values {
-		if i == 0 {
-			continue
-		}
-		startCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
-		if err != nil {
-			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		}
-		logger.Println("cell, value---------------->", startCell, v)
-		file.SetCellStyle(sheet, startCell, startCell, styleID)
-		file.SetCellValue(sheet, startCell, v)
-
-		j = j + space - 1
-
-		endCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
-		if err != nil {
-			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		}
-		file.MergeCell(sheet, startCell, endCell)
-
-	}
-
-	if err = file.SaveAs(file.Path); err != nil {
-		logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
-		return
 	}
 }

@@ -94,7 +94,6 @@ const LoginComponent = (props) => {
 LoginComponent.propTypes = {
 	isAdminFormVisible: PropTypes.bool.isRequired,
 	setIsAdminFormVisibility: PropTypes.func.isRequired,
-	// loginAsOperator: PropTypes.func.isRequired,
 	loginAsAdmin: PropTypes.func.isRequired,
 	isLoginError: PropTypes.bool.isRequired,
 };

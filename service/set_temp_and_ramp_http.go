@@ -21,6 +21,6 @@ func setTempAndRampHandler(deps Dependencies) http.HandlerFunc {
 
 		go deps.Tec.SetTempAndRamp(t)
 
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Temp and Ramp set success"} )
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "Temp and Ramp set success"})
 	})
 }

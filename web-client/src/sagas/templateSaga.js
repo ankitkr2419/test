@@ -39,10 +39,6 @@ export function* createTemplate(actions) {
   }
 }
 
-// function* createTemplateSuccess() {
-//   //   yield put(fetchTemplatesActions());
-// }
-
 export function* fetchTemplates(actions) {
   const {
     payload: { token },
@@ -116,10 +112,6 @@ export function* deleteTemplate(actions) {
 
 export function* createTemplateSaga() {
   yield takeEvery(createTemplateActions.createAction, createTemplate);
-}
-
-export function* createTemplateSuccessSaga() {
-  // yield takeEvery(createTemplateActions.successAction, createTemplateSuccess);
 }
 
 export function* fetchTemplatesSaga() {

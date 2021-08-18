@@ -44,6 +44,7 @@ const (
 
 var templateRunSuccess bool
 var expStartTime time.Time
+
 // TODO: Don't allow Template Update/Deletion if this Template is in Progress
 var currentExpTemplate db.Template
 
@@ -208,6 +209,14 @@ func MD5Hash(s string) string {
 }
 
 func LoadAllServiceFuncs(s db.Storer) (err error) {
+
+	// Delete Unfinished Templates
+	err = s.DeleteUnfinishedTemplates(context.Background())
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Cleanup of unfinished templates failed")
+		return
+	}
+
 	// Create a default supervisor
 	supervisor := db.User{
 		Username: "supervisor",
@@ -218,7 +227,7 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Add Default supervisor user to DB
 	err = s.InsertUser(context.Background(), supervisor)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		logger.WithField("err", err.Error()).Error("Setup Default Supervisor failed")
 		return
 	}
 
@@ -232,7 +241,7 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Add Default main user to DB
 	err = s.InsertUser(context.Background(), mainUser)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		logger.WithField("err", err.Error()).Error("Setup Default Main User failed")
 		return
 	}
 
@@ -246,7 +255,21 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 	// Add Default operator user to DB
 	err = s.InsertUser(context.Background(), operatorUser)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Setup Default User failed")
+		logger.WithField("err", err.Error()).Error("Setup Default Operator User failed")
+		return
+	}
+
+	// Create a default engineer user
+	engUser := db.User{
+		Username: "engineer",
+		Password: MD5Hash("engineer"),
+		Role:     "engineer",
+	}
+
+	// Add Default engineer user to DB
+	err = s.InsertUser(context.Background(), engUser)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Setup Default Engineer User failed")
 		return
 	}
 
@@ -254,4 +277,24 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 
 	loadUtils()
 	return nil
+}
+
+func ValidateDyeTarget(wc db.WellConfig, deps Dependencies) (valid bool, msg string) {
+
+	valid = true
+	//max number of dyes 6. TODO take from config
+	dyes := make(map[string]bool, 6)
+	for _, v := range wc.Targets {
+		dye, err := deps.Store.ListTargetDye(context.Background(), v)
+		if err != nil {
+			return false, err.Error()
+		}
+		for dyeKey := range dyes {
+			if dyeKey == dye {
+				return false, "invalid configuration for targets"
+			}
+		}
+		dyes[dye] = true
+	}
+	return
 }
