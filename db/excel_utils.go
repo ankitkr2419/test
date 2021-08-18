@@ -98,9 +98,10 @@ func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{},
 	j := 1
 	for i, v := range values {
 		if i == 0 {
+			j = j + 1
 			continue
 		}
-		startCell, err := excelize.CoordinatesToCellName(j+1, rowCount)
+		startCell, err := excelize.CoordinatesToCellName(j, rowCount)
 		if err != nil {
 			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
 		}
@@ -108,12 +109,13 @@ func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{},
 		file.SetCellStyle(sheet, startCell, startCell, styleID)
 		file.SetCellValue(sheet, startCell, v)
 
-		j = j + space + 1
+		j = j + space - 1
 
 		endCell, err := excelize.CoordinatesToCellName(j, rowCount)
 		if err != nil {
 			logger.Errorln(responses.ExcelSheetAddRowError, err.Error())
 		}
+		j = j + 1
 		file.MergeCell(sheet, startCell, endCell)
 
 	}
