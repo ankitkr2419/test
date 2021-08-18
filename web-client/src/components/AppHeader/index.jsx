@@ -23,6 +23,7 @@ import {
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
+import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
 import {
@@ -54,6 +55,9 @@ const AppHeader = (props) => {
   const history = useHistory();
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
+  const wellListReducer = useSelector(getWells);
+
+  const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
   const isExperimentRunning = experimentStatus === EXPERIMENT_STATUS.running;
   const isExperimentStopped = experimentStatus === EXPERIMENT_STATUS.stopped;
@@ -65,6 +69,8 @@ const AppHeader = (props) => {
   const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [isExpSuccessModalVisible, setExpSuccessModalVisibility] =
+    useState(false);
+  const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
     useState(false);
 
   const toggleUserDropdown = () =>
@@ -88,7 +94,14 @@ const AppHeader = (props) => {
   };
 
   const startExperiment = () => {
-    if (isExperimentRunning === false && isExperimentSucceeded === false) {
+    // if no well is filled then show confirmation modal.
+    if (filledWellsPositions.toJS().length === 0) {
+      //showModal = True
+      setRunConfirmModalVisibility(true);
+    } else if (
+      isExperimentRunning === false &&
+      isExperimentSucceeded === false
+    ) {
       dispatch(runExperiment(experimentId, token));
     }
   };
@@ -172,6 +185,12 @@ const AppHeader = (props) => {
     history.push("activity");
   };
 
+  // if user selects 'yes', run experiment
+  const handleRunModalConfirmation = () => {
+    setRunConfirmModalVisibility(false);
+    dispatch(runExperiment(experimentId, token));
+  };
+
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} />
@@ -196,16 +215,14 @@ const AppHeader = (props) => {
         </Nav>
       )}
       {isUserLoggedIn && (
-        <div className="header-elements d-flex align-items-center">
+        <div className="header-elements d-flex align-items-center ml-auto">
           {/* <PrintDataModal /> */}
           {/* <ExportDataModal /> */}
           {app === APP_TYPE.RTPCR && (
             <div className="experiment-info text-right mx-3">
               <Text
                 size={12}
-                className={`text-default mb-1 ${
-                  isExperimentRunning ? "show" : ""
-                }`}
+                className={`text-default ${isExperimentRunning ? "show" : ""}`}
               >
                 {`Experiment started at ${runExperimentReducer.get(
                   "experimentStartedTime"
@@ -213,17 +230,26 @@ const AppHeader = (props) => {
               </Text>
               <Text
                 size={12}
-                className={`text-error mb-1 ${isRunFailed ? "show" : ""}`}
+                className={`text-error ${isRunFailed ? "show" : ""}`}
               >
                 Experiment failed to run.
               </Text>
 
               {isExperimentSucceeded === false && isPlateRoute === true && (
-                <>
+                <div className="d-flex align-items-center">
+                  <Button
+                    color={isExperimentSucceeded ? "primary" : "secondary"}
+                    size="sm"
+                    className="font-weight-light border-2 border-gray shadow-none  mr-3"
+                    onClick={() => setAbortModalVisibility(true)}
+                    disabled={!isExperimentRunning}
+                  >
+                    Abort
+                  </Button>
                   <Button
                     color={isExperimentRunning ? "primary" : "secondary"}
                     size="sm"
-                    className="font-weight-light border-2 border-gray shadow-none mr-3"
+                    className="font-weight-light border-2 border-gray shadow-none"
                     outline={
                       isExperimentRunning === false &&
                       isExperimentSucceeded === false
@@ -233,17 +259,7 @@ const AppHeader = (props) => {
                   >
                     Run
                   </Button>
-
-                  <Button
-                    color={isExperimentSucceeded ? "primary" : "danger"}
-                    size="sm"
-                    className="font-weight-light border-2 border-gray shadow-none"
-                    onClick={() => setAbortModalVisibility(true)}
-                    disabled={!isExperimentRunning}
-                  >
-                    Abort
-                  </Button>
-                </>
+                </div>
               )}
 
               {isLoginTypeAdmin && activeWidgetID === "step" && (
@@ -331,6 +347,17 @@ const AppHeader = (props) => {
               failureBtn={MODAL_BTN.cancel}
               handleSuccessBtn={handleSuccessModalConfirmation}
               handleCrossBtn={() => setExpSuccessModalVisibility(false)}
+            />
+          )}
+
+          {isRunConfirmModalVisible && (
+            <MlModal
+              isOpen={isRunConfirmModalVisible}
+              textBody={MODAL_MESSAGE.runConfirmMsg}
+              successBtn={MODAL_BTN.yes}
+              failureBtn={MODAL_BTN.cancel}
+              handleSuccessBtn={handleRunModalConfirmation}
+              handleCrossBtn={() => setRunConfirmModalVisibility(false)}
             />
           )}
 

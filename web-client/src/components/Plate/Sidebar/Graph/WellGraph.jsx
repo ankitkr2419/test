@@ -16,7 +16,33 @@ const options = {
   scales: {
     xAxes: [
       {
+        scaleLabel: {
+          display: true,
+          labelString: "Cycles",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 5,
+        },
         offset: true,
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+        },
+      },
+    ],
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "F-value",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+        },
       },
     ],
   },
@@ -39,9 +65,6 @@ const WellGraph = ({
   resetThresholdError,
 }) => (
   <div>
-    <Text size={20} className="text-default mb-4">
-      Amplification plot
-    </Text>
     <GraphCard>
       <LineChart data={data} options={options} />
     </GraphCard>
@@ -57,15 +80,16 @@ const WellGraph = ({
         Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
       </Text>
     )}
-    <Text size={14} className="text-default mb-0">
+    {/* TODO: Un-comment after discussion with client/backend-team */}
+    {/* <Text size={14} className="text-default text-center mb-0">
       Note: Click on the threshold number to change it.
-    </Text>
+    </Text> */}
   </div>
 );
 
 const GraphCard = styled.div`
   width: 830px;
-  height: 344px;
+  height: 280px;
   background: #ffffff 0% 0% no-repeat padding-box;
   border: 1px solid #707070;
   padding: 8px;
@@ -77,6 +101,7 @@ WellGraph.propTypes = {
   onThresholdChangeHandler: PropTypes.func.isRequired,
   toggleGraphFilterActive: PropTypes.func.isRequired,
   data: PropTypes.object.isRequired,
+  isThresholdInvalid: PropTypes.bool,
 };
 
 export default React.memo(WellGraph);
