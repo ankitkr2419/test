@@ -26,6 +26,7 @@ export const disbleApplyBtn = (state, status, isExpanded) => {
     xMin.isInvalid ||
     yMin.isInvalid ||
     yMax.isInvalid ||
-    status !== EXPERIMENT_STATUS.progressComplete
+    status === EXPERIMENT_STATUS.progressing ||
+    status === null
   );
 };

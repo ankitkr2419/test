@@ -23,6 +23,10 @@ const PreviewReportModal = (props) => {
     experimentDetails,
     experimentId,
     temperatureData,
+    mailBtnHandler,
+    options,
+    isDataFromAPI,
+    experimentGraphTargetsList,
   } = props;
 
   //get login reducer details
@@ -163,6 +167,9 @@ const PreviewReportModal = (props) => {
           setIsSidebarOpen={setIsSidebarOpen}
           resetSelectedWells={resetSelectedWells}
           isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
+          experimentGraphTargetsList={experimentGraphTargetsList}
         />
       </div>
     );
@@ -187,6 +194,12 @@ const PreviewReportModal = (props) => {
           >
             Save
           </Button>
+          <ButtonIcon
+            name="published"
+            size={28}
+            className="bg-white border-secondary ml-3"
+            onClick={mailBtnHandler}
+          />
         </div>
 
         {loading === false && (

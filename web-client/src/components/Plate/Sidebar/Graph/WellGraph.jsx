@@ -9,72 +9,6 @@ import {
 } from "components/Target/targetConstants";
 import GraphFilters from "./GraphFilters";
 import GraphRange from "./GraphRange";
-import { EXPERIMENT_STATUS } from "appConstants";
-
-const options = {
-  legend: {
-    display: false,
-  },
-  scales: {
-    xAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: "Cycles",
-          fontSize: 15,
-          fontStyle: "bold",
-          padding: 5,
-        },
-        offset: true,
-        ticks: {
-          fontSize: 15,
-          fontStyle: "bold",
-        },
-      },
-    ],
-    yAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: "F-value",
-          fontSize: 15,
-          fontStyle: "bold",
-          padding: 10,
-        },
-        ticks: {
-          fontSize: 15,
-          fontStyle: "bold",
-        },
-      },
-    ],
-  },
-
-  // pan: {
-  //   enabled: true,
-  //   mode: "x",
-  //   speed: 10,
-  //   threshold: 10,
-  // },
-  // zoom: {
-  //   enabled: true,
-  //   drag: true,
-  //   mode: "xy",
-  //   speed: 0.01,
-  //   // sensitivity: 0.1,
-  //   limits: {
-  //     max: 10,
-  //     min: 0.5,
-  //   },
-  // },
-
-  //TODO: will be added later after testing & studying about it properly.
-  // This is for animation.
-
-  // animation: {
-  //   duration: 1000,
-  //   easing: "linear",
-  // },
-};
 
 const WellGraph = (props) => {
   const {
@@ -90,12 +24,18 @@ const WellGraph = (props) => {
     handleResetBtn,
     isInsidePreviewModal,
     isExpanded,
+    options,
+    isDataFromAPI,
   } = props;
 
   return (
     <div>
       <GraphCard>
-        <LineChart data={data} options={options} />
+        <LineChart
+          data={data}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
+        />
       </GraphCard>
       <GraphFilters
         targets={experimentGraphTargetsList}

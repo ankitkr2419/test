@@ -76,7 +76,7 @@ const SidebarSample = (props) => {
         isDisabled={isDisabled || isSampleListLoading}
         isLoading={isSampleListLoading}
         onChange={handleSampleChange}
-        onBlur={(e) => handleBlurChange(e.target.value)}
+        // onBlur={(e) => handleBlurChange(e.target.value)}
         onCreateOption={handleSampleCreate}
         onInputChange={handleSampleInputChange}
         options={sampleOptions}

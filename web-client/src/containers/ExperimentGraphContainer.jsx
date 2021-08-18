@@ -16,8 +16,6 @@ import {
 
 const ExperimentGraphContainer = (props) => {
   const {
-    token,
-    experimentId,
     headerData,
     showTempGraph,
     setIsSidebarOpen,
@@ -27,10 +25,13 @@ const ExperimentGraphContainer = (props) => {
     resetSelectedWells,
     isInsidePreviewModal,
     isExpanded,
+    handleRangeChangeBtn,
+    handleResetBtn,
+    options,
+    isDataFromAPI,
   } = props;
-  const dispatch = useDispatch();
 
-  const [isDataFromAPI, setDataFromAPI] = useState(false);
+  const dispatch = useDispatch();
 
   // get targets from experiment target reducer(graph : target filters)
   const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
@@ -89,31 +90,6 @@ const ExperimentGraphContainer = (props) => {
     dispatch(updateExperimentTargetFilters(index, "thresholdError", false));
   };
 
-  const handleRangeChangeBtn = ({ xMax, xMin, yMax, yMin }) => {
-    setDataFromAPI(true);
-
-    const queryStr = `x_axis_min=${xMin}&x_axis_max=${xMax}&y_axis_min=${yMin}&y_axis_max=${yMax}`;
-
-    dispatch(
-      updateGraphInitiated({
-        query: queryStr,
-        experimentId: experimentId,
-        token: token,
-      })
-    );
-  };
-
-  const handleResetBtn = () => {
-    setDataFromAPI(false);
-
-    dispatch(
-      resetGraphInitiated({
-        experimentId: experimentId,
-        token: token,
-      })
-    );
-  };
-
   return (
     <SidebarGraph
       headerData={headerData}
@@ -133,6 +109,7 @@ const ExperimentGraphContainer = (props) => {
       isInsidePreviewModal={isInsidePreviewModal}
       isDataFromAPI={isDataFromAPI}
       isExpanded={isExpanded}
+      options={options}
     />
   );
 };

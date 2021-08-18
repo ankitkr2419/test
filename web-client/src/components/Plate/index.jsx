@@ -19,6 +19,50 @@ import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
+import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
+
+const initialOptions = {
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Cycles",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 5,
+        },
+        offset: true,
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+          min: 1,
+          max: 5,
+        },
+      },
+    ],
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "F-value",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+          min: 0,
+          max: 1,
+        },
+      },
+    ],
+  },
+};
 
 const Plate = (props) => {
   const {
@@ -48,6 +92,9 @@ const Plate = (props) => {
     (state) => state.createExperimentReducer
   );
 
+  // get targets from experiment target reducer(graph : target filters)
+  const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
+
   const experimentStatus = runExperimentDetails.get("experimentStatus");
 
   let experimentDetails =
@@ -66,6 +113,53 @@ const Plate = (props) => {
 
   // local state to manage previewReport modal
   const [previewReportModal, setPreviewReportModal] = useState(false);
+
+  // default ranges for amplification plot
+  const [xMinValue, setXMin] = useState(1);
+  const [xMaxValue, setXMax] = useState(5);
+  const [yMinValue, setYMin] = useState(0);
+  const [yMaxValue, setYMax] = useState(5);
+
+  const [options, setOptions] = useState(initialOptions);
+  const [isDataFromAPI, setDataFromAPI] = useState(false);
+
+  useEffect(() => {
+    const tempOptions = options;
+
+    tempOptions.scales.xAxes[0].ticks.min = xMinValue;
+    tempOptions.scales.xAxes[0].ticks.max = xMaxValue;
+    tempOptions.scales.yAxes[0].ticks.min = yMinValue;
+    tempOptions.scales.yAxes[0].ticks.max = yMaxValue;
+
+    let newOptions = {
+      ...initialOptions,
+      scales: {
+        ...initialOptions.scales,
+        xAxes: [
+          {
+            ...initialOptions.scales.xAxes[0],
+            ticks: {
+              ...initialOptions.scales.xAxes[0].ticks,
+              min: xMinValue,
+              max: xMaxValue,
+            },
+          },
+        ],
+        yAxes: [
+          {
+            ...initialOptions.scales.yAxes[0],
+            ticks: {
+              ...initialOptions.scales.yAxes[0].ticks,
+              min: yMinValue,
+              max: yMaxValue,
+            },
+          },
+        ],
+      },
+    };
+
+    setOptions(newOptions);
+  }, [xMaxValue, xMinValue, yMaxValue, yMinValue]);
 
   useEffect(() => {
     if (
@@ -137,6 +231,28 @@ const Plate = (props) => {
     togglePreviewReportModal();
   };
 
+  const handleRangeChangeBtn = ({ xMax, xMin, yMax, yMin }) => {
+    setDataFromAPI(true);
+
+    setXMax(xMax);
+    setXMin(xMin);
+    setYMax(yMax);
+    setYMin(yMin);
+  };
+
+  const handleResetBtn = (cycleCount) => {
+    setDataFromAPI(true);
+
+    const thresholdArr = experimentGraphTargetsList
+      .toJS()
+      .map((targetObj) => parseInt(targetObj.threshold));
+
+    setXMax(cycleCount);
+    setXMin(0);
+    setYMax(Math.max(thresholdArr));
+    setYMin(0);
+  };
+
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
       {previewReportModal && (
@@ -153,6 +269,10 @@ const Plate = (props) => {
           experimentDetails={experimentDetails}
           experimentId={experimentId}
           temperatureData={temperatureData}
+          mailBtnHandler={mailBtnHandler}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
+          experimentGraphTargetsList={experimentGraphTargetsList}
         />
       )}
       <Header
@@ -265,22 +385,14 @@ const Plate = (props) => {
                     Temperature
                   </Button>
                   <ButtonIcon
-                    name="published"
-                    size={28}
-                    className="bg-white border-secondary ml-auto"
-                    onClick={mailBtnHandler}
-                  />
-                  <ButtonIcon
                     name="download-1"
                     size={28}
-                    className="bg-white border-secondary ml-3 downloadButton"
+                    className="bg-white border-secondary ml-auto downloadButton"
                     onClick={downloadClickHandler}
                   />
                 </div>
                 <ExperimentGraphContainer
-                  token={token}
                   isInsidePreviewModal={false}
-                  experimentId={experimentId}
                   headerData={headerData}
                   showTempGraph={showTempGraph}
                   experimentStatus={experimentStatus}
@@ -289,6 +401,11 @@ const Plate = (props) => {
                   resetSelectedWells={resetSelectedWells}
                   isMultiSelectionOptionOn={isMultiSelectionOptionOn}
                   isExpanded={isExpanded}
+                  handleRangeChangeBtn={handleRangeChangeBtn}
+                  handleResetBtn={handleResetBtn}
+                  options={options}
+                  isDataFromAPI={isDataFromAPI}
+                  experimentGraphTargetsList={experimentGraphTargetsList}
                 />
               </div>
             </div>

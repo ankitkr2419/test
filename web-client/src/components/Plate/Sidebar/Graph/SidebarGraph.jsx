@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { getXAxis } from "selectors/wellGraphSelector";
 import TemperatureGraphContainer from "containers/TemperatureGraphContainer";
 import WellGraph from "./WellGraph";
-import { EXPERIMENT_STATUS } from "appConstants";
 
 const SidebarGraph = (props) => {
   const {
@@ -22,6 +21,7 @@ const SidebarGraph = (props) => {
     isInsidePreviewModal,
     isDataFromAPI,
     isExpanded,
+    options,
   } = props;
 
   let cyclesCount = 0;
@@ -43,9 +43,10 @@ const SidebarGraph = (props) => {
   if (lineChartData && lineChartData.size !== 0 && isDataFromAPI === true) {
     xAxisLabels = lineChartData?.first().cycles.toJS();
 
-    chartData = chartData.filter(
-      (dataObj, index) => dataObj.label === `index-${index}`
-    );
+    // Removes threshold line
+    // chartData = chartData.filter(
+    //   (dataObj, index) => dataObj.label === `index-${index}`
+    // );
   }
 
   const data = {
@@ -71,6 +72,8 @@ const SidebarGraph = (props) => {
           experimentStatus={experimentStatus}
           isInsidePreviewModal={isInsidePreviewModal}
           isExpanded={isExpanded}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
         />
       )}
       {/* show temperature graph if showTempGraph flag is on */}
