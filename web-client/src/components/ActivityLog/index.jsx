@@ -25,12 +25,7 @@ const ActivityComponent = (props) => {
 	}
 	
 	const onConfirmedDeleteActivity = () => {
-		//TODO remove console
-		console.log('activity Id confirmed to delete: ', activityIdToDelete);
-		
 		toggleDeleteActivityModal();
-		
-		//TODO: API call here
 	}
 
 	return (
