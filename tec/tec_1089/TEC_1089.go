@@ -70,19 +70,24 @@ func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, 
 	return &tec1089 // tec Driver
 }
 
-var errorCheckStopped, tecInProgress bool
+var errorCheckStarted, tecInProgress bool
 var prevTemp float32 = 27.0
+
+
+func convertTECConfigToC(tecC config.TEC) (cfg C.struct_Config) {
+	cfg.CurrentLimitation = C.float(tecC.CurrentLimitation)
+	cfg.VoltageLimitation = C.float(tecC.VoltageLimitation)
+	cfg.CurrentErrorThreshold = C.float(tecC.CurrentErrorThreshold)
+	cfg.VoltageErrorThreshold = C.float(tecC.VoltageErrorThreshold) 
+	cfg.PeltierMaxCurrent= C.float(tecC.PeltierMaxCurrent)
+	cfg.PeltierDeltaTemperature= C.float(tecC.PeltierDeltaTemperature)
+
+	return
+}
 
 func (t *TEC1089) InitiateTEC() (err error) {
 
-	cfg := C.struct_Config{}
-
-	cfg.CurrentLimitation = C.float(config.GetCurrentLimitation())
-	cfg.VoltageLimitation = C.float(config.GetVoltageLimitation())
-	cfg.CurrentErrorThreshold = C.float(config.GetCurrentErrorThreshold())
-	cfg.VoltageErrorThreshold = C.float(config.GetVoltageErrorThreshold()) 
-	cfg.PeltierMaxCurrent= C.float(config.GetPeltierMaxCurrent())
-	cfg.PeltierDeltaTemperature= C.float(config.GetPeltierDeltaTemperature())
+	cfg := convertTECConfigToC(config.GetTECConfigValues())
 
 	C.initiateTEC(cfg)
 
@@ -117,6 +122,12 @@ func startMonitor() {
 }
 
 func startErrorCheck() {
+	if errorCheckStarted {
+		return
+	}
+
+	errorCheckStarted = true
+
 	go func() {
 		time.Sleep(5 * time.Second)
 		for {
@@ -124,7 +135,7 @@ func startErrorCheck() {
 			var errNum C.int
 			errNum = C.checkForErrorState()
 			if errNum != 0 {
-				errorCheckStopped = true
+				errorCheckStarted = false
 				logger.Errorln("Error Code for TEC: ", errNum)
 				return
 			}
@@ -166,9 +177,7 @@ func (t *TEC1089) AutoTune() (err error) {
 func (t *TEC1089) ResetDevice() (err error) {
 	C.resetDevice()
 
-	if errorCheckStopped {
-		startErrorCheck()
-	}
+	t.InitiateTEC()
 	return nil
 }
 
@@ -222,7 +231,7 @@ func (t *TEC1089) TestRun(plcDeps plc.Driver) (err error) {
 func (t *TEC1089) ReachRoomTemp() (err error) {
 	logger.Infoln("Going Back to Room Temp ")
 	ts := tec.TECTempSet{
-		TargetTemperature: config.GetRoomTemp(),
+		TargetTemperature: float64(config.GetRoomTemp()),
 		TargetRampRate:    tec.RoomTempRamp,
 	}
 	err = t.SetTempAndRamp(ts)
