@@ -294,14 +294,19 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 	wellTarget := make([]db.WellTarget, 0)
 	if len(DBResult) > 0 {
 		for _, v := range targets {
-			if tc.AutoThreshold {
-				targetThreshold := getAutoThreshold(DBResult, wells, targets, tCycles)
-				for i, tl := range targetThreshold {
-					if i.TargetID == v.TargetID {
-						v.Threshold = tl
+			if v.TargetID == tc.TargetID {
+				if tc.AutoThreshold {
+					targetThreshold := getAutoThreshold(DBResult, wells, targets, tCycles)
+					for i, tl := range targetThreshold {
+						if i.TargetID == v.TargetID {
+							v.Threshold = tl
+						}
 					}
+				} else {
+					v.Threshold = tc.Threshold
 				}
 			}
+
 			// analyseResult returns data required for ploting graph
 			wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
 		}

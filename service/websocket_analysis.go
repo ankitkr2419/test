@@ -322,7 +322,8 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 func calculateBaselineValues(array []float32, average float32) (deviation []float32) {
 	for _, v := range array {
 		value := v - average
-		deviation = append(deviation, value)
+		graphVal := scaleThreshold(value)
+		deviation = append(deviation, graphVal)
 	}
 	return
 }
