@@ -53,6 +53,15 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		44: uint16(0x102C), //start address of register For FAM
 		60: uint16(0x103C), //start address of register For VIC
 
+		//latest addresses for 16 wells
+		800: uint16(0x1320), //start address of register For FAM
+		816: uint16(0x1330), //start address of register For VIC
+		832: uint16(0x1340), //start address of register For ROX
+		848: uint16(0x1350), //start address of register For CY5
+
+		// 864: uint16(0x1360), //start address of register For CY5
+		// 880: uint16(0x1370), //start address of register For CY5
+
 		100: uint16(0x1064), // heartbeat register (W)
 		// 101:  uint16(0x1065), // offset for holding stage config (W)
 		// 113:  uint16(0x1071), // offset for cycling stage config (W)
@@ -84,8 +93,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		104: uint16(0x0868), // Restart Cycle (if rebooted during a run! (R)
 		105: uint16(0x0869), // Signal Error (R)
 		106: uint16(0x086A), // Well Emmission register data  ON: PLC write & OFF: Read (RW)
-		107: uint16(0x086B), // Cycle completed (R)
-		109: uint16(0x086D), // Lid Heating On (W)
+		133: uint16(0x0885), // Cycle completed (R)
+		197: uint16(0x08C5), // Lid Heating On (W)
 	},
 }
 
