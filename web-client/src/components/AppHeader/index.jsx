@@ -338,8 +338,12 @@ const AppHeader = (props) => {
                     <Button
                       color={btnProps.color}
                       size="sm"
-                      className={`font-weight-light border-2 border-gray shadow-none`}
-                      // ${(/*isExperimentSucceeded*/) ? "" : "d-none"}`}
+                      className={`font-weight-light border-2 border-gray shadow-none
+                       ${
+                         isExperimentSucceeded && isExpanded === false
+                           ? ""
+                           : "d-none"
+                       }`}
                       onClick={() => setExpSuccessModalVisibility(true)}
                     >
                       {btnProps.msg}

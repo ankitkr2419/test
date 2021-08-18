@@ -17,7 +17,7 @@ const SidebarSample = (props) => {
     addButtonClickHandler,
     isSampleStateValid, // form state valid
     isDisabled,
-    resetLocalState
+    resetLocalState,
   } = props;
 
   const { isSideBarOpen, sample, task, isEdit } = sampleState.toJS();
@@ -33,9 +33,17 @@ const SidebarSample = (props) => {
   };
 
   const handleSampleCreate = (inputValue) => {
+    let label = inputValue;
+    let value = inputValue;
+
+    if (inputValue === "") {
+      label = null;
+      value = null;
+    }
+
     const newOption = {
-      label: inputValue,
-      value: inputValue
+      label: label,
+      value: value,
     };
     // update local state
     updateCreateSampleWrapper("sample", newOption);
@@ -58,21 +66,18 @@ const SidebarSample = (props) => {
     updateCreateSampleWrapper("task", value);
   };
 
+  const handleBlurChange = (value) => {
+    handleSampleCreate(value);
+  };
+
   return (
-    // <Sidebar
-    // 	isOpen={true}//{isSideBarOpen}
-    // 	toggleSideBar={toggleSideBar}
-    // 	className="sample"
-    // 	handleIcon="plus-1"
-    // 	handleIconSize={36}
-    // 	isDisabled={isDisabled}
-    // >
     <>
       <CreatableSelect
         isClearable
         isDisabled={isDisabled || isSampleListLoading}
         isLoading={isSampleListLoading}
         onChange={handleSampleChange}
+        onBlur={(e) => handleBlurChange(e.target.value)}
         onCreateOption={handleSampleCreate}
         onInputChange={handleSampleInputChange}
         options={sampleOptions}
@@ -92,6 +97,8 @@ const SidebarSample = (props) => {
         value={task}
         onChange={handleTaskChange}
         isDisabled={isDisabled}
+        isSearchable={false}
+        isClearable={true}
       />
       <Button
         className="mt-auto ml-2"
@@ -118,7 +125,7 @@ SidebarSample.propTypes = {
   addButtonClickHandler: PropTypes.func.isRequired,
   isSampleStateValid: PropTypes.bool.isRequired,
   isDisabled: PropTypes.bool.isRequired,
-  resetLocalState: PropTypes.func.isRequired
+  resetLocalState: PropTypes.func.isRequired,
 };
 
 export default React.memo(SidebarSample);

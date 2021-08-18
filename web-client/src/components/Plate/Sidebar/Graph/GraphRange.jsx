@@ -113,10 +113,10 @@ const GraphRange = (props) => {
           Apply
         </Button>
         <Button
-          color="primary"
+          color="transparent"
           size="sm"
           // outline
-          className="mb-3 ml-3"
+          className="mb-3 ml-3 border-primary"
           onClick={handleResetBtn}
           disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
