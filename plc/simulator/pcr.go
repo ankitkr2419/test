@@ -185,7 +185,7 @@ func (d *Simulator) Cycle() (err error) {
 
 	if plc.ExperimentRunning {
 		logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
-		err = plc.HoldSleep(16)
+		err = plc.HoldSleep(int32(config.GetCycleTime()))
 		if err != nil {
 			logger.Errorln("Error while running cycle: ", err)
 			return
