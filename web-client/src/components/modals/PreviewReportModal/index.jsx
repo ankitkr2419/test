@@ -185,7 +185,7 @@ const PreviewReportModal = (props) => {
             className={"ml-auto"}
             size="md"
           >
-            Download
+            Save
           </Button>
         </div>
 
