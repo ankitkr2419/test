@@ -82,6 +82,7 @@ GridComponent.propTypes = {
   wells: PropTypes.object.isRequired,
   onWellUpdateClickHandler: PropTypes.func.isRequired,
   isGroupSelectionOn: PropTypes.bool.isRequired,
+  experimentStatus: PropTypes.string,
 };
 
 export default GridComponent;
