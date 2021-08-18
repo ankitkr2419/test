@@ -306,7 +306,7 @@ int autoTune(){
     }
 
     // Other Longs value means its either idle or success or err
-    while (Longs.Value > 0 && Longs.Value < 4){
+    while (Longs.Value >= 0 && Longs.Value < 4){
         sleep(5);
         if(MeCom_TEC_Oth_AtmTuningStatus(Address, Inst, &Longs, MeGet)){
             printf("TEC MeCom_TEC_Oth_AtmTuningStatus :%d\n", Longs.Value);
@@ -343,7 +343,6 @@ int autoTune(){
 int resetDevice(){
     if (MeCom_ResetDevice(Address)){
         printf("TEC Reset SUCCESS");
-        initiateTEC();
     } else {
         printf("TEC Reset FAIL");
         return -1;
