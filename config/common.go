@@ -6,7 +6,7 @@ import (
 )
 
 type Common struct {
-	RoomTemperature int64  `json:"room_temperature" validate:"required,lte=30,gte=20"`
+	RoomTemperature float64  `json:"room_temperature" validate:"required,lte=30,gte=20"`
 	ReceiverEmail   string `json:"receiver_email"`
 	ReceiverName    string `json:"receiver_name"`
 }
@@ -15,12 +15,12 @@ func SetCommonConfigValues(co Common) (err error) {
 
 	oldString, newString = []string{}, []string{}
 	oldString = append(oldString,
-		fmt.Sprintf("room_temperature: %d", GetRoomTemp()),
+		fmt.Sprintf("room_temperature: %.2f", GetRoomTemp()),
 		fmt.Sprintf("receiver_email: %s", GetReceiverEmail()),
 		fmt.Sprintf("receiver_name: %s", GetReceiverName()),
 	)
 	newString = append(newString,
-		fmt.Sprintf("room_temperature: %d", co.RoomTemperature),
+		fmt.Sprintf("room_temperature: %.2f", co.RoomTemperature),
 		fmt.Sprintf("receiver_email: %s", co.ReceiverEmail),
 		fmt.Sprintf("receiver_name: %s", co.ReceiverName),
 	)
@@ -62,6 +62,10 @@ func GetSecretKey() string {
 	return viper.GetString(key)
 }
 
+func GetRoomTemp() float64 {
+	return ReadEnvFloat("room_temp")
+}
+
 func GetReceiverName() string {
 	key := "receiver_name"
 	checkIfSet(key)
@@ -72,6 +76,10 @@ func GetReceiverEmail() string {
 	key := "receiver_email"
 	checkIfSet(key)
 	return viper.GetString(key)
+}
+
+func SetRoomTemp(rT float64) {
+	viper.Set("room_temp", rT)
 }
 
 func SetSecretKey(key string) {
@@ -89,7 +97,7 @@ func SetReceiverName(rN string) {
 
 func GetCommonConfigValues() Common {
 	return Common{
-		RoomTemperature: int64(GetRoomTemp()),
+		RoomTemperature: GetRoomTemp(),
 		ReceiverEmail: GetReceiverEmail(),
 		ReceiverName: GetReceiverName(),
 	}

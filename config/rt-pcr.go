@@ -64,10 +64,6 @@ func GetNumHomingCycles() int {
 	return ReadEnvInt("num_homing_cycles")
 }
 
-func GetRoomTemp() int {
-	return ReadEnvInt("room_temp")
-}
-
 func GetCycleTime() int {
 	return ReadEnvInt("cycle_time")
 }
@@ -78,10 +74,6 @@ func SetHomingTime(hT int64) {
 
 func SetNumHomingCycles(hC int64) {
 	viper.Set("num_homing_cycles", hC)
-}
-
-func SetRoomTemp(rT int64) {
-	viper.Set("room_temp", rT)
 }
 
 func SetCycleTime(cT int64) {
