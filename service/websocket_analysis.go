@@ -313,13 +313,13 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 
 	}
 	for _, v := range tempGraph {
-		v.FValue = calculateStandardDeviationValues(v.FValue, targetAverage[v.TargetID])
+		v.FValue = calculateBaselineValues(v.FValue, targetAverage[v.TargetID])
 		baselineValues = append(baselineValues, v)
 	}
 	return
 }
 
-func calculateStandardDeviationValues(array []float32, average float32) (deviation []float32) {
+func calculateBaselineValues(array []float32, average float32) (deviation []float32) {
 	for _, v := range array {
 		value := v - average
 		deviation = append(deviation, value)
