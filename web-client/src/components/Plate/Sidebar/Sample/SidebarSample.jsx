@@ -22,16 +22,6 @@ const SidebarSample = (props) => {
 
   const { isSideBarOpen, sample, task, isEdit } = sampleState.toJS();
 
-  const toggleSideBar = () => {
-    // console log on sample drawer handle click
-    console.info("Sample drawer handle clicked");
-    // if user close sidebar without editing then reset local state
-    if (isSideBarOpen === true && isEdit === true) {
-      resetLocalState();
-    }
-    updateCreateSampleWrapper("isSideBarOpen", !isSideBarOpen);
-  };
-
   const handleSampleCreate = (inputValue) => {
     const newOption = {
       label: inputValue,
@@ -59,14 +49,6 @@ const SidebarSample = (props) => {
   };
 
   return (
-    // <Sidebar
-    // 	isOpen={true}//{isSideBarOpen}
-    // 	toggleSideBar={toggleSideBar}
-    // 	className="sample"
-    // 	handleIcon="plus-1"
-    // 	handleIconSize={36}
-    // 	isDisabled={isDisabled}
-    // >
     <>
       <CreatableSelect
         isClearable

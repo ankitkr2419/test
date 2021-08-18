@@ -23,7 +23,6 @@ const SubHeader = (props) => {
     experimentTemplate,
     isExperimentSucceeded,
     experimentDetails,
-    experimentId //TODO remove if not needed anymore
   } = props;
 
   const { templateName } = experimentTemplate;

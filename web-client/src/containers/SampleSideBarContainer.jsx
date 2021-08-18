@@ -58,10 +58,6 @@ const SampleSideBarContainer = (props) => {
       key,
       value,
     });
-    // console log on sample sidebar opened or closed
-    if (key === "isSideBarOpen") {
-      console.info(`Sample Drawer ${value ? "Opened" : "Closed"}`);
-    }
   };
 
   // update targets to local state, so every time list will contain

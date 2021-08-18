@@ -59,10 +59,6 @@ const PlateContainer = () => {
       // fetching experiment targets to show while configuring sample and graph filter
       dispatch(fetchExperimentTargets(experimentId, token));
     }
-    return () => {
-      // isPlateRoute use in appHeader to manage visibility of header buttons
-      dispatch(setIsPlateRoute(false));
-    };
   }, [experimentId, dispatch]);
 
   const setSelectedWell = (index, isWellSelected) => {
