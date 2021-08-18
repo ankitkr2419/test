@@ -27,6 +27,15 @@ body {
 .experiment-info {
   position: relative;
 
+  > p {
+    width: rem(192px);
+    position: absolute;
+    top: rem(-14px);
+    right: 0;
+    line-height: rem(14px);
+    margin: 0;
+  }
+
   .text-default {
     width: rem(192px);
     position: absolute;
@@ -39,6 +48,10 @@ body {
     &.show {
       @include fade(show);
     }
+  }
+
+  &.text-error {
+    color: rgb(204, 201, 201);
   }
 
   .text-error {

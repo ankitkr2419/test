@@ -1,11 +1,5 @@
+import { MAX_NO_OF_WELLS } from "appConstants";
 import { createSelector } from "reselect";
-
-/**
- * Maximum number of wells that can be present in a plate.
- * Maximum number of wells are 16.
- * 96 was the old version, this is changed in future implementations.
- */
-const PLATE_CAPACITY = 96;
 
 const getWellListSelector = (state) => state.wellListReducer;
 const getAddWellsSelector = (state) => state.addWellsReducer;
@@ -85,11 +79,13 @@ export const resetMultiWellDefaultList = (state) =>
 // makes all wells isSelected flag to  true
 export const setAllWellsSelected = (state, { isAllWellsSelected }) =>
   state.updateIn(["defaultList"], (myDefaultList) =>
-    myDefaultList.map((ele) => ele && ele.setIn(["isSelected"], !isAllWellsSelected))
+    myDefaultList.map(
+      (ele) => ele && ele.setIn(["isSelected"], !isAllWellsSelected)
+    )
   );
 
 /**
- * getDefaultPlatesList return wells default data w.r.t PLATE_CAPACITY.
+ * getDefaultPlatesList return wells default data w.r.t MAX_NO_OF_WELLS.
  */
 export const getDefaultWellsList = createSelector(() => {
   const arr = [];
@@ -105,10 +101,10 @@ export const getDefaultWellsList = createSelector(() => {
     status: "", // red, green, orange
     initial: "",
     id: null,
-    isWellActive: false,
+    isWellActive: false
   };
   // Initial plate state added for wells in array from index 1
-  for (let i = 0; i !== PLATE_CAPACITY; i += 1) {
+  for (let i = 0; i !== MAX_NO_OF_WELLS; i += 1) {
     arr.push(initialPlateState);
   }
   return arr;
@@ -143,7 +139,7 @@ export const updateWellListSelector = createSelector(
     // if no wells selected
     if (action.payload.response !== null) {
       const {
-        payload: { response },
+        payload: { response }
       } = action;
       // get position of selected wells from response
       const positions = response.map((ele) => ele.position);
@@ -162,7 +158,7 @@ export const updateWellListSelector = createSelector(
               ...selectedWell,
               initial: selectedWell.task[0],
               status: selectedWell.color_code || "green",
-              sample: selectedWell.sample_name,
+              sample: selectedWell.sample_name
             });
           }
           return ele;
@@ -188,7 +184,7 @@ export const setActiveWells = createSelector(
           // find the index present in response data
           if (activeWellsPositions.includes(index) && ele !== null) {
             return ele.merge({
-              isWellActive: true,
+              isWellActive: true
             });
           }
           return ele;

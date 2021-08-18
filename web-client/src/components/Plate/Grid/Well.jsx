@@ -2,14 +2,17 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import styled from "styled-components";
+import { Text } from "shared-components";
 
 const Well = (props) => {
   const {
+    position,
     id,
     className,
     status,
     isRunning,
     isSelected,
+    isDisabled,
     taskInitials,
     onClickHandler,
   } = props;
@@ -23,11 +26,14 @@ const Well = (props) => {
       id={id}
       // isRunning={isDisabled}
       isSelected={isSelected}
-      // isDisabled={isDisabled}
+      isDisabled={isDisabled}
       status={status}
       className={wellClassnames}
       onClick={onClickHandler}
     >
+      <Text Tag="span" className="well-position">
+        {position}
+      </Text>
       {taskInitials}
     </StyledWell>
   );
@@ -51,8 +57,8 @@ const StyledWell = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 57px;
-  height: 54px;
+  width: 52px;
+  height: 52px;
   font-size: 20px;
   line-height: 24px;
   color: #666666;
@@ -62,8 +68,8 @@ const StyledWell = styled.div`
       ? "2px solid #707070"
       : "1px solid #aeaeae"};
   border-radius: 8px;
-  margin: 0 16px 16px 0;
-  padding: 20px 4px 4px;
+  margin: 0 24px 48px 0;
+  padding: 18px 4px 4px;
   box-shadow: ${(props) =>
     props.isSelected && props.isRunning ? "0 3px 6px #00000029" : ""};
   opacity: ${(props) => (props.isDisabled ? "0.2" : "1")};
@@ -100,9 +106,17 @@ const StyledWell = styled.div`
     top: 0;
     right: 0;
     left: 0;
-    height: 16px;
+    height: 14px;
     border-radius: 6px 6px 0 0;
     background-color: ${(props) => props.status};
+  }
+
+  .well-position {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #999999;
   }
 `;
 

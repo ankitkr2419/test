@@ -9,10 +9,9 @@ import WellGraph from "./WellGraph";
 
 const SidebarGraph = (props) => {
   const {
+    showTempGraph,
     isExperimentRunning,
     lineChartData,
-    isSidebarOpen,
-    toggleSideBar,
     onThresholdChangeHandler,
     toggleGraphFilterActive,
     experimentGraphTargetsList,
@@ -21,9 +20,6 @@ const SidebarGraph = (props) => {
     resetThresholdError,
     isThresholdInvalid,
   } = props;
-
-  // local state to toggle between emission graph and temperature graph
-  const [showTempGraph, setShowTempGraph] = useState(false);
 
   let cyclesCount = 0;
   // below case can happen if user selects all filter we might get empty chart data
@@ -36,30 +32,9 @@ const SidebarGraph = (props) => {
     datasets: lineChartData.toJS(),
   };
 
-  // helper function to toggle the graphs
-  const toggleTempGraphSwitch = () => {
-    setShowTempGraph((value) => !value);
-  };
-
   if (isExperimentRunning === true || isExperimentSucceeded === true) {
     return (
-      <Sidebar
-        isOpen={isSidebarOpen}
-        toggleSideBar={toggleSideBar}
-        className="graph"
-        bodyClassName="py-4"
-        handleIcon="graph"
-        handleIconSize={56}
-      >
-        <SwitchWrapper>
-          <Switch
-            id="temperature"
-            name="temperature"
-            label="Show temperature graph"
-            value={showTempGraph}
-            onChange={toggleTempGraphSwitch}
-          />
-        </SwitchWrapper>
+      <>
         {/* show the well data graph if showTempGraph flag is off */}
         {!showTempGraph && (
           <WellGraph
@@ -74,7 +49,7 @@ const SidebarGraph = (props) => {
         )}
         {/* show temperature graph if showTempGraph flag is on */}
         {showTempGraph && <TemperatureGraphContainer />}
-      </Sidebar>
+      </>
     );
   }
   return null;
@@ -89,6 +64,7 @@ SidebarGraph.propTypes = {
   toggleGraphFilterActive: PropTypes.func.isRequired,
   experimentGraphTargetsList: PropTypes.object.isRequired,
   isExperimentSucceeded: PropTypes.bool.isRequired,
+  showTempGraph: PropTypes.bool,
 };
 
 export default React.memo(SidebarGraph);
