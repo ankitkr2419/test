@@ -33,18 +33,17 @@ const SidebarSample = (props) => {
   };
 
   const handleSampleCreate = (inputValue) => {
-    let label = inputValue;
-    let value = inputValue;
-
+    // if inputValue is null then we update the sample as null and return.
     if (inputValue === "") {
-      label = null;
-      value = null;
+      updateCreateSampleWrapper("sample", null);
+      return;
     }
 
     const newOption = {
-      label: label,
-      value: value,
+      label: inputValue,
+      value: inputValue,
     };
+
     // update local state
     updateCreateSampleWrapper("sample", newOption);
     // add new sample to sample's reducer to merge it with original list
