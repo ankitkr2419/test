@@ -86,7 +86,7 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		21: uint16(0x0815), //combined with M20 ON/OFF cycle button
 		25: uint16(0x0819), //reset values
 
-		100: uint16(0x0864), // homing success (R)
+		36: uint16(0x0824), // homing success (R)
 		101: uint16(0x0865), // homing error (R)
 		// 102: uint16(0x0866), // Start / Stop Cycle (W)
 		103: uint16(0x0867), // UnUsed
