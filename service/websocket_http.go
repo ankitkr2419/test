@@ -274,7 +274,7 @@ func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets 
 
 }
 
-func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, tCycles uint16, tc ThresholdCals) (graphResult []byte, err error) {
+func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, dbWells []db.Well, tCycles uint16, tc Threshold) (graphResult []byte, err error) {
 
 	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
 	if err != nil {
@@ -291,13 +291,6 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 		wellTargets = append(wellTargets, wellTarget...)
 	}
 
-	dbWells, err := deps.Store.ListWells(context.Background(), experimentID)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error fetching data")
-		// send error
-		deps.WsErrCh <- err
-		return
-	}
 	wellTarget := make([]db.WellTarget, 0)
 	if len(DBResult) > 0 {
 		for _, v := range targets {
@@ -323,6 +316,32 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 	graphResult, err = getColorCodedWells(deps)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
+		return
+	}
+
+	return
+}
+func getBaselineData(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, dbWells []db.Well, tCycles uint16, bl Baseline) (respBytes []byte, err error) {
+
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching result data")
+		return
+	}
+
+	finalResult := make([]graph, 0)
+	if len(DBResult) > 0 {
+		finalResult = getBaselineGraph(DBResult, wells, targets, bl)
+	}
+
+	Result := resultGraph{
+		Type: "Graph",
+		Data: finalResult,
+	}
+
+	respBytes, err = json.Marshal(Result)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling graph data")
 		return
 	}
 
