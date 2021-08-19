@@ -6,13 +6,17 @@ import { options } from "./GraphOptions";
 import Filters from "./Filters";
 
 const AnalyseDataGraphComponent = (props) => {
-  let { data } = props;
+  let { data, dyeOptions, selectedDye, onDyeChanged } = props;
   return (
     <div>
       <GraphCard>
         <LineChart data={data} options={options} />
       </GraphCard>
-      <Filters />
+      <Filters
+        dyeOptions={dyeOptions}
+        selectedDye={selectedDye}
+        onDyeChanged={onDyeChanged}
+      />
     </div>
   );
 };
