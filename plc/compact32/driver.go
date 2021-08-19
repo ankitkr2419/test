@@ -23,6 +23,7 @@ var homingCount int
 
 // Interface Implementation Methods
 func (d *Compact32) HeartBeat() {
+	var value []byte
 	var err error
 
 	logger.Info("Starting HeartBeat...")
@@ -38,18 +39,18 @@ LOOP:
 			break
 		}
 
-		// logger.Infoln("Heartbeat output: ", beat)
+		logger.Debugln("Heartbeat output: ", beat)
 
 		// 3 attempts to check for heartbeat of PLC and write ours!
 		for i := 0; i < 3; i++ {
 			if beat == 1 { // If beat is 1, PLC is alive, so write 2
-				_, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][100], uint16(2))
+				value, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][100], uint16(2))
 				if err != nil {
 					logger.WithField("beat", beat).Error("WriteSingleRegister:D100 : Read PLC heartbeat")
 					// exit!!
 					break LOOP
 				}
-				// logger.Infoln("Read val:", val)
+				logger.Debugln("Read value:", value)
 				continue LOOP
 			}
 
@@ -231,10 +232,6 @@ func (d *Compact32) Start() (err error) {
 
 func (d *Compact32) Stop() (err error) {
 	plc.ExperimentRunning = false
-	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][102], plc.OFF)
-	// if err != nil {
-	// 	logger.Error("WriteSingleCoil:M102 : Stop Cycle")
-	// }
 	d.ExitCh <- errors.New("PCR Aborted")
 	return nil
 }
@@ -263,37 +260,6 @@ func (d *Compact32) Cycle() (err error) {
 	}
 
 	plc.DataCapture = true
-	// for {
-	// 	cycleCompletion, err := d.Driver.ReadCoils(plc.MODBUS["M"][27], uint16(1))
-	// 	if err != nil {
-	// 		logger.Error("ReadSingleCoil:M27: Current PV cycle")
-	// 		return err
-	// 	}
-	// 	fmt.Println("cycle completion ---------", cycleCompletion)
-	// 	if cycleCompletion[0] == 1 {
-	// 		plc.HeatingCycleComplete = true
-	// 		err := d.Driver.WriteSingleCoil(plc.MODBUS["M"][27], uint16(0))
-	// 		if err != nil {
-	// 			logger.Error("ReadSingleCoil:M27: Current PV cycle")
-	// 			return err
-	// 		}
-	// 		return nil
-	// 	}
-	// 	time.Sleep(time.Millisecond * 500)
-	// }
-
-	// for the rotation button, rotation button is required in manual move
-
-	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][14], plc.ON)
-	// if err != nil {
-	// 	logger.Error("WriteSingleCoil:M20 : Start Cycle")
-	// 	return
-	// }
-	// err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][15], plc.ON)
-	// if err != nil {
-	// 	logger.Error("WriteSingleCoil:M21 : Start Cycle")
-	// 	return
-	// }
 
 	return
 }
@@ -312,26 +278,6 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	}
 
 	if plc.CycleComplete {
-
-		// // Read lid temperature
-		// tmp, err = d.Driver.ReadSingleRegister(plc.MODBUS["D"][135])
-		// if err != nil {
-		// 	logger.Error("ReadSingleRegister:D135: Lid temperature")
-		// 	return
-		// }
-		// scan.LidTemp = float32(tmp) / 10
-
-		// // Read current cycle status
-		// tmp, err = d.Driver.ReadSingleCoil(plc.MODBUS["M"][107])
-		// if err != nil {
-		// 	logger.Error("ReadSingleCoil:M107: Current PV cycle")
-		// 	return
-		// }
-		// if !plc.CycleComplete { // 0x0000 means cycle is not complete
-		// 	// Values would not have changed.
-		// 	scan.CycleComplete = false
-		// 	return
-		// }
 		scan.CycleComplete = true
 
 		// If the invoker has already read this cycle data, don't send it again!
