@@ -417,7 +417,13 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// invoke monitor after 2 secs
 	go func() {
 		time.Sleep(2 * time.Second)
-		go monitorExperiment(deps, file)
+		defer func(){
+        	if r := recover(); r != nil {
+            	logger.Errorln("Monitor panicked: ", r)
+            	ShutDownGracefully(deps)
+        	}
+    	}()
+		monitorExperiment(deps, file)
 	}()
 
 	lidTempStartTime := time.Now()
