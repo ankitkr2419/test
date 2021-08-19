@@ -11,6 +11,7 @@ import { isAnyThresholdInvalid } from 'components/Target/targetHelper';
 
 const ExperimentGraphContainer = (props) => {
 	const {
+		showTempGraph,
 		setIsSidebarOpen,
 		isSidebarOpen,
 		experimentStatus,
@@ -26,18 +27,6 @@ const ExperimentGraphContainer = (props) => {
 
 	const isExperimentRunning = experimentStatus === EXPERIMENT_STATUS.running;
 	const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
-
-	const toggleSideBar = () => {
-		// console log on graph drawer handle click
-		console.info('Graph Drawer Handle Clicked');
-		// reset the selected wells while closing the sidebar
-		if (isSidebarOpen && isMultiSelectionOptionOn === false) {
-			resetSelectedWells();
-		}
-		// console log on graph drawer opened or close
-		console.info(`Graph Drawer ${isSidebarOpen === true ? 'Closed' : 'Opened'}`);
-		setIsSidebarOpen(toggleStateValue => !toggleStateValue);
-	};
 
 	const onThresholdChangeHandler = (threshold, index) => {
 		dispatch(updateExperimentTargetFilters(index, 'threshold', parseFloatWrapper(threshold)));
@@ -59,12 +48,12 @@ const ExperimentGraphContainer = (props) => {
 
 	return (
 		<SidebarGraph
+			showTempGraph={showTempGraph}
 			isExperimentRunning={isExperimentRunning}
 			isExperimentSucceeded={isExperimentSucceeded}
 			lineChartData={lineChartData}
 			experimentGraphTargetsList={experimentGraphTargetsList}
 			isSidebarOpen={isSidebarOpen}
-			toggleSideBar={toggleSideBar}
 			onThresholdChangeHandler={onThresholdChangeHandler}
 			toggleGraphFilterActive={toggleGraphFilterActive}
 			setThresholdError={setThresholdError}
@@ -76,6 +65,7 @@ const ExperimentGraphContainer = (props) => {
 
 ExperimentGraphContainer.propTypes = {
 	experimentStatus: PropTypes.string,
+	showTempGraph: PropTypes.bool,
 };
 
 export { ExperimentGraphContainer };

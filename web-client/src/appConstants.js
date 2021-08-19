@@ -119,6 +119,7 @@ export const API_ENDPOINTS = {
 };
 
 export const MODAL_MESSAGE = {
+  runConfirmMsg: "Wells are not configured. Are you sure you want to proceed?",
   abortExpInfo: "Can't log out while experiment is still running.",
   abortExpWarning: "Are you sure you want to abort experiment?",
   setPosition: "Please check the position of tip and magnet!",
@@ -422,4 +423,52 @@ export const timeConstants = {
 };
 
 //constants for RTPCR
-export const MAX_NO_OF_WELLS = 96; // TODO: change to 16 after new UI.
+/**
+ * Maximum number of wells that can be present in a plate.
+ * Maximum number of wells are 16.
+ * 96 was the old version, this is changed in future implementations.
+ */
+export const MAX_NO_OF_WELLS = 16;
+export const TEMPERATURE_GRAPH_OPTIONS = {
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Time (minutes)",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        offset: true,
+        type: "linear",
+        ticks: {
+          source: "data",
+          beginAtZero: true,
+          suggestedMin: 0,
+          min: 0,
+          fontSize: 15,
+          fontStyle: "bold",
+        },
+      },
+    ],
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Temperature (°C)",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+        },
+      },
+    ],
+  },
+};
