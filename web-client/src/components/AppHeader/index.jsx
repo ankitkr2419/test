@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
 import PropTypes from "prop-types";
+
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import { logoutInitiated } from "action-creators/loginActionCreators";
+import { logoutInitiated, loginReset } from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -13,7 +15,6 @@ import {
   NavItem,
   NavLink,
 } from "core-components";
-// import { getExperimentId } from 'selectors/experimentSelector';
 import {
   runExperiment,
   stopExperiment,
@@ -36,7 +37,6 @@ import {
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
-import { useHistory } from "react-router";
 
 const AppHeader = (props) => {
   const {

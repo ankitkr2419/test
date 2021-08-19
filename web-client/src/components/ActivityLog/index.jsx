@@ -1,12 +1,14 @@
 import React, { useState } from "react";
+import moment from "moment";
+
 import { Table } from "core-components";
 import { ButtonIcon } from "shared-components";
-import "./activity.scss";
 import ActivityData from "./ActivityData.json";
 import SearchBar from "./SearchBar";
 import MlModal from "shared-components/MlModal";
 import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
-import moment from "moment";
+
+import "./activity.scss";
 
 const headers = ActivityData.headers;
 // const experiments = ActivityData.experiments;//TODO remove if not needed
@@ -97,7 +99,7 @@ const ActivityComponent = (props) => {
                 className={
                   experiment.id === selectedActivity?.id ? "active" : ""
                 }
-                key={i}
+                key={experiment.id}
                 onClick={() => toggleSelectedActivity(experiment)}
               >
                 {/**TODO remove comments once activity log finalized */}
