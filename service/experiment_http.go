@@ -278,8 +278,10 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		db.AddMergeRowToExcel(file, db.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
 
 		row := []interface{}{"well positions"}
-		for _, v := range config.ActiveWells("activeWells") {
-			row = append(row, v)
+		for range dyePositions {
+			for _, v := range config.ActiveWells("activeWells") {
+				row = append(row, v)
+			}
 		}
 		db.AddRowToExcel(file, db.RTPCRSheet, row)
 

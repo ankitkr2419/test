@@ -20,7 +20,7 @@ const (
 		VALUES ($1, $2, $3, $4 ,$5) RETURNING id`
 
 	getStepsListQuery = `SELECT * FROM steps
-		where stage_id = $1`
+		where stage_id = $1 ORDER BY created_at ASC`
 
 	getStepQuery = `SELECT id,
 		stage_id,

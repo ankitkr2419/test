@@ -3,14 +3,9 @@
 #include "ComPort.h"
 #include "MeCom.h"
 
-int32_t Address;
-int8_t Buf[25];
-int32_t Inst = 1;
-int ComPortNr = 0;
-int BaudRate = 57600;         
-
-int initiateTEC()
+int initiateTEC(Config c)
 {
+
     MeParFloatFields Fields;
     MeParLongFields Longs;
 
@@ -24,7 +19,7 @@ int initiateTEC()
         printf("Ident String: %s\n", Buf);
     }
 
-    Fields.Value = 4;
+    Fields.Value = c.CurrentLimitation;
     if(MeCom_TEC_Ope_CurrentLimitation(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Ope_CurrentLimitation(Address, Inst, &Fields, MeSet);
     } else{
@@ -32,7 +27,7 @@ int initiateTEC()
         return -1;
     }
 
-    Fields.Value = 20;
+    Fields.Value = c.VoltageLimitation;
     if(MeCom_TEC_Ope_VoltageLimitation(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Ope_VoltageLimitation(Address, Inst, &Fields, MeSet);
     } else{
@@ -40,7 +35,7 @@ int initiateTEC()
         return -1;
     }
 
-    Fields.Value = 4.8;
+    Fields.Value = c.CurrentErrorThreshold;
     if(MeCom_TEC_Ope_CurrentErrorThreshold(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Ope_CurrentErrorThreshold(Address, Inst, &Fields, MeSet);
     } else{
@@ -48,7 +43,7 @@ int initiateTEC()
         return -1;
     }
 
-    Fields.Value = 21;
+    Fields.Value = c.VoltageErrorThreshold;
     if(MeCom_TEC_Ope_VoltageErrorThreshold(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Ope_VoltageErrorThreshold(Address, Inst, &Fields, MeSet);
     } else{
@@ -121,7 +116,7 @@ int initiateTEC()
 */
     // Peltier Max Current
 
-    Fields.Value = 7;
+    Fields.Value = c.PeltierMaxCurrent;
     if(MeCom_TEC_Tem_PeltierMaxCurrent(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Tem_PeltierMaxCurrent(Address, Inst, &Fields, MeSet);
     } else{
@@ -129,7 +124,7 @@ int initiateTEC()
         return -1;
     }
 
-    Fields.Value = 75;
+    Fields.Value = c.PeltierDeltaTemperature;
     if(MeCom_TEC_Tem_PeltierDeltaTemperature(Address, Inst, &Fields, MeGetLimits)){
         MeCom_TEC_Tem_PeltierDeltaTemperature(Address, Inst, &Fields, MeSet);
     } else{
@@ -311,7 +306,7 @@ int autoTune(){
     }
 
     // Other Longs value means its either idle or success or err
-    while (Longs.Value > 0 && Longs.Value < 4){
+    while (Longs.Value >= 0 && Longs.Value < 4){
         sleep(5);
         if(MeCom_TEC_Oth_AtmTuningStatus(Address, Inst, &Longs, MeGet)){
             printf("TEC MeCom_TEC_Oth_AtmTuningStatus :%d\n", Longs.Value);

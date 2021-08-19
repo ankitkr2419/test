@@ -34,7 +34,7 @@ const WellGraph = (props) => {
         <LineChart
           data={data}
           options={options}
-          isDataFromAPI={isDataFromAPI}
+          redraw={isDataFromAPI}
         />
       </GraphCard>
       <GraphFilters
@@ -59,10 +59,6 @@ const WellGraph = (props) => {
           Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
         </Text>
       )}
-      {/* TODO: Un-comment after discussion with client/backend-team */}
-      {/* <Text size={14} className="text-default text-center mb-0">
-      Note: Click on the threshold number to change it.
-    </Text> */}
     </div>
   );
 };
@@ -81,6 +77,7 @@ WellGraph.propTypes = {
   onThresholdChangeHandler: PropTypes.func.isRequired,
   toggleGraphFilterActive: PropTypes.func.isRequired,
   data: PropTypes.object.isRequired,
+  isThresholdInvalid: PropTypes.bool,
 };
 
 export default React.memo(WellGraph);

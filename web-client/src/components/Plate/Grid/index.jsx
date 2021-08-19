@@ -15,17 +15,6 @@ const GridComponent = ({
   isExpanded,
 }) => (
   <div className="d-flex flex-column flex-100 pt-4">
-    {/* <Coordinate direction="horizontal">
-      {YCoordinates.map((value, i) => (
-        <CoordinateItem key={i} coordinateValue={value.toString()} />
-      ))}
-    </Coordinate> */}
-    {/* <div className="d-flex"> */}
-    {/* <Coordinate>
-        {XCoordinates.map((value, i) => (
-          <CoordinateItem key={i} coordinateValue={value} />
-        ))}
-      </Coordinate> */}
     <WellGrid className="rtpcr-well-grid">
       {wells.map((well, index) => {
         if (well !== null) {
@@ -54,7 +43,6 @@ const GridComponent = ({
                 onClickHandler={(event) => {
                   onWellClickHandler(well, index, event);
                 }}
-                // isDisabled={isWellActive === false}
                 isDisabled={
                   isWellFilled === false &&
                   (experimentStatus === EXPERIMENT_STATUS.success ||
@@ -88,7 +76,6 @@ const GridComponent = ({
       })}
     </WellGrid>
   </div>
-  // </div>
 );
 
 GridComponent.propTypes = {
@@ -96,6 +83,7 @@ GridComponent.propTypes = {
   wells: PropTypes.object.isRequired,
   onWellUpdateClickHandler: PropTypes.func.isRequired,
   isGroupSelectionOn: PropTypes.bool.isRequired,
+  experimentStatus: PropTypes.string,
 };
 
 export default GridComponent;

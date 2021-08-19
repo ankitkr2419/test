@@ -4,43 +4,14 @@ import { ButtonIcon } from "shared-components";
 import "./activity.scss";
 import ActivityData from "./ActivityData.json";
 import SearchBar from "./SearchBar";
-import MlModal from "shared-components/MlModal";
-import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
 import moment from "moment";
 
-const headers = ActivityData.headers;
-// const experiments = ActivityData.experiments;//TODO remove if not needed
-
 const ActivityComponent = (props) => {
-  let {
-    experiments,
-    searchText,
-    onSearchTextChanged,
-    expandLogHandler,
-  } = props;
+  let { experiments, searchText, onSearchTextChanged, expandLogHandler } =
+    props;
 
   const [selectedActivity, setSelectedActivity] = useState(null);
-  const [showDeleteActivityModal, setShowDeleteActivityModal] = useState(false);
-
-  const deleteActivityClickHandler = (e) => {
-    e.stopPropagation();
-    toggleDeleteActivityModal();
-  };
-
-  const toggleDeleteActivityModal = () => {
-    setShowDeleteActivityModal(!showDeleteActivityModal);
-  };
-
-  const onConfirmedDeleteActivity = () => {
-    const activityIdToDelete = selectedActivity?.id;
-
-    //TODO remove console
-    console.log("activity Id confirmed to delete: ", activityIdToDelete);
-
-    toggleDeleteActivityModal();
-
-    //TODO: API call here
-  };
+  const headers = ActivityData.headers;
 
   const toggleSelectedActivity = (experiment) => {
     if (selectedActivity?.id === experiment.id) {
@@ -56,18 +27,6 @@ const ActivityComponent = (props) => {
 
   return (
     <div className="activity-content h-100 py-0">
-      {/**Delete activity confirmation modal */}
-      {showDeleteActivityModal && (
-        <MlModal
-          isOpen={showDeleteActivityModal}
-          textHead={""}
-          textBody={MODAL_MESSAGE.deleteActivityConfirmation}
-          handleSuccessBtn={onConfirmedDeleteActivity}
-          handleCrossBtn={toggleDeleteActivityModal}
-          successBtn={MODAL_BTN.yes}
-          failureBtn={MODAL_BTN.no}
-        />
-      )}
       <SearchBar
         id="search"
         name="search"
@@ -106,19 +65,11 @@ const ActivityComponent = (props) => {
                   key={i}
                   onClick={() => toggleSelectedActivity(experiment)}
                 >
-                  {/**TODO remove comments once activity log finalized */}
+                  <td>{i + 1}</td>
+                  <td>{experiment.template_name}</td>
                   <td>
-                    {i + 1}
-                    {/*experiment.id*/}
-                  </td>
-                  <td>{experiment.template_name /*{experiment.template}*/}</td>
-                  <td>
-                    {
-                      experiment.created_at &&
-                        moment(experiment.created_at).format(
-                          "DD/MM/YYYY"
-                        ) /*date*/
-                    }
+                    {experiment.created_at &&
+                      moment(experiment.created_at).format("DD/MM/YYYY")}
                   </td>
                   <td>
                     {experiment.start_time &&
@@ -128,8 +79,8 @@ const ActivityComponent = (props) => {
                     {experiment.end_time &&
                       moment(experiment.end_time).format("HH:MM A")}
                   </td>
-                  <td>{experiment.well_count /*no_of_wells*/}</td>
-                  <td>{experiment.repeat_cycle /*repeat_cycles*/}</td>
+                  <td>{experiment.well_count}</td>
+                  <td>{experiment.repeat_cycle}</td>
                   <td
                     className={
                       experiment.result === "Error"
@@ -140,12 +91,6 @@ const ActivityComponent = (props) => {
                     {experiment.result ? experiment.result : "NA"}
                   </td>
                   <td className="td-actions">
-                    {/* <ButtonIcon size={28} name="expand" />
-                    <ButtonIcon
-                      size={28}
-                      name="trash"
-                      onClick={deleteActivityClickHandler}
-                    /> */}
                     <ButtonIcon
                       size={28}
                       name="expand"
