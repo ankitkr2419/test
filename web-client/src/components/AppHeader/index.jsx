@@ -34,7 +34,7 @@ import {
   ROUTES,
   TOAST_MESSAGE,
 } from "appConstants";
-import { NAV_ITEMS } from "./constants";
+import { NAV_ITEMS, getBtnPropObj } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
 import { useHistory } from "react-router";
@@ -61,6 +61,9 @@ const AppHeader = (props) => {
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
   const wellListReducer = useSelector(getWells);
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
 
   const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -68,6 +71,9 @@ const AppHeader = (props) => {
   const isExperimentStopped = experimentStatus === EXPERIMENT_STATUS.stopped;
   const isRunFailed = experimentStatus === EXPERIMENT_STATUS.runFailed;
   const isExperimentSucceeded = experimentStatus === EXPERIMENT_STATUS.success;
+  const isExpanded = createExperimentReducer.get("isExpanded");
+  const result = createExperimentReducer.get("result");
+  const btnProps = getBtnPropObj(result);
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
@@ -86,13 +92,6 @@ const AppHeader = (props) => {
       setExpSuccessModalVisibility(true);
     }
   }, [isExperimentSucceeded]);
-
-  // useEffect(() => {
-  //   if (isExperimentStopped === true) {
-  //     // disConnectSocket();
-  //     dispatch(loginReset());
-  //   }
-  // }, [isExperimentStopped, dispatch]);
 
   // logout user
   const logoutClickHandler = () => {
@@ -157,7 +156,9 @@ const AppHeader = (props) => {
 		and activity log. Also user can't navigate to plate directly from templates route
 		without selecting a template. isTemplateRoute is true untill user selects a template */
       case "/plate":
-        if (isLoginTypeAdmin === true || isTemplateRoute === true) {
+        if (isLoginTypeAdmin === false && isExpanded === true) {
+          return false;
+        } else if (isLoginTypeAdmin === true || isTemplateRoute === true) {
           return true;
         }
         return false;
@@ -302,8 +303,11 @@ const AppHeader = (props) => {
                     <Button
                       color={isExperimentSucceeded ? "primary" : "secondary"}
                       size="sm"
-                      className={`font-weight-light border-2 border-gray shadow-none  mr-3 ${
-                        isExperimentSucceeded ? "d-none" : ""
+                      className={`font-weight-light border-2 border-gray shadow-none  mr-3 
+                      ${
+                        /*isExperimentSucceeded ||  */ isExpanded
+                          ? "d-none"
+                          : ""
                       }`}
                       onClick={() => setAbortModalVisibility(true)}
                       disabled={!isExperimentRunning}
@@ -314,7 +318,9 @@ const AppHeader = (props) => {
                       color={isExperimentRunning ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none ${
-                        isExperimentSucceeded ? "d-none" : ""
+                        /* isExperimentSucceeded || */ isExpanded
+                          ? "d-none"
+                          : ""
                       }`}
                       outline={
                         isExperimentRunning === false &&
@@ -330,14 +336,17 @@ const AppHeader = (props) => {
                       Run
                     </Button>
                     <Button
-                      color="success"
+                      color={btnProps.color}
                       size="sm"
-                      className={`font-weight-light border-2 border-gray shadow-none ${
-                        isExperimentSucceeded ? "" : "d-none"
-                      }`}
+                      className={`font-weight-light border-2 border-gray shadow-none
+                       ${
+                         isExperimentSucceeded && isExpanded === false
+                           ? ""
+                           : "d-none"
+                       }`}
                       onClick={() => setExpSuccessModalVisibility(true)}
                     >
-                      Result - Successful
+                      {btnProps.msg}
                     </Button>
                   </div>
                 )}

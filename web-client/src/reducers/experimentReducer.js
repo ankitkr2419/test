@@ -13,7 +13,7 @@ const listExperimentInitialState = fromJS({
 const createExperimentInitialState = fromJS({
 	data: {},
 	isExperimentSaved: false,
-	// id: '98f26854-d52c-4a14-8d96-09bcc89c3f86',
+	isExpanded: false, // isExpanded: boolean -> Determines whether this page is redirect via normal flow or by expanding
 	id: null,
 	description: null,
 });

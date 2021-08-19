@@ -1,8 +1,8 @@
 package tec_1089
 
 /*
-int SetTempAndRamp(double, double);
-int InitiateTEC();
+int setTempAndRamp(double, double);
+int initiateTEC();
 int checkForErrorState();
 int autoTune();
 int resetDevice();
@@ -65,7 +65,7 @@ var errorCheckStopped, tecInProgress bool
 var prevTemp float32 = 27.0
 
 func (t *TEC1089) InitiateTEC() (err error) {
-	C.InitiateTEC()
+	C.initiateTEC()
 
 	go startErrorCheck()
 
@@ -118,14 +118,14 @@ func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
 	tecInProgress = true
-	tempVal := C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	tempVal := C.setTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 	tecInProgress = false
 	// Handle Failure, Try again 3 times in interval of 200ms
 	i := 0
 	for (tempVal == -1) && (i < 3) {
 		i++
 		time.Sleep(200 * time.Millisecond)
-		tempVal = C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+		tempVal = C.setTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 
 		if (i == 3) && (tempVal == -1) {
 			err = errors.New("Temperature couldn't be reached even after 3 tries!")

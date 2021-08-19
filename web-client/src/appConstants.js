@@ -148,6 +148,9 @@ export const API_ENDPOINTS = {
   emailReport: "email-report",
   graphUpdate: "rtpcr/graph-update-scale",
   uploadReport: "upload-report",
+  emission: "emission",
+  experiments: "experiments",
+  temperature: "temperature",
 };
 
 export const MODAL_MESSAGE = {

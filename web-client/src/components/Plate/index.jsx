@@ -20,6 +20,50 @@ import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 import { graphs } from "./plateConstant";
+import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
+
+const initialOptions = {
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Cycles",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 5,
+        },
+        offset: true,
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+          min: 1,
+          max: 5,
+        },
+      },
+    ],
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "F-value",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+          min: 0,
+          max: 1,
+        },
+      },
+    ],
+  },
+};
 
 const Plate = (props) => {
   const {
@@ -40,12 +84,24 @@ const Plate = (props) => {
     temperatureData,
     mailBtnHandler,
     token,
+    isExpanded,
   } = props;
 
   // getExperimentStatus will return us current experiment status
   const runExperimentDetails = useSelector(getRunExperimentReducer);
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
+
+  // get targets from experiment target reducer(graph : target filters)
+  const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
+
   const experimentStatus = runExperimentDetails.get("experimentStatus");
-  const experimentDetails = runExperimentDetails.get("data");
+
+  let experimentDetails =
+    isExpanded === true
+      ? createExperimentReducer.toJS()
+      : runExperimentDetails.get("data").toJS();
 
   // local state to maintain well data which is selected for updation
   const [updateWell, setUpdateWell] = useState(null);
@@ -58,6 +114,53 @@ const Plate = (props) => {
 
   // local state to manage previewReport modal
   const [previewReportModal, setPreviewReportModal] = useState(false);
+
+  // default ranges for amplification plot
+  const [xMinValue, setXMin] = useState(1);
+  const [xMaxValue, setXMax] = useState(5);
+  const [yMinValue, setYMin] = useState(0);
+  const [yMaxValue, setYMax] = useState(5);
+
+  const [options, setOptions] = useState(initialOptions);
+  const [isDataFromAPI, setDataFromAPI] = useState(false);
+
+  useEffect(() => {
+    const tempOptions = options;
+
+    tempOptions.scales.xAxes[0].ticks.min = xMinValue;
+    tempOptions.scales.xAxes[0].ticks.max = xMaxValue;
+    tempOptions.scales.yAxes[0].ticks.min = yMinValue;
+    tempOptions.scales.yAxes[0].ticks.max = yMaxValue;
+
+    let newOptions = {
+      ...initialOptions,
+      scales: {
+        ...initialOptions.scales,
+        xAxes: [
+          {
+            ...initialOptions.scales.xAxes[0],
+            ticks: {
+              ...initialOptions.scales.xAxes[0].ticks,
+              min: xMinValue,
+              max: xMaxValue,
+            },
+          },
+        ],
+        yAxes: [
+          {
+            ...initialOptions.scales.yAxes[0],
+            ticks: {
+              ...initialOptions.scales.yAxes[0].ticks,
+              min: yMinValue,
+              max: yMaxValue,
+            },
+          },
+        ],
+      },
+    };
+
+    setOptions(newOptions);
+  }, [xMaxValue, xMinValue, yMaxValue, yMinValue]);
 
   useEffect(() => {
     if (
@@ -78,9 +181,13 @@ const Plate = (props) => {
     const { isSelected, isWellFilled, isMultiSelected } = well.toJS();
     /**
      * if well is not filled and if multi selection option is not checked
-     * 				then we can make well selected
+     * 				then we can make well selected and isExpanded === false
      */
-    if (isMultiSelectionOptionOn === false && isWellFilled === false) {
+    if (
+      isMultiSelectionOptionOn === false &&
+      isWellFilled === false &&
+      isExpanded === false
+    ) {
       setSelectedWell(index, !isSelected);
     }
 
@@ -127,6 +234,28 @@ const Plate = (props) => {
     togglePreviewReportModal();
   };
 
+  const handleRangeChangeBtn = ({ xMax, xMin, yMax, yMin }) => {
+    setDataFromAPI(true);
+
+    setXMax(xMax);
+    setXMin(xMin);
+    setYMax(yMax);
+    setYMin(yMin);
+  };
+
+  const handleResetBtn = (cycleCount) => {
+    setDataFromAPI(true);
+
+    const thresholdArr = experimentGraphTargetsList
+      .toJS()
+      .map((targetObj) => parseInt(targetObj.threshold));
+
+    setXMax(cycleCount);
+    setXMin(0);
+    setYMax(Math.max(thresholdArr));
+    setYMin(0);
+  };
+
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
       {previewReportModal && (
@@ -143,6 +272,10 @@ const Plate = (props) => {
           experimentDetails={experimentDetails}
           experimentId={experimentId}
           temperatureData={temperatureData}
+          mailBtnHandler={mailBtnHandler}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
+          experimentGraphTargetsList={experimentGraphTargetsList}
         />
       )}
       <Header
@@ -152,6 +285,7 @@ const Plate = (props) => {
         experimentDetails={experimentDetails}
         experimentId={experimentId}
         temperatureData={temperatureData}
+        isExpanded={isExpanded}
       />
       <GridWrapper className="plate-body flex-100 scroll-y">
         <Nav className="plate-nav-tabs border-0" tabs>
@@ -175,7 +309,8 @@ const Plate = (props) => {
                 !(
                   experimentStatus === EXPERIMENT_STATUS.success ||
                   experimentStatus === EXPERIMENT_STATUS.running ||
-                  experimentStatus === EXPERIMENT_STATUS.stopped
+                  experimentStatus === EXPERIMENT_STATUS.stopped ||
+                  isExpanded === true
                 )
               }
             >
@@ -209,11 +344,13 @@ const Plate = (props) => {
                     isGroupSelectionOn={isMultiSelectionOptionOn}
                     toggleMultiSelectOption={toggleMultiSelectOption}
                     experimentStatus={experimentStatus}
+                    isExpanded={isExpanded}
                   />
                   <SelectAllGridHeader
                     isAllWellsSelected={isAllWellsSelected}
                     toggleAllWellSelectedOption={toggleAllWellSelectedOption}
                     experimentStatus={experimentStatus}
+                    isExpanded={isExpanded}
                   />
                 </div>
                 <GridComponent
@@ -225,6 +362,7 @@ const Plate = (props) => {
                   onWellUpdateClickHandler={onWellUpdateClickHandler}
                   showGraphOfWell={showGraphOfWell}
                   experimentStatus={experimentStatus}
+                  isExpanded={isExpanded}
                 />
               </div>
             </div>
@@ -258,22 +396,14 @@ const Plate = (props) => {
                     Analyse Data
                   </Button>
                   <ButtonIcon
-                    name="published"
-                    size={28}
-                    className="bg-white border-secondary ml-auto"
-                    onClick={mailBtnHandler}
-                  />
-                  <ButtonIcon
                     name="download-1"
                     size={28}
-                    className="bg-white border-secondary ml-3 downloadButton"
+                    className="bg-white border-secondary ml-auto downloadButton"
                     onClick={downloadClickHandler}
                   />
                 </div>
                 <ExperimentGraphContainer
-                  token={token}
                   isInsidePreviewModal={false}
-                  experimentId={experimentId}
                   headerData={headerData}
                   activeGraph={activeGraph}
                   experimentStatus={experimentStatus}
@@ -281,6 +411,12 @@ const Plate = (props) => {
                   setIsSidebarOpen={setIsSidebarOpen}
                   resetSelectedWells={resetSelectedWells}
                   isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+                  isExpanded={isExpanded}
+                  handleRangeChangeBtn={handleRangeChangeBtn}
+                  handleResetBtn={handleResetBtn}
+                  options={options}
+                  isDataFromAPI={isDataFromAPI}
+                  experimentGraphTargetsList={experimentGraphTargetsList}
                 />
               </div>
             </div>

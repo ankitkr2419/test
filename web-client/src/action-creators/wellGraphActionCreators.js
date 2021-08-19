@@ -1,4 +1,7 @@
-import wellGraphActions, { updateGraphActions } from "actions/wellGraphActions";
+import wellGraphActions, {
+  resetGraphActions,
+  updateGraphActions,
+} from "actions/wellGraphActions";
 
 export const wellGraphSucceeded = (data) => ({
   type: wellGraphActions.successAction,
@@ -19,5 +22,20 @@ export const updateGraphSuccess = ({ response }) => ({
 
 export const updateGraphFailed = ({ error }) => ({
   type: updateGraphActions.updateGraphFailure,
+  payload: { error },
+});
+
+export const resetGraphInitiated = ({ experimentId, token }) => ({
+  type: resetGraphActions.resetGraphInitiated,
+  payload: { experimentId, token },
+});
+
+export const resetGraphSuccess = ({ response }) => ({
+  type: resetGraphActions.resetGraphSucceeded,
+  payload: { response },
+});
+
+export const resetGraphFailed = ({ error }) => ({
+  type: resetGraphActions.resetGraphFailure,
   payload: { error },
 });
