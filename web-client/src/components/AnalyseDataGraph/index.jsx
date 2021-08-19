@@ -6,16 +6,16 @@ import { options } from "./GraphOptions";
 import Filters from "./Filters";
 
 const AnalyseDataGraphComponent = (props) => {
-  let { data, dyeOptions, selectedDye, onDyeChanged } = props;
+  let { data, targetOptions, selectedTarget, onTargetChanged } = props;
   return (
     <div>
       <GraphCard>
         <LineChart data={data} options={options} />
       </GraphCard>
       <Filters
-        dyeOptions={dyeOptions}
-        selectedDye={selectedDye}
-        onDyeChanged={onDyeChanged}
+        targetOptions={targetOptions}
+        selectedTarget={selectedTarget}
+        onTargetChanged={onTargetChanged}
       />
     </div>
   );
@@ -23,6 +23,9 @@ const AnalyseDataGraphComponent = (props) => {
 
 AnalyseDataGraphComponent.propTypes = {
   data: PropTypes.object.isRequired,
+  targetOptions: PropTypes.array.isRequired,
+  selectedTarget: PropTypes.object.isRequired,
+  onTargetChanged: PropTypes.func.isRequired,
 };
 
 export default React.memo(AnalyseDataGraphComponent);

@@ -70,6 +70,7 @@ import {
   pidReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
+import { analyseDataGraphFiltersReducer } from "./analyseDataGraph";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -122,6 +123,7 @@ const rootReducer = combineReducers({
   pidReducer,
   finishCreateTemplateReducer,
   reportReducer,
+  analyseDataGraphFiltersReducer,
 });
 
 export default rootReducer;

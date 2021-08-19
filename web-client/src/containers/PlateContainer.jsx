@@ -94,10 +94,6 @@ const PlateContainer = () => {
         dispatch(temperatureApiGraphInitiated({ experimentId, token }));
       }
     }
-    return () => {
-      // isPlateRoute use in appHeader to manage visibility of header buttons
-      dispatch(setIsPlateRoute(false));
-    };
   }, [experimentId, experimentStatus, isExpanded, dispatch]);
 
   const setSelectedWell = (index, isWellSelected) => {

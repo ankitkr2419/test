@@ -1,29 +1,40 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+
+import { updateFilter } from "action-creators/analyseDataGraphFiltersActionCreators";
+import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import AnalyseDataGraphComponent from "components/AnalyseDataGraph";
+import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
 
 const AnalyseDataGraphContainer = (props) => {
-  //TODO make it dynamic
-  const dyeOptions = [
-    { label: "FAM", value: "FAM" },
-    { label: "VIC", value: "VIC" },
-  ];
+  const dispatch = useDispatch();
 
-  //local state to maintain selected dye
-  const [selectedDye, setSelectedDye] = useState(dyeOptions[0]);
+  // get targets from experiment target reducer(graph : target filters)
+  const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
+  const targetsData = experimentGraphTargetsList.toJS();
+  // transform targets into (label, value) instead (target_name, target_id) to use in dropdown
+  const targetOptions = generateTargetOptions(targetsData);
 
-  //TODO get data from reducer
+  //access filters from redux
+  const analyseDataGraphFiltersReducer = useSelector(
+    (state) => state.analyseDataGraphFiltersReducer
+  );
+  const filters = analyseDataGraphFiltersReducer.toJS();
+  const { selectedTarget, isAutoThreshold, isAutoBaseline } = filters;
+
+  //TODO get graph data from reducer
   const data = {};
 
-  const onDyeChanged = (value) => {
-    setSelectedDye(value);
+  const onTargetChanged = (value) => {
+    dispatch(updateFilter({ selectedTarget: value }));
   };
 
   return (
     <AnalyseDataGraphComponent
       data={data}
-      dyeOptions={dyeOptions}
-      selectedDye={selectedDye}
-      onDyeChanged={onDyeChanged}
+      targetOptions={targetOptions}
+      selectedTarget={selectedTarget}
+      onTargetChanged={onTargetChanged}
     />
   );
 };

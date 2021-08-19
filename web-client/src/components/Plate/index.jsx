@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 
@@ -21,6 +22,8 @@ import { ButtonIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
+import { updateFilter } from "action-creators/analyseDataGraphFiltersActionCreators";
+import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
 
 const initialOptions = {
   legend: {
@@ -87,6 +90,7 @@ const Plate = (props) => {
     isExpanded,
   } = props;
 
+  const dispatch = useDispatch();
   // getExperimentStatus will return us current experiment status
   const runExperimentDetails = useSelector(getRunExperimentReducer);
   const createExperimentReducer = useSelector(
@@ -95,6 +99,7 @@ const Plate = (props) => {
 
   // get targets from experiment target reducer(graph : target filters)
   const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
+  const targetsData = experimentGraphTargetsList.toJS();
 
   const experimentStatus = runExperimentDetails.get("experimentStatus");
 
@@ -124,14 +129,27 @@ const Plate = (props) => {
   const [options, setOptions] = useState(initialOptions);
   const [isDataFromAPI, setDataFromAPI] = useState(false);
 
+  //set first target as selected to use it in analyse data graph
   useEffect(() => {
-    const tempOptions = options;
+    const targets = generateTargetOptions(targetsData);
+    if (targets.length > 0) {
+      const firstTarget = targets[0];
+      dispatch(updateFilter({ selectedTarget: firstTarget }));
+    }
+  }, [dispatch, targetsData]);
 
-    tempOptions.scales.xAxes[0].ticks.min = xMinValue;
-    tempOptions.scales.xAxes[0].ticks.max = xMaxValue;
-    tempOptions.scales.yAxes[0].ticks.min = yMinValue;
-    tempOptions.scales.yAxes[0].ticks.max = yMaxValue;
+  //fetch analyseDataGraph data when experiment is abort/success
+  useEffect(() => {
+    if (
+      experimentStatus === EXPERIMENT_STATUS.success ||
+      experimentStatus === EXPERIMENT_STATUS.stopped ||
+      isExpanded === true
+    ) {
+      //TODO api calls of baseline and threshold
+    }
+  }, [dispatch, experimentStatus, isExpanded]);
 
+  useEffect(() => {
     let newOptions = {
       ...initialOptions,
       scales: {
@@ -221,7 +239,7 @@ const Plate = (props) => {
 
   // helper function to toggle the graphs
   const onChangeActiveGraph = (graphType) => {
-    if(activeGraph !== graphType) {
+    if (activeGraph !== graphType) {
       setActiveGraph(graphType);
     }
   };
@@ -373,7 +391,11 @@ const Plate = (props) => {
                 <div className="d-flex align-items-center mb-3">
                   <Button
                     outline={activeGraph !== graphs.Amplification}
-                    color={activeGraph === graphs.Amplification ? "primary" : "secondary"}
+                    color={
+                      activeGraph === graphs.Amplification
+                        ? "primary"
+                        : "secondary"
+                    }
                     className="mr-3 Amplification"
                     onClick={() => onChangeActiveGraph(graphs.Amplification)}
                   >
@@ -381,7 +403,11 @@ const Plate = (props) => {
                   </Button>
                   <Button
                     outline={activeGraph !== graphs.Temperature}
-                    color={activeGraph === graphs.Temperature ? "primary" : "secondary"}
+                    color={
+                      activeGraph === graphs.Temperature
+                        ? "primary"
+                        : "secondary"
+                    }
                     className="mr-3 Temperature"
                     onClick={() => onChangeActiveGraph(graphs.Temperature)}
                   >
@@ -389,7 +415,11 @@ const Plate = (props) => {
                   </Button>
                   <Button
                     outline={activeGraph !== graphs.AnalyseData}
-                    color={activeGraph === graphs.AnalyseData ? "primary" : "secondary"}
+                    color={
+                      activeGraph === graphs.AnalyseData
+                        ? "primary"
+                        : "secondary"
+                    }
                     className="mr-3 AnalyseData"
                     onClick={() => onChangeActiveGraph(graphs.AnalyseData)}
                   >
