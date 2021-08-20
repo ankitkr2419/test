@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 )
 
@@ -32,8 +33,8 @@ type Storer interface {
 	ListExperiments(context.Context) ([]Experiment, error)
 	CreateExperiment(context.Context, Experiment) (Experiment, error)
 	ShowExperiment(context.Context, uuid.UUID) (Experiment, error)
-	ListExpTemplateTargets(context.Context, uuid.UUID) ([]ExpTemplateTarget, error)
-	UpsertExpTemplateTarget(context.Context, []ExpTemplateTarget, uuid.UUID) ([]ExpTemplateTarget, error)
+	ListExpTemplateTargets(context.Context, uuid.UUID) ([]ExpTempTargeTDye, error)
+	UpsertExpTemplateTarget(context.Context, []ExpTemplateTarget, uuid.UUID) ([]ExpTempTargeTDye, error)
 	CreateSample(context.Context, Sample) (Sample, error)
 	FindSamples(context.Context, string) ([]Sample, error)
 	ListWells(context.Context, uuid.UUID) ([]Well, error)
@@ -129,4 +130,6 @@ type Storer interface {
 	DeleteCartridge(ctx context.Context, id int64) (err error)
 
 	DeleteTipTube(ctx context.Context, id int64) (err error)
+	SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) (err error)
+	ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error)
 }

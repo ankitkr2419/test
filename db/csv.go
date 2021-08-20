@@ -346,6 +346,10 @@ func addHoldStage(store Storer, record []string) (err error) {
 	cStage.TemplateID = createdTemplate.ID
 	cStage.RepeatCount = cycleCount
 
+	if cycleCount < RepeatCountDefault {
+		logger.Warnln("Repeat Count for cycle stage is below threshold")
+	}
+
 	// Create both Stages
 	createdStages, err = store.CreateStages(csvCtx, []Stage{hStage, cStage})
 	if err != nil {

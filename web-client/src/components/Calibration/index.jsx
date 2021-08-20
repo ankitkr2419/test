@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useFormik } from "formik";
+
 import {
   Button,
   Form,
@@ -18,11 +20,9 @@ import {
   validateAllFields,
   getRequestBody,
 } from "./helper";
-import { useCallback } from "react";
-import { useFormik } from "formik";
 
 const CalibrationComponent = (props) => {
-  let { configs, saveBtnClickHandler } = props;
+  let { configs, saveButtonClickHandler } = props;
 
   const formik = useFormik({
     initialValues: formikInitialState,
@@ -50,7 +50,7 @@ const CalibrationComponent = (props) => {
 
     if (validateAllFields(formik.values) === true) {
       const requestBody = getRequestBody(formik.values);
-      saveBtnClickHandler(requestBody);
+      saveButtonClickHandler(requestBody);
     }
   };
 

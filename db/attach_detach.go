@@ -132,7 +132,34 @@ func (s *pgStore) createAttachDetach(ctx context.Context, tx *sql.Tx, ad AttachD
 func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AttachDetachInitialisedState)
 
-	result, err := s.db.Exec(
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AttachDetachInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.AttachDetachUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.AttachDetachUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AttachDetachCompletedState)
+		return
+	}()
+
+	err = s.updateProcessName(ctx, tx, a.ProcessID, AttachDetachProcess, a)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AttachDetachUpdateNameError)
+		return
+	}
+
+	result, err := tx.Exec(
 		updateAttachDetachQuery,
 		strings.ToLower(a.Operation),
 		a.Height,

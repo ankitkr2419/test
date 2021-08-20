@@ -10,15 +10,15 @@ import (
 )
 
 const (
-	HOLDING_STAGE = "hold"
-	CYCLE_STAGE   = "cycle"
-	baudRate = 9600
-	dataBits = 8
-	parity = "E"
-	stopBits = 1
-	station_1_SlaveID = 1
-	station_2_SlaveID = 2
-	timeoutMs = 50
+	HOLDING_STAGE     = "hold"
+	CYCLE_STAGE       = "cycle"
+	baudRate          = 9600
+	dataBits          = 8
+	parity            = "E"
+	stopBits          = 1
+	station_1_SlaveID = byte(1)
+	station_2_SlaveID = byte(2)
+	timeoutMs         = 50
 )
 
 type Compact32 struct {
@@ -52,6 +52,8 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 	go C32.HeartBeat()
 
 	// Specifically for testing!
+	// ASK: Should testing logic be present here?
+	// It doesn't make sense as now testing is dependent on TEC as well.
 	if test {
 		p := plc.Stage{
 			Holding: []plc.Step{
@@ -133,12 +135,12 @@ func NewCompact32DeckDriverA(wsMsgCh chan string, wsErrch chan error, exit chan 
 func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, handler *modbus.RTUClientHandler) plc.Extraction {
 	/* Modbus RTU/ASCII */
 	handler2 := modbus.NewRTUClientHandler(config.ReadEnvString("MODBUS_TTY"))
-	handler.BaudRate = baudRate
-	handler.DataBits = dataBits
-	handler.Parity = parity
-	handler.StopBits = stopBits
-	handler.SlaveId = station_2_SlaveID
-	handler.Timeout = timeoutMs * time.Millisecond
+	handler2.BaudRate = baudRate
+	handler2.DataBits = dataBits
+	handler2.Parity = parity
+	handler2.StopBits = stopBits
+	handler2.SlaveId = station_2_SlaveID
+	handler2.Timeout = timeoutMs * time.Millisecond
 
 	handler2.Connect()
 	driver := Compact32ModbusDriver{}

@@ -39,7 +39,6 @@ export function* runRecipe(actions) {
         }`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
-        // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token
       },
@@ -68,7 +67,6 @@ export function* resumeRecipe(actions) {
         }`,
         successAction: resumeRecipeSuccess,
         failureAction: resumeRecipeFailed,
-        // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token
       },
@@ -98,7 +96,6 @@ export function* abortRecipe(actions) {
         }`,
         successAction: abortRecipeSuccess,
         failureAction: abortRecipeFailed,
-        // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token
       },
@@ -127,7 +124,6 @@ export function* pauseRecipe(actions) {
         }`,
         successAction: pauseRecipeSuccess,
         failureAction: pauseRecipeFailed,
-        // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token
       },
@@ -151,14 +147,13 @@ export function* recipeListing(actions) {
         reqPath: API_ENDPOINTS.recipeListing,
         successAction: recipeListingSuccess,
         failureAction: recipeListingFailed,
-        // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token,
       },
     });
   } catch (error) {
     yield put(toast(error));
-    // console.error("Error in fetching the recipes", error);
+    console.error("Error in fetching the recipes", error);
     yield put(recipeListingFailure(error));
   }
 }
@@ -182,7 +177,6 @@ export function* stepRunRecipe(actions) {
         }`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
-        // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token
       },
@@ -209,7 +203,6 @@ export function* nextStepRunRecipe(actions) {
         reqPath: `${API_ENDPOINTS.runNextStep}/${deckName === DECKNAME.DeckA ? "A" : "B"}`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
-        // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token
       },

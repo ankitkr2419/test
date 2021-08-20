@@ -44,22 +44,18 @@ func monitorForPLCTimeout(deps *Dependencies, exit chan error) {
 	}
 }
 
-func SendHeaterDataToEng(deps *Dependencies) {
+func SendHeaterDataToEng(deps Dependencies) {
 	go deps.PlcDeck[plc.DeckA].HeaterData()
 	go deps.PlcDeck[plc.DeckB].HeaterData()
 }
 
-func WaitForGracefulShutdown(deps *Dependencies, idleConnsClosed chan struct{}) {
+func WaitForGracefulShutdown(deps Dependencies, idleConnsClosed chan struct{}) {
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 	<-signals
 
-	err := shutDownGraceFully(*deps)
-	if err != nil {
-		os.Exit(-1)
-	}
-	os.Exit(0)
+	ShutDownGracefully(deps)
 }
 
 func SetLoggersAndFiles() (err error) {
@@ -75,7 +71,12 @@ func SetLoggersAndFiles() (err error) {
 	}
 	if _, err = os.Stat(tecPath); os.IsNotExist(err) {
 		os.MkdirAll(tecPath, 0755)
-		// ignore error and try creating log output file
+	}
+	if _, err = os.Stat(ReportOutputPath); os.IsNotExist(err) {
+		os.MkdirAll(ReportOutputPath, 0755)
+	}
+	if _, err = os.Stat(ExpOutputPath); os.IsNotExist(err) {
+		os.MkdirAll(ExpOutputPath, 0755)
 	}
 
 	// All terminal logs will be noted in below file

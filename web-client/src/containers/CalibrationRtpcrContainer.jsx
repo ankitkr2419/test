@@ -27,7 +27,7 @@ const CalibrationRtpcrContainer = () => {
     }
   }, [dispatch, token]);
 
-  const saveBtnClickHandler = (configData) => {
+  const saveButtonClickHandler = (configData) => {
     let data = {
       room_temperature: configData.roomTemperature,
       homing_time: configData.homingTime,
@@ -42,7 +42,7 @@ const CalibrationRtpcrContainer = () => {
   return (
     <CalibrationComponent
       configs={configs}
-      saveBtnClickHandler={saveBtnClickHandler}
+      saveButtonClickHandler={saveButtonClickHandler}
     />
   );
 };

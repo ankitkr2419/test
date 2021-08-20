@@ -185,7 +185,7 @@ func (d *Simulator) Cycle() (err error) {
 
 	if plc.ExperimentRunning {
 		logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
-		err = plc.HoldSleep(16)
+		err = plc.HoldSleep(int32(config.GetCycleTime()))
 		if err != nil {
 			logger.Errorln("Error while running cycle: ", err)
 			return
@@ -208,15 +208,15 @@ func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
 	// simulate currentLidTemp
 	if plc.ExperimentRunning {
 		time.Sleep(2 * time.Second)
-		d.plcIO.d.currentLidTemp = jitter(uint16(expectedLidTemp), 0, 30)
-		logger.Infoln("Current Lid Temp: ", d.plcIO.d.currentLidTemp)
+		plc.CurrentLidTemp = float32(expectedLidTemp)/10
+		logger.Infoln("Current Lid Temp: ", plc.CurrentLidTemp)
 	}
 	return
 }
 
 func (d *Simulator) SwitchOffLidTemp() (err error) {
 	// Off Lid Heating
-	d.plcIO.d.currentLidTemp = jitter(uint16(270), 0, 20)
+	plc.CurrentLidTemp = float32(config.GetRoomTemp())
 	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
 
 	return
