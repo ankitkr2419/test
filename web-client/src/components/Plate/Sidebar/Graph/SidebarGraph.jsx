@@ -82,7 +82,18 @@ const SidebarGraph = (props) => {
       {activeGraph === graphs.Temperature && <TemperatureGraphContainer />}
 
       {/** show analyse data graph */}
-      {activeGraph === graphs.AnalyseData && <AnalyseDataGraphContainer />}
+      {activeGraph === graphs.AnalyseData && (
+        <>
+          {(experimentStatus === EXPERIMENT_STATUS.success ||
+            experimentStatus === EXPERIMENT_STATUS.stopped ||
+            isExpanded === true) && (
+            <AnalyseDataGraphContainer
+              experimentStatus={experimentStatus}
+              isExpanded={isExpanded}
+            />
+          )}
+        </>
+      )}
     </>
   );
 };

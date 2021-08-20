@@ -22,7 +22,7 @@ import { ButtonIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
-import { updateFilter } from "action-creators/analyseDataGraphFiltersActionCreators";
+import { updateFilter } from "action-creators/analyseDataGraphActionCreators";
 import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
 
 const initialOptions = {
@@ -137,17 +137,6 @@ const Plate = (props) => {
       dispatch(updateFilter({ selectedTarget: firstTarget }));
     }
   }, [dispatch, targetsData]);
-
-  //fetch analyseDataGraph data when experiment is abort/success
-  useEffect(() => {
-    if (
-      experimentStatus === EXPERIMENT_STATUS.success ||
-      experimentStatus === EXPERIMENT_STATUS.stopped ||
-      isExpanded === true
-    ) {
-      //TODO api calls of baseline and threshold
-    }
-  }, [dispatch, experimentStatus, isExpanded]);
 
   useEffect(() => {
     let newOptions = {

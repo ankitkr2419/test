@@ -151,6 +151,7 @@ export const API_ENDPOINTS = {
   emission: "emission",
   experiments: "experiments",
   temperature: "temperature",
+  setThreshold: "set-threshold",
 };
 
 export const MODAL_MESSAGE = {
