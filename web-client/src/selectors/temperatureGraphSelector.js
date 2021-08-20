@@ -28,7 +28,7 @@ const getSortedTemperatureGraphReducer = createSelector(
 // get starting time of temperature graph
 const getStartTime = temperatureGraphData => new Date(temperatureGraphData.first().get('created_at'));
 
-const getYaxisData = createSelector(
+const getYaxisDataForTemp = createSelector(
 	temperatureGraphData => temperatureGraphData,
 	getStartTime,
 	(temperatureGraphData, startTime) => temperatureGraphData.map(ele => {
@@ -36,6 +36,18 @@ const getYaxisData = createSelector(
 		return {
 			x: getTimeDiff(startTime, currTime),
 			y: ele.get('temp'),
+		};
+	}),
+);
+
+const getYaxisDataForLidTemp = createSelector(
+	temperatureGraphData => temperatureGraphData,
+	getStartTime,
+	(temperatureGraphData, startTime) => temperatureGraphData.map(ele => {
+		const currTime = new Date(ele.get('created_at'));
+		return {
+			x: getTimeDiff(startTime, currTime),
+			y: ele.get('lid_temp'),
 		};
 	}),
 );
@@ -56,7 +68,13 @@ export const getTemperatureChartData = createSelector(
 					...lineConfigs,
 					label: 'Temperature Plot',
 					borderColor,
-					data: getYaxisData(temperatureGraphData).toJS(),
+					data: getYaxisDataForTemp(temperatureGraphData).toJS(),
+				},
+				{
+					...lineConfigs,
+					label: 'Lid Temperature Plot',
+					borderColor: `rgba(245,144,178,1)`,
+					data: getYaxisDataForLidTemp(temperatureGraphData).toJS(),
 				},
 			],
 		};

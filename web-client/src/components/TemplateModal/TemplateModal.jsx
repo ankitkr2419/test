@@ -12,7 +12,12 @@ import {
   ModalBody,
 } from "core-components";
 import { Center, ButtonIcon, Text } from "shared-components";
-import { MAX_LID_TEMP, MAX_VOLUME, MIN_LID_TEMP, MIN_VOLUME } from "appConstants";
+import {
+  MAX_LID_TEMP,
+  MAX_VOLUME,
+  MIN_LID_TEMP,
+  MIN_VOLUME,
+} from "appConstants";
 
 const TemplateModal = (props) => {
   const {
@@ -31,6 +36,7 @@ const TemplateModal = (props) => {
     resetFormValues,
     isTemplateEdited,
     resetModalState,
+    selectedTemplateDetails,
   } = props;
 
   const [isVolumeInvalid, setVolumeInvalidity] = useState(false);
@@ -45,22 +51,52 @@ const TemplateModal = (props) => {
     // eslint-disable-next-line
   }, []);
 
+  // if the updated value is empty then set previous value
+  const onTemplateNameBlurHandler = useCallback(
+    (name) => {
+      if (name === "") {
+        const prevName = selectedTemplateDetails.get("name");
+        setTemplateName(prevName);
+      }
+    },
+    [setTemplateName, selectedTemplateDetails]
+  );
+
+  // if the updated value is empty then set previous value
+  const onTemplateDescBlurHandler = useCallback(
+    (desc) => {
+      if (desc === "") {
+        const prevDesc = selectedTemplateDetails.get("description");
+        setTemplateDescription(prevDesc);
+      }
+    },
+    [setTemplateDescription, selectedTemplateDetails]
+  );
+
+  // if the updated value is empty then set previous value
   const onVolumeBlurHandler = useCallback(
     (volume) => {
-      if (volume < MIN_VOLUME || volume > MAX_VOLUME) {
+      if (!volume) {
+        const prevVolume = selectedTemplateDetails.get("volume");
+        setVolume(prevVolume);
+      } else if (volume < MIN_VOLUME || volume > MAX_VOLUME) {
         setVolumeInvalidity(true);
       }
     },
-    [setVolumeInvalidity]
+    [setVolumeInvalidity, selectedTemplateDetails]
   );
 
+  // if the updated value is empty then set previous value
   const onLidTempBlurHandler = useCallback(
     (temp) => {
-      if (temp < MIN_LID_TEMP || temp > MAX_LID_TEMP) {
+      if (!temp) {
+        const prevLidTemp = selectedTemplateDetails.get("lid_temp");
+        setLidTemperature(prevLidTemp);
+      } else if (temp < MIN_LID_TEMP || temp > MAX_LID_TEMP) {
         setLidTempInvalidity(true);
       }
     },
-    [setLidTempInvalidity]
+    [setLidTempInvalidity, selectedTemplateDetails]
   );
 
   return (
@@ -105,6 +141,9 @@ const TemplateModal = (props) => {
                     onChange={(event) => {
                       setTemplateName(event.target.value);
                     }}
+                    onBlur={(event) => {
+                      onTemplateNameBlurHandler(parseInt(event.target.value));
+                    }}
                   />
                 </FormGroup>
               </Col>
@@ -124,6 +163,9 @@ const TemplateModal = (props) => {
                     value={templateDescription}
                     onChange={(event) => {
                       setTemplateDescription(event.target.value);
+                    }}
+                    onBlur={(event) => {
+                      onTemplateDescBlurHandler(parseInt(event.target.value));
                     }}
                     maxLength={300}
                   />
