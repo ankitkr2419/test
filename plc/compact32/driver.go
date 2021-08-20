@@ -14,7 +14,7 @@ import (
 
 const (
 	maxHomingTries             = 2
-	homingSuccessValue         = 101
+	homingSuccessValue         = 37
 	noOfDyes                   = 4
 	fValueRegisterStartAddress = 800
 )
@@ -176,16 +176,16 @@ func (d *Compact32) HomingRTPCR() (err error) {
 		return
 	}
 
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][100], plc.OFF)
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][36], plc.OFF)
 	if err != nil {
-		logger.Error("WriteSingleCoil:M100 : Start Cycle")
+		logger.Error("WriteSingleCoil:M36 : Start Cycle")
 		return
 	}
 	logger.WithField("HOMING", "homing started").Infoln("HOMING STARTED")
 	time.Sleep(time.Second * time.Duration(config.GetHomingTime()))
-	result, err := d.Driver.ReadCoils(plc.MODBUS["M"][100], uint16(1))
+	result, err := d.Driver.ReadCoils(plc.MODBUS["M"][36], uint16(1))
 	if err != nil {
-		logger.Error("WriteSingleCoil:M100 ", err)
+		logger.Error("ReadCoil:M36 ", err)
 		return
 	}
 	logger.Infoln("homing result", result)
