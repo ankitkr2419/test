@@ -52,6 +52,8 @@ func NewCompact32Driver(wsMsgCh chan string, wsErrch chan error, exit chan error
 	go C32.HeartBeat()
 
 	// Specifically for testing!
+	// ASK: Should testing logic be present here?
+	// It doesn't make sense as now testing is dependent on TEC as well.
 	if test {
 		p := plc.Stage{
 			Holding: []plc.Step{

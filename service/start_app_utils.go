@@ -55,11 +55,7 @@ func WaitForGracefulShutdown(deps Dependencies, idleConnsClosed chan struct{}) {
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 	<-signals
 
-	err := shutDownGraceFully(deps)
-	if err != nil {
-		os.Exit(-1)
-	}
-	os.Exit(0)
+	ShutDownGracefully(deps)
 }
 
 func SetLoggersAndFiles() (err error) {
