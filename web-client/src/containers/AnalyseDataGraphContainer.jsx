@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import {
   fetchAnalyseDataThreshold,
+  fetchAnalyseDataBaseline,
   updateFilter,
 } from "action-creators/analyseDataGraphActionCreators";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
@@ -29,7 +30,6 @@ const AnalyseDataGraphContainer = (props) => {
 
   //current experiment id
   const experimentId = useSelector(getExperimentId);
-  console.log("exp id: ", experimentId);//check
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -51,6 +51,16 @@ const AnalyseDataGraphContainer = (props) => {
     };
     dispatch(
       fetchAnalyseDataThreshold({ token, experimentId, thresholdDataForApi })
+    );
+
+    let baselineDataForApi = {
+      auto_baseline: isAutoBaseline,
+      start_cycle: 1, //TODO make it dynamic with filters
+      end_cycle: 5, //TODO make it dynamic with filters
+    };
+
+    dispatch(
+      fetchAnalyseDataBaseline({ token, experimentId, baselineDataForApi })
     );
   }, [dispatch]);
 

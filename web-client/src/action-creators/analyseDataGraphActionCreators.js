@@ -36,3 +36,16 @@ export const fetchAnalyseDataThresholdFailed = ({ error }) => ({
   type: fetchAnalyseDataWithThresholdActions.failureAction,
   payload: { error },
 });
+
+/**
+ * Fetch with baseline
+ */
+export const fetchAnalyseDataBaseline = (payload) => ({
+  type: fetchAnalyseDataWithBaselineActions.initiateAction,
+  payload: payload,
+});
+
+export const fetchAnalyseDataBaselineFailed = ({ error }) => ({
+  type: fetchAnalyseDataWithBaselineActions.failureAction,
+  payload: { error },
+});
