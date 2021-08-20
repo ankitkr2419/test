@@ -6,6 +6,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
+	"os"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -56,7 +57,7 @@ func PrintBinaryInfo() {
 		Version, User, Machine, Branch, CommitID, BuiltOn)
 }
 
-func shutDownGraceFully(deps Dependencies) (err error) {
+func ShutDownGracefully(deps Dependencies) (err error) {
 	var err1, err2, err3, err4 error
 	// We received an interrupt signal, shut down.
 	logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
@@ -85,5 +86,11 @@ func shutDownGraceFully(deps Dependencies) (err error) {
 			err = fmt.Errorf("%v\n%v", err, err4)
 		}
 	}
+	if err != nil{
+		logger.Errorln("Shutdown graceful error: ", err)
+		os.Exit(-1)
+	}
+
+	os.Exit(0)
 	return
 }

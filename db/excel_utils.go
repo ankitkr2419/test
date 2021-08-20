@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"mylab/cpagent/responses"
+	"sync"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
@@ -10,6 +11,7 @@ import (
 )
 
 var CurrentExpExcelFile *excelize.File
+var excelLock sync.Mutex
 
 var dbSheets = []string{WellSample, ExperimentSheet, StepsStageSheet, TemplateSheet, TargetSheet}
 
@@ -47,6 +49,9 @@ func GetExcelFile(path, fileName string) (f *excelize.File) {
 
 func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err error) {
 
+	excelLock.Lock()
+	defer excelLock.Unlock()
+
 	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
 	rows, err := file.Rows(sheet)
 	if err != nil {
@@ -77,6 +82,9 @@ func AddRowToExcel(file *excelize.File, sheet string, values []interface{}) (err
 }
 
 func AddMergeRowToExcel(file *excelize.File, sheet string, values []interface{}, space int) {
+
+	excelLock.Lock()
+	defer excelLock.Unlock()
 
 	styleID, _ := file.NewStyle(`{"alignment":{"horizontal":"center"}}`)
 

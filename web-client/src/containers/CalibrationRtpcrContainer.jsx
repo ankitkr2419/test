@@ -39,7 +39,7 @@ const CalibrationRtpcrContainer = () => {
     }
   }, [dispatch, isLoading, error, token]);
 
-  const saveBtnClickHandler = (configData) => {
+  const saveButtonClickHandler = (configData) => {
     let data = {
       receiver_name: configData.name,
       receiver_email: configData.email,
@@ -57,7 +57,7 @@ const CalibrationRtpcrContainer = () => {
   return (
     <CalibrationComponent
       configs={configs}
-      saveBtnClickHandler={saveBtnClickHandler}
+      saveButtonClickHandler={saveButtonClickHandler}
     />
   );
 };

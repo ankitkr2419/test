@@ -19,6 +19,7 @@ import (
 
 const contextKeyUsername = "username"
 const contextKeyUserAuthID = "auth_id"
+const blank string = ""
 
 const (
 	hold  = "hold"
@@ -48,7 +49,7 @@ var expStartTime time.Time
 // TODO: Don't allow Template Update/Deletion if this Template is in Progress
 var currentExpTemplate db.Template
 
-var userLogin sync.Map
+var deckUserLogin sync.Map
 
 // runNext will run the next step of process when set
 var runNext, stepRunInProgress map[string]bool
@@ -73,8 +74,8 @@ func setStepRunInProgress(deck string) {
 }
 
 func loadUtils() {
-	userLogin.Store(plc.DeckA, false)
-	userLogin.Store(plc.DeckB, false)
+	deckUserLogin.Store(plc.DeckA, blank)
+	deckUserLogin.Store(plc.DeckB, blank)
 	runNext = map[string]bool{
 		plc.DeckA: false,
 		plc.DeckB: false,

@@ -39,8 +39,8 @@ const TemplateModal = (props) => {
     selectedTemplateDetails,
   } = props;
 
-  const [volumeInvalid, setVolumeInvalid] = useState(false);
-  const [lidTempInvalid, setLidTempInvalid] = useState(false);
+  const [isVolumeInvalid, setVolumeInvalidity] = useState(false);
+  const [isLidTempInvalid, setLidTempInvalidity] = useState(false);
 
   // disabled as we only need effect to be run while component is un-mounting
   // eslint-disable-next-line arrow-body-style
@@ -80,10 +80,10 @@ const TemplateModal = (props) => {
         const prevVolume = selectedTemplateDetails.get("volume");
         setVolume(prevVolume);
       } else if (volume < MIN_VOLUME || volume > MAX_VOLUME) {
-        setVolumeInvalid(true);
+        setVolumeInvalidity(true);
       }
     },
-    [setVolumeInvalid, selectedTemplateDetails]
+    [setVolumeInvalidity, selectedTemplateDetails]
   );
 
   // if the updated value is empty then set previous value
@@ -93,10 +93,10 @@ const TemplateModal = (props) => {
         const prevLidTemp = selectedTemplateDetails.get("lid_temp");
         setLidTemperature(prevLidTemp);
       } else if (temp < MIN_LID_TEMP || temp > MAX_LID_TEMP) {
-        setLidTempInvalid(true);
+        setLidTempInvalidity(true);
       }
     },
-    [setLidTempInvalid, selectedTemplateDetails]
+    [setLidTempInvalidity, selectedTemplateDetails]
   );
 
   return (
@@ -191,9 +191,9 @@ const TemplateModal = (props) => {
                     onBlur={(event) =>
                       onVolumeBlurHandler(parseInt(event.target.value))
                     }
-                    onFocus={() => setVolumeInvalid(false)}
+                    onFocus={() => setVolumeInvalidity(false)}
                   />
-                  {volumeInvalid && (
+                  {isVolumeInvalid && (
                     <div className="flex-70">
                       <Text Tag="p" size={14} className="text-danger">
                         Volume should be between {MIN_VOLUME} -{MAX_VOLUME}.
@@ -222,9 +222,9 @@ const TemplateModal = (props) => {
                     onBlur={(event) =>
                       onLidTempBlurHandler(parseInt(event.target.value))
                     }
-                    onFocus={() => setLidTempInvalid(false)}
+                    onFocus={() => setLidTempInvalidity(false)}
                   />
-                  {lidTempInvalid && (
+                  {isLidTempInvalid && (
                     <div className="flex-70">
                       <Text Tag="p" size={14} className="text-danger">
                         Lid temperature should be between {MIN_LID_TEMP} -{MAX_LID_TEMP} °C.
@@ -238,7 +238,7 @@ const TemplateModal = (props) => {
               <Button
                 onClick={addClickHandler}
                 color="primary"
-                disabled={lidTempInvalid || volumeInvalid || !isFormValid}
+                disabled={isLidTempInvalid || isVolumeInvalid || !isFormValid}
               >
                 {isTemplateEdited ? "Save" : "Add"}
               </Button>

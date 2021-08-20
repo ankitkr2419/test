@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import moment from "moment";
+
 import { Table } from "core-components";
 import { ButtonIcon } from "shared-components";
-import "./activity.scss";
 import ActivityData from "./ActivityData.json";
 import SearchBar from "./SearchBar";
-import moment from "moment";
+import MlModal from "shared-components/MlModal";
+import { MODAL_MESSAGE, MODAL_BTN } from "appConstants";
+
+import "./activity.scss";
 
 const ActivityComponent = (props) => {
   let { experiments, searchText, onSearchTextChanged, expandLogHandler } =
@@ -62,7 +66,7 @@ const ActivityComponent = (props) => {
                   className={
                     experiment.id === selectedActivity?.id ? "active" : ""
                   }
-                  key={i}
+                  key={experiment.id}
                   onClick={() => toggleSelectedActivity(experiment)}
                 >
                   <td>{i + 1}</td>

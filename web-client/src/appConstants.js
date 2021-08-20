@@ -466,7 +466,6 @@ export const timeConstants = {
   MIN_IN_ONE_HOUR: 60,
 };
 
-//constants for RTPCR - plates
 /**
  * Maximum number of wells that can be present in a plate.
  * Maximum number of wells are 16.
