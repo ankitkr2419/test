@@ -155,6 +155,7 @@ const SampleSideBarContainer = (props) => {
       isDisabled={
         experimentStatus === EXPERIMENT_STATUS.running ||
         experimentStatus === EXPERIMENT_STATUS.success ||
+        experimentStatus === EXPERIMENT_STATUS.stopped ||
         positions.size === 0
       }
     />

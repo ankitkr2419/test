@@ -25,7 +25,8 @@ const SelectAllGridHeader = ({
       onChange={() => toggleAllWellSelectedOption(isAllWellsSelected)}
       disabled={
         experimentStatus === EXPERIMENT_STATUS.success ||
-        experimentStatus === EXPERIMENT_STATUS.running
+        experimentStatus === EXPERIMENT_STATUS.running ||
+        experimentStatus === EXPERIMENT_STATUS.stopped
       }
     />
   </StyledSelectAllGridHeader>

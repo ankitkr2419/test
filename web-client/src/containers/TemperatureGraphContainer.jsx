@@ -7,6 +7,7 @@ import styled from "styled-components";
 const TemperatureGraphContainer = (props) => {
   // Extracting temperature graph data, Which is populated from websocket
   const temperatureChartData = useSelector(getTemperatureChartData);
+  // console.log("temperatureChartData: ", temperatureChartData);
   return (
     <GraphCard>
       <LineChart data={temperatureChartData} />

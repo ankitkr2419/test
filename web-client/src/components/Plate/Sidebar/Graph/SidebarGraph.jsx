@@ -1,21 +1,16 @@
-import React, { useState } from "react";
-import Sidebar from "components/Sidebar";
+import React from "react";
 import PropTypes from "prop-types";
 import { getXAxis } from "selectors/wellGraphSelector";
 import TemperatureGraphContainer from "containers/TemperatureGraphContainer";
-import { Switch } from "core-components";
-import { SwitchWrapper } from "shared-components/SwitchWrapper";
 import WellGraph from "./WellGraph";
 
 const SidebarGraph = (props) => {
   const {
     showTempGraph,
-    isExperimentRunning,
     lineChartData,
     onThresholdChangeHandler,
     toggleGraphFilterActive,
     experimentGraphTargetsList,
-    isExperimentSucceeded,
     setThresholdError,
     resetThresholdError,
     isThresholdInvalid,
@@ -31,28 +26,24 @@ const SidebarGraph = (props) => {
     labels: getXAxis(cyclesCount),
     datasets: lineChartData.toJS(),
   };
-
-  if (isExperimentRunning === true || isExperimentSucceeded === true) {
-    return (
-      <>
-        {/* show the well data graph if showTempGraph flag is off */}
-        {!showTempGraph && (
-          <WellGraph
-            data={data}
-            experimentGraphTargetsList={experimentGraphTargetsList}
-            onThresholdChangeHandler={onThresholdChangeHandler}
-            toggleGraphFilterActive={toggleGraphFilterActive}
-            setThresholdError={setThresholdError}
-            resetThresholdError={resetThresholdError}
-            isThresholdInvalid={isThresholdInvalid}
-          />
-        )}
-        {/* show temperature graph if showTempGraph flag is on */}
-        {showTempGraph && <TemperatureGraphContainer />}
-      </>
-    );
-  }
-  return null;
+  return (
+    <>
+      {/* show the well data graph if showTempGraph flag is off */}
+      {!showTempGraph && (
+        <WellGraph
+          data={data}
+          experimentGraphTargetsList={experimentGraphTargetsList}
+          onThresholdChangeHandler={onThresholdChangeHandler}
+          toggleGraphFilterActive={toggleGraphFilterActive}
+          setThresholdError={setThresholdError}
+          resetThresholdError={resetThresholdError}
+          isThresholdInvalid={isThresholdInvalid}
+        />
+      )}
+      {/* show temperature graph if showTempGraph flag is on */}
+      {showTempGraph && <TemperatureGraphContainer />}
+    </>
+  );
 };
 
 SidebarGraph.propTypes = {

@@ -23,11 +23,21 @@ import { MAX_NO_OF_WELLS } from "appConstants";
 const PlateContainer = () => {
   const dispatch = useDispatch();
 
+  const runExpProgressReducer = useSelector(
+    (state) => state.runExpProgressReducer
+  );
+  const { progressStatus, progress, remainingTime, totalTime } =
+    runExpProgressReducer.toJS();
+
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
   const { token } = activeDeckObj;
+
+  // get temperature reducer data
+  const tempDataReducer = useSelector((state) => state.temperatureGraphReducer);
+  const { temperatureData } = tempDataReducer.toJS();
 
   // experiment targets
   const experimentTargets = useSelector(getExperimentTargets);
@@ -97,6 +107,11 @@ const PlateContainer = () => {
       toggleAllWellSelectedOption={toggleAllWellSelectedOption}
       activeWells={activeWells}
       experimentTemplate={experimentTemplate}
+      progressStatus={progressStatus}
+      progress={progress}
+      remainingTime={remainingTime}
+      totalTime={totalTime}
+      temperatureData={temperatureData}
     />
   );
 };

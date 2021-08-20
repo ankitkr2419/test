@@ -24,7 +24,7 @@ const WellPopover = (props) => {
     targets,
     onEditClickHandler,
     showGraphOfWell,
-    isDisabled,
+    isEditBtnDisabled,
     ...rest
   } = props;
 
@@ -105,7 +105,7 @@ const WellPopover = (props) => {
           <Button className="mb-4" onClick={onShowClickHandler}>
             Show on Graph
           </Button>
-          <Button onClick={onEditClick} disabled={isDisabled}>
+          <Button onClick={onEditClick} disabled={isEditBtnDisabled}>
             Edit Info
           </Button>
         </Center>
