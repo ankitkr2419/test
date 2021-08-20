@@ -323,3 +323,16 @@ func ResetBothDeckHomingInProgress() {
 func IsBothDeckHomingInProgress() bool {
 	return BothDeckHomingInProgress
 }
+
+func (d *Compact32Deck) isEngineerOrAdminLogged() bool {
+	if temp, ok := EngineerOrAdminLogged.Load(d.name); !ok {
+		logger.Errorln("EngineerOrAdminLogged isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) SetEngineerOrAdminLogged(value bool) {
+	EngineerOrAdminLogged.Store(d.name, value)
+}

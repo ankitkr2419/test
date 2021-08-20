@@ -19,6 +19,7 @@ import (
 
 const contextKeyUsername = "username"
 const contextKeyUserAuthID = "auth_id"
+const blank string = ""
 
 const (
 	hold  = "hold"
@@ -44,10 +45,11 @@ const (
 
 var templateRunSuccess bool
 var expStartTime time.Time
+
 // TODO: Don't allow Template Update/Deletion if this Template is in Progress
 var currentExpTemplate db.Template
 
-var userLogin sync.Map
+var deckUserLogin sync.Map
 
 // runNext will run the next step of process when set
 var runNext, stepRunInProgress map[string]bool
@@ -72,8 +74,8 @@ func setStepRunInProgress(deck string) {
 }
 
 func loadUtils() {
-	userLogin.Store(plc.DeckA, false)
-	userLogin.Store(plc.DeckB, false)
+	deckUserLogin.Store(plc.DeckA, blank)
+	deckUserLogin.Store(plc.DeckB, blank)
 	runNext = map[string]bool{
 		plc.DeckA: false,
 		plc.DeckB: false,
@@ -208,6 +210,14 @@ func MD5Hash(s string) string {
 }
 
 func LoadAllServiceFuncs(s db.Storer) (err error) {
+
+	// Delete Unfinished Templates
+	err = s.DeleteUnfinishedTemplates(context.Background())
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Cleanup of unfinished templates failed")
+		return
+	}
+
 	// Create a default supervisor
 	supervisor := db.User{
 		Username: "supervisor",
@@ -268,4 +278,24 @@ func LoadAllServiceFuncs(s db.Storer) (err error) {
 
 	loadUtils()
 	return nil
+}
+
+func ValidateDyeTarget(wc db.WellConfig, deps Dependencies) (valid bool, msg string) {
+
+	valid = true
+	//max number of dyes 6. TODO take from config
+	dyes := make(map[string]bool, 6)
+	for _, v := range wc.Targets {
+		dye, err := deps.Store.ListTargetDye(context.Background(), v)
+		if err != nil {
+			return false, err.Error()
+		}
+		for dyeKey := range dyes {
+			if dyeKey == dye {
+				return false, "invalid configuration for targets"
+			}
+		}
+		dyes[dye] = true
+	}
+	return
 }

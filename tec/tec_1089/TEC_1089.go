@@ -1,8 +1,17 @@
 package tec_1089
 
 /*
-int SetTempAndRamp(double, double);
-int InitiateTEC();
+typedef struct Config
+{
+    float CurrentLimitation;
+    float VoltageLimitation;
+    float CurrentErrorThreshold;
+    float VoltageErrorThreshold;
+    float PeltierMaxCurrent;
+    float PeltierDeltaTemperature;
+} Config;
+int setTempAndRamp(double, double);
+int initiateTEC(Config);
 int checkForErrorState();
 int autoTune();
 int resetDevice();
@@ -29,6 +38,7 @@ import (
 
 	"errors"
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
 	"time"
@@ -60,11 +70,26 @@ func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, 
 	return &tec1089 // tec Driver
 }
 
-var errorCheckStopped, tecInProgress bool
+var errorCheckStarted, tecInProgress bool
 var prevTemp float32 = 27.0
 
+
+func convertTECConfigToC(tecC config.TEC) (cfg C.struct_Config) {
+	cfg.CurrentLimitation = C.float(tecC.CurrentLimitation)
+	cfg.VoltageLimitation = C.float(tecC.VoltageLimitation)
+	cfg.CurrentErrorThreshold = C.float(tecC.CurrentErrorThreshold)
+	cfg.VoltageErrorThreshold = C.float(tecC.VoltageErrorThreshold) 
+	cfg.PeltierMaxCurrent= C.float(tecC.PeltierMaxCurrent)
+	cfg.PeltierDeltaTemperature= C.float(tecC.PeltierDeltaTemperature)
+
+	return
+}
+
 func (t *TEC1089) InitiateTEC() (err error) {
-	C.InitiateTEC()
+
+	cfg := convertTECConfigToC(config.GetTECConfigValues())
+
+	C.initiateTEC(cfg)
 
 	go startErrorCheck()
 
@@ -97,6 +122,12 @@ func startMonitor() {
 }
 
 func startErrorCheck() {
+	if errorCheckStarted {
+		return
+	}
+
+	errorCheckStarted = true
+
 	go func() {
 		time.Sleep(5 * time.Second)
 		for {
@@ -104,7 +135,7 @@ func startErrorCheck() {
 			var errNum C.int
 			errNum = C.checkForErrorState()
 			if errNum != 0 {
-				errorCheckStopped = true
+				errorCheckStarted = false
 				logger.Errorln("Error Code for TEC: ", errNum)
 				return
 			}
@@ -117,14 +148,17 @@ func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
 	tecInProgress = true
-	tempVal := C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	logger.Warnln("TEC Start Time: ", time.Now())
+	tempVal := C.setTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	logger.Warnln("TEC End Time: ", time.Now())
+
 	tecInProgress = false
 	// Handle Failure, Try again 3 times in interval of 200ms
 	i := 0
 	for (tempVal == -1) && (i < 3) {
 		i++
 		time.Sleep(200 * time.Millisecond)
-		tempVal = C.SetTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+		tempVal = C.setTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
 
 		if (i == 3) && (tempVal == -1) {
 			err = errors.New("Temperature couldn't be reached even after 3 tries!")
@@ -143,9 +177,7 @@ func (t *TEC1089) AutoTune() (err error) {
 func (t *TEC1089) ResetDevice() (err error) {
 	C.resetDevice()
 
-	if errorCheckStopped {
-		startErrorCheck()
-	}
+	t.InitiateTEC()
 	return nil
 }
 
@@ -166,14 +198,14 @@ func (t *TEC1089) TestRun(plcDeps plc.Driver) (err error) {
 		CycleCount: 3,
 	}
 
-	file := plc.GetExcelFile(tec.LogsPath, "output_test")
+	file := db.GetExcelFile(tec.LogsPath, "output_test")
 
 	// Start line
 	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
-	plc.AddRowToExcel(file, plc.TECSheet, headings)
+	db.AddRowToExcel(file, db.TECSheet, headings)
 
 	row := []interface{}{"Holding Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	// Go back to Room Temp at the end
 	defer t.ReachRoomTemp()
@@ -185,7 +217,7 @@ func (t *TEC1089) TestRun(plcDeps plc.Driver) (err error) {
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
@@ -199,7 +231,7 @@ func (t *TEC1089) TestRun(plcDeps plc.Driver) (err error) {
 func (t *TEC1089) ReachRoomTemp() (err error) {
 	logger.Infoln("Going Back to Room Temp ")
 	ts := tec.TECTempSet{
-		TargetTemperature: config.GetRoomTemp(),
+		TargetTemperature: float64(config.GetRoomTemp()),
 		TargetRampRate:    tec.RoomTempRamp,
 	}
 	err = t.SetTempAndRamp(ts)
@@ -228,7 +260,7 @@ func (t *TEC1089) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.Fil
 		t.SetTempAndRamp(ti)
 
 		row := []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
-		plc.AddRowToExcel(file, plc.TECSheet, row)
+		db.AddRowToExcel(file, db.TECSheet, row)
 
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
@@ -255,10 +287,10 @@ func (t *TEC1089) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.Fil
 	}
 	if cycleNum != 0 {
 		row := []interface{}{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
-		plc.AddRowToExcel(file, plc.TECSheet, row)
+		db.AddRowToExcel(file, db.TECSheet, row)
 	} else {
 		row := []interface{}{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
-		plc.AddRowToExcel(file, plc.TECSheet, row)
+		db.AddRowToExcel(file, db.TECSheet, row)
 
 	}
 
@@ -272,11 +304,11 @@ func (t *TEC1089) GetAllTEC() (err error) {
 }
 
 func (t *TEC1089) RunProfile(plcDeps plc.Driver, tp tec.TempProfile) (err error) {
-	file := plc.GetExcelFile(tec.LogsPath, "test")
+	file := db.GetExcelFile(tec.LogsPath, "test")
 
 	// Start line
 	row := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	go func() {
 		for i := uint16(1); i <= uint16(tp.Cycles); i++ {

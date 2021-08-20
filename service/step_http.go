@@ -42,7 +42,7 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 		var t db.Step
 		err := json.NewDecoder(req.Body).Decode(&t)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: "Error while decoding step data"})
 			logger.WithField("err", err.Error()).Error("Error while decoding step data")
 			return
 		}
@@ -56,31 +56,22 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 		var createdTemp db.Step
 		createdTemp, err = deps.Store.CreateStep(req.Context(), t)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error create target")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Error create step"})
+			logger.WithField("err", err.Error()).Error("Error create step")
 			return
 		}
 
 		// update step count in stages
 		err = deps.Store.UpdateStepCount(req.Context())
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Error in updating step count"})
 			logger.WithField("err", err.Error()).Error("Error in updating step count")
-			return
-		}
-
-		respBytes, err = json.Marshal(createdTemp)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling targets data")
-			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		go updateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
 
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
-		rw.Header().Add("Content-Type", "application/json")
+		responseCodeAndMsg(rw, http.StatusCreated, createdTemp)
 	})
 }
 
@@ -89,7 +80,7 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := parseUUID(vars["id"])
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: "Error invalid UUID"})
 			return
 		}
 
@@ -97,7 +88,7 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 
 		err = json.NewDecoder(req.Body).Decode(&t)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: "Error while decoding step data"})
 			logger.WithField("err", err.Error()).Error("Error while decoding step data")
 			return
 		}
@@ -112,16 +103,14 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.UpdateStep(req.Context(), t)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Error updating step"})
 			logger.WithField("err", err.Error()).Error("Error update step")
 			return
 		}
 
 		go updateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
 
-		rw.WriteHeader(http.StatusOK)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write([]byte(`{"msg":"step updated successfully"}`))
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "step updated successfully"})
 	})
 }
 

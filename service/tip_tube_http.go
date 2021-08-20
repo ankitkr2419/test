@@ -43,6 +43,7 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		go db.SetTipsTubesValues([]db.TipsTubes{tt})
 		err = deps.Store.InsertTipsTubes(req.Context(), []db.TipsTubes{tt})
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipTubeCreateError)

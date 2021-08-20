@@ -105,7 +105,7 @@ func (d *SimulatorDriver) coolDown() {
 	var temp uint16 = 0
 
 	for {
-		time.Sleep( delay * 40 * time.Millisecond)
+		time.Sleep(delay * 40 * time.Millisecond)
 		if d.isHeaterInProgress() || (heater1Cooled && heater2Cooled) {
 			return
 		}

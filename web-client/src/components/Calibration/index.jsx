@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+
 import {
   Button,
   Form,
@@ -20,10 +21,9 @@ import {
   isValidNoOfHomingCycle,
   isValidCycleTime,
 } from "./helper";
-import { useCallback } from "react";
 
 const CalibrationComponent = (props) => {
-  let { configs, saveBtnClickHandler } = props;
+  let { configs, saveButtonClickHandler } = props;
 
   const [roomTemperature, setRoomTemperature] = useState(0);
   const [homingTime, setHomingTime] = useState(0);
@@ -62,7 +62,7 @@ const CalibrationComponent = (props) => {
       noOfHomingCycles !== null &&
       cycleTime !== null
     ) {
-      saveBtnClickHandler({
+      saveButtonClickHandler({
         roomTemperature,
         homingTime,
         noOfHomingCycles,

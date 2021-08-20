@@ -35,7 +35,7 @@ type Stage struct {
 	IdealLidTemp uint16 // ideal lid temp
 }
 
-type Emissions [4]uint16
+type Emissions [6]uint16
 
 type Scan struct {
 	Cycle         uint16 // current running cycle
@@ -60,12 +60,20 @@ type Driver interface {
 	SwitchOffLidTemp() error
 }
 
+type HeaterData struct {
+	Shaker1Temp float64 `json:"shaker_1_temp"`
+	Shaker2Temp float64 `json:"shaker_2_temp"`
+	Deck        string  `json:"deck"`
+	HeaterOn    bool    `json:"heater_on"`
+}
+
 type WSData struct {
 	Progress         float64          `json:"progress"`
 	Deck             string           `json:"deck"`
 	Status           string           `json:"status"`
 	OperationDetails OperationDetails `json:"operation_details"`
 }
+
 type WSError struct {
 	Message string `json:"message"`
 	Deck    string `json:"deck"`
@@ -119,7 +127,7 @@ type Extraction interface {
 	DiscardTipAndHome(discard bool) (response string, err error)
 	Heating(ht db.Heating) (response string, err error)
 	Homing() (response string, err error)
-	ManualMovement(motorNum, direction, pulses uint16) (response string, err error)
+	ManualMovement(motorNum, direction uint16, distance float32) (response string, err error)
 	Resume() (response string, err error)
 	Pause() (response string, err error)
 	Abort() (response string, err error)
@@ -137,6 +145,8 @@ type Extraction interface {
 	SetCurrentProcessNumber(step int64)
 	SwitchOffAllCoils() (response string, err error)
 	PIDCalibration(context.Context) error
+	SetEngineerOrAdminLogged(value bool)
+	HeaterData() error
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {

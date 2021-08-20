@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"strings"
 	"time"
 
 	"mylab/cpagent/responses"
@@ -12,24 +13,24 @@ import (
 )
 
 type AttachDetach struct {
-	ID            uuid.UUID `db:"id" json:"id"`
-	Operation     string    `db:"operation" json:"operation"  validate:"required"`
-	OperationType string    `db:"operation_type" json:"operation_type"`
-	ProcessID     uuid.UUID `db:"process_id" json:"process_id"`
-	CreatedAt     time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
+	ID        uuid.UUID `db:"id" json:"id"`
+	Operation string    `db:"operation" json:"operation"  validate:"required"`
+	Height    int64     `db:"height" json:"height"`
+	ProcessID uuid.UUID `db:"process_id" json:"process_id"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 const (
 	getAttachDetachQuery    = `SELECT * FROM attach_detach where process_id = $1`
 	createAttachDetachQuery = `INSERT INTO attach_detach (
 		operation,
-		operation_type,
+		height,
 		process_id)
 		VALUES ($1, $2, $3) RETURNING id`
 	updateAttachDetachQuery = `UPDATE attach_detach SET (
 			operation,
-			operation_type,
+			height,
 			updated_at) = 
 			($1, $2, $3) WHERE process_id = $4`
 )
@@ -114,8 +115,8 @@ func (s *pgStore) createAttachDetach(ctx context.Context, tx *sql.Tx, ad AttachD
 
 	err = tx.QueryRow(
 		createAttachDetachQuery,
-		ad.Operation,
-		ad.OperationType,
+		strings.ToLower(ad.Operation),
+		ad.Height,
 		ad.ProcessID,
 	).Scan(&lastInsertID)
 
@@ -131,10 +132,37 @@ func (s *pgStore) createAttachDetach(ctx context.Context, tx *sql.Tx, ad AttachD
 func (s *pgStore) UpdateAttachDetach(ctx context.Context, a AttachDetach) (err error) {
 	go s.AddAuditLog(ctx, DBOperation, InitialisedState, UpdateOperation, "", responses.AttachDetachInitialisedState)
 
-	result, err := s.db.Exec(
+	var tx *sql.Tx
+	tx, err = s.db.BeginTx(ctx, nil)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AttachDetachInitiateDBTxError)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logger.Errorln(responses.AttachDetachUpdateError)
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, UpdateOperation, "", err.Error())
+			return
+		}
+		tx.Commit()
+
+		logger.Infoln(responses.AttachDetachUpdateSuccess)
+		go s.AddAuditLog(ctx, DBOperation, CompletedState, UpdateOperation, "", responses.AttachDetachCompletedState)
+		return
+	}()
+
+	err = s.updateProcessName(ctx, tx, a.ProcessID, AttachDetachProcess, a)
+	if err != nil {
+		logger.WithField("err:", err.Error()).Errorln(responses.AttachDetachUpdateNameError)
+		return
+	}
+
+	result, err := tx.Exec(
 		updateAttachDetachQuery,
-		a.Operation,
-		a.OperationType,
+		strings.ToLower(a.Operation),
+		a.Height,
 		time.Now(),
 		a.ProcessID,
 	)

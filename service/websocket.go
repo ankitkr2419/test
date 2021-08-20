@@ -61,12 +61,12 @@ type resultOnFail struct {
 }
 
 type experimentTemperature struct {
-	Type             string                     `json:"type"`
-	Data             []db.ExperimentTemperature `json:"data"`
+	Type string                     `json:"type"`
+	Data []db.ExperimentTemperature `json:"data"`
 }
 
 type oprSuccess struct {
-	Type string 	 `json:"type"`
+	Type string      `json:"type"`
 	Data interface{} `json:"data"`
 }
 

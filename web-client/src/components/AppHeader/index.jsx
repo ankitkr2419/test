@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
 import PropTypes from "prop-types";
+
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import { logoutInitiated } from "action-creators/loginActionCreators";
+import { logoutInitiated, loginReset } from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -13,7 +15,6 @@ import {
   NavItem,
   NavLink,
 } from "core-components";
-// import { getExperimentId } from 'selectors/experimentSelector';
 import {
   runExperiment,
   stopExperiment,
@@ -36,7 +37,6 @@ import {
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
-import { useHistory } from "react-router";
 
 const AppHeader = (props) => {
   const {
@@ -78,24 +78,17 @@ const AppHeader = (props) => {
   const toggleUserDropdown = () =>
     setUserDropdownOpen((prevState) => !prevState);
 
-  // useEffect(() => {
-  // 	if (isExperimentRunning === true) {
-  // 		// connectSocket(dispatch);
-  // 	}
-  // }, [isExperimentRunning, dispatch]);
-
   useEffect(() => {
     if (isExperimentSucceeded) {
       setExpSuccessModalVisibility(true);
     }
   }, [isExperimentSucceeded]);
 
-  // useEffect(() => {
-  //   if (isExperimentStopped === true) {
-  //     // disConnectSocket();
-  //     dispatch(loginReset());
-  //   }
-  // }, [isExperimentStopped, dispatch]);
+  useEffect(() => {
+    if (isExperimentStopped === true) {
+      dispatch(loginReset());
+    }
+  }, [isExperimentStopped, dispatch]);
 
   // logout user
   const logoutClickHandler = () => {
@@ -182,7 +175,7 @@ const AppHeader = (props) => {
   // Exit modal confirmation click handler
   const confirmationClickHandler = (isConfirmed) => {
     setExitModalVisibility(false);
-    if (isConfirmed) {
+    if (isConfirmed === true) {
       if (isExperimentRunning === true) {
         // show warning that user needs to abort first in order to log out.
         setWarningModalVisibility(true);
