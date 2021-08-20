@@ -30,7 +30,7 @@ const CalibrationContainer = () => {
     }
   }, [dispatch, token]);
 
-  const saveBtnClickHandler = (configData) => {
+  const saveButtonClickHandler = (configData) => {
     let data = {
       room_temperature: configData.roomTemperature,
       homing_time: configData.homingTime,
@@ -47,7 +47,7 @@ const CalibrationContainer = () => {
   return (
     <CalibrationComponent
       configs={configs}
-      saveBtnClickHandler={saveBtnClickHandler}
+      saveButtonClickHandler={saveButtonClickHandler}
     />
   );
 };
