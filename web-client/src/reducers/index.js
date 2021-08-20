@@ -4,6 +4,7 @@ import {
   listTemplatesReducer,
   deleteTemplateReducer,
   updateTemplateReducer,
+  finishCreateTemplateReducer
 } from "reducers/templateReducer";
 import {
   listTargetReducer,
@@ -32,7 +33,10 @@ import {
   createExperimentTargetReducer,
 } from "reducers/experimentTargetReducer";
 import { listSamplesReducer } from "reducers/samplesReducer";
-import { runExperimentReducer } from "reducers/runExperimentReducer";
+import {
+  runExpProgressReducer,
+  runExperimentReducer,
+} from "reducers/runExperimentReducer";
 import { activeWellReducer } from "reducers/actionWellReducer";
 import { wellGraphReducer } from "reducers/wellGraphReducer";
 import { socketReducer } from "reducers/socketReducer";
@@ -52,6 +56,8 @@ import { processListReducer } from "reducers/processListReducer";
 import { editProcessReducer } from "reducers/editProcessReducer";
 import { appInfoReducer } from "./appInfoReducer";
 import { processesReducer } from "reducers/processesReducer";
+import { activityLogReducer } from "reducers/activityLogReducer";
+import { calibrationReducer } from "./calibrationReducer";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -77,6 +83,7 @@ const rootReducer = combineReducers({
   listSamplesReducer,
   addWellsReducer,
   runExperimentReducer,
+  runExpProgressReducer,
   activeWellReducer,
   wellGraphReducer,
   socketReducer,
@@ -94,6 +101,9 @@ const rootReducer = combineReducers({
   editProcessReducer,
   appInfoReducer,
   processesReducer,
+  activityLogReducer,
+  calibrationReducer,
+  finishCreateTemplateReducer,
 });
 
 export default rootReducer;

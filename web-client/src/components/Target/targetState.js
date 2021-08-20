@@ -11,6 +11,7 @@ export const targetStateActions = {
 	SET_CHECKED_STATE: 'SET_CHECKED_STATE',
 	UPDATE_LIST: 'UPDATE_LIST',
 	SET_THRESHOLD_ERROR: 'SET_THRESHOLD_ERROR',
+	DELETE_TARGET: 'DELETE_TARGET'
 };
 
 // Initial state wrap with fromJS for immutability
@@ -85,6 +86,14 @@ export const getCheckedExperimentTargets = (list) => {
 const updateList = (state, list) =>
 	state.merge({ targetList: List(list), originalTargetList: List(list) });
 
+const deleteTarget = (state, ele) => {
+	const listAfterDeleted = state.get('targetList').map(target => {
+		return (target.selectedTarget?.label === ele.selectedTarget.label) 
+			? {} 
+			: target
+	});
+	return state.merge({ targetList: listAfterDeleted })
+} 
 export const isTargetListUpdated = (state) => {
 	const { targetList, originalTargetList } = state.toJS();
 	return JSON.stringify(targetList) !== JSON.stringify(originalTargetList);
@@ -113,6 +122,8 @@ const targetStateReducer = (state, action) => {
 		return setCheckedState(state, action.value);
 	case targetStateActions.UPDATE_LIST:
 		return updateList(state, action.value);
+	case targetStateActions.DELETE_TARGET: 
+		return deleteTarget(state, action.value);
 	default:
 		throw new Error('Invalid action type');
 	}

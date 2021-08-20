@@ -3,7 +3,7 @@ import {
   HashRouter as Router,
   Switch,
   Redirect,
-  useHistory,
+  useHistory
 } from "react-router-dom";
 import RouteWithSubRoutes from "RouteHelper";
 import { useSelector, useDispatch } from "react-redux";
@@ -98,12 +98,16 @@ const AppLayoutContainer = (props) => {
         recipeActionReducerData.showProcess) && <CardOverlay />}
       {location.pathname === "/splashscreen" ? null : (
         <AppHeader
+          role={activeDeckObj?.role}//just to show to user
           isPlateRoute={loginReducer.get("isPlateRoute")}
-          isUserLoggedIn={activeDeckObj && activeDeckObj.isLoggedIn}
-          isLoginTypeAdmin={activeDeckObj && activeDeckObj.isAdmin}
-          isLoginTypeOperator={activeDeckObj && !activeDeckObj.isAdmin}
+          isUserLoggedIn={activeDeckObj.isLoggedIn} //{loginReducer.get("isUserLoggedIn")}
+          isLoginTypeAdmin={activeDeckObj.isAdmin} //{loginReducer.get("isLoginTypeAdmin")}
+          isLoginTypeOperator={!activeDeckObj.isAdmin} //{loginReducer.get("isLoginTypeOperator")}
+          isLoginTypeEngineer={activeDeckObj.isEngineer}
           isTemplateRoute={loginReducer.get("isTemplateRoute")}
-          currentDeckName={activeDeckObj && activeDeckObj.name}
+          token={activeDeckObj.token}
+          deckName={activeDeckObj.name}
+          app={app}
         />
       )}
       {/* Modal container will helps in displaying error/info/warning through modal */}

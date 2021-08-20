@@ -63,6 +63,7 @@ const GraphFilters = ({
 							onBlur={() => onThresholdBlurHandler(ele.get('threshold'), index)}
 							onFocus={() => onThresholdFocusHandler(index)}
 							invalid={ele.get('thresholdError')}
+							disabled
 						/>
 						<Text Tag='span' size={12} className='floating-label'>
 							Enter Threshold

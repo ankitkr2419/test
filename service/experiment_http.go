@@ -288,8 +288,10 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		db.AddMergeRowToExcel(file, db.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
 
 		row := []interface{}{"well positions"}
-		for _, v := range config.ActiveWells("activeWells") {
-			row = append(row, v)
+		for range dyePositions {
+			for _, v := range config.ActiveWells("activeWells") {
+				row = append(row, v)
+			}
 		}
 		db.AddRowToExcel(file, db.RTPCRSheet, row)
 
@@ -425,7 +427,13 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// invoke monitor after 2 secs
 	go func() {
 		time.Sleep(2 * time.Second)
-		go monitorExperiment(deps, file)
+		defer func(){
+        	if r := recover(); r != nil {
+            	logger.Errorln("Monitor panicked: ", r)
+            	ShutDownGracefully(deps)
+        	}
+    	}()
+		monitorExperiment(deps, file)
 	}()
 
 	lidTempStartTime := time.Now()

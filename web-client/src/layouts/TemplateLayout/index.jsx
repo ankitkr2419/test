@@ -1,6 +1,6 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer } from "react";
 import { CardBody, Card, Input } from "core-components";
-import { Text } from "shared-components";
+import { ButtonBar, Text } from "shared-components";
 import Wizard from "shared-components/Wizard";
 import TemplateContainer from "containers/TemplateContainer";
 import TargetContainer from "containers/TargetContainer";
@@ -16,18 +16,28 @@ import templateLayoutReducer, {
   templateLayoutActions,
   getWizardListByLoginType,
 } from "./templateState";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router";
-import { toast } from "react-toastify";
+import {
+  finishCreateTemplate,
+  finishCreateTemplateReset,
+} from "action-creators/templateActionCreators";
 
 const TemplateLayout = (props) => {
+  const dispatch = useDispatch();
   const history = useHistory();
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-  const { isAdmin, isLoggedIn } = activeDeckObj;
+  const { isAdmin, isLoggedIn, token } = activeDeckObj;
+
+  //finish template reducer details
+  const finishCreateTemplateReducer = useSelector(
+    (state) => state.finishCreateTemplateReducer
+  );
+  const { errorFinishCreateTemplate } = finishCreateTemplateReducer;
 
   // Local state to manage selected wizard
   const [templateLayoutState, templateLayoutDispatch] = useReducer(
@@ -90,45 +100,39 @@ const TemplateLayout = (props) => {
     });
   }, []);
 
+  // redirect to template initially
+  useEffect(() => {
+    updateSelectedWizard("template");
+  }, []);
+
+  //redirect to template if finish template success
+  useEffect(() => {
+    if (errorFinishCreateTemplate === false) {
+      updateSelectedWizard("template");
+      dispatch(finishCreateTemplateReset());
+    }
+  }, [errorFinishCreateTemplate]);
+
   if (!isLoggedIn) {
     history.push("splashscreen");
   }
 
   const finishBtnHandler = () => {
+    dispatch(finishCreateTemplate(templateID, token));
+  };
+
+  const backBtnHandler = () => {
     updateSelectedWizard("template");
-    toast.success("Template details Saved");
   };
 
   return (
     <div className="template-content">
-      {/* <div className="d-flex"> */}
-        <Wizard
-          list={wizardList}
-          onClickHandler={updateSelectedWizard}
-          isAdmin={isAdmin}
-          showFinishBtn={activeWidgetID === "step"}
-          finishBtnHandler={finishBtnHandler}
-        />
-        {/* TODO : changes will be made here after ui is finalized. */}
-        {/* {activeWidgetID === "step" && (
-          <div>
-            <Text
-              size={16}
-              className="text-default text-truncate-multi-line font-weight-bold mb-0 px-2"
-            >
-              Lid Temperature (°C)
-            </Text>
-            <Input
-              className="flex-100"
-              type="number"
-              name={`threshold`}
-              placeholder={`°C units`}
-              onChange={(event) => onLidTempChange(event.target.value)}
-            />
-          </div>
-        )} */}
-      {/* </div> */}
-
+      <Wizard
+        list={wizardList}
+        onClickHandler={updateSelectedWizard}
+        isAdmin={isAdmin}
+      />
+      
       <Card>
         <CardBody className="d-flex flex-unset overflow-hidden p-0">
           {/* TemplateModal container that provides template modal to create
@@ -171,6 +175,16 @@ const TemplateLayout = (props) => {
           {activeWidgetID === "step" && <StepContainer />}
         </CardBody>
       </Card>
+
+      {activeWidgetID === "step" && (
+        <ButtonBar
+          isRTPCR={true}
+          rightBtnLabel={"Finish"}
+          handleRightBtn={finishBtnHandler}
+          backBtnHandler={backBtnHandler}
+          btnBarClassname={"template-buttonBar"}
+        />
+      )}
     </div>
   );
 };

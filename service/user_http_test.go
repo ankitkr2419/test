@@ -187,7 +187,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckSuccess() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
 	//first need to login to test logout
-	userLogin.Store(plc.DeckA, true)
+	deckUserLogin.Store(plc.DeckA, "test")
 	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
@@ -230,7 +230,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, errors.New("failed to fetch user auth record"))
 
 	//first need to login to test logout
-	userLogin.Store(plc.DeckA, true)
+	deckUserLogin.Store(plc.DeckA, "test")
 
 	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
@@ -256,7 +256,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckDeleteFailure() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError)
 
 	//first need to login to test logout
-	userLogin.Store(plc.DeckA, true)
+	deckUserLogin.Store(plc.DeckA, "test")
 
 	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token

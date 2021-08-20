@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Button,
@@ -12,6 +12,12 @@ import {
   ModalBody,
 } from "core-components";
 import { Center, ButtonIcon, Text } from "shared-components";
+import {
+  MAX_LID_TEMP,
+  MAX_VOLUME,
+  MIN_LID_TEMP,
+  MIN_VOLUME,
+} from "appConstants";
 
 const TemplateModal = (props) => {
   const {
@@ -23,14 +29,18 @@ const TemplateModal = (props) => {
     setTemplateName,
     volume,
     setVolume,
-    lidTemperature,
+    lid_temp,
     setLidTemperature,
     addClickHandler,
     isFormValid,
     resetFormValues,
     isTemplateEdited,
     resetModalState,
+    selectedTemplateDetails,
   } = props;
+
+  const [isVolumeInvalid, setVolumeInvalidity] = useState(false);
+  const [isLidTempInvalid, setLidTempInvalidity] = useState(false);
 
   // disabled as we only need effect to be run while component is un-mounting
   // eslint-disable-next-line arrow-body-style
@@ -40,6 +50,54 @@ const TemplateModal = (props) => {
     };
     // eslint-disable-next-line
   }, []);
+
+  // if the updated value is empty then set previous value
+  const onTemplateNameBlurHandler = useCallback(
+    (name) => {
+      if (name === "") {
+        const prevName = selectedTemplateDetails.get("name");
+        setTemplateName(prevName);
+      }
+    },
+    [setTemplateName, selectedTemplateDetails]
+  );
+
+  // if the updated value is empty then set previous value
+  const onTemplateDescBlurHandler = useCallback(
+    (desc) => {
+      if (desc === "") {
+        const prevDesc = selectedTemplateDetails.get("description");
+        setTemplateDescription(prevDesc);
+      }
+    },
+    [setTemplateDescription, selectedTemplateDetails]
+  );
+
+  // if the updated value is empty then set previous value
+  const onVolumeBlurHandler = useCallback(
+    (volume) => {
+      if (!volume) {
+        const prevVolume = selectedTemplateDetails.get("volume");
+        setVolume(prevVolume);
+      } else if (volume < MIN_VOLUME || volume > MAX_VOLUME) {
+        setVolumeInvalidity(true);
+      }
+    },
+    [setVolumeInvalidity, selectedTemplateDetails]
+  );
+
+  // if the updated value is empty then set previous value
+  const onLidTempBlurHandler = useCallback(
+    (temp) => {
+      if (!temp) {
+        const prevLidTemp = selectedTemplateDetails.get("lid_temp");
+        setLidTemperature(prevLidTemp);
+      } else if (temp < MIN_LID_TEMP || temp > MAX_LID_TEMP) {
+        setLidTempInvalidity(true);
+      }
+    },
+    [setLidTempInvalidity, selectedTemplateDetails]
+  );
 
   return (
     <>
@@ -83,6 +141,9 @@ const TemplateModal = (props) => {
                     onChange={(event) => {
                       setTemplateName(event.target.value);
                     }}
+                    onBlur={(event) => {
+                      onTemplateNameBlurHandler(parseInt(event.target.value));
+                    }}
                   />
                 </FormGroup>
               </Col>
@@ -103,6 +164,9 @@ const TemplateModal = (props) => {
                     onChange={(event) => {
                       setTemplateDescription(event.target.value);
                     }}
+                    onBlur={(event) => {
+                      onTemplateDescBlurHandler(parseInt(event.target.value));
+                    }}
                     maxLength={300}
                   />
                 </FormGroup>
@@ -113,18 +177,29 @@ const TemplateModal = (props) => {
               <Col sm={6}>
                 <FormGroup>
                   <Label for="volume_value" className="font-weight-bold">
-                    Volume (µ units)
+                    Volume (µL)
                   </Label>
                   <Input
                     type="number"
                     name="volume_name"
                     id="volume_name"
-                    placeholder="Type here"
+                    placeholder="10-250 (µL)"
                     value={volume}
                     onChange={(event) => {
-                      setVolume(event.target.value);
+                      setVolume(parseInt(event.target.value));
                     }}
+                    onBlur={(event) =>
+                      onVolumeBlurHandler(parseInt(event.target.value))
+                    }
+                    onFocus={() => setVolumeInvalidity(false)}
                   />
+                  {isVolumeInvalid && (
+                    <div className="flex-70">
+                      <Text Tag="p" size={14} className="text-danger">
+                        Volume should be between {MIN_VOLUME} -{MAX_VOLUME}.
+                      </Text>
+                    </div>
+                  )}
                 </FormGroup>
               </Col>
               <Col sm={6}>
@@ -139,12 +214,23 @@ const TemplateModal = (props) => {
                     type="number"
                     name="lid_temperature_name"
                     id="lid_temperature_name"
-                    placeholder="Type here"
-                    value={lidTemperature}
+                    placeholder={`${MIN_LID_TEMP} - ${MAX_LID_TEMP} (°C)`}
+                    value={lid_temp}
                     onChange={(event) => {
-                      setLidTemperature(event.target.value);
+                      setLidTemperature(parseInt(event.target.value));
                     }}
+                    onBlur={(event) =>
+                      onLidTempBlurHandler(parseInt(event.target.value))
+                    }
+                    onFocus={() => setLidTempInvalidity(false)}
                   />
+                  {isLidTempInvalid && (
+                    <div className="flex-70">
+                      <Text Tag="p" size={14} className="text-danger">
+                        Lid temperature should be between {MIN_LID_TEMP} -{MAX_LID_TEMP} °C.
+                      </Text>
+                    </div>
+                  )}
                 </FormGroup>
               </Col>
             </Row>
@@ -152,7 +238,7 @@ const TemplateModal = (props) => {
               <Button
                 onClick={addClickHandler}
                 color="primary"
-                disabled={isFormValid === false}
+                disabled={isLidTempInvalid || isVolumeInvalid || !isFormValid}
               >
                 {isTemplateEdited ? "Save" : "Add"}
               </Button>

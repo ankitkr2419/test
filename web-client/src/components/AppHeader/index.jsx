@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
 import PropTypes from "prop-types";
+
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import {
-  loginReset,
-  logoutInitiated,
-} from "action-creators/loginActionCreators";
+import { logoutInitiated, loginReset } from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -16,13 +15,16 @@ import {
   NavItem,
   NavLink,
 } from "core-components";
-// import { getExperimentId } from 'selectors/experimentSelector';
 import {
   runExperiment,
   stopExperiment,
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
-import { getRunExperimentReducer } from "selectors/runExperimentSelector";
+import {
+  getRunExperimentReducer,
+  getTimeNow,
+} from "selectors/runExperimentSelector";
+import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
 // import PrintDataModal from './PrintDataModal';
 // import ExportDataModal from './ExportDataModal';
 import {
@@ -35,14 +37,15 @@ import {
 import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
-import { useHistory } from "react-router";
 
 const AppHeader = (props) => {
   const {
+    role,
     isUserLoggedIn,
     isPlateRoute,
     isLoginTypeAdmin,
     isLoginTypeOperator,
+    isLoginTypeEngineer,
     isTemplateRoute,
     token,
     deckName,
@@ -54,6 +57,9 @@ const AppHeader = (props) => {
   const history = useHistory();
   const experimentId = useSelector(getExperimentId);
   const runExperimentReducer = useSelector(getRunExperimentReducer);
+  const wellListReducer = useSelector(getWells);
+
+  const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
   const isExperimentRunning = experimentStatus === EXPERIMENT_STATUS.running;
   const isExperimentStopped = experimentStatus === EXPERIMENT_STATUS.stopped;
@@ -65,6 +71,8 @@ const AppHeader = (props) => {
   const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [isExpSuccessModalVisible, setExpSuccessModalVisibility] =
+    useState(false);
+  const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
     useState(false);
 
   const toggleUserDropdown = () =>
@@ -84,11 +92,18 @@ const AppHeader = (props) => {
 
   // logout user
   const logoutClickHandler = () => {
-    dispatch(logoutInitiated({ deckName: deckName, token: token }));
+    setExitModalVisibility(true);
   };
 
   const startExperiment = () => {
-    if (isExperimentRunning === false && isExperimentSucceeded === false) {
+    // if no well is filled then show confirmation modal.
+    if (filledWellsPositions.toJS().length === 0) {
+      //showModal = True
+      setRunConfirmModalVisibility(true);
+    } else if (
+      isExperimentRunning === false &&
+      isExperimentSucceeded === false
+    ) {
       dispatch(runExperiment(experimentId, token));
     }
   };
@@ -100,7 +115,13 @@ const AppHeader = (props) => {
 
   /** Hide plates tab if the user is admin */
   const getIsNavLinkHidden = (pathname) => {
-    if (pathname === "/plate" && isLoginTypeAdmin === true) {
+    if (pathname !== ROUTES.calibration && isLoginTypeEngineer === true) {
+      //hide all tabs for engineer other than Calibration
+      return true;
+    } else if (pathname === ROUTES.calibration && isLoginTypeAdmin === false && isLoginTypeEngineer === false) {
+      //hide Calibration tab for operator/superwiser
+      return true;
+    } else if (pathname === "/plate" && isLoginTypeAdmin === true) {
       return true;
     }
     return false;
@@ -172,6 +193,16 @@ const AppHeader = (props) => {
     history.push("activity");
   };
 
+  // if user selects 'yes', run experiment
+  const handleRunModalConfirmation = () => {
+    setRunConfirmModalVisibility(false);
+    dispatch(runExperiment(experimentId, token));
+  };
+
+  const handleBackBtn = () => {
+    history.push("templates");
+  };
+
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} />
@@ -196,101 +227,132 @@ const AppHeader = (props) => {
         </Nav>
       )}
       {isUserLoggedIn && (
-        <div className="header-elements d-flex align-items-center">
+        <div className="header-elements d-flex align-items-center ml-auto">
           {/* <PrintDataModal /> */}
           {/* <ExportDataModal /> */}
           {app === APP_TYPE.RTPCR && (
-            <div className="experiment-info text-right mx-3">
-              <Text
-                size={12}
-                className={`text-default mb-1 ${
-                  isExperimentRunning ? "show" : ""
-                }`}
-              >
-                {`Experiment started at ${runExperimentReducer.get(
-                  "experimentStartedTime"
-                )}`}
-              </Text>
-              <Text
-                size={12}
-                className={`text-error mb-1 ${isRunFailed ? "show" : ""}`}
-              >
-                Experiment failed to run.
-              </Text>
+            <>
+              <div className="experiment-info text-right mx-3">
+                <Text
+                  size={12}
+                  className={`text-default ${
+                    isExperimentRunning ? "show" : ""
+                  }`}
+                >
+                  {`Experiment started at ${runExperimentReducer.get(
+                    "experimentStartedTime"
+                  )}`}
+                </Text>
+                <Text
+                  size={12}
+                  className={`text-error ${isRunFailed ? "show" : ""}`}
+                >
+                  Experiment failed to run.
+                </Text>
 
-              {isExperimentSucceeded === false && isPlateRoute === true && (
-                <>
-                  <Button
-                    color={isExperimentRunning ? "primary" : "secondary"}
-                    size="sm"
-                    className="font-weight-light border-2 border-gray shadow-none mr-3"
-                    outline={
-                      isExperimentRunning === false &&
-                      isExperimentSucceeded === false
-                    }
-                    onClick={startExperiment}
-                    disabled={isExperimentRunning}
-                  >
-                    Run
-                  </Button>
+                <Text
+                  size={12}
+                  className={`text-error ${isExperimentStopped ? "show" : ""}`}
+                >
+                  {`Experiment aborted at ${runExperimentReducer.get(
+                    "experimentStoppedTime"
+                  )}.`}
+                </Text>
 
+                {isPlateRoute === true && (
+                  <div className="d-flex align-items-center">
+                    <Button
+                      color="secondary"
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none mr-3`}
+                      outline={true}
+                      onClick={handleBackBtn}
+                      disabled={isExperimentRunning}
+                    >
+                      Back
+                    </Button>
+
+                    <Button
+                      color={isExperimentSucceeded ? "primary" : "secondary"}
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none  mr-3 ${
+                        isExperimentSucceeded ? "d-none" : ""
+                      }`}
+                      onClick={() => setAbortModalVisibility(true)}
+                      disabled={!isExperimentRunning}
+                    >
+                      Abort
+                    </Button>
+                    <Button
+                      color={isExperimentRunning ? "primary" : "secondary"}
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none ${
+                        isExperimentSucceeded ? "d-none" : ""
+                      }`}
+                      outline={
+                        isExperimentRunning === false &&
+                        isExperimentSucceeded === false
+                      }
+                      onClick={startExperiment}
+                      disabled={
+                        isExperimentRunning ||
+                        isExperimentSucceeded ||
+                        isExperimentStopped
+                      }
+                    >
+                      Run
+                    </Button>
+                    <Button
+                      color="success"
+                      size="sm"
+                      className={`font-weight-light border-2 border-gray shadow-none ${
+                        isExperimentSucceeded ? "" : "d-none"
+                      }`}
+                      onClick={() => setExpSuccessModalVisibility(true)}
+                    >
+                      Result - Successful
+                    </Button>
+                  </div>
+                )}
+
+                {isLoginTypeAdmin && activeWidgetID === "step" && (
                   <Button
-                    color={isExperimentSucceeded ? "primary" : "danger"}
+                    color="primary"
                     size="sm"
                     className="font-weight-light border-2 border-gray shadow-none"
-                    onClick={() => setAbortModalVisibility(true)}
-                    disabled={!isExperimentRunning}
+                    // onClick={startExperiment}
                   >
-                    Abort
+                    Save
                   </Button>
-                </>
-              )}
-
-              {isLoginTypeAdmin && activeWidgetID === "step" && (
-                <Button
-                  color="primary"
-                  size="sm"
-                  className="font-weight-light border-2 border-gray shadow-none"
-                  // onClick={startExperiment}
-                >
-                  Save
-                </Button>
-              )}
-              {isExperimentSucceeded === true && (
-                <Button
-                  color="success"
-                  size="sm"
-                  className="font-weight-light border-2 border-gray shadow-none"
-                  onClick={() => setExpSuccessModalVisibility(true)}
-                >
-                  Result - Successful
-                </Button>
-              )}
-            </div>
+                )}
+              </div>
+              <Text size={10} className="text-capitalize my-auto">{role || ""}</Text>
+              <Dropdown
+                isOpen={userDropdownOpen}
+                toggle={toggleUserDropdown}
+                className="ml-2"
+              >
+                <DropdownToggle icon name="user" size={32} />
+                <DropdownMenu right>
+                  <DropdownItem
+                    onClick={logoutClickHandler}
+                    disabled={isExperimentRunning}
+                  >
+                    Log out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </>
           )}
 
-          {isLoginTypeAdmin === true && (
-            <Dropdown
-              isOpen={userDropdownOpen}
-              toggle={toggleUserDropdown}
-              className="ml-2"
-            >
-              <DropdownToggle icon name="user" size={32} />
-              <DropdownMenu right>
-                <DropdownItem onClick={logoutClickHandler}>
-                  Log out
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          )}
-          {isLoginTypeOperator === true && (
+          {/* {isLoginTypeOperator === true && (
             <ButtonIcon
               size={34}
               name="cross"
               onClick={onCrossClick}
               className="ml-2"
             />
-          )}
+          )} */}
 
           {/* MODALS */}
 
@@ -331,6 +393,17 @@ const AppHeader = (props) => {
               failureBtn={MODAL_BTN.cancel}
               handleSuccessBtn={handleSuccessModalConfirmation}
               handleCrossBtn={() => setExpSuccessModalVisibility(false)}
+            />
+          )}
+
+          {isRunConfirmModalVisible && (
+            <MlModal
+              isOpen={isRunConfirmModalVisible}
+              textBody={MODAL_MESSAGE.runConfirmMsg}
+              successBtn={MODAL_BTN.yes}
+              failureBtn={MODAL_BTN.cancel}
+              handleSuccessBtn={handleRunModalConfirmation}
+              handleCrossBtn={() => setRunConfirmModalVisibility(false)}
             />
           )}
 

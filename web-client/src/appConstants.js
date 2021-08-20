@@ -41,6 +41,8 @@ export const SOCKET_MESSAGE_TYPE = {
   ErrorPCRMonitor: "ErrorPCRMonitor",
   ErrorPCRDead: "ErrorPCRDead",
   temperatureData: "Temperature",
+  rtpcrProgress: "RTPCR_PROGRESS",
+  rtpcrSuccess: "RTPCR_SUCCESS",
   homingProgress: "PROGRESS_HOMING",
   homingSuccess: "SUCCESS_HOMING",
   runRecipeProgress: "PROGRESS_RECIPE",
@@ -56,6 +58,10 @@ export const EXPERIMENT_STATUS = {
   running: "running",
   runFailed: "run-failed",
   stopped: "stopped",
+
+  //while running experiment
+  progressing: "progressing",
+  progressComplete: "progressComplete",
 
   // socket
   success: "success",
@@ -79,6 +85,7 @@ export const ROUTES = {
   tipDiscard: "tip-discard",
   delay: "delay",
   tipPosition: "tip-position",
+  calibration: "calibration",//rtpcr flow: engineer homepage
 };
 
 export const API_ENDPOINTS = {
@@ -116,9 +123,12 @@ export const API_ENDPOINTS = {
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
   appInfo: "app-info",
+  experiments: "experiments", 
+  configs: "configs",
 };
 
 export const MODAL_MESSAGE = {
+  runConfirmMsg: "Wells are not configured. Are you sure you want to proceed?",
   abortExpInfo: "Can't log out while experiment is still running.",
   abortExpWarning: "Are you sure you want to abort experiment?",
   setPosition: "Please check the position of tip and magnet!",
@@ -183,6 +193,7 @@ export const DECKNAME = {
 export const USER_ROLES = {
   ADMIN: "admin",
   OPERATOR: "operator",
+  ENGINEER: "engineer",
 };
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
@@ -421,5 +432,60 @@ export const timeConstants = {
   MIN_IN_ONE_HOUR: 60,
 };
 
-//constants for RTPCR
-export const MAX_NO_OF_WELLS = 96; // TODO: change to 16 after new UI.
+/**
+ * Maximum number of wells that can be present in a plate.
+ * Maximum number of wells are 16.
+ * 96 was the old version, this is changed in future implementations.
+ */
+export const MAX_NO_OF_WELLS = 16;
+
+//constants for RTPCR - templates
+export const MIN_VOLUME = 10;
+export const MAX_VOLUME = 250;
+
+export const MIN_LID_TEMP = 80;
+export const MAX_LID_TEMP = 120;
+
+export const TEMPERATURE_GRAPH_OPTIONS = {
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Time (minutes)",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        offset: true,
+        type: "linear",
+        ticks: {
+          source: "data",
+          beginAtZero: true,
+          suggestedMin: 0,
+          min: 0,
+          fontSize: 15,
+          fontStyle: "bold",
+        },
+      },
+    ],
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Temperature (°C)",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+        },
+      },
+    ],
+  },
+};

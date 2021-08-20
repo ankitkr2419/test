@@ -13,6 +13,10 @@ export const NAV_ITEMS = [
     name: "Activity Log",
     path: "/activity",
   },
+  {
+    name: "Calibration",
+    path: ROUTES.calibration
+  }
 ];
 
 export const PATH_TO_SHOW_CROSS_BTN = [

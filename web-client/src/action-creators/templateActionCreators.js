@@ -3,6 +3,7 @@ import {
   listTemplateActions,
   updateTemplateActions,
   deleteTemplateActions,
+  finishCreateTemplateActions,
 } from "actions/templateActions";
 
 export const createTemplate = (body, token) => ({
@@ -81,4 +82,25 @@ export const deleteTemplateFailed = (errorResponse) => ({
 
 export const deleteTemplateReset = () => ({
   type: deleteTemplateActions.deleteTemplateReset,
+});
+
+//finish create template process
+export const finishCreateTemplate = (templateID, token) => ({
+  type: finishCreateTemplateActions.createAction,
+  payload: {
+    templateID,
+    token,
+  },
+});
+
+export const finishCreateTemplateFailed = (errorResponse) => ({
+  type: finishCreateTemplateActions.failureAction,
+  payload: {
+    ...errorResponse,
+    error: true,
+  },
+});
+
+export const finishCreateTemplateReset = () => ({
+  type: finishCreateTemplateActions.createTemplateReset,
 });

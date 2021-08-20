@@ -5,6 +5,14 @@ export const createTemplateActions =  {
 	createTemplateReset: 'CREATE_TEMPLATE_RESET',
 };
 
+//finish & save template creation process
+export const finishCreateTemplateActions =  {
+	createAction: 'FINISH_CREATE_TEMPLATE_INITIATED',
+	successAction: 'FINISH_CREATE_TEMPLATE_SUCCEEDED',
+	failureAction: 'FINISH_CREATE_TEMPLATE_FAILURE',
+	createTemplateReset: 'FINISH_CREATE_TEMPLATE_RESET',
+};
+
 export const listTemplateActions =  {
 	listAction: 'FETCH_TEMPLATES_INITIATED',
 	successAction: 'FETCH_TEMPLATES_SUCCEEDED',

@@ -7,6 +7,7 @@ import {
   updateTemplateReset,
   fetchTemplates,
 } from "action-creators/templateActionCreators";
+import { getTemplateById } from "reducers/templateReducer";
 import TemplateModal from "components/TemplateModal/TemplateModal";
 import { templateModalActions } from "components/TemplateModal/templateModalState";
 
@@ -23,12 +24,16 @@ const TemplateModalContainer = (props) => {
     templateDescription,
     templateName,
     volume,
-    lidTemperature,
+    lid_temp,
     isCreateTemplateModalVisible,
     isTemplateEdited,
   } = templateModalState.toJS();
 
   const dispatch = useDispatch();
+
+  // extracting selected template
+  const allTemplates = useSelector((state) => state.listTemplatesReducer);
+  const selectedTemplateDetails = getTemplateById(allTemplates, templateID);
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -81,10 +86,10 @@ const TemplateModalContainer = (props) => {
 
   // helper method to set lid temperature
   const setLidTemperature = useCallback(
-    (lidTemperature) => {
+    (lid_temp) => {
       templateModalDispatch({
         type: templateModalActions.SET_LID_TEMPERATURE,
-        value: lidTemperature,
+        value: lid_temp,
       });
     },
     [templateModalDispatch]
@@ -100,19 +105,17 @@ const TemplateModalContainer = (props) => {
   const autofillNameDescription = useCallback(() => {
     setTemplateName(prevTemplate.get("name"));
     setTemplateDescription(prevTemplate.get("description"));
-
-    // TODO : un-comment after APIs are ready
-    // setVolume(prevTemplate.get("volume"));
-    // setLidTemperature(prevTemplate.get("lidTemperature"));
+    setVolume(prevTemplate.get("volume"));
+    setLidTemperature(prevTemplate.get("lid_temp"));
   }, [prevTemplate, setTemplateName, setTemplateDescription]);
 
   // check if changes are persent by comparing previous values
   const checkForChanges = () => {
     if (
       templateDescription !== prevTemplate.get("description") ||
-      templateName !== prevTemplate.get("name")
-      // volume !== prevTemplate.get("volume") ||
-      // lidTemperature !== prevTemplate.get("lidTemperature")
+      templateName !== prevTemplate.get("name") ||
+      volume !== prevTemplate.get("volume") ||
+      lid_temp !== prevTemplate.get("lid_temp")
     ) {
       return true;
     }
@@ -125,7 +128,7 @@ const TemplateModalContainer = (props) => {
       templateDescription !== "" &&
       templateName !== "" &&
       volume &&
-      lidTemperature
+      lid_temp
     ) {
       return true;
     }
@@ -167,10 +170,8 @@ const TemplateModalContainer = (props) => {
           updateTemplate({
             description: templateDescription,
             name: templateName,
-
-            // TODO: add and test after API is build via backend
-            // volume: volume,
-            // lidTemperature: lidTemperature
+            volume: volume,
+            lid_temp: lid_temp,
           });
         }
       } else {
@@ -178,10 +179,8 @@ const TemplateModalContainer = (props) => {
         createTemplate({
           description: templateDescription,
           name: templateName,
-
-          // TODO: add and test after API is build via backend
-          // volume: volume,
-          // lidTemperature: lidTemperature
+          volume: volume,
+          lid_temp: lid_temp,
         });
       }
       // reset modal state to initial values
@@ -217,13 +216,14 @@ const TemplateModalContainer = (props) => {
       setTemplateName={setTemplateName}
       volume={volume}
       setVolume={setVolume}
-      lidTemperature={lidTemperature}
+      lid_temp={lid_temp}
       setLidTemperature={setLidTemperature}
       addClickHandler={addClickHandler}
       isFormValid={validateTemplateForm()}
       resetFormValues={resetFormValues}
       isTemplateEdited={isTemplateEdited}
       resetModalState={resetModalState}
+      selectedTemplateDetails={selectedTemplateDetails}
     />
   );
 };
