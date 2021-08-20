@@ -44,6 +44,7 @@ const AppHeader = (props) => {
     isPlateRoute,
     isLoginTypeAdmin,
     isLoginTypeOperator,
+    isLoginTypeEngineer,
     isTemplateRoute,
     token,
     deckName,
@@ -113,7 +114,13 @@ const AppHeader = (props) => {
 
   /** Hide plates tab if the user is admin */
   const getIsNavLinkHidden = (pathname) => {
-    if (pathname === "/plate" && isLoginTypeAdmin === true) {
+    if (pathname !== ROUTES.calibration && isLoginTypeEngineer === true) {
+      //hide all tabs for engineer other than Calibration
+      return true;
+    } else if (pathname === ROUTES.calibration && isLoginTypeAdmin === false && isLoginTypeEngineer === false) {
+      //hide Calibration tab for operator/superwiser
+      return true;
+    } else if (pathname === "/plate" && isLoginTypeAdmin === true) {
       return true;
     }
     return false;
@@ -257,6 +264,7 @@ const AppHeader = (props) => {
                       color="secondary"
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none mr-3`}
+                      outline={true}
                       onClick={handleBackBtn}
                       disabled={isExperimentRunning}
                     >

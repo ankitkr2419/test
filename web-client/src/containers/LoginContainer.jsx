@@ -8,6 +8,7 @@ import {
     login,
 } from "action-creators/loginActionCreators";
 import { toast } from "react-toastify";
+import { ROUTES } from "appConstants";
 
 const LoginContainer = () => {
     const dispatch = useDispatch();
@@ -15,7 +16,7 @@ const LoginContainer = () => {
     const loginReducer = useSelector((state) => state.loginReducer);
     const loginReducerData = loginReducer.toJS();
     let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-    const { isLoggedIn, error, name } = activeDeckObj; //name refers to deckName
+    const { isLoggedIn, error, name, isEngineer } = activeDeckObj; //name refers to deckName
 
     // local state to handle admin form visibility
     const [isAdminFormVisible, setIsAdminFormVisibility] = useState(false);
@@ -45,7 +46,7 @@ const LoginContainer = () => {
     // redirection to admin once logged in
     if (isLoggedIn === true) {
         // if (isLoggedIn === true && isSocketConnected === true) {
-        return <Redirect to="/templates" />;
+        return <Redirect to={isEngineer ? ROUTES.calibration : "/templates"} />;
     }
 
     return (

@@ -85,6 +85,7 @@ export const ROUTES = {
   tipDiscard: "tip-discard",
   delay: "delay",
   tipPosition: "tip-position",
+  calibration: "calibration",//rtpcr flow: engineer homepage
 };
 
 export const API_ENDPOINTS = {
@@ -123,6 +124,7 @@ export const API_ENDPOINTS = {
   processes: "processes",
   appInfo: "app-info",
   experiments: "experiments", 
+  configs: "configs",
 };
 
 export const MODAL_MESSAGE = {
@@ -191,6 +193,7 @@ export const DECKNAME = {
 export const USER_ROLES = {
   ADMIN: "admin",
   OPERATOR: "operator",
+  ENGINEER: "engineer",
 };
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
