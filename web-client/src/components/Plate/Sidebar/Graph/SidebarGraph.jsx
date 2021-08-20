@@ -5,6 +5,7 @@ import TemperatureGraphContainer from "containers/TemperatureGraphContainer";
 import WellGraph from "./WellGraph";
 import { graphs } from "components/Plate/plateConstant";
 import AnalyseDataGraphContainer from "containers/AnalyseDataGraphContainer";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const SidebarGraph = (props) => {
   const {
@@ -86,12 +87,7 @@ const SidebarGraph = (props) => {
         <>
           {(experimentStatus === EXPERIMENT_STATUS.success ||
             experimentStatus === EXPERIMENT_STATUS.stopped ||
-            isExpanded === true) && (
-            <AnalyseDataGraphContainer
-              experimentStatus={experimentStatus}
-              isExpanded={isExpanded}
-            />
-          )}
+            isExpanded === true) && <AnalyseDataGraphContainer />}
         </>
       )}
     </>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
@@ -8,6 +8,7 @@ import {
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import AnalyseDataGraphComponent from "components/AnalyseDataGraph";
 import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
+import { getExperimentId } from "selectors/experimentSelector";
 
 const AnalyseDataGraphContainer = (props) => {
   const dispatch = useDispatch();
@@ -26,6 +27,16 @@ const AnalyseDataGraphContainer = (props) => {
   const { selectedTarget, isAutoThreshold, isAutoBaseline } =
     analyseDataGraphFilters;
 
+  //current experiment id
+  const experimentId = useSelector(getExperimentId);
+  console.log("exp id: ", experimentId);//check
+
+  //get login reducer details
+  const loginReducer = useSelector((state) => state.loginReducer);
+  const loginReducerData = loginReducer.toJS();
+  let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
+  const { token } = activeDeckObj;
+
   //TODO get graph data from reducer
   const data = {};
 
@@ -33,11 +44,6 @@ const AnalyseDataGraphContainer = (props) => {
   useEffect(() => {
     const { selectedTarget, isAutoThreshold, isAutoBaseline } =
       analyseDataGraphFilters;
-    // if ( selectedTarget === null) {
-    //   console.log("returning from func as data not found");
-    //   //check
-    //   return;
-    // }
     let thresholdDataForApi = {
       target_id: selectedTarget?.value,
       auto_threshold: isAutoThreshold,

@@ -402,18 +402,23 @@ const Plate = (props) => {
                   >
                     Temperature
                   </Button>
-                  <Button
-                    outline={activeGraph !== graphs.AnalyseData}
-                    color={
-                      activeGraph === graphs.AnalyseData
-                        ? "primary"
-                        : "secondary"
-                    }
-                    className="mr-3 AnalyseData"
-                    onClick={() => onChangeActiveGraph(graphs.AnalyseData)}
-                  >
-                    Analyse Data
-                  </Button>
+                  {(experimentStatus === EXPERIMENT_STATUS.success ||
+                    experimentStatus === EXPERIMENT_STATUS.stopped ||
+                    isExpanded === true) && (
+                    <Button
+                      outline={activeGraph !== graphs.AnalyseData}
+                      color={
+                        activeGraph === graphs.AnalyseData
+                          ? "primary"
+                          : "secondary"
+                      }
+                      className="mr-3 AnalyseData"
+                      onClick={() => onChangeActiveGraph(graphs.AnalyseData)}
+                    >
+                      Analyse Data
+                    </Button>
+                  )}
+
                   <ButtonIcon
                     name="download-1"
                     size={28}
