@@ -20,7 +20,7 @@ type WellResult struct {
 	Task         string             `json:"task" validate:"required"`
 	ColorCode    string             `json:"color_code"`
 	Targets      []WellTargetResult `json:"targets" validate:"required"`
-	SampleName   string             `db:"sample_name" json:"sample_name"`
+	SampleName   string             `json:"sample_name"`
 }
 type WellTargetResult struct {
 	ExperimentID uuid.UUID `json:"experiment_id"`
@@ -30,6 +30,7 @@ type WellTargetResult struct {
 	CT           string    `json:"ct"`
 	Selected     bool      `json:"selected"`
 	Threshold    float32   `json:"threshold"`
+	Result       string    `json:"result"`
 }
 
 func listWellsHandler(deps Dependencies) http.HandlerFunc {
@@ -88,12 +89,27 @@ func makeWellResultData(deps Dependencies, wells []db.Well, expID uuid.UUID) (we
 
 		var wt []WellTargetResult
 		for _, t := range w.Targets {
+			var result string
 			thresholdR, err := deps.Store.GetTargetThreshold(context.Background(), expID, t.TargetID)
 			logger.Infoln(thresholdR)
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error getting threshold data")
 				return nil, err
 			}
+
+			if t.CT == undetermine {
+				result = undetermine
+			} else if t.CT == "" {
+				result = ""
+			} else {
+				if t.CT == negative {
+					result = negative
+				} else {
+					result = positive
+				}
+			}
+			logger.Infoln("result", result)
+
 			wtr := WellTargetResult{
 				ExperimentID: t.ExperimentID,
 				WellPosition: t.WellPosition,
@@ -102,6 +118,7 @@ func makeWellResultData(deps Dependencies, wells []db.Well, expID uuid.UUID) (we
 				CT:           t.CT,
 				Selected:     t.Selected,
 				Threshold:    scaleThreshold(thresholdR.Threshold),
+				Result:       result,
 			}
 			wt = append(wt, wtr)
 		}

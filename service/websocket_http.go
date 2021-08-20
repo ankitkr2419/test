@@ -306,29 +306,32 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 				} else {
 					v.Threshold = tc.Threshold
 				}
-			}
 
-			ett := db.ExpTargetThreshold{
-				ExperimentID: experimentID,
-				TargetID:     v.TargetID,
-				Threshold:    v.Threshold,
+				ett := db.ExpTargetThreshold{
+					ExperimentID: experimentID,
+					TargetID:     v.TargetID,
+					Threshold:    v.Threshold,
+				}
+				targetThreshold = append(targetThreshold, ett)
+				// analyseResult returns data required for ploting graph
+				wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
 			}
-			targetThreshold = append(targetThreshold, ett)
-			// analyseResult returns data required for ploting graph
-			wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
 		}
 	}
-	_, err = deps.Store.UpsertWellTargets(context.Background(), wellTarget, experimentID, false)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error upserting well target data")
-		return
+
+	if len(wellTarget) > 0 {
+		_, err = deps.Store.UpsertWellTargets(context.Background(), wellTarget, experimentID, false)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error upserting well target data")
+			return
+		}
+		err = deps.Store.UpsertTargetThreshold(context.Background(), targetThreshold)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error upserting well target data")
+			return
+		}
 	}
 
-	err = deps.Store.UpsertTargetThreshold(context.Background(), targetThreshold)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error upserting well target data")
-		return
-	}
 	experimentValues.experimentID = experimentID
 	graphResult, err = getColorCodedWells(deps)
 	if err != nil {

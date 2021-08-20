@@ -21,6 +21,8 @@ var (
 	graphMin          float32 = 0 // scale for graph
 	graphMax          float32 = 10
 	undetermine               = "UNDETERMINE"
+	positive                  = "POSITIVE"
+	negative                  = "NEGATIVE"
 )
 
 type experimentResultValues struct {

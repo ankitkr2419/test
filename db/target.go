@@ -58,7 +58,7 @@ func (s *pgStore) ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye st
 func (s *pgStore) GetTargetThreshold(ctx context.Context, expID, targetID uuid.UUID) (tarth ExpTargetThreshold, err error) {
 	err = s.db.Get(&tarth, getTargetThreshold, expID, targetID)
 	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error listing targets dye")
+		logger.WithField("err", err.Error()).Error("Error listing targets threshold")
 		return
 	}
 	return
