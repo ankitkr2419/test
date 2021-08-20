@@ -133,4 +133,5 @@ type Storer interface {
 	SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) (err error)
 	ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error)
 	UpsertTargetThreshold(ctx context.Context, tt []ExpTargetThreshold) (err error)
+	GetTargetThreshold(ctx context.Context, expID, targetID uuid.UUID) (tarth ExpTargetThreshold, err error)
 }

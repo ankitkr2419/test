@@ -1,14 +1,36 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
+
+type WellResult struct {
+	ID           uuid.UUID          `json:"id"`
+	Position     int32              `json:"position" validate:"required"`
+	ExperimentID uuid.UUID          `json:"experiment_id" validate:"required"`
+	SampleID     uuid.UUID          `json:"sample_id" validate:"required"`
+	Task         string             `json:"task" validate:"required"`
+	ColorCode    string             `json:"color_code"`
+	Targets      []WellTargetResult `json:"targets" validate:"required"`
+	SampleName   string             `db:"sample_name" json:"sample_name"`
+}
+type WellTargetResult struct {
+	ExperimentID uuid.UUID `json:"experiment_id"`
+	WellPosition int32     `json:"well_position"`
+	TargetID     uuid.UUID `json:"target_id" validate:"required"`
+	TargetName   string    `json:"target_name"`
+	CT           string    `json:"ct"`
+	Selected     bool      `json:"selected"`
+	Threshold    float32   `json:"threshold"`
+}
 
 func listWellsHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -25,6 +47,7 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
 		if len(wells) > 0 {
 
 			welltargets, err := deps.Store.ListWellTargets(req.Context(), expID)
@@ -42,7 +65,13 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 				}
 			}
 		}
-		respBytes, err := json.Marshal(wells)
+		wellResult, err := makeWellResultData(deps, wells, expID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error making wells data")
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		respBytes, err := json.Marshal(wellResult)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling Wells data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -54,7 +83,43 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write(respBytes)
 	})
 }
+func makeWellResultData(deps Dependencies, wells []db.Well, expID uuid.UUID) (wellResult []WellResult, err error) {
+	for _, w := range wells {
 
+		var wt []WellTargetResult
+		for _, t := range w.Targets {
+			thresholdR, err := deps.Store.GetTargetThreshold(context.Background(), expID, t.TargetID)
+			logger.Infoln(thresholdR)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error getting threshold data")
+				return nil, err
+			}
+			wtr := WellTargetResult{
+				ExperimentID: t.ExperimentID,
+				WellPosition: t.WellPosition,
+				TargetID:     t.TargetID,
+				TargetName:   t.TargetName,
+				CT:           t.CT,
+				Selected:     t.Selected,
+				Threshold:    scaleThreshold(thresholdR.Threshold),
+			}
+			wt = append(wt, wtr)
+		}
+
+		wr := WellResult{
+			ID:           w.ID,
+			Position:     w.Position,
+			ExperimentID: w.ExperimentID,
+			SampleID:     w.SampleID,
+			Task:         w.Task,
+			ColorCode:    w.ColorCode,
+			Targets:      wt,
+			SampleName:   w.SampleName,
+		}
+		wellResult = append(wellResult, wr)
+	}
+	return
+}
 func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
