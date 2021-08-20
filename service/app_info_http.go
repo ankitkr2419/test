@@ -1,17 +1,18 @@
 package service
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
+	"os"
 
 	logger "github.com/sirupsen/logrus"
 )
 
 const (
-	None   	   = "none"
+	None       = "none"
 	Combined   = "combined"
 	RTPCR      = "rtpcr"
 	Extraction = "extraction"
@@ -56,35 +57,40 @@ func PrintBinaryInfo() {
 		Version, User, Machine, Branch, CommitID, BuiltOn)
 }
 
-
-func ShutDownGraceFully(deps Dependencies) (err error) {
-		var err1, err2, err3, err4 error
-		// We received an interrupt signal, shut down.
-		logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
-		if Application == Combined || Application == RTPCR{
-			err1 = deps.Tec.ReachRoomTemp()
-			if err1 != nil {
-				logger.Errorln("Couldn't reach the room temp!")
-				err = err1
-			}
-			err2 = deps.Plc.SwitchOffLidTemp()
-			if err2 != nil {
-				logger.Errorln("Couldn't Switch off the Lid!")
-				err = fmt.Errorf("%v\n%v",err, err2)
-			}
+func ShutDownGracefully(deps Dependencies) (err error) {
+	var err1, err2, err3, err4 error
+	// We received an interrupt signal, shut down.
+	logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
+	if Application == Combined || Application == RTPCR {
+		err1 = deps.Tec.ReachRoomTemp()
+		if err1 != nil {
+			logger.Errorln("Couldn't reach the room temp!")
+			err = err1
 		}
-		if Application == Combined || Application == Extraction {
-			_, err3 = deps.PlcDeck["A"].SwitchOffAllCoils()
-			if err3 != nil {
-				logger.Errorln("Couldn't switch off Deck A motor!")
-				err = fmt.Errorf("%v\n%v",err, err3)
-			}
-
-			_, err4 = deps.PlcDeck["B"].SwitchOffAllCoils()
-			if err4 != nil {
-				logger.Errorln("Couldn't switch off Deck B motor!")
-				err = fmt.Errorf("%v\n%v",err, err4)
-			}
+		err2 = deps.Plc.SwitchOffLidTemp()
+		if err2 != nil {
+			logger.Errorln("Couldn't Switch off the Lid!")
+			err = fmt.Errorf("%v\n%v", err, err2)
 		}
-		return
+	}
+	if Application == Combined || Application == Extraction {
+		_, err3 = deps.PlcDeck["A"].SwitchOffAllCoils()
+		if err3 != nil {
+			logger.Errorln("Couldn't switch off Deck A motor!")
+			err = fmt.Errorf("%v\n%v", err, err3)
+		}
+
+		_, err4 = deps.PlcDeck["B"].SwitchOffAllCoils()
+		if err4 != nil {
+			logger.Errorln("Couldn't switch off Deck B motor!")
+			err = fmt.Errorf("%v\n%v", err, err4)
+		}
+	}
+	if err != nil{
+		logger.Errorln("Shutdown graceful error: ", err)
+		os.Exit(-1)
+	}
+
+	os.Exit(0)
+	return
 }

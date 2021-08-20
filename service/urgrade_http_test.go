@@ -16,7 +16,7 @@ import (
 // functionality from testify - including assertion methods.
 type UpgradeHandlerTestSuite struct {
 	suite.Suite
-	dbMock *db.DBMockStore
+	dbMock  *db.DBMockStore
 	plcDeck map[string]plc.Extraction
 }
 
@@ -25,8 +25,8 @@ func (suite *UpgradeHandlerTestSuite) SetupTest() {
 	driverA := &plc.PLCMockStore{}
 	driverB := &plc.PLCMockStore{}
 	suite.plcDeck = map[string]plc.Extraction{
-		plc.DeckA:driverA,
-		plc.DeckB:driverB,
+		plc.DeckA: driverA,
+		plc.DeckB: driverB,
 	}
 }
 
@@ -59,12 +59,12 @@ func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeSuccess() {
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeplc.DeckBFailure() {
+func (suite *UpgradeHandlerTestSuite) TestSafeToUpgradeFailure() {
 	// Deck A will return false
 	suite.plcDeck[plc.DeckA].(*plc.PLCMockStore).On("IsRunInProgress").Return(false).Once()
 	// Deck B will return true
 	suite.plcDeck[plc.DeckB].(*plc.PLCMockStore).On("IsRunInProgress").Return(true).Once()
-	
+
 	recorder := makeHTTPCall(http.MethodGet,
 		"/safe-to-upgrade",
 		"/safe-to-upgrade",

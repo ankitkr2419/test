@@ -96,7 +96,6 @@ const TemplateLayout = (props) => {
   }, []);
 
   if (!isLoggedIn) {
-    // history.push(ROUTES.login);
     history.push("splashscreen");
   }
 

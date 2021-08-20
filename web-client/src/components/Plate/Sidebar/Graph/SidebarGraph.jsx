@@ -43,8 +43,8 @@ const SidebarGraph = (props) => {
       {/* show temperature graph if showTempGraph flag is on */}
       {showTempGraph && <TemperatureGraphContainer />}
     </>
-
-  )};
+  );
+};
 
 SidebarGraph.propTypes = {
   isExperimentRunning: PropTypes.bool.isRequired,
@@ -55,6 +55,7 @@ SidebarGraph.propTypes = {
   toggleGraphFilterActive: PropTypes.func.isRequired,
   experimentGraphTargetsList: PropTypes.object.isRequired,
   isExperimentSucceeded: PropTypes.bool.isRequired,
+  showTempGraph: PropTypes.bool,
 };
 
 export default React.memo(SidebarGraph);

@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
+	logger "github.com/sirupsen/logrus"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -111,7 +113,7 @@ func (suite *UserHandlerTestSuite) TestValidateUsersWhenUserAuthInsertFailed() {
 	suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, errors.New("failed to insert user auth"))
 
 	body, _ := json.Marshal(testUser)
-	fmt.Print(string(body))
+	logger.Infoln(string(body))
 	recorder := makeHTTPCall(
 		http.MethodPost,
 		"/login",
@@ -185,8 +187,8 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckSuccess() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
 	//first need to login to test logout
-	userLogin.Store(plc.DeckA, true)
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
+	deckUserLogin.Store(plc.DeckA, "test")
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
@@ -207,7 +209,7 @@ func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckSuccess() {
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, "", map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
@@ -228,9 +230,9 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, errors.New("failed to fetch user auth record"))
 
 	//first need to login to test logout
-	userLogin.Store(plc.DeckA, true)
+	deckUserLogin.Store(plc.DeckA, "test")
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
@@ -254,9 +256,9 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckDeleteFailure() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError)
 
 	//first need to login to test logout
-	userLogin.Store(plc.DeckA, true)
+	deckUserLogin.Store(plc.DeckA, "test")
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, map[string]string{})
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 

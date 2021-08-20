@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"time"
 
 	logger "github.com/sirupsen/logrus"
@@ -13,22 +14,17 @@ import (
 
 1. Validate the temperature: min 20 C and max 120 C (for register it would be 200 and 1200)
 2. Validate time duration between 10 sec and 1hr-60sec(3660 secs)
-3. Validate shaker no. value as not empty and between 1-3
-4. Select shaker/s for heating
-5. Set Temperature
-6. Check if aborted before setting heater on
-7. Check if syringe module is inDeck, then get it to rest position
-8. Heater on
-9. check if followup is to be kept on if no then then start heating and the timer and after specified time turn off heater and return.
-10. if yes then start heating let it reach to specified temperature and then start timer and after time switch heater off.
-11. Switch heater OFF
+3. Set Temperature
+4. Check if aborted before setting heater on
+5. Check if syringe module is inDeck, then get it to rest position
+6. Heater on
+7. check if followup is to be kept on if no then then start heating and the timer and after specified time turn off heater and return.
+8. if yes then start heating let it reach to specified temperature and then start timer and after time switch heater off.
+9. Switch heater OFF
 */
 func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	stopMonitor := make(chan bool, 1)
-	// here we are hardcoding the shaker no in future this is to be fetched dynamically.
-	// 3 is the value that needs to be passed for heating both the shakers.
-	shaker := uint16(3)
 
 	// Step 1 : Validation for temperature
 	// validation for temperature
@@ -51,41 +47,23 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		DelayTime: ht.Duration,
 	}
 
-	// Step 3 : Validation for shaker
-	//validation for shaker
-	if shaker > 3 || shaker < 1 {
-		err = fmt.Errorf("%v not in valid range of 1-3", shaker)
-		logger.Errorln("Error shaker number not in valid range: ", err)
-		return "", err
-	}
-
-	// Step 4: Select shaker
-	//select shaker for heating
-	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][222], shaker)
-	if err != nil {
-		logger.Errorln("Error failed to write temperature: ", err)
-		return "", err
-	}
-
-	logger.Infoln("result from shaker selection", result)
-
-	//Step 5: Set Temperature
+	//Step 3: Set Temperature
 	//Set Temperature for heater
-	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(ht.Temperature*10))
+	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(ht.Temperature*10))
 	if err != nil {
 		logger.Errorln("Error failed to write temperature: ", err)
 		return "", err
 	}
 	logger.Infoln("result from temperature set ", result, ht.Temperature)
 
-	// Step 6 : Check if Aborted
+	// Step 4 : Check if Aborted
 	// first check aborted if yes then exit
 	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Operation was ABORTED!")
 		return "", err
 	}
 
-	// Step 7 : Syringe To Rest Position
+	// Step 5 : Syringe To Rest Position
 	// Check if syringe module is inDeck, then get it to rest position
 
 	if d.getSyringeModuleState() == InDeck {
@@ -96,18 +74,21 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		}
 	}
 
-	// Step 7 : Switch heater on
+	// Step 6 : Switch heater on
 	//Heater on
 	response, err = d.switchOnHeater()
 	if err != nil {
 		logger.Errorln("error in switching heater on ", err)
 		return "", err
 	}
+	logger.Infoln("heating with temperature", ht.Temperature, "started")
+
+	// Step 9:  Switch heater OFF (Called in defer)
 	defer d.switchOffHeater()
 	d.setHeaterInProgress()
 	defer d.resetHeaterInProgress()
 
-	// Step 8: For not follow Temp
+	// Step 7: For not follow Temp
 	// first check if not follow up then call delay function.
 	// if no then then start heating  after specified time turn off heater and return
 	// as we do not need to monitor the temperature here.
@@ -127,7 +108,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		return
 	}
 
-	// Step 10 : monitor the temperature if follow temp.
+	// Step 8 : monitor the temperature if follow temp.
 	// loop for continous reading of the shaker temp and check if the temperature has reached specified value.
 	response, err = d.monitorTemperature(shaker, ht.Temperature, true, stopMonitor)
 	if err != nil {
@@ -147,11 +128,13 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		return
 	}
 
+	logger.Infoln("heating with temperature", ht.Temperature, "completed")
+
 	return
 }
 
 func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64, tempCheck bool, stopMonitor chan bool) (response string, err error) {
-	var setTemp, setTemp1, setTemp2, prevTemp1, prevTemp2 float64
+	var setTemp, shaker1Temp, shaker2Temp, prevTemp1, prevTemp2 float64
 	var heatingFailCounter1, heatingFailCounter2 int
 
 	var registerAddress uint16 = 0
@@ -162,7 +145,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 	for {
 		select {
 		case n := <-stopMonitor:
-			fmt.Printf("stop the montoring %v", n)
+			logger.Infoln("stop the montoring :", n)
 			return "SUCCESS", nil
 
 		default:
@@ -202,51 +185,41 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 					goto skipToMonitor
 				}
 				// Play of 2 degrees as heater would not heat up that much sometimes
-				if (setTemp1 >= temperature - 2) && (setTemp2 >= temperature - 2) {
+				if (shaker1Temp >= temperature-2) && (shaker2Temp >= temperature-2) {
 					return "SUCCESS", nil
 				}
 
 			skipToMonitor:
 
-				if (setTemp1 - prevTemp1) < 1 {
+				if (shaker1Temp - prevTemp1) < 1 {
 					heatingFailCounter1 += 1
 				} else {
 					heatingFailCounter1 = 0
 				}
 
-				if (setTemp2 - prevTemp2) < 1 {
+				if (shaker2Temp - prevTemp2) < 1 {
 					heatingFailCounter2 += 1
 				} else {
 					heatingFailCounter2 = 0
 				}
 
-				prevTemp1 = setTemp1
-				prevTemp2 = setTemp2
+				prevTemp1 = shaker1Temp
+				prevTemp2 = shaker2Temp
 
 				if heatingFailCounter1 >= 15 || heatingFailCounter2 >= 15 {
 					err = fmt.Errorf("temperature not upgrading")
 					return "", err
 				}
 
-				results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
+				shaker1Temp, shaker2Temp, err = d.readTempValues()
 				if err != nil {
-					logger.Errorln("Error failed to read shaker 1 temperature \n", err)
+					logger.Errorln("Error failed to read temperature values for shaker heaters: ", err)
 					return "", err
 				}
-				setTemp1 = float64(binary.BigEndian.Uint16(results)) / 10
 
-				logger.Infoln("temp 1 reading", setTemp1)
-
-				results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
-				if err != nil {
-					logger.Errorln("Error failed to read shaker 2 temperature \n", err)
-					return "", err
-				}
-				setTemp2 = float64(binary.BigEndian.Uint16(results)) / 10
-				logger.Infoln("temp 2 reading", setTemp2)
 				response, err = d.AddDelay(delay, false)
 				if err != nil {
-					logger.Errorln("Error failed to add delay in monitor temperature \n", err)
+					logger.Errorln("Error failed to add delay in monitor temperature: ", err)
 					return "", err
 				}
 			}
@@ -254,7 +227,58 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 	}
 }
 
+func (d *Compact32Deck) readTempValues() (shaker1Temp, shaker2Temp float64, err error) {
+
+	defer func() {
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.FetchHeaterTempError)
+			d.WsErrCh <- err
+		}
+	}()
+
+	results, err := d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][210], 1)
+	if err != nil {
+		logger.Errorln("Error failed to read shaker 1 temperature")
+		return
+	}
+	shaker1Temp = float64(binary.BigEndian.Uint16(results)) / 10
+
+	logger.Infoln("temp 1 reading", shaker1Temp)
+
+	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][224], 1)
+	if err != nil {
+		logger.Errorln("Error failed to read shaker 2 temperature")
+		return
+	}
+	shaker2Temp = float64(binary.BigEndian.Uint16(results)) / 10
+	logger.Infoln("temp 2 reading", shaker2Temp)
+	return
+}
+
 func (d *Compact32Deck) stopMonitorTemperature(stop chan bool) {
 	logger.Infoln("stop monitor temperature")
 	stop <- true
+}
+
+func (d *Compact32Deck) HeaterData() (err error) {
+	retryCounter := 0
+	for {
+		time.Sleep(5 * time.Second)
+		if d.isEngineerOrAdminLogged() {
+			err = d.sendHeaterData()
+			if err != nil {
+				retryCounter++
+				if retryCounter > 3 {
+					return err
+				}
+				logger.WithFields(logger.Fields{
+					"heater":  err,
+					"attempt": retryCounter,
+				}).Warnln("Attempt failed. Heater Value couldn't be read. Retrying...")
+				time.Sleep(10 * time.Second) // sleep it off for a bit
+			} else {
+				retryCounter = 0
+			}
+		}
+	}
 }

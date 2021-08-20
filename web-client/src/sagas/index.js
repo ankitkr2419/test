@@ -2,7 +2,6 @@ import { all } from "redux-saga/effects";
 import {
   createTemplateSaga,
   fetchTemplatesSaga,
-  createTemplateSuccessSaga,
   deleteTemplateSaga,
   updateTemplateSaga,
 } from "sagas/templateSaga";
@@ -51,7 +50,6 @@ import { calibrationSaga } from "./calibrationSaga";
 const allSagas = [
   createTemplateSaga(),
   fetchTemplatesSaga(),
-  createTemplateSuccessSaga(),
   saveTargetSaga(),
   fetchMasterTargetsSaga(),
   fetchTargetsByTemplateIDSaga(),

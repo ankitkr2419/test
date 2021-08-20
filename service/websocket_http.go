@@ -65,6 +65,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				} else if strings.EqualFold(msgs[0], "success") {
 
 					successOperation(deps, rw, c, msgs)
+				} else if strings.EqualFold(msgs[0], "heater") {
+
+					monitorOperation(deps, rw, c, msgs)
 				}
 
 			case err = <-deps.ExitCh:
@@ -84,6 +87,9 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					errortype = "ErrorPCRDead"
 					msg = "Unable to connect to Hardware"
 
+				} else {
+					errortype = "ErrorPCR"
+					msg = err.Error()
 				}
 
 				logger.WithField("err", err.Error()).Error("PLC Driver has requested exit")
@@ -268,6 +274,80 @@ func getGraph(deps Dependencies, experimentID uuid.UUID, wells []int32, targets 
 
 }
 
+func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, dbWells []db.Well, tCycles uint16, tc Threshold) (graphResult []byte, err error) {
+
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching result data")
+		return
+	}
+
+	var wellTargets []db.WellTarget
+	for _, i := range wells {
+		wellTarget, err := deps.Store.GetWellTarget(context.Background(), i, experimentID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error fetching well targets")
+		}
+		wellTargets = append(wellTargets, wellTarget...)
+	}
+
+	wellTarget := make([]db.WellTarget, 0)
+	if len(DBResult) > 0 {
+		for _, v := range targets {
+			if tc.AutoThreshold {
+				targetThreshold := getAutoThreshold(DBResult, wells, targets, tCycles)
+				for i, tl := range targetThreshold {
+					if i.TargetID == v.TargetID {
+						v.Threshold = tl
+					}
+				}
+			}
+			// analyseResult returns data required for ploting graph
+			wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
+		}
+	}
+	_, err = deps.Store.UpsertWellTargets(context.Background(), wellTarget, experimentID, false)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error upserting well target data")
+		return
+	}
+
+	experimentValues.experimentID = experimentID
+	graphResult, err = getColorCodedWells(deps)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
+		return
+	}
+
+	return
+}
+func getBaselineData(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, dbWells []db.Well, tCycles uint16, bl Baseline) (respBytes []byte, err error) {
+
+	DBResult, err := deps.Store.GetResult(context.Background(), experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching result data")
+		return
+	}
+
+	finalResult := make([]graph, 0)
+	if len(DBResult) > 0 {
+		finalResult = getBaselineGraph(DBResult, wells, targets, bl)
+	}
+
+	Result := resultGraph{
+		Type: "Graph",
+		Data: finalResult,
+	}
+
+	respBytes, err = json.Marshal(Result)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error marshaling graph data")
+		return
+	}
+
+	return
+}
+
 func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 
 	// list wells from DB
@@ -437,7 +517,7 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 		}
 		//Add to excel
 		row := []interface{}{time.Now().Format("2006-01-02 15:04:05"), scan.Temp, scan.LidTemp}
-		plc.AddRowToExcel(file, plc.TempLogs, row)
+		db.AddRowToExcel(file, db.TempLogs, row)
 
 		// writes temp on every step against time in DB
 		err = WriteExperimentTemperature(deps, scan)
@@ -483,6 +563,26 @@ func monitorExperiment(deps Dependencies, file *excelize.File) {
 		}
 		// adding delay of 0.5s to reduce the cpu usage
 	}
+
+	e, err := deps.Store.ShowExperiment(context.Background(), experimentValues.experimentID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching experiment data")
+		return
+	}
+
+	db.AddRowToExcel(file, db.ExperimentSheet, []interface{}{e.ID,
+		e.Description,
+		e.TemplateID,
+		e.OperatorName,
+		e.StartTime.String(),
+		e.EndTime.String(),
+		e.Result,
+		e.RepeatCycle,
+		e.CreatedAt,
+		e.UpdatedAt,
+		e.TemplateName,
+		e.WellCount})
+
 	logger.Info("Stop monitoring experiment")
 }
 

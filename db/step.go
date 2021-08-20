@@ -20,7 +20,7 @@ const (
 		VALUES ($1, $2, $3, $4 ,$5) RETURNING id`
 
 	getStepsListQuery = `SELECT * FROM steps
-		where stage_id = $1`
+		where stage_id = $1 ORDER BY created_at ASC`
 
 	getStepQuery = `SELECT id,
 		stage_id,
@@ -45,14 +45,14 @@ const (
 )
 
 type Step struct {
-	ID                uuid.UUID `db:"id" json:"id"`
+	ID                uuid.UUID `db:"id" json:"step_id"`
 	StageID           uuid.UUID `db:"stage_id" json:"stage_id"`
 	RampRate          float32   `db:"ramp_rate" json:"ramp_rate"`
 	TargetTemperature float32   `db:"target_temp" json:"target_temp"`
 	HoldTime          int32     `db:"hold_time" json:"hold_time"`
 	DataCapture       bool      `db:"data_capture" json:"data_capture"`
-	CreatedAt         time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt         time.Time `db:"updated_at" json:"updated_at"`
+	CreatedAt         time.Time `db:"created_at" json:"step_created_at"`
+	UpdatedAt         time.Time `db:"updated_at" json:"step_updated_at"`
 }
 
 func (s *pgStore) ListSteps(ctx context.Context, stgID uuid.UUID) (steps []Step, err error) {

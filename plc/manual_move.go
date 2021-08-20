@@ -6,7 +6,12 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (response string, err error) {
+const (
+	manualSpeed = 2000
+	manualRamp  = 100
+)
+
+func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (response string, err error) {
 
 	if d.IsRunInProgress() {
 		err = fmt.Errorf("previous run already in progress... wait or abort it")
@@ -17,7 +22,9 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction, pulses uint16) (resp
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	response, err = d.setupMotor(uint16(2000), pulses, uint16(100), direction, motorNum)
+	deckAndMotor := DeckNumber{Deck: d.name, Number: motorNum}
+
+	response, err = d.setupMotor(manualSpeed, uint16(mm*float32(Motors[deckAndMotor]["steps"])), manualRamp, direction, motorNum)
 	if err != nil {
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
@@ -183,7 +190,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	// Switch off shaker
 	response, err = d.switchOffShaker()
 	if err != nil {
-		fmt.Println("From deck ", d.name, err)
+		logger.Errorln("From deck ", d.name, err)
 		return "", err
 	}
 
@@ -249,4 +256,3 @@ func (d *Compact32Deck) resumeMotorWithPulses(pulses uint16) (response string, e
 
 	return "RESUMED with pulses.", nil
 }
-

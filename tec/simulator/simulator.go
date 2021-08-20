@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
 	"time"
@@ -101,27 +102,27 @@ func (t *Simulator) GetAllTEC() (err error) {
 func (t *Simulator) TestRun(plcDeps plc.Driver) (err error) {
 	p := plc.Stage{
 		Holding: []plc.Step{
-			plc.Step{65.3, 10, 5, false},
-			plc.Step{85.3, 10, 5, false},
-			plc.Step{95, 10, 5, false},
+			plc.Step{TargetTemp: 65.3, RampUpTemp: 10, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 85.3, RampUpTemp: 10, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 95, RampUpTemp: 10, HoldTime: 5, DataCapture: false},
 		},
 		Cycle: []plc.Step{
-			// plc.Step{60, 10, 10},
-			plc.Step{95, 10, 5, false},
-			plc.Step{85, 10, 5, false},
-			plc.Step{75, 10, 5, false},
-			plc.Step{65, 10, 5, false},
+			// plc.Step{60, 10, 10}
+			plc.Step{TargetTemp: 95, RampUpTemp: 10, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 85, RampUpTemp: 10, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 75, RampUpTemp: 10, HoldTime: 5, DataCapture: false},
+			plc.Step{TargetTemp: 65, RampUpTemp: 10, HoldTime: 5, DataCapture: true},
 		},
 		CycleCount: 3,
 	}
 
-	file := plc.GetExcelFile(tec.LogsPath, "output")
+	file := db.GetExcelFile(tec.LogsPath, "output")
 	// Start line
 	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
-	plc.AddRowToExcel(file, plc.TECSheet, headings)
+	db.AddRowToExcel(file, db.TECSheet, headings)
 
 	row := []interface{}{"Holding Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	// Go back to Room Temp at the end
 	defer t.ReachRoomTemp()
@@ -133,7 +134,7 @@ func (t *Simulator) TestRun(plcDeps plc.Driver) (err error) {
 
 	// Run Cycle Stage
 	row = []interface{}{"Cycle Stage About to start"}
-	plc.AddRowToExcel(file, plc.TECSheet, row)
+	db.AddRowToExcel(file, db.TECSheet, row)
 
 	for i := uint16(1); i <= p.CycleCount; i++ {
 		logger.Infoln("Started Cycle->", i)
@@ -161,7 +162,7 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 		logger.Infoln("Started ->", ti)
 		t.SetTempAndRamp(ti)
 		row = []interface{}{fmt.Sprintf("Time taken to complete step: %v", i+1), time.Now().Sub(t0).String(), math.Abs(float64(h.TargetTemp-prevTemp)) / float64(h.RampUpTemp), prevTemp, h.TargetTemp, h.RampUpTemp}
-		plc.AddRowToExcel(file, plc.TECSheet, row)
+		db.AddRowToExcel(file, db.TECSheet, row)
 		logger.Infoln("Time taken to complete step: ", i+1, "\t cycle num: ", cycleNum, "\nTime Taken: ", time.Now().Sub(t0), "\nExpected Time: ", math.Abs(float64(h.TargetTemp-prevTemp))/float64(h.RampUpTemp), "\nInitial Temp:", prevTemp, "\nTarget Temp: ", h.TargetTemp, "\nRamp Rate: ", h.RampUpTemp)
 		logger.Infoln("Completed ->", ti, " holding started for ", h.HoldTime)
 
@@ -191,10 +192,10 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 
 	if cycleNum != 0 {
 		row = []interface{}{fmt.Sprintf("Time taken to complete Cycle Stage %v", cycleNum), time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
-		plc.AddRowToExcel(file, plc.TECSheet, row)
+		db.AddRowToExcel(file, db.TECSheet, row)
 	} else {
 		row = []interface{}{"Time taken to complete Holding Stage", time.Now().Sub(ts).String(), "", stagePrevTemp, prevTemp}
-		plc.AddRowToExcel(file, plc.TECSheet, row)
+		db.AddRowToExcel(file, db.TECSheet, row)
 	}
 
 	plc.CycleComplete = true
@@ -203,11 +204,11 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 
 func (t *Simulator) RunProfile(plcDeps plc.Driver, tp tec.TempProfile) (err error) {
 
-	file := plc.GetExcelFile(tec.LogsPath, "output")
+	file := db.GetExcelFile(tec.LogsPath, "output")
 
 	// Start line
 	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
-	plc.AddRowToExcel(file, plc.TECSheet, headings)
+	db.AddRowToExcel(file, db.TECSheet, headings)
 
 	for i := uint16(1); i <= uint16(tp.Cycles); i++ {
 		logger.Infoln("Started Cycle->", i)
