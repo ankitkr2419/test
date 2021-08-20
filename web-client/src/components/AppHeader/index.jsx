@@ -326,7 +326,7 @@ const AppHeader = (props) => {
                   </Button>
                 )}
               </div>
-              <Text size={10} className="text-capitalize my-auto">{role ? role : ''}</Text>
+              <Text size={10} className="text-capitalize my-auto">{role || ""}</Text>
               <Dropdown
                 isOpen={userDropdownOpen}
                 toggle={toggleUserDropdown}
