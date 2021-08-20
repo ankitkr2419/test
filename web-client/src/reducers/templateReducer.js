@@ -4,6 +4,7 @@ import {
   listTemplateActions,
   updateTemplateActions,
   deleteTemplateActions,
+  finishCreateTemplateActions,
 } from "actions/templateActions";
 import { getTemplateDetails } from "components/Template/templateHelper";
 
@@ -29,6 +30,11 @@ const deleteTemplateInitialState = {
   data: {},
   errorDeletingTemplate: null,
   isTemplateDeleted: false,
+};
+
+const finishCreateTemplateInitialState = {
+  isLoading: false,
+  errorFinishCreateTemplate: null,
 };
 
 // eslint-disable-next-line arrow-body-style
@@ -155,6 +161,36 @@ export const deleteTemplateReducer = (
       };
     case deleteTemplateActions.deleteTemplateReset:
       return deleteTemplateInitialState;
+    default:
+      return state;
+  }
+};
+
+export const finishCreateTemplateReducer = (
+  state = finishCreateTemplateInitialState,
+  action
+) => {
+  switch (action.type) {
+    case finishCreateTemplateActions.createAction:
+      return {
+        ...state,
+        isLoading: true,
+        errorFinishCreateTemplate: null,
+      };
+    case finishCreateTemplateActions.successAction:
+      return {
+        ...state,
+        isLoading: false,
+        errorFinishCreateTemplate: false,
+      };
+    case finishCreateTemplateActions.failureAction:
+      return {
+        ...state,
+        isLoading: false,
+        errorFinishCreateTemplate: true,
+      };
+    case finishCreateTemplateActions.createTemplateReset:
+      return finishCreateTemplateInitialState;
     default:
       return state;
   }

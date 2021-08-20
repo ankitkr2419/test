@@ -36,6 +36,7 @@ const TargetComponent = (props) => {
     isNoTargetSelected,
     setThresholdError,
     isThresholdInvalid,
+    onRemoveTarget,
   } = props;
 
   const isTargetDisabled = (ele) => {
@@ -71,6 +72,16 @@ const TargetComponent = (props) => {
     }
   }, [listTargetReducer, selectedTargetState, isLoginTypeAdmin]);
 
+  const incrementThreshold = (ele, index) => {
+    let val = ele.threshold ? ele.threshold + 1 : 1;
+    onThresholdChange(val, index);
+  };
+
+  const decrementThreshold = (ele, index) => {
+    let val = ele.threshold ? ele.threshold - 1 : 0;
+    onThresholdChange(val, index);
+  };
+
   const getTargetRows = useMemo(
     () =>
       selectedTargetState.map((ele, index) => (
@@ -99,7 +110,7 @@ const TargetComponent = (props) => {
               onChange={(selectedTarget) => {
                 onTargetSelect(selectedTarget, index);
               }}
-              value={ele.selectedTarget}
+              value={ele.selectedTarget ? ele.selectedTarget : null}
             />
           )}
           {isLoginTypeOperator === true && (
@@ -125,8 +136,47 @@ const TargetComponent = (props) => {
             onBlur={() => onThresholdBlurHandler(ele.threshold, index)}
             onFocus={() => onThresholdFocusHandler(index)}
             invalid={ele.thresholdError}
-            disabled={isLoginTypeOperator}
+            //disabled for operator always OR for admin it should be disabled till target is selected
+            disabled={
+              isLoginTypeOperator ||
+              (isLoginTypeAdmin === true && ele?.selectedTarget?.label == null)
+            }
           />
+
+          {isLoginTypeAdmin === true &&
+            Object.keys(ele).length !== 0 &&
+            ele?.selectedTarget?.label !== null && (
+              <>
+                {/** -1 */}
+                <Button
+                  color="secondary"
+                  className="ml-2"
+                  style={{ width: "auto" }}
+                  onClick={() => decrementThreshold(ele, index)}
+                >
+                  -
+                </Button>
+                {/** +1 */}
+                <Button
+                  color="secondary"
+                  className="ml-2"
+                  style={{ width: "auto" }}
+                  onClick={() => incrementThreshold(ele, index)}
+                >
+                  +
+                </Button>
+
+                {/**show remove target if target is available */}
+                <Button
+                  color="secondary"
+                  className="ml-2"
+                  style={{ width: "auto" }}
+                  onClick={() => onRemoveTarget(ele)}
+                >
+                  X
+                </Button>
+              </>
+            )}
         </TargetListItem>
       )),
     [

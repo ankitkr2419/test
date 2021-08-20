@@ -98,6 +98,7 @@ const AppLayoutContainer = (props) => {
         recipeActionReducerData.showProcess) && <CardOverlay />}
       {location.pathname === "/splashscreen" ? null : (
         <AppHeader
+          role={activeDeckObj?.role}//just to show to user
           isPlateRoute={loginReducer.get("isPlateRoute")}
           isUserLoggedIn={activeDeckObj.isLoggedIn} //{loginReducer.get("isUserLoggedIn")}
           isLoginTypeAdmin={activeDeckObj.isAdmin} //{loginReducer.get("isLoginTypeAdmin")}

@@ -4,6 +4,7 @@ import {
   listTemplatesReducer,
   deleteTemplateReducer,
   updateTemplateReducer,
+  finishCreateTemplateReducer
 } from "reducers/templateReducer";
 import {
   listTargetReducer,
@@ -102,6 +103,7 @@ const rootReducer = combineReducers({
   processesReducer,
   activityLogReducer,
   calibrationReducer,
+  finishCreateTemplateReducer,
 });
 
 export default rootReducer;

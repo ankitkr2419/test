@@ -40,6 +40,7 @@ import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
 
 const AppHeader = (props) => {
   const {
+    role,
     isUserLoggedIn,
     isPlateRoute,
     isLoginTypeAdmin,
@@ -325,6 +326,7 @@ const AppHeader = (props) => {
                   </Button>
                 )}
               </div>
+              <Text size={10} className="text-capitalize my-auto">{role || ""}</Text>
               <Dropdown
                 isOpen={userDropdownOpen}
                 toggle={toggleUserDropdown}

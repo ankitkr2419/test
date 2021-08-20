@@ -443,8 +443,8 @@ export const MAX_NO_OF_WELLS = 16;
 export const MIN_VOLUME = 10;
 export const MAX_VOLUME = 250;
 
-export const MIN_LID_TEMP = 30;
-export const MAX_LID_TEMP = 110;
+export const MIN_LID_TEMP = 80;
+export const MAX_LID_TEMP = 120;
 
 export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {

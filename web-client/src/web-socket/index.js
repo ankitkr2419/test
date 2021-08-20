@@ -12,7 +12,7 @@ import {
   runExperimentInProgress,
   runExperimentSuccess,
 } from "action-creators/runExperimentActionCreators";
-// import { showErrorModal } from "action-creators/modalActionCreators";
+import { showErrorModal } from "action-creators/modalActionCreators";
 import { temperatureDataSucceeded } from "action-creators/temperatureGraphActionCreators";
 import {
   homingActionInProgress,
@@ -105,7 +105,7 @@ export const connectSocket = (dispatch) => {
         // case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
         case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
-          // dispatch(showErrorModal(data));
+          dispatch(showErrorModal(data));
           break;
         case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:
           let parsedErrorData = JSON.parse(data);

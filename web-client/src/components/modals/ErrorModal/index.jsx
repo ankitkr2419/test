@@ -14,7 +14,7 @@ const ErrorModal = ({ isOpen, hideModal, message }) => (
 				</Text>
 
 				<Button onClick={hideModal} color="primary">
-          Back
+          Ok
 				</Button>
 			</Center>
 		</ModalBody>
