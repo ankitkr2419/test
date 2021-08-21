@@ -258,6 +258,16 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 				v.DyePosition,
 				v.TargetName,
 			})
+			tt := db.ExpTargetThreshold{
+				ExperimentID: expID,
+				TargetID:     v.TargetID,
+				Threshold:    v.Threshold,
+			}
+			err = deps.Store.UpsertTargetThreshold(req.Context(), []db.ExpTargetThreshold{tt})
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error upserting well target data")
+				return
+			}
 		}
 
 		var ICTargetID uuid.UUID

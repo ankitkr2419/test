@@ -15,8 +15,9 @@ import (
 )
 
 type Threshold struct {
-	AutoThreshold bool    `json:"auto_threshold"`
-	Threshold     float64 `json:"threshold"`
+	TargetID      uuid.UUID `json:"target_id"`
+	AutoThreshold bool      `json:"auto_threshold"`
+	Threshold     float32   `json:"threshold"`
 }
 type Baseline struct {
 	AutoBaseline bool   `json:"auto_baseline"`
@@ -75,14 +76,15 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+
 			return
 		}
 
 		respBytes, err := getWellsDataByThreshold(deps, expID, wellPositions, targets, wells, e.RepeatCycle, tc)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling Result data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
