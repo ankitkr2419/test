@@ -15,8 +15,9 @@ import (
 )
 
 type Threshold struct {
-	AutoThreshold bool    `json:"auto_threshold"`
-	Threshold     float64 `json:"threshold"`
+	TargetID      uuid.UUID `json:"target_id"`
+	AutoThreshold bool      `json:"auto_threshold"`
+	Threshold     float32   `json:"threshold"`
 }
 type Baseline struct {
 	AutoBaseline bool   `json:"auto_baseline"`
