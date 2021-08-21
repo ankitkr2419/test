@@ -150,7 +150,7 @@ func sendGraph(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
 func sendWells(deps Dependencies, rw http.ResponseWriter, c *websocket.Conn) {
 
-	WellResult, err := getColorCodedWells(deps)
+	WellResult, _, err := getColorCodedWells(deps)
 	if err != nil {
 		if err.Error() == "Wells not configured" {
 			logger.Info("Wells not configured")
@@ -293,29 +293,30 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 
 	wellTarget := make([]db.WellTarget, 0)
 	targetThreshold := make([]db.ExpTargetThreshold, 0)
+
 	if len(DBResult) > 0 {
-		for _, v := range targets {
+		for j, v := range targets {
 			if v.TargetID == tc.TargetID {
 				if tc.AutoThreshold {
 					targetThreshold := getAutoThreshold(DBResult, wells, targets, tCycles)
 					for i, tl := range targetThreshold {
 						if i.TargetID == v.TargetID {
-							v.Threshold = tl
+							targets[j].Threshold = tl
 						}
 					}
 				} else {
-					v.Threshold = tc.Threshold
+					targets[j].Threshold = tc.Threshold
 				}
 
-				ett := db.ExpTargetThreshold{
-					ExperimentID: experimentID,
-					TargetID:     v.TargetID,
-					Threshold:    v.Threshold,
-				}
-				targetThreshold = append(targetThreshold, ett)
 				// analyseResult returns data required for ploting graph
-				wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, v.Threshold, dbWells, wellTargets)...)
+				wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, targets[j].Threshold, dbWells, wellTargets)...)
 			}
+			ett := db.ExpTargetThreshold{
+				ExperimentID: experimentID,
+				TargetID:     v.TargetID,
+				Threshold:    targets[j].Threshold,
+			}
+			targetThreshold = append(targetThreshold, ett)
 		}
 	}
 
@@ -325,21 +326,24 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 			logger.WithField("err", err.Error()).Error("Error upserting well target data")
 			return
 		}
+
+	}
+	if len(targetThreshold) > 0 {
 		err = deps.Store.UpsertTargetThreshold(context.Background(), targetThreshold)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error upserting well target data")
 			return
 		}
-	}
-
-	experimentValues.experimentID = experimentID
-	graphResult, err = getColorCodedWells(deps)
-	if err != nil {
-		logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
+		experimentValues.experimentID = experimentID
+		_, graphResult, err = getColorCodedWells(deps)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling threshold graph data")
+			return
+		}
 		return
 	}
 
-	return
+	return nil, errors.New("No Data captured/wells configured for threshold calculation")
 }
 func getBaselineData(deps Dependencies, experimentID uuid.UUID, wells []int32, targets []db.TargetDetails, dbWells []db.Well, tCycles uint16, bl Baseline) (respBytes []byte, err error) {
 
@@ -368,7 +372,7 @@ func getBaselineData(deps Dependencies, experimentID uuid.UUID, wells []int32, t
 	return
 }
 
-func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
+func getColorCodedWells(deps Dependencies) (respBytes []byte, wellResult []byte, err error) {
 
 	// list wells from DB
 	wells, err := deps.Store.ListWells(context.Background(), experimentValues.experimentID)
@@ -406,11 +410,25 @@ func getColorCodedWells(deps Dependencies) (respBytes []byte, err error) {
 			Data: wells,
 		}
 
+		var well []WellResult
+		well, err = makeWellResultData(deps, wells, experimentValues.experimentID, false)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error making Wells data")
+			return
+		}
+
 		respBytes, err = json.Marshal(Result)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling Wells data")
 			return
 		}
+
+		wellResult, err = json.Marshal(well)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error marshaling Wells data")
+			return
+		}
+
 		return
 	}
 	err = errors.New("Wells not configured")

@@ -76,14 +76,15 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 		e, err := deps.Store.ShowExperiment(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching experiment data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+
 			return
 		}
 
 		respBytes, err := getWellsDataByThreshold(deps, expID, wellPositions, targets, wells, e.RepeatCycle, tc)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error marshaling Result data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
