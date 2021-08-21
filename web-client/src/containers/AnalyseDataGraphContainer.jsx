@@ -8,7 +8,11 @@ import {
 } from "action-creators/analyseDataGraphActionCreators";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import AnalyseDataGraphComponent from "components/AnalyseDataGraph";
-import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
+import {
+  generateTargetOptions,
+  lineConfigs,
+  lineConfigThreshold,
+} from "components/AnalyseDataGraph/helper";
 import { getExperimentId } from "selectors/experimentSelector";
 
 const AnalyseDataGraphContainer = (props) => {
@@ -37,13 +41,19 @@ const AnalyseDataGraphContainer = (props) => {
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
   const { token } = activeDeckObj;
 
-  //TODO get graph data from reducer
-  const data = {};
+  // default values for graph
+  let xAxisLabels = [];
+  let chartData = [];
+
+  //baseline data reducer
+  const analyseDataGraphBaselineReducer = useSelector(
+    (state) => state.analyseDataGraphBaselineReducer
+  );
+  const baselineApiResponse = analyseDataGraphBaselineReducer.toJS();
+  const baselineData = baselineApiResponse?.baselineApiData?.data;
 
   //fetch analyseDataGraph data
   useEffect(() => {
-    const { selectedTarget, isAutoThreshold, isAutoBaseline } =
-      analyseDataGraphFilters;
     let thresholdDataForApi = {
       target_id: selectedTarget?.value,
       auto_threshold: isAutoThreshold,
@@ -66,6 +76,44 @@ const AnalyseDataGraphContainer = (props) => {
 
   const onTargetChanged = (value) => {
     dispatch(updateFilter({ selectedTarget: value }));
+  };
+
+  //create graph data
+  if (baselineData?.length > 0) {
+    //x axis data
+    xAxisLabels = baselineData[0].cycle;
+
+    //y axis data
+    let borderColor = "rgba(148,147,147,1)"; // default line color
+
+    //filter by target id
+    let baselineDataForSelectedTarget = baselineData.filter(
+      (obj) => obj.target_id === selectedTarget?.value
+    );
+
+    chartData = baselineDataForSelectedTarget.map((obj, index) => {
+      return {
+        ...lineConfigs,
+        label: `index-${index}`,
+        borderColor,
+        data: obj.f_value || [],
+        totalCycles: obj.total_cycles || 0,
+        cycle: obj.cycle || [],
+      };
+    });
+
+    // let thresholdData = {
+    //   ...lineConfigThreshold,
+    //   totalCycles: obj.total_cycles || 0,
+    //   data: baselineDataForSelectedTarget[0].cycle.map(() => {}),
+    //   borderColor,
+    // };
+    // chartData = [...chartData, ...thresholdData];
+  }
+  //create graph data
+  let data = {
+    labels: xAxisLabels,
+    datasets: chartData,
   };
 
   return (
