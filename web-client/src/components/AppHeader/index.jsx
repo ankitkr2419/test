@@ -356,22 +356,25 @@ const AppHeader = (props) => {
                   </Button>
                 )}
               </div>
-              <Text size={10} className="text-capitalize my-auto">{role || ""}</Text>
-              <Dropdown
-                isOpen={userDropdownOpen}
-                toggle={toggleUserDropdown}
-                className="ml-2"
-              >
-                <DropdownToggle icon name="user" size={32} />
-                <DropdownMenu right>
-                  <DropdownItem
-                    onClick={logoutClickHandler}
-                    disabled={isExperimentRunning}
-                  >
-                    Log out
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+              <div className="user-dropdown-wrapper position-relative ml-2">
+                <Text
+                  size={10}
+                  className="user position-absolute font-weight-bold text-capitalize my-auto"
+                >
+                  {role || ""}
+                </Text>
+                <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
+                  <DropdownToggle icon name="user" size={32} />
+                  <DropdownMenu right>
+                    <DropdownItem
+                      onClick={logoutClickHandler}
+                      disabled={isExperimentRunning}
+                    >
+                      Log out
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
             </>
           )}
 

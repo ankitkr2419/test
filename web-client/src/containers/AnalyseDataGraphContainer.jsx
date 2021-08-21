@@ -102,14 +102,25 @@ const AnalyseDataGraphContainer = (props) => {
       };
     });
 
-    // let thresholdData = {
-    //   ...lineConfigThreshold,
-    //   totalCycles: obj.total_cycles || 0,
-    //   data: baselineDataForSelectedTarget[0].cycle.map(() => {}),
-    //   borderColor,
-    // };
-    // chartData = [...chartData, ...thresholdData];
+    // if we don't have chartData then no need to calculate threshold value
+    if (chartData.length > 0) {
+      let autoThresholdOfSelectedTarget = selectedTarget?.threshold;
+      let thresholdValue = autoThresholdOfSelectedTarget; //TODO get actual threshold value once backend api is ready
+      let apiObject = baselineDataForSelectedTarget[0];
+      let thresholdBorderColor = `rgba(245,144,178,1)`; //TODO check if it is required to be dynamic
+
+      let thresholdData = {
+        ...lineConfigThreshold,
+        label: selectedTarget?.label,
+        totalCycles: apiObject.total_cycles || 0,
+        data: apiObject.cycle.map(() => thresholdValue),
+        borderColor: thresholdBorderColor,
+      };
+      //merge graph data and threshold data
+      chartData = [...chartData, thresholdData];
+    }
   }
+
   //create graph data
   let data = {
     labels: xAxisLabels,
