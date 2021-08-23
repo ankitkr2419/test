@@ -271,3 +271,8 @@ func (d *Simulator) Calibrate() (err error) {
 	// TBD
 	return
 }
+
+func (d *Simulator) LidPIDCalibration() (err error) {
+	// TBD
+	return
+}
