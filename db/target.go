@@ -28,7 +28,7 @@ const (
 		threshold)
 		VALUES %s`
 
-	upsertExpTargThresholdQuery2 = ` ON CONFLICT (exp_id, target_id,threshold) DO UPDATE                           
+	upsertExpTargThresholdQuery2 = ` ON CONFLICT (exp_id, target_id) DO UPDATE                           
 	SET threshold=excluded.threshold                                                                            
 	where exp_target_threshold.exp_id = excluded.exp_id and exp_target_threshold.target_id = excluded.target_id`
 

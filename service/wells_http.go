@@ -66,7 +66,7 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 				}
 			}
 		}
-		wellResult, err := makeWellResultData(deps, wells, expID)
+		wellResult, err := makeWellResultData(deps, wells, expID, true)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error making wells data")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -84,14 +84,14 @@ func listWellsHandler(deps Dependencies) http.HandlerFunc {
 		rw.Write(respBytes)
 	})
 }
-func makeWellResultData(deps Dependencies, wells []db.Well, expID uuid.UUID) (wellResult []WellResult, err error) {
+func makeWellResultData(deps Dependencies, wells []db.Well, expID uuid.UUID, scale bool) (wellResult []WellResult, err error) {
 	for _, w := range wells {
 
 		var wt []WellTargetResult
 		for _, t := range w.Targets {
 			var result string
 			thresholdR, err := deps.Store.GetTargetThreshold(context.Background(), expID, t.TargetID)
-			logger.Infoln(thresholdR)
+
 			if err != nil {
 				logger.WithField("err", err.Error()).Error("Error getting threshold data")
 				return nil, err
@@ -108,7 +108,6 @@ func makeWellResultData(deps Dependencies, wells []db.Well, expID uuid.UUID) (we
 					result = positive
 				}
 			}
-			logger.Infoln("result", result)
 
 			wtr := WellTargetResult{
 				ExperimentID: t.ExperimentID,
@@ -117,8 +116,11 @@ func makeWellResultData(deps Dependencies, wells []db.Well, expID uuid.UUID) (we
 				TargetName:   t.TargetName,
 				CT:           t.CT,
 				Selected:     t.Selected,
-				Threshold:    scaleThreshold(thresholdR.Threshold),
+				Threshold:    thresholdR.Threshold,
 				Result:       result,
+			}
+			if scale {
+				wtr.Threshold = scaleThreshold(thresholdR.Threshold)
 			}
 			wt = append(wt, wtr)
 		}
