@@ -37,6 +37,17 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+func lidPIDCalibrationHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		// TODO: Logging this API
+		go deps.Plc.LidPIDCalibration()
+
+		logger.Infoln(responses.PIDCalibrationStarted)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PIDCalibrationStarted})
+	})
+}
+
 func shakerHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 

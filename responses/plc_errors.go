@@ -22,4 +22,6 @@ var (
 	ExcelSheetAddRowError    = fmt.Errorf("error in adding excel sheet rows")
 
 	InvalidCurrentStep = fmt.Errorf("invalid current step, maybe process aborted")
+
+	LidPIDTuningError = fmt.Errorf("LID PID Tuining already in progress")
 )
