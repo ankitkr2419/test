@@ -39,6 +39,8 @@ cycle_time: 15
 pid_temp: 71
 # pid time
 pid_time: 30
+# pid_lid_temp: 70
+pid_lid_temp: 70
 
 
 ## For TEC
