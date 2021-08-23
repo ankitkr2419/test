@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	maxHomingTries             = 2
+	maxHomingTries             = 3
 	homingSuccessValue         = 37
 	noOfDyes                   = 4
 	fValueRegisterStartAddress = 800
@@ -153,6 +153,7 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 
 func (d *Compact32) HomingRTPCR() (err error) {
 
+	homingCount++
 	defer func() {
 		homingCount = 0
 	}()
@@ -192,7 +193,6 @@ func (d *Compact32) HomingRTPCR() (err error) {
 	if result[0] == homingSuccessValue {
 		logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	} else {
-		homingCount++
 		// Try Homing Again
 		err = d.HomingRTPCR()
 		if err != nil {
@@ -241,6 +241,13 @@ func (d *Compact32) Cycle() (err error) {
 	if !plc.ExperimentRunning {
 		return errors.New("experiment is not running or maybe aborted")
 	}
+
+	// get blocked if homing is in progress
+	for homingCount != 0{
+		time.Sleep(2 * time.Second)
+		logger.Warnln("Homing is still in Progress, cycle will start once that is done.")
+	}
+
 	//For the cycle button
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][20], plc.ON)
 	if err != nil {
@@ -261,6 +268,7 @@ func (d *Compact32) Cycle() (err error) {
 
 	plc.DataCapture = true
 
+	go d.HomingRTPCR()
 	return
 }
 
