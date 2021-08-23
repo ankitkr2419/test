@@ -8,7 +8,14 @@ import Filters from "./Filters";
 import { GraphCard } from "./GraphCard";
 
 const AnalyseDataGraphComponent = (props) => {
-  let { data, targetOptions, selectedTarget, onTargetChanged } = props;
+  let {
+    data,
+    targetOptions,
+    selectedTarget,
+    onTargetChanged,
+    analyseDataGraphFilters,
+  } = props;
+  
   return (
     <div>
       <GraphCard>
@@ -18,6 +25,7 @@ const AnalyseDataGraphComponent = (props) => {
         targetOptions={targetOptions}
         selectedTarget={selectedTarget}
         onTargetChanged={onTargetChanged}
+        analyseDataGraphFilters={analyseDataGraphFilters}
       />
     </div>
   );
@@ -28,6 +36,7 @@ AnalyseDataGraphComponent.propTypes = {
   targetOptions: PropTypes.array.isRequired,
   selectedTarget: PropTypes.object.isRequired,
   onTargetChanged: PropTypes.func.isRequired,
+  analyseDataGraphFilters: PropTypes.object.isRequired,
 };
 
 export default React.memo(AnalyseDataGraphComponent);

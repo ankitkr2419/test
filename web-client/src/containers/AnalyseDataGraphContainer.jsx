@@ -133,6 +133,7 @@ const AnalyseDataGraphContainer = (props) => {
       targetOptions={targetOptions}
       selectedTarget={selectedTarget}
       onTargetChanged={onTargetChanged}
+      analyseDataGraphFilters={analyseDataGraphFilters}
     />
   );
 };

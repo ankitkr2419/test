@@ -27,7 +27,7 @@ export const lineConfigs = {
   borderCapStyle: "butt",
 };
 
-export const lineConfigThreshold ={
+export const lineConfigThreshold = {
   fill: false,
   borderWidth: 2,
   pointRadius: 0,
@@ -39,4 +39,27 @@ export const lineConfigThreshold ={
   pointHoverBackgroundColor: "#a2ee95",
   pointHoverBorderColor: "#a2ee95",
   pointHoverBorderWidth: 0,
-}
+};
+
+export const formikInitialState = {
+  isAutoThreshold: { value: true },
+  threshold: { value: 1, isInvalid: false },
+  isAutoBaseline: { value: true },
+  startCycle: { value: 1, isInvalid: false },
+  endCycle: { value: 1, isInvalid: false },
+};
+
+/**
+ * create initial state using reducer filters
+ */
+export const getInitialState = (analyseDataGraphFilters) => {
+  const { isAutoThreshold, threshold, isAutoBaseline, startCycle, endCycle } =
+    analyseDataGraphFilters;
+  return {
+    isAutoThreshold: { value: isAutoThreshold },
+    threshold: { value: threshold, isInvalid: false },
+    isAutoBaseline: { value: isAutoBaseline },
+    startCycle: { value: startCycle, isInvalid: false },
+    endCycle: { value: endCycle, isInvalid: false },
+  };
+};
