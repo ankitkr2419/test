@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import { useSelector, useDispatch } from "react-redux";
+
 import { Modal, ModalBody, Button } from "core-components";
 import { Text, ButtonIcon } from "shared-components";
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import Header from "components/Plate/Header";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
-import { useSelector, useDispatch } from "react-redux";
 import { saveReportInitiated } from "action-creators/reportActionCreators";
+import { createFormDataFromBlob } from "./helper";
 
 const PreviewReportModal = (props) => {
   const dispatch = useDispatch();
@@ -107,13 +109,7 @@ const PreviewReportModal = (props) => {
   };
 
   const sendReportToServer = (pdfInBlobFormat) => {
-    //create file from blob
-    var file = new File([pdfInBlobFormat], "report.pdf", {
-      lastModified: new Date().getTime(),
-    });
-    //send report file to api
-    var data = new FormData();
-    data.append("report", file);
+    var data = createFormDataFromBlob(pdfInBlobFormat, "report.pdf", "report");
     dispatch(saveReportInitiated(token, experimentId, data));
   };
 
