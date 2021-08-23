@@ -10,14 +10,14 @@ import SampleSideBarContainer from "containers/SampleSideBarContainer";
 import { EXPERIMENT_STATUS } from "appConstants";
 import Header from "./Header";
 
-import GridWrapper from "./Grid/GridWrapper";
 import GridComponent from "./Grid";
 import WellGridHeader from "./Grid/WellGridHeader";
-
-import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { Text } from "shared-components";
+
+import GridWrapper from "./Grid/GridWrapper";
+import "./Plate.scss";
 
 const Plate = (props) => {
   const {
@@ -34,10 +34,7 @@ const Plate = (props) => {
     activeWells,
     experimentTemplate,
     resetSelectedWells,
-    progressStatus,
-    progress,
-    remainingTime,
-    totalTime,
+    headerData,
     temperatureData,
   } = props;
 
@@ -96,10 +93,9 @@ const Plate = (props) => {
   };
 
   // hleper function to open sidebar and show graph of selected well
-  const showGraphOfWell = (index) => {
+  const showGraphOfWell = (index, show) => {
     // set selected well index
-    setSelectedWell(index, true);
-    setIsSidebarOpen(true);
+    setSelectedWell(index, show);
   };
 
   const [activeTab, setActiveTab] = useState("wells");
@@ -116,10 +112,7 @@ const Plate = (props) => {
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
       <Header
-        progressStatus={progressStatus}
-        progress={progress}
-        remainingTime={remainingTime}
-        totalTime={totalTime}
+        data={headerData}
         experimentTemplate={experimentTemplate}
         experimentStatus={experimentStatus}
         experimentDetails={experimentDetails}
@@ -176,11 +169,13 @@ const Plate = (props) => {
               </div>
               <div className="wells-wrapper flex-100 scroll-y">
                 <div className="d-flex align-items-center mb-4">
-                  {/* <WellGridHeader
+                  <WellGridHeader
                     className="mr-4"
+                    wells={wells}
                     isGroupSelectionOn={isMultiSelectionOptionOn}
                     toggleMultiSelectOption={toggleMultiSelectOption}
-                  /> */}
+                    experimentStatus={experimentStatus}
+                  />
                   <SelectAllGridHeader
                     isAllWellsSelected={isAllWellsSelected}
                     toggleAllWellSelectedOption={toggleAllWellSelectedOption}

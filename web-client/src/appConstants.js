@@ -41,6 +41,8 @@ export const SOCKET_MESSAGE_TYPE = {
   ErrorPCRMonitor: "ErrorPCRMonitor",
   ErrorPCRDead: "ErrorPCRDead",
   temperatureData: "Temperature",
+  PIDProgress: "PROGRESS_PID",
+  PIDSuccess: "SUCCESS_PID",
   rtpcrProgress: "RTPCR_PROGRESS",
   rtpcrSuccess: "RTPCR_SUCCESS",
   homingProgress: "PROGRESS_HOMING",
@@ -52,6 +54,15 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipProgress: "DISCARD_TIP_PROGRESS",
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
+};
+
+export const PID_STATUS = {
+  running: "running",
+  runFailed: "run-failed",
+  stopped: "stopped",
+
+  progressing: "progressing",
+  progressComplete: "progressComplete",
 };
 
 export const EXPERIMENT_STATUS = {
@@ -84,8 +95,11 @@ export const ROUTES = {
   magnet: "magnet",
   tipDiscard: "tip-discard",
   delay: "delay",
+  templates: "templates",
+  plate: "plate",
+  activity: "activity",
   tipPosition: "tip-position",
-  calibration: "calibration",//rtpcr flow: engineer homepage
+  calibration: "calibration", //rtpcr flow: engineer homepage
 };
 
 export const API_ENDPOINTS = {
@@ -123,8 +137,10 @@ export const API_ENDPOINTS = {
   rearrangeProcesses: "rearrange-processes",
   processes: "processes",
   appInfo: "app-info",
-  experiments: "experiments", 
+  experiments: "experiments",
   configs: "configs",
+  pidCalibration: "pid-calibration",
+  manual: "manual",
 };
 
 export const MODAL_MESSAGE = {
@@ -197,6 +213,9 @@ export const USER_ROLES = {
 };
 export const TOAST_MESSAGE = {
   error: "Something went wrong!",
+  calRedirect: "Cannot redirect to calibration while adding/editing processes!",
+  deckBlockForProcess: "Decks cannot be switched while adding/editing processes!",
+  deckBlockForCalibration: "Decks cannot be switched in calibration!"
 };
 
 export const LABWARE_ITEMS_NAME = [
@@ -445,6 +464,14 @@ export const MAX_VOLUME = 250;
 
 export const MIN_LID_TEMP = 80;
 export const MAX_LID_TEMP = 120;
+
+//constants for motor
+export const MIN_MOTOR_NUMBER = 5;
+export const MAX_MOTOR_NUMBER = 10;
+export const MIN_MOTOR_DISTANCE = 0;
+export const MAX_MOTOR_DISTANCE = 100;
+export const MIN_MOTOR_DIRECTION = 0;
+export const MAX_MOTOR_DIRECTION = 1;
 
 export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {

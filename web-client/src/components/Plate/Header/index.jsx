@@ -21,15 +21,15 @@ const StyledSubHeader = styled.div`
 
 const SubHeader = (props) => {
   const {
-    progressStatus,
-    progress,
-    totalTime,
-    remainingTime,
+    data,
     experimentTemplate,
     experimentStatus,
     experimentDetails,
     temperatureData,
   } = props;
+
+  const { totalCycles, progressStatus, progress, remainingTime, totalTime } =
+    data;
 
   let lidTemperature = 0;
   let temperature = 0;
@@ -85,11 +85,15 @@ const SubHeader = (props) => {
         </Text>
         {TEMPERATURE_DATA_LENGTH > 0 && (
           <div className="d-flex align-items-center">
-            <Text className="mb-0">Cycle Count - {cycleValue}</Text>
+            <Text className="mb-0">
+              Cycle - {cycleValue} / {totalCycles}{" "}
+            </Text>
             <Text className="mb-0 mx-2">|</Text>
-            <Text className="mb-0">Current temperature - {temperature}</Text>
-            <Text className="mb-0 mx-2">|</Text>
-            <Text className="mb-0">Lid temperature - {lidTemperature}</Text>
+            <Text className="mb-0">
+              Current temperature - {temperature.toFixed(2)} °C
+            </Text>
+            {/* <Text className="mb-0 mx-2">|</Text>
+            <Text className="mb-0">Lid temperature - {lidTemperature}</Text> */}
           </div>
         )}
         {/* <TemplatePopover name={templateName} className="ml-auto" /> */}
@@ -123,9 +127,7 @@ const SubHeader = (props) => {
             </div>
           ) : (
             experimentStatus !== EXPERIMENT_STATUS.stopped && (
-              <Text className="font-weight-bold">
-                Homing is in Progress...
-              </Text>
+              <Text className="font-weight-bold">Homing is in Progress...</Text>
             )
           ))}
         {experimentStatus === EXPERIMENT_STATUS.success && (

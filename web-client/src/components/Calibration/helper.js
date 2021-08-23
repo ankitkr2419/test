@@ -1,50 +1,96 @@
-export const constants = {
-  ROOM_TEMPERATURE: {
+export const formikInitialState = {
+  roomTemperature: {
+    type: "number",
+    name: "roomTemperature",
+    apiKey: "room_temperature",
+    label: "Room Temperature",
+    value: null,
     min: 20,
     max: 30,
+    isInvalid: false,
   },
-  HOMING_TIME: {
+  homingTime: {
+    type: "number",
+    name: "homingTime",
+    apiKey: "homing_time",
+    label: "Homing Time",
     min: 16,
     max: 30,
+    value: null,
+    isInvalid: false,
   },
-  NO_OF_HOMING_CYCLE: {
+  noOfHomingCycles: {
+    type: "number",
+    name: "noOfHomingCycles",
+    apiKey: "no_of_homing_cycles",
+    label: "No. Of Homing Cycles",
     min: 0,
     max: 100,
+    value: null,
+    isInvalid: false,
   },
-  CYCLE_TIME: {
+  cycleTime: {
+    type: "number",
+    name: "cycleTime",
+    apiKey: "cycle_time",
+    label: "Cycle Time",
     min: 2,
     max: 30,
+    value: null,
+    isInvalid: false,
+  },
+  pidTemperature: {
+    type: "number",
+    name: "pidTemperature",
+    apiKey: "pid_temperature",
+    label: "PID Temperature",
+    min: 50,
+    max: 75,
+    value: null,
+    isInvalid: false,
+  },
+  pidMinutes: {
+    type: "number",
+    name: "pidMinutes",
+    apiKey: "pid_minutes",
+    label: "PID Minutes",
+    min: 20,
+    max: 40,
+    value: null,
+    isInvalid: false,
   },
 };
 
-export const isValidRoomTemp = (value) => {
-  return (
-    value !== null &&
-    value >= constants.ROOM_TEMPERATURE.min &&
-    value <= constants.ROOM_TEMPERATURE.max
-  );
+export const validateAllFields = (state) => {
+  for (const key in state) {
+    const { name, value, isInvalid } = state[key];
+    if (
+      value === null ||
+      value === "" ||
+      isInvalid === true ||
+      isValueWithinRange(name, value) === false
+    ) {
+      return false;
+    }
+  }
+  return true;
 };
 
-export const isValidHomingTime = (value) => {
-  return (
-    value !== null &&
-    value >= constants.HOMING_TIME.min &&
-    value <= constants.HOMING_TIME.max
-  );
+export const isValueWithinRange = (name, value) => {
+  const element = formikInitialState[name];
+  const { min, max } = element;
+  if (value < min || value > max) {
+    return false;
+  }
+  return true;
 };
 
-export const isValidNoOfHomingCycle = (value) => {
-  return (
-    value !== null &&
-    value >= constants.NO_OF_HOMING_CYCLE.min &&
-    value <= constants.NO_OF_HOMING_CYCLE.max
-  );
-};
-
-export const isValidCycleTime = (value) => {
-  return (
-    value !== null &&
-    value >= constants.CYCLE_TIME.min &&
-    value <= constants.CYCLE_TIME.max
-  );
+export const getRequestBody = (state) => {
+  const body = {};
+  for (const key in state) {
+    const element = state[key];
+    const { name, value } = element;
+    body[name] = parseInt(value);
+  }
+  return body;
 };
