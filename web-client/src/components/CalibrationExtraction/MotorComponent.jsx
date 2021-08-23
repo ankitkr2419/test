@@ -48,6 +48,10 @@ const MotorComponent = (props) => {
     }
   };
 
+  const handleOnChange = (key, value) => {
+    formik.setFieldValue(key, value);
+  };
+
   return (
     <Card default className="my-5">
       <CardBody>
@@ -64,18 +68,16 @@ const MotorComponent = (props) => {
                   id="motor_number"
                   placeholder={`${MIN_MOTOR_NUMBER} - ${MAX_MOTOR_NUMBER}`}
                   value={motorNumber.value}
-                  onChange={(event) => {
-                    formik.setFieldValue(
+                  onChange={(event) =>
+                    handleOnChange(
                       "motorNumber.value",
                       parseInt(event.target.value)
-                    );
-                  }}
+                    )
+                  }
                   onBlur={(e) =>
                     handleBlurMotorNumber(parseInt(e.target.value))
                   }
-                  onFocus={() =>
-                    formik.setFieldValue("motorNumber.isInvalid", false)
-                  }
+                  onFocus={() => handleOnChange("motorNumber.isInvalid", false)}
                 />
                 {motorNumber.isInvalid && (
                   <div className="flex-70">
@@ -101,16 +103,14 @@ const MotorComponent = (props) => {
                   value={direction.value}
                   max={MAX_MOTOR_DIRECTION}
                   min={MIN_MOTOR_DIRECTION}
-                  onChange={(event) => {
-                    formik.setFieldValue(
+                  onChange={(event) =>
+                    handleOnChange(
                       "direction.value",
                       parseInt(event.target.value)
-                    );
-                  }}
-                  onBlur={(e) => handleBlurDirection(parseInt(e.target.value))}
-                  onFocus={() =>
-                    formik.setFieldValue("direction.isInvalid", false)
+                    )
                   }
+                  onBlur={(e) => handleBlurDirection(parseInt(e.target.value))}
+                  onFocus={() => handleOnChange("direction.isInvalid", false)}
                 />
                 {direction.isInvalid && (
                   <div className="flex-70">
@@ -134,16 +134,14 @@ const MotorComponent = (props) => {
                   id="distance"
                   placeholder={`${MIN_MOTOR_DISTANCE} - ${MAX_MOTOR_DISTANCE}`}
                   value={distance.value}
-                  onChange={(event) => {
-                    formik.setFieldValue(
+                  onChange={(event) =>
+                    handleOnChange(
                       "distance.value",
                       parseInt(event.target.value)
-                    );
-                  }}
-                  onBlur={(e) => handleBlurDistance(parseInt(e.target.value))}
-                  onFocus={() =>
-                    formik.setFieldValue("distance.isInvalid", false)
+                    )
                   }
+                  onBlur={(e) => handleBlurDistance(parseInt(e.target.value))}
+                  onFocus={() => handleOnChange("distance.isInvalid", false)}
                 />
                 {distance.isInvalid && (
                   <div className="flex-70">
@@ -157,7 +155,7 @@ const MotorComponent = (props) => {
             </Col>
           </Row>
 
-          <Row className="">
+          <Row>
             <Col>
               <Center className="text-center pt-3">
                 <Button disabled={isBtnDisabled(formik.values)} color="primary">

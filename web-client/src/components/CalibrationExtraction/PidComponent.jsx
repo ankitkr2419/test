@@ -10,20 +10,17 @@ const PidComponent = (props) => {
 
   const { progressStatus, progress, remainingTime, totalTime } = progressData;
 
-  const totalHours = totalTime?.hours ? totalTime.hours : 0;
-  const totalMinutes = totalTime?.minutes ? totalTime.minutes : 0;
-  const totalSeconds = totalTime?.seconds ? totalTime.seconds : 0;
+  const totalHours = totalTime?.hours || 0;
+  const totalMinutes = totalTime?.minutes || 0;
+  const totalSeconds = totalTime?.seconds || 0;
 
-  const remainingHours = remainingTime?.hours ? remainingTime.hours : 0;
-  const remainingMinutes = remainingTime?.minutes ? remainingTime.minutes : 0;
-  const remainingSeconds = remainingTime?.seconds ? remainingTime.seconds : 0;
+  const remainingHours = remainingTime?.hours || 0;
+  const remainingMinutes = remainingTime?.minutes || 0;
+  const remainingSeconds = remainingTime?.seconds || 0;
 
-  const progressIsRunning = () => {
-    return (
-      progressStatus === PID_STATUS.progressing ||
-      progressStatus === PID_STATUS.progressComplete
-    );
-  };
+  let progressIsRunning =
+    progressStatus === PID_STATUS.progressing ||
+    progressStatus === PID_STATUS.progressComplete;
 
   return (
     <div className="d-flex align-items-center">
@@ -50,13 +47,13 @@ const PidComponent = (props) => {
         </div>
       )}
       <Button
-        color={progressIsRunning() ? "secondary" : "primary"}
-        disabled={progressIsRunning()}
-        // outline={!(progressIsRunning() || progressStatus === null)}
+        color={progressIsRunning ? "secondary" : "primary"}
+        disabled={progressIsRunning}
+        // outline={!(progressIsRunning || progressStatus === null)}
         className="mx-5"
         onClick={handleBtnClick}
       >
-        {progressIsRunning() ? "PID Progressing..." : "Start PID"}
+        {progressIsRunning ? "PID Progressing..." : "Start PID"}
       </Button>
     </div>
   );

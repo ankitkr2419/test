@@ -258,6 +258,16 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 				v.DyePosition,
 				v.TargetName,
 			})
+			tt := db.ExpTargetThreshold{
+				ExperimentID: expID,
+				TargetID:     v.TargetID,
+				Threshold:    v.Threshold,
+			}
+			err = deps.Store.UpsertTargetThreshold(req.Context(), []db.ExpTargetThreshold{tt})
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error upserting well target data")
+				return
+			}
 		}
 
 		var ICTargetID uuid.UUID
@@ -278,8 +288,10 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		db.AddMergeRowToExcel(file, db.RTPCRSheet, heading, len(config.ActiveWells("activeWells")))
 
 		row := []interface{}{"well positions"}
-		for _, v := range config.ActiveWells("activeWells") {
-			row = append(row, v)
+		for range dyePositions {
+			for _, v := range config.ActiveWells("activeWells") {
+				row = append(row, v)
+			}
 		}
 		db.AddRowToExcel(file, db.RTPCRSheet, row)
 
@@ -415,7 +427,13 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// invoke monitor after 2 secs
 	go func() {
 		time.Sleep(2 * time.Second)
-		go monitorExperiment(deps, file)
+		defer func(){
+        	if r := recover(); r != nil {
+            	logger.Errorln("Monitor panicked: ", r)
+            	ShutDownGracefully(deps)
+        	}
+    	}()
+		monitorExperiment(deps, file)
 	}()
 
 	lidTempStartTime := time.Now()

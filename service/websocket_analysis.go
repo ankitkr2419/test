@@ -67,15 +67,23 @@ func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 		r.WellPosition = w
 		r.ExperimentID = experimentValues.experimentID
 		r.Cycle = scan.Cycle
+
 		for _, t := range experimentValues.targets {
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
 			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
-			wellFval = append(wellFval, r.FValue)
 			result = append(result, r)
 		}
 
 	}
+
+	for _, t := range experimentValues.targets {
+		for _, w := range experimentValues.activeWells {
+			FValue := scan.Wells[w-1][t.DyePosition-1]
+			wellFval = append(wellFval, FValue)
+		}
+	}
+
 	row := []interface{}{fmt.Sprintf("cycle %d", scan.Cycle)}
 	for _, v := range wellFval {
 		row = append(row, v)
@@ -278,6 +286,13 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 	var wellResult graph
 	var tempGraph []graph
 	// ex: for 8 active wells * 6 targets * no of cycle
+
+	if bl.AutoBaseline {
+		start, end := config.GetCycleRange()
+		bl.StartCycle = start
+		bl.EndCycle = end
+	}
+
 	var targetSum float32
 	targetAverage := make(map[uuid.UUID]float32, len(targets))
 	for _, t := range targets {
@@ -322,7 +337,8 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 func calculateBaselineValues(array []float32, average float32) (deviation []float32) {
 	for _, v := range array {
 		value := v - average
-		deviation = append(deviation, value)
+		graphVal := scaleThreshold(value)
+		deviation = append(deviation, graphVal)
 	}
 	return
 }

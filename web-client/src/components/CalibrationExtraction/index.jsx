@@ -1,11 +1,13 @@
 import React from "react";
+import { useHistory } from "react-router";
+
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, Icon, MlModal, Text } from "shared-components";
 import { MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PidComponent from "./PidComponent";
 import MotorComponent from "./MotorComponent";
+
 import { HeadingTitle } from "./HeadingTitle";
-import { useHistory } from "react-router";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -22,20 +24,21 @@ const CalibrationExtractionComponent = (props) => {
 
   const history = useHistory();
 
+  const handleBack = () => {
+    history.push(ROUTES.recipeListing);
+  };
+
   return (
     <div className="calibration-content px-5 pt-3">
       <div className="d-flex align-items-center pb-4">
         {isAdmin && (
-          <div
-            style={{ cursor: "pointer" }}
-            onClick={() => history.push(ROUTES.recipeListing)}
-          >
+          <div style={{ cursor: "pointer" }} onClick={handleBack}>
             <Icon name="angle-left" size={32} className="text-white" />
             <HeadingTitle
               Tag="h5"
               className="text-white font-weight-bold ml-3 mb-0"
             >
-              {`Go back to recipe listing`}
+              Go back to recipe listing
             </HeadingTitle>
           </div>
         )}
@@ -50,7 +53,6 @@ const CalibrationExtractionComponent = (props) => {
 
       <Card default className="my-3">
         <CardBody className="px-5 py-4">
-          {/* <p>Extraction Flow: Calibration</p> */}
           <PidComponent
             progressData={progressData}
             handleBtnClick={handleBtnClick}
