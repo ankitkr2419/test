@@ -15,7 +15,7 @@ import {
 import { Text } from "shared-components";
 
 import {
-  isValueWithinRange,
+  isValueValid,
   formikInitialState,
   validateAllFields,
   getRequestBody,
@@ -34,11 +34,12 @@ const CalibrationComponent = (props) => {
     if (configs) {
       Object.keys(formik.values).map((element) => {
         const { apiKey, name } = formik.values[element];
-        const newValue = configs[apiKey] ? configs[apiKey] : 0;
-        const validRange = isValueWithinRange(name, newValue);
+
+        const newValue = configs[apiKey] ? configs[apiKey] : "";
+        const isValid = isValueValid(name, newValue);
 
         // set formik fields
-        formik.setFieldValue(`${name}.isInvalid`, !validRange);
+        formik.setFieldValue(`${name}.isInvalid`, !isValid);
         formik.setFieldValue(`${name}.value`, newValue);
       });
     }
@@ -55,8 +56,8 @@ const CalibrationComponent = (props) => {
   };
 
   const handleBlurChange = useCallback((name, value) => {
-    const validRange = isValueWithinRange(name, value);
-    formik.setFieldValue(`${name}.isInvalid`, !validRange);
+    const isValid = isValueValid(name, value);
+    formik.setFieldValue(`${name}.isInvalid`, !isValid);
   }, []);
 
   const handleOnChange = (event, name) => {
@@ -75,8 +76,16 @@ const CalibrationComponent = (props) => {
             <Row>
               {Object.keys(formik.values).map((key, index) => {
                 const element = formik.values[key];
-                const { type, name, label, min, max, value, isInvalid } =
-                  element;
+                const {
+                  type,
+                  name,
+                  label,
+                  min,
+                  max,
+                  value,
+                  isInvalid,
+                  isInvalidMsg,
+                } = element;
 
                 return (
                   <Col md={6}>
@@ -86,7 +95,9 @@ const CalibrationComponent = (props) => {
                         type={type}
                         name={name}
                         id={name}
-                        placeholder={`${min} - ${max}`}
+                        placeholder={
+                          type === "number" ? `${min} - ${max}` : "Type here"
+                        }
                         value={value}
                         onChange={(event) => handleOnChange(event, name)}
                         onBlur={(event) =>
@@ -97,7 +108,7 @@ const CalibrationComponent = (props) => {
                       {(isInvalid || value == null) && (
                         <div className="flex-70">
                           <Text Tag="p" size={14} className="text-danger">
-                            {`${label} should be between ${min} - ${max}`}
+                            {`${isInvalidMsg}`}
                           </Text>
                         </div>
                       )}

@@ -14,7 +14,8 @@ import GridComponent from "./Grid";
 import WellGridHeader from "./Grid/WellGridHeader";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
-import { Text } from "shared-components";
+import { ButtonIcon, Text } from "shared-components";
+import PreviewReportModal from "components/modals/PreviewReportModal";
 
 import GridWrapper from "./Grid/GridWrapper";
 import "./Plate.scss";
@@ -51,6 +52,9 @@ const Plate = (props) => {
 
   // local state to manage toggling of graphSidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // local state to manage previewReport modal
+  const [previewReportModal, setPreviewReportModal] = useState(false);
 
   useEffect(() => {
     if (
@@ -109,8 +113,32 @@ const Plate = (props) => {
     setShowTempGraph(graphType === "temperature");
   };
 
+  const togglePreviewReportModal = () => {
+    setPreviewReportModal(!previewReportModal);
+  };
+
+  const downloadClickHandler = (e) => {
+    togglePreviewReportModal();
+  };
+
   return (
     <div className="plate-content d-flex flex-column h-100 position-relative scroll-y">
+      {previewReportModal && (
+        <PreviewReportModal
+          isOpen={previewReportModal}
+          toggleModal={togglePreviewReportModal}
+          experimentStatus={experimentStatus}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          resetSelectedWells={resetSelectedWells}
+          isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+          data={headerData}
+          experimentTemplate={experimentTemplate}
+          experimentDetails={experimentDetails}
+          experimentId={experimentId}
+          temperatureData={temperatureData}
+        />
+      )}
       <Header
         data={headerData}
         experimentTemplate={experimentTemplate}
@@ -202,7 +230,7 @@ const Plate = (props) => {
                   <Button
                     outline={showTempGraph}
                     color={!showTempGraph ? "primary" : "secondary"}
-                    className="mr-3"
+                    className="mr-3 Amplification"
                     onClick={() => toggleTempGraphSwitch("amplification")}
                   >
                     Amplification
@@ -210,10 +238,17 @@ const Plate = (props) => {
                   <Button
                     outline={!showTempGraph}
                     color={showTempGraph ? "primary" : "secondary"}
+                    className="Temperature"
                     onClick={() => toggleTempGraphSwitch("temperature")}
                   >
                     Temperature
                   </Button>
+                  <ButtonIcon
+                    name="download-1"
+                    size={28}
+                    className="bg-white border-secondary ml-auto downloadButton"
+                    onClick={downloadClickHandler}
+                  />
                 </div>
                 <ExperimentGraphContainer
                   showTempGraph={showTempGraph}

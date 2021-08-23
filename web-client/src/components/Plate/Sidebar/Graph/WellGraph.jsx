@@ -8,6 +8,7 @@ import {
   MAX_THRESHOLD,
 } from "components/Target/targetConstants";
 import GraphFilters from "./GraphFilters";
+import GraphRange from "./GraphRange";
 
 const options = {
   legend: {
@@ -75,6 +76,7 @@ const WellGraph = ({
       setThresholdError={setThresholdError}
       resetThresholdError={resetThresholdError}
     />
+    {/*<GraphRange />*/}
     {isThresholdInvalid && (
       <Text Tag="p" size={14} className="text-danger px-2 mb-1">
         Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
@@ -88,12 +90,12 @@ const WellGraph = ({
 );
 
 const GraphCard = styled.div`
-  width: 830px;
-  height: 280px;
+  width: 960px;
+  height: 326px;
   background: #ffffff 0% 0% no-repeat padding-box;
   border: 1px solid #707070;
   padding: 8px;
-  margin: 0 0 32px 0;
+  margin: 0 0 16px 0;
 `;
 
 WellGraph.propTypes = {

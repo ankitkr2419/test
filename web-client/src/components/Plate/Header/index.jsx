@@ -10,7 +10,7 @@ import { EXPERIMENT_STATUS } from "appConstants";
 const StyledSubHeader = styled.div`
   background-color: #f2f2f2;
   height: 68px;
-  padding: 10px 16px 10px 76px;
+  padding: 8px 32px;
   color: #707070;
 
   h6 {
@@ -19,13 +19,13 @@ const StyledSubHeader = styled.div`
   }
 `;
 
-const SubHeader = (props) => {
+const SubHeader = props => {
   const {
     data,
     experimentTemplate,
     experimentStatus,
     experimentDetails,
-    temperatureData,
+    temperatureData
   } = props;
 
   const { totalCycles, progressStatus, progress, remainingTime, totalTime } =
@@ -70,23 +70,19 @@ const SubHeader = (props) => {
   }
 
   const showProgressBar = () => {
-    return (
-      experimentStatus === EXPERIMENT_STATUS.success ||
-      experimentStatus === EXPERIMENT_STATUS.running ||
-      experimentStatus === EXPERIMENT_STATUS.stopped
-    );
+    return experimentStatus === EXPERIMENT_STATUS.running;
   };
 
   return (
-    <StyledSubHeader className="plate-subheader d-flex flex-column">
-      <div className="d-flex align-items-center mb-auto">
+    <StyledSubHeader className="plate-subheader d-flex flex-column justify-content-center">
+      <div className="d-flex align-items-center">
         <Text Tag="h6" className="text-capitalize mb-0 mr-auto">
           {templateName}
         </Text>
         {TEMPERATURE_DATA_LENGTH > 0 && (
           <div className="d-flex align-items-center">
             <Text className="mb-0">
-              Cycle - {cycleValue} / {totalCycles}{" "}
+              Cycle - {cycleValue} / {totalCycles ? totalCycles : 0}{" "}
             </Text>
             <Text className="mb-0 mx-2">|</Text>
             <Text className="mb-0">
@@ -127,7 +123,9 @@ const SubHeader = (props) => {
             </div>
           ) : (
             experimentStatus !== EXPERIMENT_STATUS.stopped && (
-              <Text className="font-weight-bold">Homing is in Progress...</Text>
+              <Text className="font-weight-bold mb-0">
+                Homing is in Progress...
+              </Text>
             )
           ))}
         {experimentStatus === EXPERIMENT_STATUS.success && (
@@ -151,9 +149,9 @@ const SubHeader = (props) => {
 SubHeader.propTypes = {
   experimentTemplate: PropTypes.shape({
     templateId: PropTypes.string,
-    templateName: PropTypes.string,
+    templateName: PropTypes.string
   }).isRequired,
-  isExperimentSucceeded: PropTypes.bool,
+  isExperimentSucceeded: PropTypes.bool
 };
 
 export default SubHeader;

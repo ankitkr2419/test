@@ -23,6 +23,11 @@ body {
   overflow-y: auto;
 }
 
+.header-elements {
+  position: absolute;
+  right: 15px;
+}
+
 // Page Header CSS
 .experiment-info {
   position: relative;
@@ -39,7 +44,7 @@ body {
   .text-default {
     width: rem(192px);
     position: absolute;
-    top: rem(-16px);
+    top: rem(-14px);
     right: 0;
     line-height: rem(14px);
     @include fade(hide);
@@ -58,7 +63,7 @@ body {
     color: red;
     width: rem(192px);
     position: absolute;
-    top: rem(-16px);
+    top: rem(-14px);
     right: 0;
     line-height: rem(14px);
     @include fade(hide);
@@ -67,6 +72,15 @@ body {
     &.show {
       @include fade(show);
     }
+  }
+}
+
+.user-dropdown-wrapper {
+  .user {
+    color: $gray-44;
+    bottom: rem(-8px);
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
@@ -379,6 +393,15 @@ button:focus {
     line-height: rem(16px);
     color: $gray-60;
     min-width: rem(24px);
+  }
+}
+
+.list-target-actions {
+  > .btn {
+    width: rem(32px);
+    height: rem(32px);
+    border-radius: rem(16px);
+    padding: rem(4px);
   }
 }
 
@@ -695,6 +718,18 @@ button:focus {
 }
 .card-box {
   height: 30.75rem !important;
+}
+
+// Modal Heading
+.modal-heading {
+  background-color: rgba(178, 218, 209, 0.22);
+  border-radius: 2.25rem 2.25rem 0 0;
+  height: 3rem;
+
+  .title {
+    font-size: 15px;
+    line-height: 20px;
+  }
 }
 
 .recipe-action {

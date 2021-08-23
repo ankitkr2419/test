@@ -21,6 +21,7 @@ import {
   getInitSampleTargetList,
 } from "components/Plate/Sidebar/Sample/sampleHelper";
 import { EXPERIMENT_STATUS } from "appConstants";
+import { toast } from "react-toastify";
 
 const SampleSideBarContainer = (props) => {
   // constant
@@ -127,6 +128,24 @@ const SampleSideBarContainer = (props) => {
   };
   // helper function to select or unselect a target stored in targets list in local state
   const onTargetClickHandler = (index) => {
+    /** We can select only one target for a dye,
+     * So while selection only checking whether any target is already selected having same dye as dye of selected target*/
+    const targets = sampleState.get("targets").toJS();
+    if (targets[index].isSelected === false) {
+      const selectedTargets = targets?.filter((ele) => ele.isSelected);
+      const dyeOfSelectedTarget = targets[index]?.dye;
+      let isDyeFoundInSelectedTargets = false;
+      selectedTargets.map((ele) => {
+        if (ele.dye === dyeOfSelectedTarget) {
+          isDyeFoundInSelectedTargets = true;
+        }
+      });
+      if (isDyeFoundInSelectedTargets === true) {
+        toast.error("Two targets for same dye are not allowed!");
+        return;
+      }
+    }
+
     sampleStateDispatch({
       type: createSampleActions.TOGGLE_TARGET,
       value: index,
