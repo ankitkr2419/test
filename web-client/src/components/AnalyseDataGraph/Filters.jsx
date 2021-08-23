@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+
 import { Select } from "core-components";
 import { Text } from "shared-components";
 
@@ -19,12 +20,17 @@ const Filters = (props) => {
             options={targetOptions}
             value={selectedTarget}
             onChange={onTargetChanged}
-            // isDisabled={isDisabled}
           />
         </div>
       </div>
+      {/**threshold */}
       <div className="range-filters d-flex">
-        <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3"></Text>
+        <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3">Threshold</Text>
+      </div>
+
+      {/**baseline */}
+      <div className="range-filters d-flex">
+        <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3">Baseline</Text>
       </div>
     </>
   );

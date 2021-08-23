@@ -1,9 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { GraphCard } from "./GraphCard";
+
 import { LineChart } from "core-components";
 import { options } from "./GraphOptions";
 import Filters from "./Filters";
+
+import { GraphCard } from "./GraphCard";
 
 const AnalyseDataGraphComponent = (props) => {
   let { data, targetOptions, selectedTarget, onTargetChanged } = props;
