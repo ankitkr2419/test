@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 type RTPCR struct {
-	HomingTime      int64  `json:"homing_time" validate:"required,lte=30,gte=16"`
-	NumHomingCycles int64  `json:"no_of_homing_cycles" validate:"required,lte=100,gte=0"`
-	CycleTime       int64  `json:"cycle_time" validate:"required,lte=30,gte=2"`
+	HomingTime      int64 `json:"homing_time" validate:"required,lte=30,gte=16"`
+	NumHomingCycles int64 `json:"no_of_homing_cycles" validate:"required,lte=100,gte=0"`
+	CycleTime       int64 `json:"cycle_time" validate:"required,lte=30,gte=2"`
 }
 
 func SetRTPCRConfigValues(rt RTPCR) (err error) {
@@ -50,11 +51,9 @@ func GetColorLimits(key string) uint16 {
 	return uint16(viper.GetInt(key))
 }
 
-
 func GetICPosition() int {
 	return ReadEnvInt("ic_position")
 }
-
 
 func GetHomingTime() int {
 	return ReadEnvInt("homing_time")
@@ -82,8 +81,14 @@ func SetCycleTime(cT int64) {
 
 func GetRTPCRConfigValues() RTPCR {
 	return RTPCR{
-		HomingTime: int64(GetHomingTime()),
+		HomingTime:      int64(GetHomingTime()),
 		NumHomingCycles: int64(GetNumHomingCycles()),
-		CycleTime: int64(GetCycleTime()),
+		CycleTime:       int64(GetCycleTime()),
 	}
+}
+
+func GetCycleRange() (startCycle, endCycle uint16) {
+	startCycle = uint16(viper.GetInt("start_cycle"))
+	endCycle = uint16(viper.GetInt("end_cycle"))
+	return
 }
