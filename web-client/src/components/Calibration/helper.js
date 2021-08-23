@@ -111,7 +111,7 @@ export const isValueValid = (name, value) => {
   } else if (type === "email" && value.match(EMAIL_REGEX_OR_EMPTY_STR) === null) {
     return false;
   }
-  //TODO : remove after dis.
+  //TODO : check if its required anymore else delete
   // else if (type === "text") {
   //   //&& value.match(NAME_REGEX) === null) {
   //   return false;

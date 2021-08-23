@@ -86,6 +86,7 @@ SidebarGraph.propTypes = {
   toggleGraphFilterActive: PropTypes.func.isRequired,
   experimentGraphTargetsList: PropTypes.object.isRequired,
   isExperimentSucceeded: PropTypes.bool.isRequired,
+  showTempGraph: PropTypes.bool,
 };
 
 export default React.memo(SidebarGraph);

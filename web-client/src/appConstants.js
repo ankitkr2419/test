@@ -461,7 +461,11 @@ export const timeConstants = {
   MIN_IN_ONE_HOUR: 60,
 };
 
-//constants for RTPCR - plates
+/**
+ * Maximum number of wells that can be present in a plate.
+ * Maximum number of wells are 16.
+ * 96 was the old version, this is changed in future implementations.
+ */
 export const MAX_NO_OF_WELLS = 16;
 
 //constants for RTPCR - templates
@@ -478,3 +482,47 @@ export const MIN_MOTOR_DISTANCE = 0;
 export const MAX_MOTOR_DISTANCE = 100;
 export const MIN_MOTOR_DIRECTION = 0;
 export const MAX_MOTOR_DIRECTION = 1;
+
+export const TEMPERATURE_GRAPH_OPTIONS = {
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Time (minutes)",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        offset: true,
+        type: "linear",
+        ticks: {
+          source: "data",
+          beginAtZero: true,
+          suggestedMin: 0,
+          min: 0,
+          fontSize: 15,
+          fontStyle: "bold",
+        },
+      },
+    ],
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Temperature (°C)",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+        },
+      },
+    ],
+  },
+};
