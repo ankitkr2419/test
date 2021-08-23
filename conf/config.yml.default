@@ -39,6 +39,9 @@ cycle_time: 15
 pid_temp: 71
 # pid time
 pid_time: 30
+# cycle range for baseline
+start_cycle: 1
+end_cycle: 5
 
 
 ## For TEC

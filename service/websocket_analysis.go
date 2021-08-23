@@ -286,6 +286,13 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 	var wellResult graph
 	var tempGraph []graph
 	// ex: for 8 active wells * 6 targets * no of cycle
+
+	if bl.AutoBaseline {
+		start, end := config.GetCycleRange()
+		bl.StartCycle = start
+		bl.EndCycle = end
+	}
+
 	var targetSum float32
 	targetAverage := make(map[uuid.UUID]float32, len(targets))
 	for _, t := range targets {
