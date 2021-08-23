@@ -84,6 +84,7 @@ export const pidProgessReducer = (state = pidProgressInitialState, action) => {
     case pidProgressActions.pidProgressAction:
       const { progressDetails } = action.payload;
 
+      //store payload details into appropriate deck object
       const updatedDeckStateInProgress = state.toJS().decks.map((deckObj) => {
         return deckObj.name === progressDetails.deck
           ? {
@@ -106,6 +107,7 @@ export const pidProgessReducer = (state = pidProgressInitialState, action) => {
     case pidProgressActions.pidProgressActionSuccess:
       const { progressSucceeded } = action.payload;
 
+      //store payload details into appropriate deck object
       const updatedDeckStateSuccess = state.toJS().decks.map((deckObj) => {
         return deckObj.name === progressSucceeded.deck
           ? {

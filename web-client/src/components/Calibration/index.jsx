@@ -59,6 +59,14 @@ const CalibrationComponent = (props) => {
     formik.setFieldValue(`${name}.isInvalid`, !validRange);
   }, []);
 
+  const handleOnChange = (event, name) => {
+    formik.setFieldValue(`${name}.value`, event.target.value);
+  };
+
+  const handleOnFocus = (name) => {
+    formik.setFieldValue(`${name}.isInvalid`, false);
+  };
+
   return (
     <div className="calibration-content px-5">
       <Card default className="my-5">
@@ -80,18 +88,11 @@ const CalibrationComponent = (props) => {
                         id={name}
                         placeholder={`${min} - ${max}`}
                         value={value}
-                        onChange={(event) => {
-                          formik.setFieldValue(
-                            `${name}.value`,
-                            event.target.value
-                          );
-                        }}
+                        onChange={(event) => handleOnChange(event, name)}
                         onBlur={(event) =>
                           handleBlurChange(name, event.target.value)
                         }
-                        onFocus={() =>
-                          formik.setFieldValue(`${name}.isInvalid`, false)
-                        }
+                        onFocus={() => handleOnFocus(name)}
                       />
                       {(isInvalid || value == null) && (
                         <div className="flex-70">
