@@ -11,6 +11,7 @@ import (
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
+const ErrorLidPIDTuning = "PID Error"
 
 type Status int32
 
@@ -57,7 +58,8 @@ type Driver interface {
 	Reset() error                 //reseting the values
 	Cycle() error                 // start the cycle
 	SetLidTemp(uint16) error      // set Lid Temperature
-	SwitchOffLidTemp() error
+	SwitchOffLidTemp() error	  // Lid will return to room temp
+	LidPIDCalibration() error	  // LID PID Tuning
 }
 
 type HeaterData struct {
