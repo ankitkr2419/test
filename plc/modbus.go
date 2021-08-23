@@ -50,9 +50,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	"D": map[int]uint16{
 		//updated addresses
 		23: uint16(0x1017), //register for setting rotation pulses
-		44: uint16(0x102C), //start address of register For FAM
-		60: uint16(0x103C), //start address of register For VIC
 
+		460: uint16(0x11CC), //pid value is put here
 		//latest addresses for 16 wells
 		800: uint16(0x1320), //start address of register For FAM
 		816: uint16(0x1330), //start address of register For VIC
@@ -87,6 +86,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		25: uint16(0x0819), //reset values
 
 		36: uint16(0x0824), // homing success (R)
+		42: uint16(0x082A), //register for Lid PID Tuning set/reset
+		43: uint16(0x082B), //register for Lid PID Tuning Completion status
 		101: uint16(0x0865), // homing error (R)
 		// 102: uint16(0x0866), // Start / Stop Cycle (W)
 		103: uint16(0x0867), // UnUsed
