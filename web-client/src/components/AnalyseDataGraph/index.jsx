@@ -14,19 +14,22 @@ const AnalyseDataGraphComponent = (props) => {
     selectedTarget,
     onTargetChanged,
     analyseDataGraphFilters,
+    isInsidePreviewModal,
   } = props;
-  
+
   return (
     <div>
       <GraphCard>
         <LineChart data={data} options={options} />
       </GraphCard>
-      <Filters
-        targetOptions={targetOptions}
-        selectedTarget={selectedTarget}
-        onTargetChanged={onTargetChanged}
-        analyseDataGraphFilters={analyseDataGraphFilters}
-      />
+      {isInsidePreviewModal === false && (
+        <Filters
+          targetOptions={targetOptions}
+          selectedTarget={selectedTarget}
+          onTargetChanged={onTargetChanged}
+          analyseDataGraphFilters={analyseDataGraphFilters}
+        />
+      )}
     </div>
   );
 };

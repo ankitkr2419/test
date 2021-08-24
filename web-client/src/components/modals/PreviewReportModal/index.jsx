@@ -60,57 +60,40 @@ const PreviewReportModal = (props) => {
     generateReport();
   };
 
-  const generateReport = () => {
+  const generateReport = async () => {
     //access html element we want to export contents from
     let page1 = document.getElementById("page-1");
     let page2 = document.getElementById("page-2");
     let page3 = document.getElementById("page-3");
+    let page4 = document.getElementById("page-4");
 
-    //convert html element into canvas
-    html2canvas(page1).then((canvas1) => {
-      html2canvas(page2).then((canvas2) => {
-        html2canvas(page3).then((canvas3) => {
-          const img1 = canvas1.toDataURL("image/png");
-          const img2 = canvas2.toDataURL("image/png");
-          const img3 = canvas3.toDataURL("image/png");
-          const doc = new jsPDF("l", "pt", [1024, 700]); //create custom pdf instance with its properties [width, height] in pt units //NOTE: (1 pt = 1.3281472327365 px)
-          //add contents into pdf
-          doc.addImage(
-            img1,
-            "png",
-            30, //page1.offsetLeft,
-            100, //page1.offsetTop,
-            page1.clientWidth + 100,
-            page1.clientHeight
-          );
-          doc.addPage();
-          doc.addImage(
-            img3,
-            "png",
-            30,
-            100,
-            page3.clientWidth,
-            page3.clientHeight
-          );
-          doc.addPage();
-          doc.addImage(
-            img2,
-            "png",
-            30,
-            100,
-            page2.clientWidth,
-            page2.clientHeight
-          );
+    const canvas1 = await html2canvas(page1);
+    const canvas2 = await html2canvas(page2);
+    const canvas3 = await html2canvas(page3);
+    const canvas4 = await html2canvas(page4);
 
-          // doc.save("chart.pdf"); //save file locally with default filename //kept for testing
-          setIsReportGenerated(true);
-          let pdfInBlobFormat = doc.output("blob"); //generate blob file
+    const img1 = canvas1.toDataURL("image/png");
+    const img2 = canvas2.toDataURL("image/png");
+    const img3 = canvas3.toDataURL("image/png");
+    const img4 = canvas4.toDataURL("image/png");
 
-          //save to server
-          sendReportToServer(pdfInBlobFormat);
-        }); //page 3 finish
-      }); //page 2 finish
-    }); //page 1 finish
+    const doc = new jsPDF("l", "pt", [1024, 700]); //create custom pdf instance with its properties [width, height] in pt units //NOTE: (1 pt = 1.3281472327365 px)
+    
+    //add contents into pdf
+    doc.addImage(img1, "png", 30, 100, page1.clientWidth + 100, page1.clientHeight);
+    doc.addPage();
+    doc.addImage(img3, "png", 30, 100, page3.clientWidth, page3.clientHeight);
+    doc.addPage();
+    doc.addImage(img2, "png", 30, 100, page2.clientWidth, page2.clientHeight);
+    doc.addPage();
+    doc.addImage(img4, "png", 30, 100, page4.clientWidth, page4.clientHeight);
+
+    // doc.save("chart.pdf"); //save file locally with default filename //kept for testing
+    setIsReportGenerated(true);
+    let pdfInBlobFormat = doc.output("blob"); //generate blob file
+
+    //save to server
+    sendReportToServer(pdfInBlobFormat);
   };
 
   const sendReportToServer = (pdfInBlobFormat) => {
@@ -158,6 +141,27 @@ const PreviewReportModal = (props) => {
         <Text className="font-weight-bold text-center mb-4">Amplification</Text>
         <ExperimentGraphContainer
           activeGraph={graphs.Amplification}
+          isInsidePreviewModal={true}
+          experimentStatus={experimentStatus}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          resetSelectedWells={resetSelectedWells}
+          isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
+          experimentGraphTargetsList={experimentGraphTargetsList}
+        />
+      </div>
+    );
+  };
+
+  const showPageFour = () => {
+    return (
+      <div id="page-4">
+        {/** Analyse graph data */}
+        <Text className="font-weight-bold text-center mb-4">Analyse Data</Text>
+        <ExperimentGraphContainer
+          activeGraph={graphs.AnalyseData}
           isInsidePreviewModal={true}
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
@@ -221,6 +225,7 @@ const PreviewReportModal = (props) => {
         >
           {showPageThree()}
           {showPageTwo()}
+          {showPageFour()}
         </div>
       </ModalBody>
     </Modal>

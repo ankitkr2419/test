@@ -50,9 +50,7 @@ const GraphRange = (props) => {
             className="px-2 py-1 ml-2"
             placeholder="Min value"
             value={formik.values.xMin.value}
-            onChange={(e) =>
-              formik.setFieldValue("xMin.value", parseInt(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("xMin.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`xMin.isInvalid`, false)}
           />
@@ -68,9 +66,7 @@ const GraphRange = (props) => {
             className="px-2 py-1 ml-2"
             placeholder="Max value"
             value={formik.values.xMax.value}
-            onChange={(e) =>
-              formik.setFieldValue("xMax.value", parseInt(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("xMax.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`xMax.isInvalid`, false)}
           />
@@ -84,9 +80,7 @@ const GraphRange = (props) => {
             className="px-2 py-1 ml-2"
             placeholder="Min value"
             value={formik.values.yMin.value}
-            onChange={(e) =>
-              formik.setFieldValue("yMin.value", parseFloat(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("yMin.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`yMin.isInvalid`, false)}
           />
@@ -97,9 +91,7 @@ const GraphRange = (props) => {
             className="px-2 py-1 ml-2"
             placeholder="Max value"
             value={formik.values.yMax.value}
-            onChange={(e) =>
-              formik.setFieldValue("yMax.value", parseFloat(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("yMax.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`yMax.isInvalid`, false)}
           />
@@ -120,7 +112,7 @@ const GraphRange = (props) => {
           outline={true}
           className="mb-3 ml-3 border-2 border-gray "
           onClick={() => handleResetBtn(totalCycles)}
-          disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
+          // disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
           Reset
         </Button>

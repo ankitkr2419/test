@@ -29,6 +29,7 @@ const initialOptions = {
   legend: {
     display: false,
   },
+  animation: false,
   scales: {
     xAxes: [
       {
@@ -256,9 +257,9 @@ const Plate = (props) => {
       .toJS()
       .map((targetObj) => parseInt(targetObj.threshold));
 
-    setXMax(cycleCount);
+    setXMax(0);
     setXMin(0);
-    setYMax(Math.max(thresholdArr));
+    setYMax(Math.max(...thresholdArr));
     setYMin(0);
   };
 

@@ -16,6 +16,7 @@ import {
 import { getExperimentId } from "selectors/experimentSelector";
 
 const AnalyseDataGraphContainer = (props) => {
+  const { isInsidePreviewModal } = props;
   const dispatch = useDispatch();
 
   // get targets from experiment target reducer(graph : target filters)
@@ -134,6 +135,7 @@ const AnalyseDataGraphContainer = (props) => {
       selectedTarget={selectedTarget}
       onTargetChanged={onTargetChanged}
       analyseDataGraphFilters={analyseDataGraphFilters}
+      isInsidePreviewModal={isInsidePreviewModal}
     />
   );
 };
