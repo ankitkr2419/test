@@ -31,6 +31,7 @@ const SampleSideBarContainer = (props) => {
     experimentStatus,
     experimentId,
     updateWell,
+    isExpanded,
   } = props;
   const dispatch = useDispatch();
   // useSelector
@@ -175,7 +176,8 @@ const SampleSideBarContainer = (props) => {
         experimentStatus === EXPERIMENT_STATUS.running ||
         experimentStatus === EXPERIMENT_STATUS.success ||
         experimentStatus === EXPERIMENT_STATUS.stopped ||
-        positions.size === 0
+        positions.size === 0 ||
+        isExpanded === true
       }
     />
   );

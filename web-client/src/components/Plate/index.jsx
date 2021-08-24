@@ -341,6 +341,7 @@ const Plate = (props) => {
                   experimentStatus={experimentStatus}
                   experimentTargetsList={experimentTargetsList}
                   updateWell={updateWell}
+                  isExpanded={isExpanded}
                 />
               </div>
               <div className="wells-wrapper flex-100 scroll-y">

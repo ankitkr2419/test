@@ -111,7 +111,7 @@ const WellPopover = (props) => {
           <Button
             className="mb-4"
             onClick={onShowClickHandler}
-            disabled={experimentStatus === null}
+            disabled={experimentStatus === null && isExpanded === false}
           >
             {showOnMap ? "Show on Graph" : "Hide from Graph"}
           </Button>
