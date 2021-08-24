@@ -279,6 +279,6 @@ func (d *Simulator) Calibrate() (err error) {
 }
 
 func (d *Simulator) LidPIDCalibration() (err error) {
-	// TBD
+	plc.LidPidTuningInProgress = true
 	return
 }
