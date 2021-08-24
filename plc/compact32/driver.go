@@ -72,7 +72,6 @@ LOOP:
 	// something went wrong. Signal parent process
 	logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
 	d.ExitCh <- errors.New("PCR Dead")
-	return
 }
 
 // dataBlock creates a sequence of uint16 data. (ref: modbus/client.go)
@@ -233,6 +232,12 @@ func (d *Compact32) Start() (err error) {
 }
 
 func (d *Compact32) Stop() (err error) {
+	if plc.LidPidTuningInProgress {
+		plc.LidPidTuningInProgress = false
+		d.ExitCh <- errors.New("PID Error")
+		return nil
+	}
+
 	plc.ExperimentRunning = false
 	d.ExitCh <- errors.New("PCR Aborted")
 	return nil
@@ -245,7 +250,7 @@ func (d *Compact32) Cycle() (err error) {
 	}
 
 	// get blocked if homing is in progress
-	for homingCount != 0{
+	for homingCount != 0 {
 		time.Sleep(2 * time.Second)
 		logger.Warnln("Homing is still in Progress, cycle will start once that is done.")
 	}
@@ -362,7 +367,7 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 
 	// Start Lid Heating
 	err = d.switchOnLidTemp()
-	if err!= nil {
+	if err != nil {
 		return
 	}
 
@@ -473,7 +478,6 @@ func (d *Compact32) switchOnLidTemp() (err error) {
 	return
 }
 
-
 // 1. Check for LID Tuning already in progress
 // 2. Set LID Tuning
 // 3. Write PID Temp to D 460
@@ -481,7 +485,7 @@ func (d *Compact32) switchOnLidTemp() (err error) {
 // 5. Continuously read M 43 till PID Tuning Success
 
 func (d *Compact32) LidPIDCalibration() (err error) {
-// TODO: Logging this PLC Operation
+	// TODO: Logging this PLC Operation
 
 	var pidTuningDone bool
 
@@ -544,17 +548,17 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 }
 
 func isLidPIDTuningInProgress() bool {
-	return pidTuningInProgress
+	return plc.LidPidTuningInProgress
 }
 
 func setLidPIDTuningInProgress() {
-	pidTuningInProgress = true
+	plc.LidPidTuningInProgress = true
 	plc.ExperimentRunning = true
 
 }
 
 func resetLidPIDTuningInProgress() {
-	pidTuningInProgress = false
+	plc.LidPidTuningInProgress = false
 	plc.ExperimentRunning = false
 }
 
@@ -569,7 +573,7 @@ func (d *Compact32) switchOnLidPIDCalibration() (err error) {
 	return
 }
 
-func (d *Compact32) switchOffLidPIDCalibration() (err error ){
+func (d *Compact32) switchOffLidPIDCalibration() (err error) {
 	// Off Lid PID Tuning
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.OFF)
 	if err != nil {
@@ -581,13 +585,18 @@ func (d *Compact32) switchOffLidPIDCalibration() (err error ){
 }
 
 func (d *Compact32) readLidPIDCompletion() (pidTuningDone bool, err error) {
+
+	if !plc.LidPidTuningInProgress {
+		return false, responses.LidPidTuningOffError
+	}
+
 	result, err := d.Driver.ReadCoils(plc.MODBUS["M"][43], 1)
 	if err != nil {
 		logger.WithField("LID PID ERR", err).Errorln("Error Reading M43")
 		return false, err
 	}
 
-	logger.Infoln("readLidPIDCompletion result: ", result )
+	logger.Infoln("readLidPIDCompletion result: ", result)
 
 	if result[0] == 44 {
 		return true, nil
