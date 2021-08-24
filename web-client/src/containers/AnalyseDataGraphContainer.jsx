@@ -7,6 +7,7 @@ import {
   updateFilter,
   resetThresholdFilter,
   resetBaselineFilter,
+  resetAllFiltersOfAnalyseDataGraph,
 } from "action-creators/analyseDataGraphActionCreators";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import AnalyseDataGraphComponent from "components/AnalyseDataGraph";
@@ -61,6 +62,12 @@ const AnalyseDataGraphContainer = (props) => {
   const baselineApiResponse = analyseDataGraphBaselineReducer.toJS();
   const baselineData = baselineApiResponse?.baselineApiData?.data;
 
+  //threshold data reducer
+  const analyseDataGraphThresholdReducer = useSelector(
+    (state) => state.analyseDataGraphThresholdReducer
+  );
+  let thresholdApiResponse = analyseDataGraphThresholdReducer.toJS();
+
   //fetch analyseDataGraph data
   useEffect(() => {
     let thresholdDataForApi = {
@@ -74,8 +81,8 @@ const AnalyseDataGraphContainer = (props) => {
 
     let baselineDataForApi = {
       auto_baseline: isAutoBaseline,
-      start_cycle: 1, //TODO make it dynamic with filters
-      end_cycle: 5, //TODO make it dynamic with filters
+      start_cycle: startCycle,
+      end_cycle: endCycle,
     };
 
     dispatch(
@@ -96,7 +103,27 @@ const AnalyseDataGraphContainer = (props) => {
   };
 
   const onTargetChanged = (value) => {
+    dispatch(resetAllFiltersOfAnalyseDataGraph());
     onFiltersChanged({ selectedTarget: value });
+  };
+
+  const getThresholdValue = () => {
+    //use default threshold value
+    let thresholdValue = selectedTarget?.threshold;
+
+    //if auto threshold is false get threshold value from api
+    if (isAutoThreshold === false) {
+      let targetsFromThresholdApi =
+        (thresholdApiResponse?.thresholdApiData !== null &&
+          thresholdApiResponse.thresholdApiData[0]?.targets) ||
+        [];
+      let targetObjFromApi = targetsFromThresholdApi.find(
+        (ele) => ele?.target_id === selectedTarget?.value
+      );
+      thresholdValue = targetObjFromApi?.threshold;
+    }
+
+    return thresholdValue;
   };
 
   //create graph data
@@ -125,8 +152,7 @@ const AnalyseDataGraphContainer = (props) => {
 
     // if we don't have chartData then no need to calculate threshold value
     if (chartData.length > 0) {
-      let autoThresholdOfSelectedTarget = selectedTarget?.threshold;
-      let thresholdValue = autoThresholdOfSelectedTarget; //TODO get actual threshold value once backend api is ready
+      let thresholdValue = getThresholdValue();
       let apiObject = baselineDataForSelectedTarget[0];
       let thresholdBorderColor = `rgba(245,144,178,1)`; //TODO check if it is required to be dynamic
 
