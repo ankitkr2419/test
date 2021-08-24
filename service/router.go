@@ -153,7 +153,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//TODO: allow only for engineer
 	router.HandleFunc("/pid-calibration/{deck:[A-B]}", pidCalibrationHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/lid-pid-calibration/", lidPIDCalibrationHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/lid/pid-calibration/start", lidPIDCalibrationStartHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/lid/pid-calibration/stop", lidPIDCalibrationStopHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+
 	// shaker and heater for engineer
 	router.HandleFunc("/start-shaking/{deck:[A-B]}", shakerHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/start-heating/{deck:[A-B]}", heaterHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
