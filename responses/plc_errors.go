@@ -23,5 +23,7 @@ var (
 
 	InvalidCurrentStep = fmt.Errorf("invalid current step, maybe process aborted")
 
-	LidPIDTuningError = fmt.Errorf("LID PID Tuining already in progress")
+	LidPIDTuningError        = fmt.Errorf("LID PID Tuining already in progress")
+	LidPidTuningOffError     = fmt.Errorf("LID PID Tuining was stopped")
+	LidPidTuningPresentError = fmt.Errorf("LID PID Tuning wasn't started!")
 )

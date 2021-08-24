@@ -160,6 +160,8 @@ var (
 	ConfTargetFetchError = fmt.Errorf("error fetching target data")
 	ResultFetchError     = fmt.Errorf("error fetching result data")
 
+	PreviousExperimentProgressError = fmt.Errorf("error previous experiment already in progress")
+
 	InvalidEmailIDError  = fmt.Errorf("error fetching result data")
 	
 	ReportAbsent = fmt.Errorf("report is absent in form data!")
