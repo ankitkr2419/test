@@ -3,13 +3,11 @@ package plc
 import (
 	"errors"
 	"fmt"
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"time"
 
 	logger "github.com/sirupsen/logrus"
-)
-
-const (
-	rpmToPulses = 13.3
 )
 
 // Shaking : function
@@ -31,6 +29,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	var motorNum = K8_Shaker
 	var results []byte
+
+	rpmToPulses := float64(config.GetShakerRPM() / int64(time.Second))
 
 	// 1. validate that rpm 1 is definately set and futher
 	if shakerData.RPM1 == 0 || shakerData.Time1 == 0 {

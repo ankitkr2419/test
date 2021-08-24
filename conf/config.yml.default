@@ -62,4 +62,8 @@ VoltageErrorThreshold: 24.00
 PeltierMaxCurrent: 7.00
 PeltierDeltaTemperature: 75.00
 
+##For Extraction
+micro_lit_pulses: 25
+shaker_rpm: 800
+
 
