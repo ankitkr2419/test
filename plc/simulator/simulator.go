@@ -105,6 +105,12 @@ func (d *Simulator) Start() (err error) {
 }
 
 func (d *Simulator) Stop() (err error) {
+	if plc.LidPidTuningInProgress {
+		plc.LidPidTuningInProgress = false
+		d.ExitCh <- errors.New("PID Error")
+		return nil
+	}
+
 	// Abort running process
 
 	plc.ExperimentRunning = false
