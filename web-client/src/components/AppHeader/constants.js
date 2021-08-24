@@ -3,20 +3,20 @@ import { ROUTES } from "appConstants";
 export const NAV_ITEMS = [
   {
     name: "Template",
-    path: "/templates",
+    path: ROUTES.templates,
   },
   {
     name: "Plate",
-    path: "/plate",
+    path: ROUTES.plate,
   },
   {
     name: "Activity Log",
-    path: "/activity",
+    path: ROUTES.activity,
   },
   {
     name: "Calibration",
-    path: ROUTES.calibration
-  }
+    path: ROUTES.calibration,
+  },
 ];
 
 export const PATH_TO_SHOW_CROSS_BTN = [

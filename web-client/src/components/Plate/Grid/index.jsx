@@ -63,11 +63,7 @@ const GridComponent = ({
                     onWellUpdateClickHandler(well, index, event);
                   }}
                   showGraphOfWell={showGraphOfWell}
-                  isEditBtnDisabled={
-                    experimentStatus === EXPERIMENT_STATUS.success ||
-                    experimentStatus === EXPERIMENT_STATUS.running ||
-                    experimentStatus === EXPERIMENT_STATUS.stopped
-                  }
+                  experimentStatus={experimentStatus}
                 />
               )}
             </>

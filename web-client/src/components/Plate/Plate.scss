@@ -56,7 +56,7 @@
     font-size: 1rem;
     line-height: 1.25rem;
     color: #666666;
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     text-align: center;
     border: 0 none;
     border-radius: 0;
@@ -96,7 +96,7 @@
   padding: 2rem;
 
   .wrapper-title {
-    color: #707070;
+    color: $gray-44;
   }
 }
 
@@ -105,7 +105,7 @@
 }
 
 .graph-wrapper {
-  padding: 2rem 6rem;
+  padding: 1rem 2rem;
 }
 
 // Grid Coordinates
@@ -156,7 +156,8 @@
 }
 
 // Graph Filter
-.graph-filters {
+.graph-filters,
+.graph-range {
   .title {
     color: $gray-40;
     text-align: right;
@@ -165,7 +166,12 @@
   }
 
   .form-group {
-    margin: rem(0 0 24px);
+    margin: 0 0 16px;
+  }
+}
+
+.graph-filters {
+  .form-group {
     opacity: 0.5;
     transition: transform 0.25s ease;
 
@@ -240,6 +246,15 @@
     right: 0;
     color: $gray-40;
     @include fade(hide);
+  }
+}
+
+.graph-range {
+  .form-control {
+    background: $white 0% 0% no-repeat padding-box;
+    font-size: rem(15px);
+    line-height: rem(19px);
+    box-shadow: rem(0 3px 6px) #00000012;
   }
 }
 

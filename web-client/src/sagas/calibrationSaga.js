@@ -3,11 +3,15 @@ import { callApi } from "apis/apiHelper";
 import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import {
   calibrationActions,
+  motorActions,
+  pidActions,
   updateCalibrationActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
   updateCalibrationFailed,
+  runPidFailed,
+  motorFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* fetchCalibrations(actions) {
@@ -60,10 +64,61 @@ export function* updateCalibrations(actions) {
   }
 }
 
+export function* pidStart(actions) {
+  const {
+    payload: { token, deckName },
+  } = actions;
+  const { pidActionSuccess, pidActionFailure } = pidActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        body: null,
+        reqPath: `${API_ENDPOINTS.pidCalibration}/${deckName}`,
+        successAction: pidActionSuccess,
+        failureAction: pidActionFailure,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating calibrations configs", error);
+    yield put(runPidFailed({ error }));
+  }
+}
+
+export function* motor(actions) {
+  const {
+    payload: { token, body },
+  } = actions;
+  const { motorActionSuccess, motorActionFailure } = motorActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.manual}`,
+        successAction: motorActionSuccess,
+        failureAction: motorActionFailure,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating calibrations configs", error);
+    yield put(motorFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(calibrationActions.calibrationInitiated, fetchCalibrations);
   yield takeEvery(
     updateCalibrationActions.updateCalibrationInitiated,
     updateCalibrations
   );
+  yield takeEvery(pidActions.pidActionInitiated, pidStart);
+  yield takeEvery(motorActions.motorActionInitiated, motor);
 }

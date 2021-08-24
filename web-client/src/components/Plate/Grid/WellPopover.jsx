@@ -1,9 +1,10 @@
 /* eslint-disable no-undef */
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Popover, PopoverHeader, PopoverBody } from "core-components";
 import { Text, Center, ButtonIcon } from "shared-components";
 import styled from "styled-components";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const StyledText = styled(Text)`
   color: ${(props) => {
@@ -25,8 +26,11 @@ const WellPopover = (props) => {
     onEditClickHandler,
     showGraphOfWell,
     isEditBtnDisabled,
+    experimentStatus,
     ...rest
   } = props;
+
+  const [showOnMap, setShowOnMap] = useState(true);
 
   const simulateOutSideClick = () => document.body.click();
 
@@ -34,7 +38,8 @@ const WellPopover = (props) => {
   const onShowClickHandler = () => {
     // close the popover
     simulateOutSideClick();
-    showGraphOfWell(index);
+    showGraphOfWell(index, showOnMap);
+    setShowOnMap(!showOnMap);
   };
 
   // on edit click handler
@@ -102,10 +107,21 @@ const WellPopover = (props) => {
 					</li> */}
         </ul>
         <Center>
-          <Button className="mb-4" onClick={onShowClickHandler}>
-            Show on Graph
+          <Button
+            className="mb-4"
+            onClick={onShowClickHandler}
+            disabled={experimentStatus === null}
+          >
+            {showOnMap ? "Show on Graph" : "Hide from Graph"}
           </Button>
-          <Button onClick={onEditClick} disabled={isEditBtnDisabled}>
+          <Button
+            onClick={onEditClick}
+            disabled={
+              experimentStatus === EXPERIMENT_STATUS.success ||
+              experimentStatus === EXPERIMENT_STATUS.running ||
+              experimentStatus === EXPERIMENT_STATUS.stopped
+            }
+          >
             Edit Info
           </Button>
         </Center>

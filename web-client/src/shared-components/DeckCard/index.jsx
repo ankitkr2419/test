@@ -4,7 +4,12 @@ import PropTypes from "prop-types";
 import { Text, ProcessRemaining } from "shared-components";
 import { Button } from "core-components";
 import ActionButton from "./ActionButton";
-import { DECKCARD_BTN, SELECT_PROCESS_PROPS } from "appConstants";
+import {
+  DECKCARD_BTN,
+  ROUTES,
+  SELECT_PROCESS_PROPS,
+  TOAST_MESSAGE,
+} from "appConstants";
 import { Progress } from "reactstrap";
 import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +17,7 @@ import { setActiveDeck } from "action-creators/loginActionCreators";
 import { DeckCardBox, CardOverlay } from "./Styles";
 import CommonTimerFields from "./CommonTimerFields";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router";
 
 const DeckCard = (props) => {
   const {
@@ -39,6 +45,7 @@ const DeckCard = (props) => {
 
   const [operatorLoginModalOpen, setOperatorLoginModalOpen] = useState(false);
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
@@ -159,7 +166,11 @@ const DeckCard = (props) => {
   const setCurrentDeckActive = () => {
     /** one cannot switch between deck while adding/editing processes.*/
     if (deckName !== activeDeckName && isDeckBlocked) {
-      toast.warning("Decks cannot be switched while adding/editing processes!");
+      if (location.pathname === `/${ROUTES.calibration}`) {
+        toast.warning(TOAST_MESSAGE.deckBlockForCalibration);
+      } else {
+        toast.warning(TOAST_MESSAGE.deckBlockForProcess);
+      }
       return;
     }
     /**

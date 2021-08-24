@@ -14,7 +14,7 @@ const lineConfigs = {
 	pointHoverBackgroundColor: 'rgba(148,147,147,1)',
 	pointHoverBorderColor: 'rgba(148,147,147,1)',
 	pointHoverBorderWidth: 0,
-	lineTension: 0.1,
+	lineTension: 0.4,
 	borderCapStyle: 'butt',
 };
 
