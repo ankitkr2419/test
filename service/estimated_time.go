@@ -11,6 +11,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+const(
+	degreesPerSec = 0.25
+)
+
 // ALGORITHM
 // 1. Get Stage ID from Step
 // 2. Fetch Template ID from this Stage ID
@@ -35,9 +39,9 @@ func getHomingAndLidTempTime(ctx context.Context, lidTemp int64, estimatedTime *
 	// Calculate Lid Temp Time
 	// NOTE: This is where most variance exists for estimated time
 	// TODO: Handle this in a better and accurate way
-	// here 0.5 is the rate of heating/ cooling per sec
-	*estimatedTime += math.Abs(float64(lidTemp)-config.GetRoomTemp()) / 0.5
-	logger.Infoln("Estimated Time for Lid Temp Reaching: ", math.Abs(float64(lidTemp)-config.GetRoomTemp())/0.5)
+	// here degreesPerSec is the rate of heating/ cooling per sec
+	*estimatedTime += math.Abs(float64(lidTemp)-config.GetRoomTemp()) / degreesPerSec
+	logger.Infoln("Estimated Time for Lid Temp Reaching: ", math.Abs(float64(lidTemp)-config.GetRoomTemp())/ degreesPerSec)
 	return
 }
 
@@ -49,11 +53,10 @@ func updateEstimatedTimeByTemplateID(ctx context.Context, s db.Storer, templateI
 		return
 	}
 
-	roomTemp := config.GetRoomTemp()
-	currentTemp := roomTemp
+	currentTemp := config.GetRoomTemp()
 
 	// Set Only Lid Temp and Homing Time
-	var estimatedTime float64
+	var estimatedTime, firstStepTargetTemp, firstStepTargetRamp float64
 	getHomingAndLidTempTime(ctx, temp.LidTemp, &estimatedTime)
 
 	ss, err := s.ListStages(ctx, templateID)
@@ -70,12 +73,21 @@ func updateEstimatedTimeByTemplateID(ctx context.Context, s db.Storer, templateI
 			return err
 		}
 
-		// Calculate Hold Stage
+		// Calculate Stage wise Time for Experiment
 		tp := 0.0
-		for _, st := range steps {
+		for i, st := range steps {
+			// handle 0th step difference
+			if i == 0 {
+				firstStepTargetTemp = float64(st.TargetTemperature)
+				firstStepTargetRamp = float64(st.RampRate)
+			}
 			tp += math.Abs(currentTemp-float64(st.TargetTemperature)) / float64(st.RampRate)
 			tp += float64(st.HoldTime)
 			currentTemp = float64(st.TargetTemperature)
+			// handle the difference at last step
+			if i == len(steps) - 1 {
+				tp += math.Abs(currentTemp-firstStepTargetTemp) / firstStepTargetRamp
+			}
 		}
 
 		if stage.Type == cycle {
@@ -91,7 +103,7 @@ func updateEstimatedTimeByTemplateID(ctx context.Context, s db.Storer, templateI
 	}
 
 	// Last step to go back to Room Temp
-	estimatedTime += math.Abs(currentTemp-roomTemp) / tec.RoomTempRamp
+	estimatedTime += math.Abs(currentTemp-config.GetRoomTemp()) / tec.RoomTempRamp
 	logger.Infoln("Estimated Time : ", estimatedTime)
 
 	return s.UpdateEstimatedTime(ctx, templateID, int64(estimatedTime))
