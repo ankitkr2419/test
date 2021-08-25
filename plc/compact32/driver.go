@@ -506,6 +506,7 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	// }
 
 	// 2.
+	// ASK: @ketan if below temp is to be multiplied by 10
 	result, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][460], uint16(config.GetLidPIDTemp()*10))
 	if err != nil {
 		logger.Errorln("Error failed to write lid pid temperature: ", err)
@@ -592,5 +593,23 @@ func (d *Compact32) readLidPIDCompletion() (pidTuningDone bool, err error) {
 		return true, nil
 	}
 
+	return
+}
+
+func (d *Compact32) SetScanSpeedAndScanTime() (err error) {
+
+	result, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][462], uint16(config.GetScanSpeed()))
+	if err != nil {
+		logger.Errorln("Error failed to write scan speed: ", err)
+		return err
+	}
+	logger.Infoln("result from scan speed set ", result, config.GetScanSpeed())
+
+	result, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][464], uint16(config.GetScanTime()))
+	if err != nil {
+		logger.Errorln("Error failed to write scan time: ", err)
+		return err
+	}
+	logger.Infoln("result from scan time set ", result, config.GetScanTime())
 	return
 }
