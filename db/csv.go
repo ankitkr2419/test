@@ -40,6 +40,7 @@ var createdStages []Stage
 var csvCtx context.Context = context.WithValue(context.Background(), ContextKeyUsername, "main")
 var hStage, cStage Stage
 var step Step
+var currentTemp float64
 
 // done will help us clean up
 var done, dataCapture, cycleSeen, templateCreated, createdHoldStage, createdCycleStage bool
@@ -296,6 +297,12 @@ func addTemplate(store Storer, templateDetails []string) (err error) {
 		}
 	}
 
+	currentTemp = config.GetRoomTemp()
+	defer func(){
+		// set current Temp to Room Temp
+		currentTemp = config.GetRoomTemp()
+	}()
+
 	createdTemplate.Name = templateDetails[0]
 	createdTemplate.Description = templateDetails[1]
 
@@ -420,13 +427,13 @@ func addHoldStep(store Storer, record []string) (err error) {
 
 func updateEstimatedTimeForStep(store Storer, step Step) (err error) {
 
+	var estimatedTime int64
+
 	stage, err := store.ShowStage(csvCtx, step.StageID)
 	template, err := store.ShowTemplate(csvCtx, stage.TemplateID)
 	tp := 0.0
-	config.SetRoomTemp(27)
-	currentTemp := config.GetRoomTemp()
-	estimatedTime := template.EstimatedTime
 	tp += math.Abs(currentTemp-float64(step.TargetTemperature)) / float64(step.RampRate)
+	currentTemp = float64(step.TargetTemperature)
 	tp += float64(step.HoldTime)
 
 	switch stage.Type {
@@ -479,7 +486,11 @@ func addCycleStep(store Storer, record []string) (err error) {
 	}
 
 	logger.Infoln("Step Created for Cycle: ", createdStep)
-
+	err = updateEstimatedTimeForStep(store, createdStep)
+	if err != nil {
+		logger.Errorln("error in updating estimated time for step", err)
+		return
+	}
 	return nil
 }
 
