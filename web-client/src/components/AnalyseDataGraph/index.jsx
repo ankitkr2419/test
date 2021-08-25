@@ -15,6 +15,9 @@ const AnalyseDataGraphComponent = (props) => {
     onTargetChanged,
     analyseDataGraphFilters,
     isInsidePreviewModal,
+    onFiltersChanged,
+    onResetThresholdFilter,
+    onResetBaselineFilter,
   } = props;
 
   return (
@@ -28,6 +31,9 @@ const AnalyseDataGraphComponent = (props) => {
           selectedTarget={selectedTarget}
           onTargetChanged={onTargetChanged}
           analyseDataGraphFilters={analyseDataGraphFilters}
+          onFiltersChanged={onFiltersChanged}
+          onResetThresholdFilter={onResetThresholdFilter}
+          onResetBaselineFilter={onResetBaselineFilter}
         />
       )}
     </div>
@@ -40,6 +46,9 @@ AnalyseDataGraphComponent.propTypes = {
   selectedTarget: PropTypes.object.isRequired,
   onTargetChanged: PropTypes.func.isRequired,
   analyseDataGraphFilters: PropTypes.object.isRequired,
+  onFiltersChanged: PropTypes.func.isRequired,
+  onResetThresholdFilter: PropTypes.func.isRequired,
+  onResetBaselineFilter: PropTypes.func.isRequired,
 };
 
 export default React.memo(AnalyseDataGraphComponent);

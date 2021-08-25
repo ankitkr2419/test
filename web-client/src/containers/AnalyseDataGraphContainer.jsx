@@ -5,6 +5,9 @@ import {
   fetchAnalyseDataThreshold,
   fetchAnalyseDataBaseline,
   updateFilter,
+  resetThresholdFilter,
+  resetBaselineFilter,
+  resetAllFiltersOfAnalyseDataGraph,
 } from "action-creators/analyseDataGraphActionCreators";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import AnalyseDataGraphComponent from "components/AnalyseDataGraph";
@@ -30,8 +33,14 @@ const AnalyseDataGraphContainer = (props) => {
     (state) => state.analyseDataGraphFiltersReducer
   );
   const analyseDataGraphFilters = analyseDataGraphFiltersReducer.toJS();
-  const { selectedTarget, isAutoThreshold, isAutoBaseline } =
-    analyseDataGraphFilters;
+  const {
+    selectedTarget,
+    isAutoThreshold,
+    threshold,
+    isAutoBaseline,
+    startCycle,
+    endCycle,
+  } = analyseDataGraphFilters;
 
   //current experiment id
   const experimentId = useSelector(getExperimentId);
@@ -53,12 +62,18 @@ const AnalyseDataGraphContainer = (props) => {
   const baselineApiResponse = analyseDataGraphBaselineReducer.toJS();
   const baselineData = baselineApiResponse?.baselineApiData?.data;
 
+  //threshold data reducer
+  const analyseDataGraphThresholdReducer = useSelector(
+    (state) => state.analyseDataGraphThresholdReducer
+  );
+  let thresholdApiResponse = analyseDataGraphThresholdReducer.toJS();
+
   //fetch analyseDataGraph data
   useEffect(() => {
     let thresholdDataForApi = {
       target_id: selectedTarget?.value,
       auto_threshold: isAutoThreshold,
-      threshold: 1.8, //TODO make it dynamic with filters
+      threshold: threshold,
     };
     dispatch(
       fetchAnalyseDataThreshold({ token, experimentId, thresholdDataForApi })
@@ -66,17 +81,49 @@ const AnalyseDataGraphContainer = (props) => {
 
     let baselineDataForApi = {
       auto_baseline: isAutoBaseline,
-      start_cycle: 1, //TODO make it dynamic with filters
-      end_cycle: 5, //TODO make it dynamic with filters
+      start_cycle: startCycle,
+      end_cycle: endCycle,
     };
 
     dispatch(
       fetchAnalyseDataBaseline({ token, experimentId, baselineDataForApi })
     );
-  }, [dispatch]);
+  }, [dispatch, threshold, startCycle, endCycle]);
+
+  const onFiltersChanged = (changedFilters) => {
+    dispatch(updateFilter(changedFilters));
+  };
+
+  const onResetThresholdFilter = () => {
+    dispatch(resetThresholdFilter());
+  };
+
+  const onResetBaselineFilter = () => {
+    dispatch(resetBaselineFilter());
+  };
 
   const onTargetChanged = (value) => {
-    dispatch(updateFilter({ selectedTarget: value }));
+    dispatch(resetAllFiltersOfAnalyseDataGraph());
+    onFiltersChanged({ selectedTarget: value });
+  };
+
+  const getThresholdValue = () => {
+    //use default threshold value
+    let thresholdValue = selectedTarget?.threshold;
+
+    //if auto threshold is false get threshold value from api
+    if (isAutoThreshold === false) {
+      let targetsFromThresholdApi =
+        (thresholdApiResponse?.thresholdApiData !== null &&
+          thresholdApiResponse.thresholdApiData[0]?.targets) ||
+        [];
+      let targetObjFromApi = targetsFromThresholdApi.find(
+        (ele) => ele?.target_id === selectedTarget?.value
+      );
+      thresholdValue = targetObjFromApi?.threshold;
+    }
+
+    return thresholdValue;
   };
 
   //create graph data
@@ -105,8 +152,7 @@ const AnalyseDataGraphContainer = (props) => {
 
     // if we don't have chartData then no need to calculate threshold value
     if (chartData.length > 0) {
-      let autoThresholdOfSelectedTarget = selectedTarget?.threshold;
-      let thresholdValue = autoThresholdOfSelectedTarget; //TODO get actual threshold value once backend api is ready
+      let thresholdValue = getThresholdValue();
       let apiObject = baselineDataForSelectedTarget[0];
       let thresholdBorderColor = `rgba(245,144,178,1)`; //TODO check if it is required to be dynamic
 
@@ -136,6 +182,9 @@ const AnalyseDataGraphContainer = (props) => {
       onTargetChanged={onTargetChanged}
       analyseDataGraphFilters={analyseDataGraphFilters}
       isInsidePreviewModal={isInsidePreviewModal}
+      onFiltersChanged={onFiltersChanged}
+      onResetThresholdFilter={onResetThresholdFilter}
+      onResetBaselineFilter={onResetBaselineFilter}
     />
   );
 };

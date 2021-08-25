@@ -13,6 +13,9 @@ const Filters = (props) => {
     selectedTarget,
     onTargetChanged,
     analyseDataGraphFilters,
+    onFiltersChanged,
+    onResetThresholdFilter,
+    onResetBaselineFilter,
   } = props;
 
   const formik = useFormik({
@@ -22,19 +25,34 @@ const Filters = (props) => {
     enableReinitialize: true,
   });
 
-  const onFormikValueChanged = (key, value) => {
-    formik.setFieldValue(key, value);
-  };
-
-  const handleThresholdApplyButton = () => {};
-  const handleThresholdResetButton = () => {};
-  const handleBaselineApplyButton = () => {};
-  const handleBaselineResetButton = () => {};
-
   let isAutoThreshold = formik.values.isAutoThreshold.value;
   let thresholdLabel = isAutoThreshold === true ? "Auto" : "Manual";
   let isAutoBaseline = formik.values.isAutoBaseline.value;
   let baselineLabel = isAutoBaseline === true ? "Auto" : "Manual";
+
+  const onFormikValueChanged = (key, value) => {
+    formik.setFieldValue(key, value);
+  };
+
+  const handleThresholdApplyButton = () => {
+    onFiltersChanged({
+      isAutoThreshold: isAutoThreshold,
+      threshold: formik.values.threshold.value,
+    });
+  };
+  const handleThresholdResetButton = () => {
+    onResetThresholdFilter();
+  };
+  const handleBaselineApplyButton = () => {
+    onFiltersChanged({
+      isAutoBaseline: isAutoBaseline,
+      startCycle: formik.values.startCycle.value,
+      endCycle: formik.values.endCycle.value,
+    });
+  };
+  const handleBaselineResetButton = () => {
+    onResetBaselineFilter();
+  };
 
   return (
     <>
@@ -60,7 +78,7 @@ const Filters = (props) => {
           Threshold
         </Text>
         <div className="d-flex align-items-center flex-wrap flex-90">
-          <FormGroup className="d-flex align-items-center flex-35 px-2">
+          <FormGroup className="d-flex align-items-center px-2">
             <Switch
               id="thresholdToggler"
               name="thresholdToggler"
@@ -72,26 +90,25 @@ const Filters = (props) => {
             />
             {isAutoThreshold === false && (
               <>
-                <Label className="flex-20 text-right mb-0 p-1">
-                  Threshold
-                </Label>
+                <Label className="flex-40 text-right mb-0 p-1">Threshold</Label>
                 <Input
                   name="thresholdValue"
                   type="number"
-                  className="px-2 py-1 ml-2"
+                  className="flex-25 px-2 py-1 ml-2"
                   placeholder="Threshold"
+                  step="0.1"
                   value={formik.values.threshold.value}
                   onChange={(e) =>
                     onFormikValueChanged(
                       "threshold.value",
-                      parseInt(e.target.value)
+                      parseFloat(e.target.value)
                     )
                   }
                 />
               </>
             )}
           </FormGroup>
-          <div>
+          <div className="ml-auto">
             <Button
               color="primary"
               size="sm"
@@ -131,13 +148,13 @@ const Filters = (props) => {
             />
             {isAutoBaseline === false && (
               <>
-                <Label className="flex-20 text-right mb-0 p-1">
+                <Label className="flex-40 text-right mb-0 p-1">
                   Start Cycle
                 </Label>
                 <Input
                   name="startCycle"
                   type="number"
-                  className="px-2 py-1 ml-2"
+                  className="flex-30 px-2 py-1 ml-2"
                   placeholder="Start Cycle"
                   value={formik.values.startCycle.value}
                   onChange={(e) =>
@@ -147,11 +164,11 @@ const Filters = (props) => {
                     )
                   }
                 />
-                <Label className="flex-20 text-right mb-0 p-1">End Cycle</Label>
+                <Label className="flex-40 text-right mb-0 p-1">End Cycle</Label>
                 <Input
                   name="endCycle"
                   type="number"
-                  className="px-2 py-1 ml-2"
+                  className="flex-30 px-2 py-1 ml-2"
                   placeholder="End Cycle"
                   value={formik.values.endCycle.value}
                   onChange={(e) =>
@@ -164,7 +181,7 @@ const Filters = (props) => {
               </>
             )}
           </FormGroup>
-          <div>
+          <div className="ml-auto">
             <Button
               color="primary"
               size="sm"
@@ -194,6 +211,9 @@ Filters.propTypes = {
   selectedTarget: PropTypes.object.isRequired,
   onTargetChanged: PropTypes.func.isRequired,
   analyseDataGraphFilters: PropTypes.object.isRequired,
+  onFiltersChanged: PropTypes.func.isRequired,
+  onResetThresholdFilter: PropTypes.func.isRequired,
+  onResetBaselineFilter: PropTypes.func.isRequired,
 };
 
 export default React.memo(Filters);

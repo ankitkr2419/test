@@ -7,7 +7,7 @@ export const generateTargetOptions = (targetList) => {
     return {
       label: target.target_name,
       value: target.target_id,
-      threshold: target.threshold
+      threshold: target.threshold,
     };
   });
 };
