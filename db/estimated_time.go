@@ -1,19 +1,20 @@
-package service
+package db
 
 import (
 	"context"
 	"github.com/google/uuid"
 	"math"
 	"mylab/cpagent/config"
-	"mylab/cpagent/db"
-	"mylab/cpagent/tec"
 
 	logger "github.com/sirupsen/logrus"
 )
 
-const(
+const (
 	degreesPerSec = 0.25
+	RoomTempRamp  = 6
 )
+
+var currentTemp float64
 
 // ALGORITHM
 // 1. Get Stage ID from Step
@@ -21,13 +22,13 @@ const(
 // 3. Fetch All Stages and Steps from Template ID
 // 4. Iterate over the stages and steps and calculate time accordingly
 // 5. Update time in DB
-func updateEstimatedTimeByStageID(ctx context.Context, s db.Storer, stageID uuid.UUID) (err error) {
+func UpdateEstimatedTimeByStageID(ctx context.Context, s Storer, stageID uuid.UUID) (err error) {
 	stage, err := s.ShowStage(ctx, stageID)
 	if err != nil {
 		logger.Errorln(err)
 		return
 	}
-	return updateEstimatedTimeByTemplateID(ctx, s, stage.TemplateID)
+	return UpdateEstimatedTimeByTemplateID(ctx, s, stage.TemplateID)
 }
 
 func getHomingAndLidTempTime(ctx context.Context, lidTemp int64, estimatedTime *float64) (err error) {
@@ -41,11 +42,11 @@ func getHomingAndLidTempTime(ctx context.Context, lidTemp int64, estimatedTime *
 	// TODO: Handle this in a better and accurate way
 	// here degreesPerSec is the rate of heating/ cooling per sec
 	*estimatedTime += math.Abs(float64(lidTemp)-config.GetRoomTemp()) / degreesPerSec
-	logger.Infoln("Estimated Time for Lid Temp Reaching: ", math.Abs(float64(lidTemp)-config.GetRoomTemp())/ degreesPerSec)
+	logger.Infoln("Estimated Time for Lid Temp Reaching: ", math.Abs(float64(lidTemp)-config.GetRoomTemp())/degreesPerSec)
 	return
 }
 
-func updateEstimatedTimeByTemplateID(ctx context.Context, s db.Storer, templateID uuid.UUID) (err error) {
+func UpdateEstimatedTimeByTemplateID(ctx context.Context, s Storer, templateID uuid.UUID) (err error) {
 
 	temp, err := s.ShowTemplate(ctx, templateID)
 	if err != nil {
@@ -85,7 +86,7 @@ func updateEstimatedTimeByTemplateID(ctx context.Context, s db.Storer, templateI
 			tp += float64(st.HoldTime)
 			currentTemp = float64(st.TargetTemperature)
 			// handle the difference at last step
-			if i == len(steps) - 1 {
+			if i == len(steps)-1 {
 				tp += math.Abs(currentTemp-firstStepTargetTemp) / firstStepTargetRamp
 			}
 		}
@@ -103,7 +104,7 @@ func updateEstimatedTimeByTemplateID(ctx context.Context, s db.Storer, templateI
 	}
 
 	// Last step to go back to Room Temp
-	estimatedTime += math.Abs(currentTemp-config.GetRoomTemp()) / tec.RoomTempRamp
+	estimatedTime += math.Abs(currentTemp-config.GetRoomTemp()) / RoomTempRamp
 	logger.Infoln("Estimated Time : ", estimatedTime)
 
 	return s.UpdateEstimatedTime(ctx, templateID, int64(estimatedTime))
