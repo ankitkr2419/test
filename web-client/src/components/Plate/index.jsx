@@ -44,8 +44,8 @@ const initialOptions = {
         ticks: {
           fontSize: 15,
           fontStyle: "bold",
-          min: 1,
-          max: 5,
+          min: 0,
+          max: 4,
         },
       },
     ],
@@ -122,10 +122,10 @@ const Plate = (props) => {
   const [previewReportModal, setPreviewReportModal] = useState(false);
 
   // default ranges for amplification plot
-  const [xMinValue, setXMin] = useState(1);
-  const [xMaxValue, setXMax] = useState(5);
+  const [xMinValue, setXMin] = useState(0);
+  const [xMaxValue, setXMax] = useState(0);
   const [yMinValue, setYMin] = useState(0);
-  const [yMaxValue, setYMax] = useState(5);
+  const [yMaxValue, setYMax] = useState(10);
 
   const [options, setOptions] = useState(initialOptions);
   const [isDataFromAPI, setDataFromAPI] = useState(false);
@@ -253,9 +253,9 @@ const Plate = (props) => {
   const handleResetBtn = (cycleCount) => {
     setDataFromAPI(true);
 
-    const thresholdArr = experimentGraphTargetsList
-      .toJS()
-      .map((targetObj) => parseInt(targetObj.threshold));
+    const thresholdArr = targetsData.map((targetObj) =>
+      parseInt(targetObj.threshold)
+    );
 
     setXMax(0);
     setXMin(0);
