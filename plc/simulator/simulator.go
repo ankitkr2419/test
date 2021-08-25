@@ -26,12 +26,11 @@ type Simulator struct {
 	wells     []Well
 }
 
-func NewSimulator(exit chan error) plc.Driver {
-	ex := make(chan error)
+func NewSimulator(exit, wsErr chan error) plc.Driver {
 
 	s := Simulator{}
-	s.ExitCh = ex
-	s.ErrCh = exit
+	s.ExitCh = exit
+	s.ErrCh = wsErr
 	s.pcrHeartBeat()
 	s.setWells()
 	go s.HeartBeat()
@@ -129,6 +128,7 @@ func (d *Simulator) simulate() {
 	go d.cycleStage()
 
 	for {
+		time.Sleep(1 * time.Second)
 		// Intentionally don't have a default, so that it blocks on either one of the channels.
 		select {
 		case msg := <-d.ExitCh:
