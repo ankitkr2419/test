@@ -5,9 +5,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"math"
 	"mylab/cpagent/config"
 	"mylab/cpagent/responses"
+
 	"os"
 	"strconv"
 	"strings"
@@ -40,7 +40,6 @@ var createdStages []Stage
 var csvCtx context.Context = context.WithValue(context.Background(), ContextKeyUsername, "main")
 var hStage, cStage Stage
 var step Step
-var currentTemp float64
 
 // done will help us clean up
 var done, dataCapture, cycleSeen, templateCreated, createdHoldStage, createdCycleStage bool
@@ -298,7 +297,7 @@ func addTemplate(store Storer, templateDetails []string) (err error) {
 	}
 
 	currentTemp = config.GetRoomTemp()
-	defer func(){
+	defer func() {
 		// set current Temp to Room Temp
 		currentTemp = config.GetRoomTemp()
 	}()
@@ -340,6 +339,8 @@ func addTemplate(store Storer, templateDetails []string) (err error) {
 		return
 	}
 	logger.Info("Created template-> ", createdTemplate)
+
+	go UpdateEstimatedTimeByTemplateID(csvCtx, store, createdTemplate.ID)
 	return nil
 
 }
@@ -416,41 +417,7 @@ func addHoldStep(store Storer, record []string) (err error) {
 	}
 
 	logger.Infoln("Step Created for Hold: ", createdStep)
-	err = updateEstimatedTimeForStep(store, createdStep)
-	if err != nil {
-		logger.Errorln("error in updating estimated time for step", err)
-		return
-	}
-
 	return nil
-}
-
-func updateEstimatedTimeForStep(store Storer, step Step) (err error) {
-
-	var estimatedTime int64
-
-	stage, err := store.ShowStage(csvCtx, step.StageID)
-	template, err := store.ShowTemplate(csvCtx, stage.TemplateID)
-	tp := 0.0
-	tp += math.Abs(currentTemp-float64(step.TargetTemperature)) / float64(step.RampRate)
-	currentTemp = float64(step.TargetTemperature)
-	tp += float64(step.HoldTime)
-
-	switch stage.Type {
-	case cycle:
-		estimatedTime += int64(tp * float64(stage.RepeatCount))
-	case hold:
-		estimatedTime += int64(tp)
-	}
-
-	template.EstimatedTime = estimatedTime
-	err = store.UpdateTemplate(csvCtx, template)
-	if err != nil {
-		logger.Errorln("Couldn't update estimated time", err)
-		return
-	}
-
-	return
 }
 
 func addCycleStep(store Storer, record []string) (err error) {
@@ -486,11 +453,6 @@ func addCycleStep(store Storer, record []string) (err error) {
 	}
 
 	logger.Infoln("Step Created for Cycle: ", createdStep)
-	err = updateEstimatedTimeForStep(store, createdStep)
-	if err != nil {
-		logger.Errorln("error in updating estimated time for step", err)
-		return
-	}
 	return nil
 }
 
