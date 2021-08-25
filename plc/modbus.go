@@ -50,26 +50,27 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	"D": map[int]uint16{
 		//updated addresses
 		23: uint16(0x1017), //register for setting rotation pulses
-
-		460: uint16(0x11CC), //pid value is put here
+		100: uint16(0x1064), // heartbeat register (W)
+		134: uint16(0x1086), // Ideal Lid temperature (W)
+		135: uint16(0x1087), // Current Lid temperature (R)
+		410: uint16(0x119A), // General register offset for values! (unused for now)
+		460: uint16(0x11CC), // lid pid temp value is put here(W)
+		462: uint16(0x11CE), // scan speed (W)
+		464: uint16(0x11D0), // scan time (W)
 		//latest addresses for 16 wells
-		800: uint16(0x1320), //start address of register For FAM
-		816: uint16(0x1330), //start address of register For VIC
-		832: uint16(0x1340), //start address of register For ROX
-		848: uint16(0x1350), //start address of register For CY5
+		800: uint16(0x1320), //start address of register For FAM (R)
+		816: uint16(0x1330), //start address of register For VIC (R)
+		832: uint16(0x1340), //start address of register For ROX (R)
+		848: uint16(0x1350), //start address of register For CY5 (R)
 
 		// 864: uint16(0x1360), //start address of register For CY5
 		// 880: uint16(0x1370), //start address of register For CY5
 
-		100: uint16(0x1064), // heartbeat register (W)
 		// 101:  uint16(0x1065), // offset for holding stage config (W)
 		// 113:  uint16(0x1071), // offset for cycling stage config (W)
 		// 131:  uint16(0x1083), // Number of cycles to run (W)
 		// 132:  uint16(0x1084), // Current temperature (R)
 		// 133:  uint16(0x1085), // Current cycle (R)
-		134: uint16(0x1086), // Ideal Lid temperature (W)
-		135: uint16(0x1087), // Current Lid temperature (R)
-		410: uint16(0x119A), // General register offset for values! (unused for now)
 		// 2000: uint16(0x17D0), // Well Emission data 96x6 registers (R)
 		2577: uint16(0x1A11), // error code (R)
 	},
