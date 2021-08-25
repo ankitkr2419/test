@@ -78,6 +78,13 @@ func updateRTPCRConfigHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = deps.Plc.SetScanSpeedAndScanTime()
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.PLCDataUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PLCDataUpdateError.Error()})
+			return
+		}
+
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UpdateConfigSuccess})
 	})
 }
