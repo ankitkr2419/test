@@ -24,7 +24,7 @@ const SidebarSample = (props) => {
 
   const handleSampleCreate = (inputValue) => {
     // if inputValue is null then we update the sample as null and return.
-    if (inputValue === "") {
+    if (inputValue === "" || inputValue === null || inputValue === undefined) {
       updateCreateSampleWrapper("sample", null);
       return;
     }
@@ -51,12 +51,12 @@ const SidebarSample = (props) => {
     updateCreateSampleWrapper("sample", value);
   };
 
-  const handleTaskChange = (value) => {
-    updateCreateSampleWrapper("task", value);
+  const handleBlurChange = (value) => {
+    handleSampleCreate(value || sample?.label);
   };
 
-  const handleBlurChange = (value) => {
-    handleSampleCreate(value);
+  const handleTaskChange = (value) => {
+    updateCreateSampleWrapper("task", value);
   };
 
   return (
@@ -66,7 +66,7 @@ const SidebarSample = (props) => {
         isDisabled={isDisabled || isSampleListLoading}
         isLoading={isSampleListLoading}
         onChange={handleSampleChange}
-        // onBlur={(e) => handleBlurChange(e.target.value)}
+        onBlur={(e) => handleBlurChange(e.target.value)}
         onCreateOption={handleSampleCreate}
         onInputChange={handleSampleInputChange}
         options={sampleOptions}
