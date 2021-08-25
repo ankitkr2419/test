@@ -45,6 +45,11 @@ pid_lid_temp: 70
 start_cycle: 1
 end_cycle: 5
 
+#scan_speed
+scan_speed: 100
+#scan_time
+scan_time: 100
+
 
 ## For TEC
 # For TEC-1089
