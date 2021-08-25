@@ -153,6 +153,8 @@ var (
 	ConfigDataFetchError  = fmt.Errorf("error fetching Config data")
 	ConfigDataUpdateError = fmt.Errorf("error Updating Config data")
 
+	PLCDataUpdateError = fmt.Errorf("error updatinf PLC data")
+
 	InvalidExperimentID  = fmt.Errorf("Invalid experiment id")
 	ScaleDecodeError     = fmt.Errorf("error while decoding scale data")
 	InvalidScaleRange    = fmt.Errorf("error invalid scale range")
