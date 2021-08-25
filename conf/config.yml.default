@@ -64,6 +64,6 @@ PeltierDeltaTemperature: 75.00
 
 ##For Extraction
 micro_lit_pulses: 25
-shaker_rpm: 800
+shaker_steps_per_revolution: 800
 
 

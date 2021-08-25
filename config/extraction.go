@@ -9,8 +9,8 @@ import (
 type Extraction struct {
 	PIDTemperature   int64 `json:"pid_temperature" validate:"required,lte=75,gte=50"`
 	PIDMinutes       int64 `json:"pid_minutes" validate:"required,lte=40,gte=20"`
-	ShakerRPM        int64 `json:"shaker_rpm" validate:"lte=20000,gte=200"`
-	MicroLitrePulses int64 `json:"micro_lit_pulses" validate:"gte=25"`
+	ShakerRPM        int64 `json:"shaker_steps_per_revolution" validate:"lte=20000,gte=200"`
+	MicroLitrePulses int64 `json:"micro_lit_pulses" validate:"gte=1"`
 }
 
 func SetExtractionConfigValues(ex Extraction) (err error) {

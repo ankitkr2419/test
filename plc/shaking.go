@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
-	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
+
+const secondsInMinutes = 60
 
 // Shaking : function
 /* Algorithm ******************
@@ -30,7 +31,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 	var motorNum = K8_Shaker
 	var results []byte
 
-	rpmToPulses := float64(config.GetShakerRPM() / int64(time.Second))
+	rpmToPulses := float64(config.GetShakerRPM() / secondsInMinutes)
 
 	// 1. validate that rpm 1 is definately set and futher
 	if shakerData.RPM1 == 0 || shakerData.Time1 == 0 {
