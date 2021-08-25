@@ -42,6 +42,12 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 func lidPIDCalibrationStartHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
+		if plc.LidPidTuningInProgress {
+			logger.Errorln(responses.LidPIDTuningPresentError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.LidPIDTuningPresentError.Error()})
+			return
+		}
+
 		// TODO: Logging this API
 		go deps.Plc.LidPIDCalibration()
 
@@ -54,15 +60,16 @@ func lidPIDCalibrationStopHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		if !plc.LidPidTuningInProgress {
-			logger.Errorln(responses.LidPidTuningPresentError)
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.LidPidTuningPresentError.Error()})
+			logger.Errorln(responses.LidPidTuningStartError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.LidPidTuningStartError.Error()})
+			return
 		}
 
 		// Stop the lid PID Tuning
 		err := deps.Plc.Stop()
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error in plc stop")
-			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error(responses.LidPidTuningNotOffError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, MsgObj{Msg: responses.LidPidTuningNotOffError.Error()})
 			return
 		}
 

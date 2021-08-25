@@ -478,11 +478,10 @@ func (d *Compact32) switchOnLidTemp() (err error) {
 	return
 }
 
-// 1. Check for LID Tuning already in progress
-// 2. Set LID Tuning
-// 3. Write PID Temp to D 460
-// 4. Set M 42
-// 5. Continuously read M 43 till PID Tuning Success
+// 1. Set LID Tuning
+// 2. Write PID Temp to D 460
+// 3. Set M 42
+// 4. Continuously read M 43 till PID Tuning Success
 
 func (d *Compact32) LidPIDCalibration() (err error) {
 	// TODO: Logging this PLC Operation
@@ -497,13 +496,6 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	}()
 
 	// 1.
-	if isLidPIDTuningInProgress() {
-		err = responses.LidPIDTuningError
-		logger.Errorln(err)
-		return err
-	}
-
-	// 2.
 	setLidPIDTuningInProgress()
 	defer resetLidPIDTuningInProgress()
 
@@ -513,7 +505,7 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	// 	return
 	// }
 
-	// 3.
+	// 2.
 	result, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][460], uint16(config.GetLidPIDTemp()*10))
 	if err != nil {
 		logger.Errorln("Error failed to write lid pid temperature: ", err)
@@ -525,6 +517,7 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	// defer d.SwitchOffLidTemp()
 
 	// Start PID for deck
+	// 3.
 	err = d.switchOnLidPIDCalibration()
 	if err != nil {
 		return
@@ -534,6 +527,7 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	logger.Infoln(responses.PIDCalibrationStarted)
 
 	// Check if pid tuning is Done
+	// 4.
 	for !pidTuningDone {
 		pidTuningDone, err = d.readLidPIDCompletion()
 		if err != nil {
@@ -545,10 +539,6 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	logger.Infoln(responses.PIDCalibrationSuccess)
 
 	return
-}
-
-func isLidPIDTuningInProgress() bool {
-	return plc.LidPidTuningInProgress
 }
 
 func setLidPIDTuningInProgress() {
