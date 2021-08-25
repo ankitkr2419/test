@@ -102,6 +102,11 @@ const Plate = (props) => {
   const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
   const targetsData = experimentGraphTargetsList.toJS();
 
+  const thresholdArr = targetsData?.map((targetObj) =>
+    parseInt(targetObj.threshold)
+  );
+  const maxThreshold = thresholdArr.length > 0 ? Math.max(...thresholdArr) : 10;
+
   const experimentStatus = runExperimentDetails.get("experimentStatus");
 
   let experimentDetails =
@@ -125,7 +130,7 @@ const Plate = (props) => {
   const [xMinValue, setXMin] = useState(0);
   const [xMaxValue, setXMax] = useState(0);
   const [yMinValue, setYMin] = useState(0);
-  const [yMaxValue, setYMax] = useState(10);
+  const [yMaxValue, setYMax] = useState(maxThreshold);
 
   const [options, setOptions] = useState(initialOptions);
   const [isDataFromAPI, setDataFromAPI] = useState(false);
@@ -252,10 +257,6 @@ const Plate = (props) => {
 
   const handleResetBtn = (cycleCount) => {
     setDataFromAPI(true);
-
-    const thresholdArr = targetsData.map((targetObj) =>
-      parseInt(targetObj.threshold)
-    );
 
     setXMax(0);
     setXMin(0);
