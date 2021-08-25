@@ -58,13 +58,13 @@ const Filters = (props) => {
     <>
       {/** Target selector */}
       <div className="graph-filters d-flex">
-        <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3">
+        <Text Tag="h4" size={19} className="title mb-0 pr-3">
           Target
         </Text>
         <div style={{ width: "350px" }}>
           <Select
             placeholder="Select Target"
-            className="mb-4"
+            className="mb-3"
             options={targetOptions}
             value={selectedTarget}
             onChange={onTargetChanged}
@@ -73,12 +73,12 @@ const Filters = (props) => {
       </div>
 
       {/**threshold */}
-      <div className="d-flex">
+      <div className="threshold-filter d-flex">
         <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3">
           Threshold
         </Text>
         <div className="d-flex align-items-center flex-wrap flex-90">
-          <FormGroup className="d-flex align-items-center px-2">
+          <FormGroup className="d-flex align-items-center px-2 ml-2">
             <Switch
               id="thresholdToggler"
               name="thresholdToggler"
@@ -90,7 +90,7 @@ const Filters = (props) => {
             />
             {isAutoThreshold === false && (
               <>
-                <Label className="flex-40 text-right mb-0 p-1">Threshold</Label>
+                <Label className="flex-25 text-right mb-0 p-1">Threshold</Label>
                 <Input
                   name="thresholdValue"
                   type="number"
@@ -131,12 +131,12 @@ const Filters = (props) => {
       </div>
 
       {/**baseline */}
-      <div className="d-flex">
+      <div className="baseline-filter d-flex">
         <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3">
           Baseline
         </Text>
         <div className="d-flex align-items-center flex-wrap  flex-90">
-          <FormGroup className="d-flex align-items-center flex-35 px-2">
+          <FormGroup className="d-flex align-items-center flex-35 px-2 ml-2">
             <Switch
               id="baselineToggler"
               name="baselineToggler"
