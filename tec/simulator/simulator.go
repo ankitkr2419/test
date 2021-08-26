@@ -86,7 +86,7 @@ func (t *Simulator) ReachRoomTemp() error {
 	logger.Infoln("Reaching Room Temp")
 	ts := tec.TECTempSet{
 		TargetTemperature: config.GetRoomTemp(),
-		TargetRampRate:    tec.RoomTempRamp,
+		TargetRampRate:    db.RoomTempRamp,
 	}
 	t.SetTempAndRamp(ts)
 	logger.Infoln("Room Temp Reached")

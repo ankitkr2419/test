@@ -70,7 +70,7 @@ func updateStageHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go updateEstimatedTimeByTemplateID(req.Context(), deps.Store, t.TemplateID)
+		go db.UpdateEstimatedTimeByTemplateID(req.Context(), deps.Store, t.TemplateID)
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
@@ -133,7 +133,7 @@ func deleteStageHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go updateEstimatedTimeByTemplateID(req.Context(), deps.Store, stage.TemplateID)
+		go db.UpdateEstimatedTimeByTemplateID(req.Context(), deps.Store, stage.TemplateID)
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")

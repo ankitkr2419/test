@@ -154,12 +154,18 @@ var (
 	ConfigDataFetchError  = fmt.Errorf("error fetching Config data")
 	ConfigDataUpdateError = fmt.Errorf("error Updating Config data")
 
+	PLCDataUpdateError = fmt.Errorf("error updatinf PLC data")
+
 	InvalidExperimentID  = fmt.Errorf("Invalid experiment id")
 	ScaleDecodeError     = fmt.Errorf("error while decoding scale data")
 	InvalidScaleRange    = fmt.Errorf("error invalid scale range")
 	ExperimentFetchError = fmt.Errorf("error fetching experiment data")
 	ConfTargetFetchError = fmt.Errorf("error fetching target data")
 	ResultFetchError     = fmt.Errorf("error fetching result data")
+
+	InvalidEmailIDError = fmt.Errorf("error fetching result data")
+
+	PreviousExperimentProgressError = fmt.Errorf("error previous experiment already in progress")
 
 	InvalidEmailIDError = fmt.Errorf("error fetching result data")
 

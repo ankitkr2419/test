@@ -11,6 +11,7 @@ import (
 )
 
 const ErrorExtractionMonitor = "ErrorExtractionMonitor"
+const ErrorLidPIDTuning = "PID Error"
 
 type Status int32
 
@@ -53,11 +54,13 @@ type Driver interface {
 	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
 	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
 	Calibrate() error             // TBD
-	HomingRTPCR() error           //Homing of RTPCR
-	Reset() error                 //reseting the values
+	HomingRTPCR() error           // Homing of RTPCR
+	Reset() error                 // reseting the values
 	Cycle() error                 // start the cycle
 	SetLidTemp(uint16) error      // set Lid Temperature
-	SwitchOffLidTemp() error
+	SwitchOffLidTemp() error	  // Lid will return to room temp
+	LidPIDCalibration() error	  // LID PID Tuning
+	SetScanSpeedAndScanTime() error	  // Scan speed and Scan Time is settable by user
 }
 
 type HeaterData struct {

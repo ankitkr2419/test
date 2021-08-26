@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 
 	"time"
 
@@ -13,13 +14,14 @@ import (
 )
 
 const (
-	maxHomingTries             = 2
+	maxHomingTries             = 3
 	homingSuccessValue         = 37
 	noOfDyes                   = 4
 	fValueRegisterStartAddress = 800
 )
 
 var homingCount int
+var pidTuningInProgress bool
 
 // Interface Implementation Methods
 func (d *Compact32) HeartBeat() {
@@ -70,7 +72,6 @@ LOOP:
 	// something went wrong. Signal parent process
 	logger.WithField("err", err.Error()).Error("Heartbeat Error. Abort!")
 	d.ExitCh <- errors.New("PCR Dead")
-	return
 }
 
 // dataBlock creates a sequence of uint16 data. (ref: modbus/client.go)
@@ -153,6 +154,7 @@ func (d *Compact32) writeStageData(name string, stage plc.Stage) (err error) {
 
 func (d *Compact32) HomingRTPCR() (err error) {
 
+	homingCount++
 	defer func() {
 		homingCount = 0
 	}()
@@ -192,7 +194,6 @@ func (d *Compact32) HomingRTPCR() (err error) {
 	if result[0] == homingSuccessValue {
 		logger.WithField("HOMING", "Completed").Infoln("homing completed")
 	} else {
-		homingCount++
 		// Try Homing Again
 		err = d.HomingRTPCR()
 		if err != nil {
@@ -231,6 +232,12 @@ func (d *Compact32) Start() (err error) {
 }
 
 func (d *Compact32) Stop() (err error) {
+	if plc.LidPidTuningInProgress {
+		plc.LidPidTuningInProgress = false
+		d.ExitCh <- errors.New("PID Error")
+		return nil
+	}
+
 	plc.ExperimentRunning = false
 	d.ExitCh <- errors.New("PCR Aborted")
 	return nil
@@ -241,6 +248,13 @@ func (d *Compact32) Cycle() (err error) {
 	if !plc.ExperimentRunning {
 		return errors.New("experiment is not running or maybe aborted")
 	}
+
+	// get blocked if homing is in progress
+	for homingCount != 0 {
+		time.Sleep(2 * time.Second)
+		logger.Warnln("Homing is still in Progress, cycle will start once that is done.")
+	}
+
 	//For the cycle button
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][20], plc.ON)
 	if err != nil {
@@ -261,6 +275,7 @@ func (d *Compact32) Cycle() (err error) {
 
 	plc.DataCapture = true
 
+	go d.HomingRTPCR()
 	return
 }
 
@@ -351,9 +366,8 @@ func (d *Compact32) SetLidTemp(expectedLidTemp uint16) (err error) {
 	plc.CurrentLidTemp = float32(currentLidTemp) / 10
 
 	// Start Lid Heating
-	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][197], plc.ON)
+	err = d.switchOnLidTemp()
 	if err != nil {
-		logger.Errorln("WriteSingleCoil:M109 : Start Lid Heating")
 		return
 	}
 
@@ -450,5 +464,152 @@ func (d *Compact32) SwitchOffLidTemp() (err error) {
 		return
 	}
 	logger.WithField("LID TEMP OFF", "LID TEMP SWITCHED OFF").Infoln("LID TEMP SWITCHED OFF")
+	return
+}
+
+func (d *Compact32) switchOnLidTemp() (err error) {
+	// Switch On Lid Heating
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][197], plc.ON)
+	if err != nil {
+		logger.Errorln("Switch ON Lid Heating error")
+		return
+	}
+	logger.WithField("LID TEMP ON", "LID TEMP SWITCHED ON").Infoln("LID TEMP SWITCHED ON")
+	return
+}
+
+// 1. Set LID Tuning
+// 2. Write PID Temp to D 460
+// 3. Set M 42
+// 4. Continuously read M 43 till PID Tuning Success
+
+func (d *Compact32) LidPIDCalibration() (err error) {
+	// TODO: Logging this PLC Operation
+
+	var pidTuningDone bool
+
+	defer func() {
+		if err != nil {
+			logger.Errorln(err)
+			d.ExitCh <- fmt.Errorf(plc.ErrorLidPIDTuning)
+		}
+	}()
+
+	// 1.
+	setLidPIDTuningInProgress()
+	defer resetLidPIDTuningInProgress()
+
+	// Stop Lid Heating
+	// err = d.SwitchOffLidTemp()
+	// if err != nil {
+	// 	return
+	// }
+
+	// 2.
+	// ASK: @ketan if below temp is to be multiplied by 10
+	result, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][460], uint16(config.GetLidPIDTemp()*10))
+	if err != nil {
+		logger.Errorln("Error failed to write lid pid temperature: ", err)
+		return err
+	}
+	logger.Infoln("result from lid pid temperature set ", result, config.GetLidPIDTemp())
+
+	// Reset Lid Temp in defer
+	// defer d.SwitchOffLidTemp()
+
+	// Start PID for deck
+	// 3.
+	err = d.switchOnLidPIDCalibration()
+	if err != nil {
+		return
+	}
+	// Reset PID in defer
+	defer d.switchOffLidPIDCalibration()
+	logger.Infoln(responses.PIDCalibrationStarted)
+
+	// Check if pid tuning is Done
+	// 4.
+	for !pidTuningDone {
+		pidTuningDone, err = d.readLidPIDCompletion()
+		if err != nil {
+			return
+		}
+		time.Sleep(10 * time.Second)
+	}
+
+	logger.Infoln(responses.PIDCalibrationSuccess)
+
+	return
+}
+
+func setLidPIDTuningInProgress() {
+	plc.LidPidTuningInProgress = true
+	plc.ExperimentRunning = true
+
+}
+
+func resetLidPIDTuningInProgress() {
+	plc.LidPidTuningInProgress = false
+	plc.ExperimentRunning = false
+}
+
+func (d *Compact32) switchOnLidPIDCalibration() (err error) {
+	// Switch On Lid PID Tuning
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.ON)
+	if err != nil {
+		logger.Errorln("Switch ON Lid PID Tuning error")
+		return
+	}
+	logger.WithField("LID PID TEMP ON", "LID PID TEMP SWITCHED ON").Infoln("LID PID TEMP SWITCHED ON")
+	return
+}
+
+func (d *Compact32) switchOffLidPIDCalibration() (err error) {
+	// Off Lid PID Tuning
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.OFF)
+	if err != nil {
+		logger.Errorln("Stop Lid PID Tuning error")
+		return
+	}
+	logger.WithField("LID PID TEMP OFF", "LID PID TEMP SWITCHED OFF").Infoln("LID PID TEMP SWITCHED OFF")
+	return
+}
+
+func (d *Compact32) readLidPIDCompletion() (pidTuningDone bool, err error) {
+
+	if !plc.LidPidTuningInProgress {
+		return false, responses.LidPidTuningOffError
+	}
+
+	result, err := d.Driver.ReadCoils(plc.MODBUS["M"][43], 1)
+	if err != nil {
+		logger.WithField("LID PID ERR", err).Errorln("Error Reading M43")
+		return false, err
+	}
+
+	logger.Infoln("readLidPIDCompletion result: ", result)
+
+	if result[0] == 44 {
+		return true, nil
+	}
+
+	return
+}
+
+func (d *Compact32) SetScanSpeedAndScanTime() (err error) {
+
+	result, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][462], uint16(config.GetScanSpeed()))
+	if err != nil {
+		logger.Errorln("Error failed to write scan speed: ", err)
+		return err
+	}
+	logger.Infoln("result from scan speed set ", result, config.GetScanSpeed())
+
+	result, err = d.Driver.WriteSingleRegister(plc.MODBUS["D"][464], uint16(config.GetScanTime()))
+	if err != nil {
+		logger.Errorln("Error failed to write scan time: ", err)
+		return err
+	}
+	logger.Infoln("result from scan time set ", result, config.GetScanTime())
 	return
 }
