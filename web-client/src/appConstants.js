@@ -174,6 +174,7 @@ export const MODAL_MESSAGE = {
   deleteTemplateConfirmation: "Are you sure you want to delete this template?",
   deleteStepConfirmation: "Are you sure you want to delete this step?",
   deleteActivityConfirmation: "Are you sure you want to delete this activity?",
+  forgotPasswordMsg: "Contact admin to change your password",
 };
 
 export const MODAL_BTN = {
