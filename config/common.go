@@ -15,12 +15,12 @@ func SetCommonConfigValues(co Common) (err error) {
 
 	oldString, newString = []string{}, []string{}
 	oldString = append(oldString,
-		fmt.Sprintf("room_temperature: %.2f", GetRoomTemp()),
+		fmt.Sprintf("room_temp: %.2f", GetRoomTemp()),
 		fmt.Sprintf("receiver_email: %s", GetReceiverEmail()),
 		fmt.Sprintf("receiver_name: %s", GetReceiverName()),
 	)
 	newString = append(newString,
-		fmt.Sprintf("room_temperature: %.2f", co.RoomTemperature),
+		fmt.Sprintf("room_temp: %.2f", co.RoomTemperature),
 		fmt.Sprintf("receiver_email: %s", co.ReceiverEmail),
 		fmt.Sprintf("receiver_name: %s", co.ReceiverName),
 	)

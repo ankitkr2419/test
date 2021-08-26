@@ -69,7 +69,7 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go updateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
+		go db.UpdateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
 
 		responseCodeAndMsg(rw, http.StatusCreated, createdTemp)
 	})
@@ -108,7 +108,7 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go updateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
+		go db.UpdateEstimatedTimeByStageID(req.Context(), deps.Store, t.StageID)
 
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: "step updated successfully"})
 	})
@@ -177,7 +177,7 @@ func deleteStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go updateEstimatedTimeByStageID(req.Context(), deps.Store, step.StageID)
+		go db.UpdateEstimatedTimeByStageID(req.Context(), deps.Store, step.StageID)
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Add("Content-Type", "application/json")
