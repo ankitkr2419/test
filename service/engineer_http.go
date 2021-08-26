@@ -2,11 +2,13 @@ package service
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	logger "github.com/sirupsen/logrus"
 )
 
 func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
@@ -34,6 +36,44 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.PIDCalibrationStarted)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PIDCalibrationStarted})
+	})
+}
+
+func lidPIDCalibrationStartHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		if plc.LidPidTuningInProgress {
+			logger.Errorln(responses.LidPIDTuningPresentError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.LidPIDTuningPresentError.Error()})
+			return
+		}
+
+		// TODO: Logging this API
+		go deps.Plc.LidPIDCalibration()
+
+		logger.Infoln(responses.PIDCalibrationStarted)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PIDCalibrationStarted})
+	})
+}
+
+func lidPIDCalibrationStopHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		if !plc.LidPidTuningInProgress {
+			logger.Errorln(responses.LidPidTuningStartError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.LidPidTuningStartError.Error()})
+			return
+		}
+
+		// Stop the lid PID Tuning
+		err := deps.Plc.Stop()
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.LidPidTuningNotOffError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, MsgObj{Msg: responses.LidPidTuningNotOffError.Error()})
+			return
+		}
+
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.LidPIDTuningStopped})
 	})
 }
 

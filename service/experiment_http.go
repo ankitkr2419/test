@@ -8,6 +8,7 @@ import (
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
+	"mylab/cpagent/responses"
 	"net/http"
 	"time"
 
@@ -150,6 +151,12 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		if plc.ExperimentRunning {
+			logger.Errorln(responses.PreviousExperimentProgressError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PreviousExperimentProgressError.Error()})
+		}
+
 		// create  new file for each experiment with experiment id in file name.
 		file := db.GetExcelFile(ExpOutputPath, fmt.Sprintf("output_%v", expID))
 
@@ -327,7 +334,6 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`{"msg":"experiment started"}`))
-		return
 	})
 }
 
@@ -406,7 +412,6 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 		if err != nil {
 			deps.WsErrCh <- err
 		}
-		return
 	}()
 
 	err = deps.Tec.ReachRoomTemp()
@@ -427,12 +432,12 @@ func startExp(deps Dependencies, p plc.Stage, file *excelize.File) (err error) {
 	// invoke monitor after 2 secs
 	go func() {
 		time.Sleep(2 * time.Second)
-		defer func(){
-        	if r := recover(); r != nil {
-            	logger.Errorln("Monitor panicked: ", r)
-            	ShutDownGracefully(deps)
-        	}
-    	}()
+		defer func() {
+			if r := recover(); r != nil {
+				logger.Errorln("Monitor panicked: ", r)
+				ShutDownGracefully(deps)
+			}
+		}()
 		monitorExperiment(deps, file)
 	}()
 
