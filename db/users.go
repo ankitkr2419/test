@@ -20,10 +20,14 @@ const (
 				password,
 			    role)
 				VALUES  `
-	insertUsersQuery2 = ` ON CONFLICT DO NOTHING;`
+	insertUsersQuery2 = ` ON CONFLICT (username) DO UPDATE                           
+	SET disabled = false ,
+	role = excluded.role,
+	password = excluded.password                                                                            
+	where users.username = excluded.username;`
 
 	updateUsersQuery = `UPDATE users SET username=$1, password=$2, role= $3 where username=$4 `
-	deleteUserQuery  = `DELETE FROM users where username = $1`
+	deleteUserQuery  = `UPDATE users SET disabled = true where username = $1`
 )
 
 type User struct {
