@@ -145,8 +145,9 @@ var (
 	RearrangeProcessCompletedState   = "rearrange process completed"
 
 	//RTPCR
-	RTPCRHomingSuccess = "Homing Success"
-	RTPCRResetSuccess  = "Reset Success"
+	RTPCRHomingSuccess  = "Homing Success"
+	RTPCRResetSuccess   = "Reset Success"
+	LidPIDTuningStopped = "PID Tuning stopped successfully"
 
 	// Configs
 	UpdateConfigSuccess = "Config was updated successfully"
