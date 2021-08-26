@@ -111,6 +111,7 @@ var (
 	UserAuthDataDeleteError   = fmt.Errorf("error in deleting authenticated user data")
 	UserTokenApplicationError = fmt.Errorf("error in token application type")
 	UserInvalidDeckError      = fmt.Errorf("error invalid deck")
+	UserDeleteError           = fmt.Errorf("error delete user")
 
 	//user authenticate
 	UserUnauthorised              = fmt.Errorf("error user unauthorised")
@@ -160,8 +161,8 @@ var (
 	ConfTargetFetchError = fmt.Errorf("error fetching target data")
 	ResultFetchError     = fmt.Errorf("error fetching result data")
 
-	InvalidEmailIDError  = fmt.Errorf("error fetching result data")
-	
+	InvalidEmailIDError = fmt.Errorf("error fetching result data")
+
 	ReportAbsent = fmt.Errorf("report is absent in form data!")
 )
 

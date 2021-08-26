@@ -71,6 +71,8 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/login/{deck:[A-B]?}", validateUserHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	//userlogout
 	router.HandleFunc("/logout/{deck:[A-B]?}", authenticate(logoutUserHandler(deps), deps, Combined)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	//userDelete
+	router.HandleFunc("/users/delete/{username}", authenticate(deleteUserHandler(deps), deps, Combined, supervisor, admin)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
 	// configs
 	router.HandleFunc("/common-configs", authenticate(getCommonConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)

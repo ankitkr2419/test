@@ -23,6 +23,7 @@ const (
 	insertUsersQuery2 = ` ON CONFLICT DO NOTHING;`
 
 	updateUsersQuery = `UPDATE users SET username=$1, password=$2, role= $3 where username=$4 `
+	deleteUserQuery  = `DELETE FROM users where username = $1`
 )
 
 type User struct {
@@ -104,5 +105,18 @@ func (s *pgStore) ShowUser(ctx context.Context, username string) (user User, err
 		logger.WithField("err", err.Error()).Error("Error fetching user")
 		return
 	}
+	return
+}
+
+func (s *pgStore) DeleteUser(ctx context.Context, username string) (err error) {
+	_, err = s.db.Exec(
+		deleteUserQuery,
+		username,
+	)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error deleting User")
+		return
+	}
+
 	return
 }

@@ -241,3 +241,17 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 
 	})
 }
+
+func deleteUserHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		vars := mux.Vars(req)
+		username := vars["username"]
+		err := deps.Store.DeleteUser(req.Context(), username)
+		if err != nil {
+			logger.WithField("err", err.Error())
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserDeleteError.Error()})
+		}
+
+	})
+}
