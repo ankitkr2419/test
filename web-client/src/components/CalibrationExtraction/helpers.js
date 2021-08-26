@@ -7,12 +7,14 @@ export const formikInitialState = {
 export const isBtnDisabled = (state) => {
   const { motorNumber, direction, distance } = state;
   if (
-    motorNumber.isInvalid ||
-    direction.isInvalid ||
-    distance.isInvalid ||
     !motorNumber.value ||
-    !direction.value ||
-    !distance.value
+    !distance.value ||
+    motorNumber.isInvalid ||
+    distance.isInvalid ||
+    direction.isInvalid ||
+    direction.value === "" ||
+    direction.value === null ||
+    direction.value === undefined
   ) {
     return true;
   }

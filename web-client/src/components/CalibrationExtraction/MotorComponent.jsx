@@ -159,7 +159,7 @@ const MotorComponent = (props) => {
             <Col>
               <Center className="text-center pt-3">
                 <Button disabled={isBtnDisabled(formik.values)} color="primary">
-                  Add Motor Details
+                  Start Motor
                 </Button>
               </Center>
             </Col>
