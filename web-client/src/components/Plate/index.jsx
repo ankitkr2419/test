@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
+import generatePdfIcon from "assets/images/generatePdfIcon.svg";
 
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
@@ -15,7 +16,7 @@ import GridComponent from "./Grid";
 import WellGridHeader from "./Grid/WellGridHeader";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
-import { ButtonIcon, Text } from "shared-components";
+import { ButtonIcon, ImageIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
@@ -44,8 +45,8 @@ const initialOptions = {
         ticks: {
           fontSize: 15,
           fontStyle: "bold",
-          min: 1,
-          max: 5,
+          min: 0,
+          max: 4,
         },
       },
     ],
@@ -102,6 +103,11 @@ const Plate = (props) => {
   const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
   const targetsData = experimentGraphTargetsList.toJS();
 
+  const thresholdArr = targetsData?.map((targetObj) =>
+    parseInt(targetObj.threshold)
+  );
+  const maxThreshold = thresholdArr.length > 0 ? Math.max(...thresholdArr) : 10;
+
   const experimentStatus = runExperimentDetails.get("experimentStatus");
 
   let experimentDetails =
@@ -122,10 +128,10 @@ const Plate = (props) => {
   const [previewReportModal, setPreviewReportModal] = useState(false);
 
   // default ranges for amplification plot
-  const [xMinValue, setXMin] = useState(1);
-  const [xMaxValue, setXMax] = useState(5);
+  const [xMinValue, setXMin] = useState(0);
+  const [xMaxValue, setXMax] = useState(0);
   const [yMinValue, setYMin] = useState(0);
-  const [yMaxValue, setYMax] = useState(5);
+  const [yMaxValue, setYMax] = useState(maxThreshold);
 
   const [options, setOptions] = useState(initialOptions);
   const [isDataFromAPI, setDataFromAPI] = useState(false);
@@ -252,10 +258,6 @@ const Plate = (props) => {
 
   const handleResetBtn = (cycleCount) => {
     setDataFromAPI(true);
-
-    const thresholdArr = experimentGraphTargetsList
-      .toJS()
-      .map((targetObj) => parseInt(targetObj.threshold));
 
     setXMax(0);
     setXMin(0);
@@ -420,13 +422,22 @@ const Plate = (props) => {
                     </Button>
                   )}
 
-                  <ButtonIcon
+                  {/* <ButtonIcon
                     name="download-1"
                     size={28}
                     className="bg-white border-secondary ml-auto downloadButton"
                     onClick={downloadClickHandler}
-                  />
+                  /> */}
+
+                  <div className="ml-auto" onClick={downloadClickHandler}>
+                    <ImageIcon
+                      src={generatePdfIcon}
+                      alt="icon not available"
+                      style={{ cursor: "pointer", maxHeight: 40 }}
+                    />
+                  </div>
                 </div>
+
                 <ExperimentGraphContainer
                   isInsidePreviewModal={false}
                   headerData={headerData}
