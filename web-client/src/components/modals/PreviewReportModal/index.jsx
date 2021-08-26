@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import emailIcon from "assets/images/emailIcon.svg";
 import { useSelector, useDispatch } from "react-redux";
 
 import { Modal, ModalBody, Button } from "core-components";
-import { Text, ButtonIcon } from "shared-components";
+import { Text, ButtonIcon, ImageIcon } from "shared-components";
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import Header from "components/Plate/Header";
 import { saveReportInitiated } from "action-creators/reportActionCreators";
@@ -195,12 +196,14 @@ const PreviewReportModal = (props) => {
           >
             Save
           </Button>
-          <ButtonIcon
-            name="published"
-            size={28}
-            className="bg-white border-secondary ml-3"
-            onClick={mailBtnHandler}
-          />
+
+          <div className="ml-3" onClick={mailBtnHandler}>
+            <ImageIcon
+              src={emailIcon}
+              alt="icon not available"
+              style={{ cursor: "pointer", maxHeight: 40 }}
+            />
+          </div>
         </div>
 
         {loading === false && (

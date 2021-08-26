@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
+import generatePdfIcon from "assets/images/generatePdfIcon.svg";
 
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
@@ -15,7 +16,7 @@ import GridComponent from "./Grid";
 import WellGridHeader from "./Grid/WellGridHeader";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
-import { ButtonIcon, Text } from "shared-components";
+import { ButtonIcon, ImageIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
@@ -421,13 +422,22 @@ const Plate = (props) => {
                     </Button>
                   )}
 
-                  <ButtonIcon
+                  {/* <ButtonIcon
                     name="download-1"
                     size={28}
                     className="bg-white border-secondary ml-auto downloadButton"
                     onClick={downloadClickHandler}
-                  />
+                  /> */}
+
+                  <div className="ml-auto" onClick={downloadClickHandler}>
+                    <ImageIcon
+                      src={generatePdfIcon}
+                      alt="icon not available"
+                      style={{ cursor: "pointer", maxHeight: 40 }}
+                    />
+                  </div>
                 </div>
+
                 <ExperimentGraphContainer
                   isInsidePreviewModal={false}
                   headerData={headerData}
