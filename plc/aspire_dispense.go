@@ -3,6 +3,7 @@ package plc
 import (
 	"fmt"
 	"math"
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 
 	logger "github.com/sirupsen/logrus"
@@ -267,7 +268,7 @@ skipToAspireInside:
 	deckAndMotor.Number = K10_Syringe_LHRH
 	// for volume :-> 25 pulses = 1 microLitres
 	// NOTE: Store volumes in microLitres only
-	oneMicroLitrePulses := 25.0
+	oneMicroLitrePulses := float64(config.GetMicroLitrePulses())
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireMixingVolume))
 
 	if ad.AspireNoOfCycles == 0 {

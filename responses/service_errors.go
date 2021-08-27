@@ -111,6 +111,8 @@ var (
 	UserAuthDataDeleteError   = fmt.Errorf("error in deleting authenticated user data")
 	UserTokenApplicationError = fmt.Errorf("error in token application type")
 	UserInvalidDeckError      = fmt.Errorf("error invalid deck")
+	UserDeleteError           = fmt.Errorf("error delete user")
+	SameUserDeleteError       = fmt.Errorf("error trying to delete same user")
 
 	//user authenticate
 	UserUnauthorised              = fmt.Errorf("error user unauthorised")
@@ -153,6 +155,8 @@ var (
 	ConfigDataFetchError  = fmt.Errorf("error fetching Config data")
 	ConfigDataUpdateError = fmt.Errorf("error Updating Config data")
 
+	PLCDataUpdateError = fmt.Errorf("error updatinf PLC data")
+
 	InvalidExperimentID  = fmt.Errorf("Invalid experiment id")
 	ScaleDecodeError     = fmt.Errorf("error while decoding scale data")
 	InvalidScaleRange    = fmt.Errorf("error invalid scale range")
@@ -160,8 +164,10 @@ var (
 	ConfTargetFetchError = fmt.Errorf("error fetching target data")
 	ResultFetchError     = fmt.Errorf("error fetching result data")
 
-	InvalidEmailIDError  = fmt.Errorf("error fetching result data")
-	
+	InvalidEmailIDError = fmt.Errorf("error fetching result data")
+
+	PreviousExperimentProgressError = fmt.Errorf("error previous experiment already in progress")
+
 	ReportAbsent = fmt.Errorf("report is absent in form data!")
 )
 
