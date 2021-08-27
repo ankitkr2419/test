@@ -162,3 +162,22 @@ func heaterHandler(deps Dependencies) http.HandlerFunc {
 		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: responses.HeatingSuccess})
 	})
 }
+
+func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		var dyeWellTolerance []db.DyeWellTolerance
+		err := json.NewDecoder(req.Body).Decode(&dyeWellTolerance)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.DyeToleranceDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeToleranceDecodeError.Error()})
+			return
+		}
+
+		createdData, err := deps.Store.InsertDyeWellTolerance(req.Context(), dyeWellTolerance)
+
+		logger.Infoln(responses.DyeToleranceCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, createdData)
+
+	})
+}
