@@ -216,6 +216,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	}
 
 	// Aspire some Air
+	deckAndMotor.Number = K10_Syringe_LHRH
 	oneMicroLitrePulses := float64(config.GetMicroLitrePulses())
 	pulses = uint16(math.Round(oneMicroLitrePulses * airReserve))
 
