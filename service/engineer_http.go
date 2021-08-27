@@ -176,7 +176,7 @@ func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeToleranceDecodeError.Error()})
 			return
 		}
-
+		//validate the kit id
 		for _, v := range dyeWellTolerance {
 			dye, err := deps.Store.ShowDye(req.Context(), v.DyeID)
 			if err != nil {
@@ -190,9 +190,8 @@ func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 				return
 			}
 		}
-		//validate the kit id
 
-		// write logic to caculate the optical result and then store the data to the database
+		// write logic to calculate the optical result and then store the data to the database
 
 		err = deps.Store.UpsertDyeWellTolerance(req.Context(), dyeWellTolerance)
 		if err != nil {
@@ -213,17 +212,20 @@ func validateKitID(kitID string, dyePos int) (valid bool) {
 	kitIDArr := strings.Split(kitID, "")
 
 	if !(len(kitIDArr) == 8) {
+		logger.Errorln("length of kit id is invalid")
 		valid = false
 		return
 	}
 
 	year, err := strconv.ParseInt(strings.Join(kitIDArr[0:2], ""), 10, 64)
 	if err != nil {
+		logger.Errorln("year of kit id is invalid")
 		valid = false
 	}
 	// we need the last two digit hence sustracting 2000
 	prevInvalidYear := time.Now().Year() - 3 - 2000
 	if year <= int64(prevInvalidYear) {
+		logger.Errorln("year of kit id is outdated")
 		valid = false
 	}
 	_, err = strconv.ParseInt(strings.Join(kitIDArr[3:5], ""), 10, 64)
@@ -235,14 +237,17 @@ func validateKitID(kitID string, dyePos int) (valid bool) {
 	if err != nil {
 		monthStr := strings.ToUpper(kitIDArr[6])
 		if !([]rune(monthStr)[0] >= 'A' && []rune(monthStr)[0] <= 'C') {
+			logger.Errorln("month of kit id is invalid")
 			valid = false
 		}
 	}
 	if !(month > 1 && month < 9) {
+		logger.Errorln("month of kit id is invalid")
 		valid = false
 	}
 	dyePosition, err := strconv.ParseInt(kitIDArr[7], 10, 64)
 	if dyePosition != int64(dyePos) || err != nil {
+		logger.Errorln("dye position of kit id is invalid")
 		valid = false
 	}
 
