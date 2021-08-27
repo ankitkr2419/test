@@ -6,6 +6,9 @@ import (
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -174,10 +177,74 @@ func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		createdData, err := deps.Store.InsertDyeWellTolerance(req.Context(), dyeWellTolerance)
+		for _, v := range dyeWellTolerance {
+			dye, err := deps.Store.ShowDye(req.Context(), v.DyeID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Errorln(responses.DyeDBFetchError)
+				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeDBFetchError.Error()})
+				return
+			}
+			if !validateKitID(v.KitID, dye.Position) {
+				logger.WithField("err", "INVALID KIT ID").Errorln(responses.InvalidKitIDError)
+				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidKitIDError.Error()})
+				return
+			}
+		}
+		//validate the kit id
+
+		// write logic to caculate the optical result and then store the data to the database
+
+		err = deps.Store.UpsertDyeWellTolerance(req.Context(), dyeWellTolerance)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.DyeToleranceDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeToleranceDecodeError.Error()})
+			return
+		}
 
 		logger.Infoln(responses.DyeToleranceCreateSuccess)
-		responseCodeAndMsg(rw, http.StatusCreated, createdData)
+		responseCodeAndMsg(rw, http.StatusCreated, "created successfully")
 
 	})
+}
+
+func validateKitID(kitID string, dyePos int) (valid bool) {
+
+	valid = true
+	kitIDArr := strings.Split(kitID, "")
+
+	if !(len(kitIDArr) == 8) {
+		valid = false
+		return
+	}
+
+	year, err := strconv.ParseInt(strings.Join(kitIDArr[0:2], ""), 10, 64)
+	if err != nil {
+		valid = false
+	}
+	// we need the last two digit hence sustracting 2000
+	prevInvalidYear := time.Now().Year() - 3 - 2000
+	if year <= int64(prevInvalidYear) {
+		valid = false
+	}
+	_, err = strconv.ParseInt(strings.Join(kitIDArr[3:5], ""), 10, 64)
+	if err != nil {
+		valid = false
+	}
+
+	month, err := strconv.ParseInt(kitIDArr[6], 10, 64)
+	if err != nil {
+		monthStr := strings.ToUpper(kitIDArr[6])
+		if !([]rune(monthStr)[0] >= 'A' && []rune(monthStr)[0] <= 'C') {
+			valid = false
+		}
+	}
+	if !(month > 1 && month < 9) {
+		valid = false
+	}
+	dyePosition, err := strconv.ParseInt(kitIDArr[7], 10, 64)
+	if dyePosition != int64(dyePos) || err != nil {
+		valid = false
+	}
+
+	return
 }

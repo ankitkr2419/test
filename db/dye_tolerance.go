@@ -11,9 +11,9 @@ import (
 
 type DyeWellTolerance struct {
 	ID            uuid.UUID `db:"id" json:"id"`
-	DyeID         uuid.UUID `db:"dye_id" json:"dye_id"`
+	DyeID         uuid.UUID `db:"dye_id" json:"dye_id" validate:"required"`
 	WellNo        int       `db:"well_no" json:"well_no"`
-	KitID         string    `db:"kit_id" json:"kit_id"`
+	KitID         string    `db:"kit_id" json:"kit_id" validate:"required,len=8"`
 	OpticalResult float64   `db:"optical_result" json:"optical_result"`
 }
 
@@ -24,15 +24,16 @@ const (
 		kit_id,
 		optical_result)
 		VALUES %s`
-	insertDyeWellToleranceQuery2 = ` ON CONFLICT ( dye_id , kit_id ) DO UPDATE
-	SET optical_result = excluded.optical_result                                                                             
-	where dye_well_tolerance.dye_id = excluded.dye_id AND dye_well_tolerance. kit_id = excluded. kit_id ;`
+	insertDyeWellToleranceQuery2 = ` ON CONFLICT (dye_id,well_no) DO UPDATE
+	SET kit_id = excluded.kit_id,
+	optical_result = excluded.optical_result                                                                            
+	where dye_well_tolerance.dye_id = excluded.dye_id AND dye_well_tolerance.well_no = excluded.well_no;`
 )
 
-func (s *pgStore) InsertDyeWellTolerance(ctx context.Context, dwTolerance []DyeWellTolerance) (result DyeWellTolerance, err error) {
+func (s *pgStore) UpsertDyeWellTolerance(ctx context.Context, dwTolerance []DyeWellTolerance) (err error) {
 	stmt := makeDyeWellToleranceQuery(dwTolerance)
 
-	logger.Debugln("tolerance Query: ", stmt)
+	logger.Infoln("tolerance Query: ", stmt)
 	_, err = s.db.Exec(
 		stmt,
 	)
@@ -53,7 +54,7 @@ func makeDyeWellToleranceQuery(dwTolerance []DyeWellTolerance) string {
 	stmt := fmt.Sprintf(insertDyeWellToleranceQuery1,
 		strings.Join(values, ","))
 
-	stmt += insertConsDistaceQuery2
+	stmt += insertDyeWellToleranceQuery2
 
 	return stmt
 }

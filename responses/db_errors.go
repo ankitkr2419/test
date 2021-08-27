@@ -69,4 +69,5 @@ var (
 
 	CSVBadContentError = fmt.Errorf("error unparsable content found in csv import")
 	BlankDetailsError  = fmt.Errorf("error blank details found")
+	DyeDBFetchError    = fmt.Errorf("error failed to fetch dye")
 )

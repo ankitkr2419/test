@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"mylab/cpagent/responses"
 	"strings"
 
 	"github.com/google/uuid"
@@ -16,7 +17,8 @@ const (
 				VALUES %s `
 	insertDyeQuery2 = `ON CONFLICT DO NOTHING;`
 
-	getDyes = `SELECT * FROM dyes`
+	getDyes         = `SELECT * FROM dyes`
+	getDyeByIDQuery = `SELECT * FROM dyes WHERE id = $1`
 )
 
 type Dye struct {
@@ -43,6 +45,16 @@ func (s *pgStore) InsertDyes(ctx context.Context, dyes []Dye) (DBdyes []Dye, err
 		return
 	}
 	return
+}
+func (s *pgStore) ShowDye(ctx context.Context, dyeID uuid.UUID) (DBdye Dye, err error) {
+
+	err = s.db.Get(&DBdye, getDyeByIDQuery, dyeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln(responses.DyeDBFetchError)
+		return
+	}
+	return
+
 }
 
 // prepare bulk insert query statement

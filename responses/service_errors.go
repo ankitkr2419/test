@@ -168,6 +168,7 @@ var (
 
 	ReportAbsent            = fmt.Errorf("report is absent in form data!")
 	DyeToleranceDecodeError = fmt.Errorf("error decoding dye tolerance data!")
+	InvalidKitIDError       = fmt.Errorf("error invalid kit id!")
 )
 
 // Special errors which are in []byte format
