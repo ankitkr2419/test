@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
@@ -66,16 +67,16 @@ func SetTECConfigValues(tec TEC) (err error) {
 
 	oldString, newString = []string{}, []string{}
 	oldString = append(oldString,
-		fmt.Sprintf("CurrentLimitation : %.2f", GetCurrentLimitation()),
-		fmt.Sprintf("VoltageLimitation : %.2f", GetVoltageLimitation()),
+		fmt.Sprintf("CurrentLimitation: %.2f", GetCurrentLimitation()),
+		fmt.Sprintf("VoltageLimitation: %.2f", GetVoltageLimitation()),
 		fmt.Sprintf("CurrentErrorThreshold: %.2f", GetCurrentErrorThreshold()),
 		fmt.Sprintf("VoltageErrorThreshold: %.2f", GetVoltageErrorThreshold()),
 		fmt.Sprintf("PeltierMaxCurrent: %.2f", GetPeltierMaxCurrent()),
 		fmt.Sprintf("PeltierDeltaTemperature: %.2f", GetPeltierDeltaTemperature()),
 	)
 	newString = append(newString,
-		fmt.Sprintf("CurrentLimitation : %.2f", tec.CurrentLimitation),
-		fmt.Sprintf("VoltageLimitation : %.2f", tec.VoltageLimitation),
+		fmt.Sprintf("CurrentLimitation: %.2f", tec.CurrentLimitation),
+		fmt.Sprintf("VoltageLimitation: %.2f", tec.VoltageLimitation),
 		fmt.Sprintf("CurrentErrorThreshold: %.2f", tec.CurrentErrorThreshold),
 		fmt.Sprintf("VoltageErrorThreshold: %.2f", tec.VoltageErrorThreshold),
 		fmt.Sprintf("PeltierMaxCurrent: %.2f", tec.PeltierMaxCurrent),
@@ -98,11 +99,11 @@ func SetTECConfigValues(tec TEC) (err error) {
 
 func GetTECConfigValues() TEC {
 	return TEC{
-		CurrentLimitation: GetCurrentLimitation(),
-		VoltageLimitation:  GetVoltageLimitation(),
-		CurrentErrorThreshold: GetCurrentErrorThreshold(),
-		VoltageErrorThreshold: GetVoltageErrorThreshold(),
-		PeltierMaxCurrent: GetPeltierMaxCurrent(),
+		CurrentLimitation:       GetCurrentLimitation(),
+		VoltageLimitation:       GetVoltageLimitation(),
+		CurrentErrorThreshold:   GetCurrentErrorThreshold(),
+		VoltageErrorThreshold:   GetVoltageErrorThreshold(),
+		PeltierMaxCurrent:       GetPeltierMaxCurrent(),
 		PeltierDeltaTemperature: GetPeltierDeltaTemperature(),
 	}
 }

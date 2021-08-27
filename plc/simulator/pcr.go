@@ -221,3 +221,8 @@ func (d *Simulator) SwitchOffLidTemp() (err error) {
 
 	return
 }
+
+func (d *Simulator) SetScanSpeedAndScanTime() (err error) {
+	// TBD
+	return
+}
