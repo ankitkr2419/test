@@ -5,9 +5,73 @@ import {
   pidActions,
   updateCalibrationActions,
   motorActions,
+  commonDetailsActions,
+  updateCommonDetailsActions,
 } from "actions/calibrationActions";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
+
+const commonDetailsInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  isUpdateApi: null, // to distinguish between fetch and put API
+  details: {},
+});
+
+export const commonDetailsReducer = (
+  state = commonDetailsInitialState,
+  action
+) => {
+  switch (action.type) {
+    case commonDetailsActions.commonDetailsInitiated:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: false,
+      });
+    case commonDetailsActions.commonDetailsSuccess:
+      const res = action.payload.response;
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: false,
+        details: res,
+      });
+    case commonDetailsActions.commonDetailsFailure:
+      return state.merge({
+        isLoading: false,
+        isUpdateApi: false,
+        error: true,
+      });
+
+    case updateCommonDetailsActions.updateCommonDetaislInitiated:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case updateCommonDetailsActions.updateCommonDetaislSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+    case updateCommonDetailsActions.updateCommonDetaislFailure:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+    case commonDetailsActions.commonDetailsReset:
+      return commonDetailsInitialState;
+
+    case updateCommonDetailsActions.updateCommonDetaislReset:
+      return commonDetailsInitialState;
+
+    default:
+      return state;
+  }
+};
 
 const calibrationInitialState = fromJS({
   isLoading: false,
@@ -154,6 +218,7 @@ export const pidProgessReducer = (state = pidProgressInitialState, action) => {
 const pidInitialState = fromJS({
   isLoading: false,
   error: null,
+  pidStatus: null,
   configs: {},
 });
 
@@ -172,6 +237,26 @@ export const pidReducer = (state = pidInitialState, action) => {
       return state.merge({
         isLoading: false,
         pidStatus: PID_STATUS.runFailed,
+      });
+
+    case pidActions.pidAbortActionInitiated:
+      return state.merge({
+        isLoading: true,
+        pidStatus: PID_STATUS.aborting,
+      });
+
+    case pidActions.pidAbortActionSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        pidStatus: PID_STATUS.stopped,
+      });
+
+    case pidActions.pidAbortActionFailure:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        pidStatus: PID_STATUS.abortFailed,
       });
 
     case loginActions.loginReset:

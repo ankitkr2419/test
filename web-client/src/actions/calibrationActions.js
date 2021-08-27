@@ -4,9 +4,12 @@ export const pidProgressActions = {
 };
 
 export const pidActions = {
-  pidActionInitiated: "PID_INITIATED",
-  pidActionSuccess: "PID_SUCCEEDED",
-  pidActionFailure: "PID_FAILURE",
+  pidActionInitiated: "PID_START_INITIATED",
+  pidActionSuccess: "PID_START_SUCCEEDED",
+  pidActionFailure: "PID_START_FAILURE",
+  pidAbortActionInitiated: "PID_ABORT_INITIATED",
+  pidAbortActionSuccess: "PID_ABORT_SUCCESS",
+  pidAbortActionFailure: "PID_ABORT_FAILURE",
 };
 
 export const motorActions = {
@@ -27,4 +30,18 @@ export const updateCalibrationActions = {
   updateCalibrationSuccess: "UPDATE_CALIBRATION_SUCCESS",
   updateCalibrationFailure: "UPDATE_CALIBRATION_FAILURE",
   updateCalibrationReset: "UPDATE_CALIBRATION_RESET",
+};
+
+export const commonDetailsActions = {
+  commonDetailsInitiated: "COMMON_DETAILS_INITIATED",
+  commonDetailsSuccess: "COMMON_DETAILS_SUCCESS",
+  commonDetailsFailure: "COMMON_DETAILS_FAILURE",
+  commonDetailsReset: "COMMON_DETAILS_RESET",
+};
+
+export const updateCommonDetailsActions = {
+  updateCommonDetaislInitiated: "UPDATE_COMMON_INITIATED",
+  updateCommonDetaislSuccess: "UPDATE_COMMON_SUCCESS",
+  updateCommonDetaislFailure: "UPDATE_COMMON_FAILURE",
+  updateCommonDetaislReset: "UPDATE_COMMON_RESET",
 };

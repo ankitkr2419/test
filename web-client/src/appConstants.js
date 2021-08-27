@@ -65,6 +65,9 @@ export const PID_STATUS = {
   runFailed: "run-failed",
   stopped: "stopped",
 
+  aborting: "aborting",
+  abortFailed: "abortFailed",
+
   progressing: "progressing",
   progressComplete: "progressComplete",
 };
@@ -487,6 +490,10 @@ export const MIN_MOTOR_DISTANCE = 0;
 export const MAX_MOTOR_DISTANCE = 100;
 export const MIN_MOTOR_DIRECTION = 0;
 export const MAX_MOTOR_DIRECTION = 1;
+
+// constants for engineer's flow for extraction
+export const MAX_ROOM_TEMPERATURE = 30;
+export const MIN_ROOM_TEMPERATURE = 20;
 
 export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {

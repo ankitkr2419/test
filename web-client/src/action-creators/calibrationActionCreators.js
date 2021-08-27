@@ -4,7 +4,40 @@ import {
   pidProgressActions,
   pidActions,
   motorActions,
+  commonDetailsActions,
+  updateCommonDetailsActions,
 } from "actions/calibrationActions";
+
+//fetch common details - name, email, roomTemperature
+export const commonDetailsInitiated = (token) => ({
+  type: commonDetailsActions.commonDetailsInitiated,
+  payload: {
+    token,
+  },
+});
+
+export const commonDetailsFailed = ({ error }) => ({
+  type: commonDetailsActions.commonDetailsFailure,
+  payload: {
+    error,
+  },
+});
+
+//update common details configurations
+export const updateCommonDetailsInitiated = ({ token, data }) => ({
+  type: updateCommonDetailsActions.updateCommonDetaislInitiated,
+  payload: {
+    token,
+    data,
+  },
+});
+
+export const updateCommonDetailsFailed = ({ error }) => ({
+  type: updateCommonDetailsActions.updateCommonDetaislFailure,
+  payload: {
+    error,
+  },
+});
 
 //fetch calibration configurations
 export const calibrationInitiated = (token) => ({
@@ -58,6 +91,22 @@ export const runPid = (token, deckName) => ({
 
 export const runPidFailed = (errorResponse) => ({
   type: pidActions.pidActionFailure,
+  payload: {
+    ...errorResponse,
+    error: true,
+  },
+});
+
+export const abortPid = (token, deckName) => ({
+  type: pidActions.pidAbortActionInitiated,
+  payload: {
+    token,
+    deckName,
+  },
+});
+
+export const abortPidFailed = (errorResponse) => ({
+  type: pidActions.pidAbortActionFailure,
   payload: {
     ...errorResponse,
     error: true,
