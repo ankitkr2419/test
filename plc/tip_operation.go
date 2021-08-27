@@ -2,9 +2,15 @@ package plc
 
 import (
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"math"
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+
+	logger "github.com/sirupsen/logrus"
+)
+
+const (
+	airReserve = 100 // micro litres
 )
 
 /****ALGORITHM******
@@ -173,7 +179,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// Giving it real slow speed
 	tipHeight[d.name] = pickedTipHeight - slowInside
 
-	response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	_, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 
 	// 3.1 Update Tip Height
 	// Even if error occurs we must be of the opinion that tip has been picked up
@@ -207,6 +213,15 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", "PickupTip", err)
+	}
+
+	// Aspire some Air
+	oneMicroLitrePulses := float64(config.GetMicroLitrePulses())
+	pulses = uint16(math.Round(oneMicroLitrePulses * airReserve))
+
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+	if err != nil {
+		return
 	}
 
 	return "Tip PickUp was successfull", nil
@@ -248,9 +263,6 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	//  1. Move Deck to the big hole's position
 	//
 
-	d.setTipDiscardInProgress()
-	defer d.resetTipDiscardInProgress()
-
 	deckAndMotor.Number = K5_Deck
 
 	logger.Infoln("Moving Deck to discard_big_hole")
@@ -274,6 +286,10 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	//
 	// 2. Move Syringe Module fast to deck base
 	//
+
+	// This discard has to start here else tip will dash along deck for discard
+	d.setTipDiscardInProgress()
+	defer d.resetTipDiscardInProgress()
 
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 
