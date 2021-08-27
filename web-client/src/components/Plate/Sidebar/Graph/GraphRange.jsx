@@ -3,8 +3,12 @@ import PropTypes from "prop-types";
 import { Text } from "shared-components";
 import { FormGroup, Label, Input, Button } from "core-components";
 import { useFormik } from "formik";
-import { formikInitialState, getRequestBody, disbleApplyBtn } from "./helper";
-import { EXPERIMENT_STATUS } from "appConstants";
+import {
+  formikInitialState,
+  getRequestBody,
+  disbleApplyBtn,
+  disbleResetBtn,
+} from "./helper";
 
 const GraphRange = (props) => {
   const {
@@ -112,7 +116,7 @@ const GraphRange = (props) => {
           outline={true}
           className="mb-3 ml-3 border-2 border-gray "
           onClick={() => handleResetBtn(totalCycles)}
-          // disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
+          disabled={disbleResetBtn(progressStatus, isExpanded)}
         >
           Reset
         </Button>

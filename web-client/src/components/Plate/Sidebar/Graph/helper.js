@@ -18,6 +18,8 @@ export const disbleApplyBtn = (state, status, isExpanded) => {
   const { xMax, xMin, yMax, yMin } = state;
 
   return (
+    (isExpanded === false &&
+      (status === null || status === EXPERIMENT_STATUS.progressing)) ||
     xMax.value === "" ||
     xMin.value === "" ||
     yMax.value === "" ||
@@ -31,4 +33,14 @@ export const disbleApplyBtn = (state, status, isExpanded) => {
     yMin.isInvalid ||
     yMax.isInvalid
   );
+};
+
+export const disbleResetBtn = (status, isExpanded) => {
+  if (
+    isExpanded === false &&
+    (status === EXPERIMENT_STATUS.progressing || status === null)
+  ) {
+    return true;
+  }
+  return false;
 };
