@@ -1,3 +1,7 @@
+export const heaterProgressActions = {
+  heaterProgressAction: "HEATER_IN_PROGRESS",
+};
+
 export const pidProgressActions = {
   pidProgressAction: "PID_IN_PROGRESS",
   pidProgressActionSuccess: "PID_SUCCEEDED",

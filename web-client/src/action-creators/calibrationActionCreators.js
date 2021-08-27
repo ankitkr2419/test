@@ -1,4 +1,5 @@
 import {
+  heaterProgressActions,
   calibrationActions,
   updateCalibrationActions,
   pidProgressActions,
@@ -68,6 +69,12 @@ export const updateCalibrationFailed = ({ error }) => ({
   payload: {
     error,
   },
+});
+
+//websocket heater action creators
+export const heaterProgress = (heaterData) => ({
+  type: heaterProgressActions.heaterProgressAction,
+  payload: { heaterData },
 });
 
 //websocket PID action creators

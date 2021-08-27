@@ -7,8 +7,9 @@ import {
   motorActions,
   commonDetailsActions,
   updateCommonDetailsActions,
+  heaterProgressActions,
 } from "actions/calibrationActions";
-import { DECKNAME, PID_STATUS } from "appConstants";
+import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
 
 const commonDetailsInitialState = fromJS({
@@ -135,6 +136,27 @@ export const updateCalibrationReducer = (
         isLoading: false,
         error: true,
       });
+    default:
+      return state;
+  }
+};
+
+const heaterProgressInitialState = fromJS({
+  heaterInProgress: null,
+  data: {},
+});
+
+export const heaterProgressReducer = (
+  state = heaterProgressInitialState,
+  action
+) => {
+  switch (action.type) {
+    case heaterProgressActions.heaterProgressAction:
+      return state.merge({
+        heaterInProgress: HEATER_STATUS.progressing,
+        data: action.payload.heaterData,
+      });
+
     default:
       return state;
   }

@@ -58,6 +58,12 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipProgress: "DISCARD_TIP_PROGRESS",
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
+  progressHeater: "PROGRESS_HEATER",
+};
+
+export const HEATER_STATUS = {
+  progressing: "progressing",
+  progressComplete: "progressComplete",
 };
 
 export const PID_STATUS = {

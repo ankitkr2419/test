@@ -36,6 +36,7 @@ import {
 
 import { toast } from "react-toastify";
 import {
+  heaterProgress,
   runPidInProgress,
   runPidInSuccess,
 } from "action-creators/calibrationActionCreators";
@@ -123,6 +124,9 @@ export const connectSocket = (dispatch) => {
           if (errorMessage) {
             toast.error(errorMessage);
           }
+          break;
+        case SOCKET_MESSAGE_TYPE.progressHeater:
+          dispatch(heaterProgress(JSON.parse(data)));
           break;
         default:
           break;

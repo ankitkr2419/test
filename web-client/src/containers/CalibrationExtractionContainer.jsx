@@ -33,6 +33,10 @@ const CalibrationExtractionContainer = () => {
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
   const { isAdmin, name, token } = activeDeckObj;
 
+  const heaterReducer = useSelector((state) => state.heaterProgressReducer);
+  const heaterProgressReducerData = heaterReducer.toJS();
+  const { heaterInProgress, data } = heaterProgressReducerData;
+
   const pidProgessReducer = useSelector((state) => state.pidProgessReducer);
   const pidProgessReducerData = pidProgessReducer.toJS();
   const progressData = pidProgessReducerData.decks.find(
@@ -126,6 +130,7 @@ const CalibrationExtractionContainer = () => {
       handleMotorBtn={handleMotorBtn}
       handleSaveDetailsBtn={handleSaveDetailsBtn}
       showConfirmationModal={showConfirmationModal}
+      heaterData={data}
       progressData={progressData}
       pidStatus={pidStatus}
       deckName={name}

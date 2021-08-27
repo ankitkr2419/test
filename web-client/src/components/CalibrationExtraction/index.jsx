@@ -19,6 +19,7 @@ import { HeadingTitle } from "./HeadingTitle";
 const CalibrationExtractionComponent = (props) => {
   const {
     deckName,
+    heaterData,
     progressData,
     pidStatus,
     handleBtnClick,
@@ -30,6 +31,8 @@ const CalibrationExtractionComponent = (props) => {
     formik,
     isAdmin,
   } = props;
+
+  const { shaker_1_temp, shaker_2_temp, heater_on } = heaterData;
 
   const history = useHistory();
 
@@ -55,13 +58,13 @@ const CalibrationExtractionComponent = (props) => {
         <Card default className="ml-auto rounded-lg">
           <CardBody className="d-flex p-2">
             <Text className="font-weight-bold mr-3 text-muted">
-              Heater Status: <ColoredCircle isOnline />
+              Heater Status: <ColoredCircle isOnline={heater_on} />
               {"  "}
             </Text>
             <Text className="font-weight-bold m-0 text-muted">
-              Heater Temperature 1: {43}° C
+              Heater Temperature 1: {shaker_1_temp ? shaker_1_temp : 0}° C
               <br />
-              Heater Temperature 2: {56}° C
+              Heater Temperature 2: {shaker_2_temp ? shaker_2_temp : 0}° C
             </Text>
           </CardBody>
         </Card>
