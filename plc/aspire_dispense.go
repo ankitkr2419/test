@@ -9,7 +9,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const(
+const (
 	extraDispense = 3 // microlitres
 )
 
@@ -391,7 +391,12 @@ skipAspireCycles:
 	//
 	//   20. setup the syringe module motor with dispense height
 	//
-	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * ad.DispenseHeight))
+	dispensePos := deckBase + ad.DispenseHeight
+	distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - dispensePos
+	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
+
+	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
+	logger.Warnln("going to dispensing height", ad.DispenseHeight)
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
@@ -436,6 +441,7 @@ skipDispenseCycles:
 	if err != nil {
 		return
 	}
+	logger.Info("Aspire Dispense success")
 
 	return "ASPIRE and DISPENSE was successful", nil
 }
