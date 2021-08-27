@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createUserInitiated,
   deleteUserInitiated,
+  updateUserInitiated,
 } from "action-creators/usersActionCreators";
 import ManageUsersComponent from "components/ManageUsersComponent";
 
@@ -25,7 +26,14 @@ const ManageUsersContainer = () => {
   };
 
   const handleUpdateUser = (userData) => {
-    //TODO update user api integration
+    let oldUsername = userData.oldUsername;
+    let updatedUserData = {
+      username: userData.username,
+      password: userData.password,
+      role: userData.role,
+    };
+
+    dispatch(updateUserInitiated(token, oldUsername, updatedUserData));
   };
 
   return (

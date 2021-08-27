@@ -9,6 +9,7 @@ import {
 import {
   createUserFailed,
   deleteUserFailed,
+  updateUserFailed,
 } from "action-creators/usersActionCreators";
 
 export function* createUser(actions) {
@@ -61,7 +62,33 @@ export function* deleteUser(actions) {
   }
 }
 
+export function* updateUser(actions) {
+  const {
+    payload: { token, oldUsername, updatedUserData },
+  } = actions;
+  const { updateUserSuccess, updateUserFailure } = updateUserActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: updatedUserData,
+        reqPath: `${API_ENDPOINTS.users}/${oldUsername}`,
+        successAction: updateUserSuccess,
+        failureAction: updateUserFailure,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user", error);
+    yield put(updateUserFailed({ error }));
+  }
+}
+
 export function* usersSaga() {
   yield takeEvery(createUserActions.createUserInitiated, createUser);
   yield takeEvery(deleteUserActions.deleteUserInitiated, deleteUser);
+  yield takeEvery(updateUserActions.updateUserInitiated, updateUser);
 }

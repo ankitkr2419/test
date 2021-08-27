@@ -6,6 +6,7 @@ import { Text } from "shared-components";
 import CreateUserModal from "components/modals/ManageUserModals/CreateUserModal";
 import { roleOptions } from "./helper";
 import DeleteUserModal from "components/modals/ManageUserModals/DeleteUserModal";
+import UpdateUserModal from "components/modals/ManageUserModals/UpdateUserModal";
 
 const ManageUsersComponent = (props) => {
   const { handleCreateUser, handleDeleteUser, handleUpdateUser } = props;
@@ -50,7 +51,14 @@ const ManageUsersComponent = (props) => {
           handleCreateUser={onHandleCreateUser}
         />
       )}
-      {showUpdateUserModal && <div>update</div>}
+      {showUpdateUserModal && (
+        <UpdateUserModal
+          isOpen={showUpdateUserModal}
+          toggleModal={toggleUpdateUserModal}
+          roleOptions={roleOptions}
+          handleUpdateUser={onHandleUpdateUser}
+        />
+      )}
       {showDeleteUserModal && (
         <DeleteUserModal
           isOpen={showDeleteUserModal}

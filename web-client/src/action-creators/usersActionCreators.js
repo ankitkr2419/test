@@ -29,3 +29,17 @@ export const deleteUserFailed = ({ error }) => ({
   type: deleteUserActions.deleteUserFailure,
   payload: { error },
 });
+
+export const updateUserInitiated = (token, oldUsername, updatedUserData) => ({
+  type: updateUserActions.updateUserInitiated,
+  payload: {
+    token,
+    oldUsername,
+    updatedUserData,
+  },
+});
+
+export const updateUserFailed = ({ error }) => ({
+  type: updateUserActions.updateUserFailure,
+  payload: { error },
+});
