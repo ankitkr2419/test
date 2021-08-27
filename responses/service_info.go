@@ -152,6 +152,7 @@ var (
 	// Configs
 	UpdateConfigSuccess       = "Config was updated successfully"
 	DyeToleranceCreateSuccess = "Dye tolerance values added successfully"
+	UserDeleteSuccess         = "user deleted successfully"
 )
 
 func GetMachineOperationMessage(operation string, state string) (message string) {

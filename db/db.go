@@ -136,4 +136,5 @@ type Storer interface {
 	GetTargetThreshold(ctx context.Context, expID, targetID uuid.UUID) (tarth ExpTargetThreshold, err error)
 	UpsertDyeWellTolerance(ctx context.Context, dwTolerance []DyeWellTolerance) (err error)
 	ShowDye(ctx context.Context, dyeID uuid.UUID) (DBdye Dye, err error)
+	DeleteUser(ctx context.Context, username string) (err error)
 }
