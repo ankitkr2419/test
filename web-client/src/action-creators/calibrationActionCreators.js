@@ -7,6 +7,8 @@ import {
   motorActions,
   commonDetailsActions,
   updateCommonDetailsActions,
+  updatePidDetailsActions,
+  fetchPidDetailsActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -118,6 +120,28 @@ export const abortPidFailed = (errorResponse) => ({
     ...errorResponse,
     error: true,
   },
+});
+
+// action creators for pid details fetch
+export const fetchPidInitiated = (token) => ({
+  type: fetchPidDetailsActions.fetchPidActionInitiated,
+  payload: { token },
+});
+
+export const fetchPidFailed = ({ error }) => ({
+  type: fetchPidDetailsActions.fetchPidActionFailed,
+  payload: { error },
+});
+
+// action creators for pid details update
+export const updatePidInitiated = (token, body) => ({
+  type: updatePidDetailsActions.updatePidActionInitiated,
+  payload: { token, body },
+});
+
+export const updatePidFailed = ({ error }) => ({
+  type: updatePidDetailsActions.updatePidActionFailed,
+  payload: { error },
 });
 
 // action creators for motor

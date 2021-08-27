@@ -9,9 +9,11 @@ import {
 import {
   abortPid,
   commonDetailsInitiated,
+  fetchPidInitiated,
   motorInitiated,
   runPid,
   updateCommonDetailsInitiated,
+  updatePidInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
@@ -35,7 +37,7 @@ const CalibrationExtractionContainer = () => {
 
   const heaterReducer = useSelector((state) => state.heaterProgressReducer);
   const heaterProgressReducerData = heaterReducer.toJS();
-  const { heaterInProgress, data } = heaterProgressReducerData;
+  const { data } = heaterProgressReducerData;
 
   const pidProgessReducer = useSelector((state) => state.pidProgessReducer);
   const pidProgessReducerData = pidProgessReducer.toJS();
@@ -44,33 +46,58 @@ const CalibrationExtractionContainer = () => {
   );
 
   const pidReducer = useSelector((state) => state.pidReducer);
-  const { pidStatus } = pidReducer.toJS();
+  const pidReducerData = pidReducer.toJS();
+  const { pidStatus, pidData, isPidUpdateApi } = pidReducerData;
 
   const commonDetailsReducer = useSelector(
     (state) => state.commonDetailsReducer
   );
   const commonDetailsReducerData = commonDetailsReducer.toJS();
-  const { error, isLoading, isUpdateApi, details } = commonDetailsReducerData;
+  const { isUpdateApi, details } = commonDetailsReducerData;
 
-  // fetch API called initially
+  // fetch pidDetails API (pidTemp, pidMinutes) called initially
+  useEffect(() => {
+    dispatch(fetchPidInitiated(token));
+  }, []);
+
+  // fetch commonDetails (name, email, roomTemp) API called initially
   useEffect(() => {
     dispatch(commonDetailsInitiated(token));
   }, []);
 
   useEffect(() => {
-    // populate formik data with fetched values
-    if (error === false && isLoading === false && isUpdateApi === false) {
-      const { receiver_name, receiver_email, room_temperature } = details;
-      formik.setFieldValue("name.value", receiver_name);
-      formik.setFieldValue("email.value", receiver_email);
-      formik.setFieldValue("roomTemperature.value", room_temperature);
+    if (
+      commonDetailsReducerData.error === false &&
+      commonDetailsReducerData.isLoading === false
+    ) {
+      // populate formik data with fetched values
+      if (isUpdateApi === false) {
+        const { receiver_name, receiver_email, room_temperature } = details;
+        formik.setFieldValue("name.value", receiver_name);
+        formik.setFieldValue("email.value", receiver_email);
+        formik.setFieldValue("roomTemperature.value", room_temperature);
+      } else {
+        // fetch updated data after updation
+        dispatch(commonDetailsInitiated(token));
+      }
     }
+  }, [
+    commonDetailsReducerData.error,
+    commonDetailsReducerData.isLoading,
+    isUpdateApi,
+  ]);
 
-    // API call to fetch new data after updation
-    if (error === false && isLoading === false && isUpdateApi === true) {
-      dispatch(commonDetailsInitiated(token));
+  useEffect(() => {
+    if (pidReducerData.error === false && pidReducerData.isLoading === false) {
+      if (isPidUpdateApi === false) {
+        // populate formik data with fetched values
+        formik.setFieldValue("pidTemperature.value", pidData.pid_temperature);
+      } else {
+        // fetch updated data after updation
+        dispatch(fetchPidInitiated(token));
+      }
     }
-  }, [error, isLoading, isUpdateApi]);
+  }, [pidReducerData.error, pidReducerData.isLoading, isPidUpdateApi]);
 
   /**another deck must be blocked**/
   useEffect(() => {
@@ -120,6 +147,17 @@ const CalibrationExtractionContainer = () => {
     dispatch(updateCommonDetailsInitiated({ token, data: requestBody }));
   };
 
+  const handlePidUpdateBtn = (pidData) => {
+    const { pidTemperature } = pidData;
+    const requestBody = {
+      pid_temperature: pidTemperature.value,
+      pid_minutes: 30, // will be removed in future
+      micro_lit_pulses: 25, // will be removed in future
+      shaker_steps_per_revolution: 800, // will be removed in future
+    };
+    dispatch(updatePidInitiated(token, requestBody));
+  };
+
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
 
   return (
@@ -129,6 +167,7 @@ const CalibrationExtractionContainer = () => {
       handleBtnClick={handlePidBtn}
       handleMotorBtn={handleMotorBtn}
       handleSaveDetailsBtn={handleSaveDetailsBtn}
+      handlePidUpdateBtn={handlePidUpdateBtn}
       showConfirmationModal={showConfirmationModal}
       heaterData={data}
       progressData={progressData}

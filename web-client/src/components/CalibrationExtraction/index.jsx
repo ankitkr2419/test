@@ -10,11 +10,12 @@ import {
   Text,
 } from "shared-components";
 import { MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
-import PidComponent from "./PidComponent";
 import MotorComponent from "./MotorComponent";
 import CommonFieldsComponent from "./CommonFieldsComponent";
 
 import { HeadingTitle } from "./HeadingTitle";
+import PidProgressComponent from "./PidProgressComponent";
+import PidComponent from "./PidComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -24,6 +25,7 @@ const CalibrationExtractionComponent = (props) => {
     pidStatus,
     handleBtnClick,
     handleLogout,
+    handlePidUpdateBtn,
     handleMotorBtn,
     handleSaveDetailsBtn,
     showConfirmationModal,
@@ -79,12 +81,17 @@ const CalibrationExtractionComponent = (props) => {
 
       <Card default className="my-3">
         <CardBody className="px-5 py-4">
-          {/* {PID Component} */}
-          <PidComponent
-            pidStatus={pidStatus}
-            progressData={progressData}
-            handleBtnClick={handleBtnClick}
-          />
+          <div className="d-flex">
+            {/* {PID Start/Abort Progress Component} */}
+            <PidProgressComponent
+              pidStatus={pidStatus}
+              progressData={progressData}
+              handleBtnClick={handleBtnClick}
+            />
+
+            {/* PID Details update component */}
+            <PidComponent formik={formik} handlePidBtn={handlePidUpdateBtn} />
+          </div>
 
           {/* Common fields - name, email, room temperature */}
           <CommonFieldsComponent

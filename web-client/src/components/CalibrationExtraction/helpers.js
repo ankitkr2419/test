@@ -1,3 +1,5 @@
+import { MAX_PID_TEMP, MIN_PID_TEMP } from "appConstants";
+
 export const formikInitialState = {
   name: { value: null, isInvalid: false },
   email: { value: null, isInvalid: false },
@@ -5,6 +7,7 @@ export const formikInitialState = {
   motorNumber: { value: null, isInvalid: false },
   direction: { value: null, isInvalid: false },
   distance: { value: null, isInvalid: false },
+  pidTemperature: { value: null, isInvalid: false },
 };
 
 export const isSaveDetailsBtnDisabled = (state) => {
@@ -17,6 +20,15 @@ export const isSaveDetailsBtnDisabled = (state) => {
     email.isInvalid ||
     roomTemperature.isInvalid
   ) {
+    return true;
+  }
+  return false;
+};
+
+export const isPidUpdateBtnDisabled = (state) => {
+  const { pidTemperature } = state;
+  const { value, isInvalid } = pidTemperature;
+  if (!value || isInvalid || value > MAX_PID_TEMP || value < MIN_PID_TEMP) {
     return true;
   }
   return false;

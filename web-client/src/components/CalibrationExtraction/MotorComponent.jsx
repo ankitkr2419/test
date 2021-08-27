@@ -53,7 +53,7 @@ const MotorComponent = (props) => {
   };
 
   return (
-    <Card default className="my-5">
+    <Card default className="my-3">
       <CardBody>
         <Form onSubmit={handleMotorBtn}>
           <Row form>

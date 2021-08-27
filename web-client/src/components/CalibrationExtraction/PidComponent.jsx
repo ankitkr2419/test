@@ -1,72 +1,129 @@
 import React from "react";
 
-import { Button } from "core-components";
-import { Progress, Spinner } from "reactstrap";
-import { Icon, Text } from "shared-components";
-import { PID_STATUS } from "appConstants";
+import {
+  Button,
+  Form,
+  FormGroup,
+  Row,
+  Card,
+  CardBody,
+  Col,
+  Input,
+  Label,
+} from "core-components";
+import { Center, ButtonIcon, Text } from "shared-components";
+import {
+  MAX_PID_MIN,
+  MAX_PID_TEMP,
+  MIN_PID_MIN,
+  MIN_PID_TEMP,
+} from "appConstants";
+import { isBtnDisabled, isPidUpdateBtnDisabled } from "./helpers";
 
 const PidComponent = (props) => {
-  const { pidStatus, progressData, handleBtnClick } = props;
+  const { handlePidBtn, formik } = props;
+  const { pidTemperature, pidMinutes } = formik.values;
 
-  const { progressStatus, progress, remainingTime, totalTime } = progressData;
+  const handleBlurPidTemp = (value) => {
+    if (!value || value > MAX_PID_TEMP || value < MIN_PID_TEMP) {
+      formik.setFieldValue("pidTemperature.isInvalid", true);
+    }
+  };
+  const handleBlurPidMinutes = (value) => {
+    if (!value || value > MAX_PID_MIN || value < MIN_PID_MIN) {
+      formik.setFieldValue("pidMinutes.isInvalid", true);
+    }
+  };
 
-  const totalHours = totalTime?.hours || 0;
-  const totalMinutes = totalTime?.minutes || 0;
-  const totalSeconds = totalTime?.seconds || 0;
-
-  const remainingHours = remainingTime?.hours || 0;
-  const remainingMinutes = remainingTime?.minutes || 0;
-  const remainingSeconds = remainingTime?.seconds || 0;
-
-  let progressIsRunning =
-    progressStatus === PID_STATUS.progressing ||
-    progressStatus === PID_STATUS.progressComplete;
+  const handleOnChange = (key, value) => {
+    formik.setFieldValue(key, value);
+  };
 
   return (
-    <div className="d-flex align-items-center">
-      {/* {progressStatus === PID_STATUS.progressing && (
-        <Text>PID Progressing...</Text>
-      )}
-      {progressStatus === PID_STATUS.progressComplete && (
-        <Text>PID Progress Complete</Text>
-      )} */}
-      {/* {true && (
-        <div className="progress-wrapper d-flex align-items-center">
-          <div className="d-flex align-items-center flex-100 mr-3">
-            <Progress value={progress} className="experiment-progress w-100" />
-          </div>
-          <div className="d-flex align-items-center">
-            <Icon size={20} name="timer" className="text-primary" />
-            <div className="time-wrapper d-flex align-items-center">
-              <Text>
-                {totalHours > 0 && `${totalHours} Hr `}
-                {`${totalMinutes} min ${totalSeconds} sec`}
-              </Text>
-              <div className="separator"></div>
-              <Text>
-                {remainingHours > 0 && `${remainingHours} Hr `}
-                {`${remainingMinutes} min ${remainingSeconds} sec`}
-              </Text>
-              <Text Tag="span">remaining</Text>
-            </div>
-          </div>
-        </div>
-      )} */}
-      <Button
-        color={pidStatus === PID_STATUS.running ? "secondary" : "primary"}
-        // disabled={progressStatus === PID_STATUS.progressComplete}
-        onClick={handleBtnClick}
-      >
-        {pidStatus === PID_STATUS.running ? (
-          <div className="d-flex">
-            <Spinner size="sm" />
-            <Text className="ml-5">Abort</Text>
-          </div>
-        ) : (
-          "Start PID"
-        )}
-      </Button>
-    </div>
+    <Card default className="my-3 w-100">
+      <CardBody>
+        <Form>
+          <Row form>
+            <Col sm={4}>
+              <FormGroup>
+                <Label for="pid_temperature" className="font-weight-bold ml-3">
+                  PID Temperature
+                </Label>
+                <Input
+                  className="ml-3"
+                  type="number"
+                  name="pid_temperature"
+                  id="pid_temperature"
+                  placeholder={`${MIN_PID_TEMP} - ${MAX_PID_TEMP}`}
+                  value={pidTemperature.value}
+                  onChange={(event) =>
+                    handleOnChange(
+                      "pidTemperature.value",
+                      parseInt(event.target.value)
+                    )
+                  }
+                  onBlur={(e) => handleBlurPidTemp(parseInt(e.target.value))}
+                  onFocus={() =>
+                    handleOnChange("pidTemperature.isInvalid", false)
+                  }
+                />
+                {pidTemperature.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      PID temperature should be between {MIN_PID_TEMP} -{" "}
+                      {MAX_PID_TEMP}.
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col>
+
+            {/* <Col sm={4}>
+              <FormGroup>
+                <Label for="pid_minutes" className="font-weight-bold">
+                  PID Minutes
+                </Label>
+                <Input
+                  type="number"
+                  name="pid_minutes"
+                  id="pid_minutes"
+                  placeholder={`${MIN_PID_MIN} - ${MAX_PID_MIN}`}
+                  value={pidMinutes.value}
+                  onChange={(event) =>
+                    handleOnChange(
+                      "pidMinutes.value",
+                      parseInt(event.target.value)
+                    )
+                  }
+                  onBlur={(e) => handleBlurPidMinutes(parseInt(e.target.value))}
+                  onFocus={() => handleOnChange("pidMinutes.isInvalid", false)}
+                />
+                {pidMinutes.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      PID minutes should be between {MIN_PID_MIN} -{" "}
+                      {MAX_PID_MIN}.
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col> */}
+
+            <Col>
+              <Center className="text-center pt-4">
+                <Button
+                  onClick={() => handlePidBtn(formik.values)}
+                  disabled={isPidUpdateBtnDisabled(formik.values)}
+                  color="primary"
+                >
+                  Update PID
+                </Button>
+              </Center>
+            </Col>
+          </Row>
+        </Form>
+      </CardBody>
+    </Card>
   );
 };
 

@@ -4,10 +4,12 @@ import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import {
   calibrationActions,
   commonDetailsActions,
+  fetchPidDetailsActions,
   motorActions,
   pidActions,
   updateCalibrationActions,
   updateCommonDetailsActions,
+  updatePidDetailsActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -16,6 +18,8 @@ import {
   motorFailed,
   commonDetailsFailed,
   updateCommonDetailsFailed,
+  fetchPidFailed,
+  updatePidFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* fetchCommonDetails(actions) {
@@ -189,6 +193,58 @@ export function* motor(actions) {
   }
 }
 
+export function* fetchPidDetails(actions) {
+  const {
+    payload: { token },
+  } = actions;
+  const { fetchPidActionSuccess, fetchPidActionFailed } =
+    fetchPidDetailsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.pidUpdate}`,
+        successAction: fetchPidActionSuccess,
+        failureAction: fetchPidActionFailed,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching pid configs", error);
+    yield put(fetchPidFailed({ error }));
+  }
+}
+
+export function* updatePidDetails(actions) {
+  const {
+    payload: { token, body },
+  } = actions;
+
+  const { updatePidActionSuccess, updatePidActionFailed } =
+    updatePidDetailsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: body,
+        reqPath: `${API_ENDPOINTS.pidUpdate}`,
+        successAction: updatePidActionSuccess,
+        failureAction: updatePidActionFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating pid configs", error);
+    yield put(updatePidFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(
     commonDetailsActions.commonDetailsInitiated,
@@ -206,4 +262,12 @@ export function* calibrationSaga() {
   yield takeEvery(pidActions.pidActionInitiated, pidStart);
   yield takeEvery(pidActions.pidAbortActionInitiated, pidAbort);
   yield takeEvery(motorActions.motorActionInitiated, motor);
+  yield takeEvery(
+    fetchPidDetailsActions.fetchPidActionInitiated,
+    fetchPidDetails
+  );
+  yield takeEvery(
+    updatePidDetailsActions.updatePidActionInitiated,
+    updatePidDetails
+  );
 }

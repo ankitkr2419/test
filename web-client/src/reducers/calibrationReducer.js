@@ -8,6 +8,8 @@ import {
   commonDetailsActions,
   updateCommonDetailsActions,
   heaterProgressActions,
+  updatePidDetailsActions,
+  fetchPidDetailsActions,
 } from "actions/calibrationActions";
 import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
@@ -242,6 +244,8 @@ const pidInitialState = fromJS({
   error: null,
   pidStatus: null,
   configs: {},
+  pidData: {},
+  isPidUpdateApi: null,
 });
 
 export const pidReducer = (state = pidInitialState, action) => {
@@ -279,6 +283,50 @@ export const pidReducer = (state = pidInitialState, action) => {
         isLoading: false,
         error: true,
         pidStatus: PID_STATUS.abortFailed,
+      });
+
+    case fetchPidDetailsActions.fetchPidActionInitiated:
+      return state.merge({
+        isLoading: true,
+        error: false,
+        isPidUpdateApi: false,
+      });
+
+    case fetchPidDetailsActions.fetchPidActionSuccess:
+      const res = action.payload.response;
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isPidUpdateApi: false,
+        pidData: res,
+      });
+
+    case fetchPidDetailsActions.fetchPidActionFailed:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isPidUpdateApi: false,
+      });
+
+    case updatePidDetailsActions.updatePidActionInitiated:
+      return state.merge({
+        isLoading: true,
+        error: false,
+        isPidUpdateApi: true,
+      });
+
+    case updatePidDetailsActions.updatePidActionSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isPidUpdateApi: true,
+      });
+
+    case updatePidDetailsActions.updatePidActionFailed:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isPidUpdateApi: true,
       });
 
     case loginActions.loginReset:

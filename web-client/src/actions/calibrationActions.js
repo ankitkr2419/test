@@ -16,6 +16,18 @@ export const pidActions = {
   pidAbortActionFailure: "PID_ABORT_FAILURE",
 };
 
+export const fetchPidDetailsActions = {
+  fetchPidActionInitiated: "FETCH_PID_START_INITIATED",
+  fetchPidActionSuccess: "FETCH_PID_START_SUCEEDED",
+  fetchPidActionFailed: "FETCH_PID_START_FAILED",
+};
+
+export const updatePidDetailsActions = {
+  updatePidActionInitiated: "UPDATE_PID_START_INITIATED",
+  updatePidActionSuccess: "UPDATE_PID_START_SUCEEDED",
+  updatePidActionFailed: "UPDATE_PID_START_FAILED",
+};
+
 export const motorActions = {
   motorActionInitiated: "MOTOR_INITIATED",
   motorActionSuccess: "MOTOR_SUCCEEDED",

@@ -49,7 +49,7 @@ const CommonFieldsComponent = (props) => {
   };
 
   return (
-    <Card default className="my-5">
+    <Card default className="my-3">
       <CardBody>
         <Form>
           <Row form>

@@ -153,6 +153,7 @@ export const API_ENDPOINTS = {
   experiments: "experiments",
   configs: "configs",
   pidCalibration: "pid-calibration",
+  pidUpdate: "configs/extraction",
   manual: "manual",
   emailReport: "email-report",
   graphUpdate: "rtpcr/graph-update-scale",
@@ -496,6 +497,12 @@ export const MIN_MOTOR_DISTANCE = 0;
 export const MAX_MOTOR_DISTANCE = 100;
 export const MIN_MOTOR_DIRECTION = 0;
 export const MAX_MOTOR_DIRECTION = 1;
+
+//constants for pid
+export const MIN_PID_TEMP = 50;
+export const MAX_PID_TEMP = 75;
+export const MIN_PID_MIN = 0;
+export const MAX_PID_MIN = 9999;
 
 // constants for engineer's flow for extraction
 export const MAX_ROOM_TEMPERATURE = 30;
