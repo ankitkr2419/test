@@ -85,7 +85,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/configs/extraction", authenticate(updateExtractionConfigHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/motor", authenticate(createMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/motor/{id}", authenticate(updateMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/motor", authenticate(updateMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/motors", authenticate(listMotorsHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/motor/{id}", authenticate(deleteMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
