@@ -5,7 +5,10 @@ import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import { logoutInitiated, loginReset } from "action-creators/loginActionCreators";
+import {
+  logoutInitiated,
+  loginReset,
+} from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -35,6 +38,7 @@ import {
   MODAL_MESSAGE,
   ROUTES,
   TOAST_MESSAGE,
+  USER_ROLES,
 } from "appConstants";
 import { NAV_ITEMS, getBtnPropObj } from "./constants";
 import { Header } from "./Header";
@@ -231,6 +235,10 @@ const AppHeader = (props) => {
     history.push("templates");
   };
 
+  const handleManageUsersClick = () => {
+    history.push(ROUTES.users);
+  }
+
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} />
@@ -366,6 +374,12 @@ const AppHeader = (props) => {
                 <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
                   <DropdownToggle icon name="user" size={32} />
                   <DropdownMenu right>
+                    {/**manage users accessible only for admin */}
+                    {role === USER_ROLES.ADMIN && (
+                      <DropdownItem onClick={handleManageUsersClick}>
+                        Manage Users
+                      </DropdownItem>
+                    )}
                     <DropdownItem
                       onClick={logoutClickHandler}
                       disabled={isExperimentRunning}
