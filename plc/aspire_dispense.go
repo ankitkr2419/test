@@ -9,6 +9,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+const(
+	extraDispense = 3 // microlitres
+)
+
 /****ALGORITHM******
 // TODO: check for height and volumes constraint at insertion process itself
 variables: category, cartridgeType string,
@@ -38,7 +42,7 @@ variables: category, cartridgeType string,
   19. move syringe module down at fast till base
   20. setup the syringe module motor with dispense height
   21. pickup and drop that dis_mix_vol for number of dis_cycles
-  22. Dispense completely
+  22. Dispense completely + extraDispense
 
 ********/
 
@@ -421,12 +425,14 @@ skipAspireCycles:
 skipDispenseCycles:
 
 	//
-	// 22. Dispense completely
+	// 22. Dispense completely + extraDispense
 	//
 
-	logger.Infoln("Syringe is moving down until sensor not cut")
+	pulses = uint16(math.Round(oneMicroLitrePulses * (ad.AspireAirVolume + ad.AspireVolume + extraDispense)))
+
+	logger.Infoln("Syringe is moving down and dispensingalong with extraDispense")
 	// TODO:  Note down Bio team's required speed
-	response, err = d.setupMotor(homingFastSpeed, initialSensorCutSyringePulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	response, err = d.setupMotor(homingFastSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
