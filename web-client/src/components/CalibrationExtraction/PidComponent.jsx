@@ -55,7 +55,6 @@ const PidComponent = (props) => {
       <Button
         color={pidStatus === PID_STATUS.running ? "secondary" : "primary"}
         // disabled={progressStatus === PID_STATUS.progressComplete}
-        className="mx-5"
         onClick={handleBtnClick}
       >
         {pidStatus === PID_STATUS.running ? (

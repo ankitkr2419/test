@@ -732,3 +732,12 @@ button:focus {
 .template-buttonBar {
   top: 37.5rem !important;
 }
+
+.colored-circle {
+  display: inline-block;
+  margin-bottom: -2px;
+  border-radius: 50%;
+  border-width: 0.5px;
+  height: 14px;
+  width: 14px;
+}

@@ -2,6 +2,7 @@ import ButtonGroup from "./ButtonGroup";
 import ButtonIcon from "./ButtonIcon";
 import ButtonBar from "./ButtonBar";
 import Center from "./Center";
+import ColoredCircle from "./ColoredCircle";
 import GraphCard from "./GraphCard";
 import Icon from "./Icon";
 import Link from "./Link";
@@ -29,6 +30,7 @@ export {
   ButtonIcon,
   ButtonBar,
   Center,
+  ColoredCircle,
   GraphCard,
   Icon,
   Link,

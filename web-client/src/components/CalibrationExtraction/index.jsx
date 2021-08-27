@@ -2,7 +2,13 @@ import React from "react";
 import { useHistory } from "react-router";
 
 import { Card, CardBody } from "core-components";
-import { ButtonIcon, Icon, MlModal, Text } from "shared-components";
+import {
+  ButtonIcon,
+  ColoredCircle,
+  Icon,
+  MlModal,
+  Text,
+} from "shared-components";
 import { MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
 import PidComponent from "./PidComponent";
 import MotorComponent from "./MotorComponent";
@@ -33,7 +39,7 @@ const CalibrationExtractionComponent = (props) => {
 
   return (
     <div className="calibration-content px-5 pt-3">
-      <div className="d-flex align-items-center pb-4">
+      <div className="d-flex align-items-center">
         {isAdmin && (
           <div style={{ cursor: "pointer" }} onClick={handleBack}>
             <Icon name="angle-left" size={32} className="text-white" />
@@ -46,10 +52,24 @@ const CalibrationExtractionComponent = (props) => {
           </div>
         )}
 
+        <Card default className="ml-auto rounded-lg">
+          <CardBody className="d-flex p-2">
+            <Text className="font-weight-bold mr-3 text-muted">
+              Heater Status: <ColoredCircle isOnline />
+              {"  "}
+            </Text>
+            <Text className="font-weight-bold m-0 text-muted">
+              Heater Temperature 1: {43}° C
+              <br />
+              Heater Temperature 2: {56}° C
+            </Text>
+          </CardBody>
+        </Card>
+
         <ButtonIcon
           name="logout"
           size={28}
-          className="ml-auto bg-white border-primary"
+          className="ml-3 bg-white border-primary"
           onClick={toggleConfirmModal}
         />
       </div>
