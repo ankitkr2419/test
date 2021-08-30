@@ -16,6 +16,7 @@ import CommonFieldsComponent from "./CommonFieldsComponent";
 import { HeadingTitle } from "./HeadingTitle";
 import PidProgressComponent from "./PidProgressComponent";
 import PidComponent from "./PidComponent";
+import TipsTubesComponent from "./TipsTubesComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -32,6 +33,7 @@ const CalibrationExtractionComponent = (props) => {
     toggleConfirmModal,
     formik,
     isAdmin,
+    handleTipesTubesButton,
   } = props;
 
   const { shaker_1_temp, shaker_2_temp, heater_on } = heaterData;
@@ -101,6 +103,12 @@ const CalibrationExtractionComponent = (props) => {
 
           {/* Motor Component -   */}
           <MotorComponent formik={formik} handleMotorBtn={handleMotorBtn} />
+
+          {/**Tips & tubes Component */}
+          <TipsTubesComponent
+            formik={formik}
+            handleTipesTubesButton={handleTipesTubesButton}
+          />
         </CardBody>
       </Card>
 

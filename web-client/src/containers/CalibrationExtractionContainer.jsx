@@ -17,7 +17,10 @@ import {
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
-import { formikInitialState } from "components/CalibrationExtraction/helpers";
+import {
+  formikInitialState,
+  formikToArray,
+} from "components/CalibrationExtraction/helpers";
 
 const CalibrationExtractionContainer = () => {
   const dispatch = useDispatch();
@@ -160,6 +163,15 @@ const CalibrationExtractionContainer = () => {
 
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
 
+  const handleTipesTubesButton = (e) => {
+    e.preventDefault();
+
+    let { allowedPositions } = formik.values;
+    let arrayOfAllowedPositions = formikToArray(allowedPositions);
+    
+    //TODO api call under dev
+  };
+
   return (
     <CalibrationExtractionComponent
       toggleConfirmModal={toggleConfirmModal}
@@ -175,6 +187,7 @@ const CalibrationExtractionContainer = () => {
       deckName={name}
       formik={formik}
       isAdmin={isAdmin}
+      handleTipesTubesButton={handleTipesTubesButton}
     />
   );
 };
