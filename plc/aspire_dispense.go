@@ -447,7 +447,7 @@ skipDispenseCycles:
 	} else {
 		pulses = uint16(math.Round(oneMicroLitrePulses * (ad.AspireAirVolume + ad.AspireVolume + extraDispense)))
 
-		logger.Infoln("Syringe is moving down and dispensingalong with extraDispense")
+		logger.Infoln("Syringe is moving down and dispensing along with extraDispense")
 		// TODO:  Note down Bio team's required speed
 		response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {

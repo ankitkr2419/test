@@ -51,9 +51,9 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	// Tip PickUp	*
 	//***************
 	var deckAndMotor DeckNumber
-	var position, distanceToTravel, pickedTipHeight, ttBase, slowInside, deckBase float64
+	var position, distanceToTravel, pickedTipHeight, ttBase, slowInside, deckBase, oneMicroLitrePulses float64
 	var direction, pulses uint16
-	var ok bool
+	var ok, aspireAir bool
 	deckAndMotor.Deck = d.name
 
 	//
@@ -112,10 +112,13 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 	switch pos {
 	case 1:
 		id = recipe.Position1
+		aspireAir = true
 	case 2:
 		id = recipe.Position2
+		aspireAir = true
 	case 3:
 		id = recipe.Position3
+		aspireAir = true
 	case 4:
 		id = recipe.Position4
 	case 5:
@@ -209,15 +212,18 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	_, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syinge Module to %v. Error: %v", "PickupTip", err)
 	}
 
 	// Aspire some Air
+	if !aspireAir {
+		goto skipAspireAir
+	}
 	deckAndMotor.Number = K10_Syringe_LHRH
-	oneMicroLitrePulses := float64(config.GetMicroLitrePulses())
+	oneMicroLitrePulses = float64(config.GetMicroLitrePulses())
 	pulses = uint16(math.Round(oneMicroLitrePulses * airReserve))
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
@@ -225,6 +231,7 @@ func (d *Compact32Deck) tipPickup(pos int64) (response string, err error) {
 		return
 	}
 
+skipAspireAir:
 	return "Tip PickUp was successfull", nil
 
 }
