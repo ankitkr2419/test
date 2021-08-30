@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar } from "shared-components";
@@ -9,17 +9,10 @@ import ShakingProcess from "./ShakingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TopContent, ShakingBox } from "./Style";
 import { useFormik } from "formik";
-import {
-  isDisabled,
-  getFormikInitialState,
-  getRequestBody,
-  shakerInitialFormikState,
-} from "./helpers";
+import { shakerInitialFormikState, getShakerRequestBody } from "./helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { saveProcessInitiated } from "action-creators/processesActionCreators";
-import { toast } from "react-toastify";
 import { Redirect, useHistory } from "react-router";
-import { API_ENDPOINTS, DECKNAME, HTTP_METHODS, ROUTES } from "appConstants";
+import { DECKNAME, ROUTES } from "appConstants";
 import {
   abort,
   shakerInitiated,
@@ -47,7 +40,7 @@ const ShakerComponent = (props) => {
 
   const handleStartBtn = () => {
     const requestBody = {
-      body: getRequestBody(formik, activeTab),
+      body: getShakerRequestBody(formik, activeTab),
       token: token,
       deckName:
         name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort,

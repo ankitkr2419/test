@@ -79,7 +79,7 @@ const { SEC_IN_ONE_HOUR, SEC_IN_ONE_MIN, MIN_IN_ONE_HOUR } = timeConstants;
 /** This function checks for validity of input data and
  *  returns the request body.
  */
-export const getRequestBody = (formik, activeTab) => {
+export const getShakerRequestBody = (formik, activeTab) => {
   const formikValues = formik.values;
 
   const time1 =
@@ -120,10 +120,57 @@ export const getRequestBody = (formik, activeTab) => {
     with_temp: activeTab === "2",
     temperature: temperature ? temperature : 0,
     follow_temp: formikValues.followTemperature,
-    rpm_1: parseInt(formikValues.rpm1.value) ? parseInt(formikValues.rpm1.value) : 0,
-    rpm_2: parseInt(formikValues.rpm2.value) ? parseInt(formikValues.rpm2.value) : 0,
+    rpm_1: parseInt(formikValues.rpm1.value)
+      ? parseInt(formikValues.rpm1.value)
+      : 0,
+    rpm_2: parseInt(formikValues.rpm2.value)
+      ? parseInt(formikValues.rpm2.value)
+      : 0,
     time_1: time1 ? time1 : 0,
     time_2: time2 ? time2 : 0,
+  };
+
+  return body;
+};
+
+/**
+ * Helpers for Heater.
+ */
+
+//formik state for shaker
+export const heaterInitialFormikState = {
+  temperature: 0,
+  followTemperature: false,
+  hours: 0,
+  mins: 0,
+  secs: 0,
+};
+
+export const getHeaterRequestBody = (formik) => {
+  const formikValues = formik.values;
+
+  const time =
+    parseInt(formikValues.hours) * 60 * 60 +
+    parseInt(formikValues.mins) * 60 +
+    parseInt(formikValues.secs);
+
+  if (time !== 0) {
+    if (time < 10 || time > 3660) {
+      return false;
+    }
+  }
+
+  const temperature = parseInt(formikValues.temperature);
+  if (temperature !== 0) {
+    if (temperature < 20 || temperature > 120) {
+      return false;
+    }
+  }
+
+  const body = {
+    temperature: temperature,
+    follow_temp: formikValues.followTemperature,
+    duration: time,
   };
 
   return body;

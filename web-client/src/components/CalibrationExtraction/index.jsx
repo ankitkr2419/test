@@ -84,6 +84,8 @@ const CalibrationExtractionComponent = (props) => {
           <div className="d-flex">
             {/* {Shaker Button} */}
             <Button
+              className="ml-auto"
+              color={"primary"}
               onClick={() =>
                 history.push(`${ROOT_URL_PATH}${ROUTES.calibration}/shaker`)
               }
@@ -93,9 +95,11 @@ const CalibrationExtractionComponent = (props) => {
 
             {/* {Heater Button} */}
             <Button
-            // onClick={history.push(
-            //   `${ROOT_URL_PATH}${ROUTES.calibration}/heater`
-            // )}
+              className="ml-3"
+              color={"primary"}
+              onClick={() =>
+                history.push(`${ROOT_URL_PATH}${ROUTES.calibration}/heater`)
+              }
             >
               Heater
             </Button>

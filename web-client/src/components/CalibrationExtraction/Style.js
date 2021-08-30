@@ -58,3 +58,17 @@ export const TopContent = styled.div`
     }
   }
 `;
+
+export const HeatingBox = styled.div`
+  .process-heating {
+    &::after {
+      background: url("/images/heating-bg.svg") no-repeat;
+    }
+  }
+`;
+
+export const HeatingProcessBox = styled.div`
+  .process-box {
+    width: 90.55%;
+  }
+`;
