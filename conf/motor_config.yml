@@ -127,12 +127,12 @@ motor:
     steps: 200
   - 
     deck: B
-    fast: 11000
+    fast: 12500
     id: 15
     name: K5_Deck_B
     number: 5
     ramp: 100
-    slow: 1000
+    slow: 3000
     steps: 160
   - 
     deck: B
@@ -172,10 +172,10 @@ motor:
     steps: 200
   - 
     deck: B
-    fast: 5500
+    fast: 6000
     id: 20
     name: K10_Syringe_LHRH_B
     number: 10
     ramp: 100
-    slow: 1000
+    slow: 3000
     steps: 200
