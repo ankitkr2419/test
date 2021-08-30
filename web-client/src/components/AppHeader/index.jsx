@@ -5,7 +5,10 @@ import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import { logoutInitiated, loginReset } from "action-creators/loginActionCreators";
+import {
+  logoutInitiated,
+  loginReset,
+} from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,

@@ -1,4 +1,11 @@
-import { MAX_PID_TEMP, MIN_PID_TEMP } from "appConstants";
+import {
+  MAX_PID_TEMP,
+  MAX_TEMP_ALLOWED,
+  MAX_TIME_ALLOWED,
+  MIN_PID_TEMP,
+  MIN_TEMP_ALLOWED,
+  timeConstants,
+} from "appConstants";
 
 export const formikInitialState = {
   name: { value: null, isInvalid: false },
@@ -49,4 +56,75 @@ export const isBtnDisabled = (state) => {
     return true;
   }
   return false;
+};
+
+//formik state for shaker
+export const shakerInitialFormikState = {
+  withHeating: null,
+  temperature: null,
+  followTemperature: false,
+  rpm1: { value: 0, isInvalid: false },
+  rpm2: { value: 0, isInvalid: false },
+  hours1: 0,
+  mins1: 0,
+  secs1: 0,
+  hours2: 0,
+  mins2: 0,
+  secs2: 0,
+  rpm2IsDisabled: false,
+};
+
+const { SEC_IN_ONE_HOUR, SEC_IN_ONE_MIN, MIN_IN_ONE_HOUR } = timeConstants;
+
+/** This function checks for validity of input data and
+ *  returns the request body.
+ */
+export const getRequestBody = (formik, activeTab) => {
+  const formikValues = formik.values;
+
+  const time1 =
+    parseInt(formikValues.hours1) * MIN_IN_ONE_HOUR * SEC_IN_ONE_MIN +
+    parseInt(formikValues.mins1) * SEC_IN_ONE_MIN +
+    parseInt(formikValues.secs1);
+
+  const time2 =
+    parseInt(formikValues.hours2) * MIN_IN_ONE_HOUR * SEC_IN_ONE_MIN +
+    parseInt(formikValues.mins2) * SEC_IN_ONE_MIN +
+    parseInt(formikValues.secs2);
+
+  if (time1 !== 0) {
+    if (time1 > MAX_TIME_ALLOWED) {
+      return false;
+    }
+  }
+
+  if (time2 !== 0) {
+    if (time2 > MAX_TIME_ALLOWED) {
+      return false;
+    }
+  }
+
+  const rpm1 = parseInt(formikValues.rpm1.value);
+  if (!rpm1 || rpm1 === 0) {
+    return false;
+  }
+
+  const temperature = parseInt(formikValues.temperature);
+  if (temperature !== 0) {
+    if (temperature < MIN_TEMP_ALLOWED || temperature > MAX_TEMP_ALLOWED) {
+      return false;
+    }
+  }
+
+  const body = {
+    with_temp: activeTab === "2",
+    temperature: temperature ? temperature : 0,
+    follow_temp: formikValues.followTemperature,
+    rpm_1: parseInt(formikValues.rpm1.value) ? parseInt(formikValues.rpm1.value) : 0,
+    rpm_2: parseInt(formikValues.rpm2.value) ? parseInt(formikValues.rpm2.value) : 0,
+    time_1: time1 ? time1 : 0,
+    time_2: time2 ? time2 : 0,
+  };
+
+  return body;
 };

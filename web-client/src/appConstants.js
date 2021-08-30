@@ -155,6 +155,8 @@ export const API_ENDPOINTS = {
   pidCalibration: "pid-calibration",
   pidUpdate: "configs/extraction",
   manual: "manual",
+  startShaking: "start-shaking",
+  startHeating: "start-heating",
   emailReport: "email-report",
   graphUpdate: "rtpcr/graph-update-scale",
   uploadReport: "upload-report",
@@ -475,6 +477,8 @@ export const timeConstants = {
   SEC_IN_ONE_HOUR: 3600,
   MIN_IN_ONE_HOUR: 60,
 };
+export const MAX_RPM_VALUE = 1500;
+export const MIN_RPM_VALUE = 800;
 
 /**
  * Maximum number of wells that can be present in a plate.

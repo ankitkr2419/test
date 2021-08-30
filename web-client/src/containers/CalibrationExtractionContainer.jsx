@@ -7,11 +7,12 @@ import {
   logoutInitiated,
 } from "action-creators/loginActionCreators";
 import {
-  abortPid,
+  abort,
   commonDetailsInitiated,
   fetchPidInitiated,
   motorInitiated,
   runPid,
+  runPidReset,
   updateCommonDetailsInitiated,
   updatePidInitiated,
 } from "action-creators/calibrationActionCreators";
@@ -115,7 +116,8 @@ const CalibrationExtractionContainer = () => {
       name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
     if (pidStatus === PID_STATUS.running) {
       // dispatch abort API if progressing
-      dispatch(abortPid(token, deckName));
+      dispatch(abort(token, deckName));
+      dispatch(runPidReset());
     } else {
       // dispatch run PID progressing
       dispatch(runPid(token, deckName));

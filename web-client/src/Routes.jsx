@@ -167,6 +167,18 @@ export const routeDefinitions = [
         component: CalibrationContainer,
         key: 30,
       },
+      {
+        path: `${ROOT_URL_PATH}${ROUTES.calibration}/shaker`,
+        exact: true,
+        component: ShakingContainer,
+        key: 31,
+      },
+      // {
+      //   path: `${ROOT_URL_PATH}${ROUTES.calibration}/heater`,
+      //   exact: true,
+      //   component: CalibrationContainer,
+      //   key: 32,
+      // },
     ],
   },
 ];

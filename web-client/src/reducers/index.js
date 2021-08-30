@@ -70,6 +70,7 @@ import {
   updateCalibrationReducer,
   pidProgessReducer,
   pidReducer,
+  abortReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
@@ -129,6 +130,7 @@ const rootReducer = combineReducers({
   heaterProgressReducer,
   pidProgessReducer,
   pidReducer,
+  abortReducer,
   finishCreateTemplateReducer,
   reportReducer,
   analyseDataGraphFiltersReducer,

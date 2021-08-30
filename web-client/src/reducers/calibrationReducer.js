@@ -10,6 +10,7 @@ import {
   heaterProgressActions,
   updatePidDetailsActions,
   fetchPidDetailsActions,
+  abortActions,
 } from "actions/calibrationActions";
 import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
@@ -265,25 +266,8 @@ export const pidReducer = (state = pidInitialState, action) => {
         pidStatus: PID_STATUS.runFailed,
       });
 
-    case pidActions.pidAbortActionInitiated:
-      return state.merge({
-        isLoading: true,
-        pidStatus: PID_STATUS.aborting,
-      });
-
-    case pidActions.pidAbortActionSuccess:
-      return state.merge({
-        isLoading: false,
-        error: false,
-        pidStatus: PID_STATUS.stopped,
-      });
-
-    case pidActions.pidAbortActionFailure:
-      return state.merge({
-        isLoading: false,
-        error: true,
-        pidStatus: PID_STATUS.abortFailed,
-      });
+    case pidActions.pidActionReset:
+      return pidInitialState;
 
     case fetchPidDetailsActions.fetchPidActionInitiated:
       return state.merge({
@@ -331,6 +315,46 @@ export const pidReducer = (state = pidInitialState, action) => {
 
     case loginActions.loginReset:
       return pidProgressInitialState;
+
+    default:
+      return state;
+  }
+};
+
+// abort reducer
+const abortInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  abortStatus: null,
+});
+
+// common reducer: used to abort process for PID, heater and shaker
+export const abortReducer = (state = abortInitialState, action) => {
+  switch (action.type) {
+    case abortActions.abortActionInitiated:
+      return state.merge({
+        isLoading: true,
+      });
+
+    case abortActions.abortActionSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        abortStatus: "aborted",
+      });
+
+    case abortActions.abortActionFailed:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        abortStatus: "abortFailed",
+      });
+
+    case abortActions.abortActionReset:
+      return abortInitialState;
+
+    case loginActions.loginReset:
+      return abortInitialState;
 
     default:
       return state;

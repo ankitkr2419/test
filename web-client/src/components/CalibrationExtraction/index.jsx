@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router";
 
-import { Card, CardBody } from "core-components";
+import { Button, Card, CardBody } from "core-components";
 import {
   ButtonIcon,
   ColoredCircle,
@@ -9,7 +9,7 @@ import {
   MlModal,
   Text,
 } from "shared-components";
-import { MODAL_BTN, MODAL_MESSAGE, ROUTES } from "appConstants";
+import { MODAL_BTN, MODAL_MESSAGE, ROOT_URL_PATH, ROUTES } from "appConstants";
 import MotorComponent from "./MotorComponent";
 import CommonFieldsComponent from "./CommonFieldsComponent";
 
@@ -81,6 +81,26 @@ const CalibrationExtractionComponent = (props) => {
 
       <Card default className="my-3">
         <CardBody className="px-5 py-4">
+          <div className="d-flex">
+            {/* {Shaker Button} */}
+            <Button
+              onClick={() =>
+                history.push(`${ROOT_URL_PATH}${ROUTES.calibration}/shaker`)
+              }
+            >
+              Shaker
+            </Button>
+
+            {/* {Heater Button} */}
+            <Button
+            // onClick={history.push(
+            //   `${ROOT_URL_PATH}${ROUTES.calibration}/heater`
+            // )}
+            >
+              Heater
+            </Button>
+          </div>
+
           <div className="d-flex">
             {/* {PID Start/Abort Progress Component} */}
             <PidProgressComponent

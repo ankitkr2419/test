@@ -9,7 +9,36 @@ import {
   updateCommonDetailsActions,
   updatePidDetailsActions,
   fetchPidDetailsActions,
+  shakerActions,
+  heaterActions,
+  abortActions,
 } from "actions/calibrationActions";
+
+//fetch common details - name, email, roomTemperature
+export const shakerInitiated = (payload) => ({
+  type: shakerActions.shakerActionInitiated,
+  payload,
+});
+
+export const shakerFailed = ({ error }) => ({
+  type: shakerActions.shakerActionFailed,
+  payload: {
+    error,
+  },
+});
+
+//fetch common details - name, email, roomTemperature
+export const heaterInitiated = (payload) => ({
+  type: heaterActions.heaterActionInitiated,
+  payload: payload,
+});
+
+export const heaterFailed = ({ error }) => ({
+  type: heaterActions.heaterActionFailed,
+  payload: {
+    error,
+  },
+});
 
 //fetch common details - name, email, roomTemperature
 export const commonDetailsInitiated = (token) => ({
@@ -106,20 +135,31 @@ export const runPidFailed = (errorResponse) => ({
   },
 });
 
-export const abortPid = (token, deckName) => ({
-  type: pidActions.pidAbortActionInitiated,
+export const runPidReset = (errorResponse) => ({
+  type: pidActions.pidActionReset,
+  payload: {},
+});
+
+// common abort for PID, heater, shaker
+export const abort = (token, deckName) => ({
+  type: abortActions.abortActionInitiated,
   payload: {
     token,
     deckName,
   },
 });
 
-export const abortPidFailed = (errorResponse) => ({
-  type: pidActions.pidAbortActionFailure,
+export const abortFailed = (errorResponse) => ({
+  type: abortActions.abortActionFailed,
   payload: {
     ...errorResponse,
     error: true,
   },
+});
+
+export const abortReset = () => ({
+  type: abortActions.abortActionReset,
+  payload: {},
 });
 
 // action creators for pid details fetch

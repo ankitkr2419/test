@@ -1,3 +1,22 @@
+export const abortActions = {
+  abortActionInitiated: "ABORT_INITIATED",
+  abortActionSuccess: "ABORT_SUCCEEDED",
+  abortActionFailed: "ABORT_FAILED",
+  abortActionReset: "ABORT_RESET",
+};
+
+export const shakerActions = {
+  shakerActionInitiated: "SHAKER_INITIATED",
+  shakerActionSuccess: "SHAKER_SUCCEEDED",
+  shakerActionFailed: "SHAKER_FAILED",
+};
+
+export const heaterActions = {
+  heaterActionInitiated: "HEATER_INITIATED",
+  heaterActionSuccess: "HEATER_SUCCEEDED",
+  heaterActionFailed: "HEATER_FAILED",
+};
+
 export const heaterProgressActions = {
   heaterProgressAction: "HEATER_IN_PROGRESS",
 };
@@ -11,6 +30,7 @@ export const pidActions = {
   pidActionInitiated: "PID_START_INITIATED",
   pidActionSuccess: "PID_START_SUCCEEDED",
   pidActionFailure: "PID_START_FAILURE",
+  pidActionReset: "PID_START_RESET",
   pidAbortActionInitiated: "PID_ABORT_INITIATED",
   pidAbortActionSuccess: "PID_ABORT_SUCCESS",
   pidAbortActionFailure: "PID_ABORT_FAILURE",
