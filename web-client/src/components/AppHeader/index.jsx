@@ -236,7 +236,7 @@ const AppHeader = (props) => {
 
   return (
     <Header>
-      <Logo isUserLoggedIn={isUserLoggedIn} />
+      <Logo isUserLoggedIn={isUserLoggedIn} app={app} />
       {isUserLoggedIn && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map(
