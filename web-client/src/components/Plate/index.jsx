@@ -10,16 +10,16 @@ import SampleSideBarContainer from "containers/SampleSideBarContainer";
 import { EXPERIMENT_STATUS } from "appConstants";
 import Header from "./Header";
 
-import GridWrapper from "./Grid/GridWrapper";
 import GridComponent from "./Grid";
 import WellGridHeader from "./Grid/WellGridHeader";
-
-import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
+
+import GridWrapper from "./Grid/GridWrapper";
+import "./Plate.scss";
 
 const initialOptions = {
   legend: {
@@ -209,7 +209,6 @@ const Plate = (props) => {
   const showGraphOfWell = (index, show) => {
     // set selected well index
     setSelectedWell(index, show);
-    // setIsSidebarOpen(true);
   };
 
   const [activeTab, setActiveTab] = useState("wells");

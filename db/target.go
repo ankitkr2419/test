@@ -21,7 +21,18 @@ const (
 				VALUES %s `
 	insertTargetsQuery2 = `ON CONFLICT DO NOTHING;`
 
-	fetchTargetDyeQuery = `SELECT d.Name as dye FROM targets as t ,dyes as d WHERE t.dye_id = d.id AND t.id = $1`
+	fetchTargetDyeQuery          = `SELECT d.Name as dye FROM targets as t ,dyes as d WHERE t.dye_id = d.id AND t.id = $1`
+	upsertExpTargThresholdQuery1 = `INSERT INTO exp_target_threshold (
+		exp_id,
+		target_id,
+		threshold)
+		VALUES %s`
+
+	upsertExpTargThresholdQuery2 = ` ON CONFLICT (exp_id, target_id) DO UPDATE                           
+	SET threshold=excluded.threshold                                                                            
+	where exp_target_threshold.exp_id = excluded.exp_id and exp_target_threshold.target_id = excluded.target_id`
+
+	getTargetThreshold = `SELECT * FROM exp_target_threshold WHERE exp_id = $1 AND target_id = $2`
 )
 
 type Target struct {
@@ -29,11 +40,25 @@ type Target struct {
 	Name  string    `db:"name" json:"name" validate:"required"`
 	DyeID uuid.UUID `db:"dye_id" json:"dye_id" validate:"required"`
 }
+type ExpTargetThreshold struct {
+	ID           uuid.UUID `db:"id" json:"id"`
+	ExperimentID uuid.UUID `db:"exp_id" json:"exp_id" validate:"required"`
+	TargetID     uuid.UUID `db:"target_id" json:"target_id" validate:"required"`
+	Threshold    float32   `db:"threshold" json:"threshold" validate:"required"`
+}
 
 func (s *pgStore) ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error) {
 	err = s.db.Get(&dye, fetchTargetDyeQuery, targetID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing targets dye")
+		return
+	}
+	return
+}
+func (s *pgStore) GetTargetThreshold(ctx context.Context, expID, targetID uuid.UUID) (tarth ExpTargetThreshold, err error) {
+	err = s.db.Get(&tarth, getTargetThreshold, expID, targetID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing targets threshold")
 		return
 	}
 	return
@@ -56,7 +81,19 @@ func (s *pgStore) GetTargetByName(ctx context.Context, name string) (t Target, e
 	}
 	return
 }
+func (s *pgStore) UpsertTargetThreshold(ctx context.Context, tt []ExpTargetThreshold) (err error) {
 
+	for _, v := range tt {
+		stmt := makeTargetThresoldQuery(v)
+
+		_, err = s.db.Exec(stmt)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error("Error upserting target threshold")
+			return
+		}
+	}
+	return
+}
 func (s *pgStore) InsertTargets(ctx context.Context, Targets []Target) (err error) {
 
 	stmt := makeTargetQuery(Targets)
@@ -86,5 +123,18 @@ func makeTargetQuery(Targets []Target) string {
 
 	stmt += insertTargetsQuery2
 
+	return stmt
+}
+
+func makeTargetThresoldQuery(tt ExpTargetThreshold) string {
+
+	values := make([]string, 0, 1)
+
+	values = append(values, fmt.Sprintf("('%v','%v', %v)", tt.ExperimentID, tt.TargetID, tt.Threshold))
+
+	stmt := fmt.Sprintf(upsertExpTargThresholdQuery1,
+		strings.Join(values, ","))
+
+	stmt += upsertExpTargThresholdQuery2
 	return stmt
 }

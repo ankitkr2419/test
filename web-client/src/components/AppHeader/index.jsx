@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import PropTypes from "prop-types";
+
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import { logoutInitiated } from "action-creators/loginActionCreators";
+import {
+  logoutInitiated,
+  loginReset,
+} from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -13,7 +19,6 @@ import {
   NavItem,
   NavLink,
 } from "core-components";
-// import { getExperimentId } from 'selectors/experimentSelector';
 import {
   runExperiment,
   stopExperiment,
@@ -37,8 +42,6 @@ import {
 import { NAV_ITEMS, getBtnPropObj } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
-import { useHistory } from "react-router";
-import { toast } from "react-toastify";
 
 const AppHeader = (props) => {
   const {
@@ -92,6 +95,12 @@ const AppHeader = (props) => {
       setExpSuccessModalVisibility(true);
     }
   }, [isExperimentSucceeded]);
+
+  useEffect(() => {
+    if (isExperimentStopped === true) {
+      dispatch(loginReset());
+    }
+  }, [isExperimentStopped, dispatch]);
 
   // logout user
   const logoutClickHandler = () => {
@@ -237,17 +246,17 @@ const AppHeader = (props) => {
       {isUserLoggedIn && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map(
-            (ele) =>
-              !getIsNavLinkHidden(ele.path) && (
-                <NavItem key={ele.name}>
+            (navItem) =>
+              !getIsNavLinkHidden(navItem.path) && (
+                <NavItem key={navItem.name}>
                   <NavLink
                     onClick={(event) => {
-                      onNavLinkClickHandler(event, `/${ele.path}`);
+                      onNavLinkClickHandler(event, `/${navItem.path}`);
                     }}
-                    to={ele.path}
-                    disabled={getIsNavLinkDisabled(`/${ele.path}`)}
+                    to={navItem.path}
+                    disabled={getIsNavLinkDisabled(`/${navItem.path}`)}
                   >
-                    {ele.name}
+                    {navItem.name}
                   </NavLink>
                 </NavItem>
               )
@@ -367,7 +376,7 @@ const AppHeader = (props) => {
                   size={10}
                   className="user position-absolute font-weight-bold text-capitalize my-auto"
                 >
-                  {role ? role : ""}
+                  {role || ""}
                 </Text>
                 <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
                   <DropdownToggle icon name="user" size={32} />

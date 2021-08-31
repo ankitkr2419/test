@@ -116,6 +116,7 @@ const ExperimentGraphContainer = (props) => {
 
 ExperimentGraphContainer.propTypes = {
   experimentStatus: PropTypes.string,
+  showTempGraph: PropTypes.bool,
 };
 
 export { ExperimentGraphContainer };

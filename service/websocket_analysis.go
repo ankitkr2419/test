@@ -67,15 +67,23 @@ func makeResult(scan plc.Scan, file *excelize.File) (result []db.Result) {
 		r.WellPosition = w
 		r.ExperimentID = experimentValues.experimentID
 		r.Cycle = scan.Cycle
+
 		for _, t := range experimentValues.targets {
 			t.DyePosition = t.DyePosition - 1 // -1 dye position starts with 1 and Emission starts from 0
 			r.TargetID = t.TargetID
 			r.FValue = scan.Wells[w-1][t.DyePosition] // for 5th well & target 2 = scanWells[5][1] //w-1 as emissions starts from 0
-			wellFval = append(wellFval, r.FValue)
 			result = append(result, r)
 		}
 
 	}
+
+	for _, t := range experimentValues.targets {
+		for _, w := range experimentValues.activeWells {
+			FValue := scan.Wells[w-1][t.DyePosition-1]
+			wellFval = append(wellFval, FValue)
+		}
+	}
+
 	row := []interface{}{fmt.Sprintf("cycle %d", scan.Cycle)}
 	for _, v := range wellFval {
 		row = append(row, v)
@@ -232,7 +240,7 @@ func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []
 
 func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16) (thresholdLine map[db.TargetDetails]float32) {
 
-	formulaWellTarget := make(map[TargetCycleWell]float32, cycles)
+	formulaWellTarget := make(map[TargetWell]float32, cycles)
 	var finalSum float32
 	thresholdLine = make(map[db.TargetDetails]float32, len(targets))
 	// ex: for 8 active wells * 6 targets * no of cycle
@@ -240,7 +248,7 @@ func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDeta
 	for _, t := range targets {
 
 		var wellResult graph
-		var key TargetCycleWell
+		var key TargetWell
 
 		wellResult.TargetID = t.TargetID
 		for _, aw := range wells {
@@ -253,7 +261,7 @@ func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDeta
 					wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
 				}
 			}
-			key = TargetCycleWell{
+			key = TargetWell{
 				Target: wellResult.TargetID,
 				Well:   wellResult.WellPosition,
 			}
@@ -270,6 +278,68 @@ func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDeta
 		thresholdLine[t] = finalSum / float32(len(formulaWellTarget))
 	}
 
+	return
+}
+
+func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDetails, bl Baseline) (baselineValues []graph) {
+
+	var wellResult graph
+	var tempGraph []graph
+	// ex: for 8 active wells * 6 targets * no of cycle
+
+	if bl.AutoBaseline {
+		start, end := config.GetCycleRange()
+		bl.StartCycle = start
+		bl.EndCycle = end
+	}
+
+	var targetSum float32
+	targetAverage := make(map[uuid.UUID]float32, len(targets))
+	for _, t := range targets {
+
+		wellResult.TargetID = t.TargetID
+		for _, aw := range wells {
+			var sum uint16
+			var avg float32
+			wellResult.WellPosition = aw
+			for _, r := range result {
+				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
+					wellResult.ExperimentID = r.ExperimentID
+					wellResult.TargetID = r.TargetID
+					wellResult.Threshold = r.Threshold
+					wellResult.TotalCycles = bl.EndCycle
+					if r.Cycle <= bl.EndCycle && r.Cycle >= bl.StartCycle {
+						sum = sum + r.FValue
+						wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
+						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
+					}
+				}
+			}
+			avg = float32(sum / bl.EndCycle)
+			targetSum = targetSum + avg
+			logger.Infoln("targetSum", targetSum)
+			tempGraph = append(tempGraph, wellResult)
+			wellResult.Cycle = []uint16{}
+			wellResult.FValue = []float32{}
+		}
+
+		targetAverage[t.TargetID] = targetSum / float32(len(wells))
+		logger.Infoln("targetAvg", targetAverage)
+
+	}
+	for _, v := range tempGraph {
+		v.FValue = calculateBaselineValues(v.FValue, targetAverage[v.TargetID])
+		baselineValues = append(baselineValues, v)
+	}
+	return
+}
+
+func calculateBaselineValues(array []float32, average float32) (deviation []float32) {
+	for _, v := range array {
+		value := v - average
+		graphVal := scaleThreshold(value)
+		deviation = append(deviation, graphVal)
+	}
 	return
 }
 

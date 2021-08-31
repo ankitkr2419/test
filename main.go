@@ -184,6 +184,14 @@ func startApp(deps service.Dependencies) (err error) {
 
 	go service.WaitForGracefulShutdown(deps, idleConnsClosed)
 
+	// handle global panics
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Errorln("Program panicked: ", r)
+			service.ShutDownGracefully(deps)
+		}
+	}()
+
 	server.Run(*addr)
 	<-idleConnsClosed
 

@@ -18,6 +18,8 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		var u db.User
 		var token string
+		var valueI interface{}
+		var ok bool
 		err := json.NewDecoder(req.Body).Decode(&u)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
@@ -27,19 +29,24 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
-		if deck != "" {
-			value, ok := userLogin.Load(deck)
-			if !ok {
-				logger.WithField("err", "DECK ERROR").Error(responses.UserInvalidDeckError)
-				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserInvalidDeckError.Error()})
-				return
-			}
-			if value.(bool) == true {
-				logger.WithField("err", "DECK ERROR").Error(responses.UserDeckLoginError)
-				responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserDeckLoginError.Error()})
-				return
-			}
+		if deck == blank {
+			goto skipDeckUserCheck
 		}
+
+		valueI, ok = deckUserLogin.Load(deck)
+		if !ok {
+			logger.WithField("err", "DECK ERROR").Error(responses.UserInvalidDeckError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserInvalidDeckError.Error()})
+			return
+		}
+		if valueI.(string) != u.Username && valueI.(string) != blank {
+			loggedInInfo := fmt.Errorf("%v. %v user already logged in.", responses.UserDeckLoginError, valueI)
+			logger.WithField("err", "DECK ERROR").Error(loggedInInfo)
+			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: loggedInInfo.Error()})
+			return
+		}
+
+	skipDeckUserCheck:
 
 		valid, respBytes := validate(u)
 		if !valid {
@@ -52,7 +59,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		// Getting back user along with his role
 		u, err = deps.Store.ValidateUser(req.Context(), u)
-		if err != nil || u.Role == "" {
+		if err != nil || u.Role == blank {
 			if err == nil {
 				err = responses.UserInvalidError
 			}
@@ -69,11 +76,11 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		if deck != "" {
+		if deck != blank {
 			token, err = EncodeToken(u.Username, authID, u.Role, deck, Application, map[string]string{})
-			userLogin.Store(deck, true)
+			deckUserLogin.Store(deck, u.Username)
 		} else {
-			token, err = EncodeToken(u.Username, authID, u.Role, "", Application, map[string]string{})
+			token, err = EncodeToken(u.Username, authID, u.Role, blank, Application, map[string]string{})
 		}
 
 		if err != nil {
@@ -88,18 +95,24 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.WithFields(logger.Fields{
 			"Username": u.Username,
-			"Role": u.Role,
-			"Deck": deck,
+			"Role":     u.Role,
+			"Deck":     deck,
 		}).Infoln("User logged in successfully")
-		if deck != "" && (u.Role == admin || u.Role == engineer) && ( Application == Combined || Application == Extraction)  {
-			deps.PlcDeck[deck].SetEngineerOrAdminLogged(true)
-		} else if deck != "" && ( Application == Combined || Application == Extraction)  {
-			deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
-		}
+
+		checkEngOrAdminLoggedOnDeck(deps, deck, u)
 
 		logger.Infoln(responses.UserLoginSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, response)
 	})
+}
+
+func checkEngOrAdminLoggedOnDeck(deps Dependencies, deck string, u db.User) {
+	if deck != blank && (u.Role == admin || u.Role == engineer) && (Application == Combined || Application == Extraction) {
+		deps.PlcDeck[deck].SetEngineerOrAdminLogged(true)
+	} else if deck != blank && (Application == Combined || Application == Extraction) {
+		deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
+	}
+	return
 }
 
 func createUserHandler(deps Dependencies) http.HandlerFunc {
@@ -177,28 +190,31 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 		validRoles := []string{admin, engineer, supervisor, operator}
+		var ok bool
+		var userI interface{}
 
 		// if the user is a deck user then only validate that if the user is logged out.
 		// otherwise set the deck to cloud user
-		if deck != "" {
-			value, ok := userLogin.Load(deck)
-			if !ok {
-				logger.WithField("err", "DECK TOKEN").Error(responses.UserInvalidDeckError)
-				responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserInvalidDeckError.Error()})
 
-				return
-			}
-			if value.(bool) == false {
-				logger.WithField("err", "DECK LOGGED OUT").Error(responses.UserTokenLoggedOutDeckError)
-				responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserTokenLoggedOutDeckError.Error()})
-
-				return
-			}
-
-		} else {
+		if deck == blank {
 			deck = "cloudUser"
+			goto skipDeckUserCheck
 		}
 
+		userI, ok = deckUserLogin.Load(deck)
+		if !ok {
+			logger.WithField("err", "DECK TOKEN").Error(responses.UserInvalidDeckError)
+			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserInvalidDeckError.Error()})
+			return
+		}
+
+		if userI.(string) == blank {
+			logger.WithField("err", "DECK ALREADY LOGGED OUT").Error(responses.UserTokenLoggedOutDeckError)
+			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.UserTokenLoggedOutDeckError.Error()})
+			return
+		}
+
+	skipDeckUserCheck:
 		userAuth, err := getUserAuth(token, deck, deps, Application, validRoles...)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.UserAuthDataFetchError)
@@ -212,9 +228,9 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
 			return
 		}
-		if (deck == plc.DeckA || deck== plc.DeckB) {
-			userLogin.Store(deck, false)
-			if  Application == Combined || Application == Extraction {
+		if deck == plc.DeckA || deck == plc.DeckB {
+			deckUserLogin.Store(deck, blank)
+			if Application == Combined || Application == Extraction {
 				deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 			}
 		}
@@ -223,5 +239,29 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UserLogoutSuccess})
 		return
 
+	})
+}
+
+func deleteUserHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		vars := mux.Vars(req)
+		username := vars["username"]
+
+		currentUser := req.Context().Value(db.ContextKeyUsername).(string)
+		if currentUser == username {
+			logger.WithField("err", "SAMEUSERERROR").Error(responses.SameUserDeleteError)
+			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.SameUserDeleteError.Error()})
+			return
+		}
+		err := deps.Store.DeleteUser(req.Context(), username)
+		if err != nil {
+			logger.WithField("err", err.Error())
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserDeleteError.Error()})
+			return
+		}
+
+		logger.Infoln(responses.UserDeleteSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UserDeleteSuccess})
 	})
 }

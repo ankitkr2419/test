@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useFormik } from "formik";
+
 import {
   Button,
   Form,
@@ -18,11 +20,9 @@ import {
   validateAllFields,
   getRequestBody,
 } from "./helper";
-import { useCallback } from "react";
-import { useFormik } from "formik";
 
 const CalibrationComponent = (props) => {
-  let { configs, saveBtnClickHandler } = props;
+  let { configs, saveButtonClickHandler } = props;
 
   const formik = useFormik({
     initialValues: formikInitialState,
@@ -51,7 +51,7 @@ const CalibrationComponent = (props) => {
 
     if (validateAllFields(formik.values) === true) {
       const requestBody = getRequestBody(formik.values);
-      saveBtnClickHandler(requestBody);
+      saveButtonClickHandler(requestBody);
     }
   };
 
@@ -59,6 +59,14 @@ const CalibrationComponent = (props) => {
     const isValid = isValueValid(name, value);
     formik.setFieldValue(`${name}.isInvalid`, !isValid);
   }, []);
+
+  const handleOnChange = (event, name) => {
+    formik.setFieldValue(`${name}.value`, event.target.value);
+  };
+
+  const handleOnFocus = (name) => {
+    formik.setFieldValue(`${name}.isInvalid`, false);
+  };
 
   return (
     <div className="calibration-content px-5">
@@ -91,18 +99,11 @@ const CalibrationComponent = (props) => {
                           type === "number" ? `${min} - ${max}` : "Type here"
                         }
                         value={value}
-                        onChange={(event) => {
-                          formik.setFieldValue(
-                            `${name}.value`,
-                            event.target.value
-                          );
-                        }}
+                        onChange={(event) => handleOnChange(event, name)}
                         onBlur={(event) =>
                           handleBlurChange(name, event.target.value)
                         }
-                        onFocus={() =>
-                          formik.setFieldValue(`${name}.isInvalid`, false)
-                        }
+                        onFocus={() => handleOnFocus(name)}
                       />
                       {(isInvalid || value == null) && (
                         <div className="flex-70">

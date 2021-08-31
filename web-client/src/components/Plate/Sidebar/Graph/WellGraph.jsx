@@ -81,6 +81,7 @@ WellGraph.propTypes = {
   onThresholdChangeHandler: PropTypes.func.isRequired,
   toggleGraphFilterActive: PropTypes.func.isRequired,
   data: PropTypes.object.isRequired,
+  isThresholdInvalid: PropTypes.bool,
 };
 
 export default React.memo(WellGraph);

@@ -1,8 +1,17 @@
 package tec_1089
 
 /*
+typedef struct Config
+{
+    float CurrentLimitation;
+    float VoltageLimitation;
+    float CurrentErrorThreshold;
+    float VoltageErrorThreshold;
+    float PeltierMaxCurrent;
+    float PeltierDeltaTemperature;
+} Config;
 int setTempAndRamp(double, double);
-int initiateTEC();
+int initiateTEC(Config);
 int checkForErrorState();
 int autoTune();
 int resetDevice();
@@ -61,11 +70,26 @@ func NewTEC1089Driver(wsMsgCh chan string, wsErrch chan error, exit chan error, 
 	return &tec1089 // tec Driver
 }
 
-var errorCheckStopped, tecInProgress bool
+var errorCheckStarted, tecInProgress bool
 var prevTemp float32 = 27.0
 
+
+func convertTECConfigToC(tecC config.TEC) (cfg C.struct_Config) {
+	cfg.CurrentLimitation = C.float(tecC.CurrentLimitation)
+	cfg.VoltageLimitation = C.float(tecC.VoltageLimitation)
+	cfg.CurrentErrorThreshold = C.float(tecC.CurrentErrorThreshold)
+	cfg.VoltageErrorThreshold = C.float(tecC.VoltageErrorThreshold) 
+	cfg.PeltierMaxCurrent= C.float(tecC.PeltierMaxCurrent)
+	cfg.PeltierDeltaTemperature= C.float(tecC.PeltierDeltaTemperature)
+
+	return
+}
+
 func (t *TEC1089) InitiateTEC() (err error) {
-	C.initiateTEC()
+
+	cfg := convertTECConfigToC(config.GetTECConfigValues())
+
+	C.initiateTEC(cfg)
 
 	go startErrorCheck()
 
@@ -98,6 +122,12 @@ func startMonitor() {
 }
 
 func startErrorCheck() {
+	if errorCheckStarted {
+		return
+	}
+
+	errorCheckStarted = true
+
 	go func() {
 		time.Sleep(5 * time.Second)
 		for {
@@ -105,7 +135,7 @@ func startErrorCheck() {
 			var errNum C.int
 			errNum = C.checkForErrorState()
 			if errNum != 0 {
-				errorCheckStopped = true
+				errorCheckStarted = false
 				logger.Errorln("Error Code for TEC: ", errNum)
 				return
 			}
@@ -118,7 +148,10 @@ func (t *TEC1089) SetTempAndRamp(ts tec.TECTempSet) (err error) {
 		return fmt.Errorf("TEC is already in Progress, please wait")
 	}
 	tecInProgress = true
+	logger.Warnln("TEC Start Time: ", time.Now())
 	tempVal := C.setTempAndRamp(C.double(ts.TargetTemperature), C.double(ts.TargetRampRate))
+	logger.Warnln("TEC End Time: ", time.Now())
+
 	tecInProgress = false
 	// Handle Failure, Try again 3 times in interval of 200ms
 	i := 0
@@ -144,9 +177,7 @@ func (t *TEC1089) AutoTune() (err error) {
 func (t *TEC1089) ResetDevice() (err error) {
 	C.resetDevice()
 
-	if errorCheckStopped {
-		startErrorCheck()
-	}
+	t.InitiateTEC()
 	return nil
 }
 
@@ -200,8 +231,8 @@ func (t *TEC1089) TestRun(plcDeps plc.Driver) (err error) {
 func (t *TEC1089) ReachRoomTemp() (err error) {
 	logger.Infoln("Going Back to Room Temp ")
 	ts := tec.TECTempSet{
-		TargetTemperature: config.GetRoomTemp(),
-		TargetRampRate:    tec.RoomTempRamp,
+		TargetTemperature: float64(config.GetRoomTemp()),
+		TargetRampRate:    db.RoomTempRamp,
 	}
 	err = t.SetTempAndRamp(ts)
 	if err != nil {

@@ -36,11 +36,11 @@ const SubHeader = (props) => {
   let temperature = 0;
   let cycleValue = 0;
 
-  const TEMP_ARR_LEN = temperatureData?.length;
-  if (TEMP_ARR_LEN > 0) {
+  const TEMPERATURE_DATA_LENGTH = temperatureData.length;
+  if (TEMPERATURE_DATA_LENGTH > 0) {
     // temperatureData is an array, and this array gets updated everytime new data is pushed.
     // we need the latest index of array
-    const { lid_temp, temp, cycle } = temperatureData[TEMP_ARR_LEN - 1];
+    const { lid_temp, temp, cycle } = temperatureData[TEMPERATURE_DATA_LENGTH - 1];
 
     lidTemperature = lid_temp;
     temperature = temp;
@@ -72,11 +72,6 @@ const SubHeader = (props) => {
 
   const showProgressBar = () => {
     return experimentStatus === EXPERIMENT_STATUS.running;
-    // return (
-    //   experimentStatus === EXPERIMENT_STATUS.success ||
-    //   experimentStatus === EXPERIMENT_STATUS.running ||
-    //   experimentStatus === EXPERIMENT_STATUS.stopped
-    // );
   };
 
   return (
@@ -85,7 +80,7 @@ const SubHeader = (props) => {
         <Text Tag="h6" className="text-capitalize mb-0 mr-auto">
           {templateName}
         </Text>
-        {TEMP_ARR_LEN > 0 && (
+        {TEMPERATURE_DATA_LENGTH > 0 && (
           <div className="d-flex align-items-center">
             <Text className="mb-0">
               Cycle - {cycleValue} / {totalCycles ? totalCycles : 0}{" "}

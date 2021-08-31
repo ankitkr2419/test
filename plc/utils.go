@@ -9,7 +9,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning bool
+var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning, LidPidTuningInProgress bool
 var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
 
