@@ -10,6 +10,7 @@ import {
   updateCalibrationActions,
   updateCommonDetailsActions,
   updatePidDetailsActions,
+  createTipsTubesActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -20,6 +21,7 @@ import {
   updateCommonDetailsFailed,
   fetchPidFailed,
   updatePidFailed,
+  createTipsOrTubesFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* fetchCommonDetails(actions) {
@@ -245,6 +247,32 @@ export function* updatePidDetails(actions) {
   }
 }
 
+export function* createTipsOrTubes(actions) {
+  const {
+    payload: { token, body },
+  } = actions;
+
+  const { successAction, failureAction } = createTipsTubesActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.tipTube}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating tips or tubes", error);
+    yield put(createTipsOrTubesFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(
     commonDetailsActions.commonDetailsInitiated,
@@ -270,4 +298,5 @@ export function* calibrationSaga() {
     updatePidDetailsActions.updatePidActionInitiated,
     updatePidDetails
   );
+  yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
 }

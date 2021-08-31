@@ -5,16 +5,8 @@ export const tipTubeTypeOptions = [
   { label: "Tube", value: "tube" },
 ];
 
-export const formikInitialState = {
-  name: { value: null, isInvalid: false },
-  email: { value: null, isInvalid: false },
-  roomTemperature: { value: null, isInvalid: false },
-  motorNumber: { value: null, isInvalid: false },
-  direction: { value: null, isInvalid: false },
-  distance: { value: null, isInvalid: false },
-  pidTemperature: { value: null, isInvalid: false },
-
-  //TipsTubes fields
+export const formikInitialStateForTipsTubes = {
+  tipTubeId: { value: null, isInvalid: false },
   tipTubeName: { value: null, isInvalid: false },
   tipTubeType: { value: tipTubeTypeOptions[0], isInvalid: false },
   allowedPositions: {
@@ -30,6 +22,17 @@ export const formikInitialState = {
   volume: { value: null, isInvalid: false },
   height: { value: null, isInvalid: false },
   ttBase: { value: null, isInvalid: false },
+};
+
+export const formikInitialState = {
+  name: { value: null, isInvalid: false },
+  email: { value: null, isInvalid: false },
+  roomTemperature: { value: null, isInvalid: false },
+  motorNumber: { value: null, isInvalid: false },
+  direction: { value: null, isInvalid: false },
+  distance: { value: null, isInvalid: false },
+  pidTemperature: { value: null, isInvalid: false },
+  ...formikInitialStateForTipsTubes, //TipsTubes fields
 };
 
 /**
@@ -89,17 +92,26 @@ export const isBtnDisabled = (state) => {
 };
 
 export const isTipsTubesButtonDisabled = (state) => {
-  const { tipTubeName, tipTubeType, allowedPositions, volume, height, ttBase } =
-    state;
+  const {
+    tipTubeId,
+    tipTubeName,
+    tipTubeType,
+    allowedPositions,
+    volume,
+    height,
+    ttBase,
+  } = state;
 
   let arrayOfAllowedPositions = formikToArray(allowedPositions);
 
   if (
+    !tipTubeId.value ||
     !tipTubeName.value ||
     !tipTubeType.value ||
     !volume.value ||
     !height.value ||
     !ttBase.value ||
+    tipTubeId.isInvalid ||
     tipTubeName.isInvalid ||
     tipTubeType.isInvalid ||
     volume.isInvalid ||

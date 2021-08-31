@@ -14,6 +14,8 @@ import {
   CheckBox,
 } from "core-components";
 import {
+  MIN_TIPTUBE_ID,
+  MAX_TIPTUBE_ID,
   MIN_TIPTUBE_VOLUME,
   MAX_TIPTUBE_VOLUME,
   MIN_TIPTUBE_HEIGHT,
@@ -31,8 +33,21 @@ import { CheckBoxGroup } from "components/AppHeader/CheckBoxGroup";
 
 const TipsTubesComponent = (props) => {
   const { handleTipesTubesButton, formik } = props;
-  const { tipTubeName, tipTubeType, allowedPositions, volume, height, ttBase } =
-    formik.values;
+  const {
+    tipTubeId,
+    tipTubeName,
+    tipTubeType,
+    allowedPositions,
+    volume,
+    height,
+    ttBase,
+  } = formik.values;
+
+  const handleBlurID = (value) => {
+    if (!value || value < MIN_TIPTUBE_ID || value > MAX_TIPTUBE_ID) {
+      formik.setFieldValue("tipTubeId.isInvalid", true);
+    }
+  };
 
   const handleBlurName = (value) => {
     if (!value) {
@@ -87,6 +102,38 @@ const TipsTubesComponent = (props) => {
           <Row form>
             <Col sm={4}>
               <FormGroup>
+                <Label for="tipTubeId" className="font-weight-bold">
+                  ID
+                </Label>
+                <Input
+                  type="number"
+                  name="tipTubeId"
+                  id="tipTubeId"
+                  placeholder={`${MIN_TIPTUBE_ID} - ${MAX_TIPTUBE_ID}`}
+                  value={tipTubeId.value || ""}
+                  max={MAX_TIPTUBE_ID}
+                  min={MIN_TIPTUBE_ID}
+                  onChange={(event) =>
+                    handleOnChange(
+                      "tipTubeId.value",
+                      parseInt(event.target.value)
+                    )
+                  }
+                  onBlur={(e) => handleBlurID(parseInt(e.target.value))}
+                  onFocus={() => handleOnChange("tipTubeId.isInvalid", false)}
+                />
+                {tipTubeId.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      ID should be {MIN_TIPTUBE_ID} - {MAX_TIPTUBE_ID}
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col>
+
+            <Col sm={4}>
+              <FormGroup>
                 <Label for="tipTubeName" className="font-weight-bold">
                   Name
                 </Label>
@@ -94,7 +141,7 @@ const TipsTubesComponent = (props) => {
                   name="tipTubeName"
                   id="tipTubeName"
                   placeholder={"Type here"}
-                  value={tipTubeName.value}
+                  value={tipTubeName.value || ""}
                   onChange={(event) =>
                     handleOnChange("tipTubeName.value", event.target.value)
                   }
@@ -140,7 +187,7 @@ const TipsTubesComponent = (props) => {
                   id="volume"
                   step="0.1"
                   placeholder={`${MIN_TIPTUBE_VOLUME} - ${MAX_TIPTUBE_VOLUME}`}
-                  value={volume.value}
+                  value={volume.value || ""}
                   max={MAX_TIPTUBE_VOLUME}
                   min={MIN_TIPTUBE_VOLUME}
                   onChange={(event) =>
@@ -173,7 +220,7 @@ const TipsTubesComponent = (props) => {
                   name="height"
                   id="height"
                   placeholder={`${MIN_TIPTUBE_HEIGHT} - ${MAX_TIPTUBE_HEIGHT}`}
-                  value={height.value}
+                  value={height.value || ""}
                   max={MAX_TIPTUBE_HEIGHT}
                   min={MIN_TIPTUBE_HEIGHT}
                   onChange={(event) =>
@@ -204,7 +251,7 @@ const TipsTubesComponent = (props) => {
                   id="ttBase"
                   step="0.1"
                   placeholder={`${MIN_TIPTUBE_TTBASE} - ${MAX_TIPTUBE_TTBASE}`}
-                  value={ttBase.value}
+                  value={ttBase.value || ""}
                   max={MAX_TIPTUBE_TTBASE}
                   min={MIN_TIPTUBE_TTBASE}
                   onChange={(event) =>
@@ -230,18 +277,18 @@ const TipsTubesComponent = (props) => {
             <Col sm={12}>
               <FormGroup>
                 <Label className="font-weight-bold">Allowed Positions</Label>
-
                 <CheckBoxGroup className="d-flex" style={{ height: "auto" }}>
                   {Object.entries(allowedPositions?.value).map(
                     ([key, value]) => {
                       return (
                         <CheckBox
+                          key={key}
                           id={key}
                           name={key}
                           label={key}
                           className="mr-4"
                           checked={value}
-                          onClick={() => onAllowedPositionChanged(key, value)}
+                          onChange={() => onAllowedPositionChanged(key, value)}
                         />
                       );
                     }

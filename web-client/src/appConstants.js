@@ -163,6 +163,7 @@ export const API_ENDPOINTS = {
   temperature: "temperature",
   setThreshold: "set-threshold",
   getBaseline: "get-baseline",
+  tipTube: "tiptube",
 };
 
 export const MODAL_MESSAGE = {
@@ -509,6 +510,8 @@ export const MAX_ROOM_TEMPERATURE = 30;
 export const MIN_ROOM_TEMPERATURE = 20;
 
 //engineer's flow tips & tubes constants
+export const MIN_TIPTUBE_ID = 0;
+export const MAX_TIPTUBE_ID = 9999;
 export const MIN_TIPTUBE_VOLUME = 0;
 export const MAX_TIPTUBE_VOLUME = 9999;
 export const MIN_TIPTUBE_HEIGHT = 0;

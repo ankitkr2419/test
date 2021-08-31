@@ -70,6 +70,7 @@ import {
   updateCalibrationReducer,
   pidProgessReducer,
   pidReducer,
+  createTipTubeReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
@@ -134,6 +135,7 @@ const rootReducer = combineReducers({
   analyseDataGraphFiltersReducer,
   analyseDataGraphThresholdReducer,
   analyseDataGraphBaselineReducer,
+  createTipTubeReducer,
 });
 
 export default rootReducer;
