@@ -1,7 +1,10 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -170,55 +173,51 @@ func heaterHandler(deps Dependencies) http.HandlerFunc {
 func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var dyeWellTolerance, opticalResult []db.DyeWellTolerance
+		var dyeWellTolerance db.DyeWellTolerance
 		err := json.NewDecoder(req.Body).Decode(&dyeWellTolerance)
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.DyeToleranceDecodeError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeToleranceDecodeError.Error()})
 			return
 		}
-		cycleCount := config.GetEngineerCycleCount()
-		//validate the kit id
-		plc.ExperimentRunning = true
 
-		deps.Plc.HomingRTPCR()
-
-		for _, v := range dyeWellTolerance {
-			dye, err := deps.Store.ShowDye(req.Context(), v.DyeID)
-			if err != nil {
-				logger.WithField("err", err.Error()).Errorln(responses.DyeDBFetchError)
-				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeDBFetchError.Error()})
-				return
-			}
-			knownValue, valid := validateandGetKitID(v.KitID, dye.Position)
-			if !valid {
-				logger.WithField("err", "INVALID KIT ID").Errorln(responses.InvalidKitIDError)
-				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidKitIDError.Error()})
-				return
-			}
-
-			opticalResult, err = deps.Plc.CalculateOpticalResult(dye, v.KitID, knownValue, cycleCount)
-			if err != nil {
-				logger.WithField("err", err.Error()).Errorln(responses.CalculateResultError)
-				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.CalculateResultError.Error()})
-				return
-			}
-
-		}
-
-		// write logic to calculate the optical result and then store the data to the database
-
-		err = deps.Store.UpsertDyeWellTolerance(req.Context(), opticalResult)
-		if err != nil {
-			logger.WithField("err", err.Error()).Errorln(responses.DyeToleranceDecodeError)
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeToleranceDecodeError.Error()})
-			return
-		}
-
+		go deps.Plc.HomingRTPCR()
+		go toleranceCalulation(deps, dyeWellTolerance)
 		logger.Infoln(responses.DyeToleranceCreateSuccess)
-		responseCodeAndMsg(rw, http.StatusCreated, "created successfully")
+		responseCodeAndMsg(rw, http.StatusCreated, "dye tolerance calculation in progress")
 
 	})
+}
+
+func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) {
+	cycleCount := config.GetEngineerCycleCount()
+	//validate the kit id
+	plc.ExperimentRunning = true
+	dye, err := deps.Store.ShowDye(context.Background(), dwtol.DyeID)
+	defer func() {
+		if err != nil {
+			deps.WsErrCh <- err
+			return
+		}
+	}()
+	knownValue, valid := validateandGetKitID(dwtol.KitID, dye.Position)
+	if !valid {
+		err = errors.New("invalid kit id")
+		return
+	}
+
+	opticalResult, err := deps.Plc.CalculateOpticalResult(dye, dwtol.KitID, knownValue, cycleCount)
+	if err != nil {
+		return
+	}
+	err = deps.Store.UpsertDyeWellTolerance(context.Background(), opticalResult)
+	if err != nil {
+		return
+	}
+
+	deps.WsMsgCh <- "PROGRESS_OPTCALIB_" + fmt.Sprintf("%d", 100)
+	deps.WsMsgCh <- "SUCCESS_OPTCALIB"
+
 }
 
 func validateandGetKitID(kitID string, dyePos int) (knownValue int64, valid bool) {
@@ -243,7 +242,7 @@ func validateandGetKitID(kitID string, dyePos int) (knownValue int64, valid bool
 		logger.Errorln("year of kit id is outdated")
 		valid = false
 	}
-	knownValue, err = strconv.ParseInt(strings.Join(kitIDArr[3:5], ""), 10, 64)
+	knownValue, err = strconv.ParseInt(strings.Join(kitIDArr[2:6], ""), 10, 64)
 	if err != nil {
 		valid = false
 	}

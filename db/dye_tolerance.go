@@ -23,11 +23,13 @@ const (
 		dye_id,
 		well_no,
 		kit_id,
-		optical_result)
+		optical_result,
+		valid)
 		VALUES %s`
 	insertDyeWellToleranceQuery2 = ` ON CONFLICT (dye_id,well_no) DO UPDATE
 	SET kit_id = excluded.kit_id,
-	optical_result = excluded.optical_result                                                                            
+	optical_result = excluded.optical_result,
+	valid = excluded.valid                                                                            
 	where dye_well_tolerance.dye_id = excluded.dye_id AND dye_well_tolerance.well_no = excluded.well_no;`
 )
 
@@ -49,7 +51,7 @@ func makeDyeWellToleranceQuery(dwTolerance []DyeWellTolerance) string {
 	values := make([]string, 0, len(dwTolerance))
 
 	for _, c := range dwTolerance {
-		values = append(values, fmt.Sprintf("('%v', %v,'%v',%v) ", c.DyeID, c.WellNo, c.KitID, c.OpticalResult))
+		values = append(values, fmt.Sprintf("('%v', %v,'%v',%v,%v) ", c.DyeID, c.WellNo, c.KitID, c.OpticalResult, c.Valid))
 	}
 
 	stmt := fmt.Sprintf(insertDyeWellToleranceQuery1,

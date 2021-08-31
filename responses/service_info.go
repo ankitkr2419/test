@@ -151,7 +151,7 @@ var (
 
 	// Configs
 	UpdateConfigSuccess       = "Config was updated successfully"
-	DyeToleranceCreateSuccess = "Dye tolerance values added successfully"
+	DyeToleranceCreateSuccess = "dye tolerance calculation in progress"
 	UserDeleteSuccess         = "user deleted successfully"
 )
 
