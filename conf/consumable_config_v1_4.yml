@@ -145,11 +145,11 @@ ConsumableDistance:
     description: "syringe max down limit"
   - id: 301
     name: "piercing_height_cartridge_1"
-    distance: 7
+    distance: 5
     description: "syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_1. This is below the deck base"
   - id: 302
     name: "piercing_height_cartridge_2"
-    distance: 5
+    distance: 3
     description: "syringe module goes here fast with piercing tip for actual piercing of silver foil for cartridge_2. This is below the deck base"
   - id: 306
     name: "discard_tip_and_slow_up"
@@ -165,7 +165,7 @@ ConsumableDistance:
     description: "syringe module goes here for resting by default"
   - id: 309
     name: "syringe_parking"
-    distance: 90
+    distance: 75
     description: "syringe module parks here after tip discard"
   - id: 310
     name: "deck_base"
@@ -173,7 +173,7 @@ ConsumableDistance:
     description: "syringe module is this much distance from its zero homing position to deck"
   - id: 311
     name: "syringe_module_slow_down_for_discard"
-    distance: 127
+    distance: 125
     description: "syringe module goes here at slow for discarding tip"
   - id: 325
     name: "slow_inside"
@@ -298,7 +298,7 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All magnet horizontal distances will be fixed here"
   - id: 1057
     name: "magnet_rev_fwd_b_zero"
-    distance: 0
+    distance: -5
     description: "This field is to be calibrated and set by the eng. All magnet vertical distances will be fixed here"
   - id: 1058
     name: "shaker_b_zero"
