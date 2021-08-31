@@ -26,12 +26,11 @@ type Simulator struct {
 	wells     []Well
 }
 
-func NewSimulator(exit chan error) plc.Driver {
-	ex := make(chan error)
+func NewSimulator(exit, wsErr chan error) plc.Driver {
 
 	s := Simulator{}
-	s.ExitCh = ex
-	s.ErrCh = exit
+	s.ExitCh = exit
+	s.ErrCh = wsErr
 	s.pcrHeartBeat()
 	s.setWells()
 	go s.HeartBeat()
@@ -105,6 +104,12 @@ func (d *Simulator) Start() (err error) {
 }
 
 func (d *Simulator) Stop() (err error) {
+	if plc.LidPidTuningInProgress {
+		plc.LidPidTuningInProgress = false
+		d.ExitCh <- errors.New("PID Error")
+		return nil
+	}
+
 	// Abort running process
 
 	plc.ExperimentRunning = false
@@ -123,6 +128,7 @@ func (d *Simulator) simulate() {
 	go d.cycleStage()
 
 	for {
+		time.Sleep(1 * time.Second)
 		// Intentionally don't have a default, so that it blocks on either one of the channels.
 		select {
 		case msg := <-d.ExitCh:
@@ -269,5 +275,10 @@ func (d *Simulator) SelfTest() (status plc.Status) {
 
 func (d *Simulator) Calibrate() (err error) {
 	// TBD
+	return
+}
+
+func (d *Simulator) LidPIDCalibration() (err error) {
+	plc.LidPidTuningInProgress = true
 	return
 }
