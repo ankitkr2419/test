@@ -159,7 +159,7 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 }
 
 func (d *Compact32Deck) isShakerInProgress() bool {
-	if temp, ok := heaterInProgress.Load(d.name); !ok {
+	if temp, ok := shakerInProgress.Load(d.name); !ok {
 		logger.Errorln("shakerInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
