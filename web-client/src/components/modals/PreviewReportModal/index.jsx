@@ -79,9 +79,16 @@ const PreviewReportModal = (props) => {
     const img4 = canvas4.toDataURL("image/png");
 
     const doc = new jsPDF("l", "pt", [1024, 700]); //create custom pdf instance with its properties [width, height] in pt units //NOTE: (1 pt = 1.3281472327365 px)
-    
+
     //add contents into pdf
-    doc.addImage(img1, "png", 30, 100, page1.clientWidth + 100, page1.clientHeight);
+    doc.addImage(
+      img1,
+      "png",
+      30,
+      100,
+      page1.clientWidth + 100,
+      page1.clientHeight
+    );
     doc.addPage();
     doc.addImage(img3, "png", 30, 100, page3.clientWidth, page3.clientHeight);
     doc.addPage();

@@ -31,11 +31,7 @@ const WellGraph = (props) => {
   return (
     <div>
       <GraphCard>
-        <LineChart
-          data={data}
-          options={options}
-          redraw={isDataFromAPI}
-        />
+        <LineChart data={data} options={options} redraw={isDataFromAPI} />
       </GraphCard>
       <GraphFilters
         targets={experimentGraphTargetsList}
