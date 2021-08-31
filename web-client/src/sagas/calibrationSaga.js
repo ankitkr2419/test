@@ -12,6 +12,7 @@ import {
   shakerActions,
   updateCalibrationActions,
   updateCommonDetailsActions,
+  updateMotorDetailsActions,
   updatePidDetailsActions,
 } from "actions/calibrationActions";
 import {
@@ -26,6 +27,7 @@ import {
   shakerFailed,
   heaterFailed,
   abortFailed,
+  updateMotorDetailsFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -300,6 +302,32 @@ export function* updatePidDetails(actions) {
   }
 }
 
+export function* updateMotorDetails(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { updateMotorDetaislSuccess, updateMotorDetaislFailure } =
+    updateMotorDetailsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.motor}`,
+        successAction: updateMotorDetaislSuccess,
+        failureAction: updateMotorDetaislFailure,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating motor configs", error);
+    yield put(updateMotorDetailsFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -326,5 +354,9 @@ export function* calibrationSaga() {
   yield takeEvery(
     updatePidDetailsActions.updatePidActionInitiated,
     updatePidDetails
+  );
+  yield takeEvery(
+    updateMotorDetailsActions.updateMotorDetaislInitiated,
+    updateMotorDetails
   );
 }

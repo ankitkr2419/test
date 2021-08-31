@@ -175,3 +175,127 @@ export const getHeaterRequestBody = (formik) => {
 
   return body;
 };
+
+// initial formik state for Update Motor Component
+export const updateMotorInitialFormikState = {
+  id: {
+    label: "ID",
+    name: "id",
+    type: "number",
+    min: 0,
+    max: 20,
+    value: null,
+    isInvalid: false,
+  },
+  deck: {
+    label: "Deck",
+    name: "deck",
+    type: "text",
+    min: null,
+    max: null,
+    value: null,
+    isInvalid: false,
+  },
+  number: {
+    label: "Number",
+    name: "number",
+    type: "number",
+    min: 0,
+    max: 10,
+    value: null,
+    isInvalid: false,
+  },
+  name: {
+    label: "Name",
+    name: "name",
+    type: "text",
+    min: null,
+    max: null,
+    value: null,
+    isInvalid: false,
+  },
+  ramp: {
+    label: "Ramp",
+    name: "ramp",
+    type: "number",
+    min: 1,
+    max: 3000,
+    value: null,
+    isInvalid: false,
+  },
+  steps: {
+    label: "Steps",
+    name: "steps",
+    type: "number",
+    min: 1,
+    max: 3000,
+    value: null,
+    isInvalid: false,
+  },
+  slow: {
+    label: "Slow",
+    name: "slow",
+    type: "number",
+    min: 100,
+    max: 9000,
+    value: null,
+    isInvalid: false,
+  },
+  fast: {
+    label: "Fast",
+    name: "fast",
+    type: "number",
+    min: 100,
+    max: 16000,
+    value: null,
+    isInvalid: false,
+  },
+};
+
+export const checkIsFieldInvalid = (fieldObj, value) => {
+  const { name, max, min, type } = fieldObj;
+
+  // if type is number => check for max and min
+  if (type === "number") {
+    if (!parseInt(value) || parseInt(value) > max || parseInt(value) < min) {
+      return true;
+    }
+  }
+  // else check accordingly for string type => deck and name
+  else {
+    // for deck value should only be either A or B
+    if (name === "deck") {
+      if (
+        value === "" ||
+        (value !== "A" && value !== "B" && value !== "a" && value !== "b")
+      ) {
+        return true;
+      }
+    }
+    // for name and id => value should not be empty string
+    else {
+      if (value === "") {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+export const isMotorUpdateBtnDisabled = (state) => {
+  const { id, deck, number, name, ramp, steps, slow, fast } = state;
+
+  if (
+    id.isInvalid ||
+    deck.isInvalid ||
+    number.isInvalid ||
+    name.isInvalid ||
+    ramp.isInvalid ||
+    steps.isInvalid ||
+    slow.isInvalid ||
+    fast.isInvalid
+  ) {
+    return true;
+  }
+};

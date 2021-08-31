@@ -16,6 +16,7 @@ import CommonFieldsComponent from "./CommonFieldsComponent";
 import { HeadingTitle } from "./HeadingTitle";
 import PidProgressComponent from "./PidProgressComponent";
 import PidComponent from "./PidComponent";
+import UpdateMotorComponent from "./UpdateMotorComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -28,6 +29,7 @@ const CalibrationExtractionComponent = (props) => {
     handlePidUpdateBtn,
     handleMotorBtn,
     handleSaveDetailsBtn,
+    handleUpdateMotorDetailsBtn,
     showConfirmationModal,
     toggleConfirmModal,
     formik,
@@ -125,6 +127,11 @@ const CalibrationExtractionComponent = (props) => {
 
           {/* Motor Component -   */}
           <MotorComponent formik={formik} handleMotorBtn={handleMotorBtn} />
+
+          {/* Update Motor Component -   */}
+          <UpdateMotorComponent
+            handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
+          />
         </CardBody>
       </Card>
 

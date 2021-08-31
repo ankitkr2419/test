@@ -155,6 +155,7 @@ export const API_ENDPOINTS = {
   pidCalibration: "pid-calibration",
   pidUpdate: "configs/extraction",
   manual: "manual",
+  motor: "motor",
   startShaking: "start-shaking",
   startHeating: "start-heating",
   emailReport: "email-report",

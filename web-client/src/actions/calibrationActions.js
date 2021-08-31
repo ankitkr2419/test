@@ -81,3 +81,10 @@ export const updateCommonDetailsActions = {
   updateCommonDetaislFailure: "UPDATE_COMMON_FAILURE",
   updateCommonDetaislReset: "UPDATE_COMMON_RESET",
 };
+
+export const updateMotorDetailsActions = {
+  updateMotorDetaislInitiated: "UPDATE_MOTOR_DETAILS_INITIATED",
+  updateMotorDetaislSuccess: "UPDATE_MOTOR_DETAILS_SUCCESS",
+  updateMotorDetaislFailure: "UPDATE_MOTOR_DETAILS_FAILURE",
+  updateMotorDetaislReset: "UPDATE_MOTOR_DETAILS_RESET",
+};

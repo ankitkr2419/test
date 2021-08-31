@@ -12,6 +12,7 @@ import {
   shakerActions,
   heaterActions,
   abortActions,
+  updateMotorDetailsActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -193,4 +194,17 @@ export const motorInitiated = (token, body) => ({
 export const motorFailed = ({ error }) => ({
   type: motorActions.motorActionFailure,
   payload: { error },
+});
+
+// action creators for update motor details
+export const updateMotorDetailsInitiated = (payload) => ({
+  type: updateMotorDetailsActions.updateMotorDetaislInitiated,
+  payload,
+});
+
+export const updateMotorDetailsFailed = ({ error }) => ({
+  type: updateMotorDetailsActions.updateMotorDetaislFailure,
+  payload: {
+    error,
+  },
 });

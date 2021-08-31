@@ -14,6 +14,7 @@ import {
   runPid,
   runPidReset,
   updateCommonDetailsInitiated,
+  updateMotorDetailsInitiated,
   updatePidInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
@@ -160,6 +161,29 @@ const CalibrationExtractionContainer = () => {
     dispatch(updatePidInitiated(token, requestBody));
   };
 
+  const handleUpdateMotorDetailsBtn = ({
+    id,
+    deck,
+    number,
+    name,
+    ramp,
+    steps,
+    slow,
+    fast,
+  }) => {
+    const requestBody = {
+      id: parseInt(id.value),
+      deck: deck.value,
+      number: parseInt(number.value),
+      name: name.value,
+      ramp: parseInt(ramp.value),
+      steps: parseInt(steps.value),
+      slow: parseInt(slow.value),
+      fast: parseInt(fast.value),
+    };
+    dispatch(updateMotorDetailsInitiated({ requestBody, token }));
+  };
+
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
 
   return (
@@ -170,6 +194,7 @@ const CalibrationExtractionContainer = () => {
       handleMotorBtn={handleMotorBtn}
       handleSaveDetailsBtn={handleSaveDetailsBtn}
       handlePidUpdateBtn={handlePidUpdateBtn}
+      handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
       showConfirmationModal={showConfirmationModal}
       heaterData={data}
       progressData={progressData}
