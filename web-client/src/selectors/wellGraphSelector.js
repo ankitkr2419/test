@@ -22,7 +22,7 @@ const getWellGraphData = state => state.wellGraphReducer;
 const nullableCheck = arr => arr.every(item => item === 0);
 const getThresholdLineData = (value, count) => {
 	const arr = [];
-	for (let x = 0; x <= count; x += 1) {
+	for (let x = 0; x < count; x += 1) {
 		arr.push(value);
 	}
 	return arr;
@@ -33,7 +33,7 @@ export const getXAxis = createSelector(
 	count => count,
 	(count) => {
 		const arr = [];
-		for (let x = 0; x <= count; x += 1) {
+		for (let x = 0; x < count; x += 1) {
 			arr.push(x+1);	// x-axis should start from 1
 		}
 		return arr;
@@ -75,19 +75,19 @@ export const getLineChartData = createSelector(
 		let wellGraphData = wellGraphReducer.get('chartData');
 		// filled positions is array of indexes of filled/configured wells
 		const filledPositions = getFilledWellsPosition(wells);
+
 		// filter the graph data if we have wells filled
-		if (filledPositions.size !== 0) {
-			wellGraphData = wellGraphData.filter(ele => {
-				// If the graph data is for the filled well then filter the data
-				if (filledPositions.includes(ele.get('well_position'))) {
-					// return graph data only for the targets that are configured for the filled well
-					const wellTargets = getFilledWellTargets(wells, ele.get('well_position'));
-					return wellTargets.includes(ele.get('target_id'));
-				}
-				// No need to filter if the well is not filled
-				return true;
-			});
-		}
+		wellGraphData = wellGraphData.filter(ele => {
+			// If the graph data is for the filled well then filter the data
+			if (filledPositions.includes(ele.get('well_position'))) {
+				// return graph data only for the targets that are configured for the filled well
+				const wellTargets = getFilledWellTargets(wells, ele.get('well_position'));
+				return wellTargets.includes(ele.get('target_id'));
+			}
+			// No need to filter if the well is not filled
+			return false;
+		});
+
 		// Should apply filter if we have positions selected from viewing graph
 		if (selectedPositions.size !== 0) {
 			wellGraphData = wellGraphData.filter(ele => selectedPositions.includes(ele.get('well_position')));
