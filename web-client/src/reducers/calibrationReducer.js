@@ -11,6 +11,7 @@ import {
   updatePidDetailsActions,
   fetchPidDetailsActions,
   abortActions,
+  createTipsTubesActions,
 } from "actions/calibrationActions";
 import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
@@ -389,6 +390,42 @@ export const motorReducer = (state = motorInitialState, action) => {
 
     case loginActions.loginReset:
       return motorInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const tipTubeInitialState = fromJS({
+  isLoading: false,
+  error: null,
+});
+
+export const createTipTubeReducer = (state = tipTubeInitialState, action) => {
+  switch (action.type) {
+    case createTipsTubesActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+      });
+    case createTipsTubesActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+      });
+    case createTipsTubesActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+      });
+    case createTipsTubesActions.resetAction:
+      return state.merge({
+        isLoading: false,
+        error: null,
+      });
+
+    case loginActions.loginReset:
+      return tipTubeInitialState;
 
     default:
       return state;

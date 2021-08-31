@@ -17,6 +17,7 @@ import { HeadingTitle } from "./HeadingTitle";
 import PidProgressComponent from "./PidProgressComponent";
 import PidComponent from "./PidComponent";
 import UpdateMotorComponent from "./UpdateMotorComponent";
+import TipsTubesComponent from "./TipsTubesComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -34,6 +35,7 @@ const CalibrationExtractionComponent = (props) => {
     toggleConfirmModal,
     formik,
     isAdmin,
+    handleTipesTubesButton,
   } = props;
 
   const { shaker_1_temp, shaker_2_temp, heater_on } = heaterData;
@@ -131,6 +133,12 @@ const CalibrationExtractionComponent = (props) => {
           {/* Update Motor Component -   */}
           <UpdateMotorComponent
             handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
+          />
+
+          {/**Tips & tubes Component */}
+          <TipsTubesComponent
+            formik={formik}
+            handleTipesTubesButton={handleTipesTubesButton}
           />
         </CardBody>
       </Card>

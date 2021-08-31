@@ -7,6 +7,30 @@ import {
   timeConstants,
 } from "appConstants";
 
+export const tipTubeTypeOptions = [
+  { label: "Tip", value: "tip" },
+  { label: "Tube", value: "tube" },
+];
+
+export const formikInitialStateForTipsTubes = {
+  tipTubeId: { value: null, isInvalid: false },
+  tipTubeName: { value: null, isInvalid: false },
+  tipTubeType: { value: tipTubeTypeOptions[0], isInvalid: false },
+  allowedPositions: {
+    value: {
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+    },
+    isInvalid: false,
+  },
+  volume: { value: null, isInvalid: false },
+  height: { value: null, isInvalid: false },
+  ttBase: { value: null, isInvalid: false },
+};
+
 export const formikInitialState = {
   name: { value: null, isInvalid: false },
   email: { value: null, isInvalid: false },
@@ -15,6 +39,22 @@ export const formikInitialState = {
   direction: { value: null, isInvalid: false },
   distance: { value: null, isInvalid: false },
   pidTemperature: { value: null, isInvalid: false },
+  ...formikInitialStateForTipsTubes, //TipsTubes fields
+};
+
+/**
+ * This method used to convert formik values of allowed positions to api ready response
+ * Formik: {1: true, 2: true, 3: false})
+ * Output: [1, 2])
+ */
+export const formikToArray = (allowedPositions) => {
+  let keys = Object.keys(allowedPositions.value);
+  //take key with true values i.e. selected positions
+  let allowedPositionsArr = keys.filter((key) => {
+    return allowedPositions.value[key];
+  });
+  //convert to int array
+  return allowedPositionsArr.map((position) => parseInt(position));
 };
 
 export const isSaveDetailsBtnDisabled = (state) => {
@@ -298,4 +338,37 @@ export const isMotorUpdateBtnDisabled = (state) => {
   ) {
     return true;
   }
+};
+
+export const isTipsTubesButtonDisabled = (state) => {
+  const {
+    tipTubeId,
+    tipTubeName,
+    tipTubeType,
+    allowedPositions,
+    volume,
+    height,
+    ttBase,
+  } = state;
+
+  let arrayOfAllowedPositions = formikToArray(allowedPositions);
+
+  if (
+    !tipTubeId.value ||
+    !tipTubeName.value ||
+    !tipTubeType.value ||
+    !volume.value ||
+    !height.value ||
+    !ttBase.value ||
+    tipTubeId.isInvalid ||
+    tipTubeName.isInvalid ||
+    tipTubeType.isInvalid ||
+    volume.isInvalid ||
+    height.isInvalid ||
+    ttBase.isInvalid ||
+    arrayOfAllowedPositions.length === 0
+  ) {
+    return true;
+  }
+  return false;
 };

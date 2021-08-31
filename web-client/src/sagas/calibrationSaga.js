@@ -14,6 +14,7 @@ import {
   updateCommonDetailsActions,
   updateMotorDetailsActions,
   updatePidDetailsActions,
+  createTipsTubesActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -28,6 +29,7 @@ import {
   heaterFailed,
   abortFailed,
   updateMotorDetailsFailed,
+  createTipsOrTubesFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -328,6 +330,32 @@ export function* updateMotorDetails(actions) {
   }
 }
 
+export function* createTipsOrTubes(actions) {
+  const {
+    payload: { token, body },
+  } = actions;
+
+  const { successAction, failureAction } = createTipsTubesActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.tipTube}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating tips or tubes", error);
+    yield put(createTipsOrTubesFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -359,4 +387,5 @@ export function* calibrationSaga() {
     updateMotorDetailsActions.updateMotorDetaislInitiated,
     updateMotorDetails
   );
+  yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
 }

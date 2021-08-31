@@ -13,6 +13,7 @@ import {
   heaterActions,
   abortActions,
   updateMotorDetailsActions,
+  createTipsTubesActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -207,4 +208,22 @@ export const updateMotorDetailsFailed = ({ error }) => ({
   payload: {
     error,
   },
+});
+
+// action creators for tips and tubes
+export const createTipsOrTubesInitiated = (token, body) => ({
+  type: createTipsTubesActions.initiateAction,
+  payload: {
+    token,
+    body,
+  },
+});
+
+export const createTipsOrTubesFailed = ({ error }) => ({
+  type: createTipsTubesActions.failureAction,
+  payload: { error },
+});
+
+export const resetCreatingTipsOrTubes = () => ({
+  type: createTipsTubesActions.resetAction,
 });

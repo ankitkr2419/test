@@ -16,10 +16,16 @@ import {
   updateCommonDetailsInitiated,
   updateMotorDetailsInitiated,
   updatePidInitiated,
+  createTipsOrTubesInitiated,
+  resetCreatingTipsOrTubes,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
-import { formikInitialState } from "components/CalibrationExtraction/helpers";
+import {
+  formikInitialState,
+  formikToArray,
+  formikInitialStateForTipsTubes,
+} from "components/CalibrationExtraction/helpers";
 
 const CalibrationExtractionContainer = () => {
   const dispatch = useDispatch();
@@ -40,6 +46,14 @@ const CalibrationExtractionContainer = () => {
   const heaterReducer = useSelector((state) => state.heaterProgressReducer);
   const heaterProgressReducerData = heaterReducer.toJS();
   const { data } = heaterProgressReducerData;
+
+  //create tips or tubes reducer details to reset formik after api success
+  const createTipTubeReducer = useSelector(
+    (state) => state.createTipTubeReducer
+  );
+  const createTipTubeReducerData = createTipTubeReducer.toJS();
+  const isLoadingCreateTipTube = createTipTubeReducerData?.isLoading;
+  const isErrorCreateTipTube = createTipTubeReducerData?.error;
 
   const pidProgessReducer = useSelector((state) => state.pidProgessReducer);
   const pidProgessReducerData = pidProgessReducer.toJS();
@@ -105,6 +119,25 @@ const CalibrationExtractionContainer = () => {
   useEffect(() => {
     dispatch(deckBlockInitiated({ deckName: name }));
   }, []);
+
+  //if api call is success then reset formik for tipsTubesFields and reducer
+  useEffect(() => {
+    if (isLoadingCreateTipTube === false && isErrorCreateTipTube === false) {
+      handleOnChange("tipTubeId", formikInitialStateForTipsTubes.tipTubeId);
+      handleOnChange("tipTubeName", formikInitialStateForTipsTubes.tipTubeName);
+      handleOnChange("tipTubeType", formikInitialStateForTipsTubes.tipTubeType);
+      handleOnChange(
+        "allowedPositions",
+        formikInitialStateForTipsTubes.allowedPositions
+      );
+      handleOnChange("volume", formikInitialStateForTipsTubes.volume);
+      handleOnChange("height", formikInitialStateForTipsTubes.height);
+      handleOnChange("ttBase", formikInitialStateForTipsTubes.ttBase);
+
+      //clear reducer
+      dispatch(resetCreatingTipsOrTubes());
+    }
+  }, [isLoadingCreateTipTube, isErrorCreateTipTube]);
 
   const handleLogout = () => {
     dispatch(
@@ -186,6 +219,37 @@ const CalibrationExtractionContainer = () => {
 
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
 
+  const handleTipesTubesButton = (e) => {
+    e.preventDefault();
+
+    let {
+      tipTubeId,
+      tipTubeName,
+      tipTubeType,
+      allowedPositions,
+      volume,
+      height,
+      ttBase,
+    } = formik.values;
+    let arrayOfAllowedPositions = formikToArray(allowedPositions);
+
+    let body = {
+      id: tipTubeId.value,
+      name: tipTubeName.value,
+      type: tipTubeType.value.value,
+      allowed_positions: arrayOfAllowedPositions,
+      volume: volume.value,
+      height: height.value,
+      tt_base: ttBase.value,
+    };
+
+    dispatch(createTipsOrTubesInitiated(token, body));
+  };
+
+  const handleOnChange = (key, value) => {
+    formik.setFieldValue(key, value);
+  };
+
   return (
     <CalibrationExtractionComponent
       toggleConfirmModal={toggleConfirmModal}
@@ -202,6 +266,7 @@ const CalibrationExtractionContainer = () => {
       deckName={name}
       formik={formik}
       isAdmin={isAdmin}
+      handleTipesTubesButton={handleTipesTubesButton}
     />
   );
 };

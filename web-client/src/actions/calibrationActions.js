@@ -88,3 +88,9 @@ export const updateMotorDetailsActions = {
   updateMotorDetaislFailure: "UPDATE_MOTOR_DETAILS_FAILURE",
   updateMotorDetaislReset: "UPDATE_MOTOR_DETAILS_RESET",
 };
+export const createTipsTubesActions = {
+  initiateAction: "CREATE_TIPS_TUBES_INITIATED",
+  successAction: "CREATE_TIPS_TUBES_SUCCESS",
+  failureAction: "CREATE_TIPS_TUBES_FAILURE",
+  resetAction: "CREATE_TIPS_TUBES_RESET",
+};
