@@ -19,6 +19,8 @@ import {
 import { setIsPlateRoute } from "action-creators/loginActionCreators";
 import { getActiveLoadedWells } from "selectors/activeWellSelector";
 import { MAX_NO_OF_WELLS } from "appConstants";
+import { mailReportInitiated } from "action-creators/activityLogActionCreators";
+import { toast } from "react-toastify";
 
 const PlateContainer = () => {
   const dispatch = useDispatch();
@@ -90,6 +92,18 @@ const PlateContainer = () => {
     dispatch(selectAllWellsAction(isAllWellsSelected));
   };
 
+  const mailBtnHandler = () => {
+    //API call to send an email
+    dispatch(
+      mailReportInitiated({
+        token: token,
+        experimentId: experimentId,
+        showToast: true,
+      })
+    );
+    toast.info("Sending mail...");
+  };
+
   return (
     <Plate
       wells={wellListReducer.get("defaultList")}
@@ -107,6 +121,8 @@ const PlateContainer = () => {
       experimentTemplate={experimentTemplate}
       headerData={runExpProgressReducer.toJS()}
       temperatureData={temperatureData}
+      mailBtnHandler={mailBtnHandler}
+      token={token}
     />
   );
 };
