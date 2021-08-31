@@ -157,3 +157,7 @@ func GetRTPCRConfigValues() RTPCR {
 		EndCycle:        int64(GetEndCycle()),
 	}
 }
+
+func GetEngineerCycleCount() int64 {
+	return int64(ReadEnvInt("engineer_cycle_count"))
+}

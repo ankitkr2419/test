@@ -15,6 +15,7 @@ type DyeWellTolerance struct {
 	WellNo        int       `db:"well_no" json:"well_no"`
 	KitID         string    `db:"kit_id" json:"kit_id" validate:"required,len=8"`
 	OpticalResult float64   `db:"optical_result" json:"optical_result"`
+	Valid         bool      `db:"valid" json:"valid"`
 }
 
 const (

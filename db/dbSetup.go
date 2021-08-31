@@ -21,9 +21,10 @@ const (
 // Config is used to get data from config file
 type Config struct {
 	Dyes []struct {
-		Name     string
-		Position int
-		Targets  []string
+		Name      string
+		Position  int
+		Targets   []string
+		Tolerance float64
 	}
 }
 

@@ -67,7 +67,8 @@ var (
 	ProcessRearrangeDBError        = fmt.Errorf("error rearranging the procceses in db")
 	ProcessHighestSeqNumFetchError = fmt.Errorf("error getting highest sequence number of process in db")
 
-	CSVBadContentError = fmt.Errorf("error unparsable content found in csv import")
-	BlankDetailsError  = fmt.Errorf("error blank details found")
-	DyeDBFetchError    = fmt.Errorf("error failed to fetch dye")
+	CSVBadContentError   = fmt.Errorf("error unparsable content found in csv import")
+	BlankDetailsError    = fmt.Errorf("error blank details found")
+	DyeDBFetchError      = fmt.Errorf("error failed to fetch dye")
+	CalculateResultError = fmt.Errorf("error failed to calculate the optical result")
 )

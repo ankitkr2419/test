@@ -13,7 +13,8 @@ import (
 const (
 	insertDyeQuery1 = `INSERT INTO dyes(
 				name,
-				position)
+				position,
+				tolerance)
 				VALUES %s `
 	insertDyeQuery2 = `ON CONFLICT DO NOTHING;`
 
@@ -22,9 +23,10 @@ const (
 )
 
 type Dye struct {
-	ID       uuid.UUID `db:"id"`
-	Name     string    `db:"name"`
-	Position int       `db:"position"`
+	ID        uuid.UUID `db:"id"`
+	Name      string    `db:"name"`
+	Position  int       `db:"position"`
+	Tolerance float64   `db:"tolerance"`
 }
 
 func (s *pgStore) InsertDyes(ctx context.Context, dyes []Dye) (DBdyes []Dye, err error) {
@@ -63,7 +65,7 @@ func makeDyeQuery(dye []Dye) string {
 	values := make([]string, 0, len(dye))
 
 	for _, d := range dye {
-		values = append(values, fmt.Sprintf("('%v', %v)", d.Name, d.Position))
+		values = append(values, fmt.Sprintf("('%v', %v, %v)", d.Name, d.Position, d.Tolerance))
 	}
 
 	stmt := fmt.Sprintf(insertDyeQuery1,

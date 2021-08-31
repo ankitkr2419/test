@@ -1,7 +1,10 @@
 package compact32
 
 import (
+	"encoding/binary"
+	"math"
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"time"
 
@@ -154,4 +157,45 @@ func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, ha
 	plc.SetDeckName(&C32, plc.DeckB)
 
 	return &C32
+}
+
+func (d *Compact32) CalculateOpticalResult(dye db.Dye, kitID string, knownValue, cycleCount int64) (opticalResult []db.DyeWellTolerance, err error) {
+
+	wellsData := make(map[int][]uint16, cycleCount)
+
+	plc.ExperimentRunning = true
+	start := plc.FValueRegisterStartAddress + (dye.Position-1)*16
+	for i := 0; i < int(cycleCount); i++ {
+		d.Cycle()
+		data, err := d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
+		if err != nil {
+			logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")
+		}
+		offset := 0 // offset of data. increment every 2 bytes!
+		for j := 0; j < 16; j++ {
+			wellsData[i][j] = binary.BigEndian.Uint16(data[offset : offset+2])
+			offset += 2
+		}
+	}
+
+	for j := 0; j < 16; j++ {
+		var finalValue uint16
+		var deviatedResult db.DyeWellTolerance
+		for i := 0; i < int(cycleCount); i++ {
+
+			finalValue += wellsData[i][j]
+		}
+		finalAvg := int64(finalValue) / cycleCount
+		deviatedValue := knownValue - int64(finalAvg)
+		deviatedResult.OpticalResult = math.Abs(float64((deviatedValue / knownValue) * 100))
+		deviatedResult.DyeID = dye.ID
+		deviatedResult.KitID = kitID
+		deviatedResult.WellNo = j
+		if deviatedResult.OpticalResult > dye.Tolerance {
+			deviatedResult.Valid = false
+		}
+
+		opticalResult = append(opticalResult, deviatedResult)
+	}
+	return
 }

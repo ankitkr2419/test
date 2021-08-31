@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS dye_well_tolerance(
     well_no INTEGER,
     kit_id text,
     optical_result DECIMAL DEFAULT 0.0000,
+    valid boolean DEFAULT true,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT dwell UNIQUE (dye_id,well_no),
