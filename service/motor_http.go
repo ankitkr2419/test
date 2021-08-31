@@ -50,7 +50,7 @@ func updateMotorHandler(deps Dependencies) http.HandlerFunc {
 		var m db.Motor
 		err := json.NewDecoder(req.Body).Decode(&m)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: "Error while decoding motor data"})
 			logger.WithField("err", err.Error()).Error("Error while decoding motor data")
 			return
 		}
@@ -63,18 +63,12 @@ func updateMotorHandler(deps Dependencies) http.HandlerFunc {
 
 		err = deps.Store.UpdateMotor(req.Context(), m)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Error while while inserting motor"})
 			logger.WithField("err", err.Error()).Error("Error while inserting motor")
 			return
 		}
 
-		respBytes, err = json.Marshal(m)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling Motor data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		responseCodeAndMsg(rw, http.StatusOK, respBytes)
+		responseCodeAndMsg(rw, http.StatusOK, m)
 
 	})
 }
@@ -113,14 +107,7 @@ func listMotorsHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		respBytes, err := json.Marshal(m)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling Motor data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		responseCodeAndMsg(rw, http.StatusOK, respBytes)
+		responseCodeAndMsg(rw, http.StatusOK, m)
 
 	})
 }

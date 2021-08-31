@@ -1,3 +1,10 @@
+export const expandLogActions = {
+  expandLogInitiated: "EXPAND_LOG_INITIATED",
+  expandLogSuccess: "EXPAND_LOG_SUCCESS",
+  expandLogFailure: "EXPAND_LOG_FAILURE",
+  expandLogReset: "EXPAND_LOG_RESET",
+};
+
 export const mailReportActions = {
   mailReportInitiated: "MAIL_REPORT_INITIATED",
   mailReportSuccess: "MAIL_REPORT_SUCCESS",

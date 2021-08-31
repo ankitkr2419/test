@@ -48,6 +48,7 @@ import { appInfoSaga } from "./appInfoSaga";
 import { activityLogSaga } from "./activityLogSaga";
 import { calibrationSaga } from "./calibrationSaga";
 import { reportSaga } from "./reportSaga";
+import { wellGraphSaga } from "./wellGraphSaga";
 
 const allSagas = [
   createTemplateSaga(),
@@ -88,6 +89,7 @@ const allSagas = [
   calibrationSaga(),
   finishCreateTemplateSaga(),
   reportSaga(),
+  wellGraphSaga(),
 ];
 
 export default function* rootSaga() {

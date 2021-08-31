@@ -5,7 +5,10 @@ import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
 import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
-import { logoutInitiated, loginReset } from "action-creators/loginActionCreators";
+import {
+  logoutInitiated,
+  loginReset,
+} from "action-creators/loginActionCreators";
 import {
   Button,
   Dropdown,
@@ -14,16 +17,16 @@ import {
   DropdownItem,
   Nav,
   NavItem,
-  NavLink
+  NavLink,
 } from "core-components";
 import {
   runExperiment,
-  stopExperiment
+  stopExperiment,
 } from "action-creators/runExperimentActionCreators";
 import { getExperimentId } from "selectors/experimentSelector";
 import {
   getRunExperimentReducer,
-  getTimeNow
+  getTimeNow,
 } from "selectors/runExperimentSelector";
 import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
 // import PrintDataModal from './PrintDataModal';
@@ -40,7 +43,7 @@ import { NAV_ITEMS } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
 
-const AppHeader = props => {
+const AppHeader = (props) => {
   const {
     role,
     isDeckBlocked,
@@ -53,7 +56,7 @@ const AppHeader = props => {
     token,
     deckName,
     app,
-    activeWidgetID
+    activeWidgetID,
   } = props;
 
   const dispatch = useDispatch();
@@ -78,7 +81,8 @@ const AppHeader = props => {
   const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
     useState(false);
 
-  const toggleUserDropdown = () => setUserDropdownOpen(prevState => !prevState);
+  const toggleUserDropdown = () =>
+    setUserDropdownOpen((prevState) => !prevState);
 
   useEffect(() => {
     if (isExperimentSucceeded) {
@@ -149,7 +153,7 @@ const AppHeader = props => {
     return false;
   };
 
-  const getIsNavLinkDisabled = pathname => {
+  const getIsNavLinkDisabled = (pathname) => {
     switch (pathname) {
       /* Disable plate navlink if user logged in is admin. Admin just has access to templates
 		and activity log. Also user can't navigate to plate directly from templates route
@@ -198,9 +202,9 @@ const AppHeader = props => {
       event.preventDefault();
     }
   };
-  
+
   // Exit modal confirmation click handler
-  const confirmationClickHandler = isConfirmed => {
+  const confirmationClickHandler = (isConfirmed) => {
     setExitModalVisibility(false);
     if (isExperimentRunning === true) {
       // show warning that user needs to abort first in order to log out.
@@ -234,17 +238,17 @@ const AppHeader = props => {
       {isUserLoggedIn && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map(
-            ele =>
-              !getIsNavLinkHidden(ele.path) && (
-                <NavItem key={ele.name}>
+            (navItem) =>
+              !getIsNavLinkHidden(navItem.path) && (
+                <NavItem key={navItem.name}>
                   <NavLink
                     onClick={(event) => {
-                      onNavLinkClickHandler(event, `/${ele.path}`);
+                      onNavLinkClickHandler(event, `/${navItem.path}`);
                     }}
-                    to={ele.path}
-                    disabled={getIsNavLinkDisabled(`/${ele.path}`)}
+                    to={navItem.path}
+                    disabled={getIsNavLinkDisabled(`/${navItem.path}`)}
                   >
-                    {ele.name}
+                    {navItem.name}
                   </NavLink>
                 </NavItem>
               )
@@ -453,11 +457,11 @@ const AppHeader = props => {
 };
 
 AppHeader.propTypes = {
-  isUserLoggedIn: PropTypes.bool
+  isUserLoggedIn: PropTypes.bool,
 };
 
 AppHeader.defaultProps = {
-  isUserLoggedIn: false
+  isUserLoggedIn: false,
 };
 
 export default React.memo(AppHeader);

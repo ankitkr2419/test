@@ -9,6 +9,7 @@ import {
 } from "components/Target/targetConstants";
 import GraphFilters from "./GraphFilters";
 import GraphRange from "./GraphRange";
+import { EXPERIMENT_STATUS } from "appConstants";
 
 const options = {
   legend: {
@@ -47,47 +48,56 @@ const options = {
       },
     ],
   },
-  //TODO: will be added later after testing & studying about it properly.
-  // This is for animation.
-
-  // animation: {
-  //   duration: 1000,
-  //   easing: "linear",
-  // },
 };
 
-const WellGraph = ({
-  data,
-  experimentGraphTargetsList,
-  onThresholdChangeHandler,
-  toggleGraphFilterActive,
-  isThresholdInvalid,
-  setThresholdError,
-  resetThresholdError,
-}) => (
-  <div>
-    <GraphCard>
-      <LineChart data={data} options={options} />
-    </GraphCard>
-    <GraphFilters
-      targets={experimentGraphTargetsList}
-      onThresholdChangeHandler={onThresholdChangeHandler}
-      toggleGraphFilterActive={toggleGraphFilterActive}
-      setThresholdError={setThresholdError}
-      resetThresholdError={resetThresholdError}
-    />
-    {/*<GraphRange />*/}
-    {isThresholdInvalid && (
-      <Text Tag="p" size={14} className="text-danger px-2 mb-1">
-        Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
-      </Text>
-    )}
-    {/* TODO: Un-comment after discussion with client/backend-team */}
-    {/* <Text size={14} className="text-default text-center mb-0">
+const WellGraph = (props) => {
+  const {
+    data,
+    headerData,
+    experimentGraphTargetsList,
+    onThresholdChangeHandler,
+    toggleGraphFilterActive,
+    isThresholdInvalid,
+    setThresholdError,
+    resetThresholdError,
+    handleRangeChangeBtn,
+    handleResetBtn,
+    isInsidePreviewModal,
+  } = props;
+
+  return (
+    <div>
+      <GraphCard>
+        <LineChart data={data} options={options} />
+      </GraphCard>
+      <GraphFilters
+        targets={experimentGraphTargetsList}
+        onThresholdChangeHandler={onThresholdChangeHandler}
+        toggleGraphFilterActive={toggleGraphFilterActive}
+        setThresholdError={setThresholdError}
+        resetThresholdError={resetThresholdError}
+      />
+
+      {isInsidePreviewModal === false && (
+        <GraphRange
+          handleRangeChangeBtn={handleRangeChangeBtn}
+          handleResetBtn={handleResetBtn}
+          headerData={headerData}
+        />
+      )}
+
+      {isThresholdInvalid && (
+        <Text Tag="p" size={14} className="text-danger px-2 mb-1">
+          Threshold value should be between {MIN_THRESHOLD} - {MAX_THRESHOLD}
+        </Text>
+      )}
+      {/* TODO: Un-comment after discussion with client/backend-team */}
+      {/* <Text size={14} className="text-default text-center mb-0">
       Note: Click on the threshold number to change it.
     </Text> */}
-  </div>
-);
+    </div>
+  );
+};
 
 const GraphCard = styled.div`
   width: 960px;

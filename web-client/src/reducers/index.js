@@ -38,7 +38,10 @@ import {
   runExperimentReducer,
 } from "reducers/runExperimentReducer";
 import { activeWellReducer } from "reducers/actionWellReducer";
-import { wellGraphReducer } from "reducers/wellGraphReducer";
+import {
+  wellGraphReducer,
+  updateWellGraphReducer,
+} from "reducers/wellGraphReducer";
 import { socketReducer } from "reducers/socketReducer";
 import { modalReducer } from "reducers/modalReducer";
 import { temperatureGraphReducer } from "reducers/temperatureGraphReducer";
@@ -95,6 +98,7 @@ const rootReducer = combineReducers({
   runExpProgressReducer,
   activeWellReducer,
   wellGraphReducer,
+  updateWellGraphReducer,
   socketReducer,
   modalReducer,
   temperatureGraphReducer,
