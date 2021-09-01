@@ -7,14 +7,15 @@ import (
 )
 
 type RTPCR struct {
-	HomingTime      int64 `json:"homing_time" validate:"required,lte=30,gte=16"`
-	NumHomingCycles int64 `json:"no_of_homing_cycles" validate:"required,lte=100,gte=0"`
-	CycleTime       int64 `json:"cycle_time" validate:"required,lte=30,gte=2"`
-	LidPIDTemp      int64 `json:"pid_lid_temp" validate:"required,lte=110,gte=50"`
-	ScanSpeed       int64 `json:"scan_speed" validate:"required,lte=300,gte=1"` // unit: RPM
-	ScanTime        int64 `json:"scan_time" validate:"required,lte=1000,gte=1"` // unit: ms
-	StartCycle      int64 `json:"start_cycle" validate:"required,lte=100,gte=0"`
-	EndCycle        int64 `json:"end_cycle" validate:"required,lte=100,gte=0"`
+	HomingTime                   int64 `json:"homing_time" validate:"required,lte=30,gte=16"`
+	NumHomingCycles              int64 `json:"no_of_homing_cycles" validate:"required,lte=100,gte=0"`
+	CycleTime                    int64 `json:"cycle_time" validate:"required,lte=30,gte=2"`
+	LidPIDTemp                   int64 `json:"pid_lid_temp" validate:"required,lte=110,gte=50"`
+	ScanSpeed                    int64 `json:"scan_speed" validate:"required,lte=300,gte=1"` // unit: RPM
+	ScanTime                     int64 `json:"scan_time" validate:"required,lte=1000,gte=1"` // unit: ms
+	StartCycle                   int64 `json:"start_cycle" validate:"required,lte=100,gte=0"`
+	EndCycle                     int64 `json:"end_cycle" validate:"required,lte=100,gte=0"`
+	OpticalCalibrationCycleCount int64 `json:"optical_calibration_cycle_count" validate:"required,gte=0"`
 }
 
 func SetRTPCRConfigValues(rt RTPCR) (err error) {
@@ -29,6 +30,7 @@ func SetRTPCRConfigValues(rt RTPCR) (err error) {
 		fmt.Sprintf("scan_time: %d", int64(GetScanTime())),
 		fmt.Sprintf("start_cycle: %d", int64(GetStartCycle())),
 		fmt.Sprintf("end_cycle: %d", int64(GetEndCycle())),
+		fmt.Sprintf("optical_calibration_cycle_count: %d", int64(GetOpticalCalibrationCycleCount())),
 	)
 	newString = append(newString,
 		fmt.Sprintf("homing_time: %d", rt.HomingTime),
@@ -39,6 +41,7 @@ func SetRTPCRConfigValues(rt RTPCR) (err error) {
 		fmt.Sprintf("scan_time: %d", rt.ScanTime),
 		fmt.Sprintf("start_cycle: %d", rt.StartCycle),
 		fmt.Sprintf("end_cycle: %d", rt.EndCycle),
+		fmt.Sprintf("optical_calibration_cycle_count: %d", rt.OpticalCalibrationCycleCount),
 	)
 
 	err = UpdateConfig(configPath)
@@ -147,13 +150,22 @@ func GetCycleRange() (startCycle, endCycle uint16) {
 
 func GetRTPCRConfigValues() RTPCR {
 	return RTPCR{
-		HomingTime:      int64(GetHomingTime()),
-		NumHomingCycles: int64(GetNumHomingCycles()),
-		CycleTime:       int64(GetCycleTime()),
-		LidPIDTemp:      int64(GetLidPIDTemp()),
-		ScanSpeed:       int64(GetScanSpeed()),
-		ScanTime:        int64(GetScanTime()),
-		StartCycle:      int64(GetStartCycle()),
-		EndCycle:        int64(GetEndCycle()),
+		HomingTime:                   int64(GetHomingTime()),
+		NumHomingCycles:              int64(GetNumHomingCycles()),
+		CycleTime:                    int64(GetCycleTime()),
+		LidPIDTemp:                   int64(GetLidPIDTemp()),
+		ScanSpeed:                    int64(GetScanSpeed()),
+		ScanTime:                     int64(GetScanTime()),
+		StartCycle:                   int64(GetStartCycle()),
+		EndCycle:                     int64(GetEndCycle()),
+		OpticalCalibrationCycleCount: int64(GetOpticalCalibrationCycleCount()),
 	}
+}
+
+func GetOpticalCalibrationCycleCount() int64 {
+	return int64(ReadEnvInt("optical_calibration_cycle_count"))
+}
+
+func SetOpticalCalibrationCycleCount() int64 {
+	return int64(ReadEnvInt("optical_calibration_cycle_count"))
 }
