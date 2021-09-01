@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	extraDispense = 5 // microlitres
+	extraDispense = 10 // microlitres
 )
 
 /****ALGORITHM******
@@ -302,6 +302,10 @@ skipAspireCycles:
 	//   15. pickup asp_vol slow
 	//
 
+	// Only Mixing is given
+	if ad.AspireVolume == 0 {
+		goto onlyMixing
+	}
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireVolume))
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
@@ -392,17 +396,18 @@ skipAspireCycles:
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip to deck base. Error: %v", err)
 	}
 
+onlyMixing:
+	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	//
 	//   20. setup the syringe module motor with dispense height
 	//
-	dispensePos := deckBase + ad.DispenseHeight
-	distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - dispensePos
+	distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase + ad.DispenseHeight)
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
-	logger.Warnln("going to dispensing height", ad.DispenseHeight)
+	logger.Warnln("going to dispensing height", ad.DispenseHeight, distanceToTravel)
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)

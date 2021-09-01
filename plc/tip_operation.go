@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	airReserve = 100 // micro litres
+	airReserve = 300 // micro litres
 )
 
 /****ALGORITHM******
