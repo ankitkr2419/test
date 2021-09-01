@@ -1,5 +1,8 @@
 import { fromJS } from "immutable";
-import wellGraphActions, { updateGraphActions } from "actions/wellGraphActions";
+import wellGraphActions, {
+  resetGraphActions,
+  updateGraphActions,
+} from "actions/wellGraphActions";
 import loginActions from "actions/loginActions";
 // import graphData from '../mock-json/graphData.json';
 
@@ -49,8 +52,28 @@ export const updateWellGraphReducer = (
         error: true,
       });
 
+    case resetGraphActions.resetGraphInitiated:
+      return state.merge({
+        isLoading: true,
+        error: false,
+      });
+
+    case resetGraphActions.resetGraphSucceeded:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        data: action.payload.response.data,
+      });
+
+    case resetGraphActions.resetGraphFailure:
+      return state.merge({
+        isLoading: false,
+        error: true,
+      });
+
     case loginActions.loginReset:
       return updateGraphInitialState;
+
     default:
       return state;
   }

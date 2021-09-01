@@ -52,3 +52,16 @@ export const getRedirectObj = (currentPathname) => {
       };
   }
 };
+
+export const getBtnPropObj = (result) => {
+  switch (result) {
+    case "success":
+      return { msg: "Result - Successful", color: "success" };
+    case "aborted":
+      return { msg: "Result - Aborted", color: "danger" };
+    case "running":
+      return { msg: "Running", color: "info" };
+    default:
+      return { msg: "Result - NA", color: "info" };
+  }
+};
