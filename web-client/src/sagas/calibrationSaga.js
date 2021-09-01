@@ -11,6 +11,8 @@ import {
   updateCommonDetailsActions,
   updatePidDetailsActions,
   createTipsTubesActions,
+  fetchRtpcrConfigsActions,
+  updateRtpcrConfigsActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -22,6 +24,8 @@ import {
   fetchPidFailed,
   updatePidFailed,
   createTipsOrTubesFailed,
+  fetchRtpcrConfigsFailed,
+  updateRtpcrConfigsFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* fetchCommonDetails(actions) {
@@ -273,6 +277,57 @@ export function* createTipsOrTubes(actions) {
   }
 }
 
+export function* fetchRtpcrConfigs(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = fetchRtpcrConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.rtpcrConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching rtpcr configs", error);
+    yield put(fetchRtpcrConfigsFailed({ error }));
+  }
+}
+
+export function* updateRtpcrConfigs(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateRtpcrConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.rtpcrConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating rtpcr configs", error);
+    yield put(updateRtpcrConfigsFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(
     commonDetailsActions.commonDetailsInitiated,
@@ -299,4 +354,6 @@ export function* calibrationSaga() {
     updatePidDetails
   );
   yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
+  yield takeEvery(fetchRtpcrConfigsActions.initiateAction, fetchRtpcrConfigs);
+  yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
 }

@@ -3,17 +3,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 
 import {
-  calibrationInitiated,
-  updateCalibrationInitiated,
   commonDetailsInitiated,
   updateCommonDetailsInitiated,
+  fetchRtpcrConfigsInitiated,
+  updateRtpcrConfigsInitiated,
 } from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
-import { formikInitialState } from "components/Calibration/helper";
 import {
-  deckBlockInitiated,
-  logoutInitiated,
-} from "action-creators/loginActionCreators";
+  formikInitialState,
+  formikInitialStateRtpcrVars,
+} from "components/Calibration/helper";
+import { deckBlockInitiated } from "action-creators/loginActionCreators";
+import { populateFormikStateFromApi } from "components/FormikFieldsEditor/helper";
 
 const CalibrationRtpcrContainer = () => {
   const dispatch = useDispatch();
@@ -21,6 +22,12 @@ const CalibrationRtpcrContainer = () => {
   //formik state for common fields
   const formik = useFormik({
     initialValues: formikInitialState,
+    enableReinitialize: true,
+  });
+
+  //formik state for rtpcr variables
+  const formikRtpcrVars = useFormik({
+    initialValues: formikInitialStateRtpcrVars,
     enableReinitialize: true,
   });
 
@@ -36,6 +43,12 @@ const CalibrationRtpcrContainer = () => {
   const commonDetailsReducerData = commonDetailsReducer.toJS();
   const { isUpdateApi, details } = commonDetailsReducerData;
 
+  //rtpcr configs
+  const rtpcrConfigsReducer = useSelector((state) => state.rtpcrConfigsReducer);
+  const rtpcrConfigsReducerData = rtpcrConfigsReducer.toJS();
+  let isRtpcrConfigUpdateApi = rtpcrConfigsReducerData?.isUpdateApi;
+  let rtpcrConfigDetails = rtpcrConfigsReducerData?.details;
+
   //initially populate with previous data
   useEffect(() => {
     if (token) {
@@ -43,6 +56,8 @@ const CalibrationRtpcrContainer = () => {
       dispatch(commonDetailsInitiated(token));
       //another deck must be blocked
       dispatch(deckBlockInitiated({ deckName: name }));
+      //fetch rtpcr variables from api
+      dispatch(fetchRtpcrConfigsInitiated(token));
     }
   }, [dispatch, token]);
 
@@ -68,6 +83,25 @@ const CalibrationRtpcrContainer = () => {
     isUpdateApi,
   ]);
 
+  useEffect(() => {
+    if (
+      rtpcrConfigsReducerData.error === false &&
+      rtpcrConfigsReducerData.isLoading === false
+    ) {
+      if (isRtpcrConfigUpdateApi === false) {
+        //populate formik data with fetched values
+        populateFormikStateFromApi(formikRtpcrVars, rtpcrConfigDetails);
+      } else {
+        //fetch updated data after updation
+        dispatch(fetchRtpcrConfigsInitiated(token));
+      }
+    }
+  }, [
+    rtpcrConfigsReducerData.error,
+    rtpcrConfigsReducerData.isLoading,
+    isRtpcrConfigUpdateApi,
+  ]);
+
   const handleSaveDetailsBtn = (data) => {
     const { name, email, roomTemperature } = data;
     const requestBody = {
@@ -76,6 +110,10 @@ const CalibrationRtpcrContainer = () => {
       room_temperature: roomTemperature.value,
     };
     dispatch(updateCommonDetailsInitiated({ token, data: requestBody }));
+  };
+
+  const handleRtpcrConfigSubmitButton = (requestBody) => {
+    dispatch(updateRtpcrConfigsInitiated(token, requestBody));
   };
 
   /**to change formik field */
@@ -87,85 +125,11 @@ const CalibrationRtpcrContainer = () => {
     <CalibrationComponent
       formik={formik}
       isAdmin={isAdmin}
-      handleOnChange={handleOnChange}
       handleSaveDetailsBtn={handleSaveDetailsBtn}
+      formikRtpcrVars={formikRtpcrVars}
+      handleRtpcrConfigSubmitButton={handleRtpcrConfigSubmitButton}
     />
   );
 };
 
 export default React.memo(CalibrationRtpcrContainer);
-
-//old code for reference
-//TODO remove this if not needed for reference
-
-// import React, { useEffect } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import {
-//   calibrationInitiated,
-//   updateCalibrationInitiated,
-//   commonDetailsInitiated,
-// } from "action-creators/calibrationActionCreators";
-// import CalibrationComponent from "components/Calibration";
-
-// const CalibrationRtpcrContainer = () => {
-//   const dispatch = useDispatch();
-
-//   //get login reducer details
-//   const loginReducer = useSelector((state) => state.loginReducer);
-//   const loginReducerData = loginReducer.toJS();
-//   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
-//   const { token } = activeDeckObj;
-
-//   //get calibration configurations from reducer
-//   const calibrationReducer = useSelector((state) => state.calibrationReducer);
-//   const calibrationReducerData = calibrationReducer.toJS();
-//   const { configs } = calibrationReducerData;
-
-//   //get calibration configurations from reducer
-//   const updateCalibrationReducer = useSelector(
-//     (state) => state.updateCalibrationReducer
-//   );
-//   const updateCalibrationReducerData = updateCalibrationReducer.toJS();
-//   const { isLoading, error } = updateCalibrationReducerData;
-
-//   //initially populate with previous data
-//   useEffect(() => {
-//     if (token) {
-//       // dispatch(calibrationInitiated(token));
-
-//       // fetch commonDetails (name, email, roomTemp) API called initially
-//       dispatch(commonDetailsInitiated(token));
-//     }
-//   }, [dispatch, token]);
-
-//   //after update API call is successful populate fields with new data
-//   useEffect(() => {
-//     if (token && error === false && isLoading === false) {
-//       dispatch(calibrationInitiated(token));
-//     }
-//   }, [dispatch, isLoading, error, token]);
-
-//   const saveButtonClickHandler = (configData) => {
-//     let data = {
-//       receiver_name: configData.name,
-//       receiver_email: configData.email,
-//       room_temperature: configData.roomTemperature,
-//       homing_time: configData.homingTime,
-//       no_of_homing_cycles: configData.noOfHomingCycles,
-//       cycle_time: configData.cycleTime,
-//       pid_temperature: configData.pidTemperature,
-//       pid_minutes: configData.pidMinutes,
-//     };
-
-//     dispatch(updateCalibrationInitiated({ token, data }));
-//   };
-
-//   return (
-//     <CalibrationComponent
-//       configs={configs}
-//       saveButtonClickHandler={saveButtonClickHandler}
-//     />
-//   );
-// };
-
-// export default React.memo(CalibrationRtpcrContainer);

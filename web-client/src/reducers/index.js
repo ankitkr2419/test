@@ -71,6 +71,7 @@ import {
   pidProgessReducer,
   pidReducer,
   createTipTubeReducer,
+  rtpcrConfigsReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
@@ -136,6 +137,7 @@ const rootReducer = combineReducers({
   analyseDataGraphThresholdReducer,
   analyseDataGraphBaselineReducer,
   createTipTubeReducer,
+  rtpcrConfigsReducer,
 });
 
 export default rootReducer;
