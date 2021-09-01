@@ -103,40 +103,6 @@ const DispenseCommonField = (props) => {
           </Text>
         </Text>
       </FormGroup>
-
-      {/* 
-            {can be used in future. Not sure. Will delete later!} 
-      */}
-
-      {/* <FormGroup className="d-flex align-items-center mb-2">
-        <Label for="dispense-volume" className="px-0 label-name">
-          Dispense Volume
-        </Label>
-        <div className="d-flex flex-column input-field">
-          <Input
-            type="text"
-            name="dispense-volume"
-            id="dispense-volume"
-            placeholder="Type here"
-          />
-          <FormError>Incorrect Dispense Volume</FormError>
-        </div>
-      </FormGroup> */}
-
-      {/* <FormGroup className="d-flex align-items-center mb-2">
-        <Label for="dispense-blow" className="px-0 label-name">
-          Dispense Blow
-        </Label>
-        <div className="d-flex flex-column input-field">
-          <Input
-            type="text"
-            name="dispense-blow"
-            id="dispense-blow"
-            placeholder="Type here"
-          />
-          <FormError>Incorrect Dispense Blow</FormError>
-        </div>
-      </FormGroup> */}
     </CommmonFields>
   );
 };

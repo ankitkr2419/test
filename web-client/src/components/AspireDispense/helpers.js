@@ -29,24 +29,34 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
   const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
   const dispenseWells = dispense[`cartridge${dispense.selectedCategory}Wells`];
 
+  // initially source and destination will deckPosition
+  let sourcePosition = aspire.deckPosition;
+  let destinationPosition = dispense.deckPosition;
+
   let cartridgeType = 1;
+
+  // if aspire is well then source will be position of wells.
   if (
     aspire.selectedCategory === catergories.CATEGORY_1 ||
     aspire.selectedCategory === catergories.CATEGORY_2
   ) {
     cartridgeType = aspire.selectedCategory;
+    sourcePosition = getPosition(aspireWells);
   }
+
+  // if dispense is well then destination will be position of wells.
   if (
     dispense.selectedCategory === catergories.CATEGORY_1 ||
     dispense.selectedCategory === catergories.CATEGORY_2
   ) {
     cartridgeType = dispense.selectedCategory;
+    destinationPosition = getPosition(dispenseWells);
   }
 
   return {
     category: `${aspireSelectedTabName}_to_${dispenseSelectedTabName}`,
     cartridge_type: `cartridge_${cartridgeType}`,
-    source_position: getPosition(aspireWells),
+    source_position: parseInt(sourcePosition),
     aspire_height: parseFloat(aspire.aspireHeight ? aspire.aspireHeight : 0),
     aspire_mixing_volume: parseFloat(
       aspire.mixingVolume ? aspire.mixingVolume : 0
@@ -61,7 +71,7 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
       dispense.mixingVolume ? dispense.mixingVolume : 0
     ),
     dispense_no_of_cycles: parseFloat(dispense.nCycles ? dispense.nCycles : 0),
-    destination_position: getPosition(dispenseWells),
+    destination_position: parseInt(destinationPosition),
   };
 };
 
@@ -124,6 +134,14 @@ export const getFormikInitialState = (editReducer = null) => {
     deck: catergories.DECK,
   };
 
+  // for source
+  let sourcePosForCartridge = null;
+  let sourcePosForDeck = "";
+
+  // for destination
+  let destPosForCartridge = null;
+  let destPosForDeck = "";
+
   if (editReducer?.process_id) {
     type = editReducer.cartridge_type;
 
@@ -134,6 +152,20 @@ export const getFormikInitialState = (editReducer = null) => {
 
     aspireSelectedCategory = CATEGORY_ID[category1];
     dispenseSelectedCategory = CATEGORY_ID[category2];
+
+    // source position
+    if (category1 === "well") {
+      sourcePosForCartridge = editReducer.source_position;
+    } else if (category1 === "deck") {
+      sourcePosForDeck = editReducer.source_position;
+    }
+
+    // destination position
+    if (category2 === "well") {
+      destPosForCartridge = editReducer.destination_position;
+    } else if (category2 === "deck") {
+      destPosForDeck = editReducer.destination_position;
+    }
   }
 
   return {
@@ -142,15 +174,15 @@ export const getFormikInitialState = (editReducer = null) => {
         NUMBER_OF_WELLS,
         ASPIRE_WELLS,
         aspireSelectedCategory === catergories.CATEGORY_1,
-        editReducer.source_position
+        sourcePosForCartridge
       ),
       cartridge2Wells: getArray(
         NUMBER_OF_WELLS,
         ASPIRE_WELLS,
         aspireSelectedCategory === catergories.CATEGORY_2,
-        editReducer.source_position
+        sourcePosForCartridge
       ),
-      deckPosition: "",
+      deckPosition: sourcePosForDeck,
       aspireHeight: setFormikValue(editReducer, "aspire_height"),
       mixingVolume: setFormikValue(editReducer, "aspire_mixing_volume"),
       aspireVolume: setFormikValue(editReducer, "aspire_volume"),
@@ -164,15 +196,15 @@ export const getFormikInitialState = (editReducer = null) => {
         NUMBER_OF_WELLS,
         DISPENSE_WELLS,
         dispenseSelectedCategory === catergories.CATEGORY_1,
-        editReducer.destination_position
+        destPosForCartridge
       ),
       cartridge2Wells: getArray(
         NUMBER_OF_WELLS,
         DISPENSE_WELLS,
         dispenseSelectedCategory === catergories.CATEGORY_2,
-        editReducer.destination_position
+        destPosForCartridge
       ),
-      deckPosition: "",
+      deckPosition: destPosForDeck,
       dispenseHeight: setFormikValue(editReducer, "dispense_height"),
       mixingVolume: setFormikValue(editReducer, "dispense_mixing_volume"),
       nCycles: setFormikValue(editReducer, "dispense_no_of_cycles"),
