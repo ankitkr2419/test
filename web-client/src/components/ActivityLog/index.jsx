@@ -18,7 +18,7 @@ const ActivityComponent = (props) => {
     experiments,
     searchText,
     onSearchTextChanged,
-    mailActivityReportHandler,
+    expandLogHandler,
   } = props;
 
   const [selectedActivity, setSelectedActivity] = useState(null);
@@ -150,8 +150,8 @@ const ActivityComponent = (props) => {
                     /> */}
                     <ButtonIcon
                       size={28}
-                      name="published"
-                      onClick={mailActivityReportHandler}
+                      name="expand"
+                      onClick={() => expandLogHandler(experiment)}
                     />
                   </td>
                 </tr>

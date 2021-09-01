@@ -6,7 +6,13 @@ import { useFormik } from "formik";
 import { formikInitialState, getRequestBody, disbleApplyBtn } from "./helper";
 
 const GraphRange = (props) => {
-  const { className, handleRangeChangeBtn, handleResetBtn, headerData } = props;
+  const {
+    className,
+    handleRangeChangeBtn,
+    handleResetBtn,
+    headerData,
+    isExpanded,
+  } = props;
 
   const { totalCycles, progressStatus } = headerData;
 
@@ -63,11 +69,12 @@ const GraphRange = (props) => {
           <Input
             name="yMin"
             type="number"
+            step="0.1"
             className="px-2 py-1 ml-2"
             placeholder="Min value"
             value={formik.values.yMin.value}
             onChange={(e) =>
-              formik.setFieldValue("yMin.value", parseInt(e.target.value))
+              formik.setFieldValue("yMin.value", parseFloat(e.target.value))
             }
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`yMin.isInvalid`, false)}
@@ -75,11 +82,12 @@ const GraphRange = (props) => {
           <Input
             name="yMax"
             type="number"
+            step="0.1"
             className="px-2 py-1 ml-2"
             placeholder="Max value"
             value={formik.values.yMax.value}
             onChange={(e) =>
-              formik.setFieldValue("yMax.value", parseInt(e.target.value))
+              formik.setFieldValue("yMax.value", parseFloat(e.target.value))
             }
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`yMax.isInvalid`, false)}
@@ -90,16 +98,17 @@ const GraphRange = (props) => {
           size="sm"
           className="mb-3 ml-3"
           onClick={() => handleRangeChangeBtn(getRequestBody(formik.values))}
-          disabled={disbleApplyBtn(formik.values, progressStatus)}
+          disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
           Apply
         </Button>
         <Button
-          color="primary"
+          color="secondary"
           size="sm"
-          className="mb-3 ml-3"
-          onClick={handleResetBtn}
-          disabled={disbleApplyBtn(formik.values, progressStatus)}
+          outline={true}
+          className="mb-3 ml-3 border-2 border-gray "
+          onClick={() => handleResetBtn(totalCycles)}
+          disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
           Reset
         </Button>

@@ -13,6 +13,8 @@ var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning, LidPidT
 var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
 
+const FValueRegisterStartAddress = 800
+
 type DeckNumber struct {
 	Deck   string
 	Number uint16

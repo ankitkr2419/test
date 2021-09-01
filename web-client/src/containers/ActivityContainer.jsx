@@ -6,10 +6,18 @@ import {
   mailReportInitiated,
 } from "action-creators/activityLogActionCreators";
 import { toast } from "react-toastify";
-import { TOAST_MESSAGE } from "appConstants";
+import { ROUTES, TOAST_MESSAGE } from "appConstants";
+import { useHistory } from "react-router";
+import {
+  createExperiment,
+  createExperimentSucceeded,
+  fetchExperiments,
+} from "action-creators/experimentActionCreators";
+import { loginReset } from "action-creators/loginActionCreators";
 
 const ActivityContainer = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -22,12 +30,22 @@ const ActivityContainer = () => {
   const activityLogData = activityLogReducer.toJS();
   const { activityLogs } = activityLogData;
 
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
+  const createExperimentReducerData = createExperimentReducer.toJS();
+
   //get status of mail from reducer
   const mailReportReducer = useSelector((state) => state.mailReportReducer);
   const { isLoading, error } = mailReportReducer.toJS();
 
   //search activity by experiment name
   const [searchText, setSearchText] = useState("");
+
+  // reset reducers if activity log tab is clicked
+  useEffect(() => {
+    dispatch(loginReset());
+  }, []);
 
   //get activity list api call
   useEffect(() => {
@@ -47,8 +65,12 @@ const ActivityContainer = () => {
     setSearchText(text);
   };
 
-  const mailActivityReportHandler = () => {
-    // dispatch(mailReportInitiated({ report, token })); //API call to send an email
+  const expandLogHandler = (experimentDetails) => {
+    // Call experiment success action to populate reducer.
+    dispatch(
+      createExperimentSucceeded({ ...experimentDetails, isExpanded: true })
+    );
+    history.push(ROUTES.plate);
   };
 
   return (
@@ -56,7 +78,7 @@ const ActivityContainer = () => {
       experiments={activityLogs}
       searchText={searchText}
       onSearchTextChanged={onSearchTextChanged}
-      mailActivityReportHandler={mailActivityReportHandler}
+      expandLogHandler={expandLogHandler}
     />
   );
 };
