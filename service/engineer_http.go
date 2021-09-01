@@ -23,10 +23,10 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 		// TODO: Logging this API
 		vars := mux.Vars(req)
 		deck := vars["deck"]
-		var err error
 
 		if deps.PlcDeck[deck].IsRunInProgress() {
-			logger.WithField("err", err.Error()).Error(responses.PreviousRunInProgressError)
+			logger.Errorln(responses.PreviousRunInProgressError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PreviousRunInProgressError.Error(), Deck: deck})
 			return
 		}
 
@@ -34,11 +34,6 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 		defer deps.PlcDeck[deck].ResetRunInProgress()
 
 		go deps.PlcDeck[deck].PIDCalibration(req.Context())
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.PIDCalibrationError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.PIDCalibrationError.Error(), Deck: deck})
-			return
-		}
 
 		logger.Infoln(responses.PIDCalibrationStarted)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PIDCalibrationStarted})
@@ -107,7 +102,8 @@ func shakerHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		if deps.PlcDeck[deck].IsRunInProgress() {
-			logger.WithField("err", err.Error()).Error(responses.PreviousRunInProgressError)
+			logger.Errorln(responses.PreviousRunInProgressError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PreviousRunInProgressError.Error(), Deck: deck})
 			return
 		}
 
@@ -115,11 +111,6 @@ func shakerHandler(deps Dependencies) http.HandlerFunc {
 		defer deps.PlcDeck[deck].ResetRunInProgress()
 
 		go deps.PlcDeck[deck].Shaking(shObj)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.ShakingError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ShakingError.Error(), Deck: deck})
-			return
-		}
 
 		logger.Infoln(responses.ShakingSuccess)
 		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: responses.ShakingSuccess})
@@ -150,7 +141,8 @@ func heaterHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		if deps.PlcDeck[deck].IsRunInProgress() {
-			logger.WithField("err", err.Error()).Error(responses.PreviousRunInProgressError)
+			logger.Errorln(responses.PreviousRunInProgressError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PreviousRunInProgressError.Error(), Deck: deck})
 			return
 		}
 
@@ -158,11 +150,6 @@ func heaterHandler(deps Dependencies) http.HandlerFunc {
 		defer deps.PlcDeck[deck].ResetRunInProgress()
 
 		go deps.PlcDeck[deck].Heating(hObj)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.HeatingError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.HeatingError.Error(), Deck: deck})
-			return
-		}
 
 		logger.Infoln(responses.HeatingSuccess)
 		responseCodeAndMsg(rw, http.StatusAccepted, MsgObj{Msg: responses.HeatingSuccess})
