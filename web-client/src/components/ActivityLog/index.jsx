@@ -92,7 +92,7 @@ const ActivityComponent = (props) => {
                         : "text-capitalize"
                     }
                   >
-                    {experiment.result ? experiment.result : "NA"}
+                    {experiment.result ? experiment.result : "N/A"}
                   </td>
                   <td className="td-actions">
                     <ButtonIcon

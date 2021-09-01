@@ -232,7 +232,7 @@ func (t *TEC1089) ReachRoomTemp() (err error) {
 	logger.Infoln("Going Back to Room Temp ")
 	ts := tec.TECTempSet{
 		TargetTemperature: float64(config.GetRoomTemp()),
-		TargetRampRate:    tec.RoomTempRamp,
+		TargetRampRate:    db.RoomTempRamp,
 	}
 	err = t.SetTempAndRamp(ts)
 	if err != nil {

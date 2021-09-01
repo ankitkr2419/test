@@ -71,19 +71,21 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/login/{deck:[A-B]?}", validateUserHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	//userlogout
 	router.HandleFunc("/logout/{deck:[A-B]?}", authenticate(logoutUserHandler(deps), deps, Combined)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	//userDelete
+	router.HandleFunc("/users/{username}", authenticate(deleteUserHandler(deps), deps, Combined, supervisor, admin)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
 	// configs
-	router.HandleFunc("/common-configs", authenticate(getCommonConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/common-configs", authenticate(updateCommonConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/tec-configs", authenticate(getTECConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/tec-configs", authenticate(updateTECConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/rtpcr-configs", authenticate(getRTPCRConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/rtpcr-configs", authenticate(updateRTPCRConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/extraction-configs", authenticate(getExtractionConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/extraction-configs", authenticate(updateExtractionConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/common", authenticate(getCommonConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/common", authenticate(updateCommonConfigHandler(deps), deps, Combined, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/tec", authenticate(getTECConfigHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/tec", authenticate(updateTECConfigHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/rtpcr", authenticate(getRTPCRConfigHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/rtpcr", authenticate(updateRTPCRConfigHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/extraction", authenticate(getExtractionConfigHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/configs/extraction", authenticate(updateExtractionConfigHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/motor", authenticate(createMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/motor/{id}", authenticate(updateMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/motor", authenticate(updateMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/motors", authenticate(listMotorsHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/motor/{id}", authenticate(deleteMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
@@ -153,6 +155,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//TODO: allow only for engineer
 	router.HandleFunc("/pid-calibration/{deck:[A-B]}", pidCalibrationHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/lid/pid-calibration/start", lidPIDCalibrationStartHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/lid/pid-calibration/stop", lidPIDCalibrationStopHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
+
 	// shaker and heater for engineer
 	router.HandleFunc("/start-shaking/{deck:[A-B]}", shakerHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/start-heating/{deck:[A-B]}", heaterHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)

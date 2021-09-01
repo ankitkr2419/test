@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -11,11 +11,8 @@ import SampleSideBarContainer from "containers/SampleSideBarContainer";
 import { EXPERIMENT_STATUS } from "appConstants";
 import Header from "./Header";
 
-import GridWrapper from "./Grid/GridWrapper";
 import GridComponent from "./Grid";
 import WellGridHeader from "./Grid/WellGridHeader";
-
-import "./Plate.scss";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
@@ -24,6 +21,10 @@ import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import { updateFilter } from "action-creators/analyseDataGraphActionCreators";
 import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
+
+import GridWrapper from "./Grid/GridWrapper";
+import "./Plate.scss";
+import { rangeActions, rangeInitialState, rangeReducer } from "./helpers";
 
 const initialOptions = {
   legend: {
@@ -120,11 +121,12 @@ const Plate = (props) => {
   // local state to manage previewReport modal
   const [previewReportModal, setPreviewReportModal] = useState(false);
 
-  // default ranges for amplification plot
-  const [xMinValue, setXMin] = useState(1);
-  const [xMaxValue, setXMax] = useState(5);
-  const [yMinValue, setYMin] = useState(0);
-  const [yMaxValue, setYMax] = useState(5);
+  // local state to manage min max values of X and Y
+  const [rangeState, updateRangeState] = useReducer(
+    rangeReducer,
+    rangeInitialState
+  );
+  const { xMaxValue, xMinValue, yMaxValue, yMinValue } = rangeState;
 
   const [options, setOptions] = useState(initialOptions);
   const [isDataFromAPI, setDataFromAPI] = useState(false);
@@ -217,7 +219,6 @@ const Plate = (props) => {
   const showGraphOfWell = (index, show) => {
     // set selected well index
     setSelectedWell(index, show);
-    // setIsSidebarOpen(true);
   };
 
   const [activeTab, setActiveTab] = useState("wells");
@@ -244,23 +245,15 @@ const Plate = (props) => {
   const handleRangeChangeBtn = ({ xMax, xMin, yMax, yMin }) => {
     setDataFromAPI(true);
 
-    setXMax(xMax);
-    setXMin(xMin);
-    setYMax(yMax);
-    setYMin(yMin);
+    updateRangeState({ type: rangeActions.UPDATE_X_MAX, value: xMax });
+    updateRangeState({ type: rangeActions.UPDATE_X_MIN, value: xMin });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MAX, value: yMax });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MIN, value: yMin });
   };
 
   const handleResetBtn = (cycleCount) => {
     setDataFromAPI(true);
-
-    const thresholdArr = experimentGraphTargetsList
-      .toJS()
-      .map((targetObj) => parseInt(targetObj.threshold));
-
-    setXMax(cycleCount);
-    setXMin(0);
-    setYMax(Math.max(thresholdArr));
-    setYMin(0);
+    updateRangeState({ type: rangeActions.RESET_VALUES });
   };
 
   return (

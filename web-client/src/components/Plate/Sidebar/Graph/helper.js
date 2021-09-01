@@ -1,10 +1,12 @@
 import { EXPERIMENT_STATUS } from "appConstants";
 
+const initialObj = { value: null, min: 0, max: 99, isInvalid: false };
+
 export const formikInitialState = {
-  xMin: { value: null, min: 0, max: 99, isInvalid: false },
-  xMax: { value: null, min: 0, max: 99, isInvalid: false },
-  yMin: { value: null, min: 0, max: 99, isInvalid: false },
-  yMax: { value: null, min: 0, max: 99, isInvalid: false },
+  xMin: initialObj,
+  xMax: initialObj,
+  yMin: initialObj,
+  yMax: initialObj,
 };
 
 export const getRequestBody = (state) => ({
