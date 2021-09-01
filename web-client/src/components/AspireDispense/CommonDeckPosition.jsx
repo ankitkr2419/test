@@ -22,7 +22,7 @@ const CommonDeckPosition = (props) => {
   return (
     <FormGroup className="d-flex align-items-center mb-4">
       <Label for="deck-position" className="px-0 label-name">
-        Deck position
+        Deck Position
       </Label>
       <div className="d-flex flex-column input-field">
         <CreatableSelect

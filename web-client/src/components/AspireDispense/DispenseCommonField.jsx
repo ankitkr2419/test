@@ -13,7 +13,7 @@ const DispenseCommonField = (props) => {
   // if value of mixing volume is cleared then value of nCycles must also be cleared
   const handleBlur = (value) => {
     if (value === "") {
-      setFormikField(formik, true, currentTab, "nCycles", "");
+      setFormikField(formik, false, currentTab, "nCycles", "");
     }
   };
 
