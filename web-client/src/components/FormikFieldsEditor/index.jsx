@@ -16,7 +16,7 @@ import { Center, Text } from "shared-components";
 import { isValueValid, validateAllFields, getRequestBody } from "./helper";
 
 const FormikFieldsEditor = (props) => {
-  let { formik, submitButtonLabel, submitButtonHandler } = props;
+  let { formTitle, formik, submitButtonLabel, submitButtonHandler } = props;
 
   const handleBlurChange = useCallback((name, value) => {
     const isValid = isValueValid(formik.values, name, value);
@@ -44,6 +44,15 @@ const FormikFieldsEditor = (props) => {
   return (
     <Card default className="my-3">
       <CardBody>
+        {formTitle && (
+          <Text
+            Tag="h4"
+            size={24}
+            className="text-center text-gray text-bold mt-3 mb-4"
+          >
+            {formTitle}
+          </Text>
+        )}
         <Form onSubmit={onSubmit}>
           <Row>
             {Object.keys(formik.values).map((key, index) => {

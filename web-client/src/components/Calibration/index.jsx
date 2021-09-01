@@ -67,6 +67,7 @@ const CalibrationComponent = (props) => {
 
           {/**Rtpcr vars */}
           <FormikFieldsEditor
+            formTitle={"Rtpcr Configuration"}
             formik={formikRtpcrVars}
             submitButtonLabel={"Save"}
             submitButtonHandler={handleRtpcrConfigSubmitButton}
@@ -74,6 +75,7 @@ const CalibrationComponent = (props) => {
 
           {/** TEC vars */}
           <FormikFieldsEditor
+            formTitle={"TEC Configuration"}
             formik={formikTECVars}
             submitButtonLabel={"Save"}
             submitButtonHandler={handleTECConfigSubmitButton}
