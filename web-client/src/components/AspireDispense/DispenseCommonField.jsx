@@ -10,6 +10,13 @@ const DispenseCommonField = (props) => {
   const mixingVolume = formik.values.dispense.mixingVolume;
   const nCyclesDisabled = mixingVolume === null || mixingVolume === "";
 
+  // if value of mixing volume is cleared then value of nCycles must also be cleared
+  const handleBlur = (value) => {
+    if (value === "") {
+      setFormikField(formik, true, currentTab, "nCycles", "");
+    }
+  };
+
   return (
     <CommmonFields>
       <FormGroup className="d-flex align-items-center mb-2">
@@ -61,6 +68,7 @@ const DispenseCommonField = (props) => {
                 e.target.value
               )
             }
+            onBlur={(e) => handleBlur(e.target.value)}
           />
           <FormError>Incorrect Mixing Volume</FormError>
         </div>

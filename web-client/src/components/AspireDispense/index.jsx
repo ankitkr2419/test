@@ -10,6 +10,7 @@ import { ButtonBar, ButtonIcon } from "shared-components";
 import TopHeading from "shared-components/TopHeading";
 import { AspireDispenseBox, PageBody, TopContent } from "./Style";
 import {
+  tabNames,
   setFormikField,
   getFormikInitialState,
   getRequestBody,
@@ -18,6 +19,7 @@ import {
 } from "./helpers";
 import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
+import { toast } from "react-toastify";
 
 const AspireDispenseComponent = () => {
   const [activeTab, setActiveTab] = useState("1");
@@ -44,11 +46,25 @@ const AspireDispenseComponent = () => {
     enableReinitialize: true,
   });
 
+  // if the user lands on a tab which is disabled then give a warning msg
+  useEffect(() => {
+    const currentTabName = tabNames[activeTab];
+    const isCurrentTabDisabled =
+      disabledTab[isAspire ? "aspire" : "dispense"][currentTabName];
+
+    if (isCurrentTabDisabled === true) {
+      toast.warning("Please select different tab");
+    }
+  }, [isAspire]);
+
   useEffect(() => {
     setActiveTab(
       formik.values[isAspire ? "aspire" : "dispense"].selectedCategory
     );
-  });
+  }, [
+    formik.values.aspire.selectedCategory,
+    formik.values.dispense.selectedCategory,
+  ]);
 
   const errorInAPICall = processesReducer.error;
   useEffect(() => {
@@ -98,25 +114,21 @@ const AspireDispenseComponent = () => {
     });
   };
 
-  // TODO: change dependecy array after merge.
   useEffect(() => {
     let updatedDisabledTabState = toggler(formik, isAspire);
     setDisabledTab({ ...disabledTab, ...updatedDisabledTabState });
-  }, [formik.values]);
+  }, [formik.values, isAspire]);
 
+  // back to aspire
   const handleModifyBtn = () => {
     setIsAspire(!isAspire);
     setActiveTab(formik.values.aspire.selectedCategory);
-    formik.setFieldValue("dispense.selectedCategory", activeTab);
   };
 
+  // towards dispense
   const handleNextBtn = () => {
     setIsAspire(!isAspire);
     setActiveTab(formik.values.dispense.selectedCategory);
-    formik.setFieldValue("aspire.selectedCategory", activeTab);
-    if (activeTab === "2") {
-      formik.setFieldValue("dispense.selectedCategory", activeTab);
-    }
   };
 
   const handleSaveBtn = () => {
@@ -148,7 +160,6 @@ const AspireDispenseComponent = () => {
                   size={60}
                   name="aspire-dispense"
                   className="text-primary bg-white border-gray"
-                  onClick={() => setIsAspire(!isAspire)}
                 />
                 <TopHeading titleHeading="Aspire & Dispense" />
               </div>
