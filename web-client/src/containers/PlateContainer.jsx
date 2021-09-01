@@ -18,16 +18,12 @@ import {
 } from "selectors/experimentSelector";
 import { setIsPlateRoute } from "action-creators/loginActionCreators";
 import { getActiveLoadedWells } from "selectors/activeWellSelector";
-import { EXPERIMENT_STATUS, MAX_NO_OF_WELLS } from "appConstants";
+import { MAX_NO_OF_WELLS } from "appConstants";
 import { mailReportInitiated } from "action-creators/activityLogActionCreators";
 import { toast } from "react-toastify";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
 import { resetGraphInitiated } from "action-creators/wellGraphActionCreators";
-import {
-  temperatureApiGraphInitiated,
-  temperatureDataSucceeded,
-  temperatureGraphInitiated,
-} from "action-creators/temperatureGraphActionCreators";
+import { temperatureApiGraphInitiated } from "action-creators/temperatureGraphActionCreators";
 
 const PlateContainer = () => {
   const dispatch = useDispatch();
@@ -89,7 +85,9 @@ const PlateContainer = () => {
 
       if (isExpanded === true) {
         // API to render amplification plot after clicking on expand
-        dispatch(resetGraphInitiated({ experimentId: experimentId, token: token }));
+        dispatch(
+          resetGraphInitiated({ experimentId: experimentId, token: token })
+        );
         // API to render temperature plot after clicking on expand
         dispatch(temperatureApiGraphInitiated({ experimentId, token }));
       }

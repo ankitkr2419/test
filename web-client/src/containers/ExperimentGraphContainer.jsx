@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import SidebarGraph from "components/Plate/Sidebar/Graph/SidebarGraph";
 import { useSelector, useDispatch } from "react-redux";
 import { getLineChartData } from "selectors/wellGraphSelector";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import { updateExperimentTargetFilters } from "action-creators/experimentTargetActionCreators";
-import { EXPERIMENT_STATUS } from "appConstants";
 import { parseFloatWrapper } from "utils/helpers";
 import { isAnyThresholdInvalid } from "components/Target/targetHelper";
-import {
-  resetGraphInitiated,
-  updateGraphInitiated,
-  wellGraphSucceeded,
-} from "action-creators/wellGraphActionCreators";
+import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 
 const ExperimentGraphContainer = (props) => {
   const {
