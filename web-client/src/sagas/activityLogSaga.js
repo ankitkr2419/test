@@ -62,21 +62,20 @@ export function* sendMail(actions) {
 export function* expand(actions) {
   const {
     payload: {
-      params: { x_axis_min, x_axis_max, y_axis_min, y_axis_max },
+      body,
       token,
       experimentId,
     },
   } = actions;
 
   const { expandLogSuccess, expandLogFailure } = expandLogActions;
-  const queryStr = `x_axis_min=${x_axis_min}&x_axis_max=${x_axis_max}&y_axis_min=${y_axis_min}&y_axis_max=${y_axis_max}`;
 
   try {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.GET,
         // body: body,
-        reqPath: `${API_ENDPOINTS.graphUpdate}/${experimentId}?${queryStr}`,
+        reqPath: `${API_ENDPOINTS.graphUpdate}/${experimentId}`,
         successAction: expandLogSuccess,
         failureAction: expandLogFailure,
         token,

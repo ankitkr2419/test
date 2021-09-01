@@ -9,46 +9,6 @@ import {
 } from "components/Target/targetConstants";
 import GraphFilters from "./GraphFilters";
 import GraphRange from "./GraphRange";
-import { EXPERIMENT_STATUS } from "appConstants";
-
-const options = {
-  legend: {
-    display: false,
-  },
-  scales: {
-    xAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: "Cycles",
-          fontSize: 15,
-          fontStyle: "bold",
-          padding: 5,
-        },
-        offset: true,
-        ticks: {
-          fontSize: 15,
-          fontStyle: "bold",
-        },
-      },
-    ],
-    yAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: "F-value",
-          fontSize: 15,
-          fontStyle: "bold",
-          padding: 10,
-        },
-        ticks: {
-          fontSize: 15,
-          fontStyle: "bold",
-        },
-      },
-    ],
-  },
-};
 
 const WellGraph = (props) => {
   const {
@@ -63,12 +23,19 @@ const WellGraph = (props) => {
     handleRangeChangeBtn,
     handleResetBtn,
     isInsidePreviewModal,
+    isExpanded,
+    options,
+    isDataFromAPI,
   } = props;
 
   return (
     <div>
       <GraphCard>
-        <LineChart data={data} options={options} />
+        <LineChart
+          data={data}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
+        />
       </GraphCard>
       <GraphFilters
         targets={experimentGraphTargetsList}
@@ -83,6 +50,7 @@ const WellGraph = (props) => {
           handleRangeChangeBtn={handleRangeChangeBtn}
           handleResetBtn={handleResetBtn}
           headerData={headerData}
+          isExpanded
         />
       )}
 

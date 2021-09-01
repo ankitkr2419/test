@@ -21,13 +21,27 @@ import { getActiveLoadedWells } from "selectors/activeWellSelector";
 import { MAX_NO_OF_WELLS } from "appConstants";
 import { mailReportInitiated } from "action-creators/activityLogActionCreators";
 import { toast } from "react-toastify";
+import { getRunExperimentReducer } from "selectors/runExperimentSelector";
+import { resetGraphInitiated } from "action-creators/wellGraphActionCreators";
+import { temperatureApiGraphInitiated } from "action-creators/temperatureGraphActionCreators";
 
 const PlateContainer = () => {
   const dispatch = useDispatch();
 
+  const runExperimentReducer = useSelector(getRunExperimentReducer);
   const runExpProgressReducer = useSelector(
     (state) => state.runExpProgressReducer
   );
+
+  // isExpanded: boolean -> Determines whether this page is redirect via normal flow
+  // or by expanding
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
+  const isExpanded = createExperimentReducer.get("isExpanded");
+
+  // current status of experiment
+  const experimentStatus = runExperimentReducer.get("experimentStatus");
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -68,8 +82,21 @@ const PlateContainer = () => {
       dispatch(fetchWells(experimentId, token));
       // fetching experiment targets to show while configuring sample and graph filter
       dispatch(fetchExperimentTargets(experimentId, token));
+
+      if (isExpanded === true) {
+        // API to render amplification plot after clicking on expand
+        dispatch(
+          resetGraphInitiated({ experimentId: experimentId, token: token })
+        );
+        // API to render temperature plot after clicking on expand
+        dispatch(temperatureApiGraphInitiated({ experimentId, token }));
+      }
     }
-  }, [experimentId, dispatch]);
+    return () => {
+      // isPlateRoute use in appHeader to manage visibility of header buttons
+      dispatch(setIsPlateRoute(false));
+    };
+  }, [experimentId, experimentStatus, isExpanded, dispatch]);
 
   const setSelectedWell = (index, isWellSelected) => {
     dispatch(setSelectedWellAction(index, isWellSelected));
@@ -123,6 +150,7 @@ const PlateContainer = () => {
       temperatureData={temperatureData}
       mailBtnHandler={mailBtnHandler}
       token={token}
+      isExpanded={isExpanded}
     />
   );
 };
