@@ -166,6 +166,7 @@ func (d *Compact32) CalculateOpticalResult(dye db.Dye, kitID string, knownValue,
 	defer func() {
 
 		if err != nil {
+			logger.WithField("ERR", err.Error()).Errorln("error in calculating the optical result", err.Error())
 			d.wsErrch <- err
 		}
 	}()
@@ -194,7 +195,7 @@ func (d *Compact32) CalculateOpticalResult(dye db.Dye, kitID string, knownValue,
 
 			finalValue += wellsData[i][j]
 		}
-		finalAvg := float64(int64(finalValue) / cycleCount)
+		finalAvg := float64(finalValue) / float64(cycleCount)
 
 		deviatedValue := float64(knownValue) - finalAvg
 		deviatedResult.OpticalResult = math.Abs((deviatedValue / float64(knownValue)) * 100)

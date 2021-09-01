@@ -36,7 +36,7 @@ const (
 func (s *pgStore) UpsertDyeWellTolerance(ctx context.Context, dwTolerance []DyeWellTolerance) (err error) {
 	stmt := makeDyeWellToleranceQuery(dwTolerance)
 
-	logger.Infoln("tolerance Query: ", stmt)
+	logger.Debugln("tolerance Query: ", stmt)
 	_, err = s.db.Exec(
 		stmt,
 	)

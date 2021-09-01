@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
@@ -183,14 +182,14 @@ func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 
 		go deps.Plc.HomingRTPCR()
 		go toleranceCalulation(deps, dyeWellTolerance)
-		logger.Infoln(responses.DyeToleranceCreateSuccess)
-		responseCodeAndMsg(rw, http.StatusCreated, "dye tolerance calculation in progress")
+		logger.Infoln(responses.DyeToleranceProgressSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, MsgObj{Msg: "dye tolerance calculation in progress"})
 
 	})
 }
 
 func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) {
-	cycleCount := config.GetEngineerCycleCount()
+	cycleCount := config.GetOpticalCalibrationCycleCount()
 	//validate the kit id
 	plc.ExperimentRunning = true
 	dye, err := deps.Store.ShowDye(context.Background(), dwtol.DyeID)
@@ -202,7 +201,7 @@ func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) {
 	}()
 	knownValue, valid := validateandGetKitID(dwtol.KitID, dye.Position)
 	if !valid {
-		err = errors.New("invalid kit id")
+		err = responses.InvalidKitIDError
 		return
 	}
 
@@ -216,54 +215,51 @@ func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) {
 	}
 
 	deps.WsMsgCh <- "PROGRESS_OPTCALIB_" + fmt.Sprintf("%d", 100)
-	deps.WsMsgCh <- "SUCCESS_OPTCALIB"
+	deps.WsMsgCh <- fmt.Sprintf("SUCCESS_OPTCALIB_successfully caliberated rt-pcr for dye %s", dye.Name)
 
 }
 
 func validateandGetKitID(kitID string, dyePos int) (knownValue int64, valid bool) {
 
-	valid = true
-	kitIDArr := strings.Split(kitID, "")
-
-	if !(len(kitIDArr) == 8) {
+	if len(kitID) != 8 {
 		logger.Errorln("length of kit id is invalid")
-		valid = false
 		return
 	}
 
-	year, err := strconv.ParseInt(strings.Join(kitIDArr[0:2], ""), 10, 64)
+	year, err := strconv.ParseInt(kitID[0:2], 10, 64)
 	if err != nil {
 		logger.Errorln("year of kit id is invalid")
-		valid = false
+		return
 	}
 	// we need the last two digit hence sustracting 2000
 	prevInvalidYear := time.Now().Year() - 3 - 2000
 	if year <= int64(prevInvalidYear) {
 		logger.Errorln("year of kit id is outdated")
-		valid = false
+
 	}
-	knownValue, err = strconv.ParseInt(strings.Join(kitIDArr[2:6], ""), 10, 64)
+	knownValue, err = strconv.ParseInt(kitID[2:6], 10, 64)
 	if err != nil {
-		valid = false
+		logger.Errorln("known value of kit id is invalid")
+		return
 	}
 
-	month, err := strconv.ParseInt(kitIDArr[6], 10, 64)
+	month, err := strconv.ParseInt(kitID[6:7], 10, 64)
 	if err != nil {
-		monthStr := strings.ToUpper(kitIDArr[6])
+		monthStr := strings.ToUpper(kitID[6:7])
 		if !([]rune(monthStr)[0] >= 'A' && []rune(monthStr)[0] <= 'C') {
 			logger.Errorln("month of kit id is invalid")
-			valid = false
+			return
 		}
 	}
 	if !(month > 1 && month < 9) {
 		logger.Errorln("month of kit id is invalid")
-		valid = false
+		return
 	}
-	dyePosition, err := strconv.ParseInt(kitIDArr[7], 10, 64)
+	dyePosition, err := strconv.ParseInt(kitID[7:], 10, 64)
 	if dyePosition != int64(dyePos) || err != nil {
 		logger.Errorln("dye position of kit id is invalid")
-		valid = false
+		return
 	}
-
+	valid = true
 	return
 }

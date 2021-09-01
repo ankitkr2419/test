@@ -150,9 +150,9 @@ var (
 	LidPIDTuningStopped = "PID Tuning stopped successfully"
 
 	// Configs
-	UpdateConfigSuccess       = "Config was updated successfully"
-	DyeToleranceCreateSuccess = "dye tolerance calculation in progress"
-	UserDeleteSuccess         = "user deleted successfully"
+	UpdateConfigSuccess         = "Config was updated successfully"
+	DyeToleranceProgressSuccess = "dye tolerance calculation in progress"
+	UserDeleteSuccess           = "user deleted successfully"
 )
 
 func GetMachineOperationMessage(operation string, state string) (message string) {
