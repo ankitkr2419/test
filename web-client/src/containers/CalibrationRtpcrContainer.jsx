@@ -7,11 +7,14 @@ import {
   updateCommonDetailsInitiated,
   fetchRtpcrConfigsInitiated,
   updateRtpcrConfigsInitiated,
+  fetchTECConfigsInitiated,
+  updateTECConfigsInitiated,
 } from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
 import {
   formikInitialState,
   formikInitialStateRtpcrVars,
+  formikInitialStateTECVars,
 } from "components/Calibration/helper";
 import { deckBlockInitiated } from "action-creators/loginActionCreators";
 import { populateFormikStateFromApi } from "components/FormikFieldsEditor/helper";
@@ -28,6 +31,12 @@ const CalibrationRtpcrContainer = () => {
   //formik state for rtpcr variables
   const formikRtpcrVars = useFormik({
     initialValues: formikInitialStateRtpcrVars,
+    enableReinitialize: true,
+  });
+
+  //formik state for TEC variables
+  const formikTECVars = useFormik({
+    initialValues: formikInitialStateTECVars,
     enableReinitialize: true,
   });
 
@@ -49,6 +58,12 @@ const CalibrationRtpcrContainer = () => {
   let isRtpcrConfigUpdateApi = rtpcrConfigsReducerData?.isUpdateApi;
   let rtpcrConfigDetails = rtpcrConfigsReducerData?.details;
 
+  //TEC variables
+  const tecConfigsReducer = useSelector((state) => state.tecConfigsReducer);
+  const tecConfigsReducerData = tecConfigsReducer.toJS();
+  let isTECConfigUpdateApi = tecConfigsReducerData?.isUpdateApi;
+  let tecConfigDetails = tecConfigsReducerData?.details;
+
   //initially populate with previous data
   useEffect(() => {
     if (token) {
@@ -58,6 +73,8 @@ const CalibrationRtpcrContainer = () => {
       dispatch(deckBlockInitiated({ deckName: name }));
       //fetch rtpcr variables from api
       dispatch(fetchRtpcrConfigsInitiated(token));
+      //fetch TEC variables from api
+      dispatch(fetchTECConfigsInitiated(token));
     }
   }, [dispatch, token]);
 
@@ -102,6 +119,25 @@ const CalibrationRtpcrContainer = () => {
     isRtpcrConfigUpdateApi,
   ]);
 
+  useEffect(() => {
+    if (
+      tecConfigsReducerData.error === false &&
+      tecConfigsReducerData.isLoading === false
+    ) {
+      if (isTECConfigUpdateApi === false) {
+        //populate formik data with fetched values
+        populateFormikStateFromApi(formikTECVars, tecConfigDetails);
+      } else {
+        //fetch updated data after updation
+        dispatch(fetchTECConfigsInitiated(token));
+      }
+    }
+  }, [
+    tecConfigsReducerData.error,
+    tecConfigsReducerData.isLoading,
+    isTECConfigUpdateApi,
+  ]);
+
   const handleSaveDetailsBtn = (data) => {
     const { name, email, roomTemperature } = data;
     const requestBody = {
@@ -116,6 +152,10 @@ const CalibrationRtpcrContainer = () => {
     dispatch(updateRtpcrConfigsInitiated(token, requestBody));
   };
 
+  const handleTECConfigSubmitButton = (requestBody) => {
+    dispatch(updateTECConfigsInitiated(token, requestBody));
+  };
+
   /**to change formik field */
   const handleOnChange = (key, value) => {
     formik.setFieldValue(key, value);
@@ -128,6 +168,8 @@ const CalibrationRtpcrContainer = () => {
       handleSaveDetailsBtn={handleSaveDetailsBtn}
       formikRtpcrVars={formikRtpcrVars}
       handleRtpcrConfigSubmitButton={handleRtpcrConfigSubmitButton}
+      formikTECVars={formikTECVars}
+      handleTECConfigSubmitButton={handleTECConfigSubmitButton}
     />
   );
 };

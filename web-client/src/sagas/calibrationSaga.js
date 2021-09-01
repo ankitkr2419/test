@@ -13,6 +13,8 @@ import {
   createTipsTubesActions,
   fetchRtpcrConfigsActions,
   updateRtpcrConfigsActions,
+  fetchTECConfigsActions,
+  updateTECConfigsActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -26,6 +28,8 @@ import {
   createTipsOrTubesFailed,
   fetchRtpcrConfigsFailed,
   updateRtpcrConfigsFailed,
+  fetchTECConfigsFailed,
+  updateTECConfigsFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* fetchCommonDetails(actions) {
@@ -328,6 +332,57 @@ export function* updateRtpcrConfigs(actions) {
   }
 }
 
+export function* fetchTECConfigs(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = fetchTECConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.tecConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching TEC configs", error);
+    yield put(fetchTECConfigsFailed({ error }));
+  }
+}
+
+export function* updateTECConfigs(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateTECConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.tecConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating TEC configs", error);
+    yield put(updateTECConfigsFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(
     commonDetailsActions.commonDetailsInitiated,
@@ -356,4 +411,6 @@ export function* calibrationSaga() {
   yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
   yield takeEvery(fetchRtpcrConfigsActions.initiateAction, fetchRtpcrConfigs);
   yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
+  yield takeEvery(fetchTECConfigsActions.initiateAction, fetchTECConfigs);
+  yield takeEvery(updateTECConfigsActions.initiateAction, updateTECConfigs);
 }

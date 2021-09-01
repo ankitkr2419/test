@@ -13,6 +13,8 @@ import {
   createTipsTubesActions,
   fetchRtpcrConfigsActions,
   updateRtpcrConfigsActions,
+  fetchTECConfigsActions,
+  updateTECConfigsActions,
 } from "actions/calibrationActions";
 import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
@@ -470,6 +472,68 @@ export const rtpcrConfigsReducer = (
 
     case loginActions.loginReset:
       return rtpcrConfigsInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const tecConfigsInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  isUpdateApi: null, // to distinguish between fetch and put API
+  details: {},
+});
+export const tecConfigsReducer = (state = tecConfigsInitialState, action) => {
+  switch (action.type) {
+    case fetchTECConfigsActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        details: null,
+        isUpdateApi: false,
+      });
+    case fetchTECConfigsActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        details: action.payload.response,
+        isUpdateApi: false,
+      });
+    case fetchTECConfigsActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: false,
+      });
+    case fetchTECConfigsActions.resetAction:
+      return tecConfigsInitialState;
+
+    case updateTECConfigsActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case updateTECConfigsActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+
+    case updateTECConfigsActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+
+    case updateTECConfigsActions.resetAction:
+      return tecConfigsInitialState;
+
+    case loginActions.loginReset:
+      return tecConfigsInitialState;
 
     default:
       return state;

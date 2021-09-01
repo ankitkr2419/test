@@ -32,6 +32,8 @@ const CalibrationComponent = (props) => {
     isAdmin,
     formikRtpcrVars,
     handleRtpcrConfigSubmitButton,
+    formikTECVars,
+    handleTECConfigSubmitButton,
   } = props;
 
   const history = useHistory();
@@ -68,6 +70,13 @@ const CalibrationComponent = (props) => {
             formik={formikRtpcrVars}
             submitButtonLabel={"Save"}
             submitButtonHandler={handleRtpcrConfigSubmitButton}
+          />
+
+          {/** TEC vars */}
+          <FormikFieldsEditor
+            formik={formikTECVars}
+            submitButtonLabel={"Save"}
+            submitButtonHandler={handleTECConfigSubmitButton}
           />
         </CardBody>
       </Card>

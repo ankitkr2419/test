@@ -12,6 +12,8 @@ import {
   createTipsTubesActions,
   fetchRtpcrConfigsActions,
   updateRtpcrConfigsActions,
+  fetchTECConfigsActions,
+  updateTECConfigsActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -199,5 +201,30 @@ export const updateRtpcrConfigsInitiated = (token, requestBody) => ({
 
 export const updateRtpcrConfigsFailed = ({ error }) => ({
   type: updateRtpcrConfigsActions.failureAction,
+  payload: { error },
+});
+
+export const fetchTECConfigsInitiated = (token) => ({
+  type: fetchTECConfigsActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const fetchTECConfigsFailed = ({ error }) => ({
+  type: fetchTECConfigsActions.failureAction,
+  payload: { error },
+});
+
+export const updateTECConfigsInitiated = (token, requestBody) => ({
+  type: updateTECConfigsActions.initiateAction,
+  payload: {
+    token,
+    requestBody,
+  },
+});
+
+export const updateTECConfigsFailed = ({ error }) => ({
+  type: updateTECConfigsActions.failureAction,
   payload: { error },
 });

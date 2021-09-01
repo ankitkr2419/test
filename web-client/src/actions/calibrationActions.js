@@ -82,3 +82,17 @@ export const updateRtpcrConfigsActions = {
   failureAction: "UPDATE_RTPCR_CONFIGS_FAILURE",
   resetAction: "UPDATE_RTPCR_CONFIGS_RESET",
 };
+
+export const fetchTECConfigsActions = {
+  initiateAction: "FETCH_TEC_CONFIGS_INITIATED",
+  successAction: "FETCH_TEC_CONFIGS_SUCCESS",
+  failureAction: "FETCH_TEC_CONFIGS_FAILURE",
+  resetAction: "FETCH_TEC_CONFIGS_RESET",
+};
+
+export const updateTECConfigsActions = {
+  initiateAction: "UPDATE_TEC_CONFIGS_INITIATED",
+  successAction: "UPDATE_TEC_CONFIGS_SUCCESS",
+  failureAction: "UPDATE_TEC_CONFIGS_FAILURE",
+  resetAction: "UPDATE_TEC_CONFIGS_RESET",
+}
