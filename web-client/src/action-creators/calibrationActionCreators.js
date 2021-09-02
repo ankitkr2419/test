@@ -9,12 +9,42 @@ import {
   updateCommonDetailsActions,
   updatePidDetailsActions,
   fetchPidDetailsActions,
+  shakerActions,
+  heaterActions,
+  abortActions,
+  updateMotorDetailsActions,
   createTipsTubesActions,
   fetchRtpcrConfigsActions,
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
 } from "actions/calibrationActions";
+
+//fetch common details - name, email, roomTemperature
+export const shakerInitiated = (payload) => ({
+  type: shakerActions.shakerActionInitiated,
+  payload,
+});
+
+export const shakerFailed = ({ error }) => ({
+  type: shakerActions.shakerActionFailed,
+  payload: {
+    error,
+  },
+});
+
+//fetch common details - name, email, roomTemperature
+export const heaterInitiated = (payload) => ({
+  type: heaterActions.heaterActionInitiated,
+  payload: payload,
+});
+
+export const heaterFailed = ({ error }) => ({
+  type: heaterActions.heaterActionFailed,
+  payload: {
+    error,
+  },
+});
 
 //fetch common details - name, email, roomTemperature
 export const commonDetailsInitiated = (token) => ({
@@ -111,20 +141,29 @@ export const runPidFailed = (errorResponse) => ({
   },
 });
 
-export const abortPid = (token, deckName) => ({
-  type: pidActions.pidAbortActionInitiated,
+export const runPidReset = () => ({
+  type: pidActions.pidActionReset,
+});
+
+// common abort for PID, heater, shaker
+export const abort = (token, deckName) => ({
+  type: abortActions.abortActionInitiated,
   payload: {
     token,
     deckName,
   },
 });
 
-export const abortPidFailed = (errorResponse) => ({
-  type: pidActions.pidAbortActionFailure,
+export const abortFailed = (errorResponse) => ({
+  type: abortActions.abortActionFailed,
   payload: {
     ...errorResponse,
     error: true,
   },
+});
+
+export const abortReset = () => ({
+  type: abortActions.abortActionReset,
 });
 
 // action creators for pid details fetch
@@ -158,6 +197,19 @@ export const motorInitiated = (token, body) => ({
 export const motorFailed = ({ error }) => ({
   type: motorActions.motorActionFailure,
   payload: { error },
+});
+
+// action creators for update motor details
+export const updateMotorDetailsInitiated = (payload) => ({
+  type: updateMotorDetailsActions.updateMotorDetaislInitiated,
+  payload,
+});
+
+export const updateMotorDetailsFailed = ({ error }) => ({
+  type: updateMotorDetailsActions.updateMotorDetaislFailure,
+  payload: {
+    error,
+  },
 });
 
 // action creators for tips and tubes

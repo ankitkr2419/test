@@ -33,7 +33,7 @@ export const runRecipeFailed = (serverErrors) => ({
 
 export const runRecipeReset = (deckName) => ({
   type: runRecipeAction.runRecipeReset,
-  payload: {deckName},
+  payload: { deckName },
 });
 
 export const runRecipeInProgress = (runRecipeInProgress) => ({
@@ -73,7 +73,6 @@ export const pauseRecipeFailed = (serverErrors) => ({
 
 export const pauseRecipeReset = () => ({
   type: pauseRecipeAction.pauseRecipeReset,
-  payload: {},
 });
 
 export const resumeRecipeInitiated = (params) => ({
@@ -99,7 +98,6 @@ export const resumeRecipeFailed = (serverErrors) => ({
 
 export const resumeRecipeReset = () => ({
   type: resumeRecipeAction.resumeRecipeReset,
-  payload: {},
 });
 
 export const resumeRecipeInProgress = (resumeRecipeInProgress) => ({
@@ -135,14 +133,13 @@ export const abortRecipeFailed = (serverErrors) => ({
 
 export const abortRecipeReset = () => ({
   type: abortRecipeAction.abortRecipeReset,
-  payload: {},
 });
 
 export const recipeListingInitiated = (token, deckName) => ({
   type: recipeListingAction.recipeListingInitiated,
   payload: {
     token,
-    deckName
+    deckName,
   },
 });
 
@@ -160,26 +157,29 @@ export const recipeListingFailed = (serverErrors) => ({
   },
 });
 
-export const saveRecipeDataForDeck = (recipeData, deckName) => ({//deckName should be passed
+export const saveRecipeDataForDeck = (recipeData, deckName) => ({
+  //deckName should be passed
   type: saveRecipeDataAction.saveRecipeDataForDeck,
   payload: {
     recipeData,
-    deckName
+    deckName,
   },
 });
 
-export const resetRecipeDataForDeck = (deckName) => ({//deckName should be passed
+export const resetRecipeDataForDeck = (deckName) => ({
+  //deckName should be passed
   type: saveRecipeDataAction.resetRecipeDataForDeck,
   payload: {
-    deckName
+    deckName,
   },
 });
 
-export const updateRecipeReducerDataForDeck = (deckName, body) => ({//deckName should be passed
+export const updateRecipeReducerDataForDeck = (deckName, body) => ({
+  //deckName should be passed
   type: saveRecipeDataAction.updateRecipeReducerDataForDeck,
   payload: {
     deckName,
-    body
+    body,
   },
 });
 
@@ -195,18 +195,18 @@ export const nextStepRunRecipeInitiated = (params) => ({
   payload: {
     params,
   },
-})
+});
 
 export const publishRecipeInitiated = (params) => ({
   type: publishRecipeAction.publishRecipeInitiated,
   payload: {
     params,
   },
-})
+});
 
 export const deleteRecipeInitiated = (params) => ({
   type: deleteRecipeAction.deleteRecipeInitiated,
   payload: {
     params,
   },
-})
+});

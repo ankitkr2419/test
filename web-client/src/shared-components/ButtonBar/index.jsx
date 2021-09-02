@@ -11,6 +11,8 @@ const ButtonBar = (props) => {
     rightBtnLabel,
     handleLeftBtn,
     handleRightBtn,
+    isRightBtnDisabled,
+    isLeftBtnDisabled,
     btnBarClassname,
     isRTPCR,
     backBtnHandler,
@@ -19,7 +21,7 @@ const ButtonBar = (props) => {
   const history = useHistory();
 
   const handleBackBtn = () => {
-    if(isRTPCR){
+    if (isRTPCR) {
       backBtnHandler();
       return;
     }
@@ -38,6 +40,7 @@ const ButtonBar = (props) => {
         <Button
           onClick={handleLeftBtn}
           color="outline-primary"
+          disabled={isLeftBtnDisabled}
           className="ml-auto text-dark"
           size="md"
         >
@@ -53,6 +56,7 @@ const ButtonBar = (props) => {
         <Button
           onClick={handleRightBtn}
           color="primary"
+          disabled={isRightBtnDisabled}
           className={leftBtnLabel ? "ml-4" : "ml-auto"}
           size="md"
         >
@@ -70,6 +74,8 @@ ButtonBar.propTypes = {
 
 ButtonBar.defaultProps = {
   isUserLoggedIn: false,
+  isLeftBtnDisabled: false,
+  isRightBtnDisabled: false,
 };
 
 export default ButtonBar;

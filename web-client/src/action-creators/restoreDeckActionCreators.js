@@ -9,7 +9,6 @@ export const restoreDeckInitiated = (params) => ({
 
 export const restoreDeckSuccess = () => ({
   type: restoreDeckActions.restoreDeckSuccess,
-  payload: {},
 });
 
 export const restoreDeckFailed = (serverErrors) => ({
@@ -21,5 +20,4 @@ export const restoreDeckFailed = (serverErrors) => ({
 
 export const restoreDeckReset = () => ({
   type: restoreDeckActions.restoreDeckReset,
-  payload: {},
 });

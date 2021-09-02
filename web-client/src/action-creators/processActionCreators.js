@@ -36,7 +36,6 @@ export const duplicateProcessFail = (params) => ({
 
 export const duplicateProcessReset = () => ({
     type: duplicateProcessActions.duplicateProcessReset,
-    payload: {},
 });
 
 export const fetchProcessDataInitiated = (params) => ({
@@ -55,7 +54,6 @@ export const fetchProcessDataFail = (params) => ({
 
 export const fetchProcessDataReset = () => ({
     type: fetchProcessDataActions.fetchProcessDataReset,
-    payload: {},
 });
 
 export const sequenceInitiated = (params) => ({
@@ -74,7 +72,6 @@ export const sequenceFail = (params) => ({
 
 export const sequenceReset = () => ({
     type: sequenceActions.sequenceReset,
-    payload: {},
 });
 
 export const deleteProcessInitiated = (params) => ({
