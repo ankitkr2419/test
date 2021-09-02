@@ -492,17 +492,12 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 			logger.Errorln(err)
 			d.ExitCh <- fmt.Errorf(plc.ErrorLidPIDTuning)
 		}
+		d.WsMsgCh <- "SUCCESS_ShakerPIDTuning_ShakerPIDTuningSuccess"
 	}()
 
 	// 1.
 	setLidPIDTuningInProgress()
 	defer resetLidPIDTuningInProgress()
-
-	// Stop Lid Heating
-	// err = d.SwitchOffLidTemp()
-	// if err != nil {
-	// 	return
-	// }
 
 	// 2.
 	// ASK: @ketan if below temp is to be multiplied by 10
@@ -513,15 +508,15 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	}
 	logger.Infoln("result from lid pid temperature set ", result, config.GetLidPIDTemp())
 
-	// Reset Lid Temp in defer
-	// defer d.SwitchOffLidTemp()
-
 	// Start PID for deck
 	// 3.
 	err = d.switchOnLidPIDCalibration()
 	if err != nil {
 		return
 	}
+
+	d.WsMsgCh <- "PROGRESS_LidPIDTuning_LidPIDTuningStarted"
+
 	// Reset PID in defer
 	defer d.switchOffLidPIDCalibration()
 	logger.Infoln(responses.PIDCalibrationStarted)
@@ -553,6 +548,11 @@ func resetLidPIDTuningInProgress() {
 }
 
 func (d *Compact32) switchOnLidPIDCalibration() (err error) {
+	err = d.switchOnLidTemp()
+	if err != nil {
+		logger.Errorln("Switch ON Lid Temp error")
+		return
+	}
 	// Switch On Lid PID Tuning
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.ON)
 	if err != nil {
@@ -564,6 +564,11 @@ func (d *Compact32) switchOnLidPIDCalibration() (err error) {
 }
 
 func (d *Compact32) switchOffLidPIDCalibration() (err error) {
+	//Stop Lid Heating
+	err = d.SwitchOffLidTemp()
+	if err != nil {
+		return
+	} 
 	// Off Lid PID Tuning
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.OFF)
 	if err != nil {
