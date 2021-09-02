@@ -138,18 +138,18 @@ ConsumableDistance:
   - id: 201
     name: "syringe_start"
     distance: 0.00
-    description: "syring start point"
+    description: "syringe start point"
   - id: 202
     name: "syring_end_max"
     distance: 133.00
     description: "syringe max down limit"
   - id: 301
     name: "piercing_height_cartridge_1"
-    distance: 9
+    distance: 3
     description: "syringe module goes this much down fast with piercing tip for actual piercing of silver foil for cartridge_1. This is below the deck base"
   - id: 302
     name: "piercing_height_cartridge_2"
-    distance: 7
+    distance: 3
     description: "syringe module goes here fast with piercing tip for actual piercing of silver foil for cartridge_2. This is below the deck base"
   - id: 306
     name: "discard_tip_and_slow_up"
@@ -165,7 +165,7 @@ ConsumableDistance:
     description: "syringe module goes here for resting by default"
   - id: 309
     name: "syringe_parking"
-    distance: 90
+    distance: 75
     description: "syringe module parks here after tip discard"
   - id: 310
     name: "deck_base"
@@ -173,11 +173,11 @@ ConsumableDistance:
     description: "syringe module is this much distance from its zero homing position to deck"
   - id: 311
     name: "syringe_module_slow_down_for_discard"
-    distance: 127
+    distance: 125
     description: "syringe module goes here at slow for discarding tip"
   - id: 325
     name: "slow_inside"
-    distance: 6
+    distance: 7
     description: "syringe module goes this much down at slow for picking up the tip after coming fast down"
   - id: 401
     name: "pickup_tip_up"
@@ -290,7 +290,7 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All vertical or syringe distances will be adjusted according to this variable"
   - id: 1055
     name: "deck_b_zero"
-    distance: 9.5
+    distance: 10.5
     description: "All distances on deck as well as tips and tubes distances will be adjusted according to this variable"
   - id: 1056
     name: "magnet_up_down_b_zero"
@@ -298,7 +298,7 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All magnet horizontal distances will be fixed here"
   - id: 1057
     name: "magnet_rev_fwd_b_zero"
-    distance: 0
+    distance: -5
     description: "This field is to be calibrated and set by the eng. All magnet vertical distances will be fixed here"
   - id: 1058
     name: "shaker_b_zero"
@@ -306,7 +306,7 @@ ConsumableDistance:
     description: "This field is to be calibrated and set by the eng. All shaker horizontal distances will be fixed here"
   - id: 1059
     name: "syringe_module_b_lh_rh_zero"
-    distance: 2.5
+    distance: 0.5
     description: "This field is to be calibrated and set by the eng. All volumes will be adjusted according to this variable"
   - id: 1060
     name: "syringe_b_lh_rh_zero"

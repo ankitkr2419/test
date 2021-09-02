@@ -1,119 +1,82 @@
-tipstubes:
-- id: 1
-  name: extraction_tip_1000ul_v1_3
-  type: tip
-  allowedpositions:
-  - 1
-  - 2
-  - 3
-  volume: 1000
-  height: 98
-  ttbase: 14
-- id: 2
-  name: pcr_tip_1000ul_v1_3
-  type: tip
-  allowedpositions:
-  - 1
-  - 2
-  - 3
-  volume: 1000
-  height: 98
-  ttbase: 14
-- id: 3
-  name: piercing_tip_v1_3
-  type: tip
-  allowedpositions:
-  - 4
-  - 5
-  volume: 0
-  height: 39
-  ttbase: 7.9
-- id: 4
-  name: sample_tube
-  type: tube
-  allowedpositions:
-  - 6
-  volume: 1500
-  height: 43.7
-  ttbase: 7.7
-- id: 5
-  name: shaker_tube
-  type: tube
-  allowedpositions:
-  - 7
-  volume: 5000
-  height: 58.88
-  ttbase: 1.5
-- id: 6
-  name: extraction_collection_tube
-  type: tube
-  allowedpositions:
-  - 9
-  volume: 1500
-  height: 43.7
-  ttbase: 7.7
-- id: 7
-  name: pcr_collection_tube
-  type: tube
-  allowedpositions:
-  - 11
-  volume: 200
-  height: 21
-  ttbase: 1
-- id: 8
-  name: automation_tip_1000ul_v1_4
-  type: tip
-  allowedpositions:
-  - 1
-  - 2
-  - 3
-  volume: 1000
-  height: 95
-  ttbase: 5.8
-- id: 9
-  name: automation_tip_200ul_v1_4
-  type: tip
-  allowedpositions:
-  - 1
-  - 2
-  - 3
-  volume: 200
-  height: 58.3
-  ttbase: 5.8
-- id: 10
-  name: TestingTip
-  type: tip
-  allowedpositions:
-  - 1
-  - 2
-  volume: 1000
-  height: 94
-  ttbase: 5.8
-- id: 12
-  name: testTube
-  type: tube
-  allowedpositions:
-  - 1
-  - 2
-  volume: 100
-  height: 10
-  ttbase: 10
-- id: 13
-  name: testingTube2
-  type: tube
-  allowedpositions:
-  - 1
-  - 2
-  volume: 1
-  height: 1
-  ttbase: 1
-- id: 14
-  name: testTube4
-  type: tube
-  allowedpositions:
-  - 1
-  - 2
-  - 3
-  volume: 1
-  height: 1
-  ttbase: 1
+TipsTubes:
+# NOTE: height is total height
+# ttBase is the height of tip/tube above deck
+  - id : 1
+    name : 'extraction_tip_1000ul_v1_3'
+    type: 'tip'
+    allowedPositions: [1,2,3]
+    volume: 1000
+    height: 98
+    ttBase: 14
+  
+  - id : 2
+    name : 'pcr_tip_1000ul_v1_3'
+    type: 'tip'
+    allowedPositions: [1,2,3]
+    volume: 1000
+    height: 98
+    ttBase: 14
+  
+  - id : 3
+    name : 'piercing_tip_v1_3'
+    type: 'tip'
+    allowedPositions: [4,5]
+    volume: 0.00
+    height: 39
+    ttBase: 7.9
+
+  - id : 4
+    name : 'sample_tube'
+    type: 'tube'
+    allowedPositions: [6]
+    volume: 1500
+    height: 43.70
+    ttBase: 7.7
+  
+  - id : 5
+    name : 'shaker_tube'
+    type: 'tube'
+    allowedPositions: [7]
+    volume: 5000
+    height: 58.88
+    ttBase: 1.5
+  
+  - id : 6
+    name : 'extraction_collection_tube'
+    type: 'tube'
+    allowedPositions: [9]
+    volume: 1500
+    height: 43.70
+    ttBase: 7.7
+  
+  - id : 7
+    name : 'pcr_collection_tube'
+    type: 'tube'
+    allowedPositions: [11]
+    volume: 200
+    height: 21
+    ttBase: 1
+
+  - id : 8
+    name : 'automation_tip_1000ul_v1_4'
+    type: 'tip'
+    allowedPositions: [1,2,3]
+    volume: 1000
+    height: 95
+    ttBase: 5.8
+  
+  - id : 9
+    name : 'automation_tip_200ul_v1_4'
+    type: 'tip'
+    allowedPositions: [1,2,3]
+    volume: 200
+    height: 58.3
+    ttBase: 5.8
+
+  - id : 10
+    name : 'automation_tip_piercing_v1_4'
+    type: 'tip'
+    allowedPositions: [4,5]
+    volume: 0.00
+    height: 38
+    ttBase: 7.9

@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/big"
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"time"
 
@@ -208,7 +209,7 @@ func (d *Simulator) SetLidTemp(expectedLidTemp uint16) (err error) {
 	// simulate currentLidTemp
 	if plc.ExperimentRunning {
 		time.Sleep(2 * time.Second)
-		plc.CurrentLidTemp = float32(expectedLidTemp)/10
+		plc.CurrentLidTemp = float32(expectedLidTemp) / 10
 		logger.Infoln("Current Lid Temp: ", plc.CurrentLidTemp)
 	}
 	return
@@ -224,5 +225,47 @@ func (d *Simulator) SwitchOffLidTemp() (err error) {
 
 func (d *Simulator) SetScanSpeedAndScanTime() (err error) {
 	// TBD
+	return
+}
+
+func (d *Simulator) CalculateOpticalResult(dye db.Dye, kitID string, knownValue, cycleCount int64) (opticalResult []db.DyeWellTolerance, err error) {
+
+	wellsData := make(map[int][]uint16, cycleCount)
+
+	plc.ExperimentRunning = true
+	for i := 0; i < int(cycleCount); i++ {
+		d.Cycle()
+		d.emit()
+		logger.Println("emissions------------------>", d.emissions)
+		wellsData[i] = make([]uint16, 16)
+		for j := 0; j < 16; j++ {
+			for k, data := range d.emissions {
+				if k == j {
+					logger.Infoln(data[dye.Position-1])
+					wellsData[i][j] = data[dye.Position-1]
+				}
+			}
+		}
+	}
+
+	for j := 0; j < 16; j++ {
+		var finalValue uint16
+		var deviatedResult db.DyeWellTolerance
+		for i := 0; i < int(cycleCount); i++ {
+
+			finalValue += wellsData[i][j]
+		}
+		finalAvg := int64(finalValue) / cycleCount
+		deviatedValue := float64(knownValue) - float64(finalAvg)
+		deviatedResult.OpticalResult = math.Abs(deviatedValue / float64(knownValue) * float64(100))
+		deviatedResult.DyeID = dye.ID
+		deviatedResult.KitID = kitID
+		deviatedResult.WellNo = j
+		if deviatedResult.OpticalResult > dye.Tolerance {
+			deviatedResult.Valid = false
+		}
+
+		opticalResult = append(opticalResult, deviatedResult)
+	}
 	return
 }

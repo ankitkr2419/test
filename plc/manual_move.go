@@ -105,6 +105,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			logger.Info("executedPulses is greater than wrote Pulses that means nothing to resume for current motor.")
 			wrotePulses.Store(d.name, uint16(0))
 			executedPulses.Store(d.name, uint16(0))
+			d.setMotorOperationCompleted()
 		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
 			response, err = d.resumeMotorWithPulses(temp1 - temp2)
