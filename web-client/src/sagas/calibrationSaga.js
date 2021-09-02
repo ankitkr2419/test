@@ -2,13 +2,17 @@ import { takeEvery, put, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
 import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 import {
+  abortActions,
   calibrationActions,
   commonDetailsActions,
   fetchPidDetailsActions,
+  heaterActions,
   motorActions,
   pidActions,
+  shakerActions,
   updateCalibrationActions,
   updateCommonDetailsActions,
+  updateMotorDetailsActions,
   updatePidDetailsActions,
   createTipsTubesActions,
   fetchRtpcrConfigsActions,
@@ -25,12 +29,64 @@ import {
   updateCommonDetailsFailed,
   fetchPidFailed,
   updatePidFailed,
+  shakerFailed,
+  heaterFailed,
+  abortFailed,
+  updateMotorDetailsFailed,
   createTipsOrTubesFailed,
   fetchRtpcrConfigsFailed,
   updateRtpcrConfigsFailed,
   fetchTECConfigsFailed,
   updateTECConfigsFailed,
 } from "action-creators/calibrationActionCreators";
+
+export function* shaker(actions) {
+  const {
+    payload: { token, body, deckName },
+  } = actions;
+  const { shakerActionSuccess, shakerActionFailed } = shakerActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.startShaking}/${deckName}`,
+        successAction: shakerActionSuccess,
+        failureAction: shakerActionFailed,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating shaker configs", error);
+    yield put(shakerFailed({ error }));
+  }
+}
+
+export function* heater(actions) {
+  const {
+    payload: { token, body, deckName },
+  } = actions;
+  const { heaterActionSuccess, heaterActionFailed } = heaterActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.startHeating}/${deckName}`,
+        successAction: heaterActionSuccess,
+        failureAction: heaterActionFailed,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating heater configs", error);
+    yield put(heaterFailed({ error }));
+  }
+}
 
 export function* fetchCommonDetails(actions) {
   const {
@@ -145,6 +201,7 @@ export function* pidStart(actions) {
         reqPath: `${API_ENDPOINTS.pidCalibration}/${deckName}`,
         successAction: pidActionSuccess,
         failureAction: pidActionFailure,
+        showPopupFailureMessage: true,
         token,
       },
     });
@@ -154,27 +211,27 @@ export function* pidStart(actions) {
   }
 }
 
-export function* pidAbort(actions) {
+export function* abort(actions) {
   const {
     payload: { token, deckName },
   } = actions;
-  const { pidAbortActionSuccess, pidAbortActionFailure } = pidActions;
+
+  const { abortActionSuccess, abortActionFailed } = abortActions;
 
   try {
     yield call(callApi, {
       payload: {
         body: null,
         reqPath: `${API_ENDPOINTS.abort}/${deckName}`,
-        successAction: pidAbortActionSuccess,
-        failureAction: pidAbortActionFailure,
-        showPopupSuccessMessage: true,
+        successAction: abortActionSuccess,
+        failureAction: abortActionFailed,
         showPopupFailureMessage: true,
         token,
       },
     });
   } catch (error) {
-    console.error("Error aborting pid", error);
-    yield put(runPidFailed({ error }));
+    console.error(`Error aborting`, error);
+    yield put(abortFailed({ error }));
   }
 }
 
@@ -252,6 +309,32 @@ export function* updatePidDetails(actions) {
   } catch (error) {
     console.error("Error updating pid configs", error);
     yield put(updatePidFailed({ error }));
+  }
+}
+
+export function* updateMotorDetails(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { updateMotorDetaislSuccess, updateMotorDetaislFailure } =
+    updateMotorDetailsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.motor}`,
+        successAction: updateMotorDetaislSuccess,
+        failureAction: updateMotorDetaislFailure,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating motor configs", error);
+    yield put(updateMotorDetailsFailed({ error }));
   }
 }
 
@@ -384,6 +467,8 @@ export function* updateTECConfigs(actions) {
 }
 
 export function* calibrationSaga() {
+  yield takeEvery(shakerActions.shakerActionInitiated, shaker);
+  yield takeEvery(heaterActions.heaterActionInitiated, heater);
   yield takeEvery(
     commonDetailsActions.commonDetailsInitiated,
     fetchCommonDetails
@@ -398,7 +483,7 @@ export function* calibrationSaga() {
     updateCalibrations
   );
   yield takeEvery(pidActions.pidActionInitiated, pidStart);
-  yield takeEvery(pidActions.pidAbortActionInitiated, pidAbort);
+  yield takeEvery(abortActions.abortActionInitiated, abort);
   yield takeEvery(motorActions.motorActionInitiated, motor);
   yield takeEvery(
     fetchPidDetailsActions.fetchPidActionInitiated,
@@ -407,6 +492,10 @@ export function* calibrationSaga() {
   yield takeEvery(
     updatePidDetailsActions.updatePidActionInitiated,
     updatePidDetails
+  );
+  yield takeEvery(
+    updateMotorDetailsActions.updateMotorDetaislInitiated,
+    updateMotorDetails
   );
   yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
   yield takeEvery(fetchRtpcrConfigsActions.initiateAction, fetchRtpcrConfigs);

@@ -12,7 +12,6 @@ export const discardDeckInitiated = (params) => ({
 
 export const discardDeckSuccess = () => ({
   type: discardDeckActions.discardDeckSuccess,
-  payload: {},
 });
 
 export const discardDeckFailed = (serverErrors) => ({
@@ -24,7 +23,6 @@ export const discardDeckFailed = (serverErrors) => ({
 
 export const discardDeckReset = () => ({
   type: discardDeckActions.discardDeckReset,
-  payload: {},
 });
 
 export const discardTipInitiated = (params) => ({
@@ -36,7 +34,6 @@ export const discardTipInitiated = (params) => ({
 
 export const discardTipSuccess = () => ({
   type: discardTipActions.discardTipInitiated,
-  payload: {},
 });
 
 export const discardTipFailed = (serverErrors) => ({

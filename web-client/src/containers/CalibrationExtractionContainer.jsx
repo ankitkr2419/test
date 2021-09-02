@@ -7,12 +7,14 @@ import {
   logoutInitiated,
 } from "action-creators/loginActionCreators";
 import {
-  abortPid,
+  abort,
   commonDetailsInitiated,
   fetchPidInitiated,
   motorInitiated,
   runPid,
+  runPidReset,
   updateCommonDetailsInitiated,
+  updateMotorDetailsInitiated,
   updatePidInitiated,
   createTipsOrTubesInitiated,
   resetCreatingTipsOrTubes,
@@ -148,7 +150,8 @@ const CalibrationExtractionContainer = () => {
       name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
     if (pidStatus === PID_STATUS.running) {
       // dispatch abort API if progressing
-      dispatch(abortPid(token, deckName));
+      dispatch(abort(token, deckName));
+      dispatch(runPidReset());
     } else {
       // dispatch run PID progressing
       dispatch(runPid(token, deckName));
@@ -189,6 +192,29 @@ const CalibrationExtractionContainer = () => {
       shaker_steps_per_revolution: 800, // will be removed in future
     };
     dispatch(updatePidInitiated(token, requestBody));
+  };
+
+  const handleUpdateMotorDetailsBtn = ({
+    id,
+    deck,
+    number,
+    name,
+    ramp,
+    steps,
+    slow,
+    fast,
+  }) => {
+    const requestBody = {
+      id: parseInt(id.value),
+      deck: deck.value,
+      number: parseInt(number.value),
+      name: name.value,
+      ramp: parseInt(ramp.value),
+      steps: parseInt(steps.value),
+      slow: parseInt(slow.value),
+      fast: parseInt(fast.value),
+    };
+    dispatch(updateMotorDetailsInitiated({ requestBody, token }));
   };
 
   const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
@@ -232,6 +258,7 @@ const CalibrationExtractionContainer = () => {
       handleMotorBtn={handleMotorBtn}
       handleSaveDetailsBtn={handleSaveDetailsBtn}
       handlePidUpdateBtn={handlePidUpdateBtn}
+      handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
       showConfirmationModal={showConfirmationModal}
       heaterData={data}
       progressData={progressData}
