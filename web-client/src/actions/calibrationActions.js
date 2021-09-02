@@ -66,5 +66,33 @@ export const createTipsTubesActions = {
   initiateAction: "CREATE_TIPS_TUBES_INITIATED",
   successAction: "CREATE_TIPS_TUBES_SUCCESS",
   failureAction: "CREATE_TIPS_TUBES_FAILURE",
-  resetAction: "CREATE_TIPS_TUBES_RESET"
+  resetAction: "CREATE_TIPS_TUBES_RESET",
+};
+
+export const fetchRtpcrConfigsActions = {
+  initiateAction: "FETCH_RTPCR_CONFIGS_INITIATED",
+  successAction: "FETCH_RTPCR_CONFIGS_SUCCESS",
+  failureAction: "FETCH_RTPCR_CONFIGS_FAILURE",
+  resetAction: "FETCH_RTPCR_CONFIGS_RESET",
+};
+
+export const updateRtpcrConfigsActions = {
+  initiateAction: "UPDATE_RTPCR_CONFIGS_INITIATED",
+  successAction: "UPDATE_RTPCR_CONFIGS_SUCCESS",
+  failureAction: "UPDATE_RTPCR_CONFIGS_FAILURE",
+  resetAction: "UPDATE_RTPCR_CONFIGS_RESET",
+};
+
+export const fetchTECConfigsActions = {
+  initiateAction: "FETCH_TEC_CONFIGS_INITIATED",
+  successAction: "FETCH_TEC_CONFIGS_SUCCESS",
+  failureAction: "FETCH_TEC_CONFIGS_FAILURE",
+  resetAction: "FETCH_TEC_CONFIGS_RESET",
+};
+
+export const updateTECConfigsActions = {
+  initiateAction: "UPDATE_TEC_CONFIGS_INITIATED",
+  successAction: "UPDATE_TEC_CONFIGS_SUCCESS",
+  failureAction: "UPDATE_TEC_CONFIGS_FAILURE",
+  resetAction: "UPDATE_TEC_CONFIGS_RESET",
 }
