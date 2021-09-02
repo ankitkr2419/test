@@ -88,11 +88,19 @@ export const updateMotorDetailsActions = {
   updateMotorDetaislFailure: "UPDATE_MOTOR_DETAILS_FAILURE",
   updateMotorDetaislReset: "UPDATE_MOTOR_DETAILS_RESET",
 };
+
 export const createTipsTubesActions = {
   initiateAction: "CREATE_TIPS_TUBES_INITIATED",
   successAction: "CREATE_TIPS_TUBES_SUCCESS",
   failureAction: "CREATE_TIPS_TUBES_FAILURE",
   resetAction: "CREATE_TIPS_TUBES_RESET",
+};
+
+export const createCartridgesActions = {
+  initiateAction: "CREATE_CARTRIDGES_INITIATED",
+  successAction: "CREATE_CARTRIDGES_SUCCESS",
+  failureAction: "CREATE_CARTRIDGES_FAILURE",
+  resetAction: "CREATE_CARTRIDGES_RESET",
 };
 
 export const fetchRtpcrConfigsActions = {
@@ -121,4 +129,4 @@ export const updateTECConfigsActions = {
   successAction: "UPDATE_TEC_CONFIGS_SUCCESS",
   failureAction: "UPDATE_TEC_CONFIGS_FAILURE",
   resetAction: "UPDATE_TEC_CONFIGS_RESET",
-}
+};

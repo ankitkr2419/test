@@ -19,6 +19,7 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  createCartridgesActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -38,6 +39,7 @@ import {
   updateRtpcrConfigsFailed,
   fetchTECConfigsFailed,
   updateTECConfigsFailed,
+  createCartridgesFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -364,6 +366,32 @@ export function* createTipsOrTubes(actions) {
   }
 }
 
+export function* createCartridges(actions) {
+  const {
+    payload: { token, body },
+  } = actions;
+
+  const { successAction, failureAction } = createCartridgesActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.cartridge}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating cartridges", error);
+    yield put(createCartridgesFailed({ error }));
+  }
+}
+
 export function* fetchRtpcrConfigs(actions) {
   const {
     payload: { token },
@@ -498,6 +526,7 @@ export function* calibrationSaga() {
     updateMotorDetails
   );
   yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
+  yield takeEvery(createCartridgesActions.initiateAction, createCartridges);
   yield takeEvery(fetchRtpcrConfigsActions.initiateAction, fetchRtpcrConfigs);
   yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
   yield takeEvery(fetchTECConfigsActions.initiateAction, fetchTECConfigs);

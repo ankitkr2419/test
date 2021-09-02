@@ -18,6 +18,7 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  createCartridgesActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -223,6 +224,20 @@ export const createTipsOrTubesInitiated = (token, body) => ({
 
 export const createTipsOrTubesFailed = ({ error }) => ({
   type: createTipsTubesActions.failureAction,
+  payload: { error },
+});
+
+// action creators for create cartridges
+export const createCartridgesInitiated = (token, body) => ({
+  type: createCartridgesActions.initiateAction,
+  payload: {
+    token,
+    body,
+  },
+});
+
+export const createCartridgesFailed = ({ error }) => ({
+  type: createCartridgesActions.failureAction,
   payload: { error },
 });
 

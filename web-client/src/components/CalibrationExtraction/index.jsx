@@ -18,6 +18,7 @@ import PidProgressComponent from "./PidProgressComponent";
 import PidComponent from "./PidComponent";
 import UpdateMotorComponent from "./UpdateMotorComponent";
 import TipsTubesComponent from "./TipsTubesComponent";
+import CartridgeComponent from "./CartridgeComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -31,6 +32,7 @@ const CalibrationExtractionComponent = (props) => {
     handleMotorBtn,
     handleSaveDetailsBtn,
     handleUpdateMotorDetailsBtn,
+    handleCreateCartridgeBtn,
     showConfirmationModal,
     toggleConfirmModal,
     formik,
@@ -133,6 +135,11 @@ const CalibrationExtractionComponent = (props) => {
           {/* Update Motor Component -   */}
           <UpdateMotorComponent
             handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
+          />
+
+          {/* Create Cartridges Component -   */}
+          <CartridgeComponent
+            handleCreateCartridgeBtn={handleCreateCartridgeBtn}
           />
 
           {/**Tips & tubes Component */}

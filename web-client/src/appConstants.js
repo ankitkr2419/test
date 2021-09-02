@@ -167,6 +167,7 @@ export const API_ENDPOINTS = {
   setThreshold: "set-threshold",
   getBaseline: "get-baseline",
   tipTube: "tiptube",
+  cartridge: "cartridge",
   rtpcrConfigs: "configs/rtpcr",
   tecConfigs: "configs/tec",
 };
@@ -525,6 +526,24 @@ export const MIN_TIPTUBE_HEIGHT = 0;
 export const MAX_TIPTUBE_HEIGHT = 9999;
 export const MIN_TIPTUBE_TTBASE = 0;
 export const MAX_TIPTUBE_TTBASE = 9999;
+
+//engineer's flow cartridges constants
+export const MAX_WELLS_COUNT = 13;
+export const MIN_WELLS_COUNT = 1;
+export const MAX_CARTRIDGE_ID = 15;
+export const MIN_CARTRIDGE_ID = 1;
+export const CARTRIDGE_TYPE_OPTIONS = [
+  { value: "Cartrige 1", label: "Cartridge 1" },
+  { value: "Cartrige 2", label: "Cartridge 2" },
+];
+export const CARTRIDGE_WELLS = {
+  MAX_DISTANCE: 100,
+  MIN_DISTANCE: 0,
+  MAX_VOLUME: 100,
+  MIN_VOLUME: 0,
+  MAX_HEIGHT: 100,
+  MIN_HEIGHT: 0,
+};
 
 export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {
