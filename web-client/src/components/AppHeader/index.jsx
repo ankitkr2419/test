@@ -305,7 +305,7 @@ const AppHeader = (props) => {
                       color={isExperimentSucceeded ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none  mr-3 
-                      ${isExpanded ? "d-none" : ""}`}
+                      ${isExperimentSucceeded || isExpanded ? "d-none" : ""}`}
                       onClick={() => setAbortModalVisibility(true)}
                       disabled={!isExperimentRunning}
                     >
@@ -315,7 +315,7 @@ const AppHeader = (props) => {
                       color={isExperimentRunning ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none ${
-                        isExpanded ? "d-none" : ""
+                        isExperimentSucceeded || isExpanded ? "d-none" : ""
                       }`}
                       outline={
                         isExperimentRunning === false &&
