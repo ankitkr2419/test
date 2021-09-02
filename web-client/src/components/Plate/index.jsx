@@ -26,8 +26,6 @@ import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
 import GridWrapper from "./Grid/GridWrapper";
 import "./Plate.scss";
 
-import GridWrapper from "./Grid/GridWrapper";
-import "./Plate.scss";
 import { rangeActions, rangeInitialState, rangeReducer } from "./helpers";
 
 const initialOptions = {
