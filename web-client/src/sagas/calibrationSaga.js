@@ -15,6 +15,10 @@ import {
   updateMotorDetailsActions,
   updatePidDetailsActions,
   createTipsTubesActions,
+  fetchRtpcrConfigsActions,
+  updateRtpcrConfigsActions,
+  fetchTECConfigsActions,
+  updateTECConfigsActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -30,6 +34,10 @@ import {
   abortFailed,
   updateMotorDetailsFailed,
   createTipsOrTubesFailed,
+  fetchRtpcrConfigsFailed,
+  updateRtpcrConfigsFailed,
+  fetchTECConfigsFailed,
+  updateTECConfigsFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -356,6 +364,108 @@ export function* createTipsOrTubes(actions) {
   }
 }
 
+export function* fetchRtpcrConfigs(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = fetchRtpcrConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.rtpcrConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching rtpcr configs", error);
+    yield put(fetchRtpcrConfigsFailed({ error }));
+  }
+}
+
+export function* updateRtpcrConfigs(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateRtpcrConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.rtpcrConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating rtpcr configs", error);
+    yield put(updateRtpcrConfigsFailed({ error }));
+  }
+}
+
+export function* fetchTECConfigs(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = fetchTECConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.tecConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching TEC configs", error);
+    yield put(fetchTECConfigsFailed({ error }));
+  }
+}
+
+export function* updateTECConfigs(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateTECConfigsActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.tecConfigs}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating TEC configs", error);
+    yield put(updateTECConfigsFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -388,4 +498,8 @@ export function* calibrationSaga() {
     updateMotorDetails
   );
   yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
+  yield takeEvery(fetchRtpcrConfigsActions.initiateAction, fetchRtpcrConfigs);
+  yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
+  yield takeEvery(fetchTECConfigsActions.initiateAction, fetchTECConfigs);
+  yield takeEvery(updateTECConfigsActions.initiateAction, updateTECConfigs);
 }

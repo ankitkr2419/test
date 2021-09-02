@@ -30,6 +30,9 @@ export const formikInitialState = {
     isInvalid: false,
     isInvalidMsg: "Room temperature should be between 20 - 30",
   },
+};
+
+export const formikInitialStateRtpcrVars = {
   homingTime: {
     type: "number",
     name: "homingTime",
@@ -63,27 +66,130 @@ export const formikInitialState = {
     isInvalid: false,
     isInvalidMsg: "Cycle time should be between 2 - 30",
   },
-  pidTemperature: {
+  pidLidTemperature: {
     type: "number",
-    name: "pidTemperature",
-    apiKey: "pid_temperature",
-    label: "PID Temperature",
+    name: "pidLidTemperature",
+    apiKey: "pid_lid_temp",
+    label: "PID Lid Temperature",
     min: 50,
     max: 75,
     value: null,
     isInvalid: false,
-    isInvalidMsg: "PID temperature should be between 50 - 75",
+    isInvalidMsg: "PID Lid temperature should be between 50 - 75",
   },
-  pidMinutes: {
+  scanSpeed: {
     type: "number",
-    name: "pidMinutes",
-    apiKey: "pid_minutes",
-    label: "PID Minutes",
-    min: 20,
-    max: 40,
+    name: "scanSpeed",
+    apiKey: "scan_speed",
+    label: "Scan Speed",
+    min: 0,
+    max: 9999,
     value: null,
     isInvalid: false,
-    isInvalidMsg: "PID minutes should be between 20 - 40",
+    isInvalidMsg: "Scan Speed should be between 0 - 9999",
+  },
+  scanTime: {
+    type: "number",
+    name: "scanTime",
+    apiKey: "scan_time",
+    label: "Scan Time",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Scan Time should be between 0 - 9999",
+  },
+  startCycle: {
+    type: "number",
+    name: "startCycle",
+    apiKey: "start_cycle",
+    label: "Start Cycle",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Start Cycle should be between 0 - 9999",
+  },
+  endCycle: {
+    type: "number",
+    name: "endCycle",
+    apiKey: "end_cycle",
+    label: "End Cycle",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "End Cycle should be between 0 - 9999",
+  },
+};
+
+//TEC variables
+export const formikInitialStateTECVars = {
+  currentLimitation: {
+    type: "number",
+    name: "currentLimitation",
+    apiKey: "current_limitation",
+    label: "Current Limitation",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Current Limitation should be between 0 - 9999",
+  },
+  voltageLimitation: {
+    type: "number",
+    name: "voltageLimitation",
+    apiKey: "voltage_limitation",
+    label: "Voltage Limitation",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Voltage Limitation should be between 0 - 9999",
+  },
+  currentErrorThreshold: {
+    type: "number",
+    name: "currentErrorThreshold",
+    apiKey: "current_error_threshold",
+    label: "Current Error Threshold",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Current Error Threshold should be between 0 - 9999",
+  },
+  voltageErrorThreshold: {
+    type: "number",
+    name: "voltageErrorThreshold",
+    apiKey: "voltage_error_threshold",
+    label: "Voltage Error Threshold",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Voltage Error Threshold should be between 0 - 9999",
+  },
+  peltierMaxCurrent: {
+    type: "number",
+    name: "peltierMaxCurrent",
+    apiKey: "peltier_max_current",
+    label: "Peltier Max Current",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Peltier Max Current should be between 0 - 9999",
+  },
+  peltierDeltaTemperature: {
+    type: "number",
+    name: "peltierDeltaTemperature",
+    apiKey: "peltier_delta_temperature",
+    label: "Peltier Delta Temperature",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Peltier Delta Temperature should be between 0 - 9999",
   },
 };
 
@@ -108,7 +214,10 @@ export const isValueValid = (name, value) => {
 
   if (type === "number" && (value < min || value > max)) {
     return false;
-  } else if (type === "email" && value.match(EMAIL_REGEX_OR_EMPTY_STR) === null) {
+  } else if (
+    type === "email" &&
+    value.match(EMAIL_REGEX_OR_EMPTY_STR) === null
+  ) {
     return false;
   }
   //TODO : check if its required anymore else delete

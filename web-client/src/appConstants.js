@@ -167,6 +167,8 @@ export const API_ENDPOINTS = {
   setThreshold: "set-threshold",
   getBaseline: "get-baseline",
   tipTube: "tiptube",
+  rtpcrConfigs: "configs/rtpcr",
+  tecConfigs: "configs/tec",
 };
 
 export const MODAL_MESSAGE = {

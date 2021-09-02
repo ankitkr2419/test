@@ -14,6 +14,10 @@ import {
   abortActions,
   updateMotorDetailsActions,
   createTipsTubesActions,
+  fetchRtpcrConfigsActions,
+  updateRtpcrConfigsActions,
+  fetchTECConfigsActions,
+  updateTECConfigsActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -226,4 +230,55 @@ export const createTipsOrTubesFailed = ({ error }) => ({
 
 export const resetCreatingTipsOrTubes = () => ({
   type: createTipsTubesActions.resetAction,
+});
+
+//fetch rtpcr configs
+export const fetchRtpcrConfigsInitiated = (token) => ({
+  type: fetchRtpcrConfigsActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const fetchRtpcrConfigsFailed = ({ error }) => ({
+  type: fetchRtpcrConfigsActions.failureAction,
+  payload: { error },
+});
+
+export const updateRtpcrConfigsInitiated = (token, requestBody) => ({
+  type: updateRtpcrConfigsActions.initiateAction,
+  payload: {
+    token,
+    requestBody,
+  },
+});
+
+export const updateRtpcrConfigsFailed = ({ error }) => ({
+  type: updateRtpcrConfigsActions.failureAction,
+  payload: { error },
+});
+
+export const fetchTECConfigsInitiated = (token) => ({
+  type: fetchTECConfigsActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const fetchTECConfigsFailed = ({ error }) => ({
+  type: fetchTECConfigsActions.failureAction,
+  payload: { error },
+});
+
+export const updateTECConfigsInitiated = (token, requestBody) => ({
+  type: updateTECConfigsActions.initiateAction,
+  payload: {
+    token,
+    requestBody,
+  },
+});
+
+export const updateTECConfigsFailed = ({ error }) => ({
+  type: updateTECConfigsActions.failureAction,
+  payload: { error },
 });
