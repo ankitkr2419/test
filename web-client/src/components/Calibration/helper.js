@@ -121,6 +121,17 @@ export const formikInitialStateRtpcrVars = {
     isInvalid: false,
     isInvalidMsg: "End Cycle should be between 0 - 9999",
   },
+  opticalCalibrationCycleCount: {
+    type: "number",
+    name: "opticalCalibrationCycleCount",
+    apiKey: "optical_calibration_cycle_count",
+    label: "Optical Calibration Cycle Count",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Optical Calibration Cycle Count should be between 0 - 9999",
+  },
 };
 
 //TEC variables
