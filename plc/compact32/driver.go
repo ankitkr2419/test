@@ -14,10 +14,9 @@ import (
 )
 
 const (
-	maxHomingTries             = 3
-	homingSuccessValue         = 37
-	noOfDyes                   = 4
-	fValueRegisterStartAddress = 800
+	maxHomingTries     = 3
+	homingSuccessValue = 37
+	noOfDyes           = 4
 )
 
 var homingCount int
@@ -304,7 +303,7 @@ func (d *Compact32) Monitor(cycle uint16) (scan plc.Scan, err error) {
 	if plc.DataCapture {
 		var data []byte
 		for i := 0; i < noOfDyes; i++ {
-			start := fValueRegisterStartAddress + i*16
+			start := plc.FValueRegisterStartAddress + i*16
 			data, err = d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
 			if err != nil {
 				logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")

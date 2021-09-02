@@ -2,8 +2,9 @@ package plc
 
 import (
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
+
+	logger "github.com/sirupsen/logrus"
 
 	"time"
 )
@@ -27,12 +28,13 @@ func (d *Compact32Deck) AddDelay(delay db.Delay, recipeRun bool) (response strin
 	var timeElapsedVar int64 = 0
 	timeElapsed := &timeElapsedVar
 
-	// set the timer in progress variable to specify that it is not a motor operation.
-	d.setTimerInProgress()
-	defer d.resetTimerInProgress()
 	if recipeRun {
 		// Calling in defer cause this will need to get executed despite failure
 		defer d.resetRunRecipeData()
+	} else {
+		// set the timer in progress variable to specify that it is not a motor operation.
+		d.setTimerInProgress()
+		defer d.resetTimerInProgress()
 	}
 
 skipToStartTimer:

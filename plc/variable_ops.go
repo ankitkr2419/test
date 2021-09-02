@@ -88,6 +88,14 @@ func (d *Compact32Deck) resetPIDCalibrationInProgress() {
 	pIDCalibrationInProgress.Store(d.name, false)
 }
 
+func (d *Compact32Deck) setMotorOperationCompleted() {
+	motorOperationCompleted.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetMotorOperationCompleted() {
+	motorOperationCompleted.Store(d.name, false)
+}
+
 func (d *Compact32Deck) setHomingPercent(percent float64) {
 	homingPercent.Store(d.name, percent)
 }
@@ -151,7 +159,7 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 }
 
 func (d *Compact32Deck) isShakerInProgress() bool {
-	if temp, ok := heaterInProgress.Load(d.name); !ok {
+	if temp, ok := shakerInProgress.Load(d.name); !ok {
 		logger.Errorln("shakerInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
@@ -180,6 +188,15 @@ func (d *Compact32Deck) isPIDCalibrationInProgress() bool {
 func (d *Compact32Deck) isTipDiscardInProgress() bool {
 	if temp, ok := tipDiscardInProgress.Load(d.name); !ok {
 		logger.Errorln("tipDiscardInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) isMotorOperationCompleted() bool {
+	if temp, ok := motorOperationCompleted.Load(d.name); !ok {
+		logger.Errorln("motorOperationCompleted isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}

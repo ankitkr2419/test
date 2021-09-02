@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -25,6 +25,10 @@ import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
 
 import GridWrapper from "./Grid/GridWrapper";
 import "./Plate.scss";
+
+import GridWrapper from "./Grid/GridWrapper";
+import "./Plate.scss";
+import { rangeActions, rangeInitialState, rangeReducer } from "./helpers";
 
 const initialOptions = {
   legend: {
@@ -127,11 +131,12 @@ const Plate = (props) => {
   // local state to manage previewReport modal
   const [previewReportModal, setPreviewReportModal] = useState(false);
 
-  // default ranges for amplification plot
-  const [xMinValue, setXMin] = useState(0);
-  const [xMaxValue, setXMax] = useState(0);
-  const [yMinValue, setYMin] = useState(0);
-  const [yMaxValue, setYMax] = useState(maxThreshold);
+  // local state to manage min max values of X and Y
+  const [rangeState, updateRangeState] = useReducer(
+    rangeReducer,
+    rangeInitialState
+  );
+  const { xMaxValue, xMinValue, yMaxValue, yMinValue } = rangeState;
 
   const [options, setOptions] = useState(initialOptions);
   const [isDataFromAPI, setDataFromAPI] = useState(false);
@@ -250,19 +255,15 @@ const Plate = (props) => {
   const handleRangeChangeBtn = ({ xMax, xMin, yMax, yMin }) => {
     setDataFromAPI(true);
 
-    setXMax(xMax);
-    setXMin(xMin);
-    setYMax(yMax);
-    setYMin(yMin);
+    updateRangeState({ type: rangeActions.UPDATE_X_MAX, value: xMax });
+    updateRangeState({ type: rangeActions.UPDATE_X_MIN, value: xMin });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MAX, value: yMax });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MIN, value: yMin });
   };
 
   const handleResetBtn = (cycleCount) => {
     setDataFromAPI(true);
-
-    setXMax(0);
-    setXMin(0);
-    setYMax(Math.max(...thresholdArr));
-    setYMin(0);
+    updateRangeState({ type: rangeActions.RESET_VALUES });
   };
 
   return (

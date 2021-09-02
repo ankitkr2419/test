@@ -10,32 +10,32 @@ export const wellGraphSucceeded = (data) => ({
   },
 });
 
-export const updateGraphInitiated = ({ query, experimentId, token }) => ({
+export const updateGraphInitiated = (payload) => ({
   type: updateGraphActions.updateGraphInitiated,
-  payload: { query, experimentId, token },
+  payload,
 });
 
-export const updateGraphSuccess = ({ response }) => ({
+export const updateGraphSuccess = (response) => ({
   type: updateGraphActions.updateGraphSucceeded,
-  payload: { response },
+  payload: response,
 });
 
-export const updateGraphFailed = ({ error }) => ({
+export const updateGraphFailed = (error) => ({
   type: updateGraphActions.updateGraphFailure,
-  payload: { error },
+  payload: error,
 });
 
-export const resetGraphInitiated = ({ experimentId, token }) => ({
+export const resetGraphInitiated = (payload) => ({
   type: resetGraphActions.resetGraphInitiated,
-  payload: { experimentId, token },
+  payload,
 });
 
-export const resetGraphSuccess = ({ response }) => ({
+export const resetGraphSuccess = (response) => ({
   type: resetGraphActions.resetGraphSucceeded,
-  payload: { response },
+  payload: response,
 });
 
-export const resetGraphFailed = ({ error }) => ({
+export const resetGraphFailed = (error) => ({
   type: resetGraphActions.resetGraphFailure,
-  payload: { error },
+  payload: error,
 });

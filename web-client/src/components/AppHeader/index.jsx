@@ -29,8 +29,6 @@ import {
   getTimeNow,
 } from "selectors/runExperimentSelector";
 import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
-// import PrintDataModal from './PrintDataModal';
-// import ExportDataModal from './ExportDataModal';
 import {
   APP_TYPE,
   EXPERIMENT_STATUS,
@@ -307,7 +305,7 @@ const AppHeader = (props) => {
                       color={isExperimentSucceeded ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none  mr-3 
-                      ${isExperimentSucceeded || isExpanded ? "d-none" : ""}`}
+                      ${isExpanded ? "d-none" : ""}`}
                       onClick={() => setAbortModalVisibility(true)}
                       disabled={!isExperimentRunning}
                     >
@@ -317,7 +315,7 @@ const AppHeader = (props) => {
                       color={isExperimentRunning ? "primary" : "secondary"}
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none ${
-                        isExperimentSucceeded || isExpanded ? "d-none" : ""
+                        isExpanded ? "d-none" : ""
                       }`}
                       outline={
                         isExperimentRunning === false &&
@@ -380,15 +378,6 @@ const AppHeader = (props) => {
               </div>
             </>
           )}
-
-          {/* {isLoginTypeOperator === true && (
-            <ButtonIcon
-              size={34}
-              name="cross"
-              onClick={onCrossClick}
-              className="ml-2"
-            />
-          )} */}
 
           {/* MODALS */}
 

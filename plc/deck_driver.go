@@ -10,11 +10,15 @@ import (
 
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
+	var results []byte
+	var temp uint16
+
 	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Machine in ABORTED STATE for deck: %v. Please home the machine first.", d.name)
 		return "", err
 	}
 
+	d.resetMotorOperationCompleted()
 	if pulse < minimumPulsesThreshold {
 		logger.Infoln("Current pulse: ", pulse, " is less than minimumPulsesThreshold. Avoiding Motor Movements for motor:", motorNum, ", deck: ", d.name)
 		return "SUCCESS", nil
@@ -23,8 +27,6 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	wrotePulses.Store(d.name, uint16(0))
 	executedPulses.Store(d.name, uint16(0))
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
-
-	var results []byte
 
 	//
 	//  Detach Magnet Fully if the deck is to move and magnet is in attached State
@@ -65,7 +67,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	// Switch OFF The motor
 
-	if temp := d.getOnReg(); temp == highestUint16 {
+	if temp = d.getOnReg(); temp == highestUint16 {
 		err = fmt.Errorf("on/off Register  isn't loaded!")
 		return
 	} else if temp != OFF {
@@ -85,7 +87,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "", err
 	}
 
-	if temp := d.getPulseReg(); temp == highestUint16 {
+	if temp = d.getPulseReg(); temp == highestUint16 {
 		err = fmt.Errorf("pulse Register isn't loaded!")
 		return
 	} else if temp != pulse {
@@ -100,7 +102,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	pulseReg.Store(d.name, pulse)
 	wrotePulses.Store(d.name, pulse)
 
-	if temp := d.getSpeedReg(); temp == highestUint16 {
+	if temp = d.getSpeedReg(); temp == highestUint16 {
 		err = fmt.Errorf("speed Register isn't loaded!")
 		return
 	} else if temp != speed {
@@ -114,7 +116,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Wrote Speed for deck", d.name, ". res : ", results)
 	speedReg.Store(d.name, speed)
 
-	if temp := d.getRampReg(); temp == highestUint16 {
+	if temp = d.getRampReg(); temp == highestUint16 {
 		err = fmt.Errorf("ramp Register isn't loaded!")
 		return
 	} else if temp != ramp {
@@ -128,7 +130,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Wrote Ramp for deck", d.name, ". res : ", results)
 	rampReg.Store(d.name, ramp)
 
-	if temp := d.getDirectionReg(); temp == highestUint16 {
+	if temp = d.getDirectionReg(); temp == highestUint16 {
 		err = fmt.Errorf("direction Register isn't loaded!")
 		return
 	} else if temp != direction {
@@ -142,7 +144,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Wrote direction for deck ", d.name, ". res : ", results)
 	directionReg.Store(d.name, direction)
 
-	if temp := d.getMotorNumReg(); temp == highestUint16 {
+	if temp = d.getMotorNumReg(); temp == highestUint16 {
 		err = fmt.Errorf("motor Number Register isn't loaded!")
 		return
 	} else if temp != motorNum {
@@ -180,7 +182,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	for {
 
-		if temp := d.getExecutedPulses(); temp == highestUint16 {
+		if temp = d.getExecutedPulses(); temp == highestUint16 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
 			return
 			// Write executed pulses to Position
@@ -190,6 +192,10 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			logger.Infoln("position after abortion: ", Positions[deckAndNumber])
 			err = fmt.Errorf("Operation was ABORTED!")
 			return "", err
+		}
+
+		if d.isMotorOperationCompleted() {
+			return "Nothing to resume", nil
 		}
 
 		results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][1], uint16(1))

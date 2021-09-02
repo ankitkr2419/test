@@ -15,7 +15,7 @@ import (
 // 2. Reset Heater in defer
 // 3. Start PID for deck
 // 4. Reset PID in defer
-// 5. Sleep for 15 minutes
+// 5. Delay and check if PID Calib was stopped
 
 func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// TODO: Logging this PLC Operation
@@ -56,6 +56,7 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// Start PID for deck
 	_, err = d.switchOnPIDCalibration()
 	if err != nil {
+		logger.Errorln("Switch on PID Calibration Error", err)
 		return
 	}
 	// Reset PID in defer
@@ -65,10 +66,10 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// Sleep for given minutes
 	_, err = d.AddDelay(db.Delay{DelayTime: config.GetPIDMinutes() * 60}, false)
 	if err != nil {
+		logger.WithField("err", "PID CALIBRATION").Errorln(err)
 		return
 	}
 
 	logger.Infoln(responses.PIDCalibrationSuccess)
-
 	return
 }
