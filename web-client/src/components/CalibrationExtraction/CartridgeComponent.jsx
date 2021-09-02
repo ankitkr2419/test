@@ -65,6 +65,12 @@ const CartridgeComponent = (props) => {
   const handleAddWellsBtn = () => {
     const wellsCountInt = parseInt(wellsCount.value);
 
+    // if the user clicks on button after wells are configured
+    if (noOfWellToShow !== null) {
+      setWarningModal(true);
+      return;
+    }
+
     // set formik values
     const arrInit = [...Array(wellsCountInt)].map(() => ({
       value: null,

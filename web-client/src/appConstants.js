@@ -533,8 +533,8 @@ export const MIN_WELLS_COUNT = 1;
 export const MAX_CARTRIDGE_ID = 15;
 export const MIN_CARTRIDGE_ID = 1;
 export const CARTRIDGE_TYPE_OPTIONS = [
-  { value: "Cartrige 1", label: "Cartridge 1" },
-  { value: "Cartrige 2", label: "Cartridge 2" },
+  { value: "Cartridge 1", label: "Cartridge 1" },
+  { value: "Cartridge 2", label: "Cartridge 2" },
 ];
 export const CARTRIDGE_WELLS = {
   MAX_DISTANCE: 100,
