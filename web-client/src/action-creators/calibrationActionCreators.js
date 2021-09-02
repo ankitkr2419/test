@@ -141,9 +141,8 @@ export const runPidFailed = (errorResponse) => ({
   },
 });
 
-export const runPidReset = (errorResponse) => ({
+export const runPidReset = () => ({
   type: pidActions.pidActionReset,
-  payload: {},
 });
 
 // common abort for PID, heater, shaker
@@ -165,7 +164,6 @@ export const abortFailed = (errorResponse) => ({
 
 export const abortReset = () => ({
   type: abortActions.abortActionReset,
-  payload: {},
 });
 
 // action creators for pid details fetch

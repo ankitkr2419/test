@@ -1,21 +1,20 @@
 import React from "react";
+import { Redirect } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
 
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar } from "shared-components";
-
-import HeatingProcess from "./HeatingProcess";
-import TopHeading from "shared-components/TopHeading";
-import { useDispatch, useSelector } from "react-redux";
-import { useFormik } from "formik";
-import { getHeaterRequestBody, heaterInitialFormikState } from "./helpers";
-import { PageBody, HeatingBox, TopContent } from "./Style";
-import { toast } from "react-toastify";
-import { Redirect } from "react-router";
-import { DECKNAME, ROUTES } from "appConstants";
 import {
   abort,
   heaterInitiated,
 } from "action-creators/calibrationActionCreators";
+import { getHeaterRequestBody, heaterInitialFormikState } from "./helpers";
+import { PageBody, HeatingBox, TopContent } from "./Style";
+import HeatingProcess from "./HeatingProcess";
+import TopHeading from "shared-components/TopHeading";
+import { DECKNAME, ROUTES } from "appConstants";
 
 const HeaterComponent = (props) => {
   const dispatch = useDispatch();

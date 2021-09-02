@@ -1,17 +1,14 @@
 import React, { useState } from "react";
+import { useFormik } from "formik";
 
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar } from "shared-components";
 
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
-import classnames from "classnames";
 import ShakingProcess from "./ShakingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TopContent, ShakingBox } from "./Style";
-import { useFormik } from "formik";
 import { shakerInitialFormikState, getShakerRequestBody } from "./helpers";
-import { useDispatch, useSelector } from "react-redux";
-import { Redirect, useHistory } from "react-router";
 import { DECKNAME, ROUTES } from "appConstants";
 import {
   abort,
