@@ -8,6 +8,8 @@ import (
 
 func (d *SimulatorDriver) simulateShakerPIDTuning() (err error) {
 
+	var pidDone bool
+
 	if d.isShakerPIDCalibrationInProgress() {
 		return
 	}
@@ -20,11 +22,27 @@ func (d *SimulatorDriver) simulateShakerPIDTuning() (err error) {
 	d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][534], pidProgressResponse)
 	go d.simulateOnHeater()
 
-	logger.Warnln("AtS")
-	time.Sleep(time.Duration(pidTuningTime*delay) * time.Second)
+	pidDone = d.sleepOrCheckForAbort(int(delay) * pidTuningTime)
+	if !pidDone{
+		return
+	}
+
 	d.setRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][3], plc.OFF)
 	d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][504], pidDoneResponse)
 	d.setRegister("D", plc.MODBUS_EXTRACTION[d.DeckName]["D"][534], pidDoneResponse)
 
 	return
+}
+
+
+func(d *SimulatorDriver) sleepOrCheckForAbort(maxPIDTime int) bool{
+
+	for  maxPIDTime > 0{
+		maxPIDTime--
+		time.Sleep(time.Second)
+		if plc.OFF == d.readRegister("M", plc.MODBUS_EXTRACTION[d.DeckName]["M"][4]) {
+			return false
+		}
+	}
+	return true
 }
