@@ -19,6 +19,7 @@ import {
   createTipsOrTubesInitiated,
   resetCreatingTipsOrTubes,
   createCartridgesInitiated,
+  deleteCartridgesInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
@@ -251,6 +252,10 @@ const CalibrationExtractionContainer = () => {
     dispatch(createCartridgesInitiated(token, body));
   };
 
+  const handleDeleteCartridgeBtn = (id) => {
+    dispatch(deleteCartridgesInitiated(token, id));
+  };
+
   const handleOnChange = (key, value) => {
     formik.setFieldValue(key, value);
   };
@@ -265,6 +270,7 @@ const CalibrationExtractionContainer = () => {
       handlePidUpdateBtn={handlePidUpdateBtn}
       handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
       handleCreateCartridgeBtn={handleCreateCartridgeBtn}
+      handleDeleteCartridgeBtn={handleDeleteCartridgeBtn}
       showConfirmationModal={showConfirmationModal}
       heaterData={data}
       progressData={progressData}

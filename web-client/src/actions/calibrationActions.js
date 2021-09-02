@@ -103,6 +103,13 @@ export const createCartridgesActions = {
   resetAction: "CREATE_CARTRIDGES_RESET",
 };
 
+export const deleteCartridgesActions = {
+  initiateAction: "DELETE_CARTRIDGES_INITIATED",
+  successAction: "DELETE_CARTRIDGES_SUCCESS",
+  failureAction: "DELETE_CARTRIDGES_FAILURE",
+  resetAction: "DELETE_CARTRIDGES_RESET",
+};
+
 export const fetchRtpcrConfigsActions = {
   initiateAction: "FETCH_RTPCR_CONFIGS_INITIATED",
   successAction: "FETCH_RTPCR_CONFIGS_SUCCESS",

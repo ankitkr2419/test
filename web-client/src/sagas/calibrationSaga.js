@@ -20,6 +20,7 @@ import {
   fetchTECConfigsActions,
   updateTECConfigsActions,
   createCartridgesActions,
+  deleteCartridgesActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -40,6 +41,7 @@ import {
   fetchTECConfigsFailed,
   updateTECConfigsFailed,
   createCartridgesFailed,
+  deleteCartridgesFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -392,6 +394,31 @@ export function* createCartridges(actions) {
   }
 }
 
+export function* deleteCartridges(actions) {
+  const {
+    payload: { token, id },
+  } = actions;
+
+  const { successAction, failureAction } = deleteCartridgesActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.DELETE,
+        reqPath: `${API_ENDPOINTS.cartridge}/${id}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting cartridges", error);
+    yield put(deleteCartridgesFailed({ error }));
+  }
+}
+
 export function* fetchRtpcrConfigs(actions) {
   const {
     payload: { token },
@@ -527,6 +554,7 @@ export function* calibrationSaga() {
   );
   yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
   yield takeEvery(createCartridgesActions.initiateAction, createCartridges);
+  yield takeEvery(deleteCartridgesActions.initiateAction, deleteCartridges);
   yield takeEvery(fetchRtpcrConfigsActions.initiateAction, fetchRtpcrConfigs);
   yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
   yield takeEvery(fetchTECConfigsActions.initiateAction, fetchTECConfigs);

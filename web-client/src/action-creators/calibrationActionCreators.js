@@ -19,6 +19,7 @@ import {
   fetchTECConfigsActions,
   updateTECConfigsActions,
   createCartridgesActions,
+  deleteCartridgesActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -238,6 +239,20 @@ export const createCartridgesInitiated = (token, body) => ({
 
 export const createCartridgesFailed = ({ error }) => ({
   type: createCartridgesActions.failureAction,
+  payload: { error },
+});
+
+// action creators for delete cartridges
+export const deleteCartridgesInitiated = (token, id) => ({
+  type: deleteCartridgesActions.initiateAction,
+  payload: {
+    token,
+    id,
+  },
+});
+
+export const deleteCartridgesFailed = ({ error }) => ({
+  type: deleteCartridgesActions.failureAction,
   payload: { error },
 });
 
