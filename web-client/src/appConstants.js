@@ -59,6 +59,10 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
   progressHeater: "PROGRESS_HEATER",
+  progressShakerRun: "PROGRESS_SHAKERRUN",
+  successShakerRun: "SUCCESS_SHAKERRUN",
+  progressHeaterRun: "PROGRESS_HEATERRUN",
+  successHeaterRun: "SUCCESS_HETERRUN",
 };
 
 export const HEATER_STATUS = {
@@ -74,6 +78,16 @@ export const PID_STATUS = {
   aborting: "aborting",
   abortFailed: "abortFailed",
 
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+};
+
+export const SHAKER_RUN_STATUS = {
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+};
+
+export const HEATER_RUN_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",
 };
@@ -549,6 +563,7 @@ export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {
     display: false,
   },
+  animation: false,
   scales: {
     xAxes: [
       {

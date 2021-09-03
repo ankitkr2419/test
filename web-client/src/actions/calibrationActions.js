@@ -137,3 +137,15 @@ export const updateTECConfigsActions = {
   failureAction: "UPDATE_TEC_CONFIGS_FAILURE",
   resetAction: "UPDATE_TEC_CONFIGS_RESET",
 };
+
+// websocket for shaker
+export const shakerRunProgressActions = {
+  shakerRunProgressAction: "SHAKER_RUN_IN_PROGRESS",
+  shakerRunProgressActionSuccess: "SHAKER_RUN_SUCCEEDED",
+};
+
+// websocket for heater
+export const heaterRunProgressActions = {
+  heaterRunProgressAction: "HEATER_RUN_IN_PROGRESS",
+  heaterRunProgressActionSuccess: "HEATER_RUN_SUCCEEDED",
+};

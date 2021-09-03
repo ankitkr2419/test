@@ -1,13 +1,27 @@
 import React from "react";
+import { useState } from "react";
 
 import { Row, Col, FormGroup, Label, Input, FormError } from "core-components";
 import { TemperatureInfo, TimeInfo } from "shared-components";
 
 import { ShakingProcessBox } from "./Style";
 import { isDisabled, setRpmFormikField } from "./helpers";
+import { MAX_TEMP_ALLOWED, MIN_TEMP_ALLOWED } from "appConstants";
 
 const ShakingProcess = (props) => {
   const { formik, activeTab, temperature } = props;
+
+  const [invalidTemp, setInvalidTemp] = useState(false);
+
+  const handleOnBlur = (tempValue) => {
+    if (tempValue > MAX_TEMP_ALLOWED || tempValue < MIN_TEMP_ALLOWED) {
+      setInvalidTemp(true);
+    }
+  };
+
+  const handleOnFocus = () => {
+    setInvalidTemp(false);
+  };
 
   return (
     <>
@@ -24,6 +38,9 @@ const ShakingProcess = (props) => {
                 checkBoxHandler={(e) => {
                   formik.setFieldValue("followTemperature", e.target.checked);
                 }}
+                invalidTemperature={invalidTemp}
+                handleOnFocus={handleOnFocus}
+                handleOnBlur={handleOnBlur}
               />
             </div>
           )}

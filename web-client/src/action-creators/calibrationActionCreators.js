@@ -20,6 +20,8 @@ import {
   updateTECConfigsActions,
   createCartridgesActions,
   deleteCartridgesActions,
+  shakerRunProgressActions,
+  heaterRunProgressActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -309,4 +311,22 @@ export const updateTECConfigsInitiated = (token, requestBody) => ({
 export const updateTECConfigsFailed = ({ error }) => ({
   type: updateTECConfigsActions.failureAction,
   payload: { error },
+});
+
+// websocket action creators for Shaker
+export const shakerRunInProgress = () => ({
+  type: shakerRunProgressActions.shakerRunProgressAction,
+});
+
+export const shakerRunInSuccess = () => ({
+  type: shakerRunProgressActions.shakerRunProgressActionSuccess,
+});
+
+// websocket action creators for Heater
+export const heaterRunInProgress = () => ({
+  type: heaterRunProgressActions.heaterRunProgressAction,
+});
+
+export const heaterRunInSuccess = () => ({
+  type: heaterRunProgressActions.heaterRunProgressActionSuccess,
 });

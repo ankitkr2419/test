@@ -6,14 +6,21 @@ import classnames from "classnames";
 import { toast } from "react-toastify";
 
 import { Card, CardBody } from "core-components";
-import { ButtonIcon, ButtonBar } from "shared-components";
+import { ButtonIcon, ButtonBar, Text } from "shared-components";
 
-import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
+import {
+  TabContent,
+  TabPane,
+  Nav,
+  NavItem,
+  NavLink,
+  Spinner,
+} from "reactstrap";
 import ShakingProcess from "./ShakingProcess";
 import TopHeading from "shared-components/TopHeading";
 import { PageBody, TopContent, ShakingBox } from "./Style";
 import { shakerInitialFormikState, getShakerRequestBody } from "./helpers";
-import { DECKNAME, ROUTES } from "appConstants";
+import { DECKNAME, ROUTES, SHAKER_RUN_STATUS } from "appConstants";
 import {
   abort,
   shakerInitiated,
@@ -28,6 +35,12 @@ const ShakerComponent = (props) => {
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+
+  const shakerRunProgessReducer = useSelector(
+    (state) => state.shakerRunProgessReducer
+  );
+  const { shakerRunStatus } = shakerRunProgessReducer.toJS();
+  const { progressing } = SHAKER_RUN_STATUS;
 
   const { isLoggedIn, token, name } = activeDeckObj;
 
@@ -62,6 +75,19 @@ const ShakerComponent = (props) => {
   if (!isLoggedIn) {
     return <Redirect to={`/${ROUTES.landing}`} />;
   }
+
+  const getRightBtnLabel = () => {
+    if (shakerRunStatus === progressing) {
+      return (
+        <div className="d-flex">
+          <Spinner size="sm" />
+          <Text className="ml-3">Shaking</Text>
+        </div>
+      );
+    } else {
+      return "Start";
+    }
+  };
 
   return (
     <>
@@ -123,11 +149,13 @@ const ShakerComponent = (props) => {
               </CardBody>
             </Card>
             <ButtonBar
-              rightBtnLabel="Start"
+              rightBtnLabel={getRightBtnLabel()}
               leftBtnLabel="Abort"
               handleRightBtn={handleStartBtn}
               handleLeftBtn={handleAbortBtn}
               btnBarClassname={"btn-bar-adjust-shaking"}
+              isRightBtnDisabled={shakerRunStatus === progressing}
+              isLeftBtnDisabled={!(shakerRunStatus === progressing)}
             />
           </div>
         </ShakingBox>

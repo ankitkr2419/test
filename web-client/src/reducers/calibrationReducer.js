@@ -16,8 +16,16 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  shakerRunProgressActions,
+  heaterRunProgressActions,
 } from "actions/calibrationActions";
-import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
+import {
+  DECKNAME,
+  PID_STATUS,
+  HEATER_STATUS,
+  SHAKER_RUN_STATUS,
+  HEATER_RUN_STATUS,
+} from "appConstants";
 import loginActions from "actions/loginActions";
 
 const commonDetailsInitialState = fromJS({
@@ -558,6 +566,62 @@ export const tecConfigsReducer = (state = tecConfigsInitialState, action) => {
 
     case loginActions.loginReset:
       return tecConfigsInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const shakerRunProgressInitialState = fromJS({
+  shakerRunStatus: null,
+});
+
+// websocket ShakerRun
+export const shakerRunProgessReducer = (
+  state = shakerRunProgressInitialState,
+  action
+) => {
+  switch (action.type) {
+    case shakerRunProgressActions.shakerRunProgressAction:
+      return state.merge({
+        shakerRunStatus: SHAKER_RUN_STATUS.progressing,
+      });
+
+    case shakerRunProgressActions.shakerRunProgressActionSuccess:
+      return state.merge({
+        shakerRunStatus: SHAKER_RUN_STATUS.progressComplete,
+      });
+
+    case loginActions.loginReset:
+      return shakerRunProgressInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const heaterRunProgressInitialState = fromJS({
+  heaterRunStatus: null,
+});
+
+// websocket HeaterRun
+export const heaterRunProgessReducer = (
+  state = heaterRunProgressInitialState,
+  action
+) => {
+  switch (action.type) {
+    case heaterRunProgressActions.heaterRunProgressAction:
+      return state.merge({
+        heaterRunStatus: HEATER_RUN_STATUS.progressing,
+      });
+
+    case heaterRunProgressActions.heaterRunProgressActionSuccess:
+      return state.merge({
+        heaterRunStatus: HEATER_RUN_STATUS.progressComplete,
+      });
+
+    case loginActions.loginReset:
+      return heaterRunProgressInitialState;
 
     default:
       return state;
