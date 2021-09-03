@@ -537,12 +537,12 @@ export const CARTRIDGE_TYPE_OPTIONS = [
   { value: "Cartridge 2", label: "Cartridge 2" },
 ];
 export const CARTRIDGE_WELLS = {
-  MAX_DISTANCE: 100,
+  MAX_DISTANCE: 87,
   MIN_DISTANCE: 0,
-  MAX_VOLUME: 100,
-  MIN_VOLUME: 0,
-  MAX_HEIGHT: 100,
-  MIN_HEIGHT: 0,
+  MAX_VOLUME: 5000,
+  MIN_VOLUME: 10,
+  MAX_HEIGHT: 40,
+  MIN_HEIGHT: 1,
 };
 
 export const TEMPERATURE_GRAPH_OPTIONS = {

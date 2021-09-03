@@ -19,7 +19,20 @@ import {
   isCreateCartridgesBtnDisabled,
   getRequestBody,
 } from "./helpers";
-import { CARTRIDGE_TYPE_OPTIONS, MODAL_BTN, MODAL_MESSAGE } from "appConstants";
+import {
+  CARTRIDGE_TYPE_OPTIONS,
+  CARTRIDGE_WELLS,
+  MODAL_BTN,
+  MODAL_MESSAGE,
+} from "appConstants";
+const {
+  MAX_DISTANCE,
+  MIN_DISTANCE,
+  MAX_HEIGHT,
+  MIN_HEIGHT,
+  MAX_VOLUME,
+  MIN_VOLUME,
+} = CARTRIDGE_WELLS;
 
 const CartridgeComponent = (props) => {
   const { handleCreateCartridgeBtn } = props;
@@ -35,11 +48,6 @@ const CartridgeComponent = (props) => {
   const { id, type, wellsCount, description, distance, height, volume } =
     formik.values;
 
-  let cartridgeValue = "";
-  if (type.value !== "") {
-    cartridgeValue = { value: type.value, label: type.value };
-  }
-
   const handleBlur = (key, value) => {
     const isInvalid = checkIsCartridgeFieldInvalid(key, value);
     formik.setFieldValue(`${key}.isInvalid`, isInvalid);
@@ -53,6 +61,7 @@ const CartridgeComponent = (props) => {
     // if user changes wells count afterwards
     if (key === "wellsCount.value" && noOfWellToShow !== null) {
       setWarningModal(true);
+      return;
     }
 
     let valueToSet = value;
@@ -104,6 +113,10 @@ const CartridgeComponent = (props) => {
     setWarningModal(false);
   };
 
+  const handleModalCrossBtn = () => {
+    setWarningModal(false);
+  };
+
   return (
     <>
       {showWarningModal && (
@@ -113,7 +126,7 @@ const CartridgeComponent = (props) => {
           successBtn={MODAL_BTN.yes}
           failureBtn={MODAL_BTN.no}
           handleSuccessBtn={handleModalSuccessBtn}
-          handleCrossBtn={() => setWarningModal(false)}
+          handleCrossBtn={handleModalCrossBtn}
         />
       )}
 
@@ -136,7 +149,7 @@ const CartridgeComponent = (props) => {
                 onFocus={(e) => handleFocus(e.target.name)}
               />
               {id.isInvalid && (
-                <div className="flex-70">
+                <div className="flex-auto">
                   <Text Tag="p" size={14} className="text-danger">
                     {"Enter valid id"}
                   </Text>
@@ -149,19 +162,18 @@ const CartridgeComponent = (props) => {
                 Type
               </Label>
               <Select
-                isClearable
                 name="type"
                 placeholder="Select Cartridge"
                 className=""
                 size="md"
                 options={CARTRIDGE_TYPE_OPTIONS}
-                value={cartridgeValue}
+                value={{ value: type.value, label: type.value }}
                 onChange={(e) => handleOnChange("type.value", e?.value)}
                 // onBlur={(e) => handleBlur("type", e.target.value)}
                 // onFocus={(e) => handleFocus("type")}
               />
               {type.isInvalid && (
-                <div className="flex-70">
+                <div className="flex-auto">
                   <Text Tag="p" size={14} className="text-danger">
                     {"Invalid"}
                   </Text>
@@ -200,7 +212,7 @@ const CartridgeComponent = (props) => {
                 onFocus={(e) => handleFocus(e.target.name)}
               />
               {wellsCount.isInvalid && (
-                <div className="flex-70">
+                <div className="flex-auto">
                   <Text Tag="p" size={14} className="text-danger">
                     {"Enter valid input"}
                   </Text>
@@ -249,6 +261,7 @@ const CartridgeComponent = (props) => {
                   <Input
                     name="distance"
                     id="distance"
+                    step="0.1"
                     placeholder={"Type here"}
                     value={distance[index].value}
                     onChange={(event) =>
@@ -263,9 +276,9 @@ const CartridgeComponent = (props) => {
                     onFocus={() => handleFocus(`distance.${index}`)}
                   />
                   {distance[index].isInvalid && (
-                    <div className="flex-70">
+                    <div className="flex-auto">
                       <Text Tag="p" size={14} className="text-danger">
-                        {"Enter valid distance"}
+                        {`Distance must be between ${MIN_DISTANCE} and ${MAX_DISTANCE}`}
                       </Text>
                     </div>
                   )}
@@ -278,6 +291,7 @@ const CartridgeComponent = (props) => {
                   <Input
                     name="height"
                     id="height"
+                    step="0.1"
                     placeholder={"Type here"}
                     value={height[index].value}
                     onChange={(event) =>
@@ -292,9 +306,9 @@ const CartridgeComponent = (props) => {
                     onFocus={() => handleFocus(`height.${index}`)}
                   />
                   {height[index].isInvalid && (
-                    <div className="flex-70">
+                    <div className="flex-auto">
                       <Text Tag="p" size={14} className="text-danger">
-                        {"Enter valid height"}
+                        {`Height must be between ${MIN_HEIGHT} and ${MAX_HEIGHT}`}
                       </Text>
                     </div>
                   )}
@@ -307,6 +321,7 @@ const CartridgeComponent = (props) => {
                   <Input
                     name="volume"
                     id="volume"
+                    step="1"
                     placeholder={"Type here"}
                     value={volume[index].value}
                     onChange={(event) =>
@@ -321,9 +336,9 @@ const CartridgeComponent = (props) => {
                     onFocus={() => handleFocus(`volume.${index}`)}
                   />
                   {volume[index].isInvalid && (
-                    <div className="flex-70">
+                    <div className="flex-auto">
                       <Text Tag="p" size={14} className="text-danger">
-                        {"Enter valid volume"}
+                        {`Volume must be between ${MIN_VOLUME} and ${MAX_VOLUME}`}
                       </Text>
                     </div>
                   )}

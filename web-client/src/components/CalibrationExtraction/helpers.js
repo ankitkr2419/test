@@ -383,7 +383,7 @@ export const isTipsTubesButtonDisabled = (state) => {
 // formik initial state
 export const cartridgeFormikInitialState = {
   id: { value: null, isInvalid: false },
-  type: { value: "", isInvalid: false },
+  type: { value: "Cartridge 1", isInvalid: false },
   description: { value: null, isInvalid: false },
   wellsCount: { value: null, isInvalid: false },
   distance: [],
@@ -392,12 +392,20 @@ export const cartridgeFormikInitialState = {
 };
 
 export const checkIsCartridgeFieldInvalid = (key, value) => {
-  const intValue = parseInt(value);
   const filteredKey = key.split(".")[0];
+
+  const {
+    MAX_DISTANCE,
+    MIN_DISTANCE,
+    MAX_HEIGHT,
+    MIN_HEIGHT,
+    MAX_VOLUME,
+    MIN_VOLUME,
+  } = CARTRIDGE_WELLS;
 
   switch (filteredKey) {
     case "id":
-      if (!intValue || intValue > 15 || intValue < 0) {
+      if (!Number.isInteger(parseFloat(value))) {
         return true;
       }
       return false;
@@ -409,25 +417,34 @@ export const checkIsCartridgeFieldInvalid = (key, value) => {
       return false;
 
     case "wellsCount":
-      if (!intValue || intValue > 13 || intValue < 0) {
+      const wellsCount = parseInt(value);
+      if (!wellsCount || wellsCount > 13 || wellsCount < 0) {
         return true;
       }
       return false;
 
     case "distance":
-      if (!intValue || intValue > 100 || intValue < 0) {
+      const distance = parseFloat(value);
+      if (!distance || distance > MAX_DISTANCE || distance < MIN_DISTANCE) {
         return true;
       }
       return false;
 
     case "volume":
-      if (!intValue || intValue > 100 || intValue < 0) {
+      const volume = parseFloat(value);
+      if (
+        !volume ||
+        !Number.isInteger(volume) ||
+        volume > MAX_VOLUME ||
+        volume < MIN_VOLUME
+      ) {
         return true;
       }
       return false;
 
     case "height":
-      if (!intValue || intValue > 100 || intValue < 0) {
+      const height = parseFloat(value);
+      if (!height || height > MAX_HEIGHT || height < MIN_HEIGHT) {
         return true;
       }
       return false;
@@ -508,10 +525,14 @@ export const getRequestBody = (state) => {
   const { id, type, description, wellsCount } = state;
 
   const requestBody = {
-    id: parseInt(id.value),
-    type: type.value === "Cartridge 1" ? "cartridge_1" : "cartridge_2",
-    description: description.value,
-    wells_count: parseInt(wellsCount.value),
+    cartridges: [
+      {
+        id: parseInt(id.value),
+        type: type.value === "Cartridge 1" ? "cartridge_1" : "cartridge_2",
+        description: description.value,
+        wells_count: parseInt(wellsCount.value),
+      },
+    ],
     cartridge_wells: getCartridgeWellsBody(state),
   };
 
