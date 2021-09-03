@@ -559,6 +559,9 @@ export const CARTRIDGE_WELLS = {
   MIN_HEIGHT: 1,
 };
 
+export const MAX_TOLERANCE_ALLOWED = 100;
+export const MIN_TOLERANCE_ALLOWED = 0;
+
 export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {
     display: false,

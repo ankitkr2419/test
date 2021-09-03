@@ -24,6 +24,7 @@ import {
 import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
 import CommonFieldsComponent from "components/CalibrationExtraction/CommonFieldsComponent";
 import FormikFieldsEditor from "components/FormikFieldsEditor";
+import ToleranceComponent from "./ToleranceComponent";
 
 const CalibrationComponent = (props) => {
   let {
@@ -34,6 +35,8 @@ const CalibrationComponent = (props) => {
     handleRtpcrConfigSubmitButton,
     formikTECVars,
     handleTECConfigSubmitButton,
+    handleSaveToleranceBtn,
+    mockData,
   } = props;
 
   const history = useHistory();
@@ -63,6 +66,12 @@ const CalibrationComponent = (props) => {
           <CommonFieldsComponent
             formik={formik}
             handleSaveDetailsBtn={handleSaveDetailsBtn}
+          />
+
+          {/* Tolerance Component */}
+          <ToleranceComponent
+            mockData={mockData}
+            handleSaveToleranceBtn={handleSaveToleranceBtn}
           />
 
           {/**Rtpcr vars */}

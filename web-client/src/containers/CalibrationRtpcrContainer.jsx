@@ -161,6 +161,34 @@ const CalibrationRtpcrContainer = () => {
     formik.setFieldValue(key, value);
   };
 
+  // Just for testing...
+  // Will be deleted after API is ready.
+  const mockData = [
+    {
+      id: "xyz",
+      name: "A",
+      position: 1,
+      tolerance: 23,
+    },
+    {
+      id: "abc",
+      name: "B",
+      position: 2,
+      tolerance: 53,
+    },
+    {
+      id: "pqr",
+      name: "C",
+      position: 3,
+      tolerance: 235,
+    },
+  ];
+
+  const handleSaveToleranceBtn = (requestBody) => {
+    console.log("Request body: ", requestBody);
+    // dispatch(requestBodys);
+  };
+
   return (
     <CalibrationComponent
       formik={formik}
@@ -170,6 +198,8 @@ const CalibrationRtpcrContainer = () => {
       handleRtpcrConfigSubmitButton={handleRtpcrConfigSubmitButton}
       formikTECVars={formikTECVars}
       handleTECConfigSubmitButton={handleTECConfigSubmitButton}
+      handleSaveToleranceBtn={handleSaveToleranceBtn}
+      mockData={mockData}
     />
   );
 };
