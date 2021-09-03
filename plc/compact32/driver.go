@@ -492,7 +492,7 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 			logger.Errorln(err)
 			d.ExitCh <- fmt.Errorf(plc.ErrorLidPIDTuning)
 		}
-		d.WsMsgCh <- "SUCCESS_ShakerPIDTuning_ShakerPIDTuningSuccess"
+		d.WsMsgCh <- "SUCCESS_LidPIDTuning_LidPIDTuningSuccess"
 	}()
 
 	// 1.
