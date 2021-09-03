@@ -24,6 +24,8 @@ func pidCalibrationHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		deck := vars["deck"]
 
+		deps.PlcDeck[deck].ResetAborted()
+
 		if deps.PlcDeck[deck].IsRunInProgress() {
 			logger.Errorln(responses.PreviousRunInProgressError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PreviousRunInProgressError.Error(), Deck: deck})
@@ -101,6 +103,8 @@ func shakerHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		deps.PlcDeck[deck].ResetAborted()
+
 		if deps.PlcDeck[deck].IsRunInProgress() || deps.PlcDeck[deck].IsShakerInProgress() {
 			logger.Errorln(responses.PreviousRunInProgressError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.PreviousRunInProgressError.Error(), Deck: deck})
@@ -136,6 +140,8 @@ func heaterHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
+
+		deps.PlcDeck[deck].ResetAborted()
 
 		if deps.PlcDeck[deck].IsRunInProgress() || deps.PlcDeck[deck].IsHeaterInProgress() {
 			logger.Errorln(responses.PreviousRunInProgressError)
