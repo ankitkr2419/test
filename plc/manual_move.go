@@ -2,6 +2,8 @@ package plc
 
 import (
 	"fmt"
+	"mylab/cpagent/responses"
+
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -14,7 +16,7 @@ const (
 func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (response string, err error) {
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return "", err
 	}
 
@@ -155,7 +157,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return "ABORT UV LIGHT SUCCESS", nil
 	}
 
-	if d.isPIDCalibrationInProgress() {
+	if d.isShakerPIDTuningInProgress() {
 		//  Switch off Heater
 		response, err = d.switchOffHeater()
 		if err != nil {
@@ -163,7 +165,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 			return "", err
 		}
 		//  Switch off PID Calibration
-		response, err = d.switchOffPIDCalibration()
+		response, err = d.switchOffShakerPIDCalibration()
 		if err != nil {
 			logger.Errorln("couldn't switch OFF PID Calibration", d.name, err)
 			return "", err

@@ -264,7 +264,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			logger.Infoln("Tip Docking Object: ",td)
 			if td.Type == string(db.Cartridge1) {
 				currentCartridgeID = *recipe.Cartridge1Position
-			} else {
+			} else if td.Type == string(db.Cartridge2) {
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)

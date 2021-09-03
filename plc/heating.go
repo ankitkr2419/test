@@ -24,6 +24,15 @@ import (
 */
 func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
+	defer func() {
+		if err != nil {
+			logger.Errorln(err)
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+			return
+		}
+		d.WsMsgCh <- "SUCCESS_HeaterRun_HeaterRunSuccess"
+	}()
+
 	stopMonitor := make(chan bool, 1)
 
 	// Step 1 : Validation for temperature
@@ -87,6 +96,8 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 	defer d.switchOffHeater()
 	d.setHeaterInProgress()
 	defer d.resetHeaterInProgress()
+
+	d.WsMsgCh <- "PROGRESS_HeaterRun_HeaterRunStarted"
 
 	// Step 7: For not follow Temp
 	// first check if not follow up then call delay function.
