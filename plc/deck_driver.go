@@ -407,7 +407,7 @@ func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOnPIDCalibration() (response string, err error) {
+func (d *Compact32Deck) switchOnShakerPIDCalibration() (response string, err error) {
 
 	// PID calibration LH ON
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][4], ON)
@@ -427,7 +427,7 @@ func (d *Compact32Deck) switchOnPIDCalibration() (response string, err error) {
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOffPIDCalibration() (response string, err error) {
+func (d *Compact32Deck) switchOffShakerPIDCalibration() (response string, err error) {
 
 	// PID calibration LH OFF
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][4], OFF)
@@ -443,6 +443,8 @@ func (d *Compact32Deck) switchOffPIDCalibration() (response string, err error) {
 		return "", err
 	}
 	logger.Infoln("Switched OFF PID calibration RH for deck ", d.name)
+
+	d.resetShakerPIDCalibrationInProgress()
 
 	return "SUCCESS", nil
 }
@@ -493,7 +495,7 @@ func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
 		err = fmt.Errorf("%v\n%v", err, tempErr)
 	}
 
-	_, tempErr = d.switchOffPIDCalibration()
+	_, tempErr = d.switchOffShakerPIDCalibration()
 	if tempErr != nil {
 		logger.Errorln("error switching off pid calibration bits: ", tempErr, d.name)
 		err = fmt.Errorf("%v\n%v", err, tempErr)

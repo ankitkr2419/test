@@ -39,6 +39,14 @@ func (d *SimulatorDriver) resetSensorDone() {
 	sensorDone.Store(d.DeckName, false)
 }
 
+func (d *SimulatorDriver) setShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.DeckName, true)
+}
+
+func (d *SimulatorDriver) resetShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.DeckName, false)
+}
+
 func (d *SimulatorDriver) isMotorInProgress() bool {
 	if temp, ok := motorInProgress.Load(d.DeckName); !ok {
 		logger.Errorln("motorInProgress isn't loaded!")
@@ -69,6 +77,15 @@ func (d *SimulatorDriver) isMotorDone() bool {
 func (d *SimulatorDriver) isSensorDone() bool {
 	if temp, ok := sensorDone.Load(d.DeckName); !ok {
 		logger.Errorln("sensorDone isn't loaded!")
+	} else {
+		return temp.(bool)
+	}
+	return false
+}
+
+func (d *SimulatorDriver) isShakerPIDCalibrationInProgress() bool {
+	if temp, ok := shakerPIDCalibrationInProgress.Load(d.DeckName); !ok {
+		logger.Errorln("shakerPIDCalibrationInProgress isn't loaded!")
 	} else {
 		return temp.(bool)
 	}
