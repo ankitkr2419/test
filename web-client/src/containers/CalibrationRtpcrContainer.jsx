@@ -9,6 +9,8 @@ import {
   updateRtpcrConfigsInitiated,
   fetchTECConfigsInitiated,
   updateTECConfigsInitiated,
+  startLidPid,
+  abortLidPid,
 } from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
 import {
@@ -18,6 +20,7 @@ import {
 } from "components/Calibration/helper";
 import { deckBlockInitiated } from "action-creators/loginActionCreators";
 import { populateFormikStateFromApi } from "components/FormikFieldsEditor/helper";
+import { PID_STATUS } from "appConstants";
 
 const CalibrationRtpcrContainer = () => {
   const dispatch = useDispatch();
@@ -63,6 +66,11 @@ const CalibrationRtpcrContainer = () => {
   const tecConfigsReducerData = tecConfigsReducer.toJS();
   let isTECConfigUpdateApi = tecConfigsReducerData?.isUpdateApi;
   let tecConfigDetails = tecConfigsReducerData?.details;
+
+  //lid pid reducer
+  const lidPidReducer = useSelector((state) => state.lidPidReducer);
+  const lidPidReducerData = lidPidReducer.toJS();
+  const { lidPidStatus } = lidPidReducerData;
 
   //initially populate with previous data
   useEffect(() => {
@@ -156,6 +164,17 @@ const CalibrationRtpcrContainer = () => {
     dispatch(updateTECConfigsInitiated(token, requestBody));
   };
 
+  const handleLidPidButton = () => {
+    if (
+      lidPidStatus === PID_STATUS.running ||
+      lidPidStatus === PID_STATUS.progressing
+    ) {
+      dispatch(abortLidPid(token));
+    } else {
+      dispatch(startLidPid(token));
+    }
+  };
+
   /**to change formik field */
   const handleOnChange = (key, value) => {
     formik.setFieldValue(key, value);
@@ -170,6 +189,8 @@ const CalibrationRtpcrContainer = () => {
       handleRtpcrConfigSubmitButton={handleRtpcrConfigSubmitButton}
       formikTECVars={formikTECVars}
       handleTECConfigSubmitButton={handleTECConfigSubmitButton}
+      lidPidStatus={lidPidStatus}
+      handleLidPidButton={handleLidPidButton}
     />
   );
 };

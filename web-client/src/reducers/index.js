@@ -74,6 +74,7 @@ import {
   createTipTubeReducer,
   rtpcrConfigsReducer,
   tecConfigsReducer,
+  lidPidReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
@@ -142,6 +143,7 @@ const rootReducer = combineReducers({
   createTipTubeReducer,
   rtpcrConfigsReducer,
   tecConfigsReducer,
+  lidPidReducer,
 });
 
 export default rootReducer;

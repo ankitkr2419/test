@@ -16,6 +16,9 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  startLidPidActions,
+  lidPidProgressActions,
+  abortLidPidActions,
 } from "actions/calibrationActions";
 import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
@@ -558,6 +561,78 @@ export const tecConfigsReducer = (state = tecConfigsInitialState, action) => {
 
     case loginActions.loginReset:
       return tecConfigsInitialState;
+
+    default:
+      return state;
+  }
+};
+
+//lid pid tuning reducer
+const lidPidInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  lidPidStatus: null,
+});
+
+export const lidPidReducer = (state = lidPidInitialState, action) => {
+  switch (action.type) {
+    case startLidPidActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        lidPidStatus: null,
+      });
+    case startLidPidActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        lidPidStatus: PID_STATUS.running,
+      });
+    case startLidPidActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        lidPidStatus: PID_STATUS.runFailed,
+      });
+    case startLidPidActions.resetAction:
+      return lidPidInitialState;
+
+    case abortLidPidActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        lidPidStatus: PID_STATUS.aborting,
+      });
+    case abortLidPidActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        lidPidStatus: PID_STATUS.stopped,
+      });
+    case abortLidPidActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        lidPidStatus: PID_STATUS.abortFailed,
+      });
+    case abortLidPidActions.resetAction:
+      return lidPidInitialState;
+
+    case lidPidProgressActions.lidPidProgressAction:
+      return state.merge({
+        isLoading: false,
+        error: null,
+        lidPidStatus: PID_STATUS.progressing,
+      });
+    case lidPidProgressActions.lidPidProgressActionSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        lidPidStatus: PID_STATUS.progressComplete,
+      });
+
+    case loginActions.loginReset:
+      return lidPidInitialState;
 
     default:
       return state;

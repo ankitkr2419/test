@@ -39,6 +39,8 @@ import {
   heaterProgress,
   runPidInProgress,
   runPidInSuccess,
+  progressLidPid,
+  successLidPid,
 } from "action-creators/calibrationActionCreators";
 
 let webSocket = null;
@@ -128,6 +130,13 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.progressHeater:
           dispatch(heaterProgress(JSON.parse(data)));
           break;
+        case SOCKET_MESSAGE_TYPE.PROGRESSLidPIDTuning:
+          dispatch(progressLidPid(JSON.parse(data)));
+          break;
+        case SOCKET_MESSAGE_TYPE.SUCCESSLidPIDTuning:
+          dispatch(successLidPid(JSON.parse(data)));
+          break;
+
         default:
           break;
       }

@@ -18,6 +18,9 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  startLidPidActions,
+  lidPidProgressActions,
+  abortLidPidActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -279,4 +282,42 @@ export const updateTECConfigsInitiated = (token, requestBody) => ({
 export const updateTECConfigsFailed = ({ error }) => ({
   type: updateTECConfigsActions.failureAction,
   payload: { error },
+});
+
+export const startLidPid = (token) => ({
+  type: startLidPidActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const startLidPidFailed = ({ error }) => ({
+  type: startLidPidActions.failureAction,
+  payload: { error },
+});
+
+export const abortLidPid = (token) => ({
+  type: abortLidPidActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const abortLidPidFailed = ({ error }) => ({
+  type: abortLidPidActions.failureAction,
+  payload: { error },
+});
+
+export const progressLidPid = (progressDetails) => ({
+  type: lidPidProgressActions.lidPidProgressAction,
+  payload: {
+    progressDetails,
+  },
+});
+
+export const successLidPid = (progressDetails) => ({
+  type: lidPidProgressActions.lidPidProgressActionSuccess,
+  payload: {
+    progressDetails,
+  },
 });

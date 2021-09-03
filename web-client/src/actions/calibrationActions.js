@@ -121,4 +121,23 @@ export const updateTECConfigsActions = {
   successAction: "UPDATE_TEC_CONFIGS_SUCCESS",
   failureAction: "UPDATE_TEC_CONFIGS_FAILURE",
   resetAction: "UPDATE_TEC_CONFIGS_RESET",
-}
+};
+
+export const startLidPidActions = {
+  initiateAction: "START_LID_PID_INITIATED",
+  successAction: "START_LID_PID_SUCCESS",
+  failureAction: "START_LID_PID_FAILURE",
+  resetAction: "START_LID_PID_RESET",
+};
+
+export const lidPidProgressActions = {
+  lidPidProgressAction: "LID_PID_IN_PROGRESS",
+  lidPidProgressActionSuccess: "LID_PID_SUCCEEDED",
+};
+
+export const abortLidPidActions = {
+  initiateAction: "ABORT_LID_PID_INITIATED",
+  successAction: "ABORT_LID_PID_SUCCESS",
+  failureAction: "ABORT_LID_PID_FAILURE",
+  resetAction: "ABORT_LID_PID_RESET",
+};

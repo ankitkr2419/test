@@ -1,29 +1,13 @@
 import React, { useEffect, useCallback } from "react";
 import { useHistory } from "react-router";
 
-import {
-  Button,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Card,
-  CardBody,
-  Row,
-  Col,
-} from "core-components";
+import { Card, CardBody } from "core-components";
 import { Icon, Text } from "shared-components";
-
-import {
-  isValueValid,
-  formikInitialState,
-  validateAllFields,
-  getRequestBody,
-} from "./helper";
-
-import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
 import CommonFieldsComponent from "components/CalibrationExtraction/CommonFieldsComponent";
 import FormikFieldsEditor from "components/FormikFieldsEditor";
+import LidPidTuning from "./LidPidTuning";
+
+import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
 
 const CalibrationComponent = (props) => {
   let {
@@ -34,6 +18,8 @@ const CalibrationComponent = (props) => {
     handleRtpcrConfigSubmitButton,
     formikTECVars,
     handleTECConfigSubmitButton,
+    lidPidStatus,
+    handleLidPidButton,
   } = props;
 
   const history = useHistory();
@@ -79,6 +65,12 @@ const CalibrationComponent = (props) => {
             formik={formikTECVars}
             submitButtonLabel={"Save"}
             submitButtonHandler={handleTECConfigSubmitButton}
+          />
+
+          {/** Lid PID Tuning */}
+          <LidPidTuning
+            lidPidStatus={lidPidStatus}
+            handleButtonClick={handleLidPidButton}
           />
         </CardBody>
       </Card>
