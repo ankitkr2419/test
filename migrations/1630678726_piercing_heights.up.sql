@@ -1,0 +1,1 @@
+ALTER TABLE piercing ADD COLUMN int[] NOT NULL;
