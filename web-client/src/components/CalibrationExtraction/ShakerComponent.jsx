@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useHistory } from "react-router";
 import classnames from "classnames";
+import { toast } from "react-toastify";
 
 import { Card, CardBody } from "core-components";
 import { ButtonIcon, ButtonBar } from "shared-components";
@@ -45,7 +46,11 @@ const ShakerComponent = (props) => {
       deckName:
         name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort,
     };
-    dispatch(shakerInitiated(requestBody));
+    if (requestBody) {
+      dispatch(shakerInitiated(requestBody));
+    } else {
+      toast.warning("Please check inputted values");
+    }
   };
 
   const handleAbortBtn = () => {
@@ -111,7 +116,7 @@ const ShakerComponent = (props) => {
                     <ShakingProcess
                       formik={formik}
                       activeTab={activeTab}
-                      temperature={true}
+                      temperature
                     />
                   </TabPane>
                 </TabContent>

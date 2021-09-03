@@ -1,19 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Row, Col, FormGroup, Label, Input, FormError } from "core-components";
 import { TemperatureInfo, Text, TimeInfo } from "shared-components";
 
 import { ShakingProcessBox } from "./Style";
 import { isDisabled, setRpmFormikField } from "./helpers";
-import { MAX_RPM_VALUE, MIN_RPM_VALUE } from "appConstants";
+import {
+  MAX_RPM_VALUE,
+  MAX_TEMP_ALLOWED,
+  MIN_RPM_VALUE,
+  MIN_TEMP_ALLOWED,
+} from "appConstants";
 
 const ShakingProcess = (props) => {
   const { formik, activeTab, temperature } = props;
+
+  const [invalidTemp, setInvalidTemp] = useState(false);
 
   const onBlurHandler = ({ value, name }) => {
     if (parseInt(value) < MIN_RPM_VALUE || parseInt(value) > MAX_RPM_VALUE) {
       formik.setFieldValue(`${name}.isInvalid`, true);
     }
+  };
+
+  const handleOnChange = (e) => {
+    formik.setFieldValue("temperature", e.target.value);
+  };
+
+  const handleOnBlur = (tempValue) => {
+    if (tempValue > MAX_TEMP_ALLOWED || tempValue < MIN_TEMP_ALLOWED) {
+      setInvalidTemp(true);
+    }
+  };
+
+  const handleOnFocus = () => {
+    setInvalidTemp(false);
   };
 
   return (
@@ -26,11 +47,14 @@ const ShakingProcess = (props) => {
                 temperature={formik.values.temperature}
                 followTemp={formik.values.followTemperature}
                 temperatureHandler={(e) => {
-                  formik.setFieldValue("temperature", e.target.value);
+                  handleOnChange(e);
                 }}
                 checkBoxHandler={(e) => {
                   formik.setFieldValue("followTemperature", e.target.checked);
                 }}
+                invalidTemperature={invalidTemp}
+                handleOnFocus={handleOnFocus}
+                handleOnBlur={handleOnBlur}
               />
             </div>
           )}
