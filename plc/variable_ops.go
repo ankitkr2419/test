@@ -52,7 +52,7 @@ func (d *Compact32Deck) setAborted() {
 	aborted.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetAborted() {
+func (d *Compact32Deck) ResetAborted() {
 	aborted.Store(d.name, false)
 }
 

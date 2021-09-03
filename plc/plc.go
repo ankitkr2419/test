@@ -143,6 +143,7 @@ type Extraction interface {
 	SetRunInProgress()
 	SetPaused()
 	ResetPaused()
+	ResetAborted()
 	ResetRunInProgress()
 	IsMachineHomed() bool
 	IsRunInProgress() bool

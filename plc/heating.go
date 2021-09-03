@@ -29,7 +29,7 @@ func (d *Compact32Deck) Heating(ht db.Heating, live bool) (response string, err 
 
 	defer func() {
 		if live{
-			d.resetAborted()
+			d.ResetAborted()
 		}
 		if err != nil {
 			logger.Errorln(err)

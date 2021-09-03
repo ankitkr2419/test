@@ -35,7 +35,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 
 	defer func() {
 		if live{
-			d.resetAborted()
+			d.ResetAborted()
 		}
 
 		if err != nil {

@@ -20,7 +20,7 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (
 		return "", err
 	}
 
-	d.resetAborted()
+	d.ResetAborted()
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
