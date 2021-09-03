@@ -29,11 +29,11 @@ const ToleranceComponent = (props) => {
 
   const handleBlur = (key, value) => {
     let isInvalid = false;
-    const intValue = parseFloat(value);
+    const floatValue = parseFloat(value);
     if (
-      !intValue ||
-      intValue > MAX_TOLERANCE_ALLOWED ||
-      intValue < MIN_TOLERANCE_ALLOWED
+      !floatValue ||
+      floatValue > MAX_TOLERANCE_ALLOWED ||
+      floatValue < MIN_TOLERANCE_ALLOWED
     ) {
       isInvalid = true;
     }
@@ -47,7 +47,7 @@ const ToleranceComponent = (props) => {
   const handleSaveBtn = () => {
     const requestBody = mockData.map((dataObj, index) => ({
       ...dataObj,
-      tolerance: parseInt(tolerance[index].value),
+      tolerance: parseFloat(tolerance[index].value),
     }));
 
     handleSaveToleranceBtn(requestBody);
