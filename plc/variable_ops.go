@@ -54,6 +54,11 @@ func (d *Compact32Deck) setAborted() {
 
 func (d *Compact32Deck) ResetAborted() {
 	aborted.Store(d.name, false)
+	d.resetShakerInProgress()
+	d.resetHeaterInProgress()
+	d.resetShakerPIDCalibrationInProgress()
+	d.ResetRunInProgress()
+	d.ResetPaused()
 }
 
 func (d *Compact32Deck) SetPaused() {
