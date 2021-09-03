@@ -62,14 +62,14 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
-	if d.isHeaterInProgress() {
+	if d.IsHeaterInProgress() {
 		response, err = d.switchOffHeater()
 		if err != nil {
 			return
 		}
 	}
 
-	if d.isShakerInProgress() {
+	if d.IsShakerInProgress() {
 		response, err = d.switchOffShaker()
 		if err != nil {
 			return
@@ -118,13 +118,13 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		}
 	}
 
-	if d.isHeaterInProgress() {
+	if d.IsHeaterInProgress() {
 		response, err = d.switchOnHeater()
 		if err != nil {
 			return
 		}
 	}
-	if d.isShakerInProgress() {
+	if d.IsShakerInProgress() {
 		response, err = d.switchOnShaker()
 		if err != nil {
 			return
