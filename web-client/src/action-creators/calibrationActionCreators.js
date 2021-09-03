@@ -21,6 +21,8 @@ import {
   startLidPidActions,
   lidPidProgressActions,
   abortLidPidActions,
+  resetTECActions,
+  autoTuneTECActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -320,4 +322,29 @@ export const successLidPid = (progressDetails) => ({
   payload: {
     progressDetails,
   },
+});
+
+// resetTECActions,autoTuneTECActions
+export const resetTECInitiated = (token) => ({
+  type: resetTECActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const resetTECFailed = ({ error }) => ({
+  type: resetTECActions.failureAction,
+  payload: { error },
+});
+
+export const autoTuneTECInitiated = (token) => ({
+  type: autoTuneTECActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const autoTuneTECFailed = ({ error }) => ({
+  type: autoTuneTECActions.failureAction,
+  payload: { error },
 });

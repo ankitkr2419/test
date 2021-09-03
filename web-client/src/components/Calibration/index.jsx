@@ -8,6 +8,7 @@ import FormikFieldsEditor from "components/FormikFieldsEditor";
 import LidPidTuning from "./LidPidTuning";
 
 import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
+import TECOperations from "./TECOperations";
 
 const CalibrationComponent = (props) => {
   let {
@@ -20,6 +21,8 @@ const CalibrationComponent = (props) => {
     handleTECConfigSubmitButton,
     lidPidStatus,
     handleLidPidButton,
+    handleResetTEC,
+    handleAutoTuneTEC,
   } = props;
 
   const history = useHistory();
@@ -71,6 +74,12 @@ const CalibrationComponent = (props) => {
           <LidPidTuning
             lidPidStatus={lidPidStatus}
             handleButtonClick={handleLidPidButton}
+          />
+
+          {/** TEC Operations */}
+          <TECOperations
+            handleResetTEC={handleResetTEC}
+            handleAutoTuneTEC={handleAutoTuneTEC}
           />
         </CardBody>
       </Card>

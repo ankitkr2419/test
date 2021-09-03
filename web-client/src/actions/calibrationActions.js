@@ -141,3 +141,17 @@ export const abortLidPidActions = {
   failureAction: "ABORT_LID_PID_FAILURE",
   resetAction: "ABORT_LID_PID_RESET",
 };
+
+export const resetTECActions = {
+  initiateAction: "RESET_TEC_INITIATED",
+  successAction: "RESET_TEC_SUCCESS",
+  failureAction: "RESET_TEC_FAILURE",
+  resetAction: "RESET_TEC_RESET",
+};
+
+export const autoTuneTECActions = {
+  initiateAction: "AUTOTUNE_TEC_INITIATED",
+  successAction: "AUTOTUNE_TEC_SUCCESS",
+  failureAction: "AUTOTUNE_TEC_FAILURE",
+  resetAction: "AUTOTUNE_TEC_RESET",
+};

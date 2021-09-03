@@ -22,6 +22,8 @@ import {
   startLidPidActions,
   lidPidProgressActions,
   abortLidPidActions,
+  resetTECActions,
+  autoTuneTECActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -43,6 +45,8 @@ import {
   updateTECConfigsFailed,
   startLidPidFailed,
   abortLidPidFailed,
+  resetTECFailed,
+  autoTuneTECFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -521,6 +525,59 @@ export function* abortLidPid(actions) {
     yield put(abortLidPidFailed({ error }));
   }
 }
+
+export function* resetTEC(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = resetTECActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.resetTEC}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error reseting TEC", error);
+    yield put(resetTECFailed({ error }));
+  }
+}
+
+export function* autoTuneTEC(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = autoTuneTECActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.autoTuneTEC}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error auto tuning TEC", error);
+    yield put(autoTuneTECFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -559,4 +616,6 @@ export function* calibrationSaga() {
   yield takeEvery(updateTECConfigsActions.initiateAction, updateTECConfigs);
   yield takeEvery(startLidPidActions.initiateAction, startLidPid);
   yield takeEvery(abortLidPidActions.initiateAction, abortLidPid);
+  yield takeEvery(resetTECActions.initiateAction, resetTEC);
+  yield takeEvery(autoTuneTECActions.initiateAction, autoTuneTEC);
 }

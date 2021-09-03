@@ -11,6 +11,8 @@ import {
   updateTECConfigsInitiated,
   startLidPid,
   abortLidPid,
+  resetTECInitiated,
+  autoTuneTECInitiated,
 } from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
 import {
@@ -175,6 +177,14 @@ const CalibrationRtpcrContainer = () => {
     }
   };
 
+  const handleResetTEC = () => {
+    dispatch(resetTECInitiated(token));
+  };
+
+  const handleAutoTuneTEC = () => {
+    dispatch(autoTuneTECInitiated(token));
+  };
+
   /**to change formik field */
   const handleOnChange = (key, value) => {
     formik.setFieldValue(key, value);
@@ -191,6 +201,8 @@ const CalibrationRtpcrContainer = () => {
       handleTECConfigSubmitButton={handleTECConfigSubmitButton}
       lidPidStatus={lidPidStatus}
       handleLidPidButton={handleLidPidButton}
+      handleResetTEC={handleResetTEC}
+      handleAutoTuneTEC={handleAutoTuneTEC}
     />
   );
 };
