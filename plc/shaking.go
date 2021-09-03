@@ -25,10 +25,19 @@ const secondsInMinutes = 60
 10. After this run the shaker with rpm 2 till the time1 duration is completed if rpm 2
 	is specified.
 11. After all this process is done switch the shaker and the heater off(Called in defer)
+
+NOTE: live is to be set only for engineer/admin flow when he is starting it directly
 */
-func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err error) {
+func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response string, err error) {
+
+	d.setShakerInProgress()
+	defer d.resetShakerInProgress()
 
 	defer func() {
+		if live{
+			d.resetAborted()
+		}
+
 		if err != nil {
 			logger.Errorln(err)
 			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
@@ -123,7 +132,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			FollowTemp:  shakerData.FollowTemp,
 			Duration:    0,
 		}
-		response, err = d.Heating(ht)
+		response, err = d.Heating(ht, live)
 		if err != nil {
 			return "", err
 		}
@@ -152,9 +161,6 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		return "", err
 	}
 	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "started")
-
-	d.setShakerInProgress()
-	defer d.resetShakerInProgress()
 
 	// add delay of time1 duration
 	delay := db.Delay{
