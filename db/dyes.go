@@ -16,7 +16,8 @@ const (
 				position,
 				tolerance)
 				VALUES %s `
-	insertDyeQuery2 = `ON CONFLICT DO NOTHING;`
+	insertDyeQuery2 = `ON CONFLICT (name , position) DO UPDATE
+	SET tolerance = excluded.tolerance WHERE dyes.name = excluded.name AND dyes.position = excluded.position ;`
 
 	getDyes         = `SELECT * FROM dyes`
 	getDyeByIDQuery = `SELECT * FROM dyes WHERE id = $1`
@@ -57,6 +58,16 @@ func (s *pgStore) ShowDye(ctx context.Context, dyeID uuid.UUID) (DBdye Dye, err 
 	}
 	return
 
+}
+
+func (s *pgStore) ListDyes(ctx context.Context) (DBdye []Dye, err error) {
+
+	err = s.db.Select(&DBdye, getDyes)
+	if err != nil {
+		logger.WithField("err", err.Error()).Errorln("Error listing dyes")
+		return
+	}
+	return
 }
 
 // prepare bulk insert query statement
