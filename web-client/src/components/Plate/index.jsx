@@ -1,6 +1,7 @@
 import React, { useEffect, useReducer, useState } from "react";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
 
@@ -16,7 +17,10 @@ import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
 import { ButtonIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
+import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
+import { updateFilter } from "action-creators/analyseDataGraphActionCreators";
+import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
 
 import GridWrapper from "./Grid/GridWrapper";
 import "./Plate.scss";
@@ -87,6 +91,7 @@ const Plate = (props) => {
     isExpanded,
   } = props;
 
+  const dispatch = useDispatch();
   // getExperimentStatus will return us current experiment status
   const runExperimentDetails = useSelector(getRunExperimentReducer);
   const createExperimentReducer = useSelector(
@@ -95,6 +100,7 @@ const Plate = (props) => {
 
   // get targets from experiment target reducer(graph : target filters)
   const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
+  const targetsData = experimentGraphTargetsList.toJS();
 
   const experimentStatus = runExperimentDetails.get("experimentStatus");
 
@@ -106,8 +112,8 @@ const Plate = (props) => {
   // local state to maintain well data which is selected for updation
   const [updateWell, setUpdateWell] = useState(null);
 
-  // local state to toggle between emission graph and temperature graph
-  const [showTempGraph, setShowTempGraph] = useState(false);
+  // local state to maintain active graph
+  const [activeGraph, setActiveGraph] = useState(graphs.Amplification);
 
   // local state to manage toggling of graphSidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -125,14 +131,16 @@ const Plate = (props) => {
   const [options, setOptions] = useState(initialOptions);
   const [isDataFromAPI, setDataFromAPI] = useState(false);
 
+  //set first target as selected to use it in analyse data graph
   useEffect(() => {
-    const tempOptions = options;
+    const targets = generateTargetOptions(targetsData);
+    if (targets.length > 0) {
+      const firstTarget = targets[0];
+      dispatch(updateFilter({ selectedTarget: firstTarget }));
+    }
+  }, [dispatch, targetsData]);
 
-    tempOptions.scales.xAxes[0].ticks.min = xMinValue;
-    tempOptions.scales.xAxes[0].ticks.max = xMaxValue;
-    tempOptions.scales.yAxes[0].ticks.min = yMinValue;
-    tempOptions.scales.yAxes[0].ticks.max = yMaxValue;
-
+  useEffect(() => {
     let newOptions = {
       ...initialOptions,
       scales: {
@@ -220,8 +228,20 @@ const Plate = (props) => {
   };
 
   // helper function to toggle the graphs
-  const toggleTempGraphSwitch = (graphType) => {
-    setShowTempGraph(graphType === "temperature");
+  const onChangeActiveGraph = (graphType) => {
+    if (activeGraph !== graphType) {
+      setActiveGraph(graphType);
+    }
+  };
+
+  const makeAmplificationGraphActive = () => {
+    onChangeActiveGraph(graphs.Amplification);
+  };
+  const makeTemperatureGraphActive = () => {
+    onChangeActiveGraph(graphs.Temperature);
+  };
+  const makeAnalyseDataGraphActive = () => {
+    onChangeActiveGraph(graphs.AnalyseData);
   };
 
   const togglePreviewReportModal = () => {
@@ -362,21 +382,46 @@ const Plate = (props) => {
               <div className="graph-wrapper flex-100 scroll-y">
                 <div className="d-flex align-items-center mb-3">
                   <Button
-                    outline={showTempGraph}
-                    color={!showTempGraph ? "primary" : "secondary"}
+                    outline={activeGraph !== graphs.Amplification}
+                    color={
+                      activeGraph === graphs.Amplification
+                        ? "primary"
+                        : "secondary"
+                    }
                     className="mr-3 Amplification"
-                    onClick={() => toggleTempGraphSwitch("amplification")}
+                    onClick={makeAmplificationGraphActive}
                   >
                     Amplification
                   </Button>
                   <Button
-                    outline={!showTempGraph}
-                    color={showTempGraph ? "primary" : "secondary"}
-                    className="Temperature"
-                    onClick={() => toggleTempGraphSwitch("temperature")}
+                    outline={activeGraph !== graphs.Temperature}
+                    color={
+                      activeGraph === graphs.Temperature
+                        ? "primary"
+                        : "secondary"
+                    }
+                    className="mr-3 Temperature"
+                    onClick={makeTemperatureGraphActive}
                   >
                     Temperature
                   </Button>
+                  {(experimentStatus === EXPERIMENT_STATUS.success ||
+                    experimentStatus === EXPERIMENT_STATUS.stopped ||
+                    isExpanded === true) && (
+                    <Button
+                      outline={activeGraph !== graphs.AnalyseData}
+                      color={
+                        activeGraph === graphs.AnalyseData
+                          ? "primary"
+                          : "secondary"
+                      }
+                      className="mr-3 AnalyseData"
+                      onClick={makeAnalyseDataGraphActive}
+                    >
+                      Analyse Data
+                    </Button>
+                  )}
+
                   <ButtonIcon
                     name="download-1"
                     size={28}
@@ -387,7 +432,7 @@ const Plate = (props) => {
                 <ExperimentGraphContainer
                   isInsidePreviewModal={false}
                   headerData={headerData}
-                  showTempGraph={showTempGraph}
+                  activeGraph={activeGraph}
                   experimentStatus={experimentStatus}
                   isSidebarOpen={isSidebarOpen}
                   setIsSidebarOpen={setIsSidebarOpen}
@@ -405,19 +450,6 @@ const Plate = (props) => {
           </TabPane>
         </TabContent>
       </GridWrapper>
-      {/* <SampleSideBarContainer
-        experimentId={experimentId}
-        positions={positions}
-        experimentTargetsList={experimentTargetsList}
-        updateWell={updateWell}
-      />
-      <ExperimentGraphContainer
-        experimentStatus={experimentStatus}
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        resetSelectedWells={resetSelectedWells}
-        isMultiSelectionOptionOn={isMultiSelectionOptionOn}
-      /> */}
     </div>
   );
 };

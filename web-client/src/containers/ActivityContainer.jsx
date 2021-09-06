@@ -3,7 +3,6 @@ import ActivityComponent from "components/ActivityLog";
 import { useSelector, useDispatch } from "react-redux";
 import {
   activityLogInitiated,
-  mailReportInitiated,
 } from "action-creators/activityLogActionCreators";
 import { toast } from "react-toastify";
 import { ROUTES, TOAST_MESSAGE } from "appConstants";
@@ -35,10 +34,6 @@ const ActivityContainer = () => {
   );
   const createExperimentReducerData = createExperimentReducer.toJS();
 
-  //get status of mail from reducer
-  const mailReportReducer = useSelector((state) => state.mailReportReducer);
-  const { isLoading, error } = mailReportReducer.toJS();
-
   //search activity by experiment name
   const [searchText, setSearchText] = useState("");
 
@@ -51,15 +46,6 @@ const ActivityContainer = () => {
   useEffect(() => {
     dispatch(activityLogInitiated(token));
   }, []);
-
-  // check if mail is sent or not and show toast msg acc.
-  useEffect(() => {
-    if (isLoading === false && error === true) {
-      toast.success(TOAST_MESSAGE.sendingMailSuccess);
-    } else if (isLoading === false && error === false) {
-      toast.success(TOAST_MESSAGE.sendingMailSuccess);
-    }
-  }, [isLoading, error]);
 
   const onSearchTextChanged = (text) => {
     setSearchText(text);

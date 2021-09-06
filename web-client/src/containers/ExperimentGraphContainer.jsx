@@ -12,7 +12,7 @@ import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 const ExperimentGraphContainer = (props) => {
   const {
     headerData,
-    showTempGraph,
+    activeGraph,
     setIsSidebarOpen,
     isSidebarOpen,
     experimentStatus,
@@ -88,7 +88,7 @@ const ExperimentGraphContainer = (props) => {
   return (
     <SidebarGraph
       headerData={headerData}
-      showTempGraph={showTempGraph}
+      activeGraph={activeGraph}
       experimentStatus={experimentStatus}
       lineChartData={lineChartData}
       experimentGraphTargetsList={experimentGraphTargetsList}
@@ -111,7 +111,6 @@ const ExperimentGraphContainer = (props) => {
 
 ExperimentGraphContainer.propTypes = {
   experimentStatus: PropTypes.string,
-  showTempGraph: PropTypes.bool,
 };
 
 export { ExperimentGraphContainer };

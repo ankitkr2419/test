@@ -50,6 +50,7 @@ import { calibrationSaga } from "./calibrationSaga";
 import { reportSaga } from "./reportSaga";
 import { wellGraphSaga } from "./wellGraphSaga";
 import { temperatureGraphSaga } from "./tempatureGraphSaga";
+import { analyseDataGraphSaga } from "./analyseDataGraphSaga";
 
 const allSagas = [
   createTemplateSaga(),
@@ -92,6 +93,7 @@ const allSagas = [
   reportSaga(),
   wellGraphSaga(),
   temperatureGraphSaga(),
+  analyseDataGraphSaga(),
 ];
 
 export default function* rootSaga() {
