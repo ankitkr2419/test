@@ -13,7 +13,7 @@ import {
 
 export function* fetchAnalyseDataWithThresholdData(actions) {
   const {
-    payload: { token, experimentId, thresholdDataForApi },
+    payload: { token, experimentId, target_id, auto_threshold, threshold },
   } = actions;
   const { successAction, failureAction } = fetchAnalyseDataWithThresholdActions;
 
@@ -22,7 +22,9 @@ export function* fetchAnalyseDataWithThresholdData(actions) {
       payload: {
         method: HTTP_METHODS.POST,
         body: {
-          ...thresholdDataForApi,
+          target_id,
+          auto_threshold,
+          threshold,
         },
         reqPath: `${API_ENDPOINTS.setThreshold}/${experimentId}`,
         successAction: successAction,
@@ -41,7 +43,7 @@ export function* fetchAnalyseDataWithThresholdData(actions) {
 
 export function* fetchAnalyseDataWithBaselineData(actions) {
   const {
-    payload: { token, experimentId, baselineDataForApi },
+    payload: { token, experimentId, auto_baseline, start_cycle, end_cycle },
   } = actions;
   const { successAction, failureAction } = fetchAnalyseDataWithBaselineActions;
 
@@ -50,7 +52,9 @@ export function* fetchAnalyseDataWithBaselineData(actions) {
       payload: {
         method: HTTP_METHODS.POST,
         body: {
-          ...baselineDataForApi,
+          auto_baseline,
+          start_cycle,
+          end_cycle,
         },
         reqPath: `${API_ENDPOINTS.getBaseline}/${experimentId}`,
         successAction: successAction,

@@ -17,6 +17,7 @@ import {
   lineConfigThreshold,
 } from "components/AnalyseDataGraph/helper";
 import { getExperimentId } from "selectors/experimentSelector";
+import { GRAY_COLOR, PINK_COLOR } from "appConstants";
 
 const AnalyseDataGraphContainer = (props) => {
   const { isInsidePreviewModal } = props;
@@ -70,23 +71,23 @@ const AnalyseDataGraphContainer = (props) => {
 
   //fetch analyseDataGraph data
   useEffect(() => {
-    let thresholdDataForApi = {
-      target_id: selectedTarget?.value,
-      auto_threshold: isAutoThreshold,
-      threshold: threshold,
-    };
     dispatch(
-      fetchAnalyseDataThreshold({ token, experimentId, thresholdDataForApi })
+      fetchAnalyseDataThreshold({
+        token,
+        experimentId,
+        target_id: selectedTarget?.value,
+        auto_threshold: isAutoThreshold,
+        threshold: threshold,
+      })
     );
-
-    let baselineDataForApi = {
-      auto_baseline: isAutoBaseline,
-      start_cycle: startCycle,
-      end_cycle: endCycle,
-    };
-
     dispatch(
-      fetchAnalyseDataBaseline({ token, experimentId, baselineDataForApi })
+      fetchAnalyseDataBaseline({
+        token,
+        experimentId,
+        auto_baseline: isAutoBaseline,
+        start_cycle: startCycle,
+        end_cycle: endCycle,
+      })
     );
   }, [dispatch, threshold, startCycle, endCycle]);
 
@@ -132,7 +133,7 @@ const AnalyseDataGraphContainer = (props) => {
     xAxisLabels = baselineData[0].cycle;
 
     //y axis data
-    let borderColor = "rgba(148,147,147,1)"; // default line color
+    let borderColor = GRAY_COLOR; // default line color
 
     //filter by target id
     let baselineDataForSelectedTarget = baselineData.filter(
@@ -154,7 +155,7 @@ const AnalyseDataGraphContainer = (props) => {
     if (chartData.length > 0) {
       let thresholdValue = getThresholdValue();
       let apiObject = baselineDataForSelectedTarget[0];
-      let thresholdBorderColor = `rgba(245,144,178,1)`; //TODO check if it is required to be dynamic
+      let thresholdBorderColor = PINK_COLOR;
 
       let thresholdData = {
         ...lineConfigThreshold,

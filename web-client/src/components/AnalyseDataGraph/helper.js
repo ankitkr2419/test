@@ -3,13 +3,11 @@
  * to use in dropdown of analyse data filter
  */
 export const generateTargetOptions = (targetList) => {
-  return targetList?.map((target) => {
-    return {
-      label: target.target_name,
-      value: target.target_id,
-      threshold: target.threshold,
-    };
-  });
+  return targetList?.map((target) => ({
+    label: target.target_name,
+    value: target.target_id,
+    threshold: target.threshold,
+  }));
 };
 
 export const lineConfigs = {
