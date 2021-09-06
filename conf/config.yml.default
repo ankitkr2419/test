@@ -17,8 +17,6 @@ room_temp: 27.00
 cycle_time: 15
 # pid temp 
 pid_temp: 71
-# pid time
-pid_time: 30
 # pid_lid_temp: 70
 pid_lid_temp: 70
 # cycle range for baseline

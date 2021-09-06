@@ -49,6 +49,8 @@ var REGISTERS_EXTRACTION map[string]map[string]map[uint16]uint16 = map[string]ma
 			plc.MODBUS_EXTRACTION[plc.DeckA]["D"][222]: uint16(0),             // Shaker heater selection (Note 3) (W)
 			plc.MODBUS_EXTRACTION[plc.DeckA]["D"][224]: uint16(roomTemp * 10), // Shaker temperature present value RH (R)
 			plc.MODBUS_EXTRACTION[plc.DeckA]["D"][226]: uint16(0),             // Motor Number (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["D"][504]: uint16(0),             // PID Tuning Completed LH (R) (4 = DONE)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["D"][534]: uint16(0),             // PID Tuning Completed RH (R) (4 = DONE)
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[uint16]uint16{
@@ -81,6 +83,8 @@ var REGISTERS_EXTRACTION map[string]map[string]map[uint16]uint16 = map[string]ma
 			plc.MODBUS_EXTRACTION[plc.DeckB]["D"][222]: uint16(0),             // Shaker heater selection (Note 3) (W)
 			plc.MODBUS_EXTRACTION[plc.DeckB]["D"][224]: uint16(roomTemp * 10), // Shaker temperature present value RH (R)
 			plc.MODBUS_EXTRACTION[plc.DeckB]["D"][226]: uint16(0),             // Motor Number (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["D"][504]: uint16(0),             // PID Tuning Completed LH (R) (4 = DONE)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["D"][534]: uint16(0),             // PID Tuning Completed RH (R) (4 = DONE)
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[uint16]uint16{

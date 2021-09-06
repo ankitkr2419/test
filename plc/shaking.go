@@ -28,6 +28,15 @@ const secondsInMinutes = 60
 */
 func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err error) {
 
+	defer func() {
+		if err != nil {
+			logger.Errorln(err)
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+			return
+		}
+		d.WsMsgCh <- "SUCCESS_ShakerRun_ShakerRunSuccess"
+	}()
+
 	var motorNum = K8_Shaker
 	var results []byte
 
@@ -102,6 +111,8 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
 		}
 	}
+
+	d.WsMsgCh <- "PROGRESS_ShakerRun_ShakerRunStarted"
 
 	// 5. WithTemp handle
 	// 6. Handle Follow Temp

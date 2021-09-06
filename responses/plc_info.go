@@ -3,6 +3,8 @@ package responses
 var (
 	PIDCalibrationSuccess       = "pid calibration was successful"
 	PIDCalibrationStarted       = "pid calibration started"
+	ShakerPIDCalibrationStarted = "pid calibration started for shaker"
+	ShakerPIDCalibrationSuccess = "pid calibration was successful for shaker"
 	PIDCalibrationHeaterStarted = "heater started for pid calibration"
 	ShakingSuccess              = "shaking started success"
 	HeatingSuccess              = "heating started success"

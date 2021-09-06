@@ -149,6 +149,8 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
 			226: uint16(0x10E2), // Motor Number (W)
+			504: uint16(0x11F8), // PID Tuning Completed LH (R) (4 = DONE)
+			534: uint16(0x1216), // PID Tuning Completed RH (R) (4 = DONE)
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[int]uint16{
@@ -181,6 +183,8 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
 			226: uint16(0x10E2), // Motor Number (W)
+			504: uint16(0x11F8), // PID Tuning Completed LH (R) (4 = DONE)
+			534: uint16(0x1216), // PID Tuning Completed RH (R) (4 = DONE)
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[int]uint16{
