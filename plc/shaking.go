@@ -17,14 +17,15 @@ const secondsInMinutes = 60
 2. Switch off the shaker bit first and reset the completion bit to avoid any inconsistency.
 3. Set the shaker, here in this case it is both the shaker.
 4. Set the rpm 1 value.
-5. If withTemp is true then operate with temp according to follow up or not follow up.
-6. If follow up then wait for the temperature to reach that certain value and then start shaking.
-7. Else if not follow up then just start the heater and then start the shaker.
-8. If withTemp is false then proceed with the normal flow by starting the shaker.
-9. Let the shaker run at the specified rpm1 till the time1 duration is completed.
-10. After this run the shaker with rpm 2 till the time1 duration is completed if rpm 2
+5. Start the shaker
+6. If withTemp is true then operate with temp according to follow up or not follow up.
+7. If follow up then wait for the temperature to reach that certain value and then start shaking.
+8. Else if not follow up then just start the heater and then start the shaker.
+9. If withTemp is false then proceed with the normal flow by starting the shaker.
+10. Let the shaker run at the specified rpm1 till the time1 duration is completed.
+11. After this run the shaker with rpm 2 till the time1 duration is completed if rpm 2
 	is specified.
-11. After all this process is done switch the shaker and the heater off(Called in defer)
+12. After all this process is done switch the shaker and the heater off(Called in defer)
 */
 func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err error) {
 
@@ -111,11 +112,25 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 			return "", fmt.Errorf("There was issue moving syringe module before moving the deck. Error: %v", err)
 		}
 	}
+	//start shaker
+	// 5. Let the shaker run at the specified rpm1 till the time1 duration is completed.
+	response, err = d.switchOnShaker()
+	if err != nil {
+		logger.Errorln("err in switching on shaker---> error: ", err)
+		return "", err
+	}
+	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "started")
+
+	d.setShakerInProgress()
+	defer d.resetShakerInProgress()
 
 	d.WsMsgCh <- "PROGRESS_ShakerRun_ShakerRunStarted"
+	// Step 6:  Switch Off Heater & Shaker (Call in defer)
+	defer d.switchOffHeater()
+	defer d.switchOffShaker()
 
-	// 5. WithTemp handle
-	// 6. Handle Follow Temp
+	// 7. WithTemp handle
+	// 8. Handle Follow Temp
 	if shakerData.WithTemp {
 
 		ht := db.Heating{
@@ -132,29 +147,13 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 		d.setHeaterInProgress()
 	}
 
-	// Step 11:  Switch Off Heater & Shaker (Call in defer)
-	defer d.switchOffHeater()
-	defer d.switchOffShaker()
-
-	// 7. Else if not follow up then just start the heater and then start the shaker.
-	// 8. If withTemp is false then proceed with the normal flow by starting the shaker.
+	// 9. Else if not follow up then just start the heater and then start the shaker.
+	// 10. If withTemp is false then proceed with the normal flow by starting the shaker.
 	//check if aborted
 	if d.isMachineInAbortedState() {
 		err = fmt.Errorf("Operation was ABORTED!")
 		return "", err
 	}
-
-	//start shaker
-	// 9. Let the shaker run at the specified rpm1 till the time1 duration is completed.
-	response, err = d.switchOnShaker()
-	if err != nil {
-		logger.Errorln("err in switching on shaker---> error: ", err)
-		return "", err
-	}
-	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "started")
-
-	d.setShakerInProgress()
-	defer d.resetShakerInProgress()
 
 	// add delay of time1 duration
 	delay := db.Delay{
@@ -168,7 +167,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker) (response string, err erro
 
 	logger.Infoln("shaking with rpm 1", shakerData.RPM1, "completed")
 
-	// 10. After this run the shaker with rpm 2 till the time1 duration is
+	// 11. After this run the shaker with rpm 2 till the time1 duration is
 	// completed if rpm 2 is specified.
 	//set shaker value with rpm 2 if it exists
 	if shakerData.RPM2 != 0 {
