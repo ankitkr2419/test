@@ -63,7 +63,7 @@ const ToleranceComponent = (props) => {
         >
           Tolerance Configuration
         </Text>
-        {toleranceData && toleranceData.length > 0 ? (
+        {tolerance?.length > 0 ? (
           toleranceData.map((dyeObj, index) => (
             <Row className="my-3">
               <Col className="">

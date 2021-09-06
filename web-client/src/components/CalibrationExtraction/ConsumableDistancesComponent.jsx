@@ -27,6 +27,7 @@ const ConsumableDistancesComponent = (props) => {
   };
 
   const handleAddBtn = () => {
+    formik.resetForm();
     setShowModal(true);
     setIsUpdate(false);
   };
