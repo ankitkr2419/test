@@ -137,4 +137,5 @@ type Storer interface {
 	UpsertDyeWellTolerance(ctx context.Context, dwTolerance []DyeWellTolerance) (err error)
 	ShowDye(ctx context.Context, dyeID uuid.UUID) (DBdye Dye, err error)
 	DeleteUser(ctx context.Context, username string) (err error)
+	ListDyes(ctx context.Context) (DBdye []Dye, err error)
 }

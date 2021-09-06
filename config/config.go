@@ -84,4 +84,7 @@ func LoadAllConfs() {
 
 	// config file to configure cartridge wells
 	Load("cartridge_wells_config")
+
+	// config file to configure dyes
+	Load("dyes")
 }
