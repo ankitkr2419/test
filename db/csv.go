@@ -858,6 +858,7 @@ func createPiercingProcess(record []string, store Storer) (err error) {
 	}
 
 	wells := strings.Split(record[1], ",")
+	heights := strings.Split(record[2], ",")
 
 	for _, well := range wells {
 		if wellInteger, err := strconv.ParseInt(well, 10, 64); err != nil {
@@ -868,7 +869,17 @@ func createPiercingProcess(record []string, store Storer) (err error) {
 		}
 	}
 
+	for _, height := range heights {
+		if heightInteger, err := strconv.ParseInt(height, 10, 64); err != nil {
+			logger.Errorln(err, height)
+			return err
+		} else {
+			p.Heights = append(p.Heights, heightInteger)
+		}
+	}
+
 	logger.Debugln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
+	logger.Debugln("After Trimming heights-> ", record[1], ".After splitting->", heights, ".Integer heights-> ", p.Heights)
 
 	createdProcess, err := store.CreatePiercing(csvCtx, p, createdRecipe.ID)
 	if err != nil {

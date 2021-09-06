@@ -105,7 +105,7 @@ func (d *Compact32Deck) sendWSData(time1 time.Time, timeElapsed *int64, delayTim
 func (d *Compact32Deck) sendHeaterData() (err error) {
 	hData := HeaterData{
 		Deck:     d.name,
-		HeaterOn: d.isHeaterInProgress(),
+		HeaterOn: d.IsHeaterInProgress(),
 	}
 
 	var wsData []byte

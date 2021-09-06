@@ -131,21 +131,24 @@ type Extraction interface {
 	UVLight(uvTime string) (response string, err error)
 	AddDelay(delay db.Delay, runRecipe bool) (response string, err error)
 	DiscardTipAndHome(discard bool) (response string, err error)
-	Heating(ht db.Heating) (response string, err error)
+	Heating(ht db.Heating, live bool) (response string, err error)
 	Homing() (response string, err error)
 	ManualMovement(motorNum, direction uint16, distance float32) (response string, err error)
 	Resume() (response string, err error)
 	Pause() (response string, err error)
 	Abort() (response string, err error)
 	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
-	Shaking(shakerData db.Shaker) (response string, err error)
+	Shaking(shakerData db.Shaker, live bool) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 	SetRunInProgress()
 	SetPaused()
 	ResetPaused()
+	ResetAborted()
 	ResetRunInProgress()
 	IsMachineHomed() bool
 	IsRunInProgress() bool
+	IsHeaterInProgress() bool
+	IsShakerInProgress() bool
 	TipOperation(to db.TipOperation) (response string, err error)
 	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
 	SetCurrentProcessNumber(step int64)
