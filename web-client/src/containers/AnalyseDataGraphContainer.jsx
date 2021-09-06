@@ -14,6 +14,7 @@ import {
   lineConfigThreshold,
 } from "components/AnalyseDataGraph/helper";
 import { getExperimentId } from "selectors/experimentSelector";
+import { GRAY_COLOR, PINK_COLOR } from "appConstants";
 
 const AnalyseDataGraphContainer = (props) => {
   const dispatch = useDispatch();
@@ -54,23 +55,23 @@ const AnalyseDataGraphContainer = (props) => {
 
   //fetch analyseDataGraph data
   useEffect(() => {
-    let thresholdDataForApi = {
-      target_id: selectedTarget?.value,
-      auto_threshold: isAutoThreshold,
-      threshold: 1.8, //TODO make it dynamic with filters
-    };
     dispatch(
-      fetchAnalyseDataThreshold({ token, experimentId, thresholdDataForApi })
+      fetchAnalyseDataThreshold({
+        token,
+        experimentId,
+        target_id: selectedTarget?.value,
+        auto_threshold: isAutoThreshold,
+        threshold: 1.8 /*TODO make it dynamic with filters*/,
+      })
     );
-
-    let baselineDataForApi = {
-      auto_baseline: isAutoBaseline,
-      start_cycle: 1, //TODO make it dynamic with filters
-      end_cycle: 5, //TODO make it dynamic with filters
-    };
-
     dispatch(
-      fetchAnalyseDataBaseline({ token, experimentId, baselineDataForApi })
+      fetchAnalyseDataBaseline({
+        token,
+        experimentId,
+        auto_baseline: isAutoBaseline,
+        start_cycle: 1 /*TODO make it dynamic with filters*/,
+        end_cycle: 5 /*TODO make it dynamic with filters*/,
+      })
     );
   }, [dispatch]);
 
@@ -84,7 +85,7 @@ const AnalyseDataGraphContainer = (props) => {
     xAxisLabels = baselineData[0].cycle;
 
     //y axis data
-    let borderColor = "rgba(148,147,147,1)"; // default line color
+    let borderColor = GRAY_COLOR; // default line color
 
     //filter by target id
     let baselineDataForSelectedTarget = baselineData.filter(
@@ -107,7 +108,7 @@ const AnalyseDataGraphContainer = (props) => {
       let autoThresholdOfSelectedTarget = selectedTarget?.threshold;
       let thresholdValue = autoThresholdOfSelectedTarget; //TODO get actual threshold value once backend api is ready
       let apiObject = baselineDataForSelectedTarget[0];
-      let thresholdBorderColor = `rgba(245,144,178,1)`; //TODO check if it is required to be dynamic
+      let thresholdBorderColor = PINK_COLOR;
 
       let thresholdData = {
         ...lineConfigThreshold,

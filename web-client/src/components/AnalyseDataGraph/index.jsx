@@ -8,7 +8,7 @@ import Filters from "./Filters";
 const AnalyseDataGraphComponent = (props) => {
   let { data, targetOptions, selectedTarget, onTargetChanged } = props;
   return (
-    <div>
+    <>
       <GraphCard>
         <LineChart data={data} options={options} />
       </GraphCard>
@@ -17,7 +17,7 @@ const AnalyseDataGraphComponent = (props) => {
         selectedTarget={selectedTarget}
         onTargetChanged={onTargetChanged}
       />
-    </div>
+    </>
   );
 };
 

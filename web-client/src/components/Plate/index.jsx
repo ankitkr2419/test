@@ -234,6 +234,16 @@ const Plate = (props) => {
     }
   };
 
+  const makeAmplificationGraphActive = () => {
+    onChangeActiveGraph(graphs.Amplification);
+  };
+  const makeTemperatureGraphActive = () => {
+    onChangeActiveGraph(graphs.Temperature);
+  };
+  const makeAnalyseDataGraphActive = () => {
+    onChangeActiveGraph(graphs.AnalyseData);
+  };
+
   const togglePreviewReportModal = () => {
     setPreviewReportModal(!previewReportModal);
   };
@@ -379,7 +389,7 @@ const Plate = (props) => {
                         : "secondary"
                     }
                     className="mr-3 Amplification"
-                    onClick={() => onChangeActiveGraph(graphs.Amplification)}
+                    onClick={makeAmplificationGraphActive}
                   >
                     Amplification
                   </Button>
@@ -391,7 +401,7 @@ const Plate = (props) => {
                         : "secondary"
                     }
                     className="mr-3 Temperature"
-                    onClick={() => onChangeActiveGraph(graphs.Temperature)}
+                    onClick={makeTemperatureGraphActive}
                   >
                     Temperature
                   </Button>
@@ -406,7 +416,7 @@ const Plate = (props) => {
                           : "secondary"
                       }
                       className="mr-3 AnalyseData"
-                      onClick={() => onChangeActiveGraph(graphs.AnalyseData)}
+                      onClick={makeAnalyseDataGraphActive}
                     >
                       Analyse Data
                     </Button>
