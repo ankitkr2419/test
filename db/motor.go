@@ -36,14 +36,14 @@ const (
 )
 
 type Motor struct {
-	ID        int       `db:"id" json:"id"`
+	ID        int       `db:"id" json:"id" validate:"lte=20,gte=0"`
 	Deck      string    `db:"deck" json:"deck"`
-	Number    int       `db:"number" json:"number"`
+	Number    int       `db:"number" json:"number" validate:"lte=10,gte=1"`
 	Name      string    `db:"name" json:"name"`
-	Ramp      int       `db:"ramp" json:"ramp"`
-	Steps     int       `db:"steps" json:"steps"`
-	Slow      int       `db:"slow" json:"slow"`
-	Fast      int       `db:"fast" json:"fast"`
+	Ramp      int       `db:"ramp" json:"ramp" validate:"lte=3000,gte=1"`
+	Steps     int       `db:"steps" json:"steps" validate:"lte=3000,gte=1"`
+	Slow      int       `db:"slow" json:"slow" validate:"lte=9000,gte=100"`
+	Fast      int       `db:"fast" json:"fast" validate:"lte=16000,gte=100"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }

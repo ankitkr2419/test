@@ -72,3 +72,11 @@ TipsTubes:
     volume: 200
     height: 58.3
     ttBase: 5.8
+
+  - id : 10
+    name : 'automation_tip_piercing_v1_4'
+    type: 'tip'
+    allowedPositions: [4,5]
+    volume: 0.00
+    height: 38
+    ttBase: 7.9

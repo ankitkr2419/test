@@ -87,7 +87,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					errortype = "ErrorPCRDead"
 					msg = "Unable to connect to Hardware"
 
-				} else if err.Error() == "PID Error" {
+				} else if err.Error() == plc.ErrorLidPIDTuning {
 					errortype = "ErrorPIDTuning"
 					msg = "Unable to do PID Tuning"
 
