@@ -21,6 +21,8 @@ import {
   createCartridgesInitiated,
   deleteCartridgesInitiated,
   fetchConsumableInitiated,
+  updateConsumableInitiated,
+  addConsumableInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
@@ -113,6 +115,20 @@ const CalibrationExtractionContainer = () => {
     commonDetailsReducerData.error,
     commonDetailsReducerData.isLoading,
     isUpdateApi,
+  ]);
+
+  useEffect(() => {
+    if (
+      consumableReducerData.error === false &&
+      consumableReducerData.isLoading === false &&
+      consumableReducerData.isUpdateApi === true
+    )
+      // fetch updated data after updation
+      dispatch(fetchConsumableInitiated(token));
+  }, [
+    consumableReducerData.error,
+    consumableReducerData.isLoading,
+    consumableReducerData.isUpdateApi,
   ]);
 
   useEffect(() => {
@@ -270,11 +286,13 @@ const CalibrationExtractionContainer = () => {
     formik.setFieldValue(key, value);
   };
 
-  const handleConsumableAddBtn = () => {
-    console.log("Add");
+  const addNewConsumableDistance = (requestBody, isUpdate) => {
+    if (isUpdate) {
+      dispatch(updateConsumableInitiated({ token, requestBody }));
+    } else {
+      dispatch(addConsumableInitiated({ token, requestBody }));
+    }
   };
-
-  console.log("consumableReducerData: ", consumableReducerData.data);
 
   return (
     <CalibrationExtractionComponent
@@ -295,7 +313,7 @@ const CalibrationExtractionContainer = () => {
       formik={formik}
       isAdmin={isAdmin}
       handleTipesTubesButton={handleTipesTubesButton}
-      handleAddBtn={handleConsumableAddBtn}
+      addNewConsumableDistance={addNewConsumableDistance}
       consumableDistanceData={consumableReducerData.data || null}
     />
   );

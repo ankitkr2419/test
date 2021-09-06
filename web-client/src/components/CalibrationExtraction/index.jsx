@@ -41,7 +41,7 @@ const CalibrationExtractionComponent = (props) => {
     formik,
     isAdmin,
     handleTipesTubesButton,
-    handleAddBtn,
+    addNewConsumableDistance,
     consumableDistanceData,
   } = props;
 
@@ -160,7 +160,7 @@ const CalibrationExtractionComponent = (props) => {
 
           {/* Consumable Distances Vars */}
           <ConsumableDistancesComponent
-            handleAddBtn={handleAddBtn}
+            addNewConsumableDistance={addNewConsumableDistance}
             consumableDistanceData={consumableDistanceData}
           />
         </CardBody>

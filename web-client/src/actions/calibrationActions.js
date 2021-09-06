@@ -181,8 +181,8 @@ export const updateConsumableActions = {
 };
 
 export const addConsumableActions = {
-  initiateAction: "UPDATE_CONSUMABLE_INITIATED",
-  successAction: "UPDATE_CONSUMABLE_SUCCESS",
-  failureAction: "UPDATE_CONSUMABLE_FAILURE",
-  resetAction: "UPDATE_CONSUMABLE_RESET",
+  initiateAction: "ADD_NEW_CONSUMABLE_INITIATED",
+  successAction: "ADD_NEW_CONSUMABLE_SUCCESS",
+  failureAction: "ADD_NEW_CONSUMABLE_FAILURE",
+  resetAction: "ADD_NEW_CONSUMABLE_RESET",
 };

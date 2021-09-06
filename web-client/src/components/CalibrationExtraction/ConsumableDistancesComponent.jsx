@@ -1,12 +1,22 @@
 import React, { useState } from "react";
-import { ButtonIcon, Icon, MlModal } from "shared-components";
+import { useFormik } from "formik";
+
+import { ButtonIcon, Icon } from "shared-components";
 import { Table, Button, Card, CardBody } from "core-components";
+import EditConsumableModal from "./EditConsumableModal";
+import { consumableFormikInitialState } from "./helpers";
 
 const ConsumableDistancesComponent = (props) => {
-  const { consumableDistanceData } = props;
+  const { addNewConsumableDistance, consumableDistanceData } = props;
+
+  const formik = useFormik({
+    initialValues: consumableFormikInitialState,
+    enableReinitialize: true,
+  });
 
   const [selectedId, setSelectedId] = useState(null);
   const [showEditModal, setShowModal] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
 
   const handleSelect = (id) => {
     if (id === selectedId) {
@@ -16,10 +26,49 @@ const ConsumableDistancesComponent = (props) => {
     setSelectedId(id);
   };
 
-  const handleAddBtn = () => {};
+  const handleAddBtn = () => {
+    setShowModal(true);
+    setIsUpdate(false);
+  };
+
+  const handleEditBtn = ({ id, name, description, distance }) => {
+    formik.setFieldValue(`id.value`, id);
+    formik.setFieldValue(`name.value`, name);
+    formik.setFieldValue(`description.value`, description);
+    formik.setFieldValue(`distance.value`, distance);
+
+    setShowModal(true);
+    setIsUpdate(true);
+  };
+
+  const handleModalBtn = (data) => {
+    const { id, name, description, distance } = data;
+
+    const requestBody = {
+      id: parseInt(id.value),
+      name: name.value,
+      description: description.value,
+      distance: parseFloat(distance.value),
+    };
+    addNewConsumableDistance(requestBody, isUpdate);
+    setShowModal(false);
+  };
+
+  const handleCrossBtn = () => {
+    setShowModal(false);
+  };
 
   return (
     <>
+      {showEditModal && (
+        <EditConsumableModal
+          isUpdate={isUpdate}
+          isOpen={showEditModal}
+          handleModalBtn={handleModalBtn}
+          handleCrossBtn={handleCrossBtn}
+          formik={formik}
+        />
+      )}
       <Card>
         <CardBody>
           <div className="table-consumable-wrapper -hold">
@@ -70,7 +119,7 @@ const ConsumableDistancesComponent = (props) => {
                           size={16}
                           name="pencil"
                           onClick={() => {
-                            // editStep(step.toJS());
+                            handleEditBtn({ id, name, description, distance });
                           }}
                         />
                         {/* <ButtonIcon

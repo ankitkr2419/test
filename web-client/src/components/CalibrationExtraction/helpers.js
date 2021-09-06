@@ -538,3 +538,56 @@ export const getRequestBody = (state) => {
 
   return requestBody;
 };
+
+// consumable formik initial state
+export const consumableFormikInitialState = {
+  id: { value: null, isInvalid: false },
+  name: { value: null, isInvalid: false },
+  description: { value: null, isInvalid: false },
+  distance: { value: null, isInvalid: false },
+};
+
+export const checkConsumableFieldIsInvalid = (name, value) => {
+  switch (name) {
+    case "id":
+      if (value === "" || !Number.isInteger(parseFloat(value))) {
+        return true;
+      }
+      return false;
+    case "name":
+      if (value === "") {
+        return true;
+      }
+      return false;
+    case "description":
+      if (value === "") {
+        return true;
+      }
+      return false;
+    case "distance":
+      if (value === "" || Number.isNaN(parseFloat(value))) {
+        return true;
+      }
+      return false;
+    default:
+      break;
+  }
+};
+
+export const isConsumableModalBtnDisabled = (state) => {
+  const { id, name, description, distance } = state;
+
+  if (
+    id.isInvalid ||
+    name.isInvalid ||
+    description.isInvalid ||
+    distance.isInvalid ||
+    !id.value ||
+    !name.value ||
+    !description.value ||
+    !distance.value
+  ) {
+    return true;
+  }
+  return false;
+};
