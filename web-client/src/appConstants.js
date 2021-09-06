@@ -151,6 +151,8 @@ export const API_ENDPOINTS = {
   emission: "emission",
   experiments: "experiments",
   temperature: "temperature",
+  setThreshold: "set-threshold",
+  getBaseline: "get-baseline",
 };
 
 export const MODAL_MESSAGE = {
@@ -529,3 +531,7 @@ export const TEMPERATURE_GRAPH_OPTIONS = {
     ],
   },
 };
+
+//analyse data graph constants
+export const GRAY_COLOR = "rgba(148,147,147,1)";
+export const PINK_COLOR = "rgba(245,144,178,1)";

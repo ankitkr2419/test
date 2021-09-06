@@ -8,6 +8,7 @@ import { Text, ButtonIcon } from "shared-components";
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import Header from "components/Plate/Header";
 import { saveReportInitiated } from "action-creators/reportActionCreators";
+import { graphs } from "components/Plate/plateConstant";
 import { createFormDataFromBlob } from "./helper";
 
 const PreviewReportModal = (props) => {
@@ -138,7 +139,7 @@ const PreviewReportModal = (props) => {
         {/** temp graph */}
         <Text className="font-weight-bold text-center mb-4">Temperature</Text>
         <ExperimentGraphContainer
-          showTempGraph
+          activeGraph={graphs.Temperature}
           isInsidePreviewModal
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
@@ -156,8 +157,8 @@ const PreviewReportModal = (props) => {
         {/** amplification graph */}
         <Text className="font-weight-bold text-center mb-4">Amplification</Text>
         <ExperimentGraphContainer
-          showTempGraph={false}
-          isInsidePreviewModal={true}
+          activeGraph={graphs.Amplification}
+          isInsidePreviewModal
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
