@@ -2,10 +2,10 @@ package plc
 
 import (
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
-	"sort"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 /****ALGORITHM******
@@ -23,8 +23,6 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	var position, cartridgeStart, piercingHeight, distanceToTravel, deckBase, pickUpTip float64
 	var ok bool
 	var direction, pulses, piercingPulses, afterPiercingRestPulses uint16
-	// []int has direct method to get slice sorted
-	var wellsToBePierced []int
 	deckAndMotor.Deck = d.name
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	uniqueCartridge := UniqueCartridge{
@@ -72,14 +70,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	// after piercing is completed we need to get the tip to its resting positon
 	afterPiercingRestPulses = piercingPulses
 
-	for _, well := range pi.CartridgeWells {
-		wellsToBePierced = append(wellsToBePierced, int(well))
-	}
-
-	// sort wells in Ascending Order
-	sort.Ints(wellsToBePierced)
-
-	for i, wellNumber := range wellsToBePierced {
+	for i, wellNumber := range pi.CartridgeWells {
 		//
 		// 2.1 Move deck to the well position
 		//
@@ -108,6 +99,9 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		logger.Infoln("Completed Move Deck to reach the wellNum ", wellNumber)
 
 		// 2.2 Pierce and come back up
+
+		// Go Down by cartridge height + Base
+		// Come Up by Cartridge height + Base
 
 		// WE know concrete direction here, its DOWN
 		deckAndMotor.Number = K9_Syringe_Module_LHRH
@@ -140,7 +134,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		}
 
 		// if its last well then go to resting position up
-		if i == len(wellsToBePierced)-1 {
+		if i == len(pi.CartridgeWells)-1 {
 			piercingPulses = afterPiercingRestPulses
 		}
 		// WE know concrete direction here, its UP
