@@ -24,7 +24,7 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 		return "", err
 	}
 
-	d.resetAborted()
+	d.ResetAborted()
 
 	if discard {
 		response, err = d.tipDiscard()

@@ -65,19 +65,19 @@ type TipsTubesConfig struct {
 
 type CartridgesConfig struct {
 	Cartridges []struct {
-		ID          int64
-		Type        CartridgeType
-		Description string
+		ID          int64         `yaml:"id"`
+		Type        CartridgeType `yaml:"type"`
+		Description string        `yaml:"description"`
 	}
 }
 
 type CartridgeWellsConfig struct {
 	CartridgeWells []struct {
-		ID       int64
-		WellNum  int64
-		Distance float64
-		Height   float64
-		Volume   float64
+		ID       int64   `yaml:"id"`
+		WellNum  int64   `yaml:"wellNum"`
+		Distance float64 `yaml:"distance"`
+		Height   float64 `yaml:"height"`
+		Volume   float64 `yaml:"volume"`
 	}
 }
 
@@ -362,18 +362,18 @@ func SetCartridgeValues(c CartridgeWell) (err error) {
 	}
 	carConf := CartridgesConfig{}
 	carConf.Cartridges = make([]struct {
-		ID          int64
-		Type        CartridgeType
-		Description string
+		ID          int64         `yaml:"id"`
+		Type        CartridgeType `yaml:"type"`
+		Description string        `yaml:"description"`
 	}, len(c.Cartridge))
 
 	carWellConf := CartridgeWellsConfig{}
 	carWellConf.CartridgeWells = make([]struct {
-		ID       int64
-		WellNum  int64
-		Distance float64
-		Height   float64
-		Volume   float64
+		ID       int64   `yaml:"id"`
+		WellNum  int64   `yaml:"wellNum"`
+		Distance float64 `yaml:"distance"`
+		Height   float64 `yaml:"height"`
+		Volume   float64 `yaml:"volume"`
 	}, len(c.CartridgeWells))
 
 	for i, v := range c.Cartridge {
