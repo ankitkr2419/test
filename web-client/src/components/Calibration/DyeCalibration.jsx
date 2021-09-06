@@ -16,8 +16,37 @@ import {
 import { Center, Text } from "shared-components";
 
 const DyeCalibration = (props) => {
-  let { handleDyeCalibrationButton } = props;
-  {/**TODO api integration: work in progress */}
+  let { dyeOptions, formikDyeCalibration, handleDyeCalibrationButton } = props;
+  let { selectedDye, kitID } = formikDyeCalibration.values;
+
+  const handleBlurKitID = (value) => {
+    if (!value || value < kitID.min) {
+      formikDyeCalibration.setFieldValue("kitID.isInvalid", true);
+    }
+  };
+  const handleOnChange = (key, value) => {
+    formikDyeCalibration.setFieldValue(key, value);
+  };
+
+  const handleSubmit = () => {
+    if (selectedDye.isInvalid === false && kitID.isInvalid === false) {
+      let selectedDyeID = selectedDye.value.value;
+      let selectedKitID = kitID.value;
+
+      let requestBody = {
+        dye_id: selectedDyeID,
+        kit_id: selectedKitID,
+      };
+      handleDyeCalibrationButton(requestBody);
+    }
+  };
+
+  let isDyeCalibrationDisabled =
+    selectedDye.value === null ||
+    kitID.value === null ||
+    selectedDye.isInvalid ||
+    kitID.isInvalid;
+
   return (
     <Card default className="my-3">
       <CardBody>
@@ -29,7 +58,7 @@ const DyeCalibration = (props) => {
           Dye Calibration
         </Text>
 
-        <Form onSubmit={handleDyeCalibrationButton}>
+        <Form onSubmit={handleSubmit}>
           <Row form>
             <Col sm={4}>
               <FormGroup>
@@ -39,11 +68,11 @@ const DyeCalibration = (props) => {
                 <div>
                   <Select
                     placeholder="Select Type"
-                    options={[{ label: "one", value: "one" }]}
-                    value={{ label: "one", value: "one" }}
-                    // onChange={(value) =>
-                    //   handleOnChange("tipTubeType.value", value)
-                    // }
+                    options={dyeOptions}
+                    value={selectedDye.value}
+                    onChange={(value) =>
+                      handleOnChange("selectedDye.value", value)
+                    }
                   />
                 </div>
               </FormGroup>
@@ -59,28 +88,20 @@ const DyeCalibration = (props) => {
                   name="kitId"
                   id="kitId"
                   placeholder="Type Kit Id"
-                  value={"1234"}
-                  // onChange={(event) =>
-                  //   handleOnChange(
-                  //     "tipTubeId.value",
-                  //     parseInt(event.target.value)
-                  //   )
-                  // }
-                  // onBlur={(e) => handleBlurID(parseInt(e.target.value))}
-                  // onFocus={() => handleOnChange("tipTubeId.isInvalid", false)}
+                  value={kitID.value}
+                  onChange={(event) =>
+                    handleOnChange("kitID.value", parseInt(event.target.value))
+                  }
+                  onBlur={(e) => handleBlurKitID(parseInt(e.target.value))}
+                  onFocus={() => handleOnChange("kitID.isInvalid", false)}
                 />
-                {/* {tipTubeId.isInvalid && (
-                  <div className="flex-70">
-                    <Text Tag="p" size={14} className="text-danger">
-                      ID should be {MIN_TIPTUBE_ID} - {MAX_TIPTUBE_ID}
-                    </Text>
-                  </div>
-                )} */}
               </FormGroup>
             </Col>
           </Row>
           <Center className="text-center pt-3">
-            <Button /* disabled={}*/ color="primary">Start</Button>
+            <Button disabled={isDyeCalibrationDisabled} color="primary">
+              Start
+            </Button>
           </Center>
         </Form>
       </CardBody>

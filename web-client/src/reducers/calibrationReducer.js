@@ -19,6 +19,7 @@ import {
   startLidPidActions,
   lidPidProgressActions,
   abortLidPidActions,
+  runDyeCalibrationActions,
 } from "actions/calibrationActions";
 import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
 import loginActions from "actions/loginActions";
@@ -633,6 +634,27 @@ export const lidPidReducer = (state = lidPidInitialState, action) => {
 
     case loginActions.loginReset:
       return lidPidInitialState;
+
+    default:
+      return state;
+  }
+};
+
+//run dye calibration reducer
+const dyeCalibrationInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  dyeCalibrationStatus: null,
+});
+
+export const dyeCalibrationReducer = (
+  state = dyeCalibrationInitialState,
+  action
+) => {
+  switch (action.type) {
+    //TODO other actions work in progress
+    case loginActions.loginReset:
+      return dyeCalibrationInitialState;
 
     default:
       return state;

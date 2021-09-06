@@ -24,6 +24,9 @@ const CalibrationComponent = (props) => {
     handleLidPidButton,
     handleResetTEC,
     handleAutoTuneTEC,
+    dyeOptions,
+    formikDyeCalibration,
+    handleDyeCalibrationButton,
   } = props;
 
   const history = useHistory();
@@ -84,7 +87,11 @@ const CalibrationComponent = (props) => {
           />
 
           {/**Calibration of dyes */}
-          <DyeCalibration />
+          <DyeCalibration
+            dyeOptions={dyeOptions}
+            formikDyeCalibration={formikDyeCalibration}
+            handleDyeCalibrationButton={handleDyeCalibrationButton}
+          />
         </CardBody>
       </Card>
     </div>

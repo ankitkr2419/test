@@ -204,6 +204,11 @@ export const formikInitialStateTECVars = {
   },
 };
 
+export const formikInitialStateDyeCalibration = {
+  selectedDye: { value: null, isInvalid: false },
+  kitID: { value: null, min: 0, isInvalid: false },
+};
+
 export const validateAllFields = (state) => {
   for (const key in state) {
     const { name, value, isInvalid } = state[key];

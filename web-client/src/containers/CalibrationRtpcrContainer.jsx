@@ -19,6 +19,7 @@ import {
   formikInitialState,
   formikInitialStateRtpcrVars,
   formikInitialStateTECVars,
+  formikInitialStateDyeCalibration,
 } from "components/Calibration/helper";
 import { deckBlockInitiated } from "action-creators/loginActionCreators";
 import { populateFormikStateFromApi } from "components/FormikFieldsEditor/helper";
@@ -42,6 +43,12 @@ const CalibrationRtpcrContainer = () => {
   //formik state for TEC variables
   const formikTECVars = useFormik({
     initialValues: formikInitialStateTECVars,
+    enableReinitialize: true,
+  });
+
+  //formik state for dye calibration
+  const formikDyeCalibration = useFormik({
+    initialValues: formikInitialStateDyeCalibration,
     enableReinitialize: true,
   });
 
@@ -73,6 +80,12 @@ const CalibrationRtpcrContainer = () => {
   const lidPidReducer = useSelector((state) => state.lidPidReducer);
   const lidPidReducerData = lidPidReducer.toJS();
   const { lidPidStatus } = lidPidReducerData;
+
+  //dye options: TODO make it dynamic
+  let dyeOptions = [
+    { label: "one", value: "one" },
+    { label: "two", value: "two" },
+  ];
 
   //initially populate with previous data
   useEffect(() => {
@@ -185,6 +198,11 @@ const CalibrationRtpcrContainer = () => {
     dispatch(autoTuneTECInitiated(token));
   };
 
+  const handleDyeCalibrationButton = (requestBody) => {
+    //TODO api call
+    console.log("requestBody: ", requestBody);
+  };
+
   /**to change formik field */
   const handleOnChange = (key, value) => {
     formik.setFieldValue(key, value);
@@ -203,6 +221,9 @@ const CalibrationRtpcrContainer = () => {
       handleLidPidButton={handleLidPidButton}
       handleResetTEC={handleResetTEC}
       handleAutoTuneTEC={handleAutoTuneTEC}
+      dyeOptions={dyeOptions}
+      formikDyeCalibration={formikDyeCalibration}
+      handleDyeCalibrationButton={handleDyeCalibrationButton}
     />
   );
 };

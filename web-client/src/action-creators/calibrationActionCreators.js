@@ -23,6 +23,7 @@ import {
   abortLidPidActions,
   resetTECActions,
   autoTuneTECActions,
+  runDyeCalibrationActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -347,4 +348,31 @@ export const autoTuneTECInitiated = (token) => ({
 export const autoTuneTECFailed = ({ error }) => ({
   type: autoTuneTECActions.failureAction,
   payload: { error },
+});
+
+export const runDyeCalibration = (token, requestBody) => ({
+  type: runDyeCalibrationActions.initiateAction,
+  payload: {
+    token,
+    requestBody,
+  },
+});
+
+export const runDyeCalibrationFailed = ({ error }) => ({
+  type: runDyeCalibrationActions.failureAction,
+  payload: { error },
+});
+
+export const progressDyeCalibration = (progressDetails) => ({
+  type: runDyeCalibrationActions.progressAction,
+  payload: {
+    progressDetails,
+  },
+});
+
+export const completedDyeCalibration = (progressDetails) => ({
+  type: runDyeCalibrationActions.completedAction,
+  payload: {
+    progressDetails,
+  },
 });

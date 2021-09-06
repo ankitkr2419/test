@@ -24,6 +24,7 @@ import {
   abortLidPidActions,
   resetTECActions,
   autoTuneTECActions,
+  runDyeCalibrationActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -47,6 +48,7 @@ import {
   abortLidPidFailed,
   resetTECFailed,
   autoTuneTECFailed,
+  runDyeCalibrationFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -578,6 +580,32 @@ export function* autoTuneTEC(actions) {
   }
 }
 
+export function* runDyeCalibration(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = runDyeCalibrationActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        // method: HTTP_METHODS.POST,//TODO need to confirm once api is ready
+        body: requestBody,
+        // reqPath: `${API_ENDPOINTS.}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error starting dye calibration", error);
+    yield put(runDyeCalibrationFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -618,4 +646,5 @@ export function* calibrationSaga() {
   yield takeEvery(abortLidPidActions.initiateAction, abortLidPid);
   yield takeEvery(resetTECActions.initiateAction, resetTEC);
   yield takeEvery(autoTuneTECActions.initiateAction, autoTuneTEC);
+  yield takeEvery(runDyeCalibrationActions.initiateAction, runDyeCalibration);
 }

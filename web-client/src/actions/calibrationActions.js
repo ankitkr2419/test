@@ -155,3 +155,12 @@ export const autoTuneTECActions = {
   failureAction: "AUTOTUNE_TEC_FAILURE",
   resetAction: "AUTOTUNE_TEC_RESET",
 };
+
+export const runDyeCalibrationActions = {
+  initiateAction: "START_DYE_CALIBRATION_INITIATED",
+  successAction: "START_DYE_CALIBRATION_SUCCESS",
+  failureAction: "START_DYE_CALIBRATION_FAILURE",
+  resetAction: "START_DYE_CALIBRATION_RESET",
+  progressAction: "PROGRESS_DYE_CALIBRATION",
+  completedAction: "COMPLETED_DYE_CALIBRATION",
+};
