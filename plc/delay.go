@@ -52,12 +52,6 @@ skipToStartTimer:
 				// Send Success
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightSuccess)
 				d.ResetRunInProgress()
-			} else if d.isPIDCalibrationInProgress() {
-				// Send 100 % Progress
-				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidProgress)
-				// Send Success
-				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidSuccess)
-				d.ResetRunInProgress()
 			}
 			if recipeRun {
 				// timer is over but recipe isn't
@@ -85,7 +79,7 @@ skipToStartTimer:
 			time.Sleep(time.Millisecond * 500)
 			if d.isMachineInAbortedState() {
 				t.Stop()
-				if d.isUVLightInProgress() || d.isPIDCalibrationInProgress() {
+				if d.isUVLightInProgress() {
 					d.resetAborted()
 				}
 				err = fmt.Errorf("Operation was ABORTED!")
@@ -94,9 +88,6 @@ skipToStartTimer:
 			// When UV Light is in progress nothing else is so no special handling below
 			if d.isUVLightInProgress() {
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
-			}
-			if d.isPIDCalibrationInProgress() {
-				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidProgress)
 			}
 			if recipeRun {
 				if !d.IsRunInProgress() && getCurrentProcessNumber(d.name) == -2 {

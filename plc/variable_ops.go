@@ -80,12 +80,14 @@ func (d *Compact32Deck) resetUVLightInProgress() {
 	uvLightInProgress.Store(d.name, false)
 }
 
-func (d *Compact32Deck) setPIDCalibrationInProgress() {
-	pIDCalibrationInProgress.Store(d.name, true)
+func (d *Compact32Deck) setShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetPIDCalibrationInProgress() {
-	pIDCalibrationInProgress.Store(d.name, false)
+func (d *Compact32Deck) resetShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.name, false)
+	shaker1PIDDone = false
+	shaker2PIDDone = false
 }
 
 func (d *Compact32Deck) setMotorOperationCompleted() {
@@ -176,9 +178,9 @@ func (d *Compact32Deck) isUVLightInProgress() bool {
 	return false
 }
 
-func (d *Compact32Deck) isPIDCalibrationInProgress() bool {
-	if temp, ok := pIDCalibrationInProgress.Load(d.name); !ok {
-		logger.Errorln("pIDCalibrationInProgress isn't loaded!")
+func (d *Compact32Deck) isShakerPIDTuningInProgress() bool {
+	if temp, ok := shakerPIDCalibrationInProgress.Load(d.name); !ok {
+		logger.Errorln("shakerPIDCalibrationInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}
