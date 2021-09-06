@@ -21,9 +21,8 @@ const (
 	getAllConsDistanceQuery = `SELECT *
 							FROM consumable_distances`
 	updateConsDistaceQuery1 = `UPDATE consumable_distances SET 
-	name = $1,
-	distance = $2,
-	description = $3 WHERE id = $4`
+	distance = $1,
+	description = $2 WHERE id = $3`
 )
 
 type ConsumableDistance struct {
@@ -51,7 +50,7 @@ func (s *pgStore) InsertConsumableDistance(ctx context.Context, consumabledistan
 func (s *pgStore) UpdateConsumableDistance(ctx context.Context, c ConsumableDistance) (err error) {
 
 	_, err = s.db.Exec(
-		updateConsDistaceQuery1, c.Name, c.Distance, c.Description, c.ID,
+		updateConsDistaceQuery1, c.Distance, c.Description, c.ID,
 	)
 	if err != nil {
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
