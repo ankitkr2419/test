@@ -177,6 +177,12 @@ var (
 	ConsumableDistanceFetchError     = fmt.Errorf("error fetching consumable distance record")
 	ConsumableDistanceArgumentsError = fmt.Errorf("error invalid consumable distance arguments")
 	ConsumableDistanceUpdateError    = fmt.Errorf("error updating Consumable distance record")
+
+	DyeDecodeError = fmt.Errorf("error decoding dyes record")
+	DyeFetchError  = fmt.Errorf("error fetching dyes record")
+
+	DyeInsertError  = fmt.Errorf("error Inserting dyes record")
+	DyeMarshalError = fmt.Errorf("error marshalling dyes record")
 )
 
 // Special errors which are in []byte format

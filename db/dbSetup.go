@@ -16,6 +16,7 @@ const (
 	cartridgeWellConfFile = "./conf/cartridge_wells_config.yml"
 	tipTubeConfFile       = "./conf/tips_tubes_config.yml"
 	motorConfFile         = "./conf/motor_config.yml"
+	dyeConfFile           = "./conf/dyes.yml"
 )
 
 // Config is used to get data from config file
@@ -23,9 +24,9 @@ type Config struct {
 	Dyes []struct {
 		Name      string
 		Position  int
-		Targets   []string
+		Targets   []string `yaml:"targets,flow"`
 		Tolerance float64
-	}
+	} `yaml:"dyes"`
 }
 
 type MotorConfig struct {
@@ -135,6 +136,7 @@ func makeDyeList(configDyes Config) (Dyes []Dye) {
 	for _, d := range configDyes.Dyes {
 		dye.Name = d.Name
 		dye.Position = d.Position
+		dye.Tolerance = d.Tolerance
 		Dyes = append(Dyes, dye)
 	}
 	return
@@ -508,4 +510,45 @@ func SetMotorsValues(m []Motor) (err error) {
 	}
 
 	return
+}
+
+func UpdateDyesTolerance(dyes []Dye) (err error) {
+
+	var config Config
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+
+	dyeConf := Config{}
+	dyeConf.Dyes = make([]struct {
+		Name      string
+		Position  int
+		Targets   []string `yaml:"targets,flow"`
+		Tolerance float64
+	}, 0)
+	for _, v := range dyes {
+		for _, confDyes := range config.Dyes {
+			if v.Name == confDyes.Name && v.Position == confDyes.Position {
+				confDyes.Tolerance = v.Tolerance
+			}
+
+			dyeConf.Dyes = append(dyeConf.Dyes, confDyes)
+
+		}
+	}
+	res, err := yaml.Marshal(dyeConf)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	err = ioutil.WriteFile(dyeConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+	return
+
 }
