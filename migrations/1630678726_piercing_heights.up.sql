@@ -1,1 +1,1 @@
-ALTER TABLE piercing ADD COLUMN int[] NOT NULL;
+ALTER TABLE piercing ADD COLUMN piercing_heights int[];
