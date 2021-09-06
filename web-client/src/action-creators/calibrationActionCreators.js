@@ -24,6 +24,9 @@ import {
   heaterRunProgressActions,
   fetchToleranceActions,
   updateToleranceActions,
+  fetchConsumableActions,
+  updateConsumableActions,
+  addConsumableActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -334,9 +337,9 @@ export const heaterRunInSuccess = () => ({
 });
 
 //fetch tolerance
-export const fetchToleranceInitiated = (payload) => ({
+export const fetchToleranceInitiated = (token) => ({
   type: fetchToleranceActions.initiateAction,
-  payload,
+  payload: { token },
 });
 
 export const fetchToleranceFailed = (error) => ({
@@ -344,6 +347,7 @@ export const fetchToleranceFailed = (error) => ({
   payload: error,
 });
 
+// update tolerance
 export const updateToleranceInitiated = (payload) => ({
   type: updateToleranceActions.initiateAction,
   payload,
@@ -351,5 +355,38 @@ export const updateToleranceInitiated = (payload) => ({
 
 export const updateToleranceFailed = ({ error }) => ({
   type: updateToleranceActions.failureAction,
+  payload: { error },
+});
+
+//fetch consumable
+export const fetchConsumableInitiated = (token) => ({
+  type: fetchConsumableActions.initiateAction,
+  payload: { token },
+});
+
+export const fetchConsumableFailed = (error) => ({
+  type: fetchConsumableActions.failureAction,
+  payload: error,
+});
+
+// update consumable
+export const updateConsumableInitiated = (payload) => ({
+  type: updateConsumableActions.initiateAction,
+  payload,
+});
+
+export const updateConsumableFailed = ({ error }) => ({
+  type: updateConsumableActions.failureAction,
+  payload: { error },
+});
+
+// add consumable
+export const addConsumableInitiated = (payload) => ({
+  type: addConsumableActions.initiateAction,
+  payload,
+});
+
+export const addConsumableFailed = ({ error }) => ({
+  type: addConsumableActions.failureAction,
   payload: { error },
 });

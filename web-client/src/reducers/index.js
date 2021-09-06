@@ -77,6 +77,7 @@ import {
   shakerRunProgessReducer,
   heaterRunProgessReducer,
   toleranceReducer,
+  consumableReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
@@ -146,6 +147,7 @@ const rootReducer = combineReducers({
   rtpcrConfigsReducer,
   tecConfigsReducer,
   toleranceReducer,
+  consumableReducer,
   shakerRunProgessReducer,
   heaterRunProgessReducer,
 });

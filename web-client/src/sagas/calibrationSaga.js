@@ -23,6 +23,9 @@ import {
   deleteCartridgesActions,
   fetchToleranceActions,
   updateToleranceActions,
+  fetchConsumableActions,
+  updateConsumableActions,
+  addConsumableActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -46,6 +49,9 @@ import {
   deleteCartridgesFailed,
   fetchToleranceFailed,
   updateToleranceFailed,
+  fetchConsumableFailed,
+  updateConsumableFailed,
+  addConsumableFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -575,6 +581,84 @@ export function* updateTolerance(actions) {
   }
 }
 
+export function* fetchConsumable(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  console.log("Actions: ", actions);
+
+  const { successAction, failureAction } = fetchConsumableActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        reqPath: `${API_ENDPOINTS.consumable}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching consumable distance configs", error);
+    yield put(fetchConsumableFailed(error));
+  }
+}
+
+export function* updateConsumable(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateConsumableActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.consumable}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating consumable distance configs", error);
+    yield put(updateConsumableFailed({ error }));
+  }
+}
+
+export function* addConsumable(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = addConsumableActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.consumable}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error adding consumable distance configs", error);
+    yield put(addConsumableFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -615,4 +699,7 @@ export function* calibrationSaga() {
   yield takeEvery(updateTECConfigsActions.initiateAction, updateTECConfigs);
   yield takeEvery(fetchToleranceActions.initiateAction, fetchTolerance);
   yield takeEvery(updateToleranceActions.initiateAction, updateTolerance);
+  yield takeEvery(fetchConsumableActions.initiateAction, fetchConsumable);
+  yield takeEvery(updateConsumableActions.initiateAction, updateConsumable);
+  yield takeEvery(addConsumableActions.initiateAction, addConsumable);
 }

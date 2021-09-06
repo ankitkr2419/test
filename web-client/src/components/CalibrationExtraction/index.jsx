@@ -20,6 +20,7 @@ import UpdateMotorComponent from "./UpdateMotorComponent";
 import TipsTubesComponent from "./TipsTubesComponent";
 import CartridgeComponent from "./CartridgeComponent";
 import DeleteCartridgeComponent from "./DeleteCartridgeComponent";
+import ConsumableDistancesComponent from "./ConsumableDistancesComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -40,6 +41,8 @@ const CalibrationExtractionComponent = (props) => {
     formik,
     isAdmin,
     handleTipesTubesButton,
+    handleAddBtn,
+    consumableDistanceData,
   } = props;
 
   const { shaker_1_temp, shaker_2_temp, heater_on } = heaterData;
@@ -153,6 +156,12 @@ const CalibrationExtractionComponent = (props) => {
           <TipsTubesComponent
             formik={formik}
             handleTipesTubesButton={handleTipesTubesButton}
+          />
+
+          {/* Consumable Distances Vars */}
+          <ConsumableDistancesComponent
+            handleAddBtn={handleAddBtn}
+            consumableDistanceData={consumableDistanceData}
           />
         </CardBody>
       </Card>

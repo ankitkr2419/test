@@ -20,6 +20,7 @@ import {
   resetCreatingTipsOrTubes,
   createCartridgesInitiated,
   deleteCartridgesInitiated,
+  fetchConsumableInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
@@ -73,6 +74,10 @@ const CalibrationExtractionContainer = () => {
   const commonDetailsReducerData = commonDetailsReducer.toJS();
   const { isUpdateApi, details } = commonDetailsReducerData;
 
+  //Tolerance Variables
+  const consumableReducer = useSelector((state) => state.consumableReducer);
+  const consumableReducerData = consumableReducer.toJS();
+
   // fetch pidDetails API (pidTemp, pidMinutes) called initially
   useEffect(() => {
     dispatch(fetchPidInitiated(token));
@@ -81,6 +86,11 @@ const CalibrationExtractionContainer = () => {
   // fetch commonDetails (name, email, roomTemp) API called initially
   useEffect(() => {
     dispatch(commonDetailsInitiated(token));
+  }, []);
+
+  // fetch consumable distance
+  useEffect(() => {
+    dispatch(fetchConsumableInitiated(token));
   }, []);
 
   useEffect(() => {
@@ -260,6 +270,12 @@ const CalibrationExtractionContainer = () => {
     formik.setFieldValue(key, value);
   };
 
+  const handleConsumableAddBtn = () => {
+    console.log("Add");
+  };
+
+  console.log("consumableReducerData: ", consumableReducerData.data);
+
   return (
     <CalibrationExtractionComponent
       toggleConfirmModal={toggleConfirmModal}
@@ -279,6 +295,8 @@ const CalibrationExtractionContainer = () => {
       formik={formik}
       isAdmin={isAdmin}
       handleTipesTubesButton={handleTipesTubesButton}
+      handleAddBtn={handleConsumableAddBtn}
+      consumableDistanceData={consumableReducerData.data || null}
     />
   );
 };

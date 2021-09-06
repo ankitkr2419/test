@@ -20,6 +20,9 @@ import {
   heaterRunProgressActions,
   fetchToleranceActions,
   updateToleranceActions,
+  fetchConsumableActions,
+  updateConsumableActions,
+  addConsumableActions,
 } from "actions/calibrationActions";
 import {
   DECKNAME,
@@ -685,6 +688,91 @@ export const toleranceReducer = (state = toleranceInitialState, action) => {
 
     case loginActions.loginReset:
       return toleranceInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const consumableInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  data: [],
+  isUpdateApi: null, // to distinguish between fetch and put API
+});
+
+export const consumableReducer = (state = consumableInitialState, action) => {
+  switch (action.type) {
+    case fetchConsumableActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: false,
+      });
+    case fetchConsumableActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        data: action.payload.response,
+        isUpdateApi: false,
+      });
+    case fetchConsumableActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: false,
+      });
+    case fetchConsumableActions.resetAction:
+      return consumableInitialState;
+
+    case updateConsumableActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case updateConsumableActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+
+    case updateConsumableActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+
+    case updateConsumableActions.resetAction:
+      return consumableInitialState;
+
+    case addConsumableActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case addConsumableActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+
+    case addConsumableActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+
+    case addConsumableActions.resetAction:
+      return consumableInitialState;
+
+    case loginActions.loginReset:
+      return consumableInitialState;
 
     default:
       return state;

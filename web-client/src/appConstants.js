@@ -185,6 +185,7 @@ export const API_ENDPOINTS = {
   rtpcrConfigs: "configs/rtpcr",
   tecConfigs: "configs/tec",
   dyes: "dyes",
+  consumable: "consumable-distance",
 };
 
 export const MODAL_MESSAGE = {

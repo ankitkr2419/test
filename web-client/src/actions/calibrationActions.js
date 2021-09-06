@@ -150,6 +150,7 @@ export const heaterRunProgressActions = {
   heaterRunProgressActionSuccess: "HEATER_RUN_SUCCEEDED",
 };
 
+// tolerance values
 export const fetchToleranceActions = {
   initiateAction: "FETCH_TOLERANCE_INITIATED",
   successAction: "FETCH_TOLERANCE_SUCCESS",
@@ -162,4 +163,26 @@ export const updateToleranceActions = {
   successAction: "UPDATE_TOLERANCE_SUCCESS",
   failureAction: "UPDATE_TOLERANCE_FAILURE",
   resetAction: "UPDATE_TOLERANCE_RESET",
+};
+
+// consumable distances values
+export const fetchConsumableActions = {
+  initiateAction: "FETCH_CONSUMABLE_INITIATED",
+  successAction: "FETCH_CONSUMABLE_SUCCESS",
+  failureAction: "FETCH_CONSUMABLE_FAILURE",
+  resetAction: "FETCH_CONSUMABLE_RESET",
+};
+
+export const updateConsumableActions = {
+  initiateAction: "UPDATE_CONSUMABLE_INITIATED",
+  successAction: "UPDATE_CONSUMABLE_SUCCESS",
+  failureAction: "UPDATE_CONSUMABLE_FAILURE",
+  resetAction: "UPDATE_CONSUMABLE_RESET",
+};
+
+export const addConsumableActions = {
+  initiateAction: "UPDATE_CONSUMABLE_INITIATED",
+  successAction: "UPDATE_CONSUMABLE_SUCCESS",
+  failureAction: "UPDATE_CONSUMABLE_FAILURE",
+  resetAction: "UPDATE_CONSUMABLE_RESET",
 };
