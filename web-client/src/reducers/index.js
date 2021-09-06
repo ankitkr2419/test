@@ -76,6 +76,10 @@ import {
   tecConfigsReducer,
   lidPidReducer,
   dyeCalibrationReducer,
+  shakerRunProgessReducer,
+  heaterRunProgessReducer,
+  toleranceReducer,
+  consumableReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
@@ -145,7 +149,11 @@ const rootReducer = combineReducers({
   rtpcrConfigsReducer,
   tecConfigsReducer,
   lidPidReducer,
-  dyeCalibrationReducer
+  dyeCalibrationReducer,
+  toleranceReducer,
+  consumableReducer,
+  shakerRunProgessReducer,
+  heaterRunProgessReducer,
 });
 
 export default rootReducer;

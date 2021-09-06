@@ -209,6 +209,29 @@ export const formikInitialStateDyeCalibration = {
   kitID: { value: null, min: 0, isInvalid: false },
 };
 
+export const getToleranceInitialFormikState = (data) => {
+  const toleranceArr = data?.map((dataObj) => ({
+    value: dataObj.Tolerance,
+    isInvalid: false,
+  }));
+  return {
+    tolerance: toleranceArr,
+  };
+};
+
+export const isSaveToleranceBtnDisabled = (tolerance) => {
+  const allTolValues = tolerance.map((tolObj) => tolObj.value);
+  const allTolInvalidValues = tolerance.map((tolObj) => tolObj.isInvalid);
+
+  if (
+    allTolValues.some((v) => !v || v > 100 || v < 0) ||
+    allTolInvalidValues.some((v) => v === true)
+  ) {
+    return true;
+  }
+  return false;
+};
+
 export const validateAllFields = (state) => {
   for (const key in state) {
     const { name, value, isInvalid } = state[key];

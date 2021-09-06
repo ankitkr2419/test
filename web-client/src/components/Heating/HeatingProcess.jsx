@@ -1,12 +1,27 @@
 import React from "react";
+import { useState } from "react";
 
 import { Row, Col } from "core-components";
 import { TemperatureInfo, TimeInfo } from "shared-components";
 
 import { HeatingProcessBox } from "./Style";
+import { MAX_TEMP_ALLOWED, MIN_TEMP_ALLOWED } from "appConstants";
 
 const HeatingProcess = (props) => {
   const { formik } = props;
+
+  const [invalidTemp, setInvalidTemp] = useState(false);
+
+  const handleOnBlur = (tempValue) => {
+    if (tempValue > MAX_TEMP_ALLOWED || tempValue < MIN_TEMP_ALLOWED) {
+      setInvalidTemp(true);
+    }
+  };
+
+  const handleOnFocus = () => {
+    setInvalidTemp(false);
+  };
+
   return (
     <>
       <HeatingProcessBox className="p-5">
@@ -21,6 +36,9 @@ const HeatingProcess = (props) => {
               checkBoxHandler={(e) => {
                 formik.setFieldValue("followTemperature", e.target.checked);
               }}
+              invalidTemperature={invalidTemp}
+              handleOnFocus={handleOnFocus}
+              handleOnBlur={handleOnBlur}
             />
           </div>
           <Row>

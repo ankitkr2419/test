@@ -52,8 +52,13 @@ func (d *Compact32Deck) setAborted() {
 	aborted.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetAborted() {
+func (d *Compact32Deck) ResetAborted() {
 	aborted.Store(d.name, false)
+	d.resetShakerInProgress()
+	d.resetHeaterInProgress()
+	d.resetShakerPIDCalibrationInProgress()
+	d.ResetRunInProgress()
+	d.ResetPaused()
 }
 
 func (d *Compact32Deck) SetPaused() {
@@ -151,7 +156,7 @@ func (d *Compact32Deck) isMachineInPausedState() bool {
 	return false
 }
 
-func (d *Compact32Deck) isHeaterInProgress() bool {
+func (d *Compact32Deck) IsHeaterInProgress() bool {
 	if temp, ok := heaterInProgress.Load(d.name); !ok {
 		logger.Errorln("heaterInProgress isn't loaded!")
 	} else if temp.(bool) {
@@ -160,7 +165,8 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 	return false
 }
 
-func (d *Compact32Deck) isShakerInProgress() bool {
+
+func (d *Compact32Deck) IsShakerInProgress() bool {
 	if temp, ok := shakerInProgress.Load(d.name); !ok {
 		logger.Errorln("shakerInProgress isn't loaded!")
 	} else if temp.(bool) {

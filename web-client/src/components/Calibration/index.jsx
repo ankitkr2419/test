@@ -10,6 +10,7 @@ import LidPidTuning from "./LidPidTuning";
 import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
 import TECOperations from "./TECOperations";
 import DyeCalibration from "./DyeCalibration";
+import ToleranceComponent from "./ToleranceComponent";
 
 const CalibrationComponent = (props) => {
   let {
@@ -27,6 +28,8 @@ const CalibrationComponent = (props) => {
     dyeOptions,
     formikDyeCalibration,
     handleDyeCalibrationButton,
+    handleSaveToleranceBtn,
+    toleranceData,
   } = props;
 
   const history = useHistory();
@@ -56,6 +59,12 @@ const CalibrationComponent = (props) => {
           <CommonFieldsComponent
             formik={formik}
             handleSaveDetailsBtn={handleSaveDetailsBtn}
+          />
+
+          {/* Tolerance Component */}
+          <ToleranceComponent
+            toleranceData={toleranceData}
+            handleSaveToleranceBtn={handleSaveToleranceBtn}
           />
 
           {/**Rtpcr vars */}

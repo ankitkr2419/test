@@ -18,6 +18,9 @@ import {
   updatePidInitiated,
   createTipsOrTubesInitiated,
   resetCreatingTipsOrTubes,
+  createCartridgesInitiated,
+  deleteCartridgesInitiated,
+  fetchConsumableInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
@@ -71,6 +74,10 @@ const CalibrationExtractionContainer = () => {
   const commonDetailsReducerData = commonDetailsReducer.toJS();
   const { isUpdateApi, details } = commonDetailsReducerData;
 
+  //Tolerance Variables
+  const consumableReducer = useSelector((state) => state.consumableReducer);
+  const consumableReducerData = consumableReducer.toJS();
+
   // fetch pidDetails API (pidTemp, pidMinutes) called initially
   useEffect(() => {
     dispatch(fetchPidInitiated(token));
@@ -79,6 +86,11 @@ const CalibrationExtractionContainer = () => {
   // fetch commonDetails (name, email, roomTemp) API called initially
   useEffect(() => {
     dispatch(commonDetailsInitiated(token));
+  }, []);
+
+  // fetch consumable distance
+  useEffect(() => {
+    dispatch(fetchConsumableInitiated(token));
   }, []);
 
   useEffect(() => {
@@ -246,9 +258,23 @@ const CalibrationExtractionContainer = () => {
     dispatch(createTipsOrTubesInitiated(token, body));
   };
 
+  const handleCreateCartridgeBtn = (body) => {
+    dispatch(createCartridgesInitiated(token, body));
+  };
+
+  const handleDeleteCartridgeBtn = (id) => {
+    dispatch(deleteCartridgesInitiated(token, id));
+  };
+
   const handleOnChange = (key, value) => {
     formik.setFieldValue(key, value);
   };
+
+  const handleConsumableAddBtn = () => {
+    console.log("Add");
+  };
+
+  console.log("consumableReducerData: ", consumableReducerData.data);
 
   return (
     <CalibrationExtractionComponent
@@ -259,6 +285,8 @@ const CalibrationExtractionContainer = () => {
       handleSaveDetailsBtn={handleSaveDetailsBtn}
       handlePidUpdateBtn={handlePidUpdateBtn}
       handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
+      handleCreateCartridgeBtn={handleCreateCartridgeBtn}
+      handleDeleteCartridgeBtn={handleDeleteCartridgeBtn}
       showConfirmationModal={showConfirmationModal}
       heaterData={data}
       progressData={progressData}
@@ -267,6 +295,8 @@ const CalibrationExtractionContainer = () => {
       formik={formik}
       isAdmin={isAdmin}
       handleTipesTubesButton={handleTipesTubesButton}
+      handleAddBtn={handleConsumableAddBtn}
+      consumableDistanceData={consumableReducerData.data || null}
     />
   );
 };

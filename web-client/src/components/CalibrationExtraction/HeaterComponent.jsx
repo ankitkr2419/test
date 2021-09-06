@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import { toast } from "react-toastify";
 
 import { Card, CardBody } from "core-components";
-import { ButtonIcon, ButtonBar } from "shared-components";
+import { ButtonIcon, ButtonBar, Text } from "shared-components";
 import {
   abort,
   heaterInitiated,
@@ -14,7 +14,8 @@ import { getHeaterRequestBody, heaterInitialFormikState } from "./helpers";
 import { PageBody, HeatingBox, TopContent } from "./Style";
 import HeatingProcess from "./HeatingProcess";
 import TopHeading from "shared-components/TopHeading";
-import { DECKNAME, ROUTES } from "appConstants";
+import { DECKNAME, HEATER_RUN_STATUS, ROUTES } from "appConstants";
+import { Spinner } from "reactstrap";
 
 const HeaterComponent = (props) => {
   const dispatch = useDispatch();
@@ -23,6 +24,12 @@ const HeaterComponent = (props) => {
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+
+  const heaterRunProgessReducer = useSelector(
+    (state) => state.heaterRunProgessReducer
+  );
+  const { heaterRunStatus } = heaterRunProgessReducer.toJS();
+  const { progressing } = HEATER_RUN_STATUS;
 
   const formik = useFormik({
     initialValues: heaterInitialFormikState,
@@ -54,6 +61,19 @@ const HeaterComponent = (props) => {
     dispatch(abort(token, deckName));
   };
 
+  const getRightBtnLabel = () => {
+    if (heaterRunStatus === progressing) {
+      return (
+        <div className="d-flex">
+          <Spinner size="sm" />
+          <Text className="ml-3">Heating</Text>
+        </div>
+      );
+    } else {
+      return "Start";
+    }
+  };
+
   if (!activeDeckObj.isLoggedIn) {
     return <Redirect to={`/${ROUTES.landing}`} />;
   }
@@ -81,11 +101,13 @@ const HeaterComponent = (props) => {
               </CardBody>
             </Card>
             <ButtonBar
-              rightBtnLabel="Start"
+              rightBtnLabel={getRightBtnLabel()}
               leftBtnLabel="Abort"
               handleRightBtn={handleSaveBtn}
               handleLeftBtn={handleAbortBtn}
               btnBarClassname={"btn-bar-adjust-heating"}
+              isRightBtnDisabled={heaterRunStatus === progressing}
+              isLeftBtnDisabled={!(heaterRunStatus === progressing)}
             />
           </div>
         </HeatingBox>

@@ -16,6 +16,7 @@ const (
 	cartridgeWellConfFile = "./conf/cartridge_wells_config.yml"
 	tipTubeConfFile       = "./conf/tips_tubes_config.yml"
 	motorConfFile         = "./conf/motor_config.yml"
+	dyeConfFile           = "./conf/dyes.yml"
 )
 
 // Config is used to get data from config file
@@ -23,9 +24,9 @@ type Config struct {
 	Dyes []struct {
 		Name      string
 		Position  int
-		Targets   []string
+		Targets   []string `yaml:"targets,flow"`
 		Tolerance float64
-	}
+	} `yaml:"dyes"`
 }
 
 type MotorConfig struct {
@@ -64,19 +65,19 @@ type TipsTubesConfig struct {
 
 type CartridgesConfig struct {
 	Cartridges []struct {
-		ID          int64
-		Type        CartridgeType
-		Description string
+		ID          int64         `yaml:"id"`
+		Type        CartridgeType `yaml:"type"`
+		Description string        `yaml:"description"`
 	}
 }
 
 type CartridgeWellsConfig struct {
 	CartridgeWells []struct {
-		ID       int64
-		WellNum  int64
-		Distance float64
-		Height   float64
-		Volume   float64
+		ID       int64   `yaml:"id"`
+		WellNum  int64   `yaml:"wellNum"`
+		Distance float64 `yaml:"distance"`
+		Height   float64 `yaml:"height"`
+		Volume   float64 `yaml:"volume"`
 	}
 }
 
@@ -135,6 +136,7 @@ func makeDyeList(configDyes Config) (Dyes []Dye) {
 	for _, d := range configDyes.Dyes {
 		dye.Name = d.Name
 		dye.Position = d.Position
+		dye.Tolerance = d.Tolerance
 		Dyes = append(Dyes, dye)
 	}
 	return
@@ -360,18 +362,18 @@ func SetCartridgeValues(c CartridgeWell) (err error) {
 	}
 	carConf := CartridgesConfig{}
 	carConf.Cartridges = make([]struct {
-		ID          int64
-		Type        CartridgeType
-		Description string
+		ID          int64         `yaml:"id"`
+		Type        CartridgeType `yaml:"type"`
+		Description string        `yaml:"description"`
 	}, len(c.Cartridge))
 
 	carWellConf := CartridgeWellsConfig{}
 	carWellConf.CartridgeWells = make([]struct {
-		ID       int64
-		WellNum  int64
-		Distance float64
-		Height   float64
-		Volume   float64
+		ID       int64   `yaml:"id"`
+		WellNum  int64   `yaml:"wellNum"`
+		Distance float64 `yaml:"distance"`
+		Height   float64 `yaml:"height"`
+		Volume   float64 `yaml:"volume"`
 	}, len(c.CartridgeWells))
 
 	for i, v := range c.Cartridge {
@@ -508,4 +510,45 @@ func SetMotorsValues(m []Motor) (err error) {
 	}
 
 	return
+}
+
+func UpdateDyesTolerance(dyes []Dye) (err error) {
+
+	var config Config
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+
+	dyeConf := Config{}
+	dyeConf.Dyes = make([]struct {
+		Name      string
+		Position  int
+		Targets   []string `yaml:"targets,flow"`
+		Tolerance float64
+	}, 0)
+	for _, v := range dyes {
+		for _, confDyes := range config.Dyes {
+			if v.Name == confDyes.Name && v.Position == confDyes.Position {
+				confDyes.Tolerance = v.Tolerance
+			}
+
+			dyeConf.Dyes = append(dyeConf.Dyes, confDyes)
+
+		}
+	}
+	res, err := yaml.Marshal(dyeConf)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	err = ioutil.WriteFile(dyeConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+	return
+
 }

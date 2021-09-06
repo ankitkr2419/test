@@ -38,7 +38,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	d.resetAborted()
+	d.ResetAborted()
 
 	logger.Infoln("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.syringeHoming()

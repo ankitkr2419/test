@@ -1,9 +1,14 @@
 import {
+  MAX_CARTRIDGE_ID,
+  MIN_CARTRIDGE_ID,
+  MAX_WELLS_COUNT,
+  MIN_WELLS_COUNT,
   MAX_PID_TEMP,
   MAX_TEMP_ALLOWED,
   MAX_TIME_ALLOWED,
   MIN_PID_TEMP,
   MIN_TEMP_ALLOWED,
+  CARTRIDGE_WELLS,
   timeConstants,
 } from "appConstants";
 
@@ -371,4 +376,165 @@ export const isTipsTubesButtonDisabled = (state) => {
     return true;
   }
   return false;
+};
+
+// helpers for cartridges
+
+// formik initial state
+export const cartridgeFormikInitialState = {
+  id: { value: null, isInvalid: false },
+  type: { value: "Cartridge 1", isInvalid: false },
+  description: { value: null, isInvalid: false },
+  wellsCount: { value: null, isInvalid: false },
+  distance: [],
+  height: [],
+  volume: [],
+};
+
+export const checkIsCartridgeFieldInvalid = (key, value) => {
+  const filteredKey = key.split(".")[0];
+
+  const {
+    MAX_DISTANCE,
+    MIN_DISTANCE,
+    MAX_HEIGHT,
+    MIN_HEIGHT,
+    MAX_VOLUME,
+    MIN_VOLUME,
+  } = CARTRIDGE_WELLS;
+
+  switch (filteredKey) {
+    case "id":
+      if (!Number.isInteger(parseFloat(value))) {
+        return true;
+      }
+      return false;
+
+    case "type":
+      if (value === "" || value === undefined || value === null) {
+        return true;
+      }
+      return false;
+
+    case "wellsCount":
+      const wellsCount = parseInt(value);
+      if (!wellsCount || wellsCount > 13 || wellsCount < 0) {
+        return true;
+      }
+      return false;
+
+    case "distance":
+      const distance = parseFloat(value);
+      if (!distance || distance > MAX_DISTANCE || distance < MIN_DISTANCE) {
+        return true;
+      }
+      return false;
+
+    case "volume":
+      const volume = parseFloat(value);
+      if (
+        !volume ||
+        !Number.isInteger(volume) ||
+        volume > MAX_VOLUME ||
+        volume < MIN_VOLUME
+      ) {
+        return true;
+      }
+      return false;
+
+    case "height":
+      const height = parseFloat(value);
+      if (!height || height > MAX_HEIGHT || height < MIN_HEIGHT) {
+        return true;
+      }
+      return false;
+  }
+};
+
+export const isAddWellsBtnDisabled = (state) => {
+  const { id, type, wellsCount } = state;
+
+  if (
+    type.value === "" ||
+    !parseInt(id.value) ||
+    parseInt(id.value) > MAX_CARTRIDGE_ID ||
+    parseInt(id.value) < MIN_CARTRIDGE_ID ||
+    !parseInt(wellsCount.value) ||
+    parseInt(wellsCount.value) > MAX_WELLS_COUNT ||
+    parseInt(wellsCount.value) < MIN_WELLS_COUNT ||
+    id.isInvalid ||
+    wellsCount.isInvalid ||
+    type.isInvalid
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const isCreateCartridgesBtnDisabled = (state) => {
+  const { distance, volume, height } = state;
+
+  const {
+    MAX_DISTANCE,
+    MIN_DISTANCE,
+    MAX_HEIGHT,
+    MIN_HEIGHT,
+    MAX_VOLUME,
+    MIN_VOLUME,
+  } = CARTRIDGE_WELLS;
+
+  const allDistanceValues = distance.map((disObj) => disObj.value);
+  const allHeightValues = height.map((htObj) => htObj.value);
+  const allVolumeValues = volume.map((volObj) => volObj.value);
+
+  const allDistanceInvalidValues = distance.map((disObj) => disObj.isInvalid);
+  const allHeightInvalidValues = height.map((htObj) => htObj.isInvalid);
+  const allVolumeInvalidValues = volume.map((volObj) => volObj.isInvalid);
+
+  if (
+    allDistanceValues.some((v) => !v || v > MAX_DISTANCE || v < MIN_DISTANCE) ||
+    allHeightValues.some((v) => !v || v > MAX_VOLUME || v < MIN_VOLUME) ||
+    allVolumeValues.some((v) => !v || v > MAX_HEIGHT || v < MIN_HEIGHT) ||
+    allDistanceInvalidValues.some((v) => v === true) ||
+    allHeightInvalidValues.some((v) => v === true) ||
+    allVolumeInvalidValues.some((v) => v === true)
+  ) {
+    return true;
+  }
+  return false;
+};
+
+const getCartridgeWellsBody = (state) => {
+  const { id, distance, height, volume, wellsCount } = state;
+
+  const cartridgeWells = [];
+
+  for (let index = 0; index < parseInt(wellsCount.value); index++) {
+    cartridgeWells[index] = {
+      id: parseInt(id.value),
+      well_num: parseInt(index + 1),
+      distance: parseFloat(distance[index].value),
+      height: parseInt(height[index].value),
+      volume: parseInt(volume[index].value),
+    };
+  }
+  return cartridgeWells;
+};
+
+export const getRequestBody = (state) => {
+  const { id, type, description, wellsCount } = state;
+
+  const requestBody = {
+    cartridges: [
+      {
+        id: parseInt(id.value),
+        type: type.value === "Cartridge 1" ? "cartridge_1" : "cartridge_2",
+        description: description.value,
+        wells_count: parseInt(wellsCount.value),
+      },
+    ],
+    cartridge_wells: getCartridgeWellsBody(state),
+  };
+
+  return requestBody;
 };

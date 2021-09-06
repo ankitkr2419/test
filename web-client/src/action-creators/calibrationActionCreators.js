@@ -24,6 +24,15 @@ import {
   resetTECActions,
   autoTuneTECActions,
   runDyeCalibrationActions,
+  createCartridgesActions,
+  deleteCartridgesActions,
+  shakerRunProgressActions,
+  heaterRunProgressActions,
+  fetchToleranceActions,
+  updateToleranceActions,
+  fetchConsumableActions,
+  updateConsumableActions,
+  addConsumableActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -232,6 +241,34 @@ export const createTipsOrTubesFailed = ({ error }) => ({
   payload: { error },
 });
 
+// action creators for create cartridges
+export const createCartridgesInitiated = (token, body) => ({
+  type: createCartridgesActions.initiateAction,
+  payload: {
+    token,
+    body,
+  },
+});
+
+export const createCartridgesFailed = ({ error }) => ({
+  type: createCartridgesActions.failureAction,
+  payload: { error },
+});
+
+// action creators for delete cartridges
+export const deleteCartridgesInitiated = (token, id) => ({
+  type: deleteCartridgesActions.initiateAction,
+  payload: {
+    token,
+    id,
+  },
+});
+
+export const deleteCartridgesFailed = ({ error }) => ({
+  type: deleteCartridgesActions.failureAction,
+  payload: { error },
+});
+
 export const resetCreatingTipsOrTubes = () => ({
   type: createTipsTubesActions.resetAction,
 });
@@ -375,4 +412,77 @@ export const completedDyeCalibration = (progressDetails) => ({
   payload: {
     progressDetails,
   },
+});
+
+// websocket action creators for Shaker
+export const shakerRunInProgress = () => ({
+  type: shakerRunProgressActions.shakerRunProgressAction,
+});
+
+export const shakerRunInSuccess = () => ({
+  type: shakerRunProgressActions.shakerRunProgressActionSuccess,
+});
+
+// websocket action creators for Heater
+export const heaterRunInProgress = () => ({
+  type: heaterRunProgressActions.heaterRunProgressAction,
+});
+
+export const heaterRunInSuccess = () => ({
+  type: heaterRunProgressActions.heaterRunProgressActionSuccess,
+});
+
+//fetch tolerance
+export const fetchToleranceInitiated = (token) => ({
+  type: fetchToleranceActions.initiateAction,
+  payload: { token },
+});
+
+export const fetchToleranceFailed = (error) => ({
+  type: fetchToleranceActions.failureAction,
+  payload: error,
+});
+
+// update tolerance
+export const updateToleranceInitiated = (payload) => ({
+  type: updateToleranceActions.initiateAction,
+  payload,
+});
+
+export const updateToleranceFailed = ({ error }) => ({
+  type: updateToleranceActions.failureAction,
+  payload: { error },
+});
+
+//fetch consumable
+export const fetchConsumableInitiated = (token) => ({
+  type: fetchConsumableActions.initiateAction,
+  payload: { token },
+});
+
+export const fetchConsumableFailed = (error) => ({
+  type: fetchConsumableActions.failureAction,
+  payload: error,
+});
+
+// update consumable
+export const updateConsumableInitiated = (payload) => ({
+  type: updateConsumableActions.initiateAction,
+  payload,
+});
+
+export const updateConsumableFailed = ({ error }) => ({
+  type: updateConsumableActions.failureAction,
+  payload: { error },
+});
+
+// add consumable
+export const addConsumableInitiated = (payload) => ({
+  type: addConsumableActions.initiateAction,
+  payload,
+});
+
+export const addConsumableFailed = ({ error }) => ({
+  type: addConsumableActions.failureAction,
+  payload: { error },
 });

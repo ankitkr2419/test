@@ -131,7 +131,7 @@ const PreviewReportModal = (props) => {
         <Text className="font-weight-bold text-center mb-4">Temperature</Text>
         <ExperimentGraphContainer
           activeGraph={graphs.Temperature}
-          isInsidePreviewModal={true}
+          isInsidePreviewModal
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
@@ -149,7 +149,7 @@ const PreviewReportModal = (props) => {
         <Text className="font-weight-bold text-center mb-4">Amplification</Text>
         <ExperimentGraphContainer
           activeGraph={graphs.Amplification}
-          isInsidePreviewModal={true}
+          isInsidePreviewModal
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
@@ -170,7 +170,7 @@ const PreviewReportModal = (props) => {
         <Text className="font-weight-bold text-center mb-4">Analyse Data</Text>
         <ExperimentGraphContainer
           activeGraph={graphs.AnalyseData}
-          isInsidePreviewModal={true}
+          isInsidePreviewModal
           experimentStatus={experimentStatus}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}

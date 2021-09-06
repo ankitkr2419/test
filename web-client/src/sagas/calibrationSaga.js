@@ -25,6 +25,13 @@ import {
   resetTECActions,
   autoTuneTECActions,
   runDyeCalibrationActions,
+  createCartridgesActions,
+  deleteCartridgesActions,
+  fetchToleranceActions,
+  updateToleranceActions,
+  fetchConsumableActions,
+  updateConsumableActions,
+  addConsumableActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -49,6 +56,13 @@ import {
   resetTECFailed,
   autoTuneTECFailed,
   runDyeCalibrationFailed,
+  createCartridgesFailed,
+  deleteCartridgesFailed,
+  fetchToleranceFailed,
+  updateToleranceFailed,
+  fetchConsumableFailed,
+  updateConsumableFailed,
+  addConsumableFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -375,6 +389,57 @@ export function* createTipsOrTubes(actions) {
   }
 }
 
+export function* createCartridges(actions) {
+  const {
+    payload: { token, body },
+  } = actions;
+
+  const { successAction, failureAction } = createCartridgesActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.cartridge}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating cartridges", error);
+    yield put(createCartridgesFailed({ error }));
+  }
+}
+
+export function* deleteCartridges(actions) {
+  const {
+    payload: { token, id },
+  } = actions;
+
+  const { successAction, failureAction } = deleteCartridgesActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.DELETE,
+        reqPath: `${API_ENDPOINTS.cartridge}/${id}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting cartridges", error);
+    yield put(deleteCartridgesFailed({ error }));
+  }
+}
+
 export function* fetchRtpcrConfigs(actions) {
   const {
     payload: { token },
@@ -606,6 +671,134 @@ export function* runDyeCalibration(actions) {
   }
 }
 
+export function* fetchTolerance(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = fetchToleranceActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        reqPath: `${API_ENDPOINTS.dyes}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching tolerance configs", error);
+    yield put(fetchToleranceFailed(error));
+  }
+}
+
+export function* updateTolerance(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateToleranceActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.dyes}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating tolerance configs", error);
+    yield put(updateToleranceFailed({ error }));
+  }
+}
+
+export function* fetchConsumable(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  console.log("Actions: ", actions);
+
+  const { successAction, failureAction } = fetchConsumableActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        reqPath: `${API_ENDPOINTS.consumable}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching consumable distance configs", error);
+    yield put(fetchConsumableFailed(error));
+  }
+}
+
+export function* updateConsumable(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateConsumableActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.consumable}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating consumable distance configs", error);
+    yield put(updateConsumableFailed({ error }));
+  }
+}
+
+export function* addConsumable(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = addConsumableActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.consumable}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error adding consumable distance configs", error);
+    yield put(addConsumableFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -638,6 +831,8 @@ export function* calibrationSaga() {
     updateMotorDetails
   );
   yield takeEvery(createTipsTubesActions.initiateAction, createTipsOrTubes);
+  yield takeEvery(createCartridgesActions.initiateAction, createCartridges);
+  yield takeEvery(deleteCartridgesActions.initiateAction, deleteCartridges);
   yield takeEvery(fetchRtpcrConfigsActions.initiateAction, fetchRtpcrConfigs);
   yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
   yield takeEvery(fetchTECConfigsActions.initiateAction, fetchTECConfigs);
@@ -647,4 +842,10 @@ export function* calibrationSaga() {
   yield takeEvery(resetTECActions.initiateAction, resetTEC);
   yield takeEvery(autoTuneTECActions.initiateAction, autoTuneTEC);
   yield takeEvery(runDyeCalibrationActions.initiateAction, runDyeCalibration);
+  
+  yield takeEvery(fetchToleranceActions.initiateAction, fetchTolerance);
+  yield takeEvery(updateToleranceActions.initiateAction, updateTolerance);
+  yield takeEvery(fetchConsumableActions.initiateAction, fetchConsumable);
+  yield takeEvery(updateConsumableActions.initiateAction, updateConsumable);
+  yield takeEvery(addConsumableActions.initiateAction, addConsumable);
 }

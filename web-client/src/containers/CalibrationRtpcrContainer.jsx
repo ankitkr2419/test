@@ -13,6 +13,8 @@ import {
   abortLidPid,
   resetTECInitiated,
   autoTuneTECInitiated,
+  updateToleranceInitiated,
+  fetchToleranceInitiated,
 } from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
 import {
@@ -87,6 +89,10 @@ const CalibrationRtpcrContainer = () => {
     { label: "two", value: "two" },
   ];
 
+  //Tolerance Variables
+  const toleranceReducer = useSelector((state) => state.toleranceReducer);
+  const toleranceReducerData = toleranceReducer.toJS();
+
   //initially populate with previous data
   useEffect(() => {
     if (token) {
@@ -98,6 +104,8 @@ const CalibrationRtpcrContainer = () => {
       dispatch(fetchRtpcrConfigsInitiated(token));
       //fetch TEC variables from api
       dispatch(fetchTECConfigsInitiated(token));
+      //fetch Tolerance variables from api
+      dispatch(fetchToleranceInitiated(token));
     }
   }, [dispatch, token]);
 
@@ -161,6 +169,21 @@ const CalibrationRtpcrContainer = () => {
     isTECConfigUpdateApi,
   ]);
 
+  useEffect(() => {
+    if (
+      toleranceReducerData.error === false &&
+      toleranceReducerData.isLoading === false &&
+      toleranceReducerData.isUpdateApi === true
+    ) {
+      //fetch updated data after updation
+      dispatch(fetchToleranceInitiated(token));
+    }
+  }, [
+    toleranceReducerData.error,
+    toleranceReducerData.isLoading,
+    toleranceReducerData.isUpdateApi,
+  ]);
+
   const handleSaveDetailsBtn = (data) => {
     const { name, email, roomTemperature } = data;
     const requestBody = {
@@ -203,9 +226,8 @@ const CalibrationRtpcrContainer = () => {
     console.log("requestBody: ", requestBody);
   };
 
-  /**to change formik field */
-  const handleOnChange = (key, value) => {
-    formik.setFieldValue(key, value);
+  const handleSaveToleranceBtn = (requestBody) => {
+    dispatch(updateToleranceInitiated({ token, requestBody }));
   };
 
   return (
@@ -224,6 +246,8 @@ const CalibrationRtpcrContainer = () => {
       dyeOptions={dyeOptions}
       formikDyeCalibration={formikDyeCalibration}
       handleDyeCalibrationButton={handleDyeCalibrationButton}
+      handleSaveToleranceBtn={handleSaveToleranceBtn}
+      toleranceData={toleranceReducerData.data}
     />
   );
 };
