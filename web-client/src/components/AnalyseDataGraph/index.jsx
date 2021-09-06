@@ -21,7 +21,7 @@ const AnalyseDataGraphComponent = (props) => {
   } = props;
 
   return (
-    <div>
+    <>
       <GraphCard>
         <LineChart data={data} options={options} />
       </GraphCard>
@@ -36,7 +36,7 @@ const AnalyseDataGraphComponent = (props) => {
           onResetBaselineFilter={onResetBaselineFilter}
         />
       )}
-    </div>
+    </>
   );
 };
 

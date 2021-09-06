@@ -180,7 +180,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 		case db.HeatingProcess:
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
 			logger.Infoln("Heating object :", heat)
-			ht, err := deps.PlcDeck[deck].Heating(heat)
+			ht, err := deps.PlcDeck[deck].Heating(heat, false)
 			if err != nil {
 				return "", err
 			}
@@ -193,7 +193,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			}
 			logger.Infoln("shaker object :", shaker)
 
-			sha, err := deps.PlcDeck[deck].Shaking(shaker)
+			sha, err := deps.PlcDeck[deck].Shaking(shaker, false)
 			if err != nil {
 				return "", err
 			}
@@ -264,7 +264,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			logger.Infoln("Tip Docking Object: ",td)
 			if td.Type == string(db.Cartridge1) {
 				currentCartridgeID = *recipe.Cartridge1Position
-			} else {
+			} else if td.Type == string(db.Cartridge2) {
 				currentCartridgeID = *recipe.Cartridge2Position
 			}
 			response, err = deps.PlcDeck[deck].TipDocking(td, currentCartridgeID)

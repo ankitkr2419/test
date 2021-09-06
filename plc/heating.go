@@ -22,7 +22,22 @@ import (
 8. if yes then start heating let it reach to specified temperature and then start timer and after time switch heater off.
 9. Switch heater OFF
 */
-func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
+func (d *Compact32Deck) Heating(ht db.Heating, live bool) (response string, err error) {
+
+	d.setHeaterInProgress()
+	defer d.resetHeaterInProgress()
+
+	defer func() {
+		if live{
+			d.ResetAborted()
+		}
+		if err != nil {
+			logger.Errorln(err)
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+			return
+		}
+		d.WsMsgCh <- "SUCCESS_HeaterRun_HeaterRunSuccess"
+	}()
 
 	stopMonitor := make(chan bool, 1)
 
@@ -85,8 +100,8 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	// Step 9:  Switch heater OFF (Called in defer)
 	defer d.switchOffHeater()
-	d.setHeaterInProgress()
-	defer d.resetHeaterInProgress()
+
+	d.WsMsgCh <- "PROGRESS_HeaterRun_HeaterRunStarted"
 
 	// Step 7: For not follow Temp
 	// first check if not follow up then call delay function.

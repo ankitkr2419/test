@@ -52,8 +52,13 @@ func (d *Compact32Deck) setAborted() {
 	aborted.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetAborted() {
+func (d *Compact32Deck) ResetAborted() {
 	aborted.Store(d.name, false)
+	d.resetShakerInProgress()
+	d.resetHeaterInProgress()
+	d.resetShakerPIDCalibrationInProgress()
+	d.ResetRunInProgress()
+	d.ResetPaused()
 }
 
 func (d *Compact32Deck) SetPaused() {
@@ -80,12 +85,22 @@ func (d *Compact32Deck) resetUVLightInProgress() {
 	uvLightInProgress.Store(d.name, false)
 }
 
-func (d *Compact32Deck) setPIDCalibrationInProgress() {
-	pIDCalibrationInProgress.Store(d.name, true)
+func (d *Compact32Deck) setShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetPIDCalibrationInProgress() {
-	pIDCalibrationInProgress.Store(d.name, false)
+func (d *Compact32Deck) resetShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.name, false)
+	shaker1PIDDone = false
+	shaker2PIDDone = false
+}
+
+func (d *Compact32Deck) setMotorOperationCompleted() {
+	motorOperationCompleted.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetMotorOperationCompleted() {
+	motorOperationCompleted.Store(d.name, false)
 }
 
 func (d *Compact32Deck) setHomingPercent(percent float64) {
@@ -141,7 +156,7 @@ func (d *Compact32Deck) isMachineInPausedState() bool {
 	return false
 }
 
-func (d *Compact32Deck) isHeaterInProgress() bool {
+func (d *Compact32Deck) IsHeaterInProgress() bool {
 	if temp, ok := heaterInProgress.Load(d.name); !ok {
 		logger.Errorln("heaterInProgress isn't loaded!")
 	} else if temp.(bool) {
@@ -150,8 +165,9 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 	return false
 }
 
-func (d *Compact32Deck) isShakerInProgress() bool {
-	if temp, ok := heaterInProgress.Load(d.name); !ok {
+
+func (d *Compact32Deck) IsShakerInProgress() bool {
+	if temp, ok := shakerInProgress.Load(d.name); !ok {
 		logger.Errorln("shakerInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
@@ -168,9 +184,9 @@ func (d *Compact32Deck) isUVLightInProgress() bool {
 	return false
 }
 
-func (d *Compact32Deck) isPIDCalibrationInProgress() bool {
-	if temp, ok := pIDCalibrationInProgress.Load(d.name); !ok {
-		logger.Errorln("pIDCalibrationInProgress isn't loaded!")
+func (d *Compact32Deck) isShakerPIDTuningInProgress() bool {
+	if temp, ok := shakerPIDCalibrationInProgress.Load(d.name); !ok {
+		logger.Errorln("shakerPIDCalibrationInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}
@@ -180,6 +196,15 @@ func (d *Compact32Deck) isPIDCalibrationInProgress() bool {
 func (d *Compact32Deck) isTipDiscardInProgress() bool {
 	if temp, ok := tipDiscardInProgress.Load(d.name); !ok {
 		logger.Errorln("tipDiscardInProgress isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) isMotorOperationCompleted() bool {
+	if temp, ok := motorOperationCompleted.Load(d.name); !ok {
+		logger.Errorln("motorOperationCompleted isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}

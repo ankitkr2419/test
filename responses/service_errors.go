@@ -168,7 +168,15 @@ var (
 
 	PreviousExperimentProgressError = fmt.Errorf("error previous experiment already in progress")
 
-	ReportAbsent = fmt.Errorf("report is absent in form data!")
+	ReportAbsent            = fmt.Errorf("report is absent in form data!")
+	DyeToleranceDecodeError = fmt.Errorf("error decoding dye tolerance data!")
+	InvalidKitIDError       = fmt.Errorf("error invalid kit id!")
+
+	ConsumableDistanceDecodeError    = fmt.Errorf("error decoding consumable distance record")
+	ConsumableDistanceCreateError    = fmt.Errorf("error creating consumable distance record")
+	ConsumableDistanceFetchError     = fmt.Errorf("error fetching consumable distance record")
+	ConsumableDistanceArgumentsError = fmt.Errorf("error invalid consumable distance arguments")
+	ConsumableDistanceUpdateError    = fmt.Errorf("error updating Consumable distance record")
 )
 
 // Special errors which are in []byte format

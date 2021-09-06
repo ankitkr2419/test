@@ -85,11 +85,14 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/configs/extraction", authenticate(updateExtractionConfigHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/motor", authenticate(createMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/motor/{id}", authenticate(updateMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/motor", authenticate(updateMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/motors", authenticate(listMotorsHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/motor/{id}", authenticate(deleteMotorHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/consumable-distance", authenticate(createConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/consumable-distance", authenticate(listConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/consumable-distance", authenticate(updateConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
+
 	router.HandleFunc("/tiptube", authenticate(createTipTubeHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tips-tubes/{id}", authenticate(deleteTipTubeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
@@ -184,5 +187,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/email-report/{experiment_id}", emailReport(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/upload-report/{experiment_id}", uploadReport(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/rtpcr/graph-update-scale/{id}", authenticate(updateScaleHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/set-tolerance", authenticate(dyeToleranceHandler(deps), deps, RTPCR, engineer)).Methods(http.MethodPost).Headers(versionHeader, v1)
+
 	return
 }

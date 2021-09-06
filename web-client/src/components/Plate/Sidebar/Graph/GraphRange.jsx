@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Text } from "shared-components";
 import { FormGroup, Label, Input, Button } from "core-components";
@@ -25,11 +25,6 @@ const GraphRange = (props) => {
     initialValues: formikInitialState,
     enableReinitialize: true,
   });
-
-  //TODO: to be confirmed
-  // useEffect(() => {
-  //   formik.setFieldValue("xMax.max", parseInt(totalCycles));
-  // }, [totalCycles]);
 
   const handleBlurChange = ({ name, value }) => {
     const { min, max } = formik.values[`${name}`];
@@ -58,11 +53,6 @@ const GraphRange = (props) => {
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`xMin.isInvalid`, false)}
           />
-          {/* <div className="flex-70">
-            <Text Tag="p" size={14} className="text-danger">
-              This should be between {32} -{21}.
-            </Text>
-          </div> */}
 
           <Input
             name="xMax"
@@ -103,7 +93,6 @@ const GraphRange = (props) => {
         <Button
           color="primary"
           size="sm"
-          // outline
           className="mb-3 ml-3"
           onClick={() => handleRangeChangeBtn(getRequestBody(formik.values))}
           disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}

@@ -13,6 +13,8 @@ var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning, LidPidT
 var CurrentCycleTemperature, CurrentLidTemp float32
 var CurrentCycle uint16
 
+const FValueRegisterStartAddress = 800
+
 type DeckNumber struct {
 	Deck   string
 	Number uint16
@@ -93,8 +95,8 @@ var deckRecipe map[string]db.Recipe
 var deckProcesses map[string][]db.Process
 var wrotePulses, executedPulses, aborted, paused, homed, EngineerOrAdminLogged sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
-var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
-var pIDCalibrationInProgress sync.Map
+var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress, motorOperationCompleted sync.Map
+var shakerPIDCalibrationInProgress sync.Map
 
 // tipHeight is the Height of tip from syringe's base
 var tipHeight map[string]float64
@@ -134,10 +136,12 @@ func loadUtils() {
 	syringeModuleState.Store(DeckB, OutDeck)
 	homed.Store(DeckA, false)
 	homed.Store(DeckB, false)
-	pIDCalibrationInProgress.Store("A", false)
-	pIDCalibrationInProgress.Store("B", false)
-	EngineerOrAdminLogged.Store("A", false)
-	EngineerOrAdminLogged.Store("B", false)
+	motorOperationCompleted.Store(DeckA, false)
+	motorOperationCompleted.Store(DeckB, false)
+	shakerPIDCalibrationInProgress.Store(DeckA, false)
+	shakerPIDCalibrationInProgress.Store(DeckB, false)
+	EngineerOrAdminLogged.Store(DeckA, false)
+	EngineerOrAdminLogged.Store(DeckB, false)
 
 	deckRecipe = map[string]db.Recipe{
 		DeckA: db.Recipe{},
