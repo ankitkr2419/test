@@ -327,6 +327,10 @@ export const shakerRunInSuccess = () => ({
   type: shakerRunProgressActions.shakerRunProgressActionSuccess,
 });
 
+export const shakerRunInAborted = () => ({
+  type: shakerRunProgressActions.shakerRunProgressActionAborted,
+});
+
 // websocket action creators for Heater
 export const heaterRunInProgress = () => ({
   type: heaterRunProgressActions.heaterRunProgressAction,
@@ -334,6 +338,10 @@ export const heaterRunInProgress = () => ({
 
 export const heaterRunInSuccess = () => ({
   type: heaterRunProgressActions.heaterRunProgressActionSuccess,
+});
+
+export const heaterRunInAborted = () => ({
+  type: heaterRunProgressActions.heaterRunProgressActionAborted,
 });
 
 //fetch tolerance

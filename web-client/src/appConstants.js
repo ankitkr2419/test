@@ -61,8 +61,10 @@ export const SOCKET_MESSAGE_TYPE = {
   progressHeater: "PROGRESS_HEATER",
   progressShakerRun: "PROGRESS_SHAKERRUN",
   successShakerRun: "SUCCESS_SHAKERRUN",
+  abortShakerRun: "ABORT_SHAKERRUN",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
+  abortHeaterRun: "ABORT_HEATERRUN",
 };
 
 export const HEATER_STATUS = {
@@ -85,11 +87,13 @@ export const PID_STATUS = {
 export const SHAKER_RUN_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",
+  progressAborted: "progressAborted",
 };
 
 export const HEATER_RUN_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",
+  progressAborted: "progressAborted",
 };
 
 export const EXPERIMENT_STATUS = {

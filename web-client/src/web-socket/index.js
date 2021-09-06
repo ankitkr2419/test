@@ -39,10 +39,12 @@ import {
   heaterProgress,
   heaterRunInProgress,
   heaterRunInSuccess,
+  heaterRunInAborted,
   runPidInProgress,
   runPidInSuccess,
   shakerRunInProgress,
   shakerRunInSuccess,
+  shakerRunInAborted,
 } from "action-creators/calibrationActionCreators";
 
 let webSocket = null;
@@ -138,11 +140,17 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.successShakerRun:
           dispatch(shakerRunInSuccess());
           break;
+        case SOCKET_MESSAGE_TYPE.abortShakerRun:
+          dispatch(shakerRunInAborted());
+          break;
         case SOCKET_MESSAGE_TYPE.progressHeaterRun:
           dispatch(heaterRunInProgress());
           break;
         case SOCKET_MESSAGE_TYPE.successHeaterRun:
           dispatch(heaterRunInSuccess());
+          break;
+        case SOCKET_MESSAGE_TYPE.abortHeaterRun:
+          dispatch(heaterRunInAborted());
           break;
 
         default:

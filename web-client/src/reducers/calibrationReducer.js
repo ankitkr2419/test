@@ -597,6 +597,11 @@ export const shakerRunProgessReducer = (
         shakerRunStatus: SHAKER_RUN_STATUS.progressComplete,
       });
 
+    case shakerRunProgressActions.shakerRunProgressActionAborted:
+      return state.merge({
+        shakerRunStatus: SHAKER_RUN_STATUS.progressAborted,
+      });
+
     case loginActions.loginReset:
       return shakerRunProgressInitialState;
 
@@ -623,6 +628,11 @@ export const heaterRunProgessReducer = (
     case heaterRunProgressActions.heaterRunProgressActionSuccess:
       return state.merge({
         heaterRunStatus: HEATER_RUN_STATUS.progressComplete,
+      });
+
+    case heaterRunProgressActions.heaterRunProgressActionAborted:
+      return state.merge({
+        heaterRunStatus: HEATER_RUN_STATUS.progressAborted,
       });
 
     case loginActions.loginReset:

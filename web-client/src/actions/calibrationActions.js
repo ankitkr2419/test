@@ -142,12 +142,14 @@ export const updateTECConfigsActions = {
 export const shakerRunProgressActions = {
   shakerRunProgressAction: "SHAKER_RUN_IN_PROGRESS",
   shakerRunProgressActionSuccess: "SHAKER_RUN_SUCCEEDED",
+  shakerRunProgressActionAborted: "SHAKER_RUN_ABORTED",
 };
 
 // websocket for heater
 export const heaterRunProgressActions = {
   heaterRunProgressAction: "HEATER_RUN_IN_PROGRESS",
   heaterRunProgressActionSuccess: "HEATER_RUN_SUCCEEDED",
+  heaterRunProgressActionAborted: "HEATER_RUN_ABORTED",
 };
 
 // tolerance values
