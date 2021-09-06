@@ -159,6 +159,8 @@ var (
 	UserDeleteSuccess           = "user deleted successfully"
 
 	ConsumableDistanceUpdateSuccess = "consumable distance record updated successfully"
+	DyeCreateSuccess                = "dyes record created successfully"
+	DyeListSuccess                  = "dyes record listed successfully"
 )
 
 func GetMachineOperationMessage(operation string, state string) (message string) {

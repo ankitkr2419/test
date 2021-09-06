@@ -1,0 +1,25 @@
+dyes:
+- name: FAM
+  position: 1
+  targets: [HIV, COVID-A]
+  tolerance: 15
+- name: CY5
+  position: 4
+  targets: [DENGUE, HBV]
+  tolerance: 10
+- name: VIC
+  position: 2
+  targets: [HCV]
+  tolerance: 10
+- name: NED
+  position: 5
+  targets: [COVID-B]
+  tolerance: 10
+- name: ROX
+  position: 3
+  targets: [CANCER]
+  tolerance: 10
+- name: SYBR
+  position: 6
+  targets: [TB]
+  tolerance: 10
