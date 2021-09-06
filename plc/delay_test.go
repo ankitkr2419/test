@@ -130,7 +130,7 @@ func (suite *DelayTestSuite) TestDelayRecipeProgressSuccess() {
 	initiateWebSocket()
 	deckProcesses[testdeck.name] = testProcesses
 	testDelayRecord.DelayTime = 2
-	testdeck.resetAborted()
+	testdeck.ResetAborted()
 	testdeck.ResetPaused()
 	testdeck.SetRunInProgress()
 	go func() {
