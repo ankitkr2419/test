@@ -66,6 +66,8 @@ export const SOCKET_MESSAGE_TYPE = {
   successShakerRun: "SUCCESS_SHAKERRUN",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
+  progressDyeCalibration: "PROGRESS_OPTCALIB",
+  completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
 
 export const HEATER_STATUS = {
@@ -193,6 +195,7 @@ export const API_ENDPOINTS = {
   autoTuneTEC: "tec/auto-tune",
   dyes: "dyes",
   consumable: "consumable-distance",
+  dyeCalibration: "optical-caliberation",
 };
 
 export const MODAL_MESSAGE = {

@@ -14,9 +14,16 @@ import {
   CheckBox,
 } from "core-components";
 import { Center, Text } from "shared-components";
+import { calibrationStatusMessage } from "./helper";
+import { PID_STATUS } from "appConstants";
 
 const DyeCalibration = (props) => {
-  let { dyeOptions, formikDyeCalibration, handleDyeCalibrationButton } = props;
+  let {
+    dyeCalibrationStatus,
+    dyeOptions,
+    formikDyeCalibration,
+    handleDyeCalibrationButton,
+  } = props;
   let { selectedDye, kitID } = formikDyeCalibration.values;
 
   const handleBlurKitID = (value) => {
@@ -28,16 +35,17 @@ const DyeCalibration = (props) => {
     formikDyeCalibration.setFieldValue(key, value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (selectedDye.isInvalid === false && kitID.isInvalid === false) {
       let selectedDyeID = selectedDye.value.value;
       let selectedKitID = kitID.value;
 
-      let requestBody = {
+      //create request body
+      handleDyeCalibrationButton({
         dye_id: selectedDyeID,
-        kit_id: selectedKitID,
-      };
-      handleDyeCalibrationButton(requestBody);
+        kit_id: `${selectedKitID}`, //string format as per api
+      });
     }
   };
 
@@ -45,7 +53,11 @@ const DyeCalibration = (props) => {
     selectedDye.value === null ||
     kitID.value === null ||
     selectedDye.isInvalid ||
-    kitID.isInvalid;
+    kitID.isInvalid ||
+    dyeCalibrationStatus === PID_STATUS.running ||
+    dyeCalibrationStatus === PID_STATUS.progressing;
+
+  let message = calibrationStatusMessage(dyeCalibrationStatus);
 
   return (
     <Card default className="my-3">
@@ -81,7 +93,7 @@ const DyeCalibration = (props) => {
             <Col sm={4}>
               <FormGroup>
                 <Label for="kitId" className="font-weight-bold">
-                  ID
+                  Kit ID
                 </Label>
                 <Input
                   type="number"
@@ -97,6 +109,13 @@ const DyeCalibration = (props) => {
                 />
               </FormGroup>
             </Col>
+            {message && (
+              <Col sm={4} className="d-flex align-items-center">
+                <Text Tag="h4" size={16} className="text-gray">
+                  {message}
+                </Text>
+              </Col>
+            )}
           </Row>
           <Center className="text-center pt-3">
             <Button disabled={isDyeCalibrationDisabled} color="primary">

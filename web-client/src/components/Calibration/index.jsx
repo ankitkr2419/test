@@ -28,6 +28,7 @@ const CalibrationComponent = (props) => {
     dyeOptions,
     formikDyeCalibration,
     handleDyeCalibrationButton,
+    dyeCalibrationStatus,
     handleSaveToleranceBtn,
     toleranceData,
   } = props;
@@ -99,6 +100,7 @@ const CalibrationComponent = (props) => {
           <DyeCalibration
             dyeOptions={dyeOptions}
             formikDyeCalibration={formikDyeCalibration}
+            dyeCalibrationStatus={dyeCalibrationStatus}
             handleDyeCalibrationButton={handleDyeCalibrationButton}
           />
         </CardBody>

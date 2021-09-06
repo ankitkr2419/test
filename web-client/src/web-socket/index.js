@@ -45,6 +45,8 @@ import {
   successLidPid,
   shakerRunInProgress,
   shakerRunInSuccess,
+  progressDyeCalibration,
+  completedDyeCalibration,
 } from "action-creators/calibrationActionCreators";
 
 let webSocket = null;
@@ -151,6 +153,13 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.successHeaterRun:
           dispatch(heaterRunInSuccess());
+          break;
+        case SOCKET_MESSAGE_TYPE.progressDyeCalibration:
+          dispatch(progressDyeCalibration());
+          break;
+        case SOCKET_MESSAGE_TYPE.completedDyeCalibration:
+          dispatch(completedDyeCalibration());
+          toast.success(data);
           break;
 
         default:

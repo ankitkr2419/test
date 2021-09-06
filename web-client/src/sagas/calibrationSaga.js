@@ -655,9 +655,9 @@ export function* runDyeCalibration(actions) {
   try {
     yield call(callApi, {
       payload: {
-        // method: HTTP_METHODS.POST,//TODO need to confirm once api is ready
+        method: HTTP_METHODS.POST,
         body: requestBody,
-        // reqPath: `${API_ENDPOINTS.}`,
+        reqPath: `${API_ENDPOINTS.dyeCalibration}`,
         successAction: successAction,
         failureAction: failureAction,
         showPopupSuccessMessage: true,
@@ -842,7 +842,7 @@ export function* calibrationSaga() {
   yield takeEvery(resetTECActions.initiateAction, resetTEC);
   yield takeEvery(autoTuneTECActions.initiateAction, autoTuneTEC);
   yield takeEvery(runDyeCalibrationActions.initiateAction, runDyeCalibration);
-  
+
   yield takeEvery(fetchToleranceActions.initiateAction, fetchTolerance);
   yield takeEvery(updateToleranceActions.initiateAction, updateTolerance);
   yield takeEvery(fetchConsumableActions.initiateAction, fetchConsumable);

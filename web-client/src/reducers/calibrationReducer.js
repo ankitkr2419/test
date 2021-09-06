@@ -782,7 +782,39 @@ export const dyeCalibrationReducer = (
   action
 ) => {
   switch (action.type) {
-    //TODO other actions work in progress
+    case runDyeCalibrationActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        dyeCalibrationStatus: PID_STATUS.running,
+      });
+    case runDyeCalibrationActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        dyeCalibrationStatus: PID_STATUS.running,
+      });
+    case runDyeCalibrationActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        dyeCalibrationStatus: PID_STATUS.runFailed,
+      });
+    case runDyeCalibrationActions.resetAction:
+      return dyeCalibrationInitialState;
+    case runDyeCalibrationActions.progressAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        dyeCalibrationStatus: PID_STATUS.progressing,
+      });
+    case runDyeCalibrationActions.completedAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        dyeCalibrationStatus: PID_STATUS.progressComplete,
+      });
+
     case loginActions.loginReset:
       return dyeCalibrationInitialState;
 

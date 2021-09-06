@@ -15,6 +15,7 @@ import {
   autoTuneTECInitiated,
   updateToleranceInitiated,
   fetchToleranceInitiated,
+  runDyeCalibration,
 } from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
 import {
@@ -22,6 +23,7 @@ import {
   formikInitialStateRtpcrVars,
   formikInitialStateTECVars,
   formikInitialStateDyeCalibration,
+  createDyeOptions,
 } from "components/Calibration/helper";
 import { deckBlockInitiated } from "action-creators/loginActionCreators";
 import { populateFormikStateFromApi } from "components/FormikFieldsEditor/helper";
@@ -83,15 +85,16 @@ const CalibrationRtpcrContainer = () => {
   const lidPidReducerData = lidPidReducer.toJS();
   const { lidPidStatus } = lidPidReducerData;
 
-  //dye options: TODO make it dynamic
-  let dyeOptions = [
-    { label: "one", value: "one" },
-    { label: "two", value: "two" },
-  ];
-
   //Tolerance Variables
   const toleranceReducer = useSelector((state) => state.toleranceReducer);
   const toleranceReducerData = toleranceReducer.toJS();
+
+  //dye calibration
+  const dyeCalibrationReducer = useSelector(
+    (state) => state.dyeCalibrationReducer
+  );
+  const dyeCalibrationReducerData = dyeCalibrationReducer.toJS();
+  const { dyeCalibrationStatus } = dyeCalibrationReducerData;
 
   //initially populate with previous data
   useEffect(() => {
@@ -222,13 +225,26 @@ const CalibrationRtpcrContainer = () => {
   };
 
   const handleDyeCalibrationButton = (requestBody) => {
-    //TODO api call
-    console.log("requestBody: ", requestBody);
+    dispatch(runDyeCalibration(token, requestBody));
   };
 
   const handleSaveToleranceBtn = (requestBody) => {
     dispatch(updateToleranceInitiated({ token, requestBody }));
   };
+
+  //dye options
+  let dyeOptions = [];
+  dyeOptions =
+    toleranceReducerData?.data &&
+    dyeOptions.length === 0 &&
+    createDyeOptions(toleranceReducerData?.data);
+  //set first dye as default selected for first time
+  if (
+    dyeOptions?.length &&
+    formikDyeCalibration.values.selectedDye.value === null
+  ) {
+    formikDyeCalibration.setFieldValue("selectedDye.value", dyeOptions[0]);
+  }
 
   return (
     <CalibrationComponent
@@ -246,6 +262,7 @@ const CalibrationRtpcrContainer = () => {
       dyeOptions={dyeOptions}
       formikDyeCalibration={formikDyeCalibration}
       handleDyeCalibrationButton={handleDyeCalibrationButton}
+      dyeCalibrationStatus={dyeCalibrationStatus}
       handleSaveToleranceBtn={handleSaveToleranceBtn}
       toleranceData={toleranceReducerData.data}
     />

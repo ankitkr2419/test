@@ -1,4 +1,5 @@
 import { EMAIL_REGEX_OR_EMPTY_STR, NAME_REGEX } from "appConstants";
+import { PID_STATUS } from "appConstants";
 
 export const formikInitialState = {
   name: {
@@ -275,4 +276,31 @@ export const getRequestBody = (state) => {
     body[name] = type === "number" ? parseInt(value) : value;
   }
   return body;
+};
+
+/**create dye list from tolerance data to use it in dropdown */
+export const createDyeOptions = (toleranceReducerData) => {
+  let dyeList = [];
+  if (toleranceReducerData?.length) {
+    dyeList = toleranceReducerData?.map((obj) => ({
+      label: obj.Name,
+      value: obj.ID,
+    }));
+  }
+  return dyeList;
+};
+
+export const calibrationStatusMessage = (dyeCalibrationStatus) => {
+  switch (dyeCalibrationStatus) {
+    case PID_STATUS.running:
+      return "Calibration Running";
+    case PID_STATUS.runFailed:
+      return "Calibration Failed";
+    case PID_STATUS.progressing:
+      return "Calibration In Progress";
+    case PID_STATUS.progressComplete:
+      return "Calibration Completed";
+    default:
+      return "";
+  }
 };
