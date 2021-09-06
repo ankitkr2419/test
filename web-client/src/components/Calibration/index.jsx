@@ -9,6 +9,7 @@ import LidPidTuning from "./LidPidTuning";
 
 import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
 import TECOperations from "./TECOperations";
+import DyeCalibration from "./DyeCalibration";
 
 const CalibrationComponent = (props) => {
   let {
@@ -81,6 +82,9 @@ const CalibrationComponent = (props) => {
             handleResetTEC={handleResetTEC}
             handleAutoTuneTEC={handleAutoTuneTEC}
           />
+
+          {/**Calibration of dyes */}
+          <DyeCalibration />
         </CardBody>
       </Card>
     </div>
