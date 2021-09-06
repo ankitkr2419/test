@@ -188,8 +188,8 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/upload-report/{experiment_id}", uploadReport(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/rtpcr/graph-update-scale/{id}", authenticate(updateScaleHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/optical-caliberation", authenticate(dyeToleranceHandler(deps), deps, RTPCR, engineer)).Methods(http.MethodPost).Headers(versionHeader, v1)
-	router.HandleFunc("/dyes", authenticate(updateDyeToleranceHandler(deps), deps, RTPCR, engineer)).Methods(http.MethodPut).Headers(versionHeader, v1)
-	router.HandleFunc("/dyes", authenticate(listDyesHandler(deps), deps, RTPCR, engineer)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/dyes", authenticate(updateDyeToleranceHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodPut).Headers(versionHeader, v1)
+	router.HandleFunc("/dyes", authenticate(listDyesHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
 	return
 }

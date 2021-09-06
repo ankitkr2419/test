@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 
 	logger "github.com/sirupsen/logrus"
@@ -13,8 +14,8 @@ func updateDyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 		var cd []db.Dye
 		err := json.NewDecoder(req.Body).Decode(&cd)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding dyes data")
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DyeDecodeError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DyeDecodeError)
 			return
 		}
 
@@ -22,40 +23,26 @@ func updateDyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 
 		dyes, err := deps.Store.InsertDyes(req.Context(), cd)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error while inserting dyes")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DyeInsertError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DyeInsertError)
 			return
 		}
 
-		respBytes, err := json.Marshal(dyes)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling dyes data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusCreated)
-		rw.Write(respBytes)
+		logger.Infoln(responses.DyeCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, dyes)
 	})
 }
+
 func listDyesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		e, err := deps.Store.ListDyes(req.Context())
 		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error fetching Dyes data")
-			rw.WriteHeader(http.StatusInternalServerError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.DyeFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DyeFetchError)
 			return
 		}
 
-		respBytes, err := json.Marshal(e)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error("Error marshaling Dyes data")
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(respBytes)
+		logger.Infoln(responses.DyeCreateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, e)
 	})
 }
