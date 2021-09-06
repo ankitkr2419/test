@@ -21,6 +21,8 @@ import {
   updateTECConfigsActions,
   createCartridgesActions,
   deleteCartridgesActions,
+  fetchToleranceActions,
+  updateToleranceActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -42,6 +44,8 @@ import {
   updateTECConfigsFailed,
   createCartridgesFailed,
   deleteCartridgesFailed,
+  fetchToleranceFailed,
+  updateToleranceFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -521,6 +525,56 @@ export function* updateTECConfigs(actions) {
   }
 }
 
+export function* fetchTolerance(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = fetchToleranceActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        reqPath: `${API_ENDPOINTS.dyes}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching tolerance configs", error);
+    yield put(fetchToleranceFailed(error));
+  }
+}
+
+export function* updateTolerance(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = updateToleranceActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.PUT,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.dyes}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating tolerance configs", error);
+    yield put(updateToleranceFailed({ error }));
+  }
+}
+
 export function* calibrationSaga() {
   yield takeEvery(shakerActions.shakerActionInitiated, shaker);
   yield takeEvery(heaterActions.heaterActionInitiated, heater);
@@ -559,4 +613,6 @@ export function* calibrationSaga() {
   yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
   yield takeEvery(fetchTECConfigsActions.initiateAction, fetchTECConfigs);
   yield takeEvery(updateTECConfigsActions.initiateAction, updateTECConfigs);
+  yield takeEvery(fetchToleranceActions.initiateAction, fetchTolerance);
+  yield takeEvery(updateToleranceActions.initiateAction, updateTolerance);
 }

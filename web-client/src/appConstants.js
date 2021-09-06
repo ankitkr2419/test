@@ -184,6 +184,7 @@ export const API_ENDPOINTS = {
   cartridge: "cartridge",
   rtpcrConfigs: "configs/rtpcr",
   tecConfigs: "configs/tec",
+  dyes: "dyes",
 };
 
 export const MODAL_MESSAGE = {

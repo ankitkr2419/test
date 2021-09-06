@@ -18,6 +18,8 @@ import {
   updateTECConfigsActions,
   shakerRunProgressActions,
   heaterRunProgressActions,
+  fetchToleranceActions,
+  updateToleranceActions,
 } from "actions/calibrationActions";
 import {
   DECKNAME,
@@ -622,6 +624,67 @@ export const heaterRunProgessReducer = (
 
     case loginActions.loginReset:
       return heaterRunProgressInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const toleranceInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  data: [],
+  isUpdateApi: null, // to distinguish between fetch and put API
+});
+export const toleranceReducer = (state = toleranceInitialState, action) => {
+  switch (action.type) {
+    case fetchToleranceActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: false,
+      });
+    case fetchToleranceActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        data: action.payload.response,
+        isUpdateApi: false,
+      });
+    case fetchToleranceActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: false,
+      });
+    case fetchToleranceActions.resetAction:
+      return toleranceInitialState;
+
+    case updateToleranceActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case updateToleranceActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+
+    case updateToleranceActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+
+    case updateToleranceActions.resetAction:
+      return toleranceInitialState;
+
+    case loginActions.loginReset:
+      return toleranceInitialState;
 
     default:
       return state;

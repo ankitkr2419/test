@@ -36,7 +36,7 @@ const CalibrationComponent = (props) => {
     formikTECVars,
     handleTECConfigSubmitButton,
     handleSaveToleranceBtn,
-    mockData,
+    toleranceData,
   } = props;
 
   const history = useHistory();
@@ -70,7 +70,7 @@ const CalibrationComponent = (props) => {
 
           {/* Tolerance Component */}
           <ToleranceComponent
-            mockData={mockData}
+            toleranceData={toleranceData}
             handleSaveToleranceBtn={handleSaveToleranceBtn}
           />
 

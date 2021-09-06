@@ -18,10 +18,10 @@ import {
 import { MAX_TOLERANCE_ALLOWED, MIN_TOLERANCE_ALLOWED } from "appConstants";
 
 const ToleranceComponent = (props) => {
-  const { mockData, handleSaveToleranceBtn } = props;
+  const { toleranceData, handleSaveToleranceBtn } = props;
 
   const formik = useFormik({
-    initialValues: getToleranceInitialFormikState(mockData),
+    initialValues: getToleranceInitialFormikState(toleranceData),
     enableReinitialize: true,
   });
 
@@ -45,76 +45,94 @@ const ToleranceComponent = (props) => {
   };
 
   const handleSaveBtn = () => {
-    const requestBody = mockData.map((dataObj, index) => ({
-      ...dataObj,
-      tolerance: parseFloat(tolerance[index].value),
+    const requestBody = toleranceData.map((dataObj, index) => ({
+      Name: dataObj.Name,
+      Position: dataObj.Position,
+      Tolerance: parseFloat(tolerance[index].value),
     }));
-
     handleSaveToleranceBtn(requestBody);
   };
 
   return (
     <Card default className="my-3">
       <CardBody>
-        {mockData.map((dyeObj, index) => (
-          <Row className="my-3">
-            <Col className="">
-              <Label for="name" className="font-weight-bold">
-                Name
-              </Label>
-              <Input disabled value={dyeObj.name} />
-            </Col>
+        <Text
+          Tag="h4"
+          size={24}
+          className="text-center text-gray text-bold mt-3 mb-4"
+        >
+          Tolerance Configuration
+        </Text>
+        {toleranceData && toleranceData.length > 0 ? (
+          toleranceData.map((dyeObj, index) => (
+            <Row className="my-3">
+              <Col className="">
+                <Label for="name" className="font-weight-bold">
+                  Name
+                </Label>
+                <Input disabled value={dyeObj.Name} />
+              </Col>
 
-            <Col className="">
-              <Label for="position" className="font-weight-bold">
-                Position
-              </Label>
-              <Input disabled value={dyeObj.position} />
-            </Col>
+              <Col className="">
+                <Label for="position" className="font-weight-bold">
+                  Position
+                </Label>
+                <Input disabled value={dyeObj.Position} />
+              </Col>
 
-            <Col className="">
-              <Label for="tolerance" className="font-weight-bold">
-                Tolerance
-              </Label>
-              <Input
-                name="tolerance"
-                id="tolerance"
-                placeholder={"Type here"}
-                value={tolerance[index].value}
-                onChange={(event) =>
-                  handleOnChange(`tolerance.${index}.value`, event.target.value)
-                }
-                onBlur={(e) =>
-                  handleBlur(`tolerance.${index}.isInvalid`, e.target.value)
-                }
-                onFocus={() =>
-                  formik.setFieldValue(`tolerance.${index}.isInvalid`, false)
-                }
-              />
-              {tolerance[index].isInvalid && (
-                <div className="flex-auto">
-                  <Text Tag="p" size={14} className="text-danger">
-                    {`Tolerance must be between ${MIN_TOLERANCE_ALLOWED} and ${MAX_TOLERANCE_ALLOWED}`}
-                  </Text>
-                </div>
-              )}
+              <Col className="">
+                <Label for="tolerance" className="font-weight-bold">
+                  Tolerance
+                </Label>
+                <Input
+                  name="tolerance"
+                  id="tolerance"
+                  placeholder={"Type here"}
+                  value={tolerance[index].value}
+                  onChange={(event) =>
+                    handleOnChange(
+                      `tolerance.${index}.value`,
+                      event.target.value
+                    )
+                  }
+                  onBlur={(e) =>
+                    handleBlur(`tolerance.${index}.isInvalid`, e.target.value)
+                  }
+                  onFocus={() =>
+                    formik.setFieldValue(`tolerance.${index}.isInvalid`, false)
+                  }
+                />
+                {tolerance[index].isInvalid && (
+                  <div className="flex-auto">
+                    <Text Tag="p" size={14} className="text-danger">
+                      {`Tolerance must be between ${MIN_TOLERANCE_ALLOWED} and ${MAX_TOLERANCE_ALLOWED}`}
+                    </Text>
+                  </div>
+                )}
+              </Col>
+            </Row>
+          ))
+        ) : (
+          <Text className="secondary m-5 p-5 font-weight-bold">
+            Nothing to show
+          </Text>
+        )}
+
+        {toleranceData && toleranceData.length > 0 && (
+          <Row>
+            <Col>
+              <Center className="text-center">
+                <Button
+                  onClick={handleSaveBtn}
+                  disabled={isSaveToleranceBtnDisabled(tolerance)}
+                  color="primary"
+                >
+                  Save Tolerance
+                </Button>
+              </Center>
             </Col>
           </Row>
-        ))}
-
-        <Row>
-          <Col>
-            <Center className="text-center">
-              <Button
-                onClick={handleSaveBtn}
-                disabled={isSaveToleranceBtnDisabled(tolerance)}
-                color="primary"
-              >
-                Save Tolerance
-              </Button>
-            </Center>
-          </Col>
-        </Row>
+        )}
       </CardBody>
     </Card>
   );

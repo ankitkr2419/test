@@ -194,8 +194,8 @@ export const formikInitialStateTECVars = {
 };
 
 export const getToleranceInitialFormikState = (data) => {
-  const toleranceArr = data.map((dataObj) => ({
-    value: dataObj.tolerance,
+  const toleranceArr = data?.map((dataObj) => ({
+    value: dataObj.Tolerance,
     isInvalid: false,
   }));
   return {

@@ -149,3 +149,17 @@ export const heaterRunProgressActions = {
   heaterRunProgressAction: "HEATER_RUN_IN_PROGRESS",
   heaterRunProgressActionSuccess: "HEATER_RUN_SUCCEEDED",
 };
+
+export const fetchToleranceActions = {
+  initiateAction: "FETCH_TOLERANCE_INITIATED",
+  successAction: "FETCH_TOLERANCE_SUCCESS",
+  failureAction: "FETCH_TOLERANCE_FAILURE",
+  resetAction: "FETCH_TOLERANCE_RESET",
+};
+
+export const updateToleranceActions = {
+  initiateAction: "UPDATE_TOLERANCE_INITIATED",
+  successAction: "UPDATE_TOLERANCE_SUCCESS",
+  failureAction: "UPDATE_TOLERANCE_FAILURE",
+  resetAction: "UPDATE_TOLERANCE_RESET",
+};

@@ -22,6 +22,8 @@ import {
   deleteCartridgesActions,
   shakerRunProgressActions,
   heaterRunProgressActions,
+  fetchToleranceActions,
+  updateToleranceActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -329,4 +331,25 @@ export const heaterRunInProgress = () => ({
 
 export const heaterRunInSuccess = () => ({
   type: heaterRunProgressActions.heaterRunProgressActionSuccess,
+});
+
+//fetch tolerance
+export const fetchToleranceInitiated = (payload) => ({
+  type: fetchToleranceActions.initiateAction,
+  payload,
+});
+
+export const fetchToleranceFailed = (error) => ({
+  type: fetchToleranceActions.failureAction,
+  payload: error,
+});
+
+export const updateToleranceInitiated = (payload) => ({
+  type: updateToleranceActions.initiateAction,
+  payload,
+});
+
+export const updateToleranceFailed = ({ error }) => ({
+  type: updateToleranceActions.failureAction,
+  payload: { error },
 });
