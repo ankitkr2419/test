@@ -71,4 +71,6 @@ var (
 	BlankDetailsError    = fmt.Errorf("error blank details found")
 	DyeDBFetchError      = fmt.Errorf("error failed to fetch dye")
 	CalculateResultError = fmt.Errorf("error failed to calculate the optical result")
+
+	CartridgeWellsHeightsMismatchError = fmt.Errorf("error cartridge wells and piercing heights number not matching")
 )

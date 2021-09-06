@@ -55,7 +55,7 @@ SD-> shaker-to-deck
 DW-> deck-to-well
 WD-> well-to-deck","cartridge type [1,2]","source position (number) NOTE: For Well this means well number, For Deck it means Deck Position",aspire height(in mm),aspire mixing volume(in ul),aspire number of cycles(number),aspire volume(in ul),aspire air volume(in ul ),dispense height (in mm),dispence mixing volume(in ul ),dispense number of cycles(number),"destination position(number) NOTE: For Well this means well number, For Deck it means Deck Position",,,
 ,TipOperation,pickup,5,,,,,,,,,,,,,
-,Piercing,1,"1,2,3,4,5,6,7,8",,,,,,,,,,,,,
+,Piercing,1,"1,2,3,4,5,6,7,8","3,3,3,5,5,5,5,3",,,,,,,,,,,
 ,TipOperation,discard,,,,,,,,,,,,,,
 ,TipOperation,pickup,3,,,,,,,,,,,,,
 ,AspireDispense,ww,1,1,21.9,0,0,25,10,10,0,0,3,,,

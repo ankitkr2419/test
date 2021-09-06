@@ -2,10 +2,10 @@ package plc
 
 import (
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
-	"sort"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 /****ALGORITHM******
@@ -20,11 +20,9 @@ import (
 func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response string, err error) {
 
 	var deckAndMotor DeckNumber
-	var position, cartridgeStart, piercingHeight, distanceToTravel, deckBase, pickUpTip float64
+	var position, cartridgeStart, distanceToTravel, deckBase float64
 	var ok bool
-	var direction, pulses, piercingPulses, afterPiercingRestPulses uint16
-	// []int has direct method to get slice sorted
-	var wellsToBePierced []int
+	var direction, pulses uint16
 	deckAndMotor.Deck = d.name
 	deckAndMotor.Number = K9_Syringe_Module_LHRH
 	uniqueCartridge := UniqueCartridge{
@@ -36,13 +34,6 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 	//
 	if cartridgeStart, ok = consDistance[string(pi.Type)+"_start"]; !ok {
 		err = fmt.Errorf(string(pi.Type) + "_start doesn't exist for consumable distances")
-		logger.Errorln(err)
-		return "", err
-	}
-
-	// piercingHeight is dependent on cartridge type
-	if piercingHeight, ok = consDistance["piercing_height_"+string(pi.Type)]; !ok {
-		err = fmt.Errorf("piercing_height_" + string(pi.Type) + " doesn't exist for consumable distances")
 		logger.Errorln(err)
 		return "", err
 	}
@@ -64,22 +55,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		return "", err
 	}
 
-	distanceToTravel = (deckBase + piercingHeight) - (Positions[deckAndMotor] + tipHeight[d.name])
-	// We know concrete direction here
-	// piercingHeight will be less
-
-	piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
-	// after piercing is completed we need to get the tip to its resting positon
-	afterPiercingRestPulses = piercingPulses
-
-	for _, well := range pi.CartridgeWells {
-		wellsToBePierced = append(wellsToBePierced, int(well))
-	}
-
-	// sort wells in Ascending Order
-	sort.Ints(wellsToBePierced)
-
-	for i, wellNumber := range wellsToBePierced {
+	for i, wellNumber := range pi.CartridgeWells {
 		//
 		// 2.1 Move deck to the well position
 		//
@@ -99,7 +75,7 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+		_, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 		if err != nil {
 			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Deck to Cartridge WellNum %d. Error: %v", wellNumber, err)
@@ -112,7 +88,12 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 		// WE know concrete direction here, its DOWN
 		deckAndMotor.Number = K9_Syringe_Module_LHRH
 
-		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+		// Go Down by well height + Base
+		distanceToTravel = (deckBase + float64(pi.Heights[i])) - (Positions[deckAndMotor] + tipHeight[d.name])
+
+		pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
+
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 		if err != nil {
 			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module DOWN to Cartridge WellNum %d. Error: %v", wellNumber, err)
@@ -120,38 +101,15 @@ func (d *Compact32Deck) Piercing(pi db.Piercing, cartridgeID int64) (response st
 
 		logger.Infoln("Pierced WellNumber: ", wellNumber)
 
-		// change piercingPulses just before going up after piercing the first well
-		if i == 0 {
-			// For wells other than first piercing height will be less
-
-			//
-			//  move syringe module above pickup_piercing_tip_up(17 mm) from the deck
-			//
-			if pickUpTip, ok = consDistance["pickup_piercing_tip_up"]; !ok {
-				err = fmt.Errorf("pickup_piercing_tip_up doesn't exist for consumable distances")
-				logger.Errorln(err)
-				return "", err
-			}
-
-			// piercingHeight will be always less than current position
-			distanceToTravel = Positions[deckAndMotor] + tipHeight[d.name] - (deckBase - pickUpTip)
-
-			piercingPulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
-		}
-
-		// if its last well then go to resting position up
-		if i == len(wellsToBePierced)-1 {
-			piercingPulses = afterPiercingRestPulses
-		}
 		// WE know concrete direction here, its UP
-		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], piercingPulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+		// Come Up by well height + Base
+		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
 		if err != nil {
 			logger.Errorln(err)
 			return "", fmt.Errorf("There was issue moving Syringe Module UP to Cartridge WellNum %d. Error: %v", wellNumber, err)
 		}
 
 		logger.Infoln("Got Up from WellNumber: ", wellNumber)
-
 		// 2.3 Repeat step 2.1 and  2.2 till another well exists
 	}
 

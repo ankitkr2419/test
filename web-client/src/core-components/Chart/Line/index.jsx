@@ -1,13 +1,12 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import { TEMPERATURE_GRAPH_OPTIONS } from "appConstants";
 
 const LineChart = (props) => {
-  const { data, width, height, options, isDataFromAPI } = props;
+  const { data, width, height, options, redraw } = props;
 
   return (
     <Line
-      redraw={isDataFromAPI}
+      redraw={redraw}
       width={width}
       height={height}
       data={data}
