@@ -88,11 +88,26 @@ export const updateMotorDetailsActions = {
   updateMotorDetaislFailure: "UPDATE_MOTOR_DETAILS_FAILURE",
   updateMotorDetaislReset: "UPDATE_MOTOR_DETAILS_RESET",
 };
+
 export const createTipsTubesActions = {
   initiateAction: "CREATE_TIPS_TUBES_INITIATED",
   successAction: "CREATE_TIPS_TUBES_SUCCESS",
   failureAction: "CREATE_TIPS_TUBES_FAILURE",
   resetAction: "CREATE_TIPS_TUBES_RESET",
+};
+
+export const createCartridgesActions = {
+  initiateAction: "CREATE_CARTRIDGES_INITIATED",
+  successAction: "CREATE_CARTRIDGES_SUCCESS",
+  failureAction: "CREATE_CARTRIDGES_FAILURE",
+  resetAction: "CREATE_CARTRIDGES_RESET",
+};
+
+export const deleteCartridgesActions = {
+  initiateAction: "DELETE_CARTRIDGES_INITIATED",
+  successAction: "DELETE_CARTRIDGES_SUCCESS",
+  failureAction: "DELETE_CARTRIDGES_FAILURE",
+  resetAction: "DELETE_CARTRIDGES_RESET",
 };
 
 export const fetchRtpcrConfigsActions = {
@@ -121,4 +136,53 @@ export const updateTECConfigsActions = {
   successAction: "UPDATE_TEC_CONFIGS_SUCCESS",
   failureAction: "UPDATE_TEC_CONFIGS_FAILURE",
   resetAction: "UPDATE_TEC_CONFIGS_RESET",
-}
+};
+
+// websocket for shaker
+export const shakerRunProgressActions = {
+  shakerRunProgressAction: "SHAKER_RUN_IN_PROGRESS",
+  shakerRunProgressActionSuccess: "SHAKER_RUN_SUCCEEDED",
+};
+
+// websocket for heater
+export const heaterRunProgressActions = {
+  heaterRunProgressAction: "HEATER_RUN_IN_PROGRESS",
+  heaterRunProgressActionSuccess: "HEATER_RUN_SUCCEEDED",
+};
+
+// tolerance values
+export const fetchToleranceActions = {
+  initiateAction: "FETCH_TOLERANCE_INITIATED",
+  successAction: "FETCH_TOLERANCE_SUCCESS",
+  failureAction: "FETCH_TOLERANCE_FAILURE",
+  resetAction: "FETCH_TOLERANCE_RESET",
+};
+
+export const updateToleranceActions = {
+  initiateAction: "UPDATE_TOLERANCE_INITIATED",
+  successAction: "UPDATE_TOLERANCE_SUCCESS",
+  failureAction: "UPDATE_TOLERANCE_FAILURE",
+  resetAction: "UPDATE_TOLERANCE_RESET",
+};
+
+// consumable distances values
+export const fetchConsumableActions = {
+  initiateAction: "FETCH_CONSUMABLE_INITIATED",
+  successAction: "FETCH_CONSUMABLE_SUCCESS",
+  failureAction: "FETCH_CONSUMABLE_FAILURE",
+  resetAction: "FETCH_CONSUMABLE_RESET",
+};
+
+export const updateConsumableActions = {
+  initiateAction: "UPDATE_CONSUMABLE_INITIATED",
+  successAction: "UPDATE_CONSUMABLE_SUCCESS",
+  failureAction: "UPDATE_CONSUMABLE_FAILURE",
+  resetAction: "UPDATE_CONSUMABLE_RESET",
+};
+
+export const addConsumableActions = {
+  initiateAction: "UPDATE_CONSUMABLE_INITIATED",
+  successAction: "UPDATE_CONSUMABLE_SUCCESS",
+  failureAction: "UPDATE_CONSUMABLE_FAILURE",
+  resetAction: "UPDATE_CONSUMABLE_RESET",
+};

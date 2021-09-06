@@ -524,6 +524,33 @@ button:focus {
       padding: 12px;
     }
   }
+
+  &.table-consumable {
+    display: block;
+    tbody {
+      display: block;
+      height: 415px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    thead {
+      display: block;
+      tr {
+        box-shadow: rem(0 4px 16px) #00000029;
+      }
+
+      th {
+        background-color: $white;
+        width: 25%;
+      }
+    }
+
+    th.th-counter {
+      font-size: rem(12px);
+      line-height: rem(16px);
+      padding: 12px;
+    }
+  }
 }
 
 // Table Striped
@@ -547,6 +574,17 @@ button:focus {
 .table-steps-wrapper {
   &.-hold {
     height: rem(218px);
+    margin: rem(0 0 8px);
+  }
+
+  &.-cycle {
+    height: rem(290px);
+  }
+}
+
+.table-consumable-wrapper {
+  &.-hold {
+    height: rem(118px);
     margin: rem(0 0 8px);
   }
 

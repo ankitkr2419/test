@@ -59,6 +59,10 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
   progressHeater: "PROGRESS_HEATER",
+  progressShakerRun: "PROGRESS_SHAKERRUN",
+  successShakerRun: "SUCCESS_SHAKERRUN",
+  progressHeaterRun: "PROGRESS_HEATERRUN",
+  successHeaterRun: "SUCCESS_HETERRUN",
 };
 
 export const HEATER_STATUS = {
@@ -74,6 +78,16 @@ export const PID_STATUS = {
   aborting: "aborting",
   abortFailed: "abortFailed",
 
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+};
+
+export const SHAKER_RUN_STATUS = {
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+};
+
+export const HEATER_RUN_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",
 };
@@ -167,8 +181,11 @@ export const API_ENDPOINTS = {
   setThreshold: "set-threshold",
   getBaseline: "get-baseline",
   tipTube: "tiptube",
+  cartridge: "cartridge",
   rtpcrConfigs: "configs/rtpcr",
   tecConfigs: "configs/tec",
+  dyes: "dyes",
+  consumable: "consumable-distance",
 };
 
 export const MODAL_MESSAGE = {
@@ -526,10 +543,32 @@ export const MAX_TIPTUBE_HEIGHT = 9999;
 export const MIN_TIPTUBE_TTBASE = 0;
 export const MAX_TIPTUBE_TTBASE = 9999;
 
+//engineer's flow cartridges constants
+export const MAX_WELLS_COUNT = 13;
+export const MIN_WELLS_COUNT = 1;
+export const MAX_CARTRIDGE_ID = 15;
+export const MIN_CARTRIDGE_ID = 1;
+export const CARTRIDGE_TYPE_OPTIONS = [
+  { value: "Cartridge 1", label: "Cartridge 1" },
+  { value: "Cartridge 2", label: "Cartridge 2" },
+];
+export const CARTRIDGE_WELLS = {
+  MAX_DISTANCE: 87,
+  MIN_DISTANCE: 0,
+  MAX_VOLUME: 5000,
+  MIN_VOLUME: 10,
+  MAX_HEIGHT: 40,
+  MIN_HEIGHT: 1,
+};
+
+export const MAX_TOLERANCE_ALLOWED = 100;
+export const MIN_TOLERANCE_ALLOWED = 0;
+
 export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {
     display: false,
   },
+  animation: false,
   scales: {
     xAxes: [
       {

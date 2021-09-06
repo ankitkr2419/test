@@ -16,8 +16,21 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  shakerRunProgressActions,
+  heaterRunProgressActions,
+  fetchToleranceActions,
+  updateToleranceActions,
+  fetchConsumableActions,
+  updateConsumableActions,
+  addConsumableActions,
 } from "actions/calibrationActions";
-import { DECKNAME, PID_STATUS, HEATER_STATUS } from "appConstants";
+import {
+  DECKNAME,
+  PID_STATUS,
+  HEATER_STATUS,
+  SHAKER_RUN_STATUS,
+  HEATER_RUN_STATUS,
+} from "appConstants";
 import loginActions from "actions/loginActions";
 
 const commonDetailsInitialState = fromJS({
@@ -558,6 +571,208 @@ export const tecConfigsReducer = (state = tecConfigsInitialState, action) => {
 
     case loginActions.loginReset:
       return tecConfigsInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const shakerRunProgressInitialState = fromJS({
+  shakerRunStatus: null,
+});
+
+// websocket ShakerRun
+export const shakerRunProgessReducer = (
+  state = shakerRunProgressInitialState,
+  action
+) => {
+  switch (action.type) {
+    case shakerRunProgressActions.shakerRunProgressAction:
+      return state.merge({
+        shakerRunStatus: SHAKER_RUN_STATUS.progressing,
+      });
+
+    case shakerRunProgressActions.shakerRunProgressActionSuccess:
+      return state.merge({
+        shakerRunStatus: SHAKER_RUN_STATUS.progressComplete,
+      });
+
+    case loginActions.loginReset:
+      return shakerRunProgressInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const heaterRunProgressInitialState = fromJS({
+  heaterRunStatus: null,
+});
+
+// websocket HeaterRun
+export const heaterRunProgessReducer = (
+  state = heaterRunProgressInitialState,
+  action
+) => {
+  switch (action.type) {
+    case heaterRunProgressActions.heaterRunProgressAction:
+      return state.merge({
+        heaterRunStatus: HEATER_RUN_STATUS.progressing,
+      });
+
+    case heaterRunProgressActions.heaterRunProgressActionSuccess:
+      return state.merge({
+        heaterRunStatus: HEATER_RUN_STATUS.progressComplete,
+      });
+
+    case loginActions.loginReset:
+      return heaterRunProgressInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const toleranceInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  data: [],
+  isUpdateApi: null, // to distinguish between fetch and put API
+});
+export const toleranceReducer = (state = toleranceInitialState, action) => {
+  switch (action.type) {
+    case fetchToleranceActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: false,
+      });
+    case fetchToleranceActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        data: action.payload.response,
+        isUpdateApi: false,
+      });
+    case fetchToleranceActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: false,
+      });
+    case fetchToleranceActions.resetAction:
+      return toleranceInitialState;
+
+    case updateToleranceActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case updateToleranceActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+
+    case updateToleranceActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+
+    case updateToleranceActions.resetAction:
+      return toleranceInitialState;
+
+    case loginActions.loginReset:
+      return toleranceInitialState;
+
+    default:
+      return state;
+  }
+};
+
+const consumableInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  data: [],
+  isUpdateApi: null, // to distinguish between fetch and put API
+});
+
+export const consumableReducer = (state = consumableInitialState, action) => {
+  switch (action.type) {
+    case fetchConsumableActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: false,
+      });
+    case fetchConsumableActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        data: action.payload.response,
+        isUpdateApi: false,
+      });
+    case fetchConsumableActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: false,
+      });
+    case fetchConsumableActions.resetAction:
+      return consumableInitialState;
+
+    case updateConsumableActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case updateConsumableActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+
+    case updateConsumableActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+
+    case updateConsumableActions.resetAction:
+      return consumableInitialState;
+
+    case addConsumableActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        isUpdateApi: true,
+      });
+    case addConsumableActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        isUpdateApi: true,
+      });
+
+    case addConsumableActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        isUpdateApi: true,
+      });
+
+    case addConsumableActions.resetAction:
+      return consumableInitialState;
+
+    case loginActions.loginReset:
+      return consumableInitialState;
 
     default:
       return state;

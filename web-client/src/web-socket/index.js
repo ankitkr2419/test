@@ -37,8 +37,12 @@ import {
 import { toast } from "react-toastify";
 import {
   heaterProgress,
+  heaterRunInProgress,
+  heaterRunInSuccess,
   runPidInProgress,
   runPidInSuccess,
+  shakerRunInProgress,
+  shakerRunInSuccess,
 } from "action-creators/calibrationActionCreators";
 
 let webSocket = null;
@@ -128,6 +132,19 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.progressHeater:
           dispatch(heaterProgress(JSON.parse(data)));
           break;
+        case SOCKET_MESSAGE_TYPE.progressShakerRun:
+          dispatch(shakerRunInProgress());
+          break;
+        case SOCKET_MESSAGE_TYPE.successShakerRun:
+          dispatch(shakerRunInSuccess());
+          break;
+        case SOCKET_MESSAGE_TYPE.progressHeaterRun:
+          dispatch(heaterRunInProgress());
+          break;
+        case SOCKET_MESSAGE_TYPE.successHeaterRun:
+          dispatch(heaterRunInSuccess());
+          break;
+
         default:
           break;
       }
