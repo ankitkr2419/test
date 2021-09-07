@@ -39,12 +39,14 @@ import {
   heaterProgress,
   heaterRunInProgress,
   heaterRunInSuccess,
+  heaterRunInAborted,
   runPidInProgress,
   runPidInSuccess,
   progressLidPid,
   successLidPid,
   shakerRunInProgress,
   shakerRunInSuccess,
+  shakerRunInAborted,
   progressDyeCalibration,
   completedDyeCalibration,
 } from "action-creators/calibrationActionCreators";
@@ -148,12 +150,17 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.successShakerRun:
           dispatch(shakerRunInSuccess());
           break;
+        case SOCKET_MESSAGE_TYPE.abortShakerRun:
+          dispatch(shakerRunInAborted());
+          break;
         case SOCKET_MESSAGE_TYPE.progressHeaterRun:
           dispatch(heaterRunInProgress());
           break;
         case SOCKET_MESSAGE_TYPE.successHeaterRun:
           dispatch(heaterRunInSuccess());
           break;
+        case SOCKET_MESSAGE_TYPE.abortHeaterRun:
+          dispatch(heaterRunInAborted());
         case SOCKET_MESSAGE_TYPE.progressDyeCalibration:
           dispatch(progressDyeCalibration());
           break;

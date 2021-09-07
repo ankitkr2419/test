@@ -6,186 +6,171 @@ import {
   Row,
   Col,
   Input,
-  InputGroupWithAddonText,
   Label,
   Modal,
   ModalBody,
-  CheckBox,
 } from "core-components";
 import { ButtonGroup, ButtonIcon, Text } from "shared-components";
 import {
-  getPrevValue,
-  validateHoldTime,
-  validateRampRate,
-  validateTargetTemperature,
-} from "./stepHelper";
-import {
-  MIN_RAMP_RATE,
-  MAX_RAMP_RATE,
-  MAX_TARGET_TEMPERATURE,
-  MIN_TARGET_TEMPERATURE,
-  CYCLE_STAGE,
-  HOLD_STAGE,
-  COL_SIZE_HOLD_STAGE,
-  COL_SIZE_CYCLE_STAGE,
-  MIN_HOLD_TIME,
-} from "./stepConstants";
+  checkConsumableFieldIsInvalid,
+  isConsumableModalBtnDisabled,
+} from "./helpers";
 
 const EditConsumableModal = (props) => {
-  const { isUpdate, handleCrossBtn } = props;
+  const { isUpdate, isOpen, handleModalBtn, handleCrossBtn, formik } = props;
+
+  const { id, name, description, distance } = formik.values;
+
+  const handleOnChange = ({ name, value }) => {
+    formik.setFieldValue(`${name}.value`, value);
+  };
+
+  const handleOnBlur = ({ name, value }) => {
+    const isInvalid = checkConsumableFieldIsInvalid(name, value);
+    formik.setFieldValue(`${name}.isInvalid`, isInvalid);
+  };
+
+  const handleOnFocus = ({ name }) => {
+    formik.setFieldValue(`${name}.isInvalid`, false);
+  };
 
   return (
-    <>
-      <Modal centered size="lg">
-        <ModalBody>
-          <Text
-            tag="h4"
-            size={24}
-            className="modal-title text-center text-truncate text-capitalize font-weight-bold"
-          >
-            {isUpdate ? "Update Details" : "Add New Details"}
-          </Text>
-          <ButtonIcon
-            position="absolute"
-            placement="right"
-            top={24}
-            right={32}
-            size={32}
-            name="cross"
-            onClick={handleCrossBtn}
-          />
-          <Row form className="mb-3 pb-3">
-            <Col sm={colSize}>
-              <FormGroup>
-                <Label for="id" className="font-weight-bold">
-                  ID
-                </Label>
-                <Input
-                  type="number"
-                  name="id"
-                  id="id"
-                  placeholder={"Type here"}
-                  value={id}
-                  // onChange={() => onChangeHandler(e.target)}
-                  // onBlur={}
-                  // onFocus={}
-                  // invalid={}
-                />
-                <Text
-                  Tag="p"
-                  size={12}
-                  className={`${id.isInvalid && "text-danger"} px-2 mb-0`}
-                >
-                  Invalid ID
+    <Modal isOpen={isOpen} centered size="lg">
+      <ModalBody>
+        <Text
+          tag="h4"
+          size={24}
+          className="modal-title text-center text-truncate text-capitalize font-weight-bold"
+        >
+          {isUpdate ? "Update Details" : "Add New Details"}
+        </Text>
+        <ButtonIcon
+          position="absolute"
+          placement="right"
+          top={24}
+          right={32}
+          size={32}
+          name="cross"
+          onClick={handleCrossBtn}
+        />
+        <Row form className="mb-3 pb-3">
+          <Col sm>
+            <FormGroup>
+              <Label for="id" className="font-weight-bold">
+                ID
+              </Label>
+              <Input
+                type="number"
+                name="id"
+                id="id"
+                placeholder={"Type here"}
+                value={id.value}
+                onChange={(e) => handleOnChange(e.target)}
+                onBlur={(e) => handleOnBlur(e.target)}
+                onFocus={(e) => handleOnFocus(e.target)}
+                disabled={isUpdate === true}
+              />
+              {id.isInvalid && (
+                <Text Tag="p" size={12} className="text-danger px-2 mb-0">
+                  Enter valid id
                 </Text>
-              </FormGroup>
-            </Col>
+              )}
+            </FormGroup>
+          </Col>
 
-            <Col sm={colSize}>
-              <FormGroup>
-                <Label for="target_temperature" className="font-weight-bold">
-                  Target Temperature
-                </Label>
-                <InputGroupWithAddonText addonText="unit °C">
-                  <Input
-                    type="number"
-                    name="targetTemperature"
-                    id="target_temperature"
-                    placeholder={`${MIN_TARGET_TEMPERATURE} - ${MAX_TARGET_TEMPERATURE}`}
-                    value={targetTemperature}
-                    // onChange={onChangeHandler}
-                    // onBlur={onTargetTemperatureBlurHandler}
-                    // onFocus={onTargetTemperatureFocusHandler}
-                    // invalid={targetTemperatureError}
-                  />
-                </InputGroupWithAddonText>
-                <Text
-                  Tag="p"
-                  size={12}
-                  className={`${
-                    targetTemperatureError && "text-danger"
-                  } px-2 mb-0`}
-                >
-                  Enter value between {MIN_TARGET_TEMPERATURE} to{" "}
-                  {MAX_TARGET_TEMPERATURE}
+          <Col sm>
+            <FormGroup>
+              <Label for="name" className="font-weight-bold">
+                Name
+              </Label>
+              <Input
+                type="text"
+                name="name"
+                id="name"
+                placeholder={`Type Here`}
+                value={name.value}
+                onChange={(e) => handleOnChange(e.target)}
+                onBlur={(e) => handleOnBlur(e.target)}
+                onFocus={(e) => handleOnFocus(e.target)}
+                disabled={isUpdate === true}
+              />
+
+              {name.isInvalid && (
+                <Text Tag="p" size={12} className="text-danger px-2 mb-0">
+                  Enter valid name
                 </Text>
-              </FormGroup>
-            </Col>
-            <Col sm={colSize}>
-              <FormGroup>
-                <Label for="hold_time" className="font-weight-bold">
-                  Hold Time
-                </Label>
-                <InputGroupWithAddonText addonText="unit sec">
-                  <Input
-                    type="number"
-                    name="holdTime"
-                    id="hold_time"
-                    placeholder="seconds"
-                    value={holdTime}
-                    // onBlur={onHoldTimeBlurHandler}
-                    // onFocus={onHoldTimeFocusHandler}
-                    // onChange={onChangeHandler}
-                    // invalid={holdTimeError}
-                  />
-                </InputGroupWithAddonText>
-                {/* {holdTimeError && (
-                  <Text Tag="p" size={12} className="text-danger px-2 mb-0">
-                    Invalid Hold time
-                  </Text>
-                )} */}
-                {dataCapture && (
-                  <Text
-                    Tag="p"
-                    size={12}
-                    className={`${holdTimeError && "text-danger"} px-2 mb-0`}
-                  >
-                    Enter value above {MIN_HOLD_TIME}
-                  </Text>
-                )}
-              </FormGroup>
-            </Col>
-            {/* If the stage type is hold don't show datacapture checkbox */}
-            {stageType !== HOLD_STAGE && (
-              <Col sm={colSize}>
-                <FormGroup>
-                  <Label for="data_capture" className="font-weight-bold">
-                    Data Capture
-                  </Label>
-                  <CheckBox
-                    name="dataCapture"
-                    id="dataCapture"
-                    onChange={(event) => handleDataCapture(event)}
-                    className="mr-2 ml-3 py-2"
-                    checked={dataCapture}
-                  />
-                </FormGroup>
-              </Col>
-            )}
-          </Row>
-          <ButtonGroup className="text-center p-0 m-0 pt-5">
-            {isUpdateForm === false && (
-              <Button
-                onClick={addClickHandler}
-                color="primary"
-                disabled={isFormValid === false}
-              >
-                Add
-              </Button>
-            )}
-            {isUpdateForm === true && (
-              <Button
-                onClick={saveClickHandler}
-                color="primary"
-                disabled={isFormValid === false}
-              >
-                Save
-              </Button>
-            )}
-          </ButtonGroup>
-        </ModalBody>
-      </Modal>
-    </>
+              )}
+            </FormGroup>
+          </Col>
+
+          <Col sm>
+            <FormGroup>
+              <Label for="description" className="font-weight-bold">
+                Description
+              </Label>
+              <Input
+                type="text"
+                name="description"
+                id="description"
+                placeholder="Type here"
+                value={description.value}
+                onChange={(e) => handleOnChange(e.target)}
+                onBlur={(e) => handleOnBlur(e.target)}
+                onFocus={(e) => handleOnFocus(e.target)}
+              />
+              {description.isInvalid && (
+                <Text Tag="p" size={12} className="text-danger px-2 mb-0">
+                  Enter valid description
+                </Text>
+              )}
+            </FormGroup>
+          </Col>
+
+          <Col sm>
+            <FormGroup>
+              <Label for="distance" className="font-weight-bold">
+                Distance
+              </Label>
+              <Input
+                type="number"
+                name="distance"
+                id="distance"
+                placeholder="Type here"
+                value={distance.value}
+                onChange={(e) => handleOnChange(e.target)}
+                onBlur={(e) => handleOnBlur(e.target)}
+                onFocus={(e) => handleOnFocus(e.target)}
+              />
+              {distance.isInvalid && (
+                <Text Tag="p" size={12} className="text-danger px-2 mb-0">
+                  Enter valid distance
+                </Text>
+              )}
+            </FormGroup>
+          </Col>
+        </Row>
+        <ButtonGroup className="text-center p-0 m-0 pt-5">
+          {isUpdate === false && (
+            <Button
+              onClick={() => handleModalBtn(formik.values)}
+              color="primary"
+              disabled={isConsumableModalBtnDisabled(formik.values)}
+            >
+              Add
+            </Button>
+          )}
+          {isUpdate === true && (
+            <Button
+              onClick={() => handleModalBtn(formik.values)}
+              color="primary"
+              disabled={isConsumableModalBtnDisabled(formik.values)}
+            >
+              Update
+            </Button>
+          )}
+        </ButtonGroup>
+      </ModalBody>
+    </Modal>
   );
 };
 

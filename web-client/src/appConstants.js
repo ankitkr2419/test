@@ -64,8 +64,10 @@ export const SOCKET_MESSAGE_TYPE = {
   SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
   progressShakerRun: "PROGRESS_SHAKERRUN",
   successShakerRun: "SUCCESS_SHAKERRUN",
+  abortShakerRun: "ABORT_SHAKERRUN",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
+  abortHeaterRun: "ABORT_HEATERRUN",
   progressDyeCalibration: "PROGRESS_OPTCALIB",
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
@@ -90,11 +92,13 @@ export const PID_STATUS = {
 export const SHAKER_RUN_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",
+  progressAborted: "progressAborted",
 };
 
 export const HEATER_RUN_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",
+  progressAborted: "progressAborted",
 };
 
 export const EXPERIMENT_STATUS = {
@@ -147,7 +151,8 @@ export const API_ENDPOINTS = {
   discardTipAndHoming: "discard-tip-and-home",
   cleanUp: "uv",
   tipsTubes: "tips-tubes",
-  cartridge: "cartridges",
+  cartridges: "cartridges",
+  cartridge: "cartridge",
   tubes: "tube",
   tips: "tip",
   stepRun: "step-run",
@@ -186,7 +191,6 @@ export const API_ENDPOINTS = {
   setThreshold: "set-threshold",
   getBaseline: "get-baseline",
   tipTube: "tiptube",
-  cartridge: "cartridge",
   rtpcrConfigs: "configs/rtpcr",
   tecConfigs: "configs/tec",
   lidPidStart: "lid/pid-calibration/start",

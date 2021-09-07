@@ -726,8 +726,6 @@ export function* fetchConsumable(actions) {
     payload: { token },
   } = actions;
 
-  console.log("Actions: ", actions);
-
   const { successAction, failureAction } = fetchConsumableActions;
 
   try {

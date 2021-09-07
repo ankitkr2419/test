@@ -329,20 +329,15 @@ export const checkIsFieldInvalid = (fieldObj, value) => {
 };
 
 export const isMotorUpdateBtnDisabled = (state) => {
-  const { id, deck, number, name, ramp, steps, slow, fast } = state;
-
-  if (
-    id.isInvalid ||
-    deck.isInvalid ||
-    number.isInvalid ||
-    name.isInvalid ||
-    ramp.isInvalid ||
-    steps.isInvalid ||
-    slow.isInvalid ||
-    fast.isInvalid
-  ) {
-    return true;
-  }
+  let isInvalid = false;
+  Object.keys(state).forEach((key) => {
+    const element = state[key];
+    isInvalid = checkIsFieldInvalid(element, element.value);
+    if (isInvalid === true) {
+      return;
+    }
+  });
+  return isInvalid;
 };
 
 export const isTipsTubesButtonDisabled = (state) => {
@@ -483,21 +478,41 @@ export const isCreateCartridgesBtnDisabled = (state) => {
     MIN_VOLUME,
   } = CARTRIDGE_WELLS;
 
+  // get array of all distance, height and volume values
   const allDistanceValues = distance.map((disObj) => disObj.value);
   const allHeightValues = height.map((htObj) => htObj.value);
   const allVolumeValues = volume.map((volObj) => volObj.value);
 
+  // check if any value in allDistanceValues array is out-of-range
+  const isAnyDistanceOutOfRange = allDistanceValues.some(
+    (distanceValue) =>
+      !distanceValue ||
+      distanceValue > MAX_DISTANCE ||
+      distanceValue < MIN_DISTANCE
+  );
+  // check if any value in allVolumeValues array is out-of-range
+  const isAnyVolumeOutOfRange = allVolumeValues.some(
+    (volumeValue) =>
+      !volumeValue || volumeValue > MAX_VOLUME || volumeValue < MIN_VOLUME
+  );
+  // check if any value in allHeightValues array is out-of-range
+  const isAnyHeightOutOfRange = allHeightValues.some(
+    (heightValue) =>
+      !heightValue || heightValue > MAX_HEIGHT || heightValue < MIN_HEIGHT
+  );
+
+  // check if any value is invalid
   const allDistanceInvalidValues = distance.map((disObj) => disObj.isInvalid);
   const allHeightInvalidValues = height.map((htObj) => htObj.isInvalid);
   const allVolumeInvalidValues = volume.map((volObj) => volObj.isInvalid);
 
   if (
-    allDistanceValues.some((v) => !v || v > MAX_DISTANCE || v < MIN_DISTANCE) ||
-    allHeightValues.some((v) => !v || v > MAX_VOLUME || v < MIN_VOLUME) ||
-    allVolumeValues.some((v) => !v || v > MAX_HEIGHT || v < MIN_HEIGHT) ||
-    allDistanceInvalidValues.some((v) => v === true) ||
-    allHeightInvalidValues.some((v) => v === true) ||
-    allVolumeInvalidValues.some((v) => v === true)
+    isAnyDistanceOutOfRange ||
+    isAnyHeightOutOfRange ||
+    isAnyVolumeOutOfRange ||
+    allDistanceInvalidValues.some((distance) => distance === true) ||
+    allHeightInvalidValues.some((height) => height === true) ||
+    allVolumeInvalidValues.some((volume) => volume === true)
   ) {
     return true;
   }
@@ -537,4 +552,57 @@ export const getRequestBody = (state) => {
   };
 
   return requestBody;
+};
+
+// consumable formik initial state
+export const consumableFormikInitialState = {
+  id: { value: null, isInvalid: false },
+  name: { value: null, isInvalid: false },
+  description: { value: null, isInvalid: false },
+  distance: { value: null, isInvalid: false },
+};
+
+export const checkConsumableFieldIsInvalid = (name, value) => {
+  switch (name) {
+    case "id":
+      if (value === "" || !Number.isInteger(parseFloat(value))) {
+        return true;
+      }
+      return false;
+    case "name":
+      if (value === "") {
+        return true;
+      }
+      return false;
+    case "description":
+      if (value === "") {
+        return true;
+      }
+      return false;
+    case "distance":
+      if (value === "" || Number.isNaN(parseFloat(value))) {
+        return true;
+      }
+      return false;
+    default:
+      break;
+  }
+};
+
+export const isConsumableModalBtnDisabled = (state) => {
+  const { id, name, description, distance } = state;
+
+  if (
+    id.isInvalid ||
+    name.isInvalid ||
+    description.isInvalid ||
+    distance.isInvalid ||
+    !id.value ||
+    !name.value ||
+    !description.value ||
+    !distance.value
+  ) {
+    return true;
+  }
+  return false;
 };

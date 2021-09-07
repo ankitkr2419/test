@@ -55,6 +55,13 @@ const MotorComponent = (props) => {
   return (
     <Card default className="my-3">
       <CardBody>
+        <Text
+          Tag="h4"
+          size={24}
+          className="text-center text-gray text-bold mt-3 mb-4"
+        >
+          {"Start Motor"}
+        </Text>
         <Form onSubmit={handleMotorBtn}>
           <Row form>
             <Col sm={4}>
