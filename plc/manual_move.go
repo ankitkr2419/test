@@ -2,6 +2,8 @@ package plc
 
 import (
 	"fmt"
+	"mylab/cpagent/responses"
+
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -14,11 +16,11 @@ const (
 func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (response string, err error) {
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return "", err
 	}
 
-	d.resetAborted()
+	d.ResetAborted()
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
@@ -60,14 +62,14 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 		}
 	}
 
-	if d.isHeaterInProgress() {
+	if d.IsHeaterInProgress() {
 		response, err = d.switchOffHeater()
 		if err != nil {
 			return
 		}
 	}
 
-	if d.isShakerInProgress() {
+	if d.IsShakerInProgress() {
 		response, err = d.switchOffShaker()
 		if err != nil {
 			return
@@ -105,6 +107,7 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 			logger.Info("executedPulses is greater than wrote Pulses that means nothing to resume for current motor.")
 			wrotePulses.Store(d.name, uint16(0))
 			executedPulses.Store(d.name, uint16(0))
+			d.setMotorOperationCompleted()
 		} else {
 			// calculating wrotePulses.[d.name] - executedPulses.[d.name]
 			response, err = d.resumeMotorWithPulses(temp1 - temp2)
@@ -115,13 +118,13 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 		}
 	}
 
-	if d.isHeaterInProgress() {
+	if d.IsHeaterInProgress() {
 		response, err = d.switchOnHeater()
 		if err != nil {
 			return
 		}
 	}
-	if d.isShakerInProgress() {
+	if d.IsShakerInProgress() {
 		response, err = d.switchOnShaker()
 		if err != nil {
 			return
@@ -154,7 +157,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 		return "ABORT UV LIGHT SUCCESS", nil
 	}
 
-	if d.isPIDCalibrationInProgress() {
+	if d.isShakerPIDTuningInProgress() {
 		//  Switch off Heater
 		response, err = d.switchOffHeater()
 		if err != nil {
@@ -162,7 +165,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 			return "", err
 		}
 		//  Switch off PID Calibration
-		response, err = d.switchOffPIDCalibration()
+		response, err = d.switchOffShakerPIDCalibration()
 		if err != nil {
 			logger.Errorln("couldn't switch OFF PID Calibration", d.name, err)
 			return "", err

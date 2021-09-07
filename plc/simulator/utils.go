@@ -6,7 +6,13 @@ import (
 	"sync"
 )
 
-var motorDone, sensorDone, motorInProgress, heaterInProgress sync.Map
+const (
+	pidTuningTime       = 10
+	pidProgressResponse = 0x0003
+	pidDoneResponse     = 0x0004
+)
+
+var motorDone, sensorDone, motorInProgress, heaterInProgress, shakerPIDCalibrationInProgress sync.Map
 
 func loadUtils() {
 	motorDone.Store(plc.DeckA, false)
@@ -17,6 +23,8 @@ func loadUtils() {
 	motorInProgress.Store(plc.DeckB, false)
 	heaterInProgress.Store(plc.DeckA, false)
 	heaterInProgress.Store(plc.DeckB, false)
+	shakerPIDCalibrationInProgress.Store(plc.DeckA, false)
+	shakerPIDCalibrationInProgress.Store(plc.DeckB, false)
 }
 
 func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint16) (err error) {
@@ -33,7 +41,7 @@ func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint
 	case "D":
 		// valid range 200-226
 		lowestDAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][200]
-		highestDAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][226]
+		highestDAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][534]
 
 		// check for divisibility by 2 as well
 		if address >= lowestDAddress && address <= highestDAddress && address%2 != 1 {

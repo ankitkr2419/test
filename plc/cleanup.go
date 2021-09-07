@@ -18,7 +18,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	}
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return
 	}
 
@@ -62,7 +62,7 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	}
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return
 	}
 
@@ -121,7 +121,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	}
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return
 	}
 

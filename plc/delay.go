@@ -2,8 +2,9 @@ package plc
 
 import (
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
+
+	logger "github.com/sirupsen/logrus"
 
 	"time"
 )
@@ -27,12 +28,13 @@ func (d *Compact32Deck) AddDelay(delay db.Delay, recipeRun bool) (response strin
 	var timeElapsedVar int64 = 0
 	timeElapsed := &timeElapsedVar
 
-	// set the timer in progress variable to specify that it is not a motor operation.
-	d.setTimerInProgress()
-	defer d.resetTimerInProgress()
 	if recipeRun {
 		// Calling in defer cause this will need to get executed despite failure
 		defer d.resetRunRecipeData()
+	} else {
+		// set the timer in progress variable to specify that it is not a motor operation.
+		d.setTimerInProgress()
+		defer d.resetTimerInProgress()
 	}
 
 skipToStartTimer:
@@ -49,12 +51,6 @@ skipToStartTimer:
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
 				// Send Success
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightSuccess)
-				d.ResetRunInProgress()
-			} else if d.isPIDCalibrationInProgress() {
-				// Send 100 % Progress
-				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidProgress)
-				// Send Success
-				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidSuccess)
 				d.ResetRunInProgress()
 			}
 			if recipeRun {
@@ -83,8 +79,8 @@ skipToStartTimer:
 			time.Sleep(time.Millisecond * 500)
 			if d.isMachineInAbortedState() {
 				t.Stop()
-				if d.isUVLightInProgress() || d.isPIDCalibrationInProgress() {
-					d.resetAborted()
+				if d.isUVLightInProgress() {
+					d.ResetAborted()
 				}
 				err = fmt.Errorf("Operation was ABORTED!")
 				return "", err
@@ -92,9 +88,6 @@ skipToStartTimer:
 			// When UV Light is in progress nothing else is so no special handling below
 			if d.isUVLightInProgress() {
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
-			}
-			if d.isPIDCalibrationInProgress() {
-				d.sendWSData(time1, timeElapsed, delay.DelayTime, pidProgress)
 			}
 			if recipeRun {
 				if !d.IsRunInProgress() && getCurrentProcessNumber(d.name) == -2 {

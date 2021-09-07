@@ -29,8 +29,6 @@ import {
   getTimeNow,
 } from "selectors/runExperimentSelector";
 import { getWells, getFilledWellsPosition } from "selectors/wellSelectors";
-// import PrintDataModal from './PrintDataModal';
-// import ExportDataModal from './ExportDataModal';
 import {
   APP_TYPE,
   EXPERIMENT_STATUS,
@@ -245,17 +243,17 @@ const AppHeader = (props) => {
       {isUserLoggedIn && (
         <Nav className="ml-3 mr-auto">
           {NAV_ITEMS.map(
-            (ele) =>
-              !getIsNavLinkHidden(ele.path) && (
-                <NavItem key={ele.name}>
+            (navItem) =>
+              !getIsNavLinkHidden(navItem.path) && (
+                <NavItem key={navItem.name}>
                   <NavLink
                     onClick={(event) => {
-                      onNavLinkClickHandler(event, `/${ele.path}`);
+                      onNavLinkClickHandler(event, `/${navItem.path}`);
                     }}
-                    to={ele.path}
-                    disabled={getIsNavLinkDisabled(`/${ele.path}`)}
+                    to={navItem.path}
+                    disabled={getIsNavLinkDisabled(`/${navItem.path}`)}
                   >
-                    {ele.name}
+                    {navItem.name}
                   </NavLink>
                 </NavItem>
               )
@@ -391,15 +389,6 @@ const AppHeader = (props) => {
               </div>
             </>
           )}
-
-          {/* {isLoginTypeOperator === true && (
-            <ButtonIcon
-              size={34}
-              name="cross"
-              onClick={onCrossClick}
-              className="ml-2"
-            />
-          )} */}
 
           {/* MODALS */}
 

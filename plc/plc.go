@@ -10,8 +10,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const ErrorExtractionMonitor = "ErrorExtractionMonitor"
-const ErrorLidPIDTuning = "PID Error"
+const( 
+	ErrorExtractionMonitor = "ErrorExtractionMonitor"
+	ErrorLidPIDTuning = "PID Error"
+)
 
 type Status int32
 
@@ -47,20 +49,21 @@ type Scan struct {
 }
 
 type Driver interface {
-	SelfTest() Status             // Check if Homing or any other errors during bootup of PLC {ERROR | RESTART | OK}
-	HeartBeat()                   // Attempt to write heartbeat 3 times else fail
-	ConfigureRun(Stage) error     // Configure the various holding and cycling stages
-	Start() error                 // trigger the start of the cycling process
-	Stop() error                  // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
-	Monitor(uint16) (Scan, error) // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
-	Calibrate() error             // TBD
-	HomingRTPCR() error           // Homing of RTPCR
-	Reset() error                 // reseting the values
-	Cycle() error                 // start the cycle
-	SetLidTemp(uint16) error      // set Lid Temperature
-	SwitchOffLidTemp() error	  // Lid will return to room temp
-	LidPIDCalibration() error	  // LID PID Tuning
-	SetScanSpeedAndScanTime() error	  // Scan speed and Scan Time is settable by user
+	SelfTest() Status               // Check if Homing or any other errors during bootup of PLC {ERROR | RESTART | OK}
+	HeartBeat()                     // Attempt to write heartbeat 3 times else fail
+	ConfigureRun(Stage) error       // Configure the various holding and cycling stages
+	Start() error                   // trigger the start of the cycling process
+	Stop() error                    // Stop the cycle, Status: ABORT (if pre-emptive) OK: All Cycles have completed
+	Monitor(uint16) (Scan, error)   // Monitor periodically. If Status=CYCLE_COMPLETE, the Scan will be populated
+	Calibrate() error               // TBD
+	HomingRTPCR() error             // Homing of RTPCR
+	Reset() error                   // reseting the values
+	Cycle() error                   // start the cycle
+	SetLidTemp(uint16) error        // set Lid Temperature
+	SwitchOffLidTemp() error        // Lid will return to room temp
+	LidPIDCalibration() error       // LID PID Tuning
+	SetScanSpeedAndScanTime() error // Scan speed and Scan Time is settable by user
+	CalculateOpticalResult(dye db.Dye, kitID string, knownValue, cycleCount int64) (opticalResult []db.DyeWellTolerance, err error)
 }
 
 type HeaterData struct {
@@ -128,21 +131,24 @@ type Extraction interface {
 	UVLight(uvTime string) (response string, err error)
 	AddDelay(delay db.Delay, runRecipe bool) (response string, err error)
 	DiscardTipAndHome(discard bool) (response string, err error)
-	Heating(ht db.Heating) (response string, err error)
+	Heating(ht db.Heating, live bool) (response string, err error)
 	Homing() (response string, err error)
 	ManualMovement(motorNum, direction uint16, distance float32) (response string, err error)
 	Resume() (response string, err error)
 	Pause() (response string, err error)
 	Abort() (response string, err error)
 	Piercing(pi db.Piercing, cartridgeID int64) (response string, err error)
-	Shaking(shakerData db.Shaker) (response string, err error)
+	Shaking(shakerData db.Shaker, live bool) (response string, err error)
 	TipDocking(td db.TipDock, cartridgeID int64) (response string, err error)
 	SetRunInProgress()
 	SetPaused()
 	ResetPaused()
+	ResetAborted()
 	ResetRunInProgress()
 	IsMachineHomed() bool
 	IsRunInProgress() bool
+	IsHeaterInProgress() bool
+	IsShakerInProgress() bool
 	TipOperation(to db.TipOperation) (response string, err error)
 	RunRecipeWebsocketData(recipe db.Recipe, processes []db.Process) (err error)
 	SetCurrentProcessNumber(step int64)

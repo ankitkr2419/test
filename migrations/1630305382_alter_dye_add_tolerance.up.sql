@@ -1,0 +1,1 @@
+ALTER TABLE dyes ADD COLUMN tolerance DECIMAL Default 10.0;
