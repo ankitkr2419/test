@@ -77,38 +77,6 @@ const PidComponent = (props) => {
                 )}
               </FormGroup>
             </Col>
-
-            {/* <Col sm={4}>
-              <FormGroup>
-                <Label for="pid_minutes" className="font-weight-bold">
-                  PID Minutes
-                </Label>
-                <Input
-                  type="number"
-                  name="pid_minutes"
-                  id="pid_minutes"
-                  placeholder={`${MIN_PID_MIN} - ${MAX_PID_MIN}`}
-                  value={pidMinutes.value}
-                  onChange={(event) =>
-                    handleOnChange(
-                      "pidMinutes.value",
-                      parseInt(event.target.value)
-                    )
-                  }
-                  onBlur={(e) => handleBlurPidMinutes(parseInt(e.target.value))}
-                  onFocus={() => handleOnChange("pidMinutes.isInvalid", false)}
-                />
-                {pidMinutes.isInvalid && (
-                  <div className="flex-70">
-                    <Text Tag="p" size={14} className="text-danger">
-                      PID minutes should be between {MIN_PID_MIN} -{" "}
-                      {MAX_PID_MIN}.
-                    </Text>
-                  </div>
-                )}
-              </FormGroup>
-            </Col> */}
-
             <Col>
               <Center className="text-center pt-4">
                 <Button

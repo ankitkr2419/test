@@ -224,10 +224,13 @@ export const isSaveToleranceBtnDisabled = (tolerance) => {
   const allTolValues = tolerance.map((tolObj) => tolObj.value);
   const allTolInvalidValues = tolerance.map((tolObj) => tolObj.isInvalid);
 
-  if (
-    allTolValues.some((v) => !v || v > 100 || v < 0) ||
-    allTolInvalidValues.some((v) => v === true)
-  ) {
+  const isAnyValueOutOfRange = allTolValues.some((value) => {
+    return !value || value > 100 || value < 0;
+  });
+  const isAnyValueInvalid = allTolInvalidValues.some((value) => value === true);
+
+  // check if any of the tolerance value is invalid or out-of-range
+  if (isAnyValueOutOfRange || isAnyValueInvalid) {
     return true;
   }
   return false;
