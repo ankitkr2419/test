@@ -329,20 +329,15 @@ export const checkIsFieldInvalid = (fieldObj, value) => {
 };
 
 export const isMotorUpdateBtnDisabled = (state) => {
-  const { id, deck, number, name, ramp, steps, slow, fast } = state;
-
-  if (
-    id.isInvalid ||
-    deck.isInvalid ||
-    number.isInvalid ||
-    name.isInvalid ||
-    ramp.isInvalid ||
-    steps.isInvalid ||
-    slow.isInvalid ||
-    fast.isInvalid
-  ) {
-    return true;
-  }
+  let isInvalid = false;
+  Object.keys(state).forEach((key) => {
+    const element = state[key];
+    isInvalid = checkIsFieldInvalid(element, element.value);
+    if (isInvalid === true) {
+      return;
+    }
+  });
+  return isInvalid;
 };
 
 export const isTipsTubesButtonDisabled = (state) => {

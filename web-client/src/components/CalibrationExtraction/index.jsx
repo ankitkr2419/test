@@ -21,6 +21,7 @@ import TipsTubesComponent from "./TipsTubesComponent";
 import CartridgeComponent from "./CartridgeComponent";
 import DeleteCartridgeComponent from "./DeleteCartridgeComponent";
 import ConsumableDistancesComponent from "./ConsumableDistancesComponent";
+import ShakerAndHeaterComponent from "./ShakerAndHeaterComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -91,30 +92,9 @@ const CalibrationExtractionComponent = (props) => {
       </div>
 
       <Card default className="my-3">
-        <CardBody className="px-5 py-4">
-          <div className="d-flex">
-            {/* {Shaker Button} */}
-            <Button
-              className="ml-auto"
-              color={"primary"}
-              onClick={() =>
-                history.push(`${ROOT_URL_PATH}${ROUTES.calibration}/shaker`)
-              }
-            >
-              Shaker
-            </Button>
-
-            {/* {Heater Button} */}
-            <Button
-              className="ml-3"
-              color={"primary"}
-              onClick={() =>
-                history.push(`${ROOT_URL_PATH}${ROUTES.calibration}/heater`)
-              }
-            >
-              Heater
-            </Button>
-          </div>
+        <CardBody className="px-5 py-4 text-center">
+          {/* Shaker and Heater card */}
+          <ShakerAndHeaterComponent />
 
           <div className="d-flex">
             {/* {PID Start/Abort Progress Component} */}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 
-import { ButtonIcon, Icon } from "shared-components";
+import { ButtonIcon, Icon, Text } from "shared-components";
 import { Table, Button, Card, CardBody } from "core-components";
 import EditConsumableModal from "./EditConsumableModal";
 import { consumableFormikInitialState } from "./helpers";
@@ -70,8 +70,15 @@ const ConsumableDistancesComponent = (props) => {
           formik={formik}
         />
       )}
-      <Card>
+      <Card style={{ height: 590 }}>
         <CardBody>
+          <Text
+            Tag="h4"
+            size={24}
+            className="text-center text-gray text-bold mt-3 mb-4"
+          >
+            {"Consumable Distances"}
+          </Text>
           <div className="table-consumable-wrapper -hold">
             <Table className="table-consumable" size="sm" striped>
               <colgroup>

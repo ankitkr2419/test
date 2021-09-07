@@ -37,6 +37,13 @@ const UpdateMotorComponent = (props) => {
   return (
     <Card default className="my-3">
       <CardBody>
+        <Text
+          Tag="h4"
+          size={24}
+          className="text-center text-gray text-bold mt-3 mb-4"
+        >
+          {"Update Motor Details"}
+        </Text>
         <Row>
           {Object.values(formik.values).map((e) => (
             <Col className="mb-4" key={e.id} md={3}>

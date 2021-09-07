@@ -98,6 +98,13 @@ const TipsTubesComponent = (props) => {
   return (
     <Card default className="my-3">
       <CardBody>
+        <Text
+          Tag="h4"
+          size={24}
+          className="text-center text-gray text-bold mt-3 mb-4"
+        >
+          {"Tips & Tubes"}
+        </Text>
         <Form onSubmit={handleTipesTubesButton}>
           <Row form>
             <Col sm={4}>

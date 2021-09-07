@@ -132,6 +132,13 @@ const CartridgeComponent = (props) => {
 
       <Card default className="my-3">
         <CardBody>
+          <Text
+            Tag="h4"
+            size={24}
+            className="text-center text-gray text-bold mt-3 mb-4"
+          >
+            {"Create Cartridge"}
+          </Text>
           <Row>
             <Col className="mb-4" md={3}>
               <Label for="id" className="font-weight-bold">
