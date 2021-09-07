@@ -28,11 +28,15 @@ func (d *Compact32Deck) Heating(ht db.Heating, live bool) (response string, err 
 	defer d.resetHeaterInProgress()
 
 	defer func() {
-		if live{
+		if live {
 			d.ResetAborted()
 		}
 		if err != nil {
 			logger.Errorln(err)
+			if err.Error() == AbortedError {
+				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
+				return
+			}
 			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 			return
 		}
@@ -74,7 +78,7 @@ func (d *Compact32Deck) Heating(ht db.Heating, live bool) (response string, err 
 	// Step 4 : Check if Aborted
 	// first check aborted if yes then exit
 	if d.isMachineInAbortedState() {
-		err = fmt.Errorf("Operation was ABORTED!")
+		err = fmt.Errorf(AbortedError)
 		return "", err
 	}
 
