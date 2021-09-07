@@ -91,7 +91,11 @@ const CalibrationExtractionComponent = (props) => {
         />
       </div>
 
-      <Card default className="my-3">
+      <Card
+        default
+        className="mt-3"
+        style={{ maxHeight: 419, overflow: "scroll" }}
+      >
         <CardBody className="px-5 py-4 text-center">
           {/* Shaker and Heater card */}
           <ShakerAndHeaterComponent />

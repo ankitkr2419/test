@@ -70,7 +70,7 @@ const ConsumableDistancesComponent = (props) => {
           formik={formik}
         />
       )}
-      <Card style={{ height: 590 }}>
+      <Card className="mb-4" style={{ height: 370 }}>
         <CardBody>
           <Text
             Tag="h4"
