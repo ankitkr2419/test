@@ -19,6 +19,12 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  startLidPidActions,
+  lidPidProgressActions,
+  abortLidPidActions,
+  resetTECActions,
+  autoTuneTECActions,
+  runDyeCalibrationActions,
   createCartridgesActions,
   deleteCartridgesActions,
   fetchToleranceActions,
@@ -45,6 +51,11 @@ import {
   updateRtpcrConfigsFailed,
   fetchTECConfigsFailed,
   updateTECConfigsFailed,
+  startLidPidFailed,
+  abortLidPidFailed,
+  resetTECFailed,
+  autoTuneTECFailed,
+  runDyeCalibrationFailed,
   createCartridgesFailed,
   deleteCartridgesFailed,
   fetchToleranceFailed,
@@ -531,6 +542,135 @@ export function* updateTECConfigs(actions) {
   }
 }
 
+export function* startLidPid(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = startLidPidActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.lidPidStart}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error starting Lid Pid", error);
+    yield put(startLidPidFailed({ error }));
+  }
+}
+
+export function* abortLidPid(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = abortLidPidActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.lidPidStop}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error aborting Lid Pid", error);
+    yield put(abortLidPidFailed({ error }));
+  }
+}
+
+export function* resetTEC(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = resetTECActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.resetTEC}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error reseting TEC", error);
+    yield put(resetTECFailed({ error }));
+  }
+}
+
+export function* autoTuneTEC(actions) {
+  const {
+    payload: { token },
+  } = actions;
+
+  const { successAction, failureAction } = autoTuneTECActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.autoTuneTEC}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error auto tuning TEC", error);
+    yield put(autoTuneTECFailed({ error }));
+  }
+}
+
+export function* runDyeCalibration(actions) {
+  const {
+    payload: { token, requestBody },
+  } = actions;
+
+  const { successAction, failureAction } = runDyeCalibrationActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: requestBody,
+        reqPath: `${API_ENDPOINTS.dyeCalibration}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error starting dye calibration", error);
+    yield put(runDyeCalibrationFailed({ error }));
+  }
+}
+
 export function* fetchTolerance(actions) {
   const {
     payload: { token },
@@ -697,6 +837,12 @@ export function* calibrationSaga() {
   yield takeEvery(updateRtpcrConfigsActions.initiateAction, updateRtpcrConfigs);
   yield takeEvery(fetchTECConfigsActions.initiateAction, fetchTECConfigs);
   yield takeEvery(updateTECConfigsActions.initiateAction, updateTECConfigs);
+  yield takeEvery(startLidPidActions.initiateAction, startLidPid);
+  yield takeEvery(abortLidPidActions.initiateAction, abortLidPid);
+  yield takeEvery(resetTECActions.initiateAction, resetTEC);
+  yield takeEvery(autoTuneTECActions.initiateAction, autoTuneTEC);
+  yield takeEvery(runDyeCalibrationActions.initiateAction, runDyeCalibration);
+
   yield takeEvery(fetchToleranceActions.initiateAction, fetchTolerance);
   yield takeEvery(updateToleranceActions.initiateAction, updateTolerance);
   yield takeEvery(fetchConsumableActions.initiateAction, fetchConsumable);

@@ -9,17 +9,25 @@ import {
   updateRtpcrConfigsInitiated,
   fetchTECConfigsInitiated,
   updateTECConfigsInitiated,
+  startLidPid,
+  abortLidPid,
+  resetTECInitiated,
+  autoTuneTECInitiated,
   updateToleranceInitiated,
   fetchToleranceInitiated,
+  runDyeCalibration,
 } from "action-creators/calibrationActionCreators";
 import CalibrationComponent from "components/Calibration";
 import {
   formikInitialState,
   formikInitialStateRtpcrVars,
   formikInitialStateTECVars,
+  formikInitialStateDyeCalibration,
+  createDyeOptions,
 } from "components/Calibration/helper";
 import { deckBlockInitiated } from "action-creators/loginActionCreators";
 import { populateFormikStateFromApi } from "components/FormikFieldsEditor/helper";
+import { PID_STATUS } from "appConstants";
 
 const CalibrationRtpcrContainer = () => {
   const dispatch = useDispatch();
@@ -39,6 +47,12 @@ const CalibrationRtpcrContainer = () => {
   //formik state for TEC variables
   const formikTECVars = useFormik({
     initialValues: formikInitialStateTECVars,
+    enableReinitialize: true,
+  });
+
+  //formik state for dye calibration
+  const formikDyeCalibration = useFormik({
+    initialValues: formikInitialStateDyeCalibration,
     enableReinitialize: true,
   });
 
@@ -66,9 +80,21 @@ const CalibrationRtpcrContainer = () => {
   let isTECConfigUpdateApi = tecConfigsReducerData?.isUpdateApi;
   let tecConfigDetails = tecConfigsReducerData?.details;
 
+  //lid pid reducer
+  const lidPidReducer = useSelector((state) => state.lidPidReducer);
+  const lidPidReducerData = lidPidReducer.toJS();
+  const { lidPidStatus } = lidPidReducerData;
+
   //Tolerance Variables
   const toleranceReducer = useSelector((state) => state.toleranceReducer);
   const toleranceReducerData = toleranceReducer.toJS();
+
+  //dye calibration
+  const dyeCalibrationReducer = useSelector(
+    (state) => state.dyeCalibrationReducer
+  );
+  const dyeCalibrationReducerData = dyeCalibrationReducer.toJS();
+  const { dyeCalibrationStatus } = dyeCalibrationReducerData;
 
   //initially populate with previous data
   useEffect(() => {
@@ -179,9 +205,46 @@ const CalibrationRtpcrContainer = () => {
     dispatch(updateTECConfigsInitiated(token, requestBody));
   };
 
+  const handleLidPidButton = () => {
+    if (
+      lidPidStatus === PID_STATUS.running ||
+      lidPidStatus === PID_STATUS.progressing
+    ) {
+      dispatch(abortLidPid(token));
+    } else {
+      dispatch(startLidPid(token));
+    }
+  };
+
+  const handleResetTEC = () => {
+    dispatch(resetTECInitiated(token));
+  };
+
+  const handleAutoTuneTEC = () => {
+    dispatch(autoTuneTECInitiated(token));
+  };
+
+  const handleDyeCalibrationButton = (requestBody) => {
+    dispatch(runDyeCalibration(token, requestBody));
+  };
+
   const handleSaveToleranceBtn = (requestBody) => {
     dispatch(updateToleranceInitiated({ token, requestBody }));
   };
+
+  //dye options
+  let dyeOptions = [];
+  dyeOptions =
+    toleranceReducerData?.data &&
+    dyeOptions.length === 0 &&
+    createDyeOptions(toleranceReducerData?.data);
+  //set first dye as default selected for first time
+  if (
+    dyeOptions?.length &&
+    formikDyeCalibration.values.selectedDye.value === null
+  ) {
+    formikDyeCalibration.setFieldValue("selectedDye.value", dyeOptions[0]);
+  }
 
   return (
     <CalibrationComponent
@@ -192,6 +255,14 @@ const CalibrationRtpcrContainer = () => {
       handleRtpcrConfigSubmitButton={handleRtpcrConfigSubmitButton}
       formikTECVars={formikTECVars}
       handleTECConfigSubmitButton={handleTECConfigSubmitButton}
+      lidPidStatus={lidPidStatus}
+      handleLidPidButton={handleLidPidButton}
+      handleResetTEC={handleResetTEC}
+      handleAutoTuneTEC={handleAutoTuneTEC}
+      dyeOptions={dyeOptions}
+      formikDyeCalibration={formikDyeCalibration}
+      handleDyeCalibrationButton={handleDyeCalibrationButton}
+      dyeCalibrationStatus={dyeCalibrationStatus}
       handleSaveToleranceBtn={handleSaveToleranceBtn}
       toleranceData={toleranceReducerData.data}
     />

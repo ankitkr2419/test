@@ -1,4 +1,5 @@
 import { EMAIL_REGEX_OR_EMPTY_STR, NAME_REGEX } from "appConstants";
+import { PID_STATUS } from "appConstants";
 
 export const formikInitialState = {
   name: {
@@ -121,6 +122,17 @@ export const formikInitialStateRtpcrVars = {
     isInvalid: false,
     isInvalidMsg: "End Cycle should be between 0 - 9999",
   },
+  opticalCalibrationCycleCount: {
+    type: "number",
+    name: "opticalCalibrationCycleCount",
+    apiKey: "optical_calibration_cycle_count",
+    label: "Optical Calibration Cycle Count",
+    min: 0,
+    max: 9999,
+    value: null,
+    isInvalid: false,
+    isInvalidMsg: "Optical Calibration Cycle Count should be between 0 - 9999",
+  },
 };
 
 //TEC variables
@@ -193,6 +205,11 @@ export const formikInitialStateTECVars = {
   },
 };
 
+export const formikInitialStateDyeCalibration = {
+  selectedDye: { value: null, isInvalid: false },
+  kitID: { value: null, min: 0, isInvalid: false },
+};
+
 export const getToleranceInitialFormikState = (data) => {
   const toleranceArr = data?.map((dataObj) => ({
     value: dataObj.Tolerance,
@@ -259,4 +276,31 @@ export const getRequestBody = (state) => {
     body[name] = type === "number" ? parseInt(value) : value;
   }
   return body;
+};
+
+/**create dye list from tolerance data to use it in dropdown */
+export const createDyeOptions = (toleranceReducerData) => {
+  let dyeList = [];
+  if (toleranceReducerData?.length) {
+    dyeList = toleranceReducerData?.map((obj) => ({
+      label: obj.Name,
+      value: obj.ID,
+    }));
+  }
+  return dyeList;
+};
+
+export const calibrationStatusMessage = (dyeCalibrationStatus) => {
+  switch (dyeCalibrationStatus) {
+    case PID_STATUS.running:
+      return "Calibration Running";
+    case PID_STATUS.runFailed:
+      return "Calibration Failed";
+    case PID_STATUS.progressing:
+      return "Calibration In Progress";
+    case PID_STATUS.progressComplete:
+      return "Calibration Completed";
+    default:
+      return "";
+  }
 };
