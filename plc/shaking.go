@@ -41,6 +41,10 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 
 		if err != nil {
 			logger.Errorln(err)
+			if err.Error() == AbortedError {
+				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
+				return
+			}
 			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 			return
 		}
@@ -160,7 +164,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 	// 10. If withTemp is false then proceed with the normal flow by starting the shaker.
 	//check if aborted
 	if d.isMachineInAbortedState() {
-		err = fmt.Errorf("Operation was ABORTED!")
+		err = fmt.Errorf(AbortedError)
 		return "", err
 	}
 
