@@ -42,9 +42,13 @@ import {
   heaterRunInAborted,
   runPidInProgress,
   runPidInSuccess,
+  progressLidPid,
+  successLidPid,
   shakerRunInProgress,
   shakerRunInSuccess,
   shakerRunInAborted,
+  progressDyeCalibration,
+  completedDyeCalibration,
 } from "action-creators/calibrationActionCreators";
 
 let webSocket = null;
@@ -134,6 +138,12 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.progressHeater:
           dispatch(heaterProgress(JSON.parse(data)));
           break;
+        case SOCKET_MESSAGE_TYPE.PROGRESSLidPIDTuning:
+          dispatch(progressLidPid(JSON.parse(data)));
+          break;
+        case SOCKET_MESSAGE_TYPE.SUCCESSLidPIDTuning:
+          dispatch(successLidPid(JSON.parse(data)));
+          break;
         case SOCKET_MESSAGE_TYPE.progressShakerRun:
           dispatch(shakerRunInProgress());
           break;
@@ -151,6 +161,12 @@ export const connectSocket = (dispatch) => {
           break;
         case SOCKET_MESSAGE_TYPE.abortHeaterRun:
           dispatch(heaterRunInAborted());
+        case SOCKET_MESSAGE_TYPE.progressDyeCalibration:
+          dispatch(progressDyeCalibration());
+          break;
+        case SOCKET_MESSAGE_TYPE.completedDyeCalibration:
+          dispatch(completedDyeCalibration());
+          toast.success(data);
           break;
 
         default:

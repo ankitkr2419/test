@@ -1,29 +1,15 @@
 import React, { useEffect, useCallback } from "react";
 import { useHistory } from "react-router";
 
-import {
-  Button,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Card,
-  CardBody,
-  Row,
-  Col,
-} from "core-components";
+import { Card, CardBody } from "core-components";
 import { Icon, Text } from "shared-components";
-
-import {
-  isValueValid,
-  formikInitialState,
-  validateAllFields,
-  getRequestBody,
-} from "./helper";
-
-import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
 import CommonFieldsComponent from "components/CalibrationExtraction/CommonFieldsComponent";
 import FormikFieldsEditor from "components/FormikFieldsEditor";
+import LidPidTuning from "./LidPidTuning";
+
+import { HeadingTitle } from "components/CalibrationExtraction/HeadingTitle";
+import TECOperations from "./TECOperations";
+import DyeCalibration from "./DyeCalibration";
 import ToleranceComponent from "./ToleranceComponent";
 
 const CalibrationComponent = (props) => {
@@ -35,6 +21,14 @@ const CalibrationComponent = (props) => {
     handleRtpcrConfigSubmitButton,
     formikTECVars,
     handleTECConfigSubmitButton,
+    lidPidStatus,
+    handleLidPidButton,
+    handleResetTEC,
+    handleAutoTuneTEC,
+    dyeOptions,
+    formikDyeCalibration,
+    handleDyeCalibrationButton,
+    dyeCalibrationStatus,
     handleSaveToleranceBtn,
     toleranceData,
   } = props;
@@ -88,6 +82,26 @@ const CalibrationComponent = (props) => {
             formik={formikTECVars}
             submitButtonLabel={"Save"}
             submitButtonHandler={handleTECConfigSubmitButton}
+          />
+
+          {/** Lid PID Tuning */}
+          <LidPidTuning
+            lidPidStatus={lidPidStatus}
+            handleButtonClick={handleLidPidButton}
+          />
+
+          {/** TEC Operations */}
+          <TECOperations
+            handleResetTEC={handleResetTEC}
+            handleAutoTuneTEC={handleAutoTuneTEC}
+          />
+
+          {/**Calibration of dyes */}
+          <DyeCalibration
+            dyeOptions={dyeOptions}
+            formikDyeCalibration={formikDyeCalibration}
+            dyeCalibrationStatus={dyeCalibrationStatus}
+            handleDyeCalibrationButton={handleDyeCalibrationButton}
           />
         </CardBody>
       </Card>

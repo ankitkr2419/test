@@ -16,6 +16,10 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  startLidPidActions,
+  lidPidProgressActions,
+  abortLidPidActions,
+  runDyeCalibrationActions,
   shakerRunProgressActions,
   heaterRunProgressActions,
   fetchToleranceActions,
@@ -577,6 +581,78 @@ export const tecConfigsReducer = (state = tecConfigsInitialState, action) => {
   }
 };
 
+//lid pid tuning reducer
+const lidPidInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  lidPidStatus: null,
+});
+
+export const lidPidReducer = (state = lidPidInitialState, action) => {
+  switch (action.type) {
+    case startLidPidActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        lidPidStatus: null,
+      });
+    case startLidPidActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        lidPidStatus: PID_STATUS.running,
+      });
+    case startLidPidActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        lidPidStatus: PID_STATUS.runFailed,
+      });
+    case startLidPidActions.resetAction:
+      return lidPidInitialState;
+
+    case abortLidPidActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        lidPidStatus: PID_STATUS.aborting,
+      });
+    case abortLidPidActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        lidPidStatus: PID_STATUS.stopped,
+      });
+    case abortLidPidActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        lidPidStatus: PID_STATUS.abortFailed,
+      });
+    case abortLidPidActions.resetAction:
+      return lidPidInitialState;
+
+    case lidPidProgressActions.lidPidProgressAction:
+      return state.merge({
+        isLoading: false,
+        error: null,
+        lidPidStatus: PID_STATUS.progressing,
+      });
+    case lidPidProgressActions.lidPidProgressActionSuccess:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        lidPidStatus: PID_STATUS.progressComplete,
+      });
+
+    case loginActions.loginReset:
+      return lidPidInitialState;
+
+    default:
+      return state;
+  }
+};
+
 const shakerRunProgressInitialState = fromJS({
   shakerRunStatus: null,
 });
@@ -698,6 +774,59 @@ export const toleranceReducer = (state = toleranceInitialState, action) => {
 
     case loginActions.loginReset:
       return toleranceInitialState;
+
+    default:
+      return state;
+  }
+};
+
+//run dye calibration reducer
+const dyeCalibrationInitialState = fromJS({
+  isLoading: false,
+  error: null,
+  dyeCalibrationStatus: null,
+});
+
+export const dyeCalibrationReducer = (
+  state = dyeCalibrationInitialState,
+  action
+) => {
+  switch (action.type) {
+    case runDyeCalibrationActions.initiateAction:
+      return state.merge({
+        isLoading: true,
+        error: null,
+        dyeCalibrationStatus: PID_STATUS.running,
+      });
+    case runDyeCalibrationActions.successAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        dyeCalibrationStatus: PID_STATUS.running,
+      });
+    case runDyeCalibrationActions.failureAction:
+      return state.merge({
+        isLoading: false,
+        error: true,
+        dyeCalibrationStatus: PID_STATUS.runFailed,
+      });
+    case runDyeCalibrationActions.resetAction:
+      return dyeCalibrationInitialState;
+    case runDyeCalibrationActions.progressAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        dyeCalibrationStatus: PID_STATUS.progressing,
+      });
+    case runDyeCalibrationActions.completedAction:
+      return state.merge({
+        isLoading: false,
+        error: false,
+        dyeCalibrationStatus: PID_STATUS.progressComplete,
+      });
+
+    case loginActions.loginReset:
+      return dyeCalibrationInitialState;
 
     default:
       return state;

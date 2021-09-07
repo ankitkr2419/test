@@ -59,12 +59,17 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
   progressHeater: "PROGRESS_HEATER",
+  PROGRESSLidPIDTuning: "PROGRESS_LidPIDTuning",
+  ErrorPIDTuning: "ErrorPIDTuning",
+  SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
   progressShakerRun: "PROGRESS_SHAKERRUN",
   successShakerRun: "SUCCESS_SHAKERRUN",
   abortShakerRun: "ABORT_SHAKERRUN",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
   abortHeaterRun: "ABORT_HEATERRUN",
+  progressDyeCalibration: "PROGRESS_OPTCALIB",
+  completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
 
 export const HEATER_STATUS = {
@@ -188,8 +193,13 @@ export const API_ENDPOINTS = {
   cartridge: "cartridge",
   rtpcrConfigs: "configs/rtpcr",
   tecConfigs: "configs/tec",
+  lidPidStart: "lid/pid-calibration/start",
+  lidPidStop: "/lid/pid-calibration/stop",
+  resetTEC: "tec/reset-device",
+  autoTuneTEC: "tec/auto-tune",
   dyes: "dyes",
   consumable: "consumable-distance",
+  dyeCalibration: "optical-caliberation",
 };
 
 export const MODAL_MESSAGE = {

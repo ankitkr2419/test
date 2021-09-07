@@ -18,6 +18,12 @@ import {
   updateRtpcrConfigsActions,
   fetchTECConfigsActions,
   updateTECConfigsActions,
+  startLidPidActions,
+  lidPidProgressActions,
+  abortLidPidActions,
+  resetTECActions,
+  autoTuneTECActions,
+  runDyeCalibrationActions,
   createCartridgesActions,
   deleteCartridgesActions,
   shakerRunProgressActions,
@@ -316,6 +322,96 @@ export const updateTECConfigsInitiated = (token, requestBody) => ({
 export const updateTECConfigsFailed = ({ error }) => ({
   type: updateTECConfigsActions.failureAction,
   payload: { error },
+});
+
+export const startLidPid = (token) => ({
+  type: startLidPidActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const startLidPidFailed = ({ error }) => ({
+  type: startLidPidActions.failureAction,
+  payload: { error },
+});
+
+export const abortLidPid = (token) => ({
+  type: abortLidPidActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const abortLidPidFailed = ({ error }) => ({
+  type: abortLidPidActions.failureAction,
+  payload: { error },
+});
+
+export const progressLidPid = (progressDetails) => ({
+  type: lidPidProgressActions.lidPidProgressAction,
+  payload: {
+    progressDetails,
+  },
+});
+
+export const successLidPid = (progressDetails) => ({
+  type: lidPidProgressActions.lidPidProgressActionSuccess,
+  payload: {
+    progressDetails,
+  },
+});
+
+// resetTECActions,autoTuneTECActions
+export const resetTECInitiated = (token) => ({
+  type: resetTECActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const resetTECFailed = ({ error }) => ({
+  type: resetTECActions.failureAction,
+  payload: { error },
+});
+
+export const autoTuneTECInitiated = (token) => ({
+  type: autoTuneTECActions.initiateAction,
+  payload: {
+    token,
+  },
+});
+
+export const autoTuneTECFailed = ({ error }) => ({
+  type: autoTuneTECActions.failureAction,
+  payload: { error },
+});
+
+export const runDyeCalibration = (token, requestBody) => ({
+  type: runDyeCalibrationActions.initiateAction,
+  payload: {
+    token,
+    requestBody,
+  },
+});
+
+export const runDyeCalibrationFailed = ({ error }) => ({
+  type: runDyeCalibrationActions.failureAction,
+  payload: { error },
+});
+
+export const progressDyeCalibration = (progressDetails) => ({
+  type: runDyeCalibrationActions.progressAction,
+  payload: {
+    progressDetails,
+  },
+});
+
+export const completedDyeCalibration = (progressDetails) => ({
+  type: runDyeCalibrationActions.completedAction,
+  payload: {
+    progressDetails,
+  },
 });
 
 // websocket action creators for Shaker

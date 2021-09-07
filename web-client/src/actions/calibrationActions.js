@@ -138,6 +138,47 @@ export const updateTECConfigsActions = {
   resetAction: "UPDATE_TEC_CONFIGS_RESET",
 };
 
+export const startLidPidActions = {
+  initiateAction: "START_LID_PID_INITIATED",
+  successAction: "START_LID_PID_SUCCESS",
+  failureAction: "START_LID_PID_FAILURE",
+  resetAction: "START_LID_PID_RESET",
+};
+
+export const lidPidProgressActions = {
+  lidPidProgressAction: "LID_PID_IN_PROGRESS",
+  lidPidProgressActionSuccess: "LID_PID_SUCCEEDED",
+};
+
+export const abortLidPidActions = {
+  initiateAction: "ABORT_LID_PID_INITIATED",
+  successAction: "ABORT_LID_PID_SUCCESS",
+  failureAction: "ABORT_LID_PID_FAILURE",
+  resetAction: "ABORT_LID_PID_RESET",
+};
+
+export const resetTECActions = {
+  initiateAction: "RESET_TEC_INITIATED",
+  successAction: "RESET_TEC_SUCCESS",
+  failureAction: "RESET_TEC_FAILURE",
+  resetAction: "RESET_TEC_RESET",
+};
+
+export const autoTuneTECActions = {
+  initiateAction: "AUTOTUNE_TEC_INITIATED",
+  successAction: "AUTOTUNE_TEC_SUCCESS",
+  failureAction: "AUTOTUNE_TEC_FAILURE",
+  resetAction: "AUTOTUNE_TEC_RESET",
+};
+
+export const runDyeCalibrationActions = {
+  initiateAction: "START_DYE_CALIBRATION_INITIATED",
+  successAction: "START_DYE_CALIBRATION_SUCCESS",
+  failureAction: "START_DYE_CALIBRATION_FAILURE",
+  resetAction: "START_DYE_CALIBRATION_RESET",
+  progressAction: "PROGRESS_DYE_CALIBRATION",
+  completedAction: "COMPLETED_DYE_CALIBRATION",
+};
 // websocket for shaker
 export const shakerRunProgressActions = {
   shakerRunProgressAction: "SHAKER_RUN_IN_PROGRESS",
