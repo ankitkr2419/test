@@ -55,9 +55,10 @@ const (
 	highestUint16                       = uint16(65535)
 )
 
-// 120 Seconds is the minimum UVLight On Time
 const (
-	minimumUVLightOnTime int64 = 2 * 60
+	// 120 Seconds is the minimum UVLight On Time
+	minimumUVLightOnTime       int64 = 2 * 60
+	maxCartridgeWellHeightPlay       = 5
 )
 
 // here we are hardcoding the shaker no in future this is to be fetched dynamically.
@@ -356,3 +357,36 @@ func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *ui
 		*direction = 0
 	}
 }
+
+// During Recipe and Processes
+func DoesCartridgeWellExist(cd UniqueCartridge) bool {
+	if _, ok := cartridges[cd]; ok {
+		return true
+	}
+	logger.Errorln("Cartridge Doesn't Exist!")
+	return false
+}
+
+// Well Height Check
+func IsCartridgeWellHeightSafe(cd UniqueCartridge, height float64) bool {
+	if !DoesCartridgeWellExist(cd) {
+		return false
+	}
+
+	if cartridges[cd]["height"]+maxCartridgeWellHeightPlay < height {
+		logger.Errorln("Cartridge Height is unsafe!")
+		return false
+	}
+	return true
+}
+
+// Only During Recipe
+func DoesTipExist(id int64) bool {
+	if _, ok := tipstubes[id]; ok {
+		return true
+	}
+	logger.Errorln("Tip Doesn't Exist!")
+	return false
+}
+
+// TODO: Validate Consumable Distances and Motors here
