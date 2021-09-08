@@ -190,39 +190,49 @@ func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recip
 		return
 	}
 	if ad.Category != db.SD && ad.Category != db.DS && ad.Category != db.DD {
-		cartridge, err := deps.Store.ShowCartridge(context.Background(), *recipe.Cartridge1Position)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.CartridgeFetchError)
-		}
+
 		//fetch cartridge type using id
-		if recipe.Cartridge1Position == nil || ad.CartridgeType != cartridge.Type {
-			return
+		var cartridgeID int64
+
+		switch ad.CartridgeType {
+		case db.Cartridge1:
+			if recipe.Cartridge1Position == nil {
+				return
+			}
+			cartridgeID = *recipe.Cartridge1Position
+
+		case db.Cartridge2:
+			if recipe.Cartridge2Position == nil {
+				return
+			}
+			cartridgeID = *recipe.Cartridge2Position
+
 		}
 
 		switch ad.Category {
 		case db.WW:
 			aspireCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridge.ID,
-				CartridgeType: cartridge.Type,
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
 				WellNum:       ad.SourcePosition,
 			}
 			dispenseCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridge.ID,
-				CartridgeType: cartridge.Type,
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
 				WellNum:       ad.DestinationPosition,
 			}
 			// send cartridge and both height for validation
 		case db.WD, db.WS:
 			aspireCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridge.ID,
-				CartridgeType: cartridge.Type,
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
 				WellNum:       ad.SourcePosition,
 			}
 			// send cartridge and aspire height for validation
 		case db.DW, db.SW:
 			dispenseCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridge.ID,
-				CartridgeType: cartridge.Type,
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
 				WellNum:       ad.DestinationPosition,
 			}
 		}
