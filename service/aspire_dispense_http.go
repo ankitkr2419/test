@@ -171,16 +171,19 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 }
 
 // ValidateAspireDispenceObject this can be called by CSV
-func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.AspireDispense, recipeID uuid.UUID) (valid bool) {
+func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.AspireDispense, recipeID uuid.UUID) (err error) {
 
-	var aspireCartridge, dispenseCartridge plc.UniqueCartridge
+	var aspireCartridgeWell, dispenseCartridgeWell plc.UniqueCartridge
 
-	//check for source position
-	if ad.SourcePosition == 0 && (ad.Category != db.SW || ad.Category != db.SD) {
+	//check for source position validity
+	if ad.SourcePosition == 0 && ad.Category != db.SW && ad.Category != db.SD {
+		return responses.InvalidSourcePosition
 		return
 	}
-	//check for destination
-	if ad.DestinationPosition == 0 && (ad.Category != db.WS || ad.Category != db.DS) {
+
+	//check for destination validity
+	if ad.DestinationPosition == 0 && ad.Category != db.WS && ad.Category != db.DS {
+		return responses.InvalidDestinationPosition
 		return
 	}
 
@@ -188,61 +191,98 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return responses.RecipeFetchError
+	}
+
+	switch ad.Category {
+	case db.SD:
+		if checkDeckPositionValidity(ad.DestinationPosition) {
+			return responses.InvalidDestinationPosition
+		}
+
+	case db.DS:
+		if checkDeckPositionValidity(ad.SourcePosition) {
+			return responses.InvalidSourcePosition
+		}
+
+	case db.DD:
+		if checkDeckPositionValidity(ad.DestinationPosition) {
+			return responses.InvalidDestinationPosition
+		}
+		if checkDeckPositionValidity(ad.SourcePosition) {
+			return responses.InvalidSourcePosition
+		}
+
+	}
+
+	//fetch cartridge type using id
+	var cartridgeID int64
+
+	switch ad.CartridgeType {
+	case db.Cartridge1:
+		if recipe.Cartridge1Position == nil {
+			return responses.RecipeCartridge1Missing
+
+		}
+		cartridgeID = *recipe.Cartridge1Position
+
+	case db.Cartridge2:
+		if recipe.Cartridge2Position == nil {
+			return responses.RecipeCartridge2Missing
+
+		}
+		cartridgeID = *recipe.Cartridge2Position
+	default:
+		return responses.InvalidCartridgeType
+
+	}
+
+	aspireCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.SourcePosition)
+	dispenseCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.DestinationPosition)
+
+	switch ad.Category {
+	case db.WW:
+		// send cartridge and both height for validation
+		if !plc.IsCartridgeWellHeightSafe(aspireCartridgeWell, ad.AspireHeight) {
+			return responses.InvalidAspireWell
+		}
+		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
+			return responses.InvalidDispenseWell
+		}
+
+	case db.WD, db.WS:
+		// send cartridge and aspire height for validation
+		if !plc.IsCartridgeWellHeightSafe(aspireCartridgeWell, ad.AspireHeight) {
+			return responses.InvalidAspireWell
+		}
 		return
-	}
-	if ad.Category != db.SD && ad.Category != db.DS && ad.Category != db.DD {
-
-		//fetch cartridge type using id
-		var cartridgeID int64
-
-		switch ad.CartridgeType {
-		case db.Cartridge1:
-			if recipe.Cartridge1Position == nil {
-				return
-			}
-			cartridgeID = *recipe.Cartridge1Position
-
-		case db.Cartridge2:
-			if recipe.Cartridge2Position == nil {
-				return
-			}
-			cartridgeID = *recipe.Cartridge2Position
-
+	case db.DW, db.SW:
+		// send cartridge and dispense height for validation
+		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
+			return responses.InvalidDispenseWell
 		}
-
-		switch ad.Category {
-		case db.WW:
-			aspireCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridgeID,
-				CartridgeType: ad.CartridgeType,
-				WellNum:       ad.SourcePosition,
-			}
-			dispenseCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridgeID,
-				CartridgeType: ad.CartridgeType,
-				WellNum:       ad.DestinationPosition,
-			}
-			// send cartridge and both height for validation
-		case db.WD, db.WS:
-			aspireCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridgeID,
-				CartridgeType: ad.CartridgeType,
-				WellNum:       ad.SourcePosition,
-			}
-			// send cartridge and aspire height for validation
-		case db.DW, db.SW:
-			dispenseCartridge = plc.UniqueCartridge{
-				CartridgeID:   cartridgeID,
-				CartridgeType: ad.CartridgeType,
-				WellNum:       ad.DestinationPosition,
-			}
-			// send cartridge and dispense height for validation
-
-		}
-
-		logger.Infoln(aspireCartridge, dispenseCartridge)
+	default:
+		return responses.InvalidCategoryAspireDispense
 
 	}
 
+	logger.Infoln(aspireCartridgeWell, dispenseCartridgeWell)
+
+	return
+}
+
+func checkDeckPositionValidity(position int64) bool {
+	if position == cartridge1Pos || position == cartridge2Pos ||
+		position < minAspDisDeckPos || position > maxDeckPosition {
+		return false
+	}
 	return true
+}
+
+func createCartridgeWell(cartridgeID int64, cT db.CartridgeType, wellNum int64) plc.UniqueCartridge {
+	return plc.UniqueCartridge{
+		CartridgeID:   cartridgeID,
+		CartridgeType: cT,
+		WellNum:       wellNum,
+	}
 }
