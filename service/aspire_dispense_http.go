@@ -54,6 +54,13 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = ValidateAspireDispenceObject(req.Context(), deps, adobj, recipeID)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(responses.DefineCUDNotAllowedError(processC, updateC))
+			return
+		}
+
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
