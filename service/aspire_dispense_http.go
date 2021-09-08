@@ -178,13 +178,11 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 	//check for source position validity
 	if ad.SourcePosition == 0 && ad.Category != db.SW && ad.Category != db.SD {
 		return responses.InvalidSourcePosition
-		return
 	}
 
 	//check for destination validity
 	if ad.DestinationPosition == 0 && ad.Category != db.WS && ad.Category != db.DS {
 		return responses.InvalidDestinationPosition
-		return
 	}
 
 	//check cartridge type from recipe
@@ -263,7 +261,6 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 		}
 	default:
 		return responses.InvalidCategoryAspireDispense
-
 	}
 
 	logger.Infoln(aspireCartridgeWell, dispenseCartridgeWell)
