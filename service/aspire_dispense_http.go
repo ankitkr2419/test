@@ -170,7 +170,8 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recipeID uuid.UUID) (valid bool) {
+// ValidateAspireDispenceObject this can be called by CSV
+func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.AspireDispense, recipeID uuid.UUID) (valid bool) {
 
 	var aspireCartridge, dispenseCartridge plc.UniqueCartridge
 
@@ -184,7 +185,7 @@ func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recip
 	}
 
 	//check cartridge type from recipe
-	recipe, err := deps.Store.ShowRecipe(context.Background(), recipeID)
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
 		return
@@ -235,6 +236,8 @@ func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recip
 				CartridgeType: ad.CartridgeType,
 				WellNum:       ad.DestinationPosition,
 			}
+			// send cartridge and dispense height for validation
+
 		}
 
 		logger.Infoln(aspireCartridge, dispenseCartridge)
