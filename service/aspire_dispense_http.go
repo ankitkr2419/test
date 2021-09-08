@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -166,4 +168,79 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.AspireDispenseUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.AspireDispenseUpdateSuccess})
 	})
+}
+
+func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recipeID uuid.UUID) (valid bool) {
+
+	var aspireCartridge, dispenseCartridge plc.UniqueCartridge
+
+	//check for source position
+	if ad.SourcePosition == 0 {
+		if ad.Category != db.SW || ad.Category != db.SD {
+			return
+		}
+	}
+	//check for destination
+	if ad.DestinationPosition == 0 {
+		if ad.Category != db.WS || ad.Category != db.DS {
+			return
+		}
+	}
+
+	//check cartridge type from recipe
+	recipe, err := deps.Store.ShowRecipe(context.Background(), recipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return
+	}
+	if ad.Category != db.SD || ad.Category != db.DS {
+		//fetch cartridge type using id
+		cartridge, err := deps.Store.ShowCartridge(context.Background(), *recipe.Cartridge1Position)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.CartridgeFetchError)
+		}
+		// wells, err := deps.Store.ShowCartridgeWells(int(*recipe.Cartridge1Position))
+		// if err != nil {
+		// 	logger.WithField("err", err.Error()).Error(responses.CartridgeFetchError)
+		// }
+
+		if ad.CartridgeType != cartridge.Type {
+			return
+		}
+		//send unique cartridge to the common checking method
+		if ad.Category == db.WW {
+
+			aspireCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridge.ID,
+				CartridgeType: cartridge.Type,
+				WellNum:       ad.SourcePosition,
+			}
+			dispenseCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridge.ID,
+				CartridgeType: cartridge.Type,
+				WellNum:       ad.DestinationPosition,
+			}
+			// send cartridge and both height for validation
+		} else if ad.Category == db.WD || ad.Category == db.WS {
+			aspireCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridge.ID,
+				CartridgeType: cartridge.Type,
+				WellNum:       ad.SourcePosition,
+			}
+			// send cartridge and aspire height for validation
+
+		} else if ad.Category == db.DW || ad.Category == db.SW {
+			dispenseCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridge.ID,
+				CartridgeType: cartridge.Type,
+				WellNum:       ad.DestinationPosition,
+			}
+			// send cartridge and dispense height for validation
+
+		}
+		logger.Infoln(aspireCartridge, dispenseCartridge)
+
+	}
+
+	return true
 }
