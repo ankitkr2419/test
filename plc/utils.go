@@ -73,6 +73,7 @@ const (
 	homingSlowSpeed     = uint16(500)
 	homingDeckFastSpeed = uint16(3000)
 )
+const AbortedError = "operation was ABORTED!"
 
 // Magnet States
 const (

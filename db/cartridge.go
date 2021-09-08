@@ -27,7 +27,10 @@ const (
 	selectAllCartridgeQuery      = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id GROUP BY c.id`
 	selectAllCartridgeWellsQuery = `SELECT *
 							FROM cartridge_wells`
+	selectCartridgeWellsQuery = `SELECT *
+							FROM cartridge_wells WHERE id = $1`
 	deleteCartridgeQuery = `delete from cartridges where id = $1`
+	getCartridgeQuery    = `SELECT * FROM cartridges WHERE id = $1`
 )
 
 type CartridgeType string
@@ -153,6 +156,24 @@ func (s *pgStore) ListCartridgeWells() (cartridgeWells []CartridgeWells, err err
 	err = s.db.Select(&cartridgeWells, selectAllCartridgeWellsQuery)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing cartridgeWells details")
+		return
+	}
+	return
+}
+
+func (s *pgStore) ShowCartridgeWells(id int64) (cartridgeWells []CartridgeWells, err error) {
+	err = s.db.Select(&cartridgeWells, selectCartridgeWellsQuery, id)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing cartridgeWells details")
+		return
+	}
+	return
+}
+
+func (s *pgStore) ShowCartridge(ctx context.Context, id int64) (dbCartridge Cartridge, err error) {
+	err = s.db.Get(&dbCartridge, getCartridgeQuery, id)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching cartridge")
 		return
 	}
 	return

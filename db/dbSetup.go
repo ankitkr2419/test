@@ -528,15 +528,13 @@ func UpdateDyesTolerance(dyes []Dye) (err error) {
 		Targets   []string `yaml:"targets,flow"`
 		Tolerance float64
 	}, 0)
-	for _, v := range dyes {
-		for _, confDyes := range config.Dyes {
+	for _, confDyes := range config.Dyes {
+		for _, v := range dyes {
 			if v.Name == confDyes.Name && v.Position == confDyes.Position {
 				confDyes.Tolerance = v.Tolerance
 			}
-
-			dyeConf.Dyes = append(dyeConf.Dyes, confDyes)
-
 		}
+		dyeConf.Dyes = append(dyeConf.Dyes, confDyes)
 	}
 	res, err := yaml.Marshal(dyeConf)
 	if err != nil {

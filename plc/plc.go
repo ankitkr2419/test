@@ -10,9 +10,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-const( 
+const (
 	ErrorExtractionMonitor = "ErrorExtractionMonitor"
-	ErrorLidPIDTuning = "PID Error"
+	ErrorLidPIDTuning      = "PID Error"
+	ErrorOperationAborted  = "ErrorOperationAborted"
 )
 
 type Status int32

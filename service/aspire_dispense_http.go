@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -166,4 +168,81 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.AspireDispenseUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.AspireDispenseUpdateSuccess})
 	})
+}
+
+// ValidateAspireDispenceObject this can be called by CSV
+func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.AspireDispense, recipeID uuid.UUID) (valid bool) {
+
+	var aspireCartridge, dispenseCartridge plc.UniqueCartridge
+
+	//check for source position
+	if ad.SourcePosition == 0 && (ad.Category != db.SW || ad.Category != db.SD) {
+		return
+	}
+	//check for destination
+	if ad.DestinationPosition == 0 && (ad.Category != db.WS || ad.Category != db.DS) {
+		return
+	}
+
+	//check cartridge type from recipe
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return
+	}
+	if ad.Category != db.SD && ad.Category != db.DS && ad.Category != db.DD {
+
+		//fetch cartridge type using id
+		var cartridgeID int64
+
+		switch ad.CartridgeType {
+		case db.Cartridge1:
+			if recipe.Cartridge1Position == nil {
+				return
+			}
+			cartridgeID = *recipe.Cartridge1Position
+
+		case db.Cartridge2:
+			if recipe.Cartridge2Position == nil {
+				return
+			}
+			cartridgeID = *recipe.Cartridge2Position
+
+		}
+
+		switch ad.Category {
+		case db.WW:
+			aspireCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
+				WellNum:       ad.SourcePosition,
+			}
+			dispenseCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
+				WellNum:       ad.DestinationPosition,
+			}
+			// send cartridge and both height for validation
+		case db.WD, db.WS:
+			aspireCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
+				WellNum:       ad.SourcePosition,
+			}
+			// send cartridge and aspire height for validation
+		case db.DW, db.SW:
+			dispenseCartridge = plc.UniqueCartridge{
+				CartridgeID:   cartridgeID,
+				CartridgeType: ad.CartridgeType,
+				WellNum:       ad.DestinationPosition,
+			}
+			// send cartridge and dispense height for validation
+
+		}
+
+		logger.Infoln(aspireCartridge, dispenseCartridge)
+
+	}
+
+	return true
 }
