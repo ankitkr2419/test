@@ -37,7 +37,7 @@ type Piercing struct {
 	ID             uuid.UUID     `db:"id" json:"id"`
 	Type           CartridgeType `db:"type" json:"type" validate:"required"`
 	CartridgeWells pq.Int64Array `db:"cartridge_wells" json:"cartridge_wells" validate:"required"`
-	Heights        pq.Int64Array `db:"piercing_heights" json:"piercing_heights" validate:"lte=30,gte=0"`
+	Heights        pq.Int64Array `db:"piercing_heights" json:"piercing_heights" validate:"required"`
 	ProcessID      uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt      time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt      time.Time     `db:"updated_at" json:"updated_at"`
