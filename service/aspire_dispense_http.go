@@ -175,16 +175,12 @@ func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recip
 	var aspireCartridge, dispenseCartridge plc.UniqueCartridge
 
 	//check for source position
-	if ad.SourcePosition == 0 {
-		if ad.Category != db.SW || ad.Category != db.SD {
-			return
-		}
+	if ad.SourcePosition == 0 && (ad.Category != db.SW || ad.Category != db.SD) {
+		return
 	}
 	//check for destination
-	if ad.DestinationPosition == 0 {
-		if ad.Category != db.WS || ad.Category != db.DS {
-			return
-		}
+	if ad.DestinationPosition == 0 && (ad.Category != db.WS || ad.Category != db.DS) {
+		return
 	}
 
 	//check cartridge type from recipe
@@ -193,23 +189,18 @@ func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recip
 		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
 		return
 	}
-	if ad.Category != db.SD || ad.Category != db.DS {
-		//fetch cartridge type using id
+	if ad.Category != db.SD && ad.Category != db.DS && ad.Category != db.DD {
 		cartridge, err := deps.Store.ShowCartridge(context.Background(), *recipe.Cartridge1Position)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.CartridgeFetchError)
 		}
-		// wells, err := deps.Store.ShowCartridgeWells(int(*recipe.Cartridge1Position))
-		// if err != nil {
-		// 	logger.WithField("err", err.Error()).Error(responses.CartridgeFetchError)
-		// }
-
-		if ad.CartridgeType != cartridge.Type {
+		//fetch cartridge type using id
+		if recipe.Cartridge1Position == nil || ad.CartridgeType != cartridge.Type {
 			return
 		}
-		//send unique cartridge to the common checking method
-		if ad.Category == db.WW {
 
+		switch ad.Category {
+		case db.WW:
 			aspireCartridge = plc.UniqueCartridge{
 				CartridgeID:   cartridge.ID,
 				CartridgeType: cartridge.Type,
@@ -221,23 +212,21 @@ func ValidateAspireDispenceObject(deps Dependencies, ad db.AspireDispense, recip
 				WellNum:       ad.DestinationPosition,
 			}
 			// send cartridge and both height for validation
-		} else if ad.Category == db.WD || ad.Category == db.WS {
+		case db.WD, db.WS:
 			aspireCartridge = plc.UniqueCartridge{
 				CartridgeID:   cartridge.ID,
 				CartridgeType: cartridge.Type,
 				WellNum:       ad.SourcePosition,
 			}
 			// send cartridge and aspire height for validation
-
-		} else if ad.Category == db.DW || ad.Category == db.SW {
+		case db.DW, db.SW:
 			dispenseCartridge = plc.UniqueCartridge{
 				CartridgeID:   cartridge.ID,
 				CartridgeType: cartridge.Type,
 				WellNum:       ad.DestinationPosition,
 			}
-			// send cartridge and dispense height for validation
-
 		}
+
 		logger.Infoln(aspireCartridge, dispenseCartridge)
 
 	}
