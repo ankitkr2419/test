@@ -124,6 +124,8 @@ type Storer interface {
 	FinishTemplate(ctx context.Context, id uuid.UUID) (err error)
 	ListFinishedTemplates(ctx context.Context) (t []Template, err error)
 	DeleteUnfinishedTemplates(ctx context.Context) (err error)
+	ShowCartridge(ctx context.Context, id int64) (dbCartridge Cartridge, err error)
+	ShowCartridgeWells(id int64) (cartridgeWells []CartridgeWells, err error)
 
 	UpdateMotor(ctx context.Context, motor Motor) (err error)
 	DeleteMotor(ctx context.Context, id int) (err error)
