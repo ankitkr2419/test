@@ -64,10 +64,10 @@ export const SOCKET_MESSAGE_TYPE = {
   SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
   progressShakerRun: "PROGRESS_SHAKERRUN",
   successShakerRun: "SUCCESS_SHAKERRUN",
-  abortShakerRun: "ABORT_SHAKERRUN",
+  abortShakerRun: "ErrorOperationAborted",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
-  abortHeaterRun: "ABORT_HEATERRUN",
+  abortHeaterRun: "ErrorOperationAborted",
   progressDyeCalibration: "PROGRESS_OPTCALIB",
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
