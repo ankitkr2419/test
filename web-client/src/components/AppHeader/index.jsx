@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
@@ -84,6 +84,11 @@ const AppHeader = (props) => {
     useState(false);
   const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
     useState(false);
+
+  const [showConfirmBackModal, toggleConfirmBackModal] = useReducer(
+    (showConfirmBackModal) => !showConfirmBackModal,
+    false
+  );
 
   const toggleUserDropdown = () =>
     setUserDropdownOpen((prevState) => !prevState);
@@ -229,6 +234,7 @@ const AppHeader = (props) => {
   };
 
   const handleBackBtn = () => {
+    toggleConfirmBackModal();
     history.push("templates");
   };
 
@@ -295,7 +301,7 @@ const AppHeader = (props) => {
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none mr-3`}
                       outline={true}
-                      onClick={handleBackBtn}
+                      onClick={toggleConfirmBackModal}
                       disabled={isExperimentRunning}
                     >
                       Back
@@ -432,7 +438,19 @@ const AppHeader = (props) => {
             />
           )}
 
-          <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
+          {showConfirmBackModal && (
+            <MlModal
+              isOpen={showConfirmBackModal}
+              textBody={MODAL_MESSAGE.backConfirmation}
+              successBtn={MODAL_BTN.yes}
+              failureBtn={MODAL_BTN.cancel}
+              handleSuccessBtn={handleBackBtn}
+              handleCrossBtn={toggleConfirmBackModal}
+            />
+          )}
+
+          {/**Uncomment this when required to add these features */}
+          {/* <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
             <ActionBtnListItem>
               <Icon name="setting" size={18} />
             </ActionBtnListItem>
@@ -442,7 +460,7 @@ const AppHeader = (props) => {
             <ActionBtnListItem>
               <Icon name="menu" size={18} />
             </ActionBtnListItem>
-          </ActionBtnList>
+          </ActionBtnList> */}
         </div>
       )}
     </Header>
