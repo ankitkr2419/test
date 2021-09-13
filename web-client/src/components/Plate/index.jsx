@@ -215,11 +215,17 @@ const Plate = (props) => {
       setMultiSelectedWell(index, !isMultiSelected);
       // }
     }
+    // if the fields are pre-filled, empty it
+    setUpdateWell(null);
   };
 
   const onWellUpdateClickHandler = (selectedWell) => {
     // update local state with selected well which is selected for updation
-    setUpdateWell(selectedWell.toJS());
+    let wellToUpdate = null;
+    if (selectedWell) {
+      wellToUpdate = selectedWell.toJS();
+    }
+    setUpdateWell(wellToUpdate);
   };
 
   // hleper function to open sidebar and show graph of selected well
@@ -352,6 +358,7 @@ const Plate = (props) => {
                   experimentTargetsList={experimentTargetsList}
                   updateWell={updateWell}
                   isExpanded={isExpanded}
+                  onWellUpdateClickHandler={onWellUpdateClickHandler}
                 />
               </div>
               <div className="wells-wrapper flex-100 scroll-y">
