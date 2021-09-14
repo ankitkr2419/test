@@ -11,7 +11,7 @@ var (
 	green             = "#3FC13A" // All CT values for the well are below threshold,
 	red               = "#F06666" //Even a single value crosses threshold for target
 	orange            = "#F3811F" // If the CT values are close to threshold (delta)
-	blue              = "#0000FF" // for selected wells we are using blue color,
+	blue              = "#7EC8E3" // for selected wells we are using blue color,
 	experimentRunning = false     // In case of pre-emptive stop we need to send signal to monitor through this flag
 	experimentValues  experimentResultValues
 	redlowerlimit     uint16
