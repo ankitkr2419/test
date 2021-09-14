@@ -51,12 +51,13 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
-
-		err = ValidateTipPickupObject(req.Context(), deps, tipOpr, recipeID)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(err.Error())
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
-			return
+		if tipOpr.Type == db.PickupTip {
+			err = ValidateTipPickupObject(req.Context(), deps, tipOpr, recipeID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error(err.Error())
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+				return
+			}
 		}
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
 		if err != nil {
@@ -164,13 +165,14 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
 			return
 		}
-		err = ValidateTipPickupObject(req.Context(), deps, tipOpr, process.RecipeID)
-		if err != nil {
-			logger.WithField("err", err.Error()).Error(err.Error())
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
-			return
+		if tipOpr.Type == db.PickupTip {
+			err = ValidateTipPickupObject(req.Context(), deps, tipOpr, process.RecipeID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error(err.Error())
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+				return
+			}
 		}
-
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
@@ -228,11 +230,9 @@ func ValidateTipPickupObject(ctx context.Context, deps Dependencies, to db.TipOp
 		tipID = *recipe.Position5
 	}
 
-	switch to.Type {
-	case db.PickupTip:
-		if !plc.DoesTipExist(tipID) {
-			return responses.TipDoesNotExistError
-		}
+	if !plc.DoesTipExist(tipID) {
+		return responses.TipDoesNotExistError
 	}
+
 	return
 }
