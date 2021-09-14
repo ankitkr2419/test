@@ -27,7 +27,7 @@ const (
 	cartridge1Pos    = 8
 	cartridge2Pos    = 10
 	// Shaker Temp related ranges
-	minShakerTempAllowed = 30
+	minShakerTempAllowed = 20
 	maxShakerTempAllowed = 120
 )
 
