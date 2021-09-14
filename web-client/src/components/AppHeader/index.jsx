@@ -36,6 +36,7 @@ import {
   MODAL_MESSAGE,
   ROUTES,
   TOAST_MESSAGE,
+  USER_ROLES,
 } from "appConstants";
 import {
   NAV_ITEMS,
@@ -256,6 +257,10 @@ const AppHeader = (props) => {
     const redirectPath = getRedirectObj(currentPathname).redirectPath;
     history.push(redirectPath);
   };
+  
+  const handleManageUsersClick = () => {
+    history.push(ROUTES.users);
+  }
 
   return (
     <Header>
@@ -392,6 +397,12 @@ const AppHeader = (props) => {
                 <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
                   <DropdownToggle icon name="user" size={32} />
                   <DropdownMenu right>
+                    {/**manage users accessible only for admin */}
+                    {role === USER_ROLES.ADMIN && (
+                      <DropdownItem onClick={handleManageUsersClick}>
+                        Manage Users
+                      </DropdownItem>
+                    )}
                     <DropdownItem
                       onClick={logoutClickHandler}
                       disabled={isExperimentRunning}

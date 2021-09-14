@@ -32,8 +32,8 @@ func manualHandler(deps Dependencies) http.HandlerFunc {
 		switch {
 		case m.Deck != plc.DeckA && m.Deck != plc.DeckB:
 			err = fmt.Errorf("Use A or B deck only")
-		case m.MotorNum <= 4 || m.MotorNum > 10:
-			err = fmt.Errorf("Select motor num in only in between 5-10")
+		case m.MotorNum <= 4 || m.MotorNum > 10 || m.MotorNum == 8:
+			err = fmt.Errorf("Select motor num in only in between 5-10. Shaker Motor not allowed")
 		case m.Direction != plc.TowardsSensor && m.Direction != plc.AgainstSensor:
 			err = fmt.Errorf("Select motor direction in only as 0 or 1")
 		case m.Distance > 100 || m.Distance <= 0:
