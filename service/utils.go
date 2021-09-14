@@ -26,6 +26,9 @@ const (
 	minAspDisDeckPos = 6
 	cartridge1Pos    = 8
 	cartridge2Pos    = 10
+	// Shaker Temp related ranges
+	minShakerTempAllowed = 30
+	maxShakerTempAllowed = 120
 )
 
 const (

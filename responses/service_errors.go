@@ -34,6 +34,7 @@ var (
 	ShakingCreateError     = fmt.Errorf("error creating shaking record")
 	ShakingFetchError      = fmt.Errorf("error fetching shaking record")
 	ShakingUpdateError     = fmt.Errorf("error updating shaking record")
+	InvalidShakerTemp      = fmt.Errorf("error please check shaker temperature range")
 
 	HeatingDecodeError     = fmt.Errorf("error decoding heating record")
 	HeatingValidationError = fmt.Errorf("error validating heating record")
