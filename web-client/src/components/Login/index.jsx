@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { toast } from "react-toastify";
+
 import { Card, CardBody } from "core-components";
-import { ButtonGroup, Center, Text } from "shared-components";
+import { ButtonGroup, Center, Text, MlModal } from "shared-components";
 import LoginForm from "./LoginForm";
 import OperatorLoginModalContainer from "containers/OperatorLoginModalContainer";
 import {
@@ -15,13 +17,14 @@ import {
   Col,
 } from "core-components";
 import { LoginFormRtpcr } from "./LoginFormRtpcr";
-import { toast } from "react-toastify";
+import { MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 
 const LoginComponent = (props) => {
-  const { loginBtnHandler, forgotHandler } = props;
+  const { loginBtnHandler } = props;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showForgetModal, setForgetModalVisibility] = useState(false);
 
   const handleEmailChange = (e) => {
     setUsername(e.target.value);
@@ -39,8 +42,26 @@ const LoginComponent = (props) => {
     }
   };
 
+  const forgotHandler = (e) => {
+    e.preventDefault();
+    toggleForgotModal();
+  };
+
+  const toggleForgotModal = () => {
+    setForgetModalVisibility(!showForgetModal);
+  };
+
   return (
     <div className="login-content">
+      {showForgetModal && (
+        <MlModal
+          isOpen={showForgetModal}
+          textBody={MODAL_MESSAGE.forgotPasswordMsg}
+          successBtn={MODAL_BTN.okay}
+          handleSuccessBtn={toggleForgotModal}
+          handleCrossBtn={toggleForgotModal}
+        />
+      )}
       <Text Tag="h1" size={40} className="text-center text-secondary mb-5">
         Compact 32-RTPCR
       </Text>
