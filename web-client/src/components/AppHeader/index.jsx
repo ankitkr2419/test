@@ -36,6 +36,7 @@ import {
   MODAL_MESSAGE,
   ROUTES,
   TOAST_MESSAGE,
+  USER_ROLES,
 } from "appConstants";
 import { NAV_ITEMS, getBtnPropObj } from "./constants";
 import { Header } from "./Header";
@@ -232,6 +233,10 @@ const AppHeader = (props) => {
     history.push("templates");
   };
 
+  const handleManageUsersClick = () => {
+    history.push(ROUTES.users);
+  }
+
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} app={app} />
@@ -367,6 +372,12 @@ const AppHeader = (props) => {
                 <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
                   <DropdownToggle icon name="user" size={32} />
                   <DropdownMenu right>
+                    {/**manage users accessible only for admin */}
+                    {role === USER_ROLES.ADMIN && (
+                      <DropdownItem onClick={handleManageUsersClick}>
+                        Manage Users
+                      </DropdownItem>
+                    )}
                     <DropdownItem
                       onClick={logoutClickHandler}
                       disabled={isExperimentRunning}
