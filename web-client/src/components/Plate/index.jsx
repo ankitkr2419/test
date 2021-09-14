@@ -20,9 +20,15 @@ import { ButtonIcon, ImageIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
 import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
+import { getLineChartData } from "selectors/wellGraphSelector";
 import { updateFilter } from "action-creators/analyseDataGraphActionCreators";
 import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
-import { rangeActions, rangeInitialState, rangeReducer } from "./helpers";
+import {
+  getMaxThreshold,
+  rangeActions,
+  rangeInitialState,
+  rangeReducer,
+} from "./helpers";
 
 import GridWrapper from "./Grid/GridWrapper";
 import "./Plate.scss";
@@ -100,14 +106,11 @@ const Plate = (props) => {
     (state) => state.createExperimentReducer
   );
 
+  const lineChartData = useSelector(getLineChartData);
+
   // get targets from experiment target reducer(graph : target filters)
   const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
   const targetsData = experimentGraphTargetsList.toJS();
-
-  const thresholdArr = targetsData?.map((targetObj) =>
-    parseInt(targetObj.threshold)
-  );
-  const maxThreshold = thresholdArr.length > 0 ? Math.max(...thresholdArr) : 10;
 
   const experimentStatus = runExperimentDetails.get("experimentStatus");
 
@@ -146,6 +149,18 @@ const Plate = (props) => {
       dispatch(updateFilter({ selectedTarget: firstTarget }));
     }
   }, [dispatch, targetsData]);
+
+  // initially reset the values of ranges
+  useEffect(() => {
+    if (lineChartData.size !== 0) {
+      const nCycles = lineChartData.first().totalCycles;
+      const maxThreshold = getMaxThreshold(targetsData);
+      updateRangeState({
+        type: rangeActions.RESET_VALUES,
+        value: { nCycles: nCycles, maxThreshold: maxThreshold },
+      });
+    }
+  }, [lineChartData]);
 
   useEffect(() => {
     let newOptions = {
@@ -265,18 +280,28 @@ const Plate = (props) => {
     togglePreviewReportModal();
   };
 
-  const handleRangeChangeBtn = ({ xMax, xMin, yMax, yMin }) => {
+  const handleRangeChangeBtn = (requestBody, nCycles, maxThreshold) => {
     setDataFromAPI(true);
 
-    updateRangeState({ type: rangeActions.UPDATE_X_MAX, value: xMax });
-    updateRangeState({ type: rangeActions.UPDATE_X_MIN, value: xMin });
-    updateRangeState({ type: rangeActions.UPDATE_Y_MAX, value: yMax });
-    updateRangeState({ type: rangeActions.UPDATE_Y_MIN, value: yMin });
+    const { xMax, xMin, yMax, yMin } = requestBody;
+
+    const xMinValue = Number.isNaN(xMin) ? 0 : xMin;
+    const xMaxValue = Number.isNaN(xMax) ? nCycles : xMax;
+    const yMinValue = Number.isNaN(yMin) ? 0 : yMin;
+    const yMaxValue = Number.isNaN(yMax) ? maxThreshold : yMax;
+
+    updateRangeState({ type: rangeActions.UPDATE_X_MAX, value: xMaxValue });
+    updateRangeState({ type: rangeActions.UPDATE_X_MIN, value: xMinValue });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MAX, value: yMaxValue });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MIN, value: yMinValue });
   };
 
-  const handleResetBtn = (cycleCount) => {
+  const handleResetBtn = (nCycles, maxThreshold) => {
     setDataFromAPI(true);
-    updateRangeState({ type: rangeActions.RESET_VALUES });
+    updateRangeState({
+      type: rangeActions.RESET_VALUES,
+      value: { nCycles: nCycles, maxThreshold: maxThreshold },
+    });
   };
 
   return (
