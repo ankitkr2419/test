@@ -8,7 +8,10 @@ import {
 const analyseDataGraphFiltersInitialState = fromJS({
   selectedTarget: null,
   isAutoThreshold: true,
+  threshold: 0,
   isAutoBaseline: true,
+  startCycle: 0,
+  endCycle: 0,
 });
 
 // analyse data graph filters reducer
@@ -25,17 +28,23 @@ export const analyseDataGraphFiltersReducer = (
     case analyseDataGraphFilterActions.resetAllFilters:
       return state.merge({
         isAutoThreshold: true,
+        threshold: 0,
         isAutoBaseline: true,
+        startCycle: 0,
+        endCycle: 0,
       });
 
     case analyseDataGraphFilterActions.resetThresholdFilter:
       return state.merge({
         isAutoThreshold: true,
+        threshold: 0,
       });
 
     case analyseDataGraphFilterActions.resetBaselineFilter:
       return state.merge({
         isAutoBaseline: true,
+        startCycle: 0,
+        endCycle: 0,
       });
 
     default:
