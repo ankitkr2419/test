@@ -148,7 +148,9 @@ var (
 	InvalidCategoryAspireDispense         = fmt.Errorf("error category for aspire dispense is invalid")
 	InvalidPiercingWell                   = fmt.Errorf("error piercing well settings are invalid")
 
-	WrongDeckError = fmt.Errorf("error invalid deck name")
+	WrongDeckError       = fmt.Errorf("error invalid deck name")
+	TipDoesNotExistError = fmt.Errorf("error specified tip does not exist")
+	TipMissingError      = fmt.Errorf("error specified tip does not exist in recipe")
 
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
 

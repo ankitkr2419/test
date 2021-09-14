@@ -83,7 +83,10 @@ const SubHeader = (props) => {
         {TEMPERATURE_DATA_LENGTH > 0 && (
           <div className="d-flex align-items-center">
             <Text className="mb-0">
-              Cycle - {cycleValue} / {totalCycles ? totalCycles : 0}{" "}
+              Cycle -{" "}
+              {`${cycleValue} / ${
+                isExpanded === true ? cycleValue : totalCycles
+              }`}{" "}
             </Text>
             <Text className="mb-0 mx-2">|</Text>
             <Text className="mb-0">

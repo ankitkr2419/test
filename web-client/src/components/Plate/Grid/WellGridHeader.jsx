@@ -29,7 +29,10 @@ const WellGridHeader = ({
         label="Group Selection to view on graph"
         checked={isGroupSelectionOn}
         onChange={toggleMultiSelectOption}
-        disabled={isExpanded === true || filledWells.length === 0 || experimentStatus === null}
+        disabled={
+          filledWells.length === 0 ||
+          (experimentStatus === null && isExpanded === false)
+        }
       />
     </StyledWellGridHeader>
   );
