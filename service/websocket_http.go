@@ -118,6 +118,17 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 						return
 					}
 					sendOnFail(string(wsError), errs[0], rw, c)
+				} else if errs[0] == plc.ErrorOperationAborted {
+					errorData := plc.WSError{
+						Message: errs[2],
+						Deck:    errs[1],
+					}
+					wsError, err := json.Marshal(errorData)
+					if err != nil {
+						logger.Errorf("error in marshalling web socket data %v", err.Error())
+						return
+					}
+					sendOnFail(string(wsError), errs[0], rw, c)
 				} else {
 					logger.WithField("err", err.Error()).Error("Monitor has requested exit")
 					var errortype = "ErrorPCRMonitor"
