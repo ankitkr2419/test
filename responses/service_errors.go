@@ -136,6 +136,15 @@ var (
 
 	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
 
+	InvalidSourcePosition         = fmt.Errorf("error source position is invalid")
+	InvalidDestinationPosition    = fmt.Errorf("error destination position is invalid")
+	RecipeCartridge1Missing       = fmt.Errorf("error cartridge 1 is missing")
+	RecipeCartridge2Missing       = fmt.Errorf("error cartridge 2 is missing")
+	InvalidCartridgeType          = fmt.Errorf("error cartridge type is invalid")
+	InvalidAspireWell             = fmt.Errorf("error aspire well settings are invalid")
+	InvalidDispenseWell           = fmt.Errorf("error dispense well position is invalid")
+	InvalidCategoryAspireDispense = fmt.Errorf("error category for aspire dispense is invalid")
+
 	WrongDeckError = fmt.Errorf("error invalid deck name")
 
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")

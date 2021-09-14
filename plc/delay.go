@@ -82,7 +82,7 @@ skipToStartTimer:
 				if d.isUVLightInProgress() {
 					d.ResetAborted()
 				}
-				err = fmt.Errorf("Operation was ABORTED!")
+				err = fmt.Errorf(AbortedError)
 				return "", err
 			}
 			// When UV Light is in progress nothing else is so no special handling below

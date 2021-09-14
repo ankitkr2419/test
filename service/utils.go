@@ -17,9 +17,16 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-const contextKeyUsername = "username"
-const contextKeyUserAuthID = "auth_id"
-const blank string = ""
+const (
+	contextKeyUsername          = "username"
+	contextKeyUserAuthID        = "auth_id"
+	blank                string = ""
+	// NOTE: These are version specific
+	maxDeckPosition  = 11
+	minAspDisDeckPos = 6
+	cartridge1Pos    = 8
+	cartridge2Pos    = 10
+)
 
 const (
 	hold  = "hold"
