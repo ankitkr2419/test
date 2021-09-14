@@ -21,22 +21,12 @@ const LoginContainer = () => {
     dispatch(login({ email, password, deckName: name, /*role*/ }));
   };
 
-  const forgotHandler = (e) => {
-    e.preventDefault();
-    //TODO
-  };
-
   // redirection once logged in
   if (isLoggedIn === true) {
     return <Redirect to={isEngineer ? ROUTES.calibration : "/templates"} />;
   }
 
-  return (
-    <LoginComponent
-      loginBtnHandler={loginBtnHandler}
-      forgotHandler={forgotHandler}
-    />
-  );
+  return <LoginComponent loginBtnHandler={loginBtnHandler} />;
 };
 
 export default LoginContainer;

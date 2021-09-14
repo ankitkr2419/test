@@ -89,7 +89,8 @@ body {
 .login-content,
 .activity-content,
 .landing-content,
-.calibration-content {
+.calibration-content,
+.manageUsers-content {
   position: relative;
   @extend .flex-100;
   padding: rem(40px 72px);

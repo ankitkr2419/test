@@ -10,25 +10,39 @@ export const formikInitialState = {
 };
 
 export const getRequestBody = (state) => ({
-  xMax: state.xMax.value,
-  xMin: state.xMin.value,
-  yMax: state.yMax.value,
-  yMin: state.yMin.value,
+  xMax: parseInt(state.xMax.value),
+  xMin: parseInt(state.xMin.value),
+  yMax: parseFloat(state.yMax.value),
+  yMin: parseFloat(state.yMin.value),
 });
 
 export const disbleApplyBtn = (state, status, isExpanded) => {
   const { xMax, xMin, yMax, yMin } = state;
 
-  if (isExpanded === true) {
-    return false;
-  }
-
   return (
+    (isExpanded === false &&
+      (status === null || status === EXPERIMENT_STATUS.progressing)) ||
+    xMax.value === "" ||
+    xMin.value === "" ||
+    yMax.value === "" ||
+    yMin.value === "" ||
+    xMax.value === null ||
+    xMin.value === null ||
+    yMax.value === null ||
+    yMin.value === null ||
     xMax.isInvalid ||
     xMin.isInvalid ||
     yMin.isInvalid ||
-    yMax.isInvalid ||
-    status === EXPERIMENT_STATUS.progressing ||
-    status === null
+    yMax.isInvalid
   );
+};
+
+export const disbleResetBtn = (status, isExpanded) => {
+  if (
+    isExpanded === false &&
+    (status === EXPERIMENT_STATUS.progressing || status === null)
+  ) {
+    return true;
+  }
+  return false;
 };
