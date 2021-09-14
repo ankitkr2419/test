@@ -138,26 +138,6 @@ func (s *pgStore) CreatePiercing(ctx context.Context, ad Piercing, recipeID uuid
 func (s *pgStore) createPiercing(ctx context.Context, tx *sql.Tx, pi Piercing) (createdPiercing Piercing, err error) {
 
 	var lastInsertID uuid.UUID
-	var wellsToBePierced, piercingHeights []int
-
-	if len(pi.CartridgeWells) != len(pi.Heights) {
-		logger.Errorln(responses.CartridgeWellsHeightsMismatchError)
-		return
-	}
-
-	for i := range pi.CartridgeWells {
-		wellsToBePierced = append(wellsToBePierced, int(pi.CartridgeWells[i]))
-		piercingHeights = append(piercingHeights, int(pi.Heights[i]))
-	}
-
-	t := NewWellsSlice(wellsToBePierced, piercingHeights)
-
-	logger.Debugln("Wells -> ", t)
-
-	for i := range t.IntSlice {
-		pi.CartridgeWells[i] = int64(t.IntSlice[i])
-		pi.Heights[i] = int64(t.Heights[i])
-	}
 
 	err = tx.QueryRow(
 		createPiercingQuery,
