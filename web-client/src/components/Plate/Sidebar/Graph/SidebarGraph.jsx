@@ -84,11 +84,9 @@ const SidebarGraph = (props) => {
 
       {/** show analyse data graph */}
       {activeGraph === graphs.AnalyseData && (
-        <>
-          {(experimentStatus === EXPERIMENT_STATUS.success ||
-            experimentStatus === EXPERIMENT_STATUS.stopped ||
-            isExpanded === true) && <AnalyseDataGraphContainer />}
-        </>
+        <AnalyseDataGraphContainer
+          isInsidePreviewModal={isInsidePreviewModal}
+        />
       )}
     </>
   );

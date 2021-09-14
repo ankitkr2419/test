@@ -93,7 +93,7 @@ const WellPopover = (props) => {
                     positive={ele.ct === ""}
                   >
                     {ele.target_name || "target_name"}
-                    {ele.ct === "" ? "" : `, CT ${ele.ct}`}
+                    {ele.ct === "" ? " (NEGATIVE) " : `, CT ${ele.ct} (POSITIVE)`}
                   </StyledText>
                 ))}
             </div>
@@ -111,7 +111,7 @@ const WellPopover = (props) => {
           <Button
             className="mb-4"
             onClick={onShowClickHandler}
-            disabled={experimentStatus === null}
+            disabled={experimentStatus === null && isExpanded === false}
           >
             {showOnMap ? "Show on Graph" : "Hide from Graph"}
           </Button>

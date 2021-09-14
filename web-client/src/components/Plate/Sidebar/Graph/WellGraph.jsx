@@ -50,7 +50,7 @@ const WellGraph = (props) => {
           handleRangeChangeBtn={handleRangeChangeBtn}
           handleResetBtn={handleResetBtn}
           headerData={headerData}
-          isExpanded
+          isExpanded={isExpanded}
         />
       )}
 
