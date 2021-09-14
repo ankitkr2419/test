@@ -104,6 +104,7 @@ export const ROUTES = {
   activity: "activity",
   tipPosition: "tip-position",
   calibration: "calibration", //rtpcr flow: engineer homepage
+  users: "users",//manage users
 };
 
 export const API_ENDPOINTS = {
@@ -153,6 +154,7 @@ export const API_ENDPOINTS = {
   temperature: "temperature",
   setThreshold: "set-threshold",
   getBaseline: "get-baseline",
+  users: "users",
 };
 
 export const MODAL_MESSAGE = {
@@ -174,6 +176,7 @@ export const MODAL_MESSAGE = {
   deleteTemplateConfirmation: "Are you sure you want to delete this template?",
   deleteStepConfirmation: "Are you sure you want to delete this step?",
   deleteActivityConfirmation: "Are you sure you want to delete this activity?",
+  forgotPasswordMsg: "Contact admin to change your password",
 };
 
 export const MODAL_BTN = {
