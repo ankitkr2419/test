@@ -4,7 +4,7 @@ import { Text } from "shared-components";
 import { FormGroup, Label, Input, Button } from "core-components";
 import { useFormik } from "formik";
 import {
-  formikInitialState,
+  getFormikInitialState,
   getRequestBody,
   disbleApplyBtn,
   disbleResetBtn,
@@ -16,13 +16,14 @@ const GraphRange = (props) => {
     handleRangeChangeBtn,
     handleResetBtn,
     headerData,
+    data,
     isExpanded,
   } = props;
 
   const { totalCycles, progressStatus } = headerData;
 
   const formik = useFormik({
-    initialValues: formikInitialState,
+    initialValues: getFormikInitialState(data?.labels?.length),
     enableReinitialize: true,
   });
 

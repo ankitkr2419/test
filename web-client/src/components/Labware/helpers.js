@@ -18,18 +18,27 @@ export const getRequestBody = (recipeName, formikState) => {
   return requestBody;
 };
 
-export const getOptions = (options, allowedPositions) => {
+export const getOptions = (options, position, type) => {
   let optionsObj;
 
   if (options) {
     optionsObj = options.map((optionObject) => {
-      if (allowedPositions && allowedPositions.includes(optionObject.id)) {
-        return {
-          value: optionObject.id,
-          label: optionObject.name
-            ? optionObject.name
-            : optionObject.description,
-        };
+      if (type === "cartridge_1" || type === "cartridge_2") {
+        const { id, description } = optionObject;
+        if (type === optionObject.type) {
+          return {
+            value: id,
+            label: description,
+          };
+        }
+      } else {
+        const { id, name, description, allowed_positions } = optionObject;
+        if (allowed_positions?.includes(position)) {
+          return {
+            value: id,
+            label: name ? name : description,
+          };
+        }
       }
     });
     return optionsObj.filter((item) => item);
