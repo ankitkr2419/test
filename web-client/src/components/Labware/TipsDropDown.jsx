@@ -31,6 +31,7 @@ const TipsDropdown = (props) => {
             </Label>
             <div className="d-flex flex-column input-field position-relative">
               <Select
+                isClearable
                 placeholder="Select Option"
                 className=""
                 size="sm"
@@ -39,11 +40,11 @@ const TipsDropdown = (props) => {
                 onChange={(e) => {
                   formik.setFieldValue(
                     `tips.processDetails.tipPosition${i + 1}.id`,
-                    e.value
+                    e ? e.value : null
                   );
                   formik.setFieldValue(
                     `tips.processDetails.tipPosition${i + 1}.label`,
-                    e.label
+                    e ? e.label : null
                   );
                 }}
               />
