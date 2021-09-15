@@ -10,8 +10,7 @@ import {
   Col,
   Input,
   Label,
-  Modal,
-  ModalBody,
+  Select,
 } from "core-components";
 import { Center, ButtonIcon, Text } from "shared-components";
 import {
@@ -21,6 +20,8 @@ import {
   MIN_MOTOR_DIRECTION,
   MIN_MOTOR_DISTANCE,
   MIN_MOTOR_NUMBER,
+  MOTOR_NUMBER_OPTIONS,
+  MOTOR_DIRECTION_OPTIONS,
 } from "appConstants";
 import { isBtnDisabled } from "./helpers";
 
@@ -28,20 +29,6 @@ const MotorComponent = (props) => {
   const { handleMotorBtn, formik } = props;
   const { motorNumber, direction, distance } = formik.values;
 
-  const handleBlurMotorNumber = (value) => {
-    if (!value || value > MAX_MOTOR_NUMBER || value < MIN_MOTOR_NUMBER) {
-      formik.setFieldValue("motorNumber.isInvalid", true);
-    }
-  };
-  const handleBlurDirection = (value) => {
-    if (
-      value === null ||
-      value === "" ||
-      (value !== MIN_MOTOR_DIRECTION && value !== MAX_MOTOR_DIRECTION)
-    ) {
-      formik.setFieldValue("direction.isInvalid", true);
-    }
-  };
   const handleBlurDistance = (value) => {
     if (!value || value > MAX_MOTOR_DISTANCE || value <= MIN_MOTOR_DISTANCE) {
       formik.setFieldValue("distance.isInvalid", true);
@@ -50,6 +37,25 @@ const MotorComponent = (props) => {
 
   const handleOnChange = (key, value) => {
     formik.setFieldValue(key, value);
+  };
+
+  let optionValue;
+  //sets values to formik
+  const handleOptionChange = (event, isMotorNumber = false) => {
+    let value = null;
+    let label = null;
+
+    if (event) {
+      value = event.value;
+      label = event.label;
+      optionValue = { value: value, label: label };
+    }
+
+    if (isMotorNumber === true) {
+      formik.setFieldValue("motorNumber.value", value);
+    } else {
+      formik.setFieldValue("direction.value", value);
+    }
   };
 
   return (
@@ -69,22 +75,13 @@ const MotorComponent = (props) => {
                 <Label for="motor_number" className="font-weight-bold">
                   Motor Number
                 </Label>
-                <Input
-                  type="number"
-                  name="motor_number"
-                  id="motor_number"
-                  placeholder={`${MIN_MOTOR_NUMBER} - ${MAX_MOTOR_NUMBER}`}
-                  value={motorNumber.value}
-                  onChange={(event) =>
-                    handleOnChange(
-                      "motorNumber.value",
-                      parseInt(event.target.value)
-                    )
-                  }
-                  onBlur={(e) =>
-                    handleBlurMotorNumber(parseInt(e.target.value))
-                  }
-                  onFocus={() => handleOnChange("motorNumber.isInvalid", false)}
+                <Select
+                  placeholder="Select Motor Number"
+                  className=""
+                  size="sm"
+                  value={optionValue}
+                  options={MOTOR_NUMBER_OPTIONS}
+                  onChange={(e) => handleOptionChange(e, true)}
                 />
                 {motorNumber.isInvalid && (
                   <div className="flex-70">
@@ -102,22 +99,13 @@ const MotorComponent = (props) => {
                 <Label for="direction" className="font-weight-bold">
                   Direction
                 </Label>
-                <Input
-                  type="number"
-                  name="direction"
-                  id="direction"
-                  placeholder={`${MIN_MOTOR_DIRECTION} / ${MAX_MOTOR_DIRECTION}`}
-                  value={direction.value}
-                  max={MAX_MOTOR_DIRECTION}
-                  min={MIN_MOTOR_DIRECTION}
-                  onChange={(event) =>
-                    handleOnChange(
-                      "direction.value",
-                      parseInt(event.target.value)
-                    )
-                  }
-                  onBlur={(e) => handleBlurDirection(parseInt(e.target.value))}
-                  onFocus={() => handleOnChange("direction.isInvalid", false)}
+                <Select
+                  placeholder="Select Motor Direction"
+                  className=""
+                  size="sm"
+                  value={optionValue}
+                  options={MOTOR_DIRECTION_OPTIONS}
+                  onChange={(e) => handleOptionChange(e)}
                 />
                 {direction.isInvalid && (
                   <div className="flex-70">
