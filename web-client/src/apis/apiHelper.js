@@ -130,8 +130,8 @@ export function* callApi(actions) {
       }
     } else {
       yield put(dispatcherHelper(failureAction, parsedResponse, true));
-      if(showPopupFailureMessage && (parsedResponse?.err || parsedResponse?.error)){
-        toast.error(parsedResponse.err || parsedResponse.error)
+      if(showPopupFailureMessage && parsedResponse?.err){
+        toast.error(parsedResponse.err)
       }
     }
   } catch (error) {

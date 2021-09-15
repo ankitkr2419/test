@@ -40,11 +40,11 @@ const TipsDropdown = (props) => {
                 onChange={(e) => {
                   formik.setFieldValue(
                     `tips.processDetails.tipPosition${i + 1}.id`,
-                    e ? e.value : null
+                    e?.value || null
                   );
                   formik.setFieldValue(
                     `tips.processDetails.tipPosition${i + 1}.label`,
-                    e ? e.label : null
+                    e?.label || null
                   );
                 }}
               />
