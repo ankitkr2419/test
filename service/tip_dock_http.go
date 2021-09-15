@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -164,4 +166,44 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.TipDockingUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.TipDockingUpdateSuccess})
 	})
+}
+
+func ValidateTipDockObject(ctx context.Context, deps Dependencies, td db.TipDock, recipeID uuid.UUID) (err error) {
+
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return responses.RecipeFetchError
+	}
+	// check if cartridage type
+	switch td.Type {
+	case "cartridge_1":
+		if recipe.Cartridge1Position == nil {
+			return responses.RecipeCartridge1Missing
+		}
+		cartridgeWell := createCartridgeWell(*recipe.Cartridge1Position, db.CartridgeType(td.Type), td.Position)
+		if err != nil {
+			return err
+		}
+		if !plc.IsCartridgeWellHeightSafe(cartridgeWell, td.Height) {
+			return responses.InvalidTipDockWell
+		}
+	case "cartridge_2":
+		if recipe.Cartridge2Position == nil {
+			return responses.RecipeCartridge2Missing
+		}
+
+		cartridgeWell := createCartridgeWell(*recipe.Cartridge2Position, db.CartridgeType(td.Type), td.Position)
+		if err != nil {
+			return err
+		}
+		if !plc.IsCartridgeWellHeightSafe(cartridgeWell, td.Height) {
+			return responses.InvalidTipDockWell
+		}
+	case "deck":
+		if checkDeckPositionValidity(td.Position) {
+			return responses.InvalidDeckPosition
+		}
+	}
+	return
 }

@@ -30,6 +30,9 @@ func checkDeckPositionValidity(position int64) bool {
 		position < minAspDisDeckPos || position > maxDeckPosition {
 		return false
 	}
+	if position > maxDeckPosition {
+		return false
+	}
 	return true
 }
 
