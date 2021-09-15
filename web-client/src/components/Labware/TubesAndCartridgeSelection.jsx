@@ -17,7 +17,7 @@ const deckImages = [
 const cartridgeImages = [labwareCartridePosition1, labwareCartridePosition2];
 
 const TubeAndCartridgeSelection = (props) => {
-  const { formik, position, allOptions, allowedPositions, isDeck } = props;
+  const { formik, id, position, allOptions, isDeck } = props;
 
   const recipeData = formik.values;
   const images = isDeck ? deckImages : cartridgeImages;
@@ -26,20 +26,22 @@ const TubeAndCartridgeSelection = (props) => {
   const type = isDeck ? "tubeType" : "cartridgeType";
 
   // gets options array is desired format i.e. {value: "abc", label: "xyz"}
-  const options = getOptions(allOptions, allowedPositions);
-  const selectedOptionID =
-    recipeData[`${key}${position}`].processDetails[type].id;
+  let options = null;
+  if (isDeck) {
+    options = getOptions(allOptions, position, "tubes");
+  } else {
+    options = getOptions(allOptions, null, `cartridge_${id}`);
+  }
+
+  const selectedOptionID = recipeData[`${key}${id}`].processDetails[type].id;
   const index =
     options && options.map((item) => item.value).indexOf(selectedOptionID);
 
   //sets values to formik
   const handleOptionChange = (event) => {
+    formik.setFieldValue(`${key}${id}.processDetails.${type}.id`, event.value);
     formik.setFieldValue(
-      `${key}${position}.processDetails.${type}.id`,
-      event.value
-    );
-    formik.setFieldValue(
-      `${key}${position}.processDetails.${type}.label`,
+      `${key}${id}.processDetails.${type}.label`,
       event.label
     );
   };
@@ -51,7 +53,7 @@ const TubeAndCartridgeSelection = (props) => {
         handleOptionChange={(event) => handleOptionChange(event)}
         value={options[index]}
         options={options}
-        position={position}
+        position={id}
         images={images}
         typeValue={selectedOptionID}
       />

@@ -34,12 +34,13 @@ export const getWellsArrayForEdit = (wellsArray, editReducerData = null) => {
 };
 
 //this function updates and renders wellsArray after selecting or de-selecting wells
-export const updateWellsArray = (wellsObjArray, currentWellObj) => {
+export const updateWellsArray = (wellsObjArray, currentWellObj, height) => {
   const updatedWellObjArray = wellsObjArray.map((wellObj) => {
     if (wellObj.id === currentWellObj.id) {
       return {
         ...wellObj,
-        isSelected: !wellObj.isSelected,  //toggle
+        isSelected: !wellObj.isSelected, //toggle
+        height: height, // set height
       };
     }
     return wellObj;

@@ -32,6 +32,7 @@ const SampleSideBarContainer = (props) => {
     experimentId,
     updateWell,
     isExpanded,
+    onWellUpdateClickHandler,
   } = props;
   const dispatch = useDispatch();
   // useSelector
@@ -80,6 +81,13 @@ const SampleSideBarContainer = (props) => {
     // original target list is shown
     addTargetsToLocalState();
   }, [addTargetsToLocalState]);
+
+  useEffect(() => {
+    // if well is selected and data is prefilled, then we empty it
+    if (updateWell === null) {
+      resetLocalState();
+    }
+  }, [updateWell]);
 
   useEffect(() => {
     // on page load, Load target list to local
@@ -156,6 +164,8 @@ const SampleSideBarContainer = (props) => {
   const addButtonClickHandler = () => {
     const requestObject = getSampleRequestData(sampleState, positions.toJS());
     dispatch(addWell(experimentId, requestObject, token));
+    // reset well update
+    onWellUpdateClickHandler(null);
   };
 
   return (
@@ -173,11 +183,12 @@ const SampleSideBarContainer = (props) => {
       isSampleStateValid={isSampleStateValid}
       resetLocalState={resetLocalState}
       isDisabled={
-        experimentStatus === EXPERIMENT_STATUS.running ||
-        experimentStatus === EXPERIMENT_STATUS.success ||
-        experimentStatus === EXPERIMENT_STATUS.stopped ||
-        positions.size === 0 ||
-        isExpanded === true
+        (experimentStatus === EXPERIMENT_STATUS.running ||
+          experimentStatus === EXPERIMENT_STATUS.success ||
+          experimentStatus === EXPERIMENT_STATUS.stopped ||
+          positions.size === 0 ||
+          isExpanded === true) &&
+        updateWell === null
       }
     />
   );
