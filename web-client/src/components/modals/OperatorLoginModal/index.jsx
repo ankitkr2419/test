@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { 
@@ -13,9 +13,9 @@ import {
 	Row,
 	Col,
 } from 'core-components';
-import { Center, Text, ButtonIcon } from 'shared-components';
+import { Center, Text, ButtonIcon, MlModal } from 'shared-components';
 import { OperatorLoginForm } from './OperatorLoginForm';
-
+import { MODAL_BTN, MODAL_MESSAGE } from "appConstants";
 
 const OperatorLoginModal = (props) => {
 
@@ -29,6 +29,16 @@ const OperatorLoginModal = (props) => {
 	} = props;
 
 	//const { confirmationText, isOpen, confirmationClickHandler } = props;
+  const [showForgetModal, setForgetModalVisibility] = useState(false);
+ 
+	const forgotHandler = (e) => {
+    e.preventDefault();
+    toggleForgotModal();
+  };
+
+  const toggleForgotModal = () => {
+    setForgetModalVisibility(!showForgetModal);
+  };
 
 	// Operator Login Modal
 	return (
@@ -41,6 +51,15 @@ const OperatorLoginModal = (props) => {
 			size="md"
 			>
 			<ModalBody>
+				{showForgetModal && (
+					<MlModal
+						isOpen={showForgetModal}
+						textBody={MODAL_MESSAGE.forgotPasswordMsg}
+						successBtn={MODAL_BTN.okay}
+						handleSuccessBtn={toggleForgotModal}
+						handleCrossBtn={toggleForgotModal}
+					/>
+				)}
 				<Text Tag="h4" size={24} className="text-center text-primary mt-3 mb-4">
 					Welcome
 				</Text>
@@ -106,7 +125,7 @@ const OperatorLoginModal = (props) => {
 						</Center>
 					
 						<Center>
-							<a href="!#" className="link">
+							<a href="!#" className="link" onClick={forgotHandler}>
 								Forgot username or password?
 							</a> 
 						</Center>

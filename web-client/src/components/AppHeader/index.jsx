@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
@@ -36,8 +36,14 @@ import {
   MODAL_MESSAGE,
   ROUTES,
   TOAST_MESSAGE,
+  USER_ROLES,
 } from "appConstants";
-import { NAV_ITEMS, getBtnPropObj } from "./constants";
+import {
+  NAV_ITEMS,
+  getBtnPropObj,
+  PATH_TO_SHOW_CROSS_BTN,
+  getRedirectObj,
+} from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
 
@@ -57,6 +63,7 @@ const AppHeader = (props) => {
     activeWidgetID,
   } = props;
 
+  const location = useLocation();
   const dispatch = useDispatch();
   const history = useHistory();
   const experimentId = useSelector(getExperimentId);
@@ -84,6 +91,17 @@ const AppHeader = (props) => {
     useState(false);
   const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
     useState(false);
+
+  const [showConfirmBackModal, toggleConfirmBackModal] = useReducer(
+    (showConfirmBackModal) => !showConfirmBackModal,
+    false
+  );
+
+  //local state to handle extraction flow cross button confirmation modal
+  const [showRedirectionModal, toggleRedirectionModal] = useReducer(
+    (showRedirectionModal) => !showRedirectionModal,
+    false
+  );
 
   const toggleUserDropdown = () =>
     setUserDropdownOpen((prevState) => !prevState);
@@ -229,8 +247,20 @@ const AppHeader = (props) => {
   };
 
   const handleBackBtn = () => {
+    toggleConfirmBackModal();
     history.push("templates");
   };
+
+  const handleRedirectionButton = () => {
+    toggleRedirectionModal();
+    const currentPathname = location.pathname;
+    const redirectPath = getRedirectObj(currentPathname).redirectPath;
+    history.push(redirectPath);
+  };
+  
+  const handleManageUsersClick = () => {
+    history.push(ROUTES.users);
+  }
 
   return (
     <Header>
@@ -295,7 +325,7 @@ const AppHeader = (props) => {
                       size="sm"
                       className={`font-weight-light border-2 border-gray shadow-none mr-3`}
                       outline={true}
-                      onClick={handleBackBtn}
+                      onClick={toggleConfirmBackModal}
                       disabled={isExperimentRunning}
                     >
                       Back
@@ -367,6 +397,12 @@ const AppHeader = (props) => {
                 <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
                   <DropdownToggle icon name="user" size={32} />
                   <DropdownMenu right>
+                    {/**manage users accessible only for admin */}
+                    {role === USER_ROLES.ADMIN && (
+                      <DropdownItem onClick={handleManageUsersClick}>
+                        Manage Users
+                      </DropdownItem>
+                    )}
                     <DropdownItem
                       onClick={logoutClickHandler}
                       disabled={isExperimentRunning}
@@ -377,6 +413,28 @@ const AppHeader = (props) => {
                 </Dropdown>
               </div>
             </>
+          )}
+
+          {/**extraction flow cross button used in process creation/edition flow */}
+          {PATH_TO_SHOW_CROSS_BTN.includes(location.pathname) && (
+            <ButtonIcon
+              size={34}
+              name="cross"
+              onClick={toggleRedirectionModal}
+              className="ml-2"
+            />
+          )}
+
+          {showRedirectionModal && (
+            <MlModal
+              isOpen={showRedirectionModal}
+              successBtn={MODAL_BTN.yes}
+              failureBtn={MODAL_BTN.no}
+              handleSuccessBtn={handleRedirectionButton}
+              handleCrossBtn={toggleRedirectionModal}
+              textHead={deckName}
+              textBody={getRedirectObj(location.pathname).msg}
+            />
           )}
 
           {/* MODALS */}
@@ -432,7 +490,19 @@ const AppHeader = (props) => {
             />
           )}
 
-          <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
+          {showConfirmBackModal && (
+            <MlModal
+              isOpen={showConfirmBackModal}
+              textBody={MODAL_MESSAGE.backConfirmation}
+              successBtn={MODAL_BTN.yes}
+              failureBtn={MODAL_BTN.cancel}
+              handleSuccessBtn={handleBackBtn}
+              handleCrossBtn={toggleConfirmBackModal}
+            />
+          )}
+
+          {/**Uncomment this when required to add these features */}
+          {/* <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
             <ActionBtnListItem>
               <Icon name="setting" size={18} />
             </ActionBtnListItem>
@@ -442,7 +512,7 @@ const AppHeader = (props) => {
             <ActionBtnListItem>
               <Icon name="menu" size={18} />
             </ActionBtnListItem>
-          </ActionBtnList>
+          </ActionBtnList> */}
         </div>
       )}
     </Header>
