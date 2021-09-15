@@ -38,17 +38,17 @@ export const getRedirectObj = (currentPathname) => {
     case "/select-process":
       return {
         redirectPath: ROUTES.recipeListing,
-        msg: "Are you sure you want to exit adding process?",
+        msg: "Would you like to add processes later to this recipe?",
       };
     case "/process-listing":
       return {
         redirectPath: ROUTES.recipeListing,
-        msg: "Are you sure you want to exit editing?",
+        msg: "Would you like to add processes later to this recipe?",
       };
     default:
       return {
         redirectPath: ROUTES.processListing,
-        msg: "Are you sure you want to exit?",
+        msg: "Do you want to quit adding/editing process?",
       };
   }
 };
