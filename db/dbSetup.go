@@ -56,7 +56,7 @@ type TipsTubesConfig struct {
 		ID               int64
 		Name             string
 		Type             string
-		AllowedPositions pq.Int64Array
+		AllowedPositions pq.Int64Array `yaml:"allowedPositions,flow"`
 		Volume           float64
 		Height           float64
 		TtBase           float64
@@ -435,7 +435,7 @@ func SetTipsTubesValues(tt []TipsTubes) (err error) {
 		ID               int64
 		Name             string
 		Type             string
-		AllowedPositions pq.Int64Array
+		AllowedPositions pq.Int64Array `yaml:"allowedPositions,flow"`
 		Volume           float64
 		Height           float64
 		TtBase           float64
