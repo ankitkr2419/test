@@ -1,9 +1,13 @@
 import React from "react";
-import { TopContent } from "./TopContent";
-import { HeadingTitle } from "./HeadingTitle";
+import { useHistory } from "react-router";
+import moment from "moment";
+
 import { Icon, ButtonIcon, Text } from "shared-components";
 import { Button } from "core-components";
-import moment from "moment";
+import { ROUTES } from "appConstants";
+
+import { TopContent } from "./TopContent";
+import { HeadingTitle } from "./HeadingTitle";
 
 const TopContentComponent = (props) => {
     const {
@@ -25,12 +29,17 @@ const TopContentComponent = (props) => {
      * prop: isProcessListingPage: false/undefined  means RecipeListing Page (default)
      * prop: isProcessListingPage: true  means ProcessListing Page
      */
+    const history = useHistory();
 
     const classNameTopContent = () => {
         return `d-flex justify-content-between align-items-center mx-5 ${
             isProcessListingPage ? "process-listing-changes" : ""
         }`;
     };
+
+    const handleManageUsersClick = () => {
+        history.push(ROUTES.users);
+    }
 
     return (
         <TopContent className={classNameTopContent()}>
@@ -59,13 +68,22 @@ const TopContentComponent = (props) => {
             {isProcessInProgress || isProcessListingPage ? null : (
                 <div className="d-flex align-items-center ml-auto">
                     {isAdmin ? (
-                        <Button
-                            color="secondary"
-                            className="ml-2 border-primary btn-discard-tray bg-white"
-                            onClick={toggleAddNewRecipesModal}
-                        >
-                            Add Recipe
-                        </Button>
+                        <>
+                            <Button
+                                color="secondary"
+                                className="ml-2 border-primary btn-discard-tray bg-white"
+                                onClick={toggleAddNewRecipesModal}
+                            >
+                                Add Recipe
+                            </Button>
+                            <Button
+                                color="secondary"
+                                className="ml-2 border-primary btn-discard-tray bg-white"
+                                onClick={handleManageUsersClick}
+                            >
+                                Manage Users
+                            </Button>
+                        </>
                     ) : (
                         <>
                             <ButtonIcon

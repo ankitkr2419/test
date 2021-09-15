@@ -27,6 +27,7 @@ import DelayContainer from "containers/DelayContainer";
 import LoginContainer from "containers/LoginContainer";
 import TipPositionContainer from "containers/TipPositionContainer";
 import CalibrationContainer from "containers/CalibrationContainer";
+import ManageUsersContainer from "containers/ManageUsersContainer";
 
 export const routeDefinitions = [
   {
@@ -178,6 +179,12 @@ export const routeDefinitions = [
         exact: true,
         component: HeatingContainer,
         key: 32,
+      },
+      {
+        path: `${ROOT_URL_PATH}${ROUTES.users}`,
+        exact: true,
+        component: ManageUsersContainer,
+        key: 31,
       },
     ],
   },
