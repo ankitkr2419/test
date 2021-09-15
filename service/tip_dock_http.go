@@ -182,10 +182,8 @@ func ValidateTipDockObject(ctx context.Context, deps Dependencies, td db.TipDock
 			return responses.RecipeCartridge1Missing
 		}
 		cartridgeWell := createCartridgeWell(*recipe.Cartridge1Position, db.CartridgeType(td.Type), td.Position)
-		if err != nil {
-			return err
-		}
-		if !plc.IsCartridgeWellHeightSafe(cartridgeWell, td.Height) {
+
+		if !plc.DoesCartridgeWellExist(cartridgeWell) {
 			return responses.InvalidTipDockWell
 		}
 	case "cartridge_2":
@@ -194,10 +192,8 @@ func ValidateTipDockObject(ctx context.Context, deps Dependencies, td db.TipDock
 		}
 
 		cartridgeWell := createCartridgeWell(*recipe.Cartridge2Position, db.CartridgeType(td.Type), td.Position)
-		if err != nil {
-			return err
-		}
-		if !plc.IsCartridgeWellHeightSafe(cartridgeWell, td.Height) {
+
+		if !plc.DoesCartridgeWellExist(cartridgeWell) {
 			return responses.InvalidTipDockWell
 		}
 	case "deck":

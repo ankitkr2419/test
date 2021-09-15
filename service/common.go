@@ -31,9 +31,9 @@ func isDeckPositionInvalid(position int64) bool {
 		return true
 	}
 	if position > maxDeckPosition {
-		return false
+		return true
 	}
-	return true
+	return false
 }
 
 func createCartridgeWell(cartridgeID int64, cT db.CartridgeType, wellNum int64) plc.UniqueCartridge {
