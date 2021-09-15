@@ -184,7 +184,7 @@ export const routeDefinitions = [
         path: `${ROOT_URL_PATH}${ROUTES.users}`,
         exact: true,
         component: ManageUsersContainer,
-        key: 31,
+        key: 33,
       },
     ],
   },
