@@ -201,7 +201,7 @@ func ValidateTipDockObject(ctx context.Context, deps Dependencies, td db.TipDock
 			return responses.InvalidTipDockWell
 		}
 	case "deck":
-		if checkDeckPositionValidity(td.Position) {
+		if isDeckPositionInvalid(td.Position) {
 			return responses.InvalidDeckPosition
 		}
 	}
