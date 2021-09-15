@@ -25,10 +25,10 @@ func checkCartridgeType(recipe db.Recipe, cT db.CartridgeType, cartridgeID *int6
 	return nil
 }
 
-func checkDeckPositionValidity(position int64) bool {
+func isDeckPositionInvalid(position int64) bool {
 	if position == cartridge1Pos || position == cartridge2Pos ||
 		position < minAspDisDeckPos || position > maxDeckPosition {
-		return false
+		return true
 	}
 	if position > maxDeckPosition {
 		return false
