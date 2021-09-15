@@ -30,6 +30,9 @@ func isDeckPositionInvalid(position int64) bool {
 		position < minAspDisDeckPos || position > maxDeckPosition {
 		return true
 	}
+	if position > maxDeckPosition {
+		return true
+	}
 	return false
 }
 
