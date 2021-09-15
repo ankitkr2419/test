@@ -84,6 +84,8 @@ var (
 	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
 	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
 	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
+	RecipeRunError   	  = fmt.Errorf("error occured while recipe was running")
+	RecipeWasPausedError  = fmt.Errorf("error running recipe was paused atleast once")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
@@ -139,12 +141,14 @@ var (
 
 	InvalidSourcePosition                 = fmt.Errorf("error source position is invalid")
 	InvalidDestinationPosition            = fmt.Errorf("error destination position is invalid")
+	InvalidDeckPosition                   = fmt.Errorf("error deck position is invalid")
 	RecipeCartridge1Missing               = fmt.Errorf("error cartridge 1 is missing")
 	RecipeCartridge2Missing               = fmt.Errorf("error cartridge 2 is missing")
 	MissingCartridgeWellsError            = fmt.Errorf("error cartridge wells are missing")
 	InvalidCartridgeType                  = fmt.Errorf("error cartridge type is invalid")
 	CartridgeWellsMismatchWithHeightError = fmt.Errorf("error cartridge wells mismatch with heights")
 	InvalidAspireWell                     = fmt.Errorf("error aspire well settings are invalid")
+	InvalidTipDockWell                    = fmt.Errorf("error tip docking on well settings are invalid")
 	InvalidDispenseWell                   = fmt.Errorf("error dispense well position is invalid")
 	InvalidCategoryAspireDispense         = fmt.Errorf("error category for aspire dispense is invalid")
 	InvalidPiercingWell                   = fmt.Errorf("error piercing well settings are invalid")
