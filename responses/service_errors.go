@@ -84,6 +84,8 @@ var (
 	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
 	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
 	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
+	RecipeRunError   	  = fmt.Errorf("error occured while recipe was running")
+	RecipeWasPausedError  = fmt.Errorf("error running recipe was paused atleast once")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")

@@ -157,6 +157,8 @@ type Extraction interface {
 	PIDCalibration(context.Context) error
 	SetEngineerOrAdminLogged(value bool)
 	HeaterData() error
+	StartRecipeTimeCounter()
+	UpdateRecipeEstimatedTime(ctx context.Context, recipeID uuid.UUID, s db.Storer, err *error) error
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {

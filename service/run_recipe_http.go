@@ -126,6 +126,10 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	if runStepWise {
 		setStepRunInProgress(deck)
 		populateNextStepChan(deck)
+	} else {
+		//  else just calculate recipe Time
+		deps.PlcDeck[deck].StartRecipeTimeCounter()
+		defer deps.PlcDeck[deck].UpdateRecipeEstimatedTime(ctx, recipeID, deps.Store, &err)
 	}
 
 	err = deps.PlcDeck[deck].RunRecipeWebsocketData(recipe, processes)
