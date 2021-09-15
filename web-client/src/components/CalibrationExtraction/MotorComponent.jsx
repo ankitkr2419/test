@@ -45,11 +45,9 @@ const MotorComponent = (props) => {
     let value = null;
     let label = null;
 
-    if (event) {
-      value = event.value;
-      label = event.label;
-      optionValue = { value: value, label: label };
-    }
+    value = event.value;
+    label = event.label;
+    optionValue = { value: value, label: label };
 
     if (isMotorNumber === true) {
       formik.setFieldValue("motorNumber.value", value);
@@ -105,7 +103,7 @@ const MotorComponent = (props) => {
                   size="sm"
                   value={optionValue}
                   options={MOTOR_DIRECTION_OPTIONS}
-                  onChange={(e) => handleOptionChange(e)}
+                  onChange={handleOptionChange}
                 />
                 {direction.isInvalid && (
                   <div className="flex-70">
