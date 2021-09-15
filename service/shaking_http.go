@@ -1,7 +1,9 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
@@ -43,6 +45,13 @@ func createShakingHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = ValidateShakingObject(req.Context(), deps, shaObj, recipeID)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(err.Error())
 			return
 		}
 
@@ -142,6 +151,20 @@ func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		process, err := deps.Store.ShowProcess(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
+			return
+		}
+
+		err = ValidateShakingObject(req.Context(), deps, shObj, process.RecipeID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
+			return
+		}
+
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
@@ -160,4 +183,17 @@ func updateShakingHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.ShakingUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ShakingUpdateSuccess})
 	})
+}
+
+// TODO: ValidateShakingObject to be also called from CSV
+func ValidateShakingObject(ctx context.Context, deps Dependencies, sh db.Shaker, recipeID uuid.UUID) (err error) {
+	// Currently only validating Temperature at here
+	if !sh.WithTemp {
+		return
+	}
+
+	if sh.Temperature < minShakerTempAllowed || sh.Temperature > maxShakerTempAllowed {
+		return responses.InvalidShakerTemp
+	}
+	return
 }
