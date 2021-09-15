@@ -39,11 +39,16 @@ const TubeAndCartridgeSelection = (props) => {
 
   //sets values to formik
   const handleOptionChange = (event) => {
-    formik.setFieldValue(`${key}${id}.processDetails.${type}.id`, event.value);
-    formik.setFieldValue(
-      `${key}${id}.processDetails.${type}.label`,
-      event.label
-    );
+    let value = null;
+    let label = null;
+
+    if (event) {
+      value = event.value;
+      label = event.label;
+    }
+
+    formik.setFieldValue(`${key}${id}.processDetails.${type}.id`, value);
+    formik.setFieldValue(`${key}${id}.processDetails.${type}.label`, label);
   };
 
   return (

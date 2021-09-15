@@ -136,7 +136,7 @@ export const ROUTES = {
   activity: "activity",
   tipPosition: "tip-position",
   calibration: "calibration", //rtpcr flow: engineer homepage
-  users: "users",//manage users
+  users: "users", //manage users
 };
 
 export const API_ENDPOINTS = {
@@ -540,6 +540,17 @@ export const MIN_MOTOR_DISTANCE = 0;
 export const MAX_MOTOR_DISTANCE = 100;
 export const MIN_MOTOR_DIRECTION = 0;
 export const MAX_MOTOR_DIRECTION = 1;
+export const MOTOR_NUMBER_OPTIONS = [
+  { value: 5, label: 5 },
+  { value: 6, label: 6 },
+  { value: 7, label: 7 },
+  { value: 9, label: 9 },
+  { value: 10, label: 10 },
+];
+export const MOTOR_DIRECTION_OPTIONS = [
+  { value: 0, label: 0 },
+  { value: 1, label: 1 },
+];
 
 //constants for pid
 export const MIN_PID_TEMP = 50;
