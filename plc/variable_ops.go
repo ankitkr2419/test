@@ -2,6 +2,7 @@ package plc
 
 import (
 	logger "github.com/sirupsen/logrus"
+	"time"
 )
 
 func (d *Compact32Deck) NameOfDeck() string {
@@ -63,10 +64,20 @@ func (d *Compact32Deck) ResetAborted() {
 
 func (d *Compact32Deck) SetPaused() {
 	paused.Store(d.name, true)
+	// Set Recipe Was Paused
+	d.setRecipeWasPaused()
 }
 
 func (d *Compact32Deck) ResetPaused() {
 	paused.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setRecipeWasPaused() {
+	recipeWasPaused.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetRecipeWasPaused() {
+	recipeWasPaused.Store(d.name, false)
 }
 
 func (d *Compact32Deck) setHomed() {
@@ -111,6 +122,10 @@ func (d *Compact32Deck) SetCurrentProcessNumber(step int64) {
 	currentProcess.Store(d.name, step)
 }
 
+func (d *Compact32Deck) setRecipeStartTime() {
+	recipeStartTime.Store(d.name, time.Now())
+}
+
 func (d *Compact32Deck) IsMachineHomed() bool {
 	if temp, ok := homed.Load(d.name); !ok {
 		logger.Errorln("homed isn't loaded!")
@@ -150,6 +165,15 @@ func (d *Compact32Deck) isMachineInAbortedState() bool {
 func (d *Compact32Deck) isMachineInPausedState() bool {
 	if temp, ok := paused.Load(d.name); !ok {
 		logger.Errorln("paused isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) wasRecipePaused() bool {
+	if temp, ok := recipeWasPaused.Load(d.name); !ok {
+		logger.Errorln("recipeWasPaused isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}
@@ -217,6 +241,15 @@ func (d *Compact32Deck) getMagnetState() int {
 		return -1
 	} else {
 		return temp.(int)
+	}
+}
+
+func (d *Compact32Deck) getRecipeStartTime() time.Time {
+	if temp, ok := recipeStartTime.Load(d.name); !ok {
+		logger.Errorln("recipeStartTime isn't loaded!")
+		return time.Now()
+	} else {
+		return temp.(time.Time)
 	}
 }
 
