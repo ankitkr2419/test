@@ -215,20 +215,20 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 
 	switch ad.Category {
 	case db.SD:
-		if checkDeckPositionValidity(ad.DestinationPosition) {
+		if isDeckPositionInvalid(ad.DestinationPosition) {
 			return responses.InvalidDestinationPosition
 		}
 
 	case db.DS:
-		if checkDeckPositionValidity(ad.SourcePosition) {
+		if isDeckPositionInvalid(ad.SourcePosition) {
 			return responses.InvalidSourcePosition
 		}
 
 	case db.DD:
-		if checkDeckPositionValidity(ad.DestinationPosition) {
+		if isDeckPositionInvalid(ad.DestinationPosition) {
 			return responses.InvalidDestinationPosition
 		}
-		if checkDeckPositionValidity(ad.SourcePosition) {
+		if isDeckPositionInvalid(ad.SourcePosition) {
 			return responses.InvalidSourcePosition
 		}
 
