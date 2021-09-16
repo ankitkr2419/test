@@ -176,8 +176,7 @@ func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err erro
 		time.Sleep(time.Millisecond * 300)
 
 		if d.isMachineInAbortedState() {
-			err = fmt.Errorf("Operation was Aborted!")
-			return "", err
+			return "", responses.AbortedError
 		}
 
 		if !d.isMachineInPausedState() {

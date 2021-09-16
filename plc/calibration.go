@@ -24,7 +24,7 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	defer func() {
 		if err != nil {
 			logger.Errorln(err)
-			if err.Error() == AbortedError {
+			if err == responses.AbortedError {
 				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
 				return
 			}
@@ -98,7 +98,7 @@ func (d *Compact32Deck) readShakerPIDCompletion() (pidTuningDone bool, err error
 	var shaker1, shaker2 uint16
 
 	if !d.isShakerPIDTuningInProgress() {
-		return false, responses.ShakerPidCalibrationError
+		return false, responses.AbortedError
 	}
 
 	if shaker1PIDDone {

@@ -3,6 +3,7 @@ package plc
 import (
 	"encoding/binary"
 	"fmt"
+	"mylab/cpagent/responses"
 	"time"
 
 	logger "github.com/sirupsen/logrus"
@@ -190,8 +191,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			logger.Infoln("position before abortion: ", Positions[deckAndNumber])
 			Positions[deckAndNumber] += float64(temp) / float64(Motors[deckAndNumber]["steps"])
 			logger.Infoln("position after abortion: ", Positions[deckAndNumber])
-			err = fmt.Errorf("Operation was ABORTED!")
-			return "", err
+			return "", responses.AbortedError
 		}
 
 		if d.isMotorOperationCompleted() {

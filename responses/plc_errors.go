@@ -7,7 +7,8 @@ import (
 var (
 	PreviousRunInProgressError = fmt.Errorf("previous run already in progress... wait or abort it")
 
-	ShakerPidCalibrationError  = fmt.Errorf("error doing shaker pid calibration")
+	ShakerPidCalibrationError = fmt.Errorf("error doing shaker pid calibration")
+	AbortedError              = fmt.Errorf("Operation was Aborted")
 
 	PIDCalibrationError  = fmt.Errorf("error doing pid calibration")
 	ShakingError         = fmt.Errorf("error doing shaking")
@@ -29,5 +30,4 @@ var (
 	LidPidTuningOffError     = fmt.Errorf("LID PID Tuining was stopped")
 	LidPidTuningNotOffError  = fmt.Errorf("LID PID Tuining was not stopped")
 	LidPidTuningStartError   = fmt.Errorf("LID PID Tuning wasn't started!")
-
 )
