@@ -29,24 +29,34 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
   const aspireWells = aspire[`cartridge${aspire.selectedCategory}Wells`];
   const dispenseWells = dispense[`cartridge${dispense.selectedCategory}Wells`];
 
+  // initially source and destination will deckPosition
+  let sourcePosition = aspire.deckPosition;
+  let destinationPosition = dispense.deckPosition;
+
   let cartridgeType = 1;
+
+  // if aspire is well then source will be position of wells.
   if (
     aspire.selectedCategory === catergories.CATEGORY_1 ||
     aspire.selectedCategory === catergories.CATEGORY_2
   ) {
     cartridgeType = aspire.selectedCategory;
+    sourcePosition = getPosition(aspireWells);
   }
+
+  // if dispense is well then destination will be position of wells.
   if (
     dispense.selectedCategory === catergories.CATEGORY_1 ||
     dispense.selectedCategory === catergories.CATEGORY_2
   ) {
     cartridgeType = dispense.selectedCategory;
+    destinationPosition = getPosition(dispenseWells);
   }
 
   return {
     category: `${aspireSelectedTabName}_to_${dispenseSelectedTabName}`,
     cartridge_type: `cartridge_${cartridgeType}`,
-    source_position: getPosition(aspireWells),
+    source_position: parseInt(sourcePosition),
     aspire_height: parseFloat(aspire.aspireHeight ? aspire.aspireHeight : 0),
     aspire_mixing_volume: parseFloat(
       aspire.mixingVolume ? aspire.mixingVolume : 0
@@ -61,18 +71,27 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
       dispense.mixingVolume ? dispense.mixingVolume : 0
     ),
     dispense_no_of_cycles: parseFloat(dispense.nCycles ? dispense.nCycles : 0),
-    destination_position: getPosition(dispenseWells),
+    destination_position: parseInt(destinationPosition),
   };
 };
 
 // footerText can be: "aspire-from" or "selected"
 // generates array of objects for wells.
-export const getArray = (length, type, selectedPosition = null) => {
+export const getArray = (
+  length,
+  type,
+  currentSelectedCategory,
+  selectedPosition = null
+) => {
   const array = [];
 
   for (let i = 0; i < length; i++) {
     let isSelected = false;
-    if (selectedPosition && i + 1 === selectedPosition) {
+    if (
+      selectedPosition &&
+      i + 1 === selectedPosition &&
+      currentSelectedCategory === true
+    ) {
       isSelected = true;
     }
     array.push({
@@ -87,11 +106,20 @@ export const getArray = (length, type, selectedPosition = null) => {
   return array;
 };
 
+// function that checks and sets formik initial values
+// based on update or create
+const setFormikValue = (editReducer, name) => {
+  if ((editReducer && editReducer[name]) || editReducer[name] === 0) {
+    return `${editReducer[name]}`;
+  }
+  return "";
+};
+
 // this function generates the initial formik state according to the
 // operation being performeed i.e. if NEW process is being created than
 // empty data is loaded in formikState else for EDIT old values are loaded.
 export const getFormikInitialState = (editReducer = null) => {
-  let type = "category_1",
+  let type = "category_1", // default
     category,
     category1,
     category2,
@@ -99,67 +127,87 @@ export const getFormikInitialState = (editReducer = null) => {
     dispenseSelectedCategory = catergories.CATEGORY_1;
 
   const CATEGORY_ID = {
-    well: type === "category_1" ? catergories.CATEGORY_1 : catergories.CATEGORY_2,
+    // type will change according to response from API
+    well:
+      type === "cartridge_1" ? catergories.CATEGORY_1 : catergories.CATEGORY_2, // default cartridge 1
     shaker: catergories.SHAKER,
     deck: catergories.DECK,
   };
 
+  // for source
+  let sourcePosForCartridge = null;
+  let sourcePosForDeck = "";
+
+  // for destination
+  let destPosForCartridge = null;
+  let destPosForDeck = "";
+
   if (editReducer?.process_id) {
     type = editReducer.cartridge_type;
 
-    category = editReducer.category.split("_");
-    category1 = category[0];
-    category2 = category[2];
+    // editReducer.category is a string in format like : well_to_well, well_to_shaker, etc..
+    category = editReducer.category.split("_"); // [ 'well', 'to', 'deck' ] -> in case of well_to_deck
+    category1 = category[0]; // 'well' -> in case of well_to_well
+    category2 = category[2]; // 'deck' -> in case of well_to_well
 
     aspireSelectedCategory = CATEGORY_ID[category1];
     dispenseSelectedCategory = CATEGORY_ID[category2];
+
+    // source position
+    if (category1 === "well") {
+      sourcePosForCartridge = editReducer.source_position;
+    } else if (category1 === "deck") {
+      sourcePosForDeck = editReducer.source_position;
+    }
+
+    // destination position
+    if (category2 === "well") {
+      destPosForCartridge = editReducer.destination_position;
+    } else if (category2 === "deck") {
+      destPosForDeck = editReducer.destination_position;
+    }
   }
 
   return {
     aspire: {
-      cartridge1Wells:
-        type === "cartridge_1"
-          ? getArray(NUMBER_OF_WELLS, ASPIRE_WELLS, editReducer.source_position)
-          : getArray(NUMBER_OF_WELLS, ASPIRE_WELLS),
-      cartridge2Wells:
-        type === "cartridge_2"
-          ? getArray(NUMBER_OF_WELLS, ASPIRE_WELLS, editReducer.source_position)
-          : getArray(NUMBER_OF_WELLS, ASPIRE_WELLS),
-      deckPosition: "",
-      aspireHeight: editReducer?.aspire_height ? editReducer.aspire_height : "",
-      mixingVolume: editReducer?.aspire_mixing_volume
-        ? editReducer.aspire_mixing_volume
-        : "",
-      aspireVolume: editReducer?.aspire_volume ? editReducer.aspire_volume : "",
-      airVolume: editReducer?.aspire_air_volume
-        ? editReducer.aspire_air_volume
-        : "",
-      nCycles: editReducer?.aspire_no_of_cycles
-        ? editReducer.aspire_no_of_cycles
-        : "",
+      cartridge1Wells: getArray(
+        NUMBER_OF_WELLS,
+        ASPIRE_WELLS,
+        aspireSelectedCategory === catergories.CATEGORY_1,
+        sourcePosForCartridge
+      ),
+      cartridge2Wells: getArray(
+        NUMBER_OF_WELLS,
+        ASPIRE_WELLS,
+        aspireSelectedCategory === catergories.CATEGORY_2,
+        sourcePosForCartridge
+      ),
+      deckPosition: sourcePosForDeck,
+      aspireHeight: setFormikValue(editReducer, "aspire_height"),
+      mixingVolume: setFormikValue(editReducer, "aspire_mixing_volume"),
+      aspireVolume: setFormikValue(editReducer, "aspire_volume"),
+      airVolume: setFormikValue(editReducer, "aspire_air_volume"),
+      nCycles: setFormikValue(editReducer, "aspire_no_of_cycles"),
+
       selectedCategory: aspireSelectedCategory,
     },
     dispense: {
       cartridge1Wells: getArray(
         NUMBER_OF_WELLS,
         DISPENSE_WELLS,
-        editReducer.destination_position
+        dispenseSelectedCategory === catergories.CATEGORY_1,
+        destPosForCartridge
       ),
       cartridge2Wells: getArray(
         NUMBER_OF_WELLS,
         DISPENSE_WELLS,
-        editReducer.destination_position
+        dispenseSelectedCategory === catergories.CATEGORY_2,
+        destPosForCartridge
       ),
-      deckPosition: "",
-      dispenseHeight: editReducer?.dispense_height
-        ? editReducer.dispense_height
-        : "",
-      mixingVolume: editReducer?.dispense_mixing_volume
-        ? editReducer.dispense_mixing_volume
-        : "",
-      nCycles: editReducer?.dispense_no_of_cycles
-        ? editReducer.dispense_no_of_cycles
-        : "",
+      deckPosition: destPosForDeck,
+      dispenseHeight: setFormikValue(editReducer, "dispense_height"),
+      mixingVolume: setFormikValue(editReducer, "dispense_mixing_volume"),
+      nCycles: setFormikValue(editReducer, "dispense_no_of_cycles"),
       selectedCategory: dispenseSelectedCategory,
     },
   };
@@ -207,7 +255,7 @@ const checkIsFilled = (formikData, currentKey = null) => {
   return isFilled;
 };
 
-const tabNames = {
+export const tabNames = {
   1: "cartridge1",
   2: "cartridge2",
   3: "shaker",
@@ -249,12 +297,11 @@ export const toggler = (formik, isAspire) => {
   //disable other tabs accordingly
   if (isFilled) {
     for (const key in aspireOrDispense) {
-      if (key !== currentTabName) {
-        aspireOrDispense[key] = true;
-      }
+      const disableTab = key !== currentTabName;
+      aspireOrDispense[`${key}`] = disableTab;
     }
 
-    //also if cartridge1 is selected in Aspire, cart2 will be discarded in dispense
+    //also if cartridge1 is selected in Aspire, cart2 will be disabled in dispense
     if (currentTabName === "cartridge1" || currentTabName === "cartridge2") {
       const otherTab = !isAspire ? "aspire" : "dispense";
       const tabToDisableInNextPage =
