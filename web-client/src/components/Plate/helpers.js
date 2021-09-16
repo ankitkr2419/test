@@ -29,9 +29,19 @@ export const rangeReducer = (state, action) => {
       return { ...state, yMinValue: parseFloat(action.value) };
 
     case rangeActions.RESET_VALUES:
-      return rangeInitialState;
+      const { nCycles, maxThreshold } = action.value;
+      return {
+        ...rangeInitialState,
+        xMaxValue: nCycles,
+        yMaxValue: maxThreshold,
+      };
 
     default:
       throw new Error("Invalid action type");
   }
+};
+
+export const getMaxThreshold = (targets) => {
+  const thresholdArr = targets.map((targetObj) => targetObj.threshold);
+  return Math.max(...thresholdArr);
 };

@@ -46,6 +46,9 @@ const WellGraph = (props) => {
           handleRangeChangeBtn={handleRangeChangeBtn}
           handleResetBtn={handleResetBtn}
           headerData={headerData}
+          data={data}
+          options={options}
+          targets={experimentGraphTargetsList}
           isExpanded={isExpanded}
         />
       )}

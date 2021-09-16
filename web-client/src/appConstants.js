@@ -64,10 +64,10 @@ export const SOCKET_MESSAGE_TYPE = {
   SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
   progressShakerRun: "PROGRESS_SHAKERRUN",
   successShakerRun: "SUCCESS_SHAKERRUN",
-  abortShakerRun: "ABORT_SHAKERRUN",
+  abortShakerRun: "ErrorOperationAborted",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
-  abortHeaterRun: "ABORT_HEATERRUN",
+  abortHeaterRun: "ErrorOperationAborted",
   progressDyeCalibration: "PROGRESS_OPTCALIB",
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
@@ -136,7 +136,7 @@ export const ROUTES = {
   activity: "activity",
   tipPosition: "tip-position",
   calibration: "calibration", //rtpcr flow: engineer homepage
-  users: "users",//manage users
+  users: "users", //manage users
 };
 
 export const API_ENDPOINTS = {
@@ -223,6 +223,7 @@ export const MODAL_MESSAGE = {
   deleteTemplateConfirmation: "Are you sure you want to delete this template?",
   deleteStepConfirmation: "Are you sure you want to delete this step?",
   deleteActivityConfirmation: "Are you sure you want to delete this activity?",
+  backConfirmation: "Are you sure you want to go back?",
   forgotPasswordMsg: "Contact admin to change your password",
 };
 
@@ -475,8 +476,8 @@ export const CATEGORY_NAME = {
 };
 
 export const CATEGORY_LABEL = {
-  1: "Category 1",
-  2: "Category 2",
+  1: "Cartridge 1",
+  2: "Cartridge 2",
   3: "Shaker",
   4: "Deck Position",
 };
@@ -539,6 +540,17 @@ export const MIN_MOTOR_DISTANCE = 0;
 export const MAX_MOTOR_DISTANCE = 100;
 export const MIN_MOTOR_DIRECTION = 0;
 export const MAX_MOTOR_DIRECTION = 1;
+export const MOTOR_NUMBER_OPTIONS = [
+  { value: 5, label: 5 },
+  { value: 6, label: 6 },
+  { value: 7, label: 7 },
+  { value: 9, label: 9 },
+  { value: 10, label: 10 },
+];
+export const MOTOR_DIRECTION_OPTIONS = [
+  { value: 0, label: 0 },
+  { value: 1, label: 1 },
+];
 
 //constants for pid
 export const MIN_PID_TEMP = 50;

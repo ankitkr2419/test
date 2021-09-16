@@ -109,9 +109,9 @@ const MagnetComponent = (props) => {
                 </div>
               </div>
             </TopContent>
-            <Card>
+            <Card className="fix-height-card">
               <CardBody className="p-5 overflow-hidden">
-                <div className="process-box mx-auto py-5 d-flex">
+                <div className="process-box mx-auto py-4 d-flex">
                   <div className="magnet-large-btn d-flex justify-content-around align-items-center flex-column">
                     <div style={{ width: "8rem" }} className="d-flex">
                       <Text className={isAttach ? "" : "text-muted"}>

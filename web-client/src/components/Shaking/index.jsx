@@ -102,7 +102,7 @@ const ShakingComponent = (props) => {
                 </div>
               </div>
             </TopContent>
-            <Card>
+            <Card className="fix-height-card">
               <CardBody className="p-0 overflow-hidden">
                 <Nav
                   tabs

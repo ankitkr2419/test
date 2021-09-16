@@ -1,5 +1,6 @@
 import {
   ASPIRE_WELLS,
+  CATEGORY_LABEL,
   CATEGORY_NAME,
   DISPENSE_WELLS,
   NUMBER_OF_WELLS,
@@ -12,6 +13,17 @@ export const getPosition = (wells) => {
     return selectedWell ? selectedWell.id : 0;
   }
   return 0;
+};
+
+export const getWellLabel = (categoryLabel, wellNumber = 0) => {
+  if (
+    (categoryLabel === CATEGORY_LABEL[1] ||
+      categoryLabel === CATEGORY_LABEL[2]) &&
+    wellNumber > 0
+  ) {
+    return ` | Well No. ${wellNumber}`;
+  }
+  return "";
 };
 
 const catergories = {
@@ -115,24 +127,30 @@ const setFormikValue = (editReducer, name) => {
   return "";
 };
 
+const getCategoryId = (type, cartridgeType = null) => {
+  const { CATEGORY_1, CATEGORY_2, DECK, SHAKER } = catergories;
+
+  // type will change according to response from API
+  switch (type) {
+    case "well":
+      return cartridgeType === "cartridge_1" ? CATEGORY_1 : CATEGORY_2;
+    case "shaker":
+      return SHAKER;
+    case "deck":
+      return DECK;
+  }
+};
+
 // this function generates the initial formik state according to the
 // operation being performeed i.e. if NEW process is being created than
 // empty data is loaded in formikState else for EDIT old values are loaded.
 export const getFormikInitialState = (editReducer = null) => {
-  let type = "category_1", // default
+  let type = "cartridge_1", // default
     category,
     category1,
     category2,
-    aspireSelectedCategory = catergories.CATEGORY_1,
-    dispenseSelectedCategory = catergories.CATEGORY_1;
-
-  const CATEGORY_ID = {
-    // type will change according to response from API
-    well:
-      type === "cartridge_1" ? catergories.CATEGORY_1 : catergories.CATEGORY_2, // default cartridge 1
-    shaker: catergories.SHAKER,
-    deck: catergories.DECK,
-  };
+    aspireSelectedCategory = catergories.CATEGORY_1, // default
+    dispenseSelectedCategory = catergories.CATEGORY_1; // default
 
   // for source
   let sourcePosForCartridge = null;
@@ -150,8 +168,8 @@ export const getFormikInitialState = (editReducer = null) => {
     category1 = category[0]; // 'well' -> in case of well_to_well
     category2 = category[2]; // 'deck' -> in case of well_to_well
 
-    aspireSelectedCategory = CATEGORY_ID[category1];
-    dispenseSelectedCategory = CATEGORY_ID[category2];
+    aspireSelectedCategory = getCategoryId(category1, type);
+    dispenseSelectedCategory = getCategoryId(category2, type);
 
     // source position
     if (category1 === "well") {
@@ -265,7 +283,7 @@ export const tabNames = {
 /** This function enables tab of aspire or dispense
  * if no parameter is sent it will enable tabs for both
  */
-const enableAllTabs = (aspireOrDispense = null) => {
+const enableAllTabs = (aspireOrDispense = null, except = null) => {
   Object.values(tabNames).forEach((key) => {
     // enable tabs for aspire AND dispense
     if (!aspireOrDispense) {
@@ -274,7 +292,13 @@ const enableAllTabs = (aspireOrDispense = null) => {
     }
     // enable tabs only for the param sent
     else {
-      disabledTabInitTab[`${aspireOrDispense}`][key] = false;
+      if (except === null) {
+        // enable all
+        disabledTabInitTab[`${aspireOrDispense}`][key] = false;
+      } else {
+        // enable all except one
+        disabledTabInitTab[`${aspireOrDispense}`][key] = key === except;
+      }
     }
   });
 };
@@ -301,12 +325,19 @@ export const toggler = (formik, isAspire) => {
       aspireOrDispense[`${key}`] = disableTab;
     }
 
+    // opposite of currentTab, if currentTab === aspire, then otherTab === dispense and vice versa
+    const otherTab = !isAspire ? "aspire" : "dispense";
+
     //also if cartridge1 is selected in Aspire, cart2 will be disabled in dispense
     if (currentTabName === "cartridge1" || currentTabName === "cartridge2") {
-      const otherTab = !isAspire ? "aspire" : "dispense";
       const tabToDisableInNextPage =
         currentTabName === "cartridge1" ? "cartridge2" : "cartridge1";
       disabledState[otherTab][tabToDisableInNextPage] = true;
+    }
+
+    // if shaker tab is selected in aspire, then shaker tab will get disabled in dispense
+    if (currentTabName === "shaker") {
+      disabledState[otherTab].shaker = true;
     }
   }
   // here we check conditions and enable tabs accordingly
@@ -321,17 +352,26 @@ export const toggler = (formik, isAspire) => {
 
     // if aspire and dispense BOTH have no fields, then enable all tabs
     if (!aspireFieldsAreFilled && !dispenseFieldsAreFilled) {
+      //enable all tabs in aspire and dispense
       enableAllTabs();
     } else {
       // in aspire tab
       if (isAspire) {
         /** if dispense selected category is cartridge1
          * then we enable cartridge2 and others in aspire AND vice-versa*/
-        if (dispenseSelectedCategory <= 2) {
-          disabledState.aspire[`cartridge${dispenseSelectedCategory}`] = false;
-          disabledState.aspire["shaker"] = false;
-          disabledState.aspire["deckPosition"] = false;
+
+        // either cartridge1 or cartridge2
+        if (dispenseSelectedCategory === 1 || dispenseSelectedCategory === 2) {
+          const exceptValue =
+            dispenseSelectedCategory === 1 ? tabNames[2] : tabNames[1];
+          enableAllTabs("aspire", exceptValue);
+        } else if (dispenseSelectedCategory === 3) {
+          /** if shaker is selected in dispense, then in aspire
+           * we enable all tabs except shaker */
+          // enable all aspire tabs except shaker
+          enableAllTabs("aspire", "shaker");
         } else {
+          // enable all aspire tabs
           enableAllTabs("aspire");
         }
       }
@@ -339,17 +379,24 @@ export const toggler = (formik, isAspire) => {
       else {
         /** if aspire selected category is cartridge1
          * then we enable cartridge2 and others in dispense AND vice-versa*/
-        if (aspireSelectedCategory <= 2) {
-          disabledState.dispense[`cartridge${aspireSelectedCategory}`] = false;
-          disabledState.dispense["shaker"] = false;
-          disabledState.dispense["deckPosition"] = false;
+
+        // either cartridge1 or cartridge2
+        if (aspireSelectedCategory === 1 || aspireSelectedCategory === 2) {
+          const exceptValue =
+            aspireSelectedCategory === 1 ? tabNames[2] : tabNames[1];
+          enableAllTabs("dispense", exceptValue);
+        } else if (aspireSelectedCategory === 3) {
+          /** if shaker is selected in aspire, then in dispense
+           * we enable all tabs except shaker */
+          // enable all dispense tabs except shaker
+          enableAllTabs("dispense", "shaker");
         } else {
+          // enable all dispense tabs except shaker
           enableAllTabs("dispense");
         }
       }
     }
   }
-
   return disabledState;
 };
 
