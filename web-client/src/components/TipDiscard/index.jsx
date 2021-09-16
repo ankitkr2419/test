@@ -81,7 +81,7 @@ const TipDiscardComponent = (props) => {
             </TopContent>
             <Card>
               <CardBody className="p-5 overflow-hidden">
-                <div className="process-box mx-auto py-5 d-flex">
+                <div className="process-box mx-auto py-4 d-flex">
                   <div className="magnet-large-btn d-flex justify-content-around align-items-center flex-column">
                     <Radio
                       id="attach"
