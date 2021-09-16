@@ -45,7 +45,7 @@ func createProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(process)
+		valid, respBytes := Validate(process)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.ProcessValidationError)
 			responseBadRequest(rw, respBytes)
@@ -135,7 +135,7 @@ func updateProcessHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(process)
+		valid, respBytes := Validate(process)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.ProcessValidationError)
 			responseBadRequest(rw, respBytes)

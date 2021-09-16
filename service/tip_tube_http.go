@@ -37,7 +37,7 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(tt)
+		valid, respBytes := Validate(tt)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

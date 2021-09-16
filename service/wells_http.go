@@ -156,7 +156,7 @@ func upsertWellHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(wc)
+		valid, respBytes := Validate(wc)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

@@ -123,7 +123,7 @@ type MsgObj struct {
 	Deck string `json:"deck,omitempty"`
 }
 
-func validate(i interface{}) (valid bool, respBytes []byte) {
+func Validate(i interface{}) (valid bool, respBytes []byte) {
 
 	fieldErrors := make(map[string]string)
 

@@ -44,7 +44,7 @@ func createDelayHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(delay)
+		valid, respBytes := Validate(delay)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.DelayValidationError)
 			responseBadRequest(rw, respBytes)
@@ -146,7 +146,7 @@ func updateDelayHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(delay)
+		valid, respBytes := Validate(delay)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.DelayValidationError)
 			responseBadRequest(rw, respBytes)

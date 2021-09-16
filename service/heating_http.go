@@ -45,7 +45,7 @@ func createHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(htObj)
+		valid, respBytes := Validate(htObj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
@@ -145,7 +145,7 @@ func updateHeatingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(htObj)
+		valid, respBytes := Validate(htObj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
