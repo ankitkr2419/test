@@ -16,7 +16,7 @@ export const StyledProcessListing = styled.div`
 
         //TopContent reduce space for ProcessListing page
         .process-listing-changes {
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.6rem;
         }
 
         //TODO: remove if not needed

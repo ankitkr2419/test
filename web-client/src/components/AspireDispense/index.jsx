@@ -166,7 +166,7 @@ const AspireDispenseComponent = () => {
             </div>
           </TopContent>
 
-          <Card>
+          <Card className="fix-height-card">
             <CardBody className="p-0 overflow-hidden">
               <AspireDispenseTabsContent
                 formik={formik}

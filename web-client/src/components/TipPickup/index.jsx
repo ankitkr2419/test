@@ -85,7 +85,7 @@ const TipPickupComponent = () => {
               </div>
             </div>
           </TopContent>
-          <Card>
+          <Card className="fix-height-card">
             <CardBody className="tip-pickup-inner-box">
               <div className="tip-pickup-box d-flex justify-content-center align-items-center">
                 <FormGroup className="d-flex align-items-center px-4">
