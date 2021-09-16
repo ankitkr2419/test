@@ -1,4 +1,4 @@
-package db
+package csv
 
 import (
 	"context"
@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io"
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
+	"mylab/cpagent/service"
 
 	"os"
 	"strconv"
@@ -27,31 +29,32 @@ const (
 	blank       = ""
 	rtpcr       = "RTPCR"
 	extraction  = "EXTRACTION"
-	hold        = "hold"
-	cycle       = "cycle"
-	target      = "TARGET"
+
+	target = "TARGET"
 )
 
 var sequenceNumber int64 = 0
 var cycleCount uint16
-var createdRecipe Recipe
-var createdTemplate Template
-var createdStages []Stage
-var csvCtx context.Context = context.WithValue(context.Background(), ContextKeyUsername, "main")
-var hStage, cStage Stage
-var step Step
+var createdRecipe db.Recipe
+var createdTemplate db.Template
+var createdStages []db.Stage
+var csvCtx context.Context = context.WithValue(context.Background(), db.ContextKeyUsername, "main")
+var hStage, cStage db.Stage
+var step db.Step
 
 // done will help us clean up
 var done, dataCapture, cycleSeen, templateCreated, createdHoldStage, createdCycleStage bool
 
 func ImportCSV(csvPath string) (err error) {
 
-	var store Storer
-	store, err = Init()
+	var store db.Storer
+	store, err = db.Init()
 	if err != nil {
 		logger.Errorln("err", err.Error())
 		return
 	}
+
+	service.LoadAllSetups(store)
 
 	// open csvPath file for reading
 	csvfile, err := os.Open(csvPath)
@@ -103,7 +106,7 @@ func ImportCSV(csvPath string) (err error) {
 	return err
 }
 
-func importRTPCR(store Storer, csvReader *csv.Reader) (err error) {
+func importRTPCR(store db.Storer, csvReader *csv.Reader) (err error) {
 	// clean up failed recipe
 	defer clearFailedTemplate(store)
 
@@ -165,7 +168,7 @@ iterateCSV:
 	return nil
 }
 
-func AddTargets(store Storer, csvReader *csv.Reader) (err error) {
+func AddTargets(store db.Storer, csvReader *csv.Reader) (err error) {
 
 	subRecord, err := csvReader.Read()
 	if err == io.EOF {
@@ -183,7 +186,7 @@ func AddTargets(store Storer, csvReader *csv.Reader) (err error) {
 			logger.Errorln("error while fetching target details:", err)
 			return err
 		}
-		tempTarget := []TemplateTarget{TemplateTarget{
+		tempTarget := []db.TemplateTarget{db.TemplateTarget{
 			TemplateID: createdTemplate.ID,
 			TargetID:   targetDetails.ID,
 		}}
@@ -202,7 +205,7 @@ func AddTargets(store Storer, csvReader *csv.Reader) (err error) {
 
 }
 
-func AddCycles(store Storer, csvReader *csv.Reader) (err error) {
+func AddCycles(store db.Storer, csvReader *csv.Reader) (err error) {
 
 	for {
 
@@ -238,7 +241,7 @@ func AddCycles(store Storer, csvReader *csv.Reader) (err error) {
 	return
 }
 
-func addStage(store Storer, record []string) (err error) {
+func addStage(store db.Storer, record []string) (err error) {
 	logger.Infoln("Record-> ", record)
 	if !templateCreated {
 		err = fmt.Errorf("template doesn't exist, first add its entry")
@@ -247,7 +250,7 @@ func addStage(store Storer, record []string) (err error) {
 	}
 
 	switch strings.TrimSpace(strings.ToLower(record[1])) {
-	case hold:
+	case db.Hold:
 		if cycleSeen {
 			err = fmt.Errorf("Couldn't create Holding step entry as Cycle entry is alreday present.")
 			logger.Errorln(err)
@@ -264,7 +267,7 @@ func addStage(store Storer, record []string) (err error) {
 			return err
 		}
 
-	case cycle:
+	case db.Cycle:
 		if createdCycleStage {
 			err = addCycleStep(store, record[1:])
 			break
@@ -288,7 +291,7 @@ func addStage(store Storer, record []string) (err error) {
 	return nil
 }
 
-func addTemplate(store Storer, templateDetails []string) (err error) {
+func addTemplate(store db.Storer, templateDetails []string) (err error) {
 	// template name and description are NOT allowed to be empty/blank
 	for _, rd := range templateDetails[:2] {
 		if rd == blank {
@@ -296,10 +299,10 @@ func addTemplate(store Storer, templateDetails []string) (err error) {
 		}
 	}
 
-	currentTemp = config.GetRoomTemp()
+	db.CurrentTemp = config.GetRoomTemp()
 	defer func() {
 		// set current Temp to Room Temp
-		currentTemp = config.GetRoomTemp()
+		db.CurrentTemp = config.GetRoomTemp()
 	}()
 
 	createdTemplate.Name = templateDetails[0]
@@ -340,33 +343,33 @@ func addTemplate(store Storer, templateDetails []string) (err error) {
 	}
 	logger.Info("Created template-> ", createdTemplate)
 
-	go UpdateEstimatedTimeByTemplateID(csvCtx, store, createdTemplate.ID)
+	go db.UpdateEstimatedTimeByTemplateID(csvCtx, store, createdTemplate.ID)
 	return nil
 
 }
 
-func addHoldStage(store Storer, record []string) (err error) {
+func addHoldStage(store db.Storer, record []string) (err error) {
 
-	hStage.Type = hold
+	hStage.Type = db.Hold
 	hStage.TemplateID = createdTemplate.ID
 
-	cStage.Type = cycle
+	cStage.Type = db.Cycle
 	cStage.TemplateID = createdTemplate.ID
 	cStage.RepeatCount = cycleCount
 
-	if cycleCount < RepeatCountDefault {
+	if cycleCount < db.RepeatCountDefault {
 		logger.Warnln("Repeat Count for cycle stage is below threshold")
 	}
 
 	// Create both Stages
-	createdStages, err = store.CreateStages(csvCtx, []Stage{hStage, cStage})
+	createdStages, err = store.CreateStages(csvCtx, []db.Stage{hStage, cStage})
 	if err != nil {
 		logger.Errorln("Couldn't insert Stage entries", err)
 		return
 	}
 
 	for _, st := range createdStages {
-		if st.Type == hold {
+		if st.Type == db.Hold {
 			hStage = st
 		} else {
 			cStage = st
@@ -384,7 +387,7 @@ func addHoldStage(store Storer, record []string) (err error) {
 	return nil
 }
 
-func addHoldStep(store Storer, record []string) (err error) {
+func addHoldStep(store db.Storer, record []string) (err error) {
 	logger.Infoln("hold step record----------", record)
 	step.StageID = hStage.ID
 	step.DataCapture = dataCapture
@@ -420,7 +423,7 @@ func addHoldStep(store Storer, record []string) (err error) {
 	return nil
 }
 
-func addCycleStep(store Storer, record []string) (err error) {
+func addCycleStep(store db.Storer, record []string) (err error) {
 
 	step.StageID = cStage.ID
 	step.DataCapture = dataCapture
@@ -456,15 +459,15 @@ func addCycleStep(store Storer, record []string) (err error) {
 	return nil
 }
 
-func addCycleStage(store Storer, record []string) (err error) {
+func addCycleStage(store db.Storer, record []string) (err error) {
 
 	if !createdHoldStage {
 
-		cStage.Type = cycle
+		cStage.Type = db.Cycle
 		cStage.TemplateID = createdTemplate.ID
 		cStage.RepeatCount = cycleCount
 
-		createdStages, err = store.CreateStages(csvCtx, []Stage{cStage})
+		createdStages, err = store.CreateStages(csvCtx, []db.Stage{cStage})
 		if err != nil {
 			logger.Errorln("Couldn't insert Cycle Stage entry", err)
 			return
@@ -483,7 +486,7 @@ func addCycleStage(store Storer, record []string) (err error) {
 	return nil
 }
 
-func importExtraction(store Storer, csvReader *csv.Reader) (err error) {
+func importExtraction(store db.Storer, csvReader *csv.Reader) (err error) {
 	// clean up failed recipe
 	defer clearFailedRecipe(store)
 
@@ -556,7 +559,7 @@ func addRecipeDetails(recipeDetails []string) (err error) {
 	createdRecipe.Name = recipeDetails[0]
 	createdRecipe.Description = recipeDetails[1]
 
-	if createdRecipe.TotalTime, err = CalculateTimeInSeconds(recipeDetails[2]); err != nil {
+	if createdRecipe.TotalTime, err = db.CalculateTimeInSeconds(recipeDetails[2]); err != nil {
 		logger.Warnln(err, recipeDetails[2])
 	}
 
@@ -568,7 +571,7 @@ func addRecipeDetails(recipeDetails []string) (err error) {
 	return nil
 }
 
-func createRecipe(record []string, store Storer) (err error) {
+func createRecipe(record []string, store db.Storer) (err error) {
 
 	for i, rec := range record {
 		record[i] = strings.TrimSpace(rec)
@@ -657,8 +660,8 @@ func createRecipe(record []string, store Storer) (err error) {
 }
 
 // NOTE: Passing db connection as function parameter isn't the best approach
-// But this avoids populating Storer interface with CSV Methods
-func createProcesses(record []string, store Storer) (err error) {
+// But this avoids populating db.Storer interface with CSV Methods
+func createProcesses(record []string, store db.Storer) (err error) {
 
 	// Create database entry for individual process here
 	// based on the name in record[0]
@@ -690,7 +693,7 @@ func createProcesses(record []string, store Storer) (err error) {
 }
 
 // WARN: DB changes will also need to be reflected in below functions!
-func createAspireDispenseProcess(record []string, store Storer) (err error) {
+func createAspireDispenseProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside aspire dispense create Process. Record: ", record)
 
 	//  record[0] is Category
@@ -700,24 +703,24 @@ func createAspireDispenseProcess(record []string, store Storer) (err error) {
 		return
 	}
 
-	a := AspireDispense{}
+	a := db.AspireDispense{}
 	switch {
 	case strings.EqualFold(strings.TrimSpace(record[0]), "WS"):
-		a.Category = WS
+		a.Category = db.WS
 	case strings.EqualFold(strings.TrimSpace(record[0]), "SW"):
-		a.Category = SW
+		a.Category = db.SW
 	case strings.EqualFold(strings.TrimSpace(record[0]), "WW"):
-		a.Category = WW
+		a.Category = db.WW
 	case strings.EqualFold(strings.TrimSpace(record[0]), "WD"):
-		a.Category = WD
+		a.Category = db.WD
 	case strings.EqualFold(strings.TrimSpace(record[0]), "DW"):
-		a.Category = DW
+		a.Category = db.DW
 	case strings.EqualFold(strings.TrimSpace(record[0]), "DD"):
-		a.Category = DD
+		a.Category = db.DD
 	case strings.EqualFold(strings.TrimSpace(record[0]), "SD"):
-		a.Category = SD
+		a.Category = db.SD
 	case strings.EqualFold(strings.TrimSpace(record[0]), "DS"):
-		a.Category = DS
+		a.Category = db.DS
 	default:
 		err = fmt.Errorf("Category is supposed to be only from these [WW, WS,SW,DD,DS,SD,DW,WD].Current Category: %v", record[0])
 		logger.Errorln(err)
@@ -727,12 +730,12 @@ func createAspireDispenseProcess(record []string, store Storer) (err error) {
 	// record[1] is CartridgeType
 	switch record[1] {
 	case "1":
-		a.CartridgeType = Cartridge1
+		a.CartridgeType = db.Cartridge1
 	case "2":
-		a.CartridgeType = Cartridge2
+		a.CartridgeType = db.Cartridge2
 	default:
 		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v. Setting Cartridge Type to 1", record[1])
-		a.CartridgeType = Cartridge1
+		a.CartridgeType = db.Cartridge1
 		logger.Warnln(err)
 	}
 
@@ -779,6 +782,18 @@ func createAspireDispenseProcess(record []string, store Storer) (err error) {
 		logger.Errorln(err, record[11])
 		return
 	}
+	valid, _ := service.Validate(a)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.AspireDispenseValidationError)
+		return
+	}
+	err = service.ValidateAspireDispenceObject(csvCtx, service.Dependencies{
+		Store: store,
+	}, a, createdRecipe.ID)
+	if err != nil {
+		logger.WithField("ERROR", "ASPIRE DISPENSE").Errorln(err)
+		return
+	}
 
 	createdProcess, err := store.CreateAspireDispense(csvCtx, a, createdRecipe.ID)
 	if err != nil {
@@ -791,7 +806,7 @@ func createAspireDispenseProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
-func createAttachDetachProcess(record []string, store Storer) (err error) {
+func createAttachDetachProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside attach detach create Process. Record: ", record)
 
 	var height int64
@@ -803,9 +818,15 @@ func createAttachDetachProcess(record []string, store Storer) (err error) {
 		}
 	}
 
-	a := AttachDetach{
+	a := db.AttachDetach{
 		Operation: record[0],
 		Height:    height,
+	}
+
+	valid, _ := service.Validate(a)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.AttachDetachValidationError)
+		return
 	}
 
 	createdProcess, err := store.CreateAttachDetach(csvCtx, a, createdRecipe.ID)
@@ -819,15 +840,20 @@ func createAttachDetachProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
-func createDelayProcess(record []string, store Storer) (err error) {
+func createDelayProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside delay create Process. Record: ", record)
 
-	d := Delay{}
+	d := db.Delay{}
 	if delay, err := strconv.ParseInt(record[0], 10, 64); err != nil {
 		logger.Errorln(err, record[0])
 		return err
 	} else {
 		d.DelayTime = delay
+	}
+	valid, _ := service.Validate(d)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.DelayValidationError)
+		return
 	}
 
 	createdProcess, err := store.CreateDelay(csvCtx, d, createdRecipe.ID)
@@ -840,17 +866,17 @@ func createDelayProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
-func createPiercingProcess(record []string, store Storer) (err error) {
+func createPiercingProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside piercing create Process. Record: ", record)
 
-	p := Piercing{}
+	p := db.Piercing{}
 
 	// record[0] is CartridgeType
 	switch record[0] {
 	case "1":
-		p.Type = Cartridge1
+		p.Type = db.Cartridge1
 	case "2":
-		p.Type = Cartridge2
+		p.Type = db.Cartridge2
 	default:
 		err = fmt.Errorf("CartridgeType is supposed to be only from these [1,2]. Avoid any spaces. Current Category: %v", record[0])
 		logger.Errorln(err)
@@ -881,6 +907,19 @@ func createPiercingProcess(record []string, store Storer) (err error) {
 	logger.Debugln("After Trimming wells-> ", record[1], ".After splitting->", wells, ".Integer Wells-> ", p.CartridgeWells)
 	logger.Debugln("After Trimming heights-> ", record[1], ".After splitting->", heights, ".Integer heights-> ", p.Heights)
 
+	valid, _ := service.Validate(p)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.PiercingValidationError)
+		return
+	}
+	err = service.ValidatePiercingObject(csvCtx, service.Dependencies{
+		Store: store,
+	}, &p, createdRecipe.ID)
+	if err != nil {
+		logger.WithField("ERROR", "PIERCING").Errorln(err)
+		return
+	}
+
 	createdProcess, err := store.CreatePiercing(csvCtx, p, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
@@ -893,20 +932,32 @@ func createPiercingProcess(record []string, store Storer) (err error) {
 }
 
 // TODO: Implement Discard at_pickup_passing for tip operation whenever feature added
-func createTipOperationProcess(record []string, store Storer) (err error) {
+func createTipOperationProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside tip operation create Process. Record: ", record)
 
-	t := TipOperation{}
+	t := db.TipOperation{}
 
-	t.Type = TipOps(record[0])
-	if t.Type == PickupTip {
+	t.Type = db.TipOps(record[0])
+	if t.Type == db.PickupTip {
 		if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil {
 			logger.Errorln(err, record[1])
 			return err
 		}
-	} else if t.Type != DiscardTip {
+		err = service.ValidateTipPickupObject(csvCtx, service.Dependencies{
+			Store: store,
+		}, t, createdRecipe.ID)
+		if err != nil {
+			logger.WithField("ERROR", "TIP OPERATION").Errorln(err)
+			return
+		}
+	} else if t.Type != db.DiscardTip {
 		err = responses.TipOperationTypeInvalid
 		return err
+	}
+	valid, _ := service.Validate(t)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.TipOperationValidationError)
+		return
 	}
 
 	createdProcess, err := store.CreateTipOperation(csvCtx, t, createdRecipe.ID)
@@ -920,17 +971,28 @@ func createTipOperationProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
-func createTipDockingProcess(record []string, store Storer) (err error) {
+func createTipDockingProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside tip docking create Process. Record: ", record)
 
-	t := TipDock{}
+	t := db.TipDock{}
 
 	t.Type = record[0]
 	if t.Position, err = strconv.ParseInt(record[1], 10, 64); err != nil {
 		logger.Errorln(err, record[1])
 		return err
 	}
-
+	valid, _ := service.Validate(t)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.TipDockingValidationError)
+		return
+	}
+	err = service.ValidateTipDockObject(csvCtx, service.Dependencies{
+		Store: store,
+	}, t, createdRecipe.ID)
+	if err != nil {
+		logger.WithField("ERROR", "ASPIRE DISPENSE").Errorln(err)
+		return
+	}
 	createdProcess, err := store.CreateTipDocking(csvCtx, t, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
@@ -942,10 +1004,10 @@ func createTipDockingProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
-func createShakingProcess(record []string, store Storer) (err error) {
+func createShakingProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside shaking create Process. Record: ", record)
 
-	s := Shaker{}
+	s := db.Shaker{}
 
 	if s.WithTemp, err = strconv.ParseBool(record[0]); err != nil {
 		logger.Errorln(err, record[0])
@@ -989,6 +1051,12 @@ func createShakingProcess(record []string, store Storer) (err error) {
 		s.Time2 = time2
 	}
 
+	valid, _ := service.Validate(s)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
+		return
+	}
+
 	createdProcess, err := store.CreateShaking(csvCtx, s, createdRecipe.ID)
 	if err != nil {
 		logger.Errorln(err)
@@ -1000,10 +1068,10 @@ func createShakingProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
-func createHeatingProcess(record []string, store Storer) (err error) {
+func createHeatingProcess(record []string, store db.Storer) (err error) {
 	logger.Info("Inside heating create Process. Record: ", record)
 
-	h := Heating{}
+	h := db.Heating{}
 
 	// Current Temperature is accurate only to 1 decimal point
 	// While sending it to PLC  we need to multiply by 10
@@ -1024,6 +1092,11 @@ func createHeatingProcess(record []string, store Storer) (err error) {
 	} else {
 		h.Duration = time1
 	}
+	valid, _ := service.Validate(h)
+	if !valid {
+		logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
+		return
+	}
 
 	createdProcess, err := store.CreateHeating(csvCtx, h, createdRecipe.ID)
 	if err != nil {
@@ -1036,7 +1109,7 @@ func createHeatingProcess(record []string, store Storer) (err error) {
 	return nil
 }
 
-func clearFailedRecipe(store Storer) {
+func clearFailedRecipe(store db.Storer) {
 	if !done {
 		err := store.DeleteRecipe(csvCtx, createdRecipe.ID)
 		if err != nil {
@@ -1050,7 +1123,7 @@ func clearFailedRecipe(store Storer) {
 	return
 }
 
-func clearFailedTemplate(store Storer) {
+func clearFailedTemplate(store db.Storer) {
 	if !done {
 		err := store.DeleteTemplate(csvCtx, createdTemplate.ID)
 		if err != nil {
