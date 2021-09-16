@@ -59,6 +59,9 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
   progressHeater: "PROGRESS_HEATER",
+  progressPidTuning: "PROGRESS_SHAKERPIDTUNING",
+  successPidTuning: "SUCCESS_SHAKERPIDTUNING",
+  abortPidTuning: "ErrorOperationAborted",
   PROGRESSLidPIDTuning: "PROGRESS_LidPIDTuning",
   ErrorPIDTuning: "ErrorPIDTuning",
   SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
@@ -81,6 +84,7 @@ export const PID_STATUS = {
   running: "running",
   runFailed: "run-failed",
   stopped: "stopped",
+  aborted: "aborted",
 
   aborting: "aborting",
   abortFailed: "abortFailed",
