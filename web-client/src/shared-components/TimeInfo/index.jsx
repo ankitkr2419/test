@@ -37,7 +37,7 @@ const TimeInfo = (props) => {
               <Row>
                 <Col sm={3}>
                   <Input
-                    type="text"
+                    type="number"
                     name="hours"
                     id="hours"
                     placeholder=""
@@ -51,7 +51,7 @@ const TimeInfo = (props) => {
                 </Col>
                 <Col sm={3}>
                   <Input
-                    type="text"
+                    type="number"
                     name="minutes"
                     id="minutes"
                     placeholder=""
@@ -65,7 +65,7 @@ const TimeInfo = (props) => {
                 </Col>
                 <Col sm={3}>
                   <Input
-                    type="text"
+                    type="number"
                     name="seconds"
                     id="seconds"
                     placeholder=""

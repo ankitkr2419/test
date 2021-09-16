@@ -64,10 +64,22 @@ import {
   mailReportReducer,
 } from "reducers/activityLogReducer";
 import {
+  heaterProgressReducer,
+  commonDetailsReducer,
   calibrationReducer,
   updateCalibrationReducer,
   pidProgessReducer,
   pidReducer,
+  abortReducer,
+  createTipTubeReducer,
+  rtpcrConfigsReducer,
+  tecConfigsReducer,
+  lidPidReducer,
+  dyeCalibrationReducer,
+  shakerRunProgessReducer,
+  heaterRunProgessReducer,
+  toleranceReducer,
+  consumableReducer,
 } from "./calibrationReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
@@ -121,15 +133,27 @@ const rootReducer = combineReducers({
   processesReducer,
   activityLogReducer,
   mailReportReducer,
+  commonDetailsReducer,
   calibrationReducer,
   updateCalibrationReducer,
+  heaterProgressReducer,
   pidProgessReducer,
   pidReducer,
+  abortReducer,
   finishCreateTemplateReducer,
   reportReducer,
   analyseDataGraphFiltersReducer,
   analyseDataGraphThresholdReducer,
   analyseDataGraphBaselineReducer,
+  createTipTubeReducer,
+  rtpcrConfigsReducer,
+  tecConfigsReducer,
+  lidPidReducer,
+  dyeCalibrationReducer,
+  toleranceReducer,
+  consumableReducer,
+  shakerRunProgessReducer,
+  heaterRunProgessReducer,
 });
 
 export default rootReducer;

@@ -169,10 +169,22 @@ export const routeDefinitions = [
         key: 30,
       },
       {
+        path: `${ROOT_URL_PATH}${ROUTES.calibration}/shaker`,
+        exact: true,
+        component: ShakingContainer,
+        key: 31,
+      },
+      {
+        path: `${ROOT_URL_PATH}${ROUTES.calibration}/heater`,
+        exact: true,
+        component: HeatingContainer,
+        key: 32,
+      },
+      {
         path: `${ROOT_URL_PATH}${ROUTES.users}`,
         exact: true,
         component: ManageUsersContainer,
-        key: 31,
+        key: 33,
       },
     ],
   },

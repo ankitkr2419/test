@@ -22,10 +22,10 @@ import { graphs } from "./plateConstant";
 import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
 import { updateFilter } from "action-creators/analyseDataGraphActionCreators";
 import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
+import { rangeActions, rangeInitialState, rangeReducer } from "./helpers";
 
 import GridWrapper from "./Grid/GridWrapper";
 import "./Plate.scss";
-import { rangeActions, rangeInitialState, rangeReducer } from "./helpers";
 
 const initialOptions = {
   legend: {

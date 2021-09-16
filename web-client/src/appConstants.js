@@ -58,6 +58,23 @@ export const SOCKET_MESSAGE_TYPE = {
   discardTipProgress: "DISCARD_TIP_PROGRESS",
   discardTipSuccess: "DISCARD_TIP_SUCCESS",
   ErrorExtractionMonitor: "ErrorExtractionMonitor",
+  progressHeater: "PROGRESS_HEATER",
+  PROGRESSLidPIDTuning: "PROGRESS_LidPIDTuning",
+  ErrorPIDTuning: "ErrorPIDTuning",
+  SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
+  progressShakerRun: "PROGRESS_SHAKERRUN",
+  successShakerRun: "SUCCESS_SHAKERRUN",
+  abortShakerRun: "ABORT_SHAKERRUN",
+  progressHeaterRun: "PROGRESS_HEATERRUN",
+  successHeaterRun: "SUCCESS_HETERRUN",
+  abortHeaterRun: "ABORT_HEATERRUN",
+  progressDyeCalibration: "PROGRESS_OPTCALIB",
+  completedDyeCalibration: "SUCCESS_OPTCALIB",
+};
+
+export const HEATER_STATUS = {
+  progressing: "progressing",
+  progressComplete: "progressComplete",
 };
 
 export const PID_STATUS = {
@@ -65,8 +82,23 @@ export const PID_STATUS = {
   runFailed: "run-failed",
   stopped: "stopped",
 
+  aborting: "aborting",
+  abortFailed: "abortFailed",
+
   progressing: "progressing",
   progressComplete: "progressComplete",
+};
+
+export const SHAKER_RUN_STATUS = {
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+  progressAborted: "progressAborted",
+};
+
+export const HEATER_RUN_STATUS = {
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+  progressAborted: "progressAborted",
 };
 
 export const EXPERIMENT_STATUS = {
@@ -120,7 +152,8 @@ export const API_ENDPOINTS = {
   discardTipAndHoming: "discard-tip-and-home",
   cleanUp: "uv",
   tipsTubes: "tips-tubes",
-  cartridge: "cartridges",
+  cartridges: "cartridges",
+  cartridge: "cartridge",
   tubes: "tube",
   tips: "tip",
   stepRun: "step-run",
@@ -145,7 +178,11 @@ export const API_ENDPOINTS = {
   experiments: "experiments",
   configs: "configs",
   pidCalibration: "pid-calibration",
+  pidUpdate: "configs/extraction",
   manual: "manual",
+  motor: "motor",
+  startShaking: "start-shaking",
+  startHeating: "start-heating",
   emailReport: "email-report",
   graphUpdate: "rtpcr/graph-update-scale",
   uploadReport: "upload-report",
@@ -154,6 +191,16 @@ export const API_ENDPOINTS = {
   temperature: "temperature",
   setThreshold: "set-threshold",
   getBaseline: "get-baseline",
+  tipTube: "tiptube",
+  rtpcrConfigs: "configs/rtpcr",
+  tecConfigs: "configs/tec",
+  lidPidStart: "lid/pid-calibration/start",
+  lidPidStop: "/lid/pid-calibration/stop",
+  resetTEC: "tec/reset-device",
+  autoTuneTEC: "tec/auto-tune",
+  dyes: "dyes",
+  consumable: "consumable-distance",
+  dyeCalibration: "optical-caliberation",
   users: "users",
 };
 
@@ -468,6 +515,8 @@ export const timeConstants = {
   SEC_IN_ONE_HOUR: 3600,
   MIN_IN_ONE_HOUR: 60,
 };
+export const MAX_RPM_VALUE = 1500;
+export const MIN_RPM_VALUE = 800;
 
 /**
  * Maximum number of wells that can be present in a plate.
@@ -491,10 +540,52 @@ export const MAX_MOTOR_DISTANCE = 100;
 export const MIN_MOTOR_DIRECTION = 0;
 export const MAX_MOTOR_DIRECTION = 1;
 
+//constants for pid
+export const MIN_PID_TEMP = 50;
+export const MAX_PID_TEMP = 75;
+export const MIN_PID_MIN = 0;
+export const MAX_PID_MIN = 9999;
+
+// constants for engineer's flow for extraction
+export const MAX_ROOM_TEMPERATURE = 30;
+export const MIN_ROOM_TEMPERATURE = 20;
+
+//engineer's flow tips & tubes constants
+export const MIN_TIPTUBE_ID = 0;
+export const MAX_TIPTUBE_ID = 9999;
+export const MIN_TIPTUBE_VOLUME = 0;
+export const MAX_TIPTUBE_VOLUME = 9999;
+export const MIN_TIPTUBE_HEIGHT = 0;
+export const MAX_TIPTUBE_HEIGHT = 9999;
+export const MIN_TIPTUBE_TTBASE = 0;
+export const MAX_TIPTUBE_TTBASE = 9999;
+
+//engineer's flow cartridges constants
+export const MAX_WELLS_COUNT = 13;
+export const MIN_WELLS_COUNT = 1;
+export const MAX_CARTRIDGE_ID = 15;
+export const MIN_CARTRIDGE_ID = 1;
+export const CARTRIDGE_TYPE_OPTIONS = [
+  { value: "Cartridge 1", label: "Cartridge 1" },
+  { value: "Cartridge 2", label: "Cartridge 2" },
+];
+export const CARTRIDGE_WELLS = {
+  MAX_DISTANCE: 87,
+  MIN_DISTANCE: 0,
+  MAX_VOLUME: 5000,
+  MIN_VOLUME: 10,
+  MAX_HEIGHT: 40,
+  MIN_HEIGHT: 1,
+};
+
+export const MAX_TOLERANCE_ALLOWED = 100;
+export const MIN_TOLERANCE_ALLOWED = 0;
+
 export const TEMPERATURE_GRAPH_OPTIONS = {
   legend: {
     display: false,
   },
+  animation: false,
   scales: {
     xAxes: [
       {
