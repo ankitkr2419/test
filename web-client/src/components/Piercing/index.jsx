@@ -82,7 +82,11 @@ const PiercingComponent = (props) => {
   const handleSuccessBtn = (height, type) => {
     setShowHieghtModal(!showHeightModal);
     const wellsObjArray = type === 0 ? extractionWells : pcrWells;
-    const updatedWellObjArray = updateWellsArray(wellsObjArray, currentWellObj);
+    const updatedWellObjArray = updateWellsArray(
+      wellsObjArray,
+      currentWellObj,
+      height
+    );
     type === 0
       ? setExtractionWell(updatedWellObjArray)
       : setPcrWell(updatedWellObjArray);
@@ -101,7 +105,8 @@ const PiercingComponent = (props) => {
     if (currentWellObj.isSelected) {
       const updatedWellObjArray = updateWellsArray(
         wellsObjArray,
-        currentWellObj
+        currentWellObj,
+        null
       );
       type === 0
         ? setExtractionWell(updatedWellObjArray)
@@ -120,9 +125,14 @@ const PiercingComponent = (props) => {
       .filter((obj) => obj.isSelected)
       .map((obj) => obj.id);
 
+    const piercingHeights = wellsObjArray
+      .filter((obj) => obj.isSelected)
+      .map((obj) => obj.height);
+
     const body = {
       type: `cartridge_${type + 1}`,
       cartridge_wells: cartridgeWells,
+      piercing_heights: piercingHeights,
     };
     const requestBody = {
       body: body,
@@ -163,7 +173,7 @@ const PiercingComponent = (props) => {
                 </div>
               </div>
             </TopContent>
-            <Card>
+            <Card className="fix-height-card">
               <CardBody className="p-0 overflow-hidden">
                 <Nav
                   tabs
