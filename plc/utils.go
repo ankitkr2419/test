@@ -3,17 +3,12 @@ package plc
 import (
 	"context"
 	"mylab/cpagent/db"
+	"time"
 
 	"sync"
 
 	logger "github.com/sirupsen/logrus"
 )
-
-var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning, LidPidTuningInProgress bool
-var CurrentCycleTemperature, CurrentLidTemp float32
-var CurrentCycle uint16
-
-const FValueRegisterStartAddress = 800
 
 type DeckNumber struct {
 	Deck   string
@@ -93,12 +88,18 @@ const (
 	DeckB = "B"
 )
 
+const FValueRegisterStartAddress = 800
+
+var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning, LidPidTuningInProgress bool
+var CurrentCycleTemperature, CurrentLidTemp float32
+var CurrentCycle uint16
+
 var deckRecipe map[string]db.Recipe
 var deckProcesses map[string][]db.Process
 var wrotePulses, executedPulses, aborted, paused, homed, EngineerOrAdminLogged sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
 var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress, motorOperationCompleted sync.Map
-var shakerPIDCalibrationInProgress sync.Map
+var shakerPIDCalibrationInProgress, recipeWasPaused, recipeStartTime sync.Map
 
 // tipHeight is the Height of tip from syringe's base
 var tipHeight map[string]float64
@@ -120,6 +121,10 @@ func loadUtils() {
 	aborted.Store(DeckB, false)
 	paused.Store(DeckA, false)
 	paused.Store(DeckB, false)
+	recipeWasPaused.Store(DeckA, false)
+	recipeWasPaused.Store(DeckB, false)
+	recipeStartTime.Store(DeckA, time.Now())
+	recipeStartTime.Store(DeckB, time.Now())
 	runInProgress.Store(DeckA, false)
 	runInProgress.Store(DeckB, false)
 	timerInProgress.Store(DeckA, false)

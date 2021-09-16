@@ -34,6 +34,7 @@ var (
 	ShakingCreateError     = fmt.Errorf("error creating shaking record")
 	ShakingFetchError      = fmt.Errorf("error fetching shaking record")
 	ShakingUpdateError     = fmt.Errorf("error updating shaking record")
+	InvalidShakerTemp      = fmt.Errorf("error please check shaker temperature range")
 
 	HeatingDecodeError     = fmt.Errorf("error decoding heating record")
 	HeatingValidationError = fmt.Errorf("error validating heating record")
@@ -83,6 +84,8 @@ var (
 	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
 	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
 	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
+	RecipeRunError   	  = fmt.Errorf("error occured while recipe was running")
+	RecipeWasPausedError  = fmt.Errorf("error running recipe was paused atleast once")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
@@ -136,17 +139,23 @@ var (
 
 	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
 
-	InvalidSourcePosition         = fmt.Errorf("error source position is invalid")
-	InvalidDestinationPosition    = fmt.Errorf("error destination position is invalid")
-	RecipeCartridge1Missing       = fmt.Errorf("error cartridge 1 is missing")
-	RecipeCartridge2Missing       = fmt.Errorf("error cartridge 2 is missing")
-	InvalidCartridgeType          = fmt.Errorf("error cartridge type is invalid")
-	InvalidAspireWell             = fmt.Errorf("error aspire well settings are invalid")
-	InvalidDispenseWell           = fmt.Errorf("error dispense well position is invalid")
-	InvalidCategoryAspireDispense = fmt.Errorf("error category for aspire dispense is invalid")
-	TipDoesNotExistError          = fmt.Errorf("error specified tip does not exist")
-	TipMissingError               = fmt.Errorf("error specified tip does not exist in recipe")
-	WrongDeckError                = fmt.Errorf("error invalid deck name")
+	InvalidSourcePosition                 = fmt.Errorf("error source position is invalid")
+	InvalidDestinationPosition            = fmt.Errorf("error destination position is invalid")
+	InvalidDeckPosition                   = fmt.Errorf("error deck position is invalid")
+	RecipeCartridge1Missing               = fmt.Errorf("error cartridge 1 is missing")
+	RecipeCartridge2Missing               = fmt.Errorf("error cartridge 2 is missing")
+	MissingCartridgeWellsError            = fmt.Errorf("error cartridge wells are missing")
+	InvalidCartridgeType                  = fmt.Errorf("error cartridge type is invalid")
+	CartridgeWellsMismatchWithHeightError = fmt.Errorf("error cartridge wells mismatch with heights")
+	InvalidAspireWell                     = fmt.Errorf("error aspire well settings are invalid")
+	InvalidTipDockWell                    = fmt.Errorf("error tip docking on well settings are invalid")
+	InvalidDispenseWell                   = fmt.Errorf("error dispense well position is invalid")
+	InvalidCategoryAspireDispense         = fmt.Errorf("error category for aspire dispense is invalid")
+	InvalidPiercingWell                   = fmt.Errorf("error piercing well settings are invalid")
+
+	WrongDeckError       = fmt.Errorf("error invalid deck name")
+	TipDoesNotExistError = fmt.Errorf("error specified tip does not exist")
+	TipMissingError      = fmt.Errorf("error specified tip does not exist in recipe")
 
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
 

@@ -48,6 +48,9 @@ const (
 						total_time,
 						is_published,
 						updated_at) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) WHERE id = $17`
+	updateEstimatedTimeForRecipe = `UPDATE recipes SET
+						total_time = $1
+						where id = $2`
 )
 
 type Recipe struct {
@@ -182,5 +185,22 @@ func (s *pgStore) UpdateRecipe(ctx context.Context, r Recipe) (err error) {
 		logger.Errorln(responses.RecipeIDInvalidError)
 		return responses.RecipeIDInvalidError
 	}
+	return
+}
+
+func (s *pgStore) UpdateEstimatedTimeForRecipe(ctx context.Context, id uuid.UUID, et int64) (err error) {
+	logger.Infoln("Estimated Time: ", et, id)
+
+	_, err = s.db.Exec(
+		updateEstimatedTimeForRecipe,
+		et,
+		id,
+	)
+
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("error updating estimated template time")
+		return
+	}
+
 	return
 }

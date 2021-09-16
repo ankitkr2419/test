@@ -14,7 +14,7 @@ import (
 type Shaker struct {
 	ID          uuid.UUID `json:"id" db:"id"`
 	WithTemp    bool      `json:"with_temp" db:"with_temp"`
-	Temperature float64   `json:"temperature" db:"temperature" validate:"required_with=WithTemp,gte=20,lte=120"`
+	Temperature float64   `json:"temperature" db:"temperature"`
 	FollowTemp  bool      `json:"follow_temp" db:"follow_temp"`
 	ProcessID   uuid.UUID `json:"process_id" db:"process_id"`
 	RPM1        int64     `json:"rpm_1" db:"rpm_1" validate:"required,gte=500,lte=1200"`

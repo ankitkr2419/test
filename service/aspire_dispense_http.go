@@ -156,18 +156,21 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			responseBadRequest(rw, respBytes)
 			return
 		}
+
 		process, err := deps.Store.ShowProcess(req.Context(), id)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
 			return
 		}
+
 		err = ValidateAspireDispenceObject(req.Context(), deps, adobj, process.RecipeID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(err.Error())
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
+
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
@@ -212,20 +215,20 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 
 	switch ad.Category {
 	case db.SD:
-		if checkDeckPositionValidity(ad.DestinationPosition) {
+		if isDeckPositionInvalid(ad.DestinationPosition) {
 			return responses.InvalidDestinationPosition
 		}
 
 	case db.DS:
-		if checkDeckPositionValidity(ad.SourcePosition) {
+		if isDeckPositionInvalid(ad.SourcePosition) {
 			return responses.InvalidSourcePosition
 		}
 
 	case db.DD:
-		if checkDeckPositionValidity(ad.DestinationPosition) {
+		if isDeckPositionInvalid(ad.DestinationPosition) {
 			return responses.InvalidDestinationPosition
 		}
-		if checkDeckPositionValidity(ad.SourcePosition) {
+		if isDeckPositionInvalid(ad.SourcePosition) {
 			return responses.InvalidSourcePosition
 		}
 
@@ -234,23 +237,9 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 	//fetch cartridge type using id
 	var cartridgeID int64
 
-	switch ad.CartridgeType {
-	case db.Cartridge1:
-		if recipe.Cartridge1Position == nil {
-			return responses.RecipeCartridge1Missing
-
-		}
-		cartridgeID = *recipe.Cartridge1Position
-
-	case db.Cartridge2:
-		if recipe.Cartridge2Position == nil {
-			return responses.RecipeCartridge2Missing
-
-		}
-		cartridgeID = *recipe.Cartridge2Position
-	default:
-		return responses.InvalidCartridgeType
-
+	err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
+	if err != nil {
+		return err
 	}
 
 	aspireCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.SourcePosition)
@@ -284,20 +273,4 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 	logger.Infoln(aspireCartridgeWell, dispenseCartridgeWell)
 
 	return
-}
-
-func checkDeckPositionValidity(position int64) bool {
-	if position == cartridge1Pos || position == cartridge2Pos ||
-		position < minAspDisDeckPos || position > maxDeckPosition {
-		return false
-	}
-	return true
-}
-
-func createCartridgeWell(cartridgeID int64, cT db.CartridgeType, wellNum int64) plc.UniqueCartridge {
-	return plc.UniqueCartridge{
-		CartridgeID:   cartridgeID,
-		CartridgeType: cT,
-		WellNum:       wellNum,
-	}
 }
