@@ -24,6 +24,10 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	defer func() {
 		if err != nil {
 			logger.Errorln(err)
+			if err.Error() == AbortedError {
+				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
+				return
+			}
 			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 			return
 		}
