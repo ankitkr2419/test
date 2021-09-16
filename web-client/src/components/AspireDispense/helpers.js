@@ -1,5 +1,6 @@
 import {
   ASPIRE_WELLS,
+  CATEGORY_LABEL,
   CATEGORY_NAME,
   DISPENSE_WELLS,
   NUMBER_OF_WELLS,
@@ -12,6 +13,17 @@ export const getPosition = (wells) => {
     return selectedWell ? selectedWell.id : 0;
   }
   return 0;
+};
+
+export const getWellLabel = (categoryLabel, wellNumber = 0) => {
+  if (
+    (categoryLabel === CATEGORY_LABEL[1] ||
+      categoryLabel === CATEGORY_LABEL[2]) &&
+    wellNumber > 0
+  ) {
+    return ` | Well No. ${wellNumber}`;
+  }
+  return "";
 };
 
 const catergories = {

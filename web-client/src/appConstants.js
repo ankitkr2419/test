@@ -476,8 +476,8 @@ export const CATEGORY_NAME = {
 };
 
 export const CATEGORY_LABEL = {
-  1: "Category 1",
-  2: "Category 2",
+  1: "Cartridge 1",
+  2: "Cartridge 2",
   3: "Shaker",
   4: "Deck Position",
 };
