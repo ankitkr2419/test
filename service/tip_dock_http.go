@@ -51,6 +51,12 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = ValidateTipDockObject(req.Context(), deps, tdObj, recipeID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
+			return
+		}
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
@@ -145,6 +151,20 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.TipDockingValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		process, err := deps.Store.ShowProcess(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
+			return
+		}
+
+		err = ValidateTipDockObject(req.Context(), deps, tdObj, process.RecipeID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
 
