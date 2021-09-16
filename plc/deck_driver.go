@@ -298,12 +298,22 @@ func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 	}
 	logger.Infoln("Switched off the heater--> for deck ", d.name)
 
+	d.resetHeaterInProgress()
+
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOnShaker() (response string, err error) {
+func (d *Compact32Deck) switchOnShaker(rpmPulses uint16) (response string, err error) {
 
 	d.switchOffShaker()
+
+	// 4 set shaker register with rpm 1
+	// NOTE: Calculation of RPM involves multiplying it with 13.3
+	_, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], rpmPulses)
+	if err != nil {
+		logger.Errorln("error in setting rpm 1 value : ", err)
+		return "", err
+	}
 
 	//select shaker
 	_, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][222], shaker)
@@ -312,26 +322,32 @@ func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 		return "", err
 	}
 
-	// Switch on Motor
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	_, err = d.startShaker()
 	if err != nil {
-		logger.Errorln("error starting motor: ", err)
-		return "", err
+		return
 	}
-	logger.Infoln("Switched on the shaker motor--> for deck ", d.name)
-
-	// Switch on Shaker
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
-	if err != nil {
-		logger.Errorln("error starting shaker: ", err)
-		return "", err
-	}
-	logger.Infoln("Switched on the shaker--> for deck ", d.name)
 
 	return "SUCCESS", nil
 }
 
 func (d *Compact32Deck) switchOffShaker() (response string, err error) {
+
+	var results []byte
+	var motorNum = K8_Shaker
+
+	if temp := d.getMotorNumReg(); temp == highestUint16 {
+		err = fmt.Errorf("motor Number Register isn't loaded!")
+		return
+	} else if temp != motorNum {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][226], motorNum)
+	}
+
+	if err != nil {
+		logger.Errorln("error writing motor num: ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote motorNum. res : ", results)
+	motorNumReg.Store(d.name, motorNum)
 
 	// Switch off Motor
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
@@ -348,11 +364,21 @@ func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 		return "", err
 	}
 	logger.Infoln("Switched off the shaker--> for deck ", d.name)
+
+	// reset completion
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
+	if err != nil {
+		logger.Errorln("err resetting completion bit: ", err)
+		return "", err
+	}
+
+	d.resetShakerInProgress()
+
 	return "SUCCESS", nil
 
 }
 
-func (d *Compact32Deck) switchOnHeater() (response string, err error) {
+func (d *Compact32Deck) switchOnHeater(temp uint16) (response string, err error) {
 
 	d.switchOffHeater()
 
@@ -372,13 +398,57 @@ func (d *Compact32Deck) switchOnHeater() (response string, err error) {
 
 	logger.Infoln("result from shaker selection", result)
 
-	// Switch on Heater
+	//Step 3: Set Temperature
+	//Set Temperature for heater
+	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], temp)
+	if err != nil {
+		logger.Errorln("Error failed to write temperature: ", err)
+		return "", err
+	}
+	logger.Infoln("result from temperature set ", result, temp)
+
+	_, err = d.startHeater()
+	if err != nil {
+		return
+	}
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) startHeater() (response string, err error) {
+
+	// on Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], ON)
 	if err != nil {
 		logger.Errorln("error Switching on the heater: ", err)
 		return "", err
 	}
 	logger.Infoln("Switched on the heater--> for deck ", d.name)
+
+	d.setHeaterInProgress()
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) startShaker() (response string, err error) {
+
+	// Switch on Motor
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	if err != nil {
+		logger.Errorln("error starting motor: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched on the shaker motor--> for deck ", d.name)
+
+	// Switch on Shaker
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
+	if err != nil {
+		logger.Errorln("error starting shaker: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched on the shaker--> for deck ", d.name)
+
+	d.setShakerInProgress()
 
 	return "SUCCESS", nil
 }
