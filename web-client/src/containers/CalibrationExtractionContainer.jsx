@@ -70,6 +70,10 @@ const CalibrationExtractionContainer = () => {
   const pidReducerData = pidReducer.toJS();
   const { pidStatus, pidData, isPidUpdateApi } = pidReducerData;
 
+  const abortReducer = useSelector((state) => state.abortReducer);
+  const abortReducerData = abortReducer.toJS();
+  const { abortStatus } = abortReducerData;
+
   const commonDetailsReducer = useSelector(
     (state) => state.commonDetailsReducer
   );
@@ -179,7 +183,6 @@ const CalibrationExtractionContainer = () => {
     if (pidStatus === PID_STATUS.running) {
       // dispatch abort API if progressing
       dispatch(abort(token, deckName));
-      dispatch(runPidReset());
     } else {
       // dispatch run PID progressing
       dispatch(runPid(token, deckName));
@@ -309,6 +312,7 @@ const CalibrationExtractionContainer = () => {
       heaterData={data}
       progressData={progressData}
       pidStatus={pidStatus}
+      abortStatus={abortStatus}
       deckName={name}
       formik={formik}
       isAdmin={isAdmin}

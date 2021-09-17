@@ -29,6 +29,7 @@ const CalibrationExtractionComponent = (props) => {
     heaterData,
     progressData,
     pidStatus,
+    abortStatus,
     handleBtnClick,
     handleLogout,
     handlePidUpdateBtn,
@@ -104,6 +105,7 @@ const CalibrationExtractionComponent = (props) => {
             {/* {PID Start/Abort Progress Component} */}
             <PidProgressComponent
               pidStatus={pidStatus}
+              abortStatus={abortStatus}
               progressData={progressData}
               handleBtnClick={handleBtnClick}
             />
