@@ -164,8 +164,9 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 	// 9. Else if not follow up then just start the heater and then start the shaker.
 	// 10. If withTemp is false then proceed with the normal flow by starting the shaker.
 	//check if aborted
-	if d.isMachineInAbortedState() {
-		return "", responses.AbortedError
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
 	}
 
 	// add delay of time1 duration
