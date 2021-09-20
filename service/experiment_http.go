@@ -50,7 +50,7 @@ func createExperimentHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(e)
+		valid, respBytes := Validate(e)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

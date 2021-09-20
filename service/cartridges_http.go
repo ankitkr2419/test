@@ -51,7 +51,7 @@ func createCartridgeHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		go db.SetCartridgeValues(m)
-		valid, respBytes := validate(m)
+		valid, respBytes := Validate(m)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

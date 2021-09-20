@@ -56,7 +56,7 @@ func updateExpTempTargetsHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		for _, tt := range t {
-			valid, respBytes := validate(tt)
+			valid, respBytes := Validate(tt)
 			if !valid {
 				responseBadRequest(rw, respBytes)
 				return

@@ -96,7 +96,7 @@ func shakerHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(shObj)
+		valid, respBytes := Validate(shObj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.ShakingValidationError)
 			responseBadRequest(rw, respBytes)
@@ -134,7 +134,7 @@ func heaterHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(hObj)
+		valid, respBytes := Validate(hObj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.HeatingValidationError)
 			responseBadRequest(rw, respBytes)
