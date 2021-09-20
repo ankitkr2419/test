@@ -82,10 +82,14 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 
 func (d *Compact32Deck) Resume() (response string, err error) {
 
+	// if aborted
+	if !d.isMachineInAbortedState() {
+		return "", responses.ErrorAbortedState
+	}
+
 	// if paused only then resume
 	if !d.isMachineInPausedState() {
-		err = fmt.Errorf("System is already running, or done with the run")
-		return "", err
+		return "", responses.ErrorAlreadyPausedState
 	}
 
 	// TODO: Check if adding && !d.isCompletionBitSet() is suited below
