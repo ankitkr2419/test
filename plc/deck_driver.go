@@ -9,6 +9,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+// NOTE:
+// switchOff and just off have different meanings
+// for reset of operation use switchOff for only pausing use off
+
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
 	var results []byte
@@ -302,6 +306,19 @@ func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 	return "SUCCESS", nil
 }
 
+func (d *Compact32Deck) offHeater() (response string, err error) {
+
+	// Switch off Heater
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], OFF)
+	if err != nil {
+		logger.Errorln("err pausing the heater for deck: ", d.name, err)
+		return "", err
+	}
+	logger.Infoln("Switched off the heater--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
 func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 
 	// Switch off Heater
@@ -344,7 +361,7 @@ func (d *Compact32Deck) switchOnShaker(rpmPulses uint16) (response string, err e
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOffShaker() (response string, err error) {
+func (d *Compact32Deck) offShaker() (response string, err error) {
 
 	var results []byte
 	var motorNum = K8_Shaker
@@ -386,15 +403,27 @@ func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 		return "", err
 	}
 
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) switchOffShaker() (response string, err error) {
+
+	response, err = d.offShaker()
+	if err != nil {
+		return
+	}
+
 	d.resetShakerInProgress()
 
 	return "SUCCESS", nil
-
 }
 
 func (d *Compact32Deck) switchOnHeater(temp uint16) (response string, err error) {
 
-	d.switchOffHeater()
+	response, err = d.switchOffHeater()
+	if err != nil {
+		return
+	}
 
 	err = d.sleepIfPaused()
 	if err != nil {
@@ -439,7 +468,7 @@ func (d *Compact32Deck) startHeater() (response string, err error) {
 	// on Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], ON)
 	if err != nil {
-		logger.Errorln("error Switching on the heater: ", err)
+		logger.Errorln("error starting on the heater: ", err)
 		return "", err
 	}
 	logger.Infoln("Switched on the heater--> for deck ", d.name)
@@ -486,14 +515,24 @@ func (d *Compact32Deck) switchOnUVLight() (response string, err error) {
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
+func (d *Compact32Deck) offUVLight() (response string, err error) {
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][6], OFF)
 	if err != nil {
-		logger.Errorln("err Switching off the UV Light: ", err)
+		logger.Errorln("err Pausing the UV Light: ", err)
 		return "", err
 	}
 	logger.Infoln("Switched off the UV Light--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
+
+	response, err = d.offUVLight()
+	if err != nil {
+		return
+	}
 
 	d.resetUVLightInProgress()
 

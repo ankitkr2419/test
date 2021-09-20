@@ -55,21 +55,21 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 	}
 
 	if d.isUVLightInProgress() {
-		response, err = d.switchOffUVLight()
+		response, err = d.offUVLight()
 		if err != nil {
 			return "", err
 		}
 	}
 
 	if d.IsHeaterInProgress() {
-		response, err = d.switchOffHeater()
+		response, err = d.offHeater()
 		if err != nil {
 			return
 		}
 	}
 
 	if d.IsShakerInProgress() {
-		response, err = d.switchOffShaker()
+		response, err = d.offShaker()
 		if err != nil {
 			return
 		}
