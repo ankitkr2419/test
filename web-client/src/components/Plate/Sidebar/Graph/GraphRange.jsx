@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { Text } from "shared-components";
 import { FormGroup, Label, Input, Button } from "core-components";
 import { useFormik } from "formik";
 import {
-  formikInitialState,
+  getFormikInitialState,
   getRequestBody,
   disbleApplyBtn,
   disbleResetBtn,
 } from "./helper";
+import { getMaxThreshold } from "components/Plate/helpers";
 
 const GraphRange = (props) => {
   const {
@@ -16,15 +17,31 @@ const GraphRange = (props) => {
     handleRangeChangeBtn,
     handleResetBtn,
     headerData,
+    data,
+    targets,
     isExpanded,
+    options,
   } = props;
 
-  const { totalCycles, progressStatus } = headerData;
+  const { progressStatus } = headerData;
+  const nCycles = data?.labels?.length; // number of cycles
 
   const formik = useFormik({
-    initialValues: formikInitialState,
+    initialValues: getFormikInitialState(nCycles),
     enableReinitialize: true,
   });
+
+  useEffect(() => {
+    const {
+      scales: { xAxes, yAxes },
+    } = options;
+
+    // pre-fill values to show in the input fields after update/reset
+    formik.setFieldValue("xMin.value", xAxes[0].ticks.min);
+    formik.setFieldValue("xMax.value", xAxes[0].ticks.max);
+    formik.setFieldValue("yMin.value", yAxes[0].ticks.min);
+    formik.setFieldValue("yMax.value", yAxes[0].ticks.max);
+  }, [options]);
 
   const handleBlurChange = ({ name, value }) => {
     const { min, max } = formik.values[`${name}`];
@@ -32,6 +49,17 @@ const GraphRange = (props) => {
     if (value > max || value < min) {
       formik.setFieldValue(`${name}.isInvalid`, true);
     }
+  };
+
+  const applyBtnHandler = () => {
+    const requestBody = getRequestBody(formik.values);
+    const maxThreshold = getMaxThreshold(targets.toJS());
+    handleRangeChangeBtn(requestBody, nCycles, maxThreshold);
+  };
+
+  const resetBtnHandler = () => {
+    const maxThreshold = getMaxThreshold(targets.toJS());
+    handleResetBtn(nCycles, maxThreshold);
   };
 
   return (
@@ -94,7 +122,7 @@ const GraphRange = (props) => {
           color="primary"
           size="sm"
           className="mb-3 ml-3"
-          onClick={() => handleRangeChangeBtn(getRequestBody(formik.values))}
+          onClick={applyBtnHandler}
           disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
           Apply
@@ -104,7 +132,7 @@ const GraphRange = (props) => {
           size="sm"
           outline={true}
           className="mb-3 ml-3 border-2 border-gray "
-          onClick={() => handleResetBtn(totalCycles)}
+          onClick={resetBtnHandler}
           disabled={disbleResetBtn(progressStatus, isExpanded)}
         >
           Reset

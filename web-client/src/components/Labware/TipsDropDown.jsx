@@ -7,8 +7,7 @@ import { ProcessSetting } from "./Styles";
 import { getOptions } from "./helpers";
 
 const TipsDropdown = (props) => {
-  const { formik, tipsOptions, allowedPositions } = props;
-  const options = getOptions(tipsOptions, allowedPositions);
+  const { formik, tipsOptions } = props;
 
   const tips = formik.values.tips;
   const tipPosition1Value = tips.processDetails.tipPosition1.id;
@@ -19,6 +18,7 @@ const TipsDropdown = (props) => {
     const tipPositions = formik.values.tips.processDetails;
 
     return Object.keys(tipPositions).map((tipPosition, i) => {
+      let options = getOptions(tipsOptions, i + 1, "tips");
       let id = tipPositions[tipPosition].id;
       //match the id of option with current tipPosition ID
       let index = options && options.map((item) => item.value).indexOf(id);
@@ -31,6 +31,7 @@ const TipsDropdown = (props) => {
             </Label>
             <div className="d-flex flex-column input-field position-relative">
               <Select
+                isClearable
                 placeholder="Select Option"
                 className=""
                 size="sm"
@@ -39,11 +40,11 @@ const TipsDropdown = (props) => {
                 onChange={(e) => {
                   formik.setFieldValue(
                     `tips.processDetails.tipPosition${i + 1}.id`,
-                    e.value
+                    e?.value || null
                   );
                   formik.setFieldValue(
                     `tips.processDetails.tipPosition${i + 1}.label`,
-                    e.label
+                    e?.label || null
                   );
                 }}
               />

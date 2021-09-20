@@ -3,10 +3,15 @@ package plc
 import (
 	"encoding/binary"
 	"fmt"
+	"mylab/cpagent/responses"
 	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
+
+// NOTE:
+// switchOff and just off have different meanings
+// for reset of operation use switchOff for only pausing use off
 
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
@@ -22,6 +27,11 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	if pulse < minimumPulsesThreshold {
 		logger.Infoln("Current pulse: ", pulse, " is less than minimumPulsesThreshold. Avoiding Motor Movements for motor:", motorNum, ", deck: ", d.name)
 		return "SUCCESS", nil
+	}
+
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
 	}
 
 	wrotePulses.Store(d.name, uint16(0))
@@ -158,14 +168,9 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Wrote motorNum", d.name, ". res : ", results)
 	motorNumReg.Store(d.name, motorNum)
 
-	// Check if User has paused the run/operation
-	for {
-		if d.isMachineInPausedState() {
-			logger.Infoln("Machine in PAUSED state for deck:", d.name)
-			time.Sleep(400 * time.Millisecond)
-		} else {
-			break
-		}
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
 	}
 
 	// Switching Motor ON
@@ -190,8 +195,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			logger.Infoln("position before abortion: ", Positions[deckAndNumber])
 			Positions[deckAndNumber] += float64(temp) / float64(Motors[deckAndNumber]["steps"])
 			logger.Infoln("position after abortion: ", Positions[deckAndNumber])
-			err = fmt.Errorf("Operation was ABORTED!")
-			return "", err
+			return "", responses.AbortedError
 		}
 
 		if d.isMotorOperationCompleted() {
@@ -270,6 +274,20 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 }
 
+func (d *Compact32Deck) sleepIfPaused() (err error) {
+	// Check if User has paused the run/operation
+	for {
+		if d.isMachineInAbortedState() {
+			return responses.AbortedError
+		} else if d.isMachineInPausedState() {
+			logger.Infoln("Machine in PAUSED state for deck:", d.name)
+			time.Sleep(400 * time.Millisecond)
+		} else {
+			return
+		}
+	}
+}
+
 func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 
 	if temp := d.getOnReg(); temp == highestUint16 {
@@ -288,6 +306,19 @@ func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 	return "SUCCESS", nil
 }
 
+func (d *Compact32Deck) offHeater() (response string, err error) {
+
+	// Switch off Heater
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], OFF)
+	if err != nil {
+		logger.Errorln("err pausing the heater for deck: ", d.name, err)
+		return "", err
+	}
+	logger.Infoln("Switched off the heater--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
 func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 
 	// Switch off Heater
@@ -298,12 +329,22 @@ func (d *Compact32Deck) switchOffHeater() (response string, err error) {
 	}
 	logger.Infoln("Switched off the heater--> for deck ", d.name)
 
+	d.resetHeaterInProgress()
+
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOnShaker() (response string, err error) {
+func (d *Compact32Deck) switchOnShaker(rpmPulses uint16) (response string, err error) {
 
 	d.switchOffShaker()
+
+	// 4 set shaker register with rpm 1
+	// NOTE: Calculation of RPM involves multiplying it with 13.3
+	_, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][218], rpmPulses)
+	if err != nil {
+		logger.Errorln("error in setting rpm 1 value : ", err)
+		return "", err
+	}
 
 	//select shaker
 	_, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][222], shaker)
@@ -312,26 +353,32 @@ func (d *Compact32Deck) switchOnShaker() (response string, err error) {
 		return "", err
 	}
 
-	// Switch on Motor
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	_, err = d.startShaker()
 	if err != nil {
-		logger.Errorln("error starting motor: ", err)
-		return "", err
+		return
 	}
-	logger.Infoln("Switched on the shaker motor--> for deck ", d.name)
-
-	// Switch on Shaker
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
-	if err != nil {
-		logger.Errorln("error starting shaker: ", err)
-		return "", err
-	}
-	logger.Infoln("Switched on the shaker--> for deck ", d.name)
 
 	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOffShaker() (response string, err error) {
+func (d *Compact32Deck) offShaker() (response string, err error) {
+
+	var results []byte
+	var motorNum = K8_Shaker
+
+	if temp := d.getMotorNumReg(); temp == highestUint16 {
+		err = fmt.Errorf("motor Number Register isn't loaded!")
+		return
+	} else if temp != motorNum {
+		results, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][226], motorNum)
+	}
+
+	if err != nil {
+		logger.Errorln("error writing motor num: ", err, d.name)
+		return "", err
+	}
+	logger.Infoln("Wrote motorNum. res : ", results)
+	motorNumReg.Store(d.name, motorNum)
 
 	// Switch off Motor
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], OFF)
@@ -348,13 +395,40 @@ func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 		return "", err
 	}
 	logger.Infoln("Switched off the shaker--> for deck ", d.name)
-	return "SUCCESS", nil
 
+	// reset completion
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
+	if err != nil {
+		logger.Errorln("err resetting completion bit: ", err)
+		return "", err
+	}
+
+	return "SUCCESS", nil
 }
 
-func (d *Compact32Deck) switchOnHeater() (response string, err error) {
+func (d *Compact32Deck) switchOffShaker() (response string, err error) {
 
-	d.switchOffHeater()
+	response, err = d.offShaker()
+	if err != nil {
+		return
+	}
+
+	d.resetShakerInProgress()
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) switchOnHeater(temp uint16) (response string, err error) {
+
+	response, err = d.switchOffHeater()
+	if err != nil {
+		return
+	}
+
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
+	}
 
 	//validation for shaker
 	if shaker > 3 || shaker < 1 {
@@ -372,13 +446,57 @@ func (d *Compact32Deck) switchOnHeater() (response string, err error) {
 
 	logger.Infoln("result from shaker selection", result)
 
-	// Switch on Heater
+	//Step 3: Set Temperature
+	//Set Temperature for heater
+	result, err = d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], temp)
+	if err != nil {
+		logger.Errorln("Error failed to write temperature: ", err)
+		return "", err
+	}
+	logger.Infoln("result from temperature set ", result, temp)
+
+	_, err = d.startHeater()
+	if err != nil {
+		return
+	}
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) startHeater() (response string, err error) {
+
+	// on Heater
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][3], ON)
 	if err != nil {
-		logger.Errorln("error Switching on the heater: ", err)
+		logger.Errorln("error starting on the heater: ", err)
 		return "", err
 	}
 	logger.Infoln("Switched on the heater--> for deck ", d.name)
+
+	d.setHeaterInProgress()
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) startShaker() (response string, err error) {
+
+	// Switch on Motor
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][0], ON)
+	if err != nil {
+		logger.Errorln("error starting motor: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched on the shaker motor--> for deck ", d.name)
+
+	// Switch on Shaker
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][5], ON)
+	if err != nil {
+		logger.Errorln("error starting shaker: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched on the shaker--> for deck ", d.name)
+
+	d.setShakerInProgress()
 
 	return "SUCCESS", nil
 }
@@ -392,17 +510,31 @@ func (d *Compact32Deck) switchOnUVLight() (response string, err error) {
 	}
 	logger.Infoln("Switched on the UV Light--> for deck ", d.name)
 
+	d.setUVLightInProgress()
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) offUVLight() (response string, err error) {
+
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][6], OFF)
+	if err != nil {
+		logger.Errorln("err Pausing the UV Light: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched off the UV Light--> for deck ", d.name)
+
 	return "SUCCESS", nil
 }
 
 func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
 
-	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][6], OFF)
+	response, err = d.offUVLight()
 	if err != nil {
-		logger.Errorln("err Switching off the UV Light: ", err)
-		return "", err
+		return
 	}
-	logger.Infoln("Switched off the UV Light--> for deck ", d.name)
+
+	d.resetUVLightInProgress()
 
 	return "SUCCESS", nil
 }

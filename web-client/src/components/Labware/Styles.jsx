@@ -7,7 +7,7 @@ export const LabwareBox = styled.div`
   .process-labware {
     padding: 1rem 4.5rem 0.75rem 4.5rem;
     .side-bar {
-      width: 10.875rem;
+      width: 10.88rem;
       height: 100vh;
       background: rgb(131, 180, 172);
       background: linear-gradient(

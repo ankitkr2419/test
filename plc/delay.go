@@ -1,8 +1,8 @@
 package plc
 
 import (
-	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 
 	logger "github.com/sirupsen/logrus"
 
@@ -82,8 +82,7 @@ skipToStartTimer:
 				if d.isUVLightInProgress() {
 					d.ResetAborted()
 				}
-				err = fmt.Errorf(AbortedError)
-				return "", err
+				return "", responses.AbortedError
 			}
 			// When UV Light is in progress nothing else is so no special handling below
 			if d.isUVLightInProgress() {
