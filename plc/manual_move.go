@@ -83,7 +83,7 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 func (d *Compact32Deck) Resume() (response string, err error) {
 
 	// if aborted
-	if !d.isMachineInAbortedState() {
+	if d.isMachineInAbortedState() {
 		return "", responses.ErrorAbortedState
 	}
 
