@@ -36,8 +36,22 @@ import {
 
 import { toast } from "react-toastify";
 import {
+  heaterProgress,
+  heaterRunInProgress,
+  heaterRunInSuccess,
+  heaterRunInAborted,
   runPidInProgress,
   runPidInSuccess,
+  progressLidPid,
+  successLidPid,
+  shakerRunInProgress,
+  shakerRunInSuccess,
+  shakerRunInAborted,
+  progressDyeCalibration,
+  completedDyeCalibration,
+  pidInProgress,
+  pidInSuccess,
+  pidInAborted,
 } from "action-creators/calibrationActionCreators";
 
 let webSocket = null;
@@ -124,6 +138,49 @@ export const connectSocket = (dispatch) => {
             toast.error(errorMessage);
           }
           break;
+        case SOCKET_MESSAGE_TYPE.progressHeater:
+          dispatch(heaterProgress(JSON.parse(data)));
+          break;
+        case SOCKET_MESSAGE_TYPE.progressPidTuning:
+          dispatch(pidInProgress());
+          break;
+        case SOCKET_MESSAGE_TYPE.successPidTuning:
+          dispatch(pidInSuccess());
+          break;
+        case SOCKET_MESSAGE_TYPE.abortPidTuning:
+          dispatch(pidInAborted());
+          break;
+        case SOCKET_MESSAGE_TYPE.PROGRESSLidPIDTuning:
+          dispatch(progressLidPid(JSON.parse(data)));
+          break;
+        case SOCKET_MESSAGE_TYPE.SUCCESSLidPIDTuning:
+          dispatch(successLidPid(JSON.parse(data)));
+          break;
+        case SOCKET_MESSAGE_TYPE.progressShakerRun:
+          dispatch(shakerRunInProgress());
+          break;
+        case SOCKET_MESSAGE_TYPE.successShakerRun:
+          dispatch(shakerRunInSuccess());
+          break;
+        case SOCKET_MESSAGE_TYPE.abortShakerRun:
+          dispatch(shakerRunInAborted());
+          break;
+        case SOCKET_MESSAGE_TYPE.progressHeaterRun:
+          dispatch(heaterRunInProgress());
+          break;
+        case SOCKET_MESSAGE_TYPE.successHeaterRun:
+          dispatch(heaterRunInSuccess());
+          break;
+        case SOCKET_MESSAGE_TYPE.abortHeaterRun:
+          dispatch(heaterRunInAborted());
+        case SOCKET_MESSAGE_TYPE.progressDyeCalibration:
+          dispatch(progressDyeCalibration());
+          break;
+        case SOCKET_MESSAGE_TYPE.completedDyeCalibration:
+          dispatch(completedDyeCalibration());
+          toast.success(data);
+          break;
+
         default:
           break;
       }

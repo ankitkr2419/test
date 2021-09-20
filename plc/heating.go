@@ -30,7 +30,7 @@ func (d *Compact32Deck) Heating(ht db.Heating, live bool) (response string, err 
 		}
 		if err != nil {
 			logger.Errorln(err)
-			if err.Error() == AbortedError {
+			if err == responses.AbortedError {
 				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
 				return
 			}
@@ -66,8 +66,7 @@ func (d *Compact32Deck) Heating(ht db.Heating, live bool) (response string, err 
 	// Step 4 : Check if Aborted
 	// first check aborted if yes then exit
 	if d.isMachineInAbortedState() {
-		err = fmt.Errorf(AbortedError)
-		return "", err
+		return "", responses.AbortedError
 	}
 
 	// Step 5 : Syringe To Rest Position
@@ -164,8 +163,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 			}
 
 			if d.isMachineInAbortedState() {
-				err = fmt.Errorf("operation was ABORTED \n")
-				return "ABORTED", err
+				return "ABORTED", responses.AbortedError
 			}
 
 			time.Sleep(time.Second * 2)

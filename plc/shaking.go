@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -34,7 +35,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 
 		if err != nil {
 			logger.Errorln(err)
-			if err.Error() == AbortedError {
+			if err == responses.AbortedError {
 				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
 				return
 			}
@@ -112,8 +113,7 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 
 	//check if aborted
 	if d.isMachineInAbortedState() {
-		err = fmt.Errorf(AbortedError)
-		return "", err
+		return "", responses.AbortedError
 	}
 
 	// add delay of time1 duration

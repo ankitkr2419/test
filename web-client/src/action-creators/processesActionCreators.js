@@ -18,5 +18,4 @@ export const saveProcessFailure = (error) => ({
 
 export const saveProcessReset = () => ({
   type: processAction.saveProcessReset,
-  payload: {},
 });

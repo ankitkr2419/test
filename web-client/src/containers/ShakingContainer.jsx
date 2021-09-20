@@ -1,9 +1,17 @@
-import React from 'react';
+import React from "react";
+import { useLocation } from "react-router";
 
-import ShakingComponent from 'components/Shaking';
+import ShakingComponent from "components/Shaking";
+import ShakerComponent from "components/CalibrationExtraction/ShakerComponent";
+import { ROUTES } from "appConstants";
 
 const ShakingContainer = (props) => {
-	return <ShakingComponent />;
+  const location = useLocation();
+  if (location.pathname === `/${ROUTES.calibration}/shaker`) {
+    return <ShakerComponent />;
+  }
+
+  return <ShakingComponent />;
 };
 
 ShakingContainer.propTypes = {};

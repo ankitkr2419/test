@@ -73,7 +73,7 @@ export function* getCartridge(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.cartridge}`,
+        reqPath: `${API_ENDPOINTS.cartridges}`,
         successAction: getCartridgeSuccess,
         failureAction: getCartridgeFailure,
         // showPopupSuccessMessage: true,

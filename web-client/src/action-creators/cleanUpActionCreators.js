@@ -72,7 +72,6 @@ export const pauseCleanUpActionFailed = (serverErrors) => ({
 
 export const pauseCleanUpActionReset = () => ({
   type: pauseCleanUpAction.pauseCleanUpReset,
-  payload: {},
 });
 
 export const resumeCleanUpActionInitiated = (params) => ({
@@ -98,7 +97,6 @@ export const resumeCleanUpActionFailed = (serverErrors) => ({
 
 export const resumeCleanUpActionReset = () => ({
   type: resumeCleanUpAction.resumeCleanUpReset,
-  payload: {},
 });
 
 export const abortCleanUpActionInitiated = (params) => ({
@@ -124,7 +122,6 @@ export const abortCleanUpActionFailed = (serverErrors) => ({
 
 export const abortCleanUpActionReset = () => ({
   type: abortCleanUpAction.abortCleanUpReset,
-  payload: {},
 });
 
 export const cleanUpHours = (params) => ({

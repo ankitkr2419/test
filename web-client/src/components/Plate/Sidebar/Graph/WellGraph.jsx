@@ -31,11 +31,7 @@ const WellGraph = (props) => {
   return (
     <div>
       <GraphCard>
-        <LineChart
-          data={data}
-          options={options}
-          redraw={isDataFromAPI}
-        />
+        <LineChart data={data} options={options} redraw={isDataFromAPI} />
       </GraphCard>
       <GraphFilters
         targets={experimentGraphTargetsList}
@@ -50,6 +46,9 @@ const WellGraph = (props) => {
           handleRangeChangeBtn={handleRangeChangeBtn}
           handleResetBtn={handleResetBtn}
           headerData={headerData}
+          data={data}
+          options={options}
+          targets={experimentGraphTargetsList}
           isExpanded={isExpanded}
         />
       )}

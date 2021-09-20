@@ -1,13 +1,15 @@
 package plc
 
 import (
-	logger "github.com/sirupsen/logrus"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	logger "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
@@ -109,7 +111,7 @@ func (suite *DelayTestSuite) TestDelayMachineAbortedSuccess() {
 
 	assert.Equal(suite.T(), "", res)
 	assert.NotNil(suite.T(), err)
-	assert.Equal(suite.T(), "Operation was ABORTED!", err.Error())
+	assert.Equal(suite.T(), responses.AbortedError, err.Error())
 	suite.driverMock.AssertExpectations(suite.T())
 	testDelayRecord.DelayTime = 5
 }

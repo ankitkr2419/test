@@ -5,13 +5,7 @@ const LineChart = (props) => {
   const { data, width, height, options } = props;
 
   return (
-    <Line
-      redraw={true}
-      width={width}
-      height={height}
-      data={data}
-      options={options}
-    />
+    <Line redraw width={width} height={height} data={data} options={options} />
   );
 };
 
