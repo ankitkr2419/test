@@ -25,6 +25,11 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		return "SUCCESS", nil
 	}
 
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
+	}
+
 	wrotePulses.Store(d.name, uint16(0))
 	executedPulses.Store(d.name, uint16(0))
 	deckAndNumber := DeckNumber{Deck: d.name, Number: motorNum}
@@ -159,14 +164,9 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Wrote motorNum", d.name, ". res : ", results)
 	motorNumReg.Store(d.name, motorNum)
 
-	// Check if User has paused the run/operation
-	for {
-		if d.isMachineInPausedState() {
-			logger.Infoln("Machine in PAUSED state for deck:", d.name)
-			time.Sleep(400 * time.Millisecond)
-		} else {
-			break
-		}
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
 	}
 
 	// Switching Motor ON
@@ -270,6 +270,20 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 }
 
+func (d *Compact32Deck) sleepIfPaused() (err error) {
+	// Check if User has paused the run/operation
+	for {
+		if d.isMachineInAbortedState() {
+			return responses.AbortedError
+		} else if d.isMachineInPausedState() {
+			logger.Infoln("Machine in PAUSED state for deck:", d.name)
+			time.Sleep(400 * time.Millisecond)
+		} else {
+			return
+		}
+	}
+}
+
 func (d *Compact32Deck) switchOffMotor() (response string, err error) {
 
 	if temp := d.getOnReg(); temp == highestUint16 {
@@ -356,6 +370,11 @@ func (d *Compact32Deck) switchOnHeater() (response string, err error) {
 
 	d.switchOffHeater()
 
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
+	}
+
 	//validation for shaker
 	if shaker > 3 || shaker < 1 {
 		err = fmt.Errorf("%v not in valid range of 1-3", shaker)
@@ -392,6 +411,8 @@ func (d *Compact32Deck) switchOnUVLight() (response string, err error) {
 	}
 	logger.Infoln("Switched on the UV Light--> for deck ", d.name)
 
+	d.setUVLightInProgress()
+
 	return "SUCCESS", nil
 }
 
@@ -403,6 +424,8 @@ func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
 		return "", err
 	}
 	logger.Infoln("Switched off the UV Light--> for deck ", d.name)
+
+	d.resetUVLightInProgress()
 
 	return "SUCCESS", nil
 }
