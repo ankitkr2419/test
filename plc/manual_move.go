@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"mylab/cpagent/responses"
 
-
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -119,13 +118,13 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 	}
 
 	if d.IsHeaterInProgress() {
-		response, err = d.switchOnHeater()
+		response, err = d.startHeater()
 		if err != nil {
 			return
 		}
 	}
 	if d.IsShakerInProgress() {
-		response, err = d.switchOnShaker()
+		response, err = d.startShaker()
 		if err != nil {
 			return
 		}
