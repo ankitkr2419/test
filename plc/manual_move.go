@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"mylab/cpagent/responses"
 
-
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -153,7 +152,6 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 			logger.Errorln("From deck ", d.name, err)
 			return "", err
 		}
-		d.setAborted()
 		return "ABORT UV LIGHT SUCCESS", nil
 	}
 
