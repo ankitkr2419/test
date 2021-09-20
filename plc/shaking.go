@@ -112,8 +112,9 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 	}
 
 	//check if aborted
-	if d.isMachineInAbortedState() {
-		return "", responses.AbortedError
+	err = d.sleepIfPaused()
+	if err != nil {
+		return
 	}
 
 	// add delay of time1 duration
