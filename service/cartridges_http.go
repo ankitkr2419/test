@@ -50,13 +50,18 @@ func createCartridgeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go db.SetCartridgeValues(m)
 		valid, respBytes := Validate(m)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
+		err = db.SetCartridgeValues(m)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.CartridgeCreateConfigError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CartridgeCreateConfigError.Error()})
+			return
+		}
 		err = deps.Store.InsertCartridge(req.Context(), m.Cartridge, m.CartridgeWells)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
