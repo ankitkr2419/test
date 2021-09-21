@@ -64,8 +64,12 @@ func SetMicroLitrePulses(value int64) {
 
 func GetExtractionConfigValues() Extraction {
 	return Extraction{
-		PIDTemperature: GetPIDTemp(),
-		ShakerStepsPerRev:GetShakerStepsPerRev(),
-		MicroLitrePulses: GetMicroLitrePulses(),
+		PIDTemperature:    GetPIDTemp(),
+		ShakerStepsPerRev: GetShakerStepsPerRev(),
+		MicroLitrePulses:  GetMicroLitrePulses(),
 	}
+}
+
+func GetConsumableDistanceFilePath() string {
+	return ReadEnvString("consumable_distance_conf_file")
 }
