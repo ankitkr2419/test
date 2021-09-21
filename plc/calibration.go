@@ -13,10 +13,10 @@ import (
 var shaker1PIDDone, shaker2PIDDone bool
 
 // ALGORITHM
-// 1. Start Heater
-// 2. Reset Heater in defer
-// 3. Start PID for deck
-// 4. Reset PID in defer
+// 1. Start PID for deck
+// 2. Reset PID in defer
+// 3. Start Heater
+// 4. Reset Heater in defer
 // 5. Delay and check if PID Calib was stopped
 
 func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
@@ -47,14 +47,6 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 		return
 	}
 
-	// Set Temperature
-	//Set Temperature for heater
-	_, err = d.switchOnHeater(uint16(config.GetPIDTemp() * 10))
-	if err != nil {
-		return
-	}
-	// Reset Heater in defer
-	defer d.switchOffHeater()
 	logger.Infoln(responses.PIDCalibrationHeaterStarted)
 
 	// Start PID for deck
@@ -65,13 +57,22 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	}
 	// Reset PID in defer
 	defer d.switchOffShakerPIDCalibration()
+
+	// Set Temperature
+	//Set Temperature for heater
+	_, err = d.switchOnHeater(uint16(config.GetPIDTemp() * 10))
+	if err != nil {
+		return
+	}
+	// Reset Heater in defer
+	defer d.switchOffHeater()
+
 	logger.Infoln(responses.ShakerPIDCalibrationStarted)
 
 	// Check until Done
 	// D 504 & D 534 change from K3 to K4
 
 	// Check if pid tuning is Done
-	// 4.
 	for !pidTuningDone {
 		pidTuningDone, err = d.readShakerPIDCompletion()
 		if err != nil {
