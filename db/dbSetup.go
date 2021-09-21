@@ -4,6 +4,8 @@ import (
 	"context"
 	"io/ioutil"
 
+	conf "mylab/cpagent/config"
+
 	"github.com/lib/pq"
 	"gopkg.in/yaml.v2"
 
@@ -12,11 +14,12 @@ import (
 )
 
 const (
-	cartridgeConfFile     = "./conf/cartridges_config.yml"
-	cartridgeWellConfFile = "./conf/cartridge_wells_config.yml"
-	tipTubeConfFile       = "./conf/tips_tubes_config.yml"
-	motorConfFile         = "./conf/motor_config.yml"
-	dyeConfFile           = "./conf/dyes.yml"
+	cartridgeConfFile          = "./conf/cartridges_config.yml"
+	cartridgeWellConfFile      = "./conf/cartridge_wells_config.yml"
+	tipTubeConfFile            = "./conf/tips_tubes_config.yml"
+	motorConfFile              = "./conf/motor_config.yml"
+	dyeConfFile                = "./conf/dyes.yml"
+	consumableDistanceConfFile = "./conf/consumable_config_v1_4.yml"
 )
 
 // Config is used to get data from config file
@@ -504,6 +507,102 @@ func SetMotorsValues(m []Motor) (err error) {
 	}
 
 	err = ioutil.WriteFile(motorConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+
+	return
+}
+
+func UpdateMotorsValues(m []Motor) (err error) {
+	var config MotorConfig
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+
+	motorConf := MotorConfig{}
+	motorConf.Motor = make([]struct {
+		ID     int
+		Deck   string
+		Number int
+		Name   string
+		Ramp   int
+		Steps  int
+		Slow   int
+		Fast   int
+	}, 1)
+	for _, confMotor := range config.Motor {
+		for _, motor := range m {
+
+			if motor.ID == confMotor.ID {
+				confMotor.Deck = motor.Deck
+				confMotor.Number = motor.Number
+				confMotor.Name = motor.Name
+				confMotor.Ramp = motor.Ramp
+				confMotor.Steps = motor.Steps
+				confMotor.Slow = motor.Slow
+				confMotor.Fast = motor.Fast
+			}
+
+			motorConf.Motor = append(motorConf.Motor, confMotor)
+		}
+	}
+	res, err := yaml.Marshal(config)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	err = ioutil.WriteFile(motorConfFile, res, 0666)
+	if err != nil {
+		logger.Errorln("error in writing to file", err)
+		return
+	}
+
+	return
+}
+
+func UpdateConsumableDistancesValues(m []ConsumableDistance) (err error) {
+	var config ConsumableConfig
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Unable to unmarshal config")
+		return
+	}
+
+	ConsumableDConf := ConsumableConfig{}
+	ConsumableDConf.ConsumableDistance = make([]struct {
+		ID          int
+		Name        string
+		Distance    float64
+		Description string
+	}, 1)
+	for _, confConsDist := range config.ConsumableDistance {
+		for _, consDist := range m {
+
+			if consDist.ID == confConsDist.ID {
+				confConsDist.ID = consDist.ID
+				confConsDist.Name = consDist.Name
+				confConsDist.Distance = consDist.Distance
+				confConsDist.Description = consDist.Description
+
+			}
+
+			ConsumableDConf.ConsumableDistance = append(ConsumableDConf.ConsumableDistance, confConsDist)
+		}
+	}
+	res, err := yaml.Marshal(config)
+	if err != nil {
+		logger.Errorln("error in marshalling", err)
+		return
+	}
+
+	consumableDistanceConfFile := conf.GetConsumableDistanceFilePath()
+
+	err = ioutil.WriteFile(consumableDistanceConfFile, res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return

@@ -101,6 +101,8 @@ func updateConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		go db.UpdateConsumableDistancesValues([]db.ConsumableDistance{adobj})
+
 		logger.Infoln(responses.ConsumableDistanceUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ConsumableDistanceUpdateSuccess})
 	})

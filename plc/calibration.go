@@ -81,6 +81,10 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// Check if pid tuning is Done
 	// 4.
 	for !pidTuningDone {
+		if d.isMachineInAbortedState() {
+			err = responses.AbortedError
+			return
+		}
 		pidTuningDone, err = d.readShakerPIDCompletion()
 		if err != nil {
 			logger.Errorln(err)
@@ -101,6 +105,9 @@ func (d *Compact32Deck) readShakerPIDCompletion() (pidTuningDone bool, err error
 		return false, responses.AbortedError
 	}
 
+	if d.isMachineInAbortedState() {
+		return false, responses.AbortedError
+	}
 	if shaker1PIDDone {
 		goto skipReadingShaker1PIDStatus
 	}
@@ -119,6 +126,9 @@ func (d *Compact32Deck) readShakerPIDCompletion() (pidTuningDone bool, err error
 	}
 
 skipReadingShaker1PIDStatus:
+	if d.isMachineInAbortedState() {
+		return false, responses.AbortedError
+	}
 
 	if shaker2PIDDone {
 		goto skipReadingShaker2PIDStatus
