@@ -115,11 +115,6 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 		}
 	}()
 
-	if !d.IsMachineHomed() {
-		err = responses.PleaseHomeMachineError
-		return
-	}
-
 	if d.IsRunInProgress() {
 		err = responses.PreviousRunInProgressError
 		return
@@ -152,8 +147,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	if err != nil {
 		return
 	}
-	d.setUVLightInProgress()
-	defer d.resetUVLightInProgress()
+	defer d.switchOffUVLight()
 
 	//
 	// 3. Add delay

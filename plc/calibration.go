@@ -49,15 +49,7 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 
 	// Set Temperature
 	//Set Temperature for heater
-	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(config.GetPIDTemp()*10))
-	if err != nil {
-		logger.Errorln("Error failed to write temperature: ", err)
-		return err
-	}
-	logger.Infoln("result from temperature set ", result, config.GetPIDTemp())
-
-	// Start Heater
-	_, err = d.switchOnHeater()
+	_, err = d.switchOnHeater(uint16(config.GetPIDTemp() * 10))
 	if err != nil {
 		return
 	}

@@ -19,7 +19,7 @@ func createConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(cd)
+		valid, respBytes := Validate(cd)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

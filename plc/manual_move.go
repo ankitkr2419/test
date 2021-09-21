@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"mylab/cpagent/responses"
 
-
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -56,21 +55,21 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 	}
 
 	if d.isUVLightInProgress() {
-		response, err = d.switchOffUVLight()
+		response, err = d.offUVLight()
 		if err != nil {
 			return "", err
 		}
 	}
 
 	if d.IsHeaterInProgress() {
-		response, err = d.switchOffHeater()
+		response, err = d.offHeater()
 		if err != nil {
 			return
 		}
 	}
 
 	if d.IsShakerInProgress() {
-		response, err = d.switchOffShaker()
+		response, err = d.offShaker()
 		if err != nil {
 			return
 		}
@@ -83,10 +82,14 @@ func (d *Compact32Deck) Pause() (response string, err error) {
 
 func (d *Compact32Deck) Resume() (response string, err error) {
 
+	// if aborted
+	if d.isMachineInAbortedState() {
+		return "", responses.ErrorAbortedState
+	}
+
 	// if paused only then resume
 	if !d.isMachineInPausedState() {
-		err = fmt.Errorf("System is already running, or done with the run")
-		return "", err
+		return "", responses.ErrorAlreadyPausedState
 	}
 
 	// TODO: Check if adding && !d.isCompletionBitSet() is suited below
@@ -119,13 +122,13 @@ func (d *Compact32Deck) Resume() (response string, err error) {
 	}
 
 	if d.IsHeaterInProgress() {
-		response, err = d.switchOnHeater()
+		response, err = d.startHeater()
 		if err != nil {
 			return
 		}
 	}
 	if d.IsShakerInProgress() {
-		response, err = d.switchOnShaker()
+		response, err = d.startShaker()
 		if err != nil {
 			return
 		}
@@ -153,7 +156,6 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 			logger.Errorln("From deck ", d.name, err)
 			return "", err
 		}
-		d.setAborted()
 		return "ABORT UV LIGHT SUCCESS", nil
 	}
 

@@ -20,7 +20,7 @@ func createMotorHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(m)
+		valid, respBytes := Validate(m)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -56,7 +56,7 @@ func updateMotorHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(m)
+		valid, respBytes := Validate(m)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

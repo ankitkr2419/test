@@ -148,6 +148,23 @@ export const runPid = (token, deckName) => ({
   },
 });
 
+//websocket shaker PID action creators
+export const pidInProgress = () => ({
+  type: pidActions.pidActionProgressing,
+});
+
+export const pidInSuccess = () => ({
+  type: pidActions.pidActionProgressSuccess,
+});
+
+export const pidInError = () => ({
+  type: pidActions.pidActionFailure,
+});
+
+export const pidInAborted = () => ({
+  type: pidActions.pidActionProgressAbort,
+});
+
 export const runPidFailed = (errorResponse) => ({
   type: pidActions.pidActionFailure,
   payload: {

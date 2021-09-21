@@ -276,10 +276,22 @@ export const pidReducer = (state = pidInitialState, action) => {
     case pidActions.pidActionInitiated:
       return pidInitialState;
 
-    case pidActions.pidActionSuccess:
+    case pidActions.pidActionProgressing:
       return state.merge({
         isLoading: false,
         pidStatus: PID_STATUS.running,
+      });
+
+    case pidActions.pidActionProgressSuccess:
+      return state.merge({
+        isLoading: false,
+        pidStatus: PID_STATUS.progressComplete,
+      });
+
+    case pidActions.pidActionProgressAbort:
+      return state.merge({
+        isLoading: false,
+        pidStatus: PID_STATUS.aborted,
       });
 
     case pidActions.pidActionFailure:
@@ -356,6 +368,7 @@ export const abortReducer = (state = abortInitialState, action) => {
     case abortActions.abortActionInitiated:
       return state.merge({
         isLoading: true,
+        abortStatus: "aborting",
       });
 
     case abortActions.abortActionSuccess:

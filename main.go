@@ -5,6 +5,7 @@ import (
 
 	"flag"
 	"mylab/cpagent/config"
+	"mylab/cpagent/csv"
 	"mylab/cpagent/db"
 
 	"mylab/cpagent/plc/simulator"
@@ -103,7 +104,7 @@ var cliCommand = []cli.Command{
 		},
 		Action: func(c *cli.Context) error {
 			logger.Infoln("Importing CSV named -->", c.String("csv"))
-			return db.ImportCSV(c.String("csv"))
+			return csv.ImportCSV(c.String("csv"))
 		},
 	},
 	{

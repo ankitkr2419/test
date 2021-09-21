@@ -47,7 +47,7 @@ func createStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(t)
+		valid, respBytes := Validate(t)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -93,7 +93,7 @@ func updateStepHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(t)
+		valid, respBytes := Validate(t)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

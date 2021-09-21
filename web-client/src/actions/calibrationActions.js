@@ -34,6 +34,9 @@ export const pidActions = {
   pidAbortActionInitiated: "PID_ABORT_INITIATED",
   pidAbortActionSuccess: "PID_ABORT_SUCCESS",
   pidAbortActionFailure: "PID_ABORT_FAILURE",
+  pidActionProgressing: "PID_PROGRESSING",
+  pidActionProgressSuccess: "PID_PROGRESS_SUCCEEDED",
+  pidActionProgressAbort: "PID_PROGRESS_ABORTED",
 };
 
 export const fetchPidDetailsActions = {
