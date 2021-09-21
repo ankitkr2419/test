@@ -212,6 +212,7 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
 		return responses.RecipeFetchError
 	}
+	//fetch cartridge type using id
 	var cartridgeID int64
 
 	err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)

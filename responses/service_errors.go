@@ -55,10 +55,11 @@ var (
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
 	TipOperationConvertError    = fmt.Errorf("error converting tip operation to its specific type")
 
-	TipTubeDecodeError    = fmt.Errorf("error decoding tip tube record")
-	TipTubeCreateError    = fmt.Errorf("error creating tip tube record")
-	TipTubeFetchError     = fmt.Errorf("error fetching tip tube record")
-	TipTubeArgumentsError = fmt.Errorf("error invalid tip tube arguments")
+	TipTubeDecodeError       = fmt.Errorf("error decoding tip tube record")
+	TipTubeCreateError       = fmt.Errorf("error creating tip tube record")
+	TipTubeFetchError        = fmt.Errorf("error fetching tip tube record")
+	TipTubeArgumentsError    = fmt.Errorf("error invalid tip tube arguments")
+	TipTubeCreateConfigError = fmt.Errorf("error creating tip tube config")
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
@@ -84,7 +85,7 @@ var (
 	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
 	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
 	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
-	RecipeRunError   	  = fmt.Errorf("error occured while recipe was running")
+	RecipeRunError        = fmt.Errorf("error occured while recipe was running")
 	RecipeWasPausedError  = fmt.Errorf("error running recipe was paused atleast once")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
@@ -191,11 +192,13 @@ var (
 	DyeToleranceDecodeError = fmt.Errorf("error decoding dye tolerance data!")
 	InvalidKitIDError       = fmt.Errorf("error invalid kit id!")
 
-	ConsumableDistanceDecodeError    = fmt.Errorf("error decoding consumable distance record")
-	ConsumableDistanceCreateError    = fmt.Errorf("error creating consumable distance record")
-	ConsumableDistanceFetchError     = fmt.Errorf("error fetching consumable distance record")
-	ConsumableDistanceArgumentsError = fmt.Errorf("error invalid consumable distance arguments")
-	ConsumableDistanceUpdateError    = fmt.Errorf("error updating Consumable distance record")
+	ConsumableDistanceDecodeError       = fmt.Errorf("error decoding consumable distance record")
+	ConsumableDistanceCreateError       = fmt.Errorf("error creating consumable distance record")
+	ConsumableDistanceFetchError        = fmt.Errorf("error fetching consumable distance record")
+	ConsumableDistanceArgumentsError    = fmt.Errorf("error invalid consumable distance arguments")
+	ConsumableDistanceUpdateError       = fmt.Errorf("error updating Consumable distance record")
+	ConsumableDistanceUpdateConfigError = fmt.Errorf("error updating Consumable distance config")
+	CartridgeCreateConfigError          = fmt.Errorf("error creating Cartridge config")
 
 	DyeDecodeError = fmt.Errorf("error decoding dyes record")
 	DyeFetchError  = fmt.Errorf("error fetching dyes record")
