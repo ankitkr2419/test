@@ -6,11 +6,7 @@ import { Icon, Text } from "shared-components";
 import { PID_STATUS } from "appConstants";
 
 const PidProgressComponent = (props) => {
-  const { pidStatus, abortStatus, handleBtnClick } = props;
-  let abortBtnLabel = "Abort";
-  if (abortStatus === "aborting" || abortStatus === "aborted") {
-    abortBtnLabel = "Aborting...";
-  }
+  const { pidStatus, handleBtnClick } = props;
 
   return (
     <div className="d-flex align-items-center mr-3">
@@ -21,7 +17,7 @@ const PidProgressComponent = (props) => {
         {pidStatus === PID_STATUS.running ? (
           <div className="d-flex">
             <Spinner size="sm" />
-            <Text className="m-auto">{abortBtnLabel}</Text>
+            <Text className="m-auto">Abort</Text>
           </div>
         ) : (
           "Start PID"
