@@ -498,16 +498,6 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 	// 1.
 	setLidPIDTuningInProgress()
 	defer resetLidPIDTuningInProgress()
-
-	// 2.
-	// ASK: @ketan if below temp is to be multiplied by 10
-	result, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][460], uint16(config.GetLidPIDTemp()*10))
-	if err != nil {
-		logger.Errorln("Error failed to write lid pid temperature: ", err)
-		return err
-	}
-	logger.Infoln("result from lid pid temperature set ", result, config.GetLidPIDTemp())
-
 	// Start PID for deck
 	// 3.
 	err = d.switchOnLidPIDCalibration()
@@ -515,7 +505,18 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 		return
 	}
 
+	// 2.
+	// ASK: @ketan if below temp is to be multiplied by 10
+	result, err := d.Driver.WriteSingleRegister(plc.MODBUS["D"][134], uint16(config.GetLidPIDTemp()*10))
+	if err != nil {
+		logger.Errorln("Error failed to write lid pid temperature: ", err)
+		return err
+	}
+	logger.Infoln("result from lid pid temperature set ", result, config.GetLidPIDTemp())
+
 	d.WsMsgCh <- "PROGRESS_LidPIDTuning_LidPIDTuningStarted"
+
+	d.switchOnLidTemp()
 
 	// Reset PID in defer
 	defer d.switchOffLidPIDCalibration()
@@ -548,11 +549,7 @@ func resetLidPIDTuningInProgress() {
 }
 
 func (d *Compact32) switchOnLidPIDCalibration() (err error) {
-	err = d.switchOnLidTemp()
-	if err != nil {
-		logger.Errorln("Switch ON Lid Temp error")
-		return
-	}
+
 	// Switch On Lid PID Tuning
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.ON)
 	if err != nil {
@@ -560,6 +557,12 @@ func (d *Compact32) switchOnLidPIDCalibration() (err error) {
 		return
 	}
 	logger.WithField("LID PID TEMP ON", "LID PID TEMP SWITCHED ON").Infoln("LID PID TEMP SWITCHED ON")
+
+	err = d.switchOnLidTemp()
+	if err != nil {
+		logger.Errorln("Switch ON Lid Temp error")
+		return
+	}
 	return
 }
 
@@ -568,7 +571,7 @@ func (d *Compact32) switchOffLidPIDCalibration() (err error) {
 	err = d.SwitchOffLidTemp()
 	if err != nil {
 		return
-	} 
+	}
 	// Off Lid PID Tuning
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.OFF)
 	if err != nil {
@@ -585,7 +588,7 @@ func (d *Compact32) readLidPIDCompletion() (pidTuningDone bool, err error) {
 		return false, responses.LidPidTuningOffError
 	}
 
-	result, err := d.Driver.ReadCoils(plc.MODBUS["M"][43], 1)
+	result, err := d.Driver.ReadSingleRegister(plc.MODBUS["D"][504])
 	if err != nil {
 		logger.WithField("LID PID ERR", err).Errorln("Error Reading M43")
 		return false, err
@@ -593,7 +596,7 @@ func (d *Compact32) readLidPIDCompletion() (pidTuningDone bool, err error) {
 
 	logger.Infoln("readLidPIDCompletion result: ", result)
 
-	if result[0] == 44 {
+	if result == 4 {
 		return true, nil
 	}
 
