@@ -82,7 +82,7 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 			logger.Errorln(err)
 			return
 		}
-		time.Sleep(10 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 
 	logger.Infoln(responses.ShakerPIDCalibrationSuccess)
