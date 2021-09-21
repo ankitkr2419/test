@@ -26,8 +26,12 @@ func createMotorHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go db.SetMotorsValues([]db.Motor{m})
-
+		err = db.SetMotorsValues([]db.Motor{m})
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			logger.WithField("err", err.Error()).Error("Error while inserting motor config")
+			return
+		}
 		err = deps.Store.InsertMotor(req.Context(), []db.Motor{m})
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -62,12 +66,17 @@ func updateMotorHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go db.UpdateMotorsValues([]db.Motor{m})
+		err = db.UpdateMotorsValues([]db.Motor{m})
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Error while while updating motor config"})
+			logger.WithField("err", err.Error()).Error("Error while updating motor config")
+			return
+		}
 
 		err = deps.Store.UpdateMotor(req.Context(), m)
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Error while while inserting motor"})
-			logger.WithField("err", err.Error()).Error("Error while inserting motor")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: "Error while while updating motor"})
+			logger.WithField("err", err.Error()).Error("Error while updating motor")
 			return
 		}
 

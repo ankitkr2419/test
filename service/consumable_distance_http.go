@@ -94,14 +94,19 @@ func updateConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ConsumableDistanceDecodeError.Error()})
 			return
 		}
+		err = db.UpdateConsumableDistancesValues([]db.ConsumableDistance{adobj})
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ConsumableDistanceUpdateConfigError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConsumableDistanceUpdateConfigError.Error()})
+			return
+		}
+
 		err = deps.Store.UpdateConsumableDistance(req.Context(), adobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.ConsumableDistanceUpdateError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConsumableDistanceUpdateError.Error()})
 			return
 		}
-
-		go db.UpdateConsumableDistancesValues([]db.ConsumableDistance{adobj})
 
 		logger.Infoln(responses.ConsumableDistanceUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ConsumableDistanceUpdateSuccess})
