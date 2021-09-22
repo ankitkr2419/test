@@ -62,6 +62,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		816: uint16(0x1330), //start address of register For VIC (R)
 		832: uint16(0x1340), //start address of register For ROX (R)
 		848: uint16(0x1350), //start address of register For CY5 (R)
+		504: uint16(0x11F8), // PID Tuning Completed (4 = DONE)
+		452: uint16(0x11C4), // not used
 
 		// 864: uint16(0x1360), //start address of register For CY5
 		// 880: uint16(0x1370), //start address of register For CY5
