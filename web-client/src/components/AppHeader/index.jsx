@@ -4,7 +4,7 @@ import { useHistory, useLocation } from "react-router";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
-import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
+import { Logo, ButtonIcon, Text, MlModal, WhiteLight } from "shared-components";
 import {
   logoutInitiated,
   loginReset,
@@ -46,6 +46,7 @@ import {
 } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
+import { whiteLightInitiated } from "action-creators/whiteLightActionCreators";
 
 const AppHeader = (props) => {
   const {
@@ -72,6 +73,7 @@ const AppHeader = (props) => {
   const createExperimentReducer = useSelector(
     (state) => state.createExperimentReducer
   );
+  const whiteLightReducer = useSelector((state) => state.whiteLightReducer);
 
   const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -82,6 +84,7 @@ const AppHeader = (props) => {
   const isExpanded = createExperimentReducer.get("isExpanded");
   const result = createExperimentReducer.get("result");
   const btnProps = getBtnPropObj(result);
+  const { isLightOn } = whiteLightReducer.toJS();
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
@@ -257,10 +260,18 @@ const AppHeader = (props) => {
     const redirectPath = getRedirectObj(currentPathname).redirectPath;
     history.push(redirectPath);
   };
-  
+
   const handleManageUsersClick = () => {
     history.push(ROUTES.users);
-  }
+  };
+
+  const handleWhiteLightClick = () => {
+    if (isLightOn === true) {
+      // dispatch(whiteLightInitiated())
+    } else {
+      // dispatch(whiteLightInitiated())
+    }
+  };
 
   return (
     <Header>
@@ -285,6 +296,15 @@ const AppHeader = (props) => {
           )}
         </Nav>
       )}
+
+      {/* White Light Switch */}
+      {app === APP_TYPE.EXTRACTION && (
+        <WhiteLight
+          isLightOn={isLightOn}
+          handleWhiteLightClick={handleWhiteLightClick}
+        />
+      )}
+
       {isUserLoggedIn && (
         <div className="header-elements d-flex align-items-center ml-auto">
           {/* <PrintDataModal /> */}
@@ -501,18 +521,20 @@ const AppHeader = (props) => {
             />
           )}
 
-          {/**Uncomment this when required to add these features */}
-          {/* <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
-            <ActionBtnListItem>
-              <Icon name="setting" size={18} />
-            </ActionBtnListItem>
-            <ActionBtnListItem>
-              <Icon name="notifications" size={18} />
-            </ActionBtnListItem>
-            <ActionBtnListItem>
-              <Icon name="menu" size={18} />
-            </ActionBtnListItem>
-          </ActionBtnList> */}
+          {/* <Dropdown isOpen={menuDropdownOpen} toggle={toggleMenuClick}>
+              <DropdownToggle icon name="menu" size={18} />
+              <DropdownMenu right>
+                <DropdownItem>
+                  <Switch
+                    id="whiteLightSwitch"
+                    name="whiteLightSwitch"
+                    label="White Light"
+                    checked={whiteLightIsOn}
+                    onChange={handleWhiteLightClick}
+                  />
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown> */}
         </div>
       )}
     </Header>

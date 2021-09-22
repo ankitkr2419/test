@@ -204,6 +204,7 @@ export const API_ENDPOINTS = {
   consumable: "consumable-distance",
   dyeCalibration: "optical-caliberation",
   users: "users",
+  whiteLight: "whiteLight",
 };
 
 export const MODAL_MESSAGE = {
