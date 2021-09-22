@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"mylab/cpagent/config"
+	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
-	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -83,7 +83,19 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 			logger.Errorln(err)
 			return
 		}
-		time.Sleep(2 * time.Second)
+		_, err = d.AddDelay(db.Delay{DelayTime: 10}, false)
+		if err != nil {
+			logger.Errorln(err)
+			return
+		}
+	}
+
+	// Wait for 10 sec for PID Tuning Completion
+	logger.Infoln(responses.ShakerPIDCalibrationWait)
+	_, err = d.AddDelay(db.Delay{DelayTime: 120}, false)
+	if err != nil {
+		logger.Errorln(err)
+		return
 	}
 
 	logger.Infoln(responses.ShakerPIDCalibrationSuccess)
