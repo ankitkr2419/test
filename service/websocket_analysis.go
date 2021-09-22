@@ -310,36 +310,38 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 					wellResult.TotalCycles = bl.EndCycle
 					if r.Cycle <= bl.EndCycle && r.Cycle >= bl.StartCycle {
 						sum = sum + r.FValue
-						wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
-						wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
+
 					}
+					wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
+					wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
 				}
 			}
 			avg = float32(sum / bl.EndCycle)
 			targetSum = targetSum + avg
-			logger.Infoln("targetSum", targetSum)
 			tempGraph = append(tempGraph, wellResult)
 			wellResult.Cycle = []uint16{}
 			wellResult.FValue = []float32{}
 		}
 
 		targetAverage[t.TargetID] = targetSum / float32(len(wells))
-		logger.Infoln("targetAvg", targetAverage)
 
 	}
 	for _, v := range tempGraph {
-		v.FValue = calculateBaselineValues(v.FValue, targetAverage[v.TargetID])
+		for i, cycle := range v.Cycle {
+			if cycle <= bl.EndCycle && cycle >= bl.StartCycle {
+				v.FValue[i] = calculateBaselineValues(v.FValue[i], targetAverage[v.TargetID])
+			}
+		}
 		baselineValues = append(baselineValues, v)
 	}
 	return
 }
 
-func calculateBaselineValues(array []float32, average float32) (deviation []float32) {
-	for _, v := range array {
-		value := v - average
-		graphVal := scaleThreshold(value)
-		deviation = append(deviation, graphVal)
-	}
+func calculateBaselineValues(val float32, average float32) (deviation float32) {
+
+	value := val - average
+	deviation = value
+
 	return
 }
 
