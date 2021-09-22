@@ -182,6 +182,9 @@ func (d *Compact32) HomingRTPCR() (err error) {
 		logger.Error("WriteSingleCoil:M36 : Start Cycle")
 		return
 	}
+
+	logger.Infoln("HOMING Bit Reset M36")
+
 	logger.WithField("HOMING", "homing started").Infoln("HOMING STARTED")
 	time.Sleep(time.Second * time.Duration(config.GetHomingTime()))
 	result, err := d.Driver.ReadCoils(plc.MODBUS["M"][36], uint16(1))
@@ -199,6 +202,23 @@ func (d *Compact32) HomingRTPCR() (err error) {
 			return
 		}
 	}
+
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][36], plc.OFF)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M36 : Start Cycle")
+		return
+	}
+
+	logger.Infoln("HOMING Bit Reset M36")
+
+	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][45], plc.OFF)
+	if err != nil {
+		logger.Error("WriteSingleCoil:M45 : Start Cycle")
+		return
+	}
+
+	logger.Infoln("HOMING Bit Reset M45")
+
 	// Also Reset
 	return d.Reset()
 }
@@ -266,9 +286,9 @@ func (d *Compact32) Cycle() (err error) {
 		return
 	}
 	logger.WithField("CYCLE RTPCR", "LED SWITCHED ON").Infoln("cycle started")
-	err = plc.HoldSleep(int32(config.GetCycleTime()))
+
+	err = d.checkCycleCompletion()
 	if err != nil {
-		logger.Errorln("Error while running cycle: ", err)
 		return
 	}
 
@@ -276,6 +296,32 @@ func (d *Compact32) Cycle() (err error) {
 
 	go d.HomingRTPCR()
 	return
+}
+
+func (d *Compact32) checkCycleCompletion() (err error) {
+
+	var result []byte
+	for {
+		if !plc.ExperimentRunning {
+			logger.Errorln("experiment has stoped running")
+			return errors.New("experiment has stoped running")
+		}
+
+		result, err = d.Driver.ReadCoils(plc.MODBUS["M"][45], uint16(1))
+		if err != nil {
+			logger.Error("ReadCoil:M45 ", err)
+			return
+		}
+
+		logger.Warnln("M45", result)
+
+		if result[0] == 45 {
+			logger.Warnln("Cycle completed")
+			return
+		}
+		time.Sleep(2 * time.Second)
+	}
+
 }
 
 // Monitor periodically. If CycleComplete == true, Scan will be populated
@@ -568,7 +614,7 @@ func (d *Compact32) switchOffLidPIDCalibration() (err error) {
 	err = d.SwitchOffLidTemp()
 	if err != nil {
 		return
-	} 
+	}
 	// Off Lid PID Tuning
 	err = d.Driver.WriteSingleCoil(plc.MODBUS["M"][42], plc.OFF)
 	if err != nil {
@@ -616,4 +662,5 @@ func (d *Compact32) SetScanSpeedAndScanTime() (err error) {
 	}
 	logger.Infoln("result from scan time set ", result, config.GetScanTime())
 	return
+
 }
