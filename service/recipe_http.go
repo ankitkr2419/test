@@ -66,7 +66,7 @@ func createRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(recipe)
+		valid, respBytes := Validate(recipe)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.RecipeValidationError)
 			responseBadRequest(rw, respBytes)
@@ -201,7 +201,7 @@ func updateRecipeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(recipe)
+		valid, respBytes := Validate(recipe)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.RecipeValidationError)
 			responseBadRequest(rw, respBytes)

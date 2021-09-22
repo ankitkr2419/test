@@ -49,15 +49,7 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 
 	// Set Temperature
 	//Set Temperature for heater
-	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(config.GetPIDTemp()*10))
-	if err != nil {
-		logger.Errorln("Error failed to write temperature: ", err)
-		return err
-	}
-	logger.Infoln("result from temperature set ", result, config.GetPIDTemp())
-
-	// Start Heater
-	_, err = d.switchOnHeater()
+	_, err = d.switchOnHeater(uint16(config.GetPIDTemp() * 10))
 	if err != nil {
 		return
 	}
@@ -81,12 +73,16 @@ func (d *Compact32Deck) PIDCalibration(ctx context.Context) (err error) {
 	// Check if pid tuning is Done
 	// 4.
 	for !pidTuningDone {
+		if d.isMachineInAbortedState() {
+			err = responses.AbortedError
+			return
+		}
 		pidTuningDone, err = d.readShakerPIDCompletion()
 		if err != nil {
 			logger.Errorln(err)
 			return
 		}
-		time.Sleep(10 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 
 	logger.Infoln(responses.ShakerPIDCalibrationSuccess)
@@ -101,6 +97,9 @@ func (d *Compact32Deck) readShakerPIDCompletion() (pidTuningDone bool, err error
 		return false, responses.AbortedError
 	}
 
+	if d.isMachineInAbortedState() {
+		return false, responses.AbortedError
+	}
 	if shaker1PIDDone {
 		goto skipReadingShaker1PIDStatus
 	}
@@ -119,6 +118,9 @@ func (d *Compact32Deck) readShakerPIDCompletion() (pidTuningDone bool, err error
 	}
 
 skipReadingShaker1PIDStatus:
+	if d.isMachineInAbortedState() {
+		return false, responses.AbortedError
+	}
 
 	if shaker2PIDDone {
 		goto skipReadingShaker2PIDStatus

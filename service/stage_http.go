@@ -55,7 +55,7 @@ func updateStageHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(t)
+		valid, respBytes := Validate(t)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

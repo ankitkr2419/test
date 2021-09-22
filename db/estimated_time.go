@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"math"
 	"mylab/cpagent/config"
+
+	"github.com/google/uuid"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -12,9 +13,11 @@ import (
 const (
 	degreesPerSec = 0.25
 	RoomTempRamp  = 6
+	Hold          = "hold"
+	Cycle         = "cycle"
 )
 
-var currentTemp float64
+var CurrentTemp float64
 
 // ALGORITHM
 // 1. Get Stage ID from Step
@@ -54,7 +57,7 @@ func UpdateEstimatedTimeByTemplateID(ctx context.Context, s Storer, templateID u
 		return
 	}
 
-	currentTemp := config.GetRoomTemp()
+	CurrentTemp := config.GetRoomTemp()
 
 	// Set Only Lid Temp and Homing Time
 	var estimatedTime, firstStepTargetTemp, firstStepTargetRamp float64
@@ -82,16 +85,16 @@ func UpdateEstimatedTimeByTemplateID(ctx context.Context, s Storer, templateID u
 				firstStepTargetTemp = float64(st.TargetTemperature)
 				firstStepTargetRamp = float64(st.RampRate)
 			}
-			tp += math.Abs(currentTemp-float64(st.TargetTemperature)) / float64(st.RampRate)
+			tp += math.Abs(CurrentTemp-float64(st.TargetTemperature)) / float64(st.RampRate)
 			tp += float64(st.HoldTime)
-			currentTemp = float64(st.TargetTemperature)
+			CurrentTemp = float64(st.TargetTemperature)
 			// handle the difference at last step
 			if i == len(steps)-1 {
-				tp += math.Abs(currentTemp-firstStepTargetTemp) / firstStepTargetRamp
+				tp += math.Abs(CurrentTemp-firstStepTargetTemp) / firstStepTargetRamp
 			}
 		}
 
-		if stage.Type == cycle {
+		if stage.Type == Cycle {
 			estimatedTime += tp * float64(stage.RepeatCount)
 			// Add extra Homing Cycles Time
 			if config.GetNumHomingCycles() != 0 {
@@ -104,7 +107,7 @@ func UpdateEstimatedTimeByTemplateID(ctx context.Context, s Storer, templateID u
 	}
 
 	// Last step to go back to Room Temp
-	estimatedTime += math.Abs(currentTemp-config.GetRoomTemp()) / RoomTempRamp
+	estimatedTime += math.Abs(CurrentTemp-config.GetRoomTemp()) / RoomTempRamp
 	logger.Infoln("Estimated Time : ", estimatedTime)
 
 	return s.UpdateEstimatedTime(ctx, templateID, int64(estimatedTime))

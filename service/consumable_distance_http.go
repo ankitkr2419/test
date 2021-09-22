@@ -19,7 +19,7 @@ func createConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(cd)
+		valid, respBytes := Validate(cd)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -94,6 +94,13 @@ func updateConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.ConsumableDistanceDecodeError.Error()})
 			return
 		}
+		err = db.UpdateConsumableDistancesValues([]db.ConsumableDistance{adobj})
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ConsumableDistanceUpdateConfigError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConsumableDistanceUpdateConfigError.Error()})
+			return
+		}
+
 		err = deps.Store.UpdateConsumableDistance(req.Context(), adobj)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.ConsumableDistanceUpdateError)

@@ -31,7 +31,7 @@ func updateTECConfigHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(tc)
+		valid, respBytes := Validate(tc)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -65,7 +65,7 @@ func updateRTPCRConfigHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(rt)
+		valid, respBytes := Validate(rt)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -106,7 +106,7 @@ func updateExtractionConfigHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(ex)
+		valid, respBytes := Validate(ex)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -141,7 +141,7 @@ func updateCommonConfigHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(co)
+		valid, respBytes := Validate(co)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
