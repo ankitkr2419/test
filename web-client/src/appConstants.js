@@ -641,6 +641,12 @@ export const TEMPERATURE_GRAPH_OPTIONS = {
   },
 };
 
+// default min values for amplification plot
+export const DEFAULT_MIN_VALUE = {
+  yAxisMin: 0,
+  xAxisMin: 1,
+};
+
 //analyse data graph constants
 export const GRAY_COLOR = "rgba(148,147,147,1)";
 export const PINK_COLOR = "rgba(245,144,178,1)";

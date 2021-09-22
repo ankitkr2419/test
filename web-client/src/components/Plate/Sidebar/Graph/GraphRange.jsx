@@ -10,6 +10,7 @@ import {
   disbleResetBtn,
 } from "./helper";
 import { getMaxThreshold } from "components/Plate/helpers";
+import { DEFAULT_MIN_VALUE } from "appConstants";
 
 const GraphRange = (props) => {
   const {
@@ -60,6 +61,26 @@ const GraphRange = (props) => {
   const resetBtnHandler = () => {
     const maxThreshold = getMaxThreshold(targets.toJS());
     handleResetBtn(nCycles, maxThreshold);
+
+    const { xMax, xMin, yMax, yMin } = formik.values;
+    const { yAxisMin, xAxisMin } = DEFAULT_MIN_VALUE;
+
+    // if values are empty, pre-fill input fields
+    if (
+      xMax.value === null ||
+      xMax.value === "" ||
+      xMin.value === null ||
+      xMin.value === "" ||
+      yMax.value === null ||
+      yMax.value === "" ||
+      yMin.value === null ||
+      yMin.value === ""
+    ) {
+      formik.setFieldValue("xMin.value", xAxisMin);
+      formik.setFieldValue("xMax.value", nCycles);
+      formik.setFieldValue("yMin.value", yAxisMin);
+      formik.setFieldValue("yMax.value", maxThreshold);
+    }
   };
 
   return (

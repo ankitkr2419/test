@@ -9,7 +9,7 @@ import generatePdfIcon from "assets/images/generatePdfIcon.svg";
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
 import SampleSideBarContainer from "containers/SampleSideBarContainer";
-import { EXPERIMENT_STATUS } from "appConstants";
+import { DEFAULT_MIN_VALUE, EXPERIMENT_STATUS } from "appConstants";
 import Header from "./Header";
 
 import GridComponent from "./Grid";
@@ -284,10 +284,11 @@ const Plate = (props) => {
     setDataFromAPI(true);
 
     const { xMax, xMin, yMax, yMin } = requestBody;
+    const { yAxisMin, xAxisMin } = DEFAULT_MIN_VALUE;
 
-    const xMinValue = Number.isNaN(xMin) ? 0 : xMin;
+    const xMinValue = Number.isNaN(xMin) ? xAxisMin : xMin;
     const xMaxValue = Number.isNaN(xMax) ? nCycles : xMax;
-    const yMinValue = Number.isNaN(yMin) ? 0 : yMin;
+    const yMinValue = Number.isNaN(yMin) ? yAxisMin : yMin;
     const yMaxValue = Number.isNaN(yMax) ? maxThreshold : yMax;
 
     updateRangeState({ type: rangeActions.UPDATE_X_MAX, value: xMaxValue });
