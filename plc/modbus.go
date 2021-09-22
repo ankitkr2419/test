@@ -62,6 +62,8 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		816: uint16(0x1330), //start address of register For VIC (R)
 		832: uint16(0x1340), //start address of register For ROX (R)
 		848: uint16(0x1350), //start address of register For CY5 (R)
+		504: uint16(0x11F8), // PID Tuning Completed (4 = DONE)
+		452: uint16(0x11C4), // not used
 
 		// 864: uint16(0x1360), //start address of register For CY5
 		// 880: uint16(0x1370), //start address of register For CY5
@@ -89,6 +91,7 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		36:  uint16(0x0824), // homing success (R)
 		42:  uint16(0x082A), //register for Lid PID Tuning set/reset
 		43:  uint16(0x082B), //register for Lid PID Tuning Completion status
+		45:  uint16(0x082D), //register for Cycle completion
 		101: uint16(0x0865), // homing error (R)
 		// 102: uint16(0x0866), // Start / Stop Cycle (W)
 		103: uint16(0x0867), // UnUsed
