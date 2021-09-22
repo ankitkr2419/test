@@ -89,6 +89,7 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		36:  uint16(0x0824), // homing success (R)
 		42:  uint16(0x082A), //register for Lid PID Tuning set/reset
 		43:  uint16(0x082B), //register for Lid PID Tuning Completion status
+		45:  uint16(0x082D), //register for Cycle completion
 		101: uint16(0x0865), // homing error (R)
 		// 102: uint16(0x0866), // Start / Stop Cycle (W)
 		103: uint16(0x0867), // UnUsed
