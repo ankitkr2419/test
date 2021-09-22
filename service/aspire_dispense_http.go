@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -45,10 +47,17 @@ func createAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(adobj)
+		valid, respBytes := Validate(adobj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.AspireDispenseValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = ValidateAspireDispenceObject(req.Context(), deps, adobj, recipeID)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(err.Error())
 			return
 		}
 
@@ -141,10 +150,24 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(adobj)
+		valid, respBytes := Validate(adobj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.AspireDispenseValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		process, err := deps.Store.ShowProcess(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
+			return
+		}
+
+		err = ValidateAspireDispenceObject(req.Context(), deps, adobj, process.RecipeID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
 
@@ -166,4 +189,84 @@ func updateAspireDispenseHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.AspireDispenseUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.AspireDispenseUpdateSuccess})
 	})
+}
+
+// ValidateAspireDispenceObject this can be called by CSV
+func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.AspireDispense, recipeID uuid.UUID) (err error) {
+
+	var aspireCartridgeWell, dispenseCartridgeWell plc.UniqueCartridge
+
+	//check for source position validity
+	if ad.SourcePosition == 0 && ad.Category != db.SW && ad.Category != db.SD {
+		return responses.InvalidSourcePosition
+	}
+
+	//check for destination validity
+	if ad.DestinationPosition == 0 && ad.Category != db.WS && ad.Category != db.DS {
+		return responses.InvalidDestinationPosition
+	}
+
+	//check cartridge type from recipe
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return responses.RecipeFetchError
+	}
+	//fetch cartridge type using id
+	var cartridgeID int64
+
+	err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
+	if err != nil {
+		return err
+	}
+
+	aspireCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.SourcePosition)
+	dispenseCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.DestinationPosition)
+
+	switch ad.Category {
+	case db.SD:
+		if isDeckPositionInvalid(ad.DestinationPosition) {
+			return responses.InvalidDestinationPosition
+		}
+
+	case db.DS:
+		if isDeckPositionInvalid(ad.SourcePosition) {
+			return responses.InvalidSourcePosition
+		}
+
+	case db.DD:
+		if isDeckPositionInvalid(ad.DestinationPosition) {
+			return responses.InvalidDestinationPosition
+		}
+		if isDeckPositionInvalid(ad.SourcePosition) {
+			return responses.InvalidSourcePosition
+		}
+	case db.WW:
+		// send cartridge and both height for validation
+		if !plc.IsCartridgeWellHeightSafe(aspireCartridgeWell, ad.AspireHeight) {
+			return responses.InvalidAspireWell
+		}
+		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
+			return responses.InvalidDispenseWell
+		}
+
+	case db.WD, db.WS:
+		// send cartridge and aspire height for validation
+		if !plc.IsCartridgeWellHeightSafe(aspireCartridgeWell, ad.AspireHeight) {
+			return responses.InvalidAspireWell
+		}
+		return
+	case db.DW, db.SW:
+		// send cartridge and dispense height for validation
+		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
+			return responses.InvalidDispenseWell
+		}
+	default:
+		return responses.InvalidCategoryAspireDispense
+
+	}
+
+	logger.Infoln(aspireCartridgeWell, dispenseCartridgeWell)
+
+	return
 }

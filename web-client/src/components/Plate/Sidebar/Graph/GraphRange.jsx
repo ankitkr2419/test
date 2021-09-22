@@ -1,19 +1,47 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { Text } from "shared-components";
 import { FormGroup, Label, Input, Button } from "core-components";
 import { useFormik } from "formik";
-import { formikInitialState, getRequestBody, disbleApplyBtn } from "./helper";
+import {
+  getFormikInitialState,
+  getRequestBody,
+  disbleApplyBtn,
+  disbleResetBtn,
+} from "./helper";
+import { getMaxThreshold } from "components/Plate/helpers";
 
 const GraphRange = (props) => {
-  const { className, handleRangeChangeBtn, handleResetBtn, headerData } = props;
+  const {
+    className,
+    handleRangeChangeBtn,
+    handleResetBtn,
+    headerData,
+    data,
+    targets,
+    isExpanded,
+    options,
+  } = props;
 
-  const { totalCycles, progressStatus } = headerData;
+  const { progressStatus } = headerData;
+  const nCycles = data?.labels?.length; // number of cycles
 
   const formik = useFormik({
-    initialValues: formikInitialState,
+    initialValues: getFormikInitialState(nCycles),
     enableReinitialize: true,
   });
+
+  useEffect(() => {
+    const {
+      scales: { xAxes, yAxes },
+    } = options;
+
+    // pre-fill values to show in the input fields after update/reset
+    formik.setFieldValue("xMin.value", xAxes[0].ticks.min);
+    formik.setFieldValue("xMax.value", xAxes[0].ticks.max);
+    formik.setFieldValue("yMin.value", yAxes[0].ticks.min);
+    formik.setFieldValue("yMax.value", yAxes[0].ticks.max);
+  }, [options]);
 
   const handleBlurChange = ({ name, value }) => {
     const { min, max } = formik.values[`${name}`];
@@ -21,6 +49,17 @@ const GraphRange = (props) => {
     if (value > max || value < min) {
       formik.setFieldValue(`${name}.isInvalid`, true);
     }
+  };
+
+  const applyBtnHandler = () => {
+    const requestBody = getRequestBody(formik.values);
+    const maxThreshold = getMaxThreshold(targets.toJS());
+    handleRangeChangeBtn(requestBody, nCycles, maxThreshold);
+  };
+
+  const resetBtnHandler = () => {
+    const maxThreshold = getMaxThreshold(targets.toJS());
+    handleResetBtn(nCycles, maxThreshold);
   };
 
   return (
@@ -38,9 +77,7 @@ const GraphRange = (props) => {
             className="px-2 py-1 ml-2"
             placeholder="Min value"
             value={formik.values.xMin.value}
-            onChange={(e) =>
-              formik.setFieldValue("xMin.value", parseInt(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("xMin.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`xMin.isInvalid`, false)}
           />
@@ -51,9 +88,7 @@ const GraphRange = (props) => {
             className="px-2 py-1 ml-2"
             placeholder="Max value"
             value={formik.values.xMax.value}
-            onChange={(e) =>
-              formik.setFieldValue("xMax.value", parseInt(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("xMax.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`xMax.isInvalid`, false)}
           />
@@ -63,24 +98,22 @@ const GraphRange = (props) => {
           <Input
             name="yMin"
             type="number"
+            step="0.1"
             className="px-2 py-1 ml-2"
             placeholder="Min value"
             value={formik.values.yMin.value}
-            onChange={(e) =>
-              formik.setFieldValue("yMin.value", parseInt(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("yMin.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`yMin.isInvalid`, false)}
           />
           <Input
             name="yMax"
             type="number"
+            step="0.1"
             className="px-2 py-1 ml-2"
             placeholder="Max value"
             value={formik.values.yMax.value}
-            onChange={(e) =>
-              formik.setFieldValue("yMax.value", parseInt(e.target.value))
-            }
+            onChange={(e) => formik.setFieldValue("yMax.value", e.target.value)}
             onBlur={(event) => handleBlurChange(event.target)}
             onFocus={() => formik.setFieldValue(`yMax.isInvalid`, false)}
           />
@@ -89,17 +122,18 @@ const GraphRange = (props) => {
           color="primary"
           size="sm"
           className="mb-3 ml-3"
-          onClick={() => handleRangeChangeBtn(getRequestBody(formik.values))}
-          disabled={disbleApplyBtn(formik.values, progressStatus)}
+          onClick={applyBtnHandler}
+          disabled={disbleApplyBtn(formik.values, progressStatus, isExpanded)}
         >
           Apply
         </Button>
         <Button
-          color="primary"
+          color="secondary"
           size="sm"
-          className="mb-3 ml-3"
-          onClick={handleResetBtn}
-          disabled={disbleApplyBtn(formik.values, progressStatus)}
+          outline={true}
+          className="mb-3 ml-3 border-2 border-gray "
+          onClick={resetBtnHandler}
+          disabled={disbleResetBtn(progressStatus, isExpanded)}
         >
           Reset
         </Button>

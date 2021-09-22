@@ -22,7 +22,23 @@ import (
 8. if yes then start heating let it reach to specified temperature and then start timer and after time switch heater off.
 9. Switch heater OFF
 */
-func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
+func (d *Compact32Deck) Heating(ht db.Heating, live bool) (response string, err error) {
+
+	defer func() {
+		if live {
+			d.ResetAborted()
+		}
+		if err != nil {
+			logger.Errorln(err)
+			if err == responses.AbortedError {
+				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
+				return
+			}
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+			return
+		}
+		d.WsMsgCh <- "SUCCESS_HeaterRun_HeaterRunSuccess"
+	}()
 
 	stopMonitor := make(chan bool, 1)
 
@@ -47,20 +63,10 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 		DelayTime: ht.Duration,
 	}
 
-	//Step 3: Set Temperature
-	//Set Temperature for heater
-	result, err := d.DeckDriver.WriteSingleRegister(MODBUS_EXTRACTION[d.name]["D"][208], uint16(ht.Temperature*10))
-	if err != nil {
-		logger.Errorln("Error failed to write temperature: ", err)
-		return "", err
-	}
-	logger.Infoln("result from temperature set ", result, ht.Temperature)
-
 	// Step 4 : Check if Aborted
 	// first check aborted if yes then exit
 	if d.isMachineInAbortedState() {
-		err = fmt.Errorf("Operation was ABORTED!")
-		return "", err
+		return "", responses.AbortedError
 	}
 
 	// Step 5 : Syringe To Rest Position
@@ -76,7 +82,7 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	// Step 6 : Switch heater on
 	//Heater on
-	response, err = d.switchOnHeater()
+	response, err = d.switchOnHeater(uint16(ht.Temperature * 10))
 	if err != nil {
 		logger.Errorln("error in switching heater on ", err)
 		return "", err
@@ -85,8 +91,8 @@ func (d *Compact32Deck) Heating(ht db.Heating) (response string, err error) {
 
 	// Step 9:  Switch heater OFF (Called in defer)
 	defer d.switchOffHeater()
-	d.setHeaterInProgress()
-	defer d.resetHeaterInProgress()
+
+	d.WsMsgCh <- "PROGRESS_HeaterRun_HeaterRunStarted"
 
 	// Step 7: For not follow Temp
 	// first check if not follow up then call delay function.
@@ -157,8 +163,7 @@ func (d *Compact32Deck) monitorTemperature(shakerNo uint16, temperature float64,
 			}
 
 			if d.isMachineInAbortedState() {
-				err = fmt.Errorf("operation was ABORTED \n")
-				return "ABORTED", err
+				return "ABORTED", responses.AbortedError
 			}
 
 			time.Sleep(time.Second * 2)

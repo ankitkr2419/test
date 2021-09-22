@@ -1,0 +1,1 @@
+ALTER TABLE piercing DROP COLUMN piercing_heights;

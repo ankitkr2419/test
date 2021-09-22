@@ -17,9 +17,19 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-const contextKeyUsername = "username"
-const contextKeyUserAuthID = "auth_id"
-const blank string = ""
+const (
+	contextKeyUsername          = "username"
+	contextKeyUserAuthID        = "auth_id"
+	blank                string = ""
+	// NOTE: These are version specific
+	maxDeckPosition  = 11
+	minAspDisDeckPos = 6
+	cartridge1Pos    = 8
+	cartridge2Pos    = 10
+	// Shaker Temp related ranges
+	minShakerTempAllowed = 20
+	maxShakerTempAllowed = 120
+)
 
 const (
 	hold  = "hold"
@@ -113,7 +123,7 @@ type MsgObj struct {
 	Deck string `json:"deck,omitempty"`
 }
 
-func validate(i interface{}) (valid bool, respBytes []byte) {
+func Validate(i interface{}) (valid bool, respBytes []byte) {
 
 	fieldErrors := make(map[string]string)
 

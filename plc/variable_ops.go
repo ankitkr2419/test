@@ -2,6 +2,7 @@ package plc
 
 import (
 	logger "github.com/sirupsen/logrus"
+	"time"
 )
 
 func (d *Compact32Deck) NameOfDeck() string {
@@ -52,16 +53,31 @@ func (d *Compact32Deck) setAborted() {
 	aborted.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetAborted() {
+func (d *Compact32Deck) ResetAborted() {
 	aborted.Store(d.name, false)
+	d.resetShakerInProgress()
+	d.resetHeaterInProgress()
+	d.resetShakerPIDCalibrationInProgress()
+	d.ResetRunInProgress()
+	d.ResetPaused()
 }
 
 func (d *Compact32Deck) SetPaused() {
 	paused.Store(d.name, true)
+	// Set Recipe Was Paused
+	d.setRecipeWasPaused()
 }
 
 func (d *Compact32Deck) ResetPaused() {
 	paused.Store(d.name, false)
+}
+
+func (d *Compact32Deck) setRecipeWasPaused() {
+	recipeWasPaused.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetRecipeWasPaused() {
+	recipeWasPaused.Store(d.name, false)
 }
 
 func (d *Compact32Deck) setHomed() {
@@ -80,12 +96,22 @@ func (d *Compact32Deck) resetUVLightInProgress() {
 	uvLightInProgress.Store(d.name, false)
 }
 
-func (d *Compact32Deck) setPIDCalibrationInProgress() {
-	pIDCalibrationInProgress.Store(d.name, true)
+func (d *Compact32Deck) setShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.name, true)
 }
 
-func (d *Compact32Deck) resetPIDCalibrationInProgress() {
-	pIDCalibrationInProgress.Store(d.name, false)
+func (d *Compact32Deck) resetShakerPIDCalibrationInProgress() {
+	shakerPIDCalibrationInProgress.Store(d.name, false)
+	shaker1PIDDone = false
+	shaker2PIDDone = false
+}
+
+func (d *Compact32Deck) setMotorOperationCompleted() {
+	motorOperationCompleted.Store(d.name, true)
+}
+
+func (d *Compact32Deck) resetMotorOperationCompleted() {
+	motorOperationCompleted.Store(d.name, false)
 }
 
 func (d *Compact32Deck) setHomingPercent(percent float64) {
@@ -94,6 +120,10 @@ func (d *Compact32Deck) setHomingPercent(percent float64) {
 
 func (d *Compact32Deck) SetCurrentProcessNumber(step int64) {
 	currentProcess.Store(d.name, step)
+}
+
+func (d *Compact32Deck) setRecipeStartTime() {
+	recipeStartTime.Store(d.name, time.Now())
 }
 
 func (d *Compact32Deck) IsMachineHomed() bool {
@@ -141,7 +171,16 @@ func (d *Compact32Deck) isMachineInPausedState() bool {
 	return false
 }
 
-func (d *Compact32Deck) isHeaterInProgress() bool {
+func (d *Compact32Deck) wasRecipePaused() bool {
+	if temp, ok := recipeWasPaused.Load(d.name); !ok {
+		logger.Errorln("recipeWasPaused isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
+func (d *Compact32Deck) IsHeaterInProgress() bool {
 	if temp, ok := heaterInProgress.Load(d.name); !ok {
 		logger.Errorln("heaterInProgress isn't loaded!")
 	} else if temp.(bool) {
@@ -150,8 +189,9 @@ func (d *Compact32Deck) isHeaterInProgress() bool {
 	return false
 }
 
-func (d *Compact32Deck) isShakerInProgress() bool {
-	if temp, ok := heaterInProgress.Load(d.name); !ok {
+
+func (d *Compact32Deck) IsShakerInProgress() bool {
+	if temp, ok := shakerInProgress.Load(d.name); !ok {
 		logger.Errorln("shakerInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
@@ -168,9 +208,9 @@ func (d *Compact32Deck) isUVLightInProgress() bool {
 	return false
 }
 
-func (d *Compact32Deck) isPIDCalibrationInProgress() bool {
-	if temp, ok := pIDCalibrationInProgress.Load(d.name); !ok {
-		logger.Errorln("pIDCalibrationInProgress isn't loaded!")
+func (d *Compact32Deck) isShakerPIDTuningInProgress() bool {
+	if temp, ok := shakerPIDCalibrationInProgress.Load(d.name); !ok {
+		logger.Errorln("shakerPIDCalibrationInProgress isn't loaded!")
 	} else if temp.(bool) {
 		return true
 	}
@@ -186,12 +226,30 @@ func (d *Compact32Deck) isTipDiscardInProgress() bool {
 	return false
 }
 
+func (d *Compact32Deck) isMotorOperationCompleted() bool {
+	if temp, ok := motorOperationCompleted.Load(d.name); !ok {
+		logger.Errorln("motorOperationCompleted isn't loaded!")
+	} else if temp.(bool) {
+		return true
+	}
+	return false
+}
+
 func (d *Compact32Deck) getMagnetState() int {
 	if temp, ok := magnetState.Load(d.name); !ok {
 		logger.Errorln("magnet State isn't loaded!")
 		return -1
 	} else {
 		return temp.(int)
+	}
+}
+
+func (d *Compact32Deck) getRecipeStartTime() time.Time {
+	if temp, ok := recipeStartTime.Load(d.name); !ok {
+		logger.Errorln("recipeStartTime isn't loaded!")
+		return time.Now()
+	} else {
+		return temp.(time.Time)
 	}
 }
 

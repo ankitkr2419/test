@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -42,13 +44,19 @@ func createTipDockHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(tdObj)
+		valid, respBytes := Validate(tdObj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.TipDockingValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
+		err = ValidateTipDockObject(req.Context(), deps, tdObj, recipeID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
+			return
+		}
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
@@ -139,10 +147,24 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.TipDockingDecodeError.Error()})
 			return
 		}
-		valid, respBytes := validate(tdObj)
+		valid, respBytes := Validate(tdObj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.TipDockingValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		process, err := deps.Store.ShowProcess(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
+			return
+		}
+
+		err = ValidateTipDockObject(req.Context(), deps, tdObj, process.RecipeID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
 
@@ -164,4 +186,40 @@ func updateTipDockHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.TipDockingUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.TipDockingUpdateSuccess})
 	})
+}
+
+func ValidateTipDockObject(ctx context.Context, deps Dependencies, td db.TipDock, recipeID uuid.UUID) (err error) {
+
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return responses.RecipeFetchError
+	}
+	// check if cartridage type
+	switch td.Type {
+	case "cartridge_1":
+		if recipe.Cartridge1Position == nil {
+			return responses.RecipeCartridge1Missing
+		}
+		cartridgeWell := createCartridgeWell(*recipe.Cartridge1Position, db.CartridgeType(td.Type), td.Position)
+
+		if !plc.DoesCartridgeWellExist(cartridgeWell) {
+			return responses.InvalidTipDockWell
+		}
+	case "cartridge_2":
+		if recipe.Cartridge2Position == nil {
+			return responses.RecipeCartridge2Missing
+		}
+
+		cartridgeWell := createCartridgeWell(*recipe.Cartridge2Position, db.CartridgeType(td.Type), td.Position)
+
+		if !plc.DoesCartridgeWellExist(cartridgeWell) {
+			return responses.InvalidTipDockWell
+		}
+	case "deck":
+		if isDeckPositionInvalid(td.Position) {
+			return responses.InvalidDeckPosition
+		}
+	}
+	return
 }

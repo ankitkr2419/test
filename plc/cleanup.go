@@ -18,7 +18,7 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 	}
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return
 	}
 
@@ -62,7 +62,7 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 	}
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return
 	}
 
@@ -115,13 +115,8 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 		}
 	}()
 
-	if !d.IsMachineHomed() {
-		err = responses.PleaseHomeMachineError
-		return
-	}
-
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return
 	}
 
@@ -152,8 +147,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	if err != nil {
 		return
 	}
-	d.setUVLightInProgress()
-	defer d.resetUVLightInProgress()
+	defer d.switchOffUVLight()
 
 	//
 	// 3. Add delay
@@ -176,8 +170,7 @@ func (d *Compact32Deck) waitUntilResumed(deck string) (response string, err erro
 		time.Sleep(time.Millisecond * 300)
 
 		if d.isMachineInAbortedState() {
-			err = fmt.Errorf("Operation was Aborted!")
-			return "", err
+			return "", responses.AbortedError
 		}
 
 		if !d.isMachineInPausedState() {

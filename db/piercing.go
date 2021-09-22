@@ -23,18 +23,21 @@ const (
 	createPiercingQuery = `INSERT INTO piercing (
 						type,
 						cartridge_wells,
+						piercing_heights,
 						process_id)
-						VALUES ($1, $2, $3) RETURNING id`
+						VALUES ($1, $2, $3, $4) RETURNING id`
 	updatePiercingQuery = `UPDATE piercing SET (
 						type,
 						cartridge_wells,
-						updated_at) = ($1, $2, $3) WHERE process_id = $4`
+						piercing_heights,
+						updated_at) = ($1, $2, $3, $4) WHERE process_id = $5`
 )
 
 type Piercing struct {
 	ID             uuid.UUID     `db:"id" json:"id"`
 	Type           CartridgeType `db:"type" json:"type" validate:"required"`
 	CartridgeWells pq.Int64Array `db:"cartridge_wells" json:"cartridge_wells" validate:"required"`
+	Heights        pq.Int64Array `db:"piercing_heights" json:"piercing_heights" validate:"required"`
 	ProcessID      uuid.UUID     `db:"process_id" json:"process_id"`
 	CreatedAt      time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt      time.Time     `db:"updated_at" json:"updated_at"`
@@ -140,6 +143,7 @@ func (s *pgStore) createPiercing(ctx context.Context, tx *sql.Tx, pi Piercing) (
 		createPiercingQuery,
 		pi.Type,
 		pi.CartridgeWells,
+		pi.Heights,
 		pi.ProcessID,
 	).Scan(&lastInsertID)
 
@@ -185,6 +189,7 @@ func (s *pgStore) UpdatePiercing(ctx context.Context, p Piercing) (err error) {
 		updatePiercingQuery,
 		p.Type,
 		p.CartridgeWells,
+		p.Heights,
 		time.Now(),
 		p.ProcessID,
 	)

@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
 import { TabContent, TabPane, Nav, NavItem, NavLink } from "reactstrap";
 import classnames from "classnames";
+import generatePdfIcon from "assets/images/generatePdfIcon.svg";
 
 import { ExperimentGraphContainer } from "containers/ExperimentGraphContainer";
 import { getRunExperimentReducer } from "selectors/runExperimentSelector";
@@ -14,11 +16,66 @@ import GridComponent from "./Grid";
 import WellGridHeader from "./Grid/WellGridHeader";
 import SelectAllGridHeader from "./Grid/SelectAllGridHeader";
 import { Button } from "core-components";
-import { ButtonIcon, Text } from "shared-components";
+import { ButtonIcon, ImageIcon, Text } from "shared-components";
 import PreviewReportModal from "components/modals/PreviewReportModal";
+import { graphs } from "./plateConstant";
+import { getExperimentGraphTargets } from "selectors/experimentTargetSelector";
+import { getLineChartData } from "selectors/wellGraphSelector";
+import { updateFilter } from "action-creators/analyseDataGraphActionCreators";
+import { generateTargetOptions } from "components/AnalyseDataGraph/helper";
+import {
+  getMaxThreshold,
+  rangeActions,
+  rangeInitialState,
+  rangeReducer,
+} from "./helpers";
 
 import GridWrapper from "./Grid/GridWrapper";
 import "./Plate.scss";
+
+const initialOptions = {
+  legend: {
+    display: false,
+  },
+  animation: false,
+  scales: {
+    xAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Cycles",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 5,
+        },
+        offset: true,
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+          min: 0,
+          max: 4,
+        },
+      },
+    ],
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "F-value",
+          fontSize: 15,
+          fontStyle: "bold",
+          padding: 10,
+        },
+        ticks: {
+          fontSize: 15,
+          fontStyle: "bold",
+          min: 0,
+          max: 1,
+        },
+      },
+    ],
+  },
+};
 
 const Plate = (props) => {
   const {
@@ -39,24 +96,102 @@ const Plate = (props) => {
     temperatureData,
     mailBtnHandler,
     token,
+    isExpanded,
   } = props;
 
+  const dispatch = useDispatch();
   // getExperimentStatus will return us current experiment status
   const runExperimentDetails = useSelector(getRunExperimentReducer);
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
+
+  const lineChartData = useSelector(getLineChartData);
+
+  // get targets from experiment target reducer(graph : target filters)
+  const experimentGraphTargetsList = useSelector(getExperimentGraphTargets);
+  const targetsData = experimentGraphTargetsList.toJS();
+
   const experimentStatus = runExperimentDetails.get("experimentStatus");
-  const experimentDetails = runExperimentDetails.get("data");
+
+  let experimentDetails =
+    isExpanded === true
+      ? createExperimentReducer.toJS()
+      : runExperimentDetails.get("data").toJS();
 
   // local state to maintain well data which is selected for updation
   const [updateWell, setUpdateWell] = useState(null);
 
-  // local state to toggle between emission graph and temperature graph
-  const [showTempGraph, setShowTempGraph] = useState(false);
+  // local state to maintain active graph
+  const [activeGraph, setActiveGraph] = useState(graphs.Amplification);
 
   // local state to manage toggling of graphSidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // local state to manage previewReport modal
   const [previewReportModal, setPreviewReportModal] = useState(false);
+
+  // local state to manage min max values of X and Y
+  const [rangeState, updateRangeState] = useReducer(
+    rangeReducer,
+    rangeInitialState
+  );
+  const { xMaxValue, xMinValue, yMaxValue, yMinValue } = rangeState;
+
+  const [options, setOptions] = useState(initialOptions);
+  const [isDataFromAPI, setDataFromAPI] = useState(false);
+
+  //set first target as selected to use it in analyse data graph
+  useEffect(() => {
+    const targets = generateTargetOptions(targetsData);
+    if (targets.length > 0) {
+      const firstTarget = targets[0];
+      dispatch(updateFilter({ selectedTarget: firstTarget }));
+    }
+  }, [dispatch, targetsData]);
+
+  // initially reset the values of ranges
+  useEffect(() => {
+    if (lineChartData.size !== 0) {
+      const nCycles = lineChartData.first().totalCycles;
+      const maxThreshold = getMaxThreshold(targetsData);
+      updateRangeState({
+        type: rangeActions.RESET_VALUES,
+        value: { nCycles: nCycles, maxThreshold: maxThreshold },
+      });
+    }
+  }, [lineChartData]);
+
+  useEffect(() => {
+    let newOptions = {
+      ...initialOptions,
+      scales: {
+        ...initialOptions.scales,
+        xAxes: [
+          {
+            ...initialOptions.scales.xAxes[0],
+            ticks: {
+              ...initialOptions.scales.xAxes[0].ticks,
+              min: xMinValue,
+              max: xMaxValue,
+            },
+          },
+        ],
+        yAxes: [
+          {
+            ...initialOptions.scales.yAxes[0],
+            ticks: {
+              ...initialOptions.scales.yAxes[0].ticks,
+              min: yMinValue,
+              max: yMaxValue,
+            },
+          },
+        ],
+      },
+    };
+
+    setOptions(newOptions);
+  }, [xMaxValue, xMinValue, yMaxValue, yMinValue]);
 
   useEffect(() => {
     if (
@@ -77,9 +212,13 @@ const Plate = (props) => {
     const { isSelected, isWellFilled, isMultiSelected } = well.toJS();
     /**
      * if well is not filled and if multi selection option is not checked
-     * 				then we can make well selected
+     * 				then we can make well selected and isExpanded === false
      */
-    if (isMultiSelectionOptionOn === false && isWellFilled === false) {
+    if (
+      isMultiSelectionOptionOn === false &&
+      isWellFilled === false &&
+      isExpanded === false
+    ) {
       setSelectedWell(index, !isSelected);
     }
 
@@ -91,11 +230,17 @@ const Plate = (props) => {
       setMultiSelectedWell(index, !isMultiSelected);
       // }
     }
+    // if the fields are pre-filled, empty it
+    setUpdateWell(null);
   };
 
   const onWellUpdateClickHandler = (selectedWell) => {
     // update local state with selected well which is selected for updation
-    setUpdateWell(selectedWell.toJS());
+    let wellToUpdate = null;
+    if (selectedWell) {
+      wellToUpdate = selectedWell.toJS();
+    }
+    setUpdateWell(wellToUpdate);
   };
 
   // hleper function to open sidebar and show graph of selected well
@@ -111,8 +256,20 @@ const Plate = (props) => {
   };
 
   // helper function to toggle the graphs
-  const toggleTempGraphSwitch = (graphType) => {
-    setShowTempGraph(graphType === "temperature");
+  const onChangeActiveGraph = (graphType) => {
+    if (activeGraph !== graphType) {
+      setActiveGraph(graphType);
+    }
+  };
+
+  const makeAmplificationGraphActive = () => {
+    onChangeActiveGraph(graphs.Amplification);
+  };
+  const makeTemperatureGraphActive = () => {
+    onChangeActiveGraph(graphs.Temperature);
+  };
+  const makeAnalyseDataGraphActive = () => {
+    onChangeActiveGraph(graphs.AnalyseData);
   };
 
   const togglePreviewReportModal = () => {
@@ -121,6 +278,30 @@ const Plate = (props) => {
 
   const downloadClickHandler = (e) => {
     togglePreviewReportModal();
+  };
+
+  const handleRangeChangeBtn = (requestBody, nCycles, maxThreshold) => {
+    setDataFromAPI(true);
+
+    const { xMax, xMin, yMax, yMin } = requestBody;
+
+    const xMinValue = Number.isNaN(xMin) ? 0 : xMin;
+    const xMaxValue = Number.isNaN(xMax) ? nCycles : xMax;
+    const yMinValue = Number.isNaN(yMin) ? 0 : yMin;
+    const yMaxValue = Number.isNaN(yMax) ? maxThreshold : yMax;
+
+    updateRangeState({ type: rangeActions.UPDATE_X_MAX, value: xMaxValue });
+    updateRangeState({ type: rangeActions.UPDATE_X_MIN, value: xMinValue });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MAX, value: yMaxValue });
+    updateRangeState({ type: rangeActions.UPDATE_Y_MIN, value: yMinValue });
+  };
+
+  const handleResetBtn = (nCycles, maxThreshold) => {
+    setDataFromAPI(true);
+    updateRangeState({
+      type: rangeActions.RESET_VALUES,
+      value: { nCycles: nCycles, maxThreshold: maxThreshold },
+    });
   };
 
   return (
@@ -139,6 +320,10 @@ const Plate = (props) => {
           experimentDetails={experimentDetails}
           experimentId={experimentId}
           temperatureData={temperatureData}
+          mailBtnHandler={mailBtnHandler}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
+          experimentGraphTargetsList={experimentGraphTargetsList}
         />
       )}
       <Header
@@ -148,6 +333,7 @@ const Plate = (props) => {
         experimentDetails={experimentDetails}
         experimentId={experimentId}
         temperatureData={temperatureData}
+        isExpanded={isExpanded}
       />
       <GridWrapper className="plate-body flex-100 scroll-y">
         <Nav className="plate-nav-tabs border-0" tabs>
@@ -171,7 +357,8 @@ const Plate = (props) => {
                 !(
                   experimentStatus === EXPERIMENT_STATUS.success ||
                   experimentStatus === EXPERIMENT_STATUS.running ||
-                  experimentStatus === EXPERIMENT_STATUS.stopped
+                  experimentStatus === EXPERIMENT_STATUS.stopped ||
+                  isExpanded === true
                 )
               }
             >
@@ -195,6 +382,8 @@ const Plate = (props) => {
                   experimentStatus={experimentStatus}
                   experimentTargetsList={experimentTargetsList}
                   updateWell={updateWell}
+                  isExpanded={isExpanded}
+                  onWellUpdateClickHandler={onWellUpdateClickHandler}
                 />
               </div>
               <div className="wells-wrapper flex-100 scroll-y">
@@ -205,11 +394,13 @@ const Plate = (props) => {
                     isGroupSelectionOn={isMultiSelectionOptionOn}
                     toggleMultiSelectOption={toggleMultiSelectOption}
                     experimentStatus={experimentStatus}
+                    isExpanded={isExpanded}
                   />
                   <SelectAllGridHeader
                     isAllWellsSelected={isAllWellsSelected}
                     toggleAllWellSelectedOption={toggleAllWellSelectedOption}
                     experimentStatus={experimentStatus}
+                    isExpanded={isExpanded}
                   />
                 </div>
                 <GridComponent
@@ -221,6 +412,7 @@ const Plate = (props) => {
                   onWellUpdateClickHandler={onWellUpdateClickHandler}
                   showGraphOfWell={showGraphOfWell}
                   experimentStatus={experimentStatus}
+                  isExpanded={isExpanded}
                 />
               </div>
             </div>
@@ -230,64 +422,83 @@ const Plate = (props) => {
               <div className="graph-wrapper flex-100 scroll-y">
                 <div className="d-flex align-items-center mb-3">
                   <Button
-                    outline={showTempGraph}
-                    color={!showTempGraph ? "primary" : "secondary"}
+                    outline={activeGraph !== graphs.Amplification}
+                    color={
+                      activeGraph === graphs.Amplification
+                        ? "primary"
+                        : "secondary"
+                    }
                     className="mr-3 Amplification"
-                    onClick={() => toggleTempGraphSwitch("amplification")}
+                    onClick={makeAmplificationGraphActive}
                   >
                     Amplification
                   </Button>
                   <Button
-                    outline={!showTempGraph}
-                    color={showTempGraph ? "primary" : "secondary"}
-                    className="Temperature"
-                    onClick={() => toggleTempGraphSwitch("temperature")}
+                    outline={activeGraph !== graphs.Temperature}
+                    color={
+                      activeGraph === graphs.Temperature
+                        ? "primary"
+                        : "secondary"
+                    }
+                    className="mr-3 Temperature"
+                    onClick={makeTemperatureGraphActive}
                   >
                     Temperature
                   </Button>
-                  <ButtonIcon
-                    name="published"
-                    size={28}
-                    className="bg-white border-secondary ml-auto"
-                    onClick={mailBtnHandler}
-                  />
-                  <ButtonIcon
+                  {(experimentStatus === EXPERIMENT_STATUS.success ||
+                    experimentStatus === EXPERIMENT_STATUS.stopped ||
+                    isExpanded === true) && (
+                    <Button
+                      outline={activeGraph !== graphs.AnalyseData}
+                      color={
+                        activeGraph === graphs.AnalyseData
+                          ? "primary"
+                          : "secondary"
+                      }
+                      className="mr-3 AnalyseData"
+                      onClick={makeAnalyseDataGraphActive}
+                    >
+                      Analyse Data
+                    </Button>
+                  )}
+
+                  {/* <ButtonIcon
                     name="download-1"
                     size={28}
-                    className="bg-white border-secondary ml-3 downloadButton"
+                    className="bg-white border-secondary ml-auto downloadButton"
                     onClick={downloadClickHandler}
-                  />
+                  /> */}
+
+                  <div className="ml-auto" onClick={downloadClickHandler}>
+                    <ImageIcon
+                      src={generatePdfIcon}
+                      alt="icon not available"
+                      style={{ cursor: "pointer", maxHeight: 40 }}
+                    />
+                  </div>
                 </div>
+
                 <ExperimentGraphContainer
-                  token={token}
                   isInsidePreviewModal={false}
-                  experimentId={experimentId}
                   headerData={headerData}
-                  showTempGraph={showTempGraph}
+                  activeGraph={activeGraph}
                   experimentStatus={experimentStatus}
                   isSidebarOpen={isSidebarOpen}
                   setIsSidebarOpen={setIsSidebarOpen}
                   resetSelectedWells={resetSelectedWells}
                   isMultiSelectionOptionOn={isMultiSelectionOptionOn}
+                  isExpanded={isExpanded}
+                  handleRangeChangeBtn={handleRangeChangeBtn}
+                  handleResetBtn={handleResetBtn}
+                  options={options}
+                  isDataFromAPI={isDataFromAPI}
+                  experimentGraphTargetsList={experimentGraphTargetsList}
                 />
               </div>
             </div>
           </TabPane>
         </TabContent>
       </GridWrapper>
-      {/* <SampleSideBarContainer
-        experimentId={experimentId}
-        positions={positions}
-        experimentTargetsList={experimentTargetsList}
-        updateWell={updateWell}
-      />
-      <ExperimentGraphContainer
-        experimentStatus={experimentStatus}
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        resetSelectedWells={resetSelectedWells}
-        isMultiSelectionOptionOn={isMultiSelectionOptionOn}
-      /> */}
     </div>
   );
 };

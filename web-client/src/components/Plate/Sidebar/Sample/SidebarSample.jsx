@@ -17,16 +17,23 @@ const SidebarSample = (props) => {
     addButtonClickHandler,
     isSampleStateValid, // form state valid
     isDisabled,
-    resetLocalState
+    resetLocalState,
   } = props;
 
   const { isSideBarOpen, sample, task, isEdit } = sampleState.toJS();
 
   const handleSampleCreate = (inputValue) => {
+    // if inputValue is null then we update the sample as null and return.
+    if (inputValue === "" || inputValue === null || inputValue === undefined) {
+      updateCreateSampleWrapper("sample", null);
+      return;
+    }
+
     const newOption = {
       label: inputValue,
-      value: inputValue
+      value: inputValue,
     };
+
     // update local state
     updateCreateSampleWrapper("sample", newOption);
     // add new sample to sample's reducer to merge it with original list
@@ -44,6 +51,10 @@ const SidebarSample = (props) => {
     updateCreateSampleWrapper("sample", value);
   };
 
+  const handleBlurChange = (value) => {
+    handleSampleCreate(value || sample?.label);
+  };
+
   const handleTaskChange = (value) => {
     updateCreateSampleWrapper("task", value);
   };
@@ -55,6 +66,7 @@ const SidebarSample = (props) => {
         isDisabled={isDisabled || isSampleListLoading}
         isLoading={isSampleListLoading}
         onChange={handleSampleChange}
+        onBlur={(e) => handleBlurChange(e.target.value)}
         onCreateOption={handleSampleCreate}
         onInputChange={handleSampleInputChange}
         options={sampleOptions}
@@ -74,6 +86,8 @@ const SidebarSample = (props) => {
         value={task}
         onChange={handleTaskChange}
         isDisabled={isDisabled}
+        isSearchable={false}
+        isClearable={true}
       />
       <Button
         className="mt-auto ml-2"
@@ -100,7 +114,7 @@ SidebarSample.propTypes = {
   addButtonClickHandler: PropTypes.func.isRequired,
   isSampleStateValid: PropTypes.bool.isRequired,
   isDisabled: PropTypes.bool.isRequired,
-  resetLocalState: PropTypes.func.isRequired
+  resetLocalState: PropTypes.func.isRequired,
 };
 
 export default React.memo(SidebarSample);

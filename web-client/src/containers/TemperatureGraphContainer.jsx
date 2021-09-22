@@ -3,13 +3,14 @@ import { useSelector } from "react-redux";
 import { LineChart } from "core-components";
 import { getTemperatureChartData } from "selectors/temperatureGraphSelector";
 import styled from "styled-components";
+import { TEMPERATURE_GRAPH_OPTIONS } from "appConstants";
 
 const TemperatureGraphContainer = (props) => {
   // Extracting temperature graph data, Which is populated from websocket
   const temperatureChartData = useSelector(getTemperatureChartData);
   return (
     <GraphCard>
-      <LineChart data={temperatureChartData} />
+      <LineChart data={temperatureChartData} options={TEMPERATURE_GRAPH_OPTIONS} />
     </GraphCard>
   );
 };

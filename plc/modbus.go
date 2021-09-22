@@ -49,7 +49,7 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 	// Data Registers
 	"D": map[int]uint16{
 		//updated addresses
-		23: uint16(0x1017), //register for setting rotation pulses
+		23:  uint16(0x1017), //register for setting rotation pulses
 		100: uint16(0x1064), // heartbeat register (W)
 		134: uint16(0x1086), // Ideal Lid temperature (W)
 		135: uint16(0x1087), // Current Lid temperature (R)
@@ -86,9 +86,9 @@ var MODBUS map[string]map[int]uint16 = map[string]map[int]uint16{
 		21: uint16(0x0815), //combined with M20 ON/OFF cycle button
 		25: uint16(0x0819), //reset values
 
-		36: uint16(0x0824), // homing success (R)
-		42: uint16(0x082A), //register for Lid PID Tuning set/reset
-		43: uint16(0x082B), //register for Lid PID Tuning Completion status
+		36:  uint16(0x0824), // homing success (R)
+		42:  uint16(0x082A), //register for Lid PID Tuning set/reset
+		43:  uint16(0x082B), //register for Lid PID Tuning Completion status
 		101: uint16(0x0865), // homing error (R)
 		// 102: uint16(0x0866), // Start / Stop Cycle (W)
 		103: uint16(0x0867), // UnUsed
@@ -149,6 +149,8 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
 			226: uint16(0x10E2), // Motor Number (W)
+			504: uint16(0x11F8), // PID Tuning Completed LH (R) (4 = DONE)
+			534: uint16(0x1216), // PID Tuning Completed RH (R) (4 = DONE)
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[int]uint16{
@@ -181,6 +183,8 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
 			226: uint16(0x10E2), // Motor Number (W)
+			504: uint16(0x11F8), // PID Tuning Completed LH (R) (4 = DONE)
+			534: uint16(0x1216), // PID Tuning Completed RH (R) (4 = DONE)
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[int]uint16{

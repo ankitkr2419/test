@@ -87,7 +87,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					errortype = "ErrorPCRDead"
 					msg = "Unable to connect to Hardware"
 
-				} else if err.Error() == "PID Error" {
+				} else if err.Error() == plc.ErrorLidPIDTuning {
 					errortype = "ErrorPIDTuning"
 					msg = "Unable to do PID Tuning"
 
@@ -108,6 +108,17 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				errs := msgDivision(err.Error())
 				if errs[0] == "ErrorExtractionMonitor" {
 
+					errorData := plc.WSError{
+						Message: errs[2],
+						Deck:    errs[1],
+					}
+					wsError, err := json.Marshal(errorData)
+					if err != nil {
+						logger.Errorf("error in marshalling web socket data %v", err.Error())
+						return
+					}
+					sendOnFail(string(wsError), errs[0], rw, c)
+				} else if errs[0] == plc.ErrorOperationAborted {
 					errorData := plc.WSError{
 						Message: errs[2],
 						Deck:    errs[1],

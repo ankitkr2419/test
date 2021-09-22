@@ -4,6 +4,8 @@ import { FormGroup, Label, Input, FormError, CheckBox } from "core-components";
 import {} from "shared-components";
 
 import styled from "styled-components";
+import { MAX_TEMP_ALLOWED, MIN_TEMP_ALLOWED } from "appConstants";
+import Text from "shared-components/Text";
 
 const TemperatureInfoBox = styled.div`
   .temperature-info {
@@ -29,8 +31,15 @@ const TemperatureInfoBox = styled.div`
 `;
 
 const TemperatureInfo = (props) => {
-  const { temperature, followTemp, temperatureHandler, checkBoxHandler } =
-    props;
+  const {
+    temperature,
+    invalidTemperature,
+    followTemp,
+    temperatureHandler,
+    handleOnFocus,
+    handleOnBlur,
+    checkBoxHandler,
+  } = props;
   return (
     <TemperatureInfoBox>
       <FormGroup className="d-flex temperature-info">
@@ -45,8 +54,17 @@ const TemperatureInfo = (props) => {
             placeholder="Type here"
             value={temperature}
             onChange={temperatureHandler}
+            onFocus={handleOnFocus}
+            onBlur={(e) => handleOnBlur(parseInt(e.target.value))}
           />
-          <FormError>Incorrect Temperature</FormError>
+          {invalidTemperature && (
+            <div className="flex-70">
+              <Text Tag="p" size={14} className="text-danger">
+                Temperature must be between {MIN_TEMP_ALLOWED} and{" "}
+                {MAX_TEMP_ALLOWED}.
+              </Text>
+            </div>
+          )}
 
           <div className="d-flex mt-3">
             <CheckBox

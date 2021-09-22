@@ -37,13 +37,18 @@ func createTipTubeHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(tt)
+		valid, respBytes := Validate(tt)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
-		go db.SetTipsTubesValues([]db.TipsTubes{tt})
+		err = db.SetTipsTubesValues([]db.TipsTubes{tt})
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.TipTubeCreateConfigError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.TipTubeCreateConfigError.Error()})
+			return
+		}
 		err = deps.Store.InsertTipsTubes(req.Context(), []db.TipsTubes{tt})
 		if err != nil {
 			logger.WithField("err", err.Error()).Errorln(responses.TipTubeCreateError)

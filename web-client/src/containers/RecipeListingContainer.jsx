@@ -46,7 +46,7 @@ const RecipeListingContainer = (props) => {
 
   let deckName = activeDeckObj.name;
   let isAdmin = activeDeckObj.isAdmin;
-  if (!token) setToken(activeDeckObj.token);
+  if (!token && activeDeckObj.token) setToken(activeDeckObj.token);
 
   const recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(
     (deck) => deck.name === deckName

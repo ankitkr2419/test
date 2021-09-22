@@ -19,13 +19,14 @@ const StyledSubHeader = styled.div`
   }
 `;
 
-const SubHeader = props => {
+const SubHeader = (props) => {
   const {
     data,
     experimentTemplate,
     experimentStatus,
     experimentDetails,
-    temperatureData
+    temperatureData,
+    isExpanded,
   } = props;
 
   const { totalCycles, progressStatus, progress, remainingTime, totalTime } =
@@ -47,7 +48,7 @@ const SubHeader = props => {
   }
 
   const { templateName } = experimentTemplate;
-  const { start_time, end_time, well_count } = experimentDetails.toJS();
+  const { start_time, end_time, well_count } = experimentDetails;
 
   let totalHours = 0;
   let totalMins = 0;
@@ -82,7 +83,10 @@ const SubHeader = props => {
         {TEMPERATURE_DATA_LENGTH > 0 && (
           <div className="d-flex align-items-center">
             <Text className="mb-0">
-              Cycle - {cycleValue} / {totalCycles ? totalCycles : 0}{" "}
+              Cycle -{" "}
+              {`${cycleValue} / ${
+                isExpanded === true ? cycleValue : totalCycles
+              }`}{" "}
             </Text>
             <Text className="mb-0 mx-2">|</Text>
             <Text className="mb-0">
@@ -128,7 +132,7 @@ const SubHeader = props => {
               </Text>
             )
           ))}
-        {experimentStatus === EXPERIMENT_STATUS.success && (
+        {(isExpanded === true || experimentStatus === EXPERIMENT_STATUS.success) && (
           <div className="d-flex align-items-center ml-auto">
             <Text Tag="h6" className="mb-0 ml-5">
               {formatDate(start_time)}
@@ -149,9 +153,9 @@ const SubHeader = props => {
 SubHeader.propTypes = {
   experimentTemplate: PropTypes.shape({
     templateId: PropTypes.string,
-    templateName: PropTypes.string
+    templateName: PropTypes.string,
   }).isRequired,
-  isExperimentSucceeded: PropTypes.bool
+  isExperimentSucceeded: PropTypes.bool,
 };
 
 export default SubHeader;

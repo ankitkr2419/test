@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import imgLogo from 'assets/images/mylab-logo.png';
 import imgSymbol from 'assets/images/mylab-symbol.png';
 import ImageIcon from 'shared-components/ImageIcon';
+import { APP_TYPE } from 'appConstants';
 
 const StyledLogo = styled(Link)`
   display: flex;
@@ -16,12 +17,12 @@ const StyledLogo = styled(Link)`
 `;
 
 const Logo = (props) => {
-	const { isUserLoggedIn } = props;
+	const { isUserLoggedIn, app } = props;
 	// if user logged-in will show small icon
 	const size = isUserLoggedIn ? 'sm' : 'lg';
 
 	return (
-		<StyledLogo size={size} to={isUserLoggedIn === true ? '/login' : ''} className="logo">
+		<StyledLogo size={size} to={app === APP_TYPE.EXTRACTION ? '/landing' : '/login'} className="logo">
 			{isUserLoggedIn === true ? (
 				<ImageIcon src={imgSymbol} alt="My Lab logo" className="h-100" />
 			) : (

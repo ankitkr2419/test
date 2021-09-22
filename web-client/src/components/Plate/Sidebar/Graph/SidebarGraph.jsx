@@ -3,12 +3,13 @@ import PropTypes from "prop-types";
 import { getXAxis } from "selectors/wellGraphSelector";
 import TemperatureGraphContainer from "containers/TemperatureGraphContainer";
 import WellGraph from "./WellGraph";
-import { EXPERIMENT_STATUS } from "appConstants";
+import { graphs } from "components/Plate/plateConstant";
+import AnalyseDataGraphContainer from "containers/AnalyseDataGraphContainer";
 
 const SidebarGraph = (props) => {
   const {
     headerData,
-    showTempGraph,
+    activeGraph,
     lineChartData,
     onThresholdChangeHandler,
     toggleGraphFilterActive,
@@ -21,6 +22,8 @@ const SidebarGraph = (props) => {
     handleResetBtn,
     isInsidePreviewModal,
     isDataFromAPI,
+    isExpanded,
+    options,
   } = props;
 
   let cyclesCount = 0;
@@ -39,12 +42,13 @@ const SidebarGraph = (props) => {
 
   // if data is fetched from API, then keep xAxis labels same as fetched.
   // Also we hide threshold, that is, remove the last objects from data array.
-  if (isDataFromAPI === true) {
+  if (lineChartData && lineChartData.size !== 0 && isDataFromAPI === true) {
     xAxisLabels = lineChartData?.first().cycles.toJS();
 
-    chartData = chartData.filter(
-      (dataObj, index) => dataObj.label === `index-${index}`
-    );
+    // Removes threshold line
+    // chartData = chartData.filter(
+    //   (dataObj, index) => dataObj.label === `index-${index}`
+    // );
   }
 
   const data = {
@@ -54,8 +58,8 @@ const SidebarGraph = (props) => {
 
   return (
     <>
-      {/* show the well data graph if showTempGraph flag is off */}
-      {!showTempGraph && (
+      {/* show the well data graph */}
+      {activeGraph === graphs.Amplification && (
         <WellGraph
           data={data}
           headerData={headerData}
@@ -69,10 +73,20 @@ const SidebarGraph = (props) => {
           handleResetBtn={handleResetBtn}
           experimentStatus={experimentStatus}
           isInsidePreviewModal={isInsidePreviewModal}
+          isExpanded={isExpanded}
+          options={options}
+          isDataFromAPI={isDataFromAPI}
         />
       )}
-      {/* show temperature graph if showTempGraph flag is on */}
-      {showTempGraph && <TemperatureGraphContainer />}
+      {/* show temperature graph */}
+      {activeGraph === graphs.Temperature && <TemperatureGraphContainer />}
+
+      {/** show analyse data graph */}
+      {activeGraph === graphs.AnalyseData && (
+        <AnalyseDataGraphContainer
+          isInsidePreviewModal={isInsidePreviewModal}
+        />
+      )}
     </>
   );
 };

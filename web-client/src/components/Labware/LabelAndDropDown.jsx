@@ -29,6 +29,7 @@ const LabelAndDropDown = (props) => {
           <Label className="px-0 label-name">{label}</Label>
           <div className="d-flex flex-column input-field position-relative">
             <Select
+              isClearable
               placeholder="Select Option"
               className=""
               size="sm"

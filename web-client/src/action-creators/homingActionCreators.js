@@ -6,12 +6,10 @@ import {
 
 export const hideHomingModal = () => ({
   type: homingActions.hideHomingModaal,
-  payload: {},
 });
 
 export const showHomingModal = () => ({
   type: homingActions.showHomingModaal,
-  payload: {},
 });
 
 export const homingActionInitiated = (params) => ({
@@ -52,7 +50,6 @@ export const deckHomingActionInitiated = (params) => ({
 
 export const deckHomingActionSuccess = () => ({
   type: deckHomingActions.deckHomingActionSuccess,
-  payload: {},
 });
 
 export const deckHomingActionFailed = (serverErrors) => ({
@@ -85,5 +82,4 @@ export const discardTipAndHomingActionFailed = (serverErrors) => ({
 
 export const discardTipAndHomingActionReset = () => ({
   type: discardTipAndHomingActions.discardTipAndHomingActionReset,
-  payload: {},
 });

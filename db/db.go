@@ -120,10 +120,13 @@ type Storer interface {
 	AddAuditLog(ctx context.Context, activity ActivityType, state StateType, oprType OperationType, deck, description string) (err error)
 	ListTipsTubesByPosition(ctx context.Context, ttype string, position int64) (tipstubes []TipsTubes, err error)
 	UpdateEstimatedTime(ctx context.Context, id uuid.UUID, estimatedTime int64) (err error)
+	UpdateEstimatedTimeForRecipe(ctx context.Context, id uuid.UUID, estimatedTime int64) error
 	GetTargetByName(ctx context.Context, name string) (t Target, err error)
 	FinishTemplate(ctx context.Context, id uuid.UUID) (err error)
 	ListFinishedTemplates(ctx context.Context) (t []Template, err error)
 	DeleteUnfinishedTemplates(ctx context.Context) (err error)
+	ShowCartridge(ctx context.Context, id int64) (dbCartridge Cartridge, err error)
+	ShowCartridgeWells(id int64) (cartridgeWells []CartridgeWells, err error)
 
 	UpdateMotor(ctx context.Context, motor Motor) (err error)
 	DeleteMotor(ctx context.Context, id int) (err error)
@@ -134,5 +137,9 @@ type Storer interface {
 	ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error)
 	UpsertTargetThreshold(ctx context.Context, tt []ExpTargetThreshold) (err error)
 	GetTargetThreshold(ctx context.Context, expID, targetID uuid.UUID) (tarth ExpTargetThreshold, err error)
+	UpsertDyeWellTolerance(ctx context.Context, dwTolerance []DyeWellTolerance) (err error)
+	ShowDye(ctx context.Context, dyeID uuid.UUID) (DBdye Dye, err error)
 	DeleteUser(ctx context.Context, username string) (err error)
+	ListDyes(ctx context.Context) (DBdye []Dye, err error)
+	UpdateConsumableDistance(ctx context.Context, c ConsumableDistance) (err error)
 }

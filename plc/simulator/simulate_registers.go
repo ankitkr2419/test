@@ -88,7 +88,8 @@ func (d *SimulatorDriver) simulateWriteSingleCoil(address, value uint16) (err er
 		go d.simulateOnMotor()
 	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][3]:
 		go d.simulateOnHeater()
+	case plc.MODBUS_EXTRACTION[d.DeckName]["M"][4], plc.MODBUS_EXTRACTION[d.DeckName]["M"][8]:
+		go d.simulateShakerPIDTuning()
 	}
-
 	return
 }

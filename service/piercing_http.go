@@ -1,11 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
+
+	"github.com/google/uuid"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -45,10 +48,17 @@ func createPiercingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(pobj)
+		valid, respBytes := Validate(pobj)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.PiercingValidationError)
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		err = ValidatePiercingObject(req.Context(), deps, &pobj, recipeID)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(err.Error())
 			return
 		}
 
@@ -145,9 +155,23 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(pobj)
+		valid, respBytes := Validate(pobj)
 		if !valid {
 			responseBadRequest(rw, respBytes)
+			return
+		}
+
+		process, err := deps.Store.ShowProcess(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
+			return
+		}
+
+		err = ValidatePiercingObject(req.Context(), deps, &pobj, process.RecipeID)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(err.Error())
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
 
@@ -169,4 +193,63 @@ func updatePiercingHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.PiercingUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.PiercingUpdateSuccess})
 	})
+}
+
+// ValidatePiercingObject this can be called by CSV
+func ValidatePiercingObject(ctx context.Context, deps Dependencies, pi *db.Piercing, recipeID uuid.UUID) (err error) {
+
+	//fetch cartridge type using id
+	var cartridgeID int64
+
+	//check cartridge type from recipe
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return responses.RecipeFetchError
+	}
+
+	err = checkCartridgeType(recipe, pi.Type, &cartridgeID)
+	if err != nil {
+		return
+	}
+
+	// sorting logic needs to be here cause CSV will be using this
+	return validateWellsLengthAndSortWells(pi, cartridgeID)
+}
+
+// check per well basis
+func validateWellsLengthAndSortWells(pi *db.Piercing, cartridgeID int64) error {
+	var wellsToBePierced, piercingHeights []int
+	var cartridgeWell plc.UniqueCartridge
+
+	if len(pi.CartridgeWells) == 0 {
+		logger.Errorln(responses.MissingCartridgeWellsError)
+		return responses.MissingCartridgeWellsError
+	}
+
+	if len(pi.CartridgeWells) != len(pi.Heights) {
+		logger.Errorln(responses.CartridgeWellsHeightsMismatchError)
+		return responses.CartridgeWellsMismatchWithHeightError
+	}
+
+	for i := range pi.CartridgeWells {
+		wellsToBePierced = append(wellsToBePierced, int(pi.CartridgeWells[i]))
+		piercingHeights = append(piercingHeights, int(pi.Heights[i]))
+	}
+
+	t := db.NewWellsSlice(wellsToBePierced, piercingHeights)
+
+	logger.Debugln("Wells -> ", t)
+
+	for i := range t.IntSlice {
+		pi.CartridgeWells[i] = int64(t.IntSlice[i])
+		pi.Heights[i] = int64(t.Heights[i])
+
+		//  check if the individual well exists
+		cartridgeWell = createCartridgeWell(cartridgeID, pi.Type, int64(t.IntSlice[i]))
+		if !plc.IsCartridgeWellHeightSafe(cartridgeWell, float64(t.Heights[i])) {
+			return responses.InvalidPiercingWell
+		}
+	}
+	return nil
 }

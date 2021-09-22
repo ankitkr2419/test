@@ -22,7 +22,7 @@ const getTemperatureGraphReducer = state => state.temperatureGraphReducer;
 const getSortedTemperatureGraphReducer = createSelector(
 	getTemperatureGraphReducer,
 	temperatureGraphReducer => temperatureGraphReducer.updateIn(['temperatureData'],
-		myList => myList.sortBy(ele => ele.get('created_at'))),
+		myList => myList?.sortBy(ele => ele.get('created_at'))),
 );
 
 // get starting time of temperature graph
@@ -58,7 +58,7 @@ export const getTemperatureChartData = createSelector(
 	(temperatureGraphReducer) => {
 		const temperatureGraphData = temperatureGraphReducer.get('temperatureData');
 		// if no data present return empty object
-		if (temperatureGraphData.size === 0) {
+		if (temperatureGraphData === null || temperatureGraphData === undefined || temperatureGraphData?.size === 0) {
 			return {};
 		}
 		const borderColor = 'rgba(148,147,147,1)'; // default line color

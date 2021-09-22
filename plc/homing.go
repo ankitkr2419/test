@@ -3,6 +3,8 @@ package plc
 import (
 	"encoding/json"
 	"fmt"
+	"mylab/cpagent/responses"
+	
 	"math"
 	"time"
 
@@ -14,7 +16,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.setHomingPercent(0)
 
 	if d.IsRunInProgress() {
-		err = fmt.Errorf("previous run already in progress... wait or abort it")
+		err = responses.PreviousRunInProgressError
 		return "", err
 	}
 
@@ -36,7 +38,7 @@ func (d *Compact32Deck) Homing() (response string, err error) {
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
-	d.resetAborted()
+	d.ResetAborted()
 
 	logger.Infoln("Moving Syringe DOWN till sensor cuts it")
 	response, err = d.syringeHoming()

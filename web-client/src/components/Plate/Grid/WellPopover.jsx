@@ -27,6 +27,7 @@ const WellPopover = (props) => {
     showGraphOfWell,
     isEditBtnDisabled,
     experimentStatus,
+    isExpanded,
     ...rest
   } = props;
 
@@ -92,7 +93,7 @@ const WellPopover = (props) => {
                     positive={ele.ct === ""}
                   >
                     {ele.target_name || "target_name"}
-                    {ele.ct === "" ? "" : `, CT ${ele.ct}`}
+                    {ele.ct === "" ? " (NEGATIVE) " : `, CT ${ele.ct} (POSITIVE)`}
                   </StyledText>
                 ))}
             </div>
@@ -110,7 +111,7 @@ const WellPopover = (props) => {
           <Button
             className="mb-4"
             onClick={onShowClickHandler}
-            disabled={experimentStatus === null}
+            disabled={experimentStatus === null && isExpanded === false}
           >
             {showOnMap ? "Show on Graph" : "Hide from Graph"}
           </Button>
@@ -119,7 +120,8 @@ const WellPopover = (props) => {
             disabled={
               experimentStatus === EXPERIMENT_STATUS.success ||
               experimentStatus === EXPERIMENT_STATUS.running ||
-              experimentStatus === EXPERIMENT_STATUS.stopped
+              experimentStatus === EXPERIMENT_STATUS.stopped ||
+              isExpanded === true
             }
           >
             Edit Info

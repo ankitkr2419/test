@@ -34,6 +34,7 @@ var (
 	ShakingCreateError     = fmt.Errorf("error creating shaking record")
 	ShakingFetchError      = fmt.Errorf("error fetching shaking record")
 	ShakingUpdateError     = fmt.Errorf("error updating shaking record")
+	InvalidShakerTemp      = fmt.Errorf("error please check shaker temperature range")
 
 	HeatingDecodeError     = fmt.Errorf("error decoding heating record")
 	HeatingValidationError = fmt.Errorf("error validating heating record")
@@ -54,10 +55,11 @@ var (
 	TipOperationUpdateError     = fmt.Errorf("error updating tip operation record")
 	TipOperationConvertError    = fmt.Errorf("error converting tip operation to its specific type")
 
-	TipTubeDecodeError    = fmt.Errorf("error decoding tip tube record")
-	TipTubeCreateError    = fmt.Errorf("error creating tip tube record")
-	TipTubeFetchError     = fmt.Errorf("error fetching tip tube record")
-	TipTubeArgumentsError = fmt.Errorf("error invalid tip tube arguments")
+	TipTubeDecodeError       = fmt.Errorf("error decoding tip tube record")
+	TipTubeCreateError       = fmt.Errorf("error creating tip tube record")
+	TipTubeFetchError        = fmt.Errorf("error fetching tip tube record")
+	TipTubeArgumentsError    = fmt.Errorf("error invalid tip tube arguments")
+	TipTubeCreateConfigError = fmt.Errorf("error creating tip tube config")
 
 	UUIDParseError = fmt.Errorf("error parsing uuid")
 
@@ -83,6 +85,8 @@ var (
 	RecipeUpdateError     = fmt.Errorf("error updating Recipe record")
 	RecipeDeleteError     = fmt.Errorf("error deleting Recipe record")
 	RecipePublishError    = fmt.Errorf("error recipe already published/unpublished")
+	RecipeRunError        = fmt.Errorf("error occured while recipe was running")
+	RecipeWasPausedError  = fmt.Errorf("error running recipe was paused atleast once")
 
 	InvalidInterfaceConversionError = fmt.Errorf("error interface conversion failed")
 	DelayRangeInvalid               = fmt.Errorf("error invalid delay range allowed range is (0, 100]")
@@ -136,7 +140,23 @@ var (
 
 	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
 
-	WrongDeckError = fmt.Errorf("error invalid deck name")
+	InvalidSourcePosition                 = fmt.Errorf("error source position is invalid")
+	InvalidDestinationPosition            = fmt.Errorf("error destination position is invalid")
+	InvalidDeckPosition                   = fmt.Errorf("error deck position is invalid")
+	RecipeCartridge1Missing               = fmt.Errorf("error cartridge 1 is missing")
+	RecipeCartridge2Missing               = fmt.Errorf("error cartridge 2 is missing")
+	MissingCartridgeWellsError            = fmt.Errorf("error cartridge wells are missing")
+	InvalidCartridgeType                  = fmt.Errorf("error cartridge type is invalid")
+	CartridgeWellsMismatchWithHeightError = fmt.Errorf("error cartridge wells mismatch with heights")
+	InvalidAspireWell                     = fmt.Errorf("error aspire well settings are invalid")
+	InvalidTipDockWell                    = fmt.Errorf("error tip docking on well settings are invalid")
+	InvalidDispenseWell                   = fmt.Errorf("error dispense well position is invalid")
+	InvalidCategoryAspireDispense         = fmt.Errorf("error category for aspire dispense is invalid")
+	InvalidPiercingWell                   = fmt.Errorf("error piercing well settings are invalid")
+
+	WrongDeckError       = fmt.Errorf("error invalid deck name")
+	TipDoesNotExistError = fmt.Errorf("error specified tip does not exist")
+	TipMissingError      = fmt.Errorf("error specified tip does not exist in recipe")
 
 	RunInProgressForSomeDeckError = fmt.Errorf("error run is in progress for either of the decks")
 
@@ -168,7 +188,23 @@ var (
 
 	PreviousExperimentProgressError = fmt.Errorf("error previous experiment already in progress")
 
-	ReportAbsent = fmt.Errorf("report is absent in form data!")
+	ReportAbsent            = fmt.Errorf("report is absent in form data!")
+	DyeToleranceDecodeError = fmt.Errorf("error decoding dye tolerance data!")
+	InvalidKitIDError       = fmt.Errorf("error invalid kit id!")
+
+	ConsumableDistanceDecodeError       = fmt.Errorf("error decoding consumable distance record")
+	ConsumableDistanceCreateError       = fmt.Errorf("error creating consumable distance record")
+	ConsumableDistanceFetchError        = fmt.Errorf("error fetching consumable distance record")
+	ConsumableDistanceArgumentsError    = fmt.Errorf("error invalid consumable distance arguments")
+	ConsumableDistanceUpdateError       = fmt.Errorf("error updating Consumable distance record")
+	ConsumableDistanceUpdateConfigError = fmt.Errorf("error updating Consumable distance config")
+	CartridgeCreateConfigError          = fmt.Errorf("error creating Cartridge config")
+
+	DyeDecodeError = fmt.Errorf("error decoding dyes record")
+	DyeFetchError  = fmt.Errorf("error fetching dyes record")
+
+	DyeInsertError  = fmt.Errorf("error Inserting dyes record")
+	DyeMarshalError = fmt.Errorf("error marshalling dyes record")
 )
 
 // Special errors which are in []byte format

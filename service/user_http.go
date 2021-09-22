@@ -48,7 +48,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 	skipDeckUserCheck:
 
-		valid, respBytes := validate(u)
+		valid, respBytes := Validate(u)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -125,7 +125,7 @@ func createUserHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(u)
+		valid, respBytes := Validate(u)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return
@@ -161,7 +161,7 @@ func updateUserHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(u)
+		valid, respBytes := Validate(u)
 		if !valid {
 			responseBadRequest(rw, respBytes)
 			return

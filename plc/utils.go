@@ -3,15 +3,12 @@ package plc
 import (
 	"context"
 	"mylab/cpagent/db"
+	"time"
 
 	"sync"
 
 	logger "github.com/sirupsen/logrus"
 )
-
-var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning, LidPidTuningInProgress bool
-var CurrentCycleTemperature, CurrentLidTemp float32
-var CurrentCycle uint16
 
 type DeckNumber struct {
 	Deck   string
@@ -53,9 +50,10 @@ const (
 	highestUint16                       = uint16(65535)
 )
 
-// 120 Seconds is the minimum UVLight On Time
 const (
-	minimumUVLightOnTime int64 = 2 * 60
+	// 120 Seconds is the minimum UVLight On Time
+	minimumUVLightOnTime       int64 = 2 * 60
+	maxCartridgeWellHeightPlay       = 5
 )
 
 // here we are hardcoding the shaker no in future this is to be fetched dynamically.
@@ -89,12 +87,18 @@ const (
 	DeckB = "B"
 )
 
+const FValueRegisterStartAddress = 800
+
+var HeatingCycleComplete, CycleComplete, DataCapture, ExperimentRunning, LidPidTuningInProgress bool
+var CurrentCycleTemperature, CurrentLidTemp float32
+var CurrentCycle uint16
+
 var deckRecipe map[string]db.Recipe
 var deckProcesses map[string][]db.Process
 var wrotePulses, executedPulses, aborted, paused, homed, EngineerOrAdminLogged sync.Map
 var runInProgress, magnetState, timerInProgress, heaterInProgress sync.Map
-var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress sync.Map
-var pIDCalibrationInProgress sync.Map
+var uvLightInProgress, syringeModuleState, shakerInProgress, tipDiscardInProgress, motorOperationCompleted sync.Map
+var shakerPIDCalibrationInProgress, recipeWasPaused, recipeStartTime sync.Map
 
 // tipHeight is the Height of tip from syringe's base
 var tipHeight map[string]float64
@@ -116,6 +120,10 @@ func loadUtils() {
 	aborted.Store(DeckB, false)
 	paused.Store(DeckA, false)
 	paused.Store(DeckB, false)
+	recipeWasPaused.Store(DeckA, false)
+	recipeWasPaused.Store(DeckB, false)
+	recipeStartTime.Store(DeckA, time.Now())
+	recipeStartTime.Store(DeckB, time.Now())
 	runInProgress.Store(DeckA, false)
 	runInProgress.Store(DeckB, false)
 	timerInProgress.Store(DeckA, false)
@@ -134,10 +142,12 @@ func loadUtils() {
 	syringeModuleState.Store(DeckB, OutDeck)
 	homed.Store(DeckA, false)
 	homed.Store(DeckB, false)
-	pIDCalibrationInProgress.Store("A", false)
-	pIDCalibrationInProgress.Store("B", false)
-	EngineerOrAdminLogged.Store("A", false)
-	EngineerOrAdminLogged.Store("B", false)
+	motorOperationCompleted.Store(DeckA, false)
+	motorOperationCompleted.Store(DeckB, false)
+	shakerPIDCalibrationInProgress.Store(DeckA, false)
+	shakerPIDCalibrationInProgress.Store(DeckB, false)
+	EngineerOrAdminLogged.Store(DeckA, false)
+	EngineerOrAdminLogged.Store(DeckB, false)
 
 	deckRecipe = map[string]db.Recipe{
 		DeckA: db.Recipe{},
@@ -352,3 +362,36 @@ func modifyDirectionAndDistanceToTravel(distanceToTravel *float64, direction *ui
 		*direction = 0
 	}
 }
+
+// During Recipe and Processes
+func DoesCartridgeWellExist(cd UniqueCartridge) bool {
+	if _, ok := cartridges[cd]; ok {
+		return true
+	}
+	logger.Errorln("Cartridge Doesn't Exist!")
+	return false
+}
+
+// Well Height Check
+func IsCartridgeWellHeightSafe(cd UniqueCartridge, height float64) bool {
+	if !DoesCartridgeWellExist(cd) {
+		return false
+	}
+
+	if cartridges[cd]["height"]+maxCartridgeWellHeightPlay < height {
+		logger.Errorln("Cartridge Height is unsafe!")
+		return false
+	}
+	return true
+}
+
+// Only During Recipe
+func DoesTipExist(id int64) bool {
+	if _, ok := tipstubes[id]; ok {
+		return true
+	}
+	logger.Errorln("Tip Doesn't Exist!")
+	return false
+}
+
+// TODO: Validate Consumable Distances and Motors here

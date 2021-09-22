@@ -71,12 +71,16 @@ var (
 
 	ProcessesRearrangeSuccess = "rearranging processes success"
 
-	CartridgeFetchSuccess = "cartridge record fetched successfully"
+	CartridgeFetchSuccess          = "cartridge record fetched successfully"
+	ConsumableDistanceFetchSuccess = "consumable distances records fetched successfully"
 
 	CartridgeInitialisedState     = "cartridge initialised"
 	CartridgeCompletedState       = "cartridge completed"
 	CartridgeListInitialisedState = "cartridge list initialised"
 	CartridgeListCompletedState   = "cartridge list completed"
+
+	ConsumableDistanceInitialisedState = "consumable initialised"
+	ConsumableDistanceCompletedState   = "ConsumableDistance completed"
 
 	TipTubeFetchSuccess  = "tip tube record fetched successfully"
 	TipTubeCreateSuccess = "tip tube record created successfully"
@@ -150,8 +154,13 @@ var (
 	LidPIDTuningStopped = "PID Tuning stopped successfully"
 
 	// Configs
-	UpdateConfigSuccess = "Config was updated successfully"
-	UserDeleteSuccess   = "user deleted successfully"
+	UpdateConfigSuccess         = "Config was updated successfully"
+	DyeToleranceProgressSuccess = "dye tolerance calculation in progress"
+	UserDeleteSuccess           = "user deleted successfully"
+
+	ConsumableDistanceUpdateSuccess = "consumable distance record updated successfully"
+	DyeCreateSuccess                = "dyes record created successfully"
+	DyeListSuccess                  = "dyes record listed successfully"
 )
 
 func GetMachineOperationMessage(operation string, state string) (message string) {

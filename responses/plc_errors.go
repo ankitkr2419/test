@@ -7,6 +7,12 @@ import (
 var (
 	PreviousRunInProgressError = fmt.Errorf("previous run already in progress... wait or abort it")
 
+	ShakerPidCalibrationError = fmt.Errorf("error doing shaker pid calibration")
+	AbortedError              = fmt.Errorf("Operation was Aborted")
+
+	ErrorAbortedState       = fmt.Errorf("system is in aborted state, please home the machine")
+	ErrorAlreadyPausedState = fmt.Errorf("system is already running, or done with the run")
+
 	PIDCalibrationError  = fmt.Errorf("error doing pid calibration")
 	ShakingError         = fmt.Errorf("error doing shaking")
 	HeatingError         = fmt.Errorf("error doing heating")

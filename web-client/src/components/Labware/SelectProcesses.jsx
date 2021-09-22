@@ -35,11 +35,7 @@ const SelectProcesses = (props) => {
 
       <TabContent activeTab={activeTab} className="flex-grow-1">
         <TabPane tabId="1">
-          <TipsDropDown
-            formik={formik}
-            allowedPositions={[1, 2, 3]}
-            tipsOptions={tipsOptions}
-          />
+          <TipsDropDown formik={formik} tipsOptions={tipsOptions} />
         </TabPane>
         <TabPane tabId="2">
           <TipPiercingCheckbox formik={formik} />
@@ -48,8 +44,8 @@ const SelectProcesses = (props) => {
           <TubesAndCartridgeSelection
             formik={formik}
             isDeck={true}
-            position={1}
-            allowedPositions={[4]}
+            id={1}
+            position={6}
             allOptions={tubesOptions}
           />
         </TabPane>
@@ -57,8 +53,8 @@ const SelectProcesses = (props) => {
           <TubesAndCartridgeSelection
             formik={formik}
             isDeck={true}
-            position={2}
-            allowedPositions={[5]}
+            id={2}
+            position={7}
             allOptions={tubesOptions}
           />
         </TabPane>
@@ -66,8 +62,8 @@ const SelectProcesses = (props) => {
           <TubesAndCartridgeSelection
             formik={formik}
             isDeck={false}
-            position={1}
-            allowedPositions={[1]}
+            id={1}
+            position={8}
             allOptions={cartridgeOptions}
           />
         </TabPane>
@@ -75,8 +71,8 @@ const SelectProcesses = (props) => {
           <TubesAndCartridgeSelection
             formik={formik}
             isDeck={true}
-            position={3}
-            allowedPositions={[6]}
+            id={3}
+            position={9}
             allOptions={tubesOptions}
           />
         </TabPane>
@@ -84,8 +80,8 @@ const SelectProcesses = (props) => {
           <TubesAndCartridgeSelection
             formik={formik}
             isDeck={false}
-            position={2}
-            allowedPositions={[2]}
+            id={2}
+            position={10}
             allOptions={cartridgeOptions}
           />
         </TabPane>
@@ -93,8 +89,8 @@ const SelectProcesses = (props) => {
           <TubesAndCartridgeSelection
             formik={formik}
             isDeck={true}
-            position={4}
-            allowedPositions={[7]}
+            id={4}
+            position={11}
             allOptions={tubesOptions}
           />
         </TabPane>

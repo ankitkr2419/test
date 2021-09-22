@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -16,6 +17,26 @@ const (
 type ProcessSequence struct {
 	ID             uuid.UUID `db:"id" json:"process_id" validate:"required"`
 	SequenceNumber int64     `db:"sequence_num" json:"sequence_num" validate:"required,gte=1"`
+}
+
+type WellsSlice struct {
+	sort.IntSlice // Wells
+	Heights       []int
+}
+
+func (s WellsSlice) Swap(i, j int) {
+	s.IntSlice.Swap(i, j)
+	s.Heights[i], s.Heights[j] = s.Heights[j], s.Heights[i]
+}
+
+func NewWellsSlice(n, m []int) *WellsSlice {
+	if len(m) != len(n) {
+		return nil
+	}
+
+	s := &WellsSlice{IntSlice: sort.IntSlice(n), Heights: m}
+	sort.Sort(s)
+	return s
 }
 
 func CalculateTimeInSeconds(t string) (totalTime int64, err error) {

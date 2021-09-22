@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
@@ -43,13 +45,20 @@ func createTipOperationHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(tipOpr)
+		valid, respBytes := Validate(tipOpr)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.TipOperationValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
-
+		if tipOpr.Type == db.PickupTip {
+			err = ValidateTipPickupObject(req.Context(), deps, tipOpr, recipeID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error(err.Error())
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+				return
+			}
+		}
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(&recipeID, nil)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
@@ -143,13 +152,27 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		valid, respBytes := validate(tipOpr)
+		valid, respBytes := Validate(tipOpr)
 		if !valid {
 			logger.WithField("err", "Validation Error").Errorln(responses.TipOperationValidationError)
 			responseBadRequest(rw, respBytes)
 			return
 		}
 
+		process, err := deps.Store.ShowProcess(req.Context(), id)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ProcessFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ProcessFetchError.Error()})
+			return
+		}
+		if tipOpr.Type == db.PickupTip {
+			err = ValidateTipPickupObject(req.Context(), deps, tipOpr, process.RecipeID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error(err.Error())
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+				return
+			}
+		}
 		err = plc.CheckIfRecipeOrProcessSafeForCUDs(nil, &id)
 		if err != nil {
 			responseCodeAndMsg(rw, http.StatusConflict, ErrObj{Err: err.Error()})
@@ -168,4 +191,48 @@ func updateTipOperationHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.TipOperationUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.TipOperationUpdateSuccess})
 	})
+}
+
+func ValidateTipPickupObject(ctx context.Context, deps Dependencies, to db.TipOperation, recipeID uuid.UUID) (err error) {
+	//check Tip ID from recipe
+	recipe, err := deps.Store.ShowRecipe(ctx, recipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+		return responses.RecipeFetchError
+	}
+
+	var tipID int64
+	switch to.Position {
+	case 1:
+		if recipe.Position1 == nil {
+			return responses.TipMissingError
+		}
+		tipID = *recipe.Position1
+	case 2:
+		if recipe.Position2 == nil {
+			return responses.TipMissingError
+		}
+		tipID = *recipe.Position2
+	case 3:
+		if recipe.Position3 == nil {
+			return responses.TipMissingError
+		}
+		tipID = *recipe.Position3
+	case 4:
+		if recipe.Position4 == nil {
+			return responses.TipMissingError
+		}
+		tipID = *recipe.Position4
+	case 5:
+		if recipe.Position5 == nil {
+			return responses.TipMissingError
+		}
+		tipID = *recipe.Position5
+	}
+
+	if !plc.DoesTipExist(tipID) {
+		return responses.TipDoesNotExistError
+	}
+
+	return
 }

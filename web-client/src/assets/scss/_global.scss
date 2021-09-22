@@ -89,7 +89,8 @@ body {
 .login-content,
 .activity-content,
 .landing-content,
-.calibration-content {
+.calibration-content,
+.manageUsers-content {
   position: relative;
   @extend .flex-100;
   padding: rem(40px 72px);
@@ -524,6 +525,33 @@ button:focus {
       padding: 12px;
     }
   }
+
+  &.table-consumable {
+    display: block;
+    tbody {
+      display: block;
+      height: 200px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    thead {
+      display: block;
+      tr {
+        box-shadow: rem(0 4px 16px) #00000029;
+      }
+
+      th {
+        background-color: $white;
+        width: 25%;
+      }
+    }
+
+    th.th-counter {
+      font-size: rem(12px);
+      line-height: rem(16px);
+      padding: 12px;
+    }
+  }
 }
 
 // Table Striped
@@ -547,6 +575,17 @@ button:focus {
 .table-steps-wrapper {
   &.-hold {
     height: rem(218px);
+    margin: rem(0 0 8px);
+  }
+
+  &.-cycle {
+    height: rem(290px);
+  }
+}
+
+.table-consumable-wrapper {
+  &.-hold {
+    height: rem(118px);
     margin: rem(0 0 8px);
   }
 
@@ -687,6 +726,9 @@ button:focus {
       }
     }
   }
+  .fix-height-card {
+    height: 490px !important;
+  }
 }
 //For Input Field
 .form-control {
@@ -720,18 +762,6 @@ button:focus {
   height: 30.75rem !important;
 }
 
-// Modal Heading
-.modal-heading {
-  background-color: rgba(178, 218, 209, 0.22);
-  border-radius: 2.25rem 2.25rem 0 0;
-  height: 3rem;
-
-  .title {
-    font-size: 15px;
-    line-height: 20px;
-  }
-}
-
 .recipe-action {
   .icon-play,
   .icon-edit-pencil,
@@ -743,4 +773,13 @@ button:focus {
 
 .template-buttonBar {
   top: 37.5rem !important;
+}
+
+.colored-circle {
+  display: inline-block;
+  margin-bottom: -2px;
+  border-radius: 50%;
+  border-width: 0.5px;
+  height: 14px;
+  width: 14px;
 }

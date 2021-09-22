@@ -3,13 +3,20 @@ import ActivityComponent from "components/ActivityLog";
 import { useSelector, useDispatch } from "react-redux";
 import {
   activityLogInitiated,
-  mailReportInitiated,
 } from "action-creators/activityLogActionCreators";
 import { toast } from "react-toastify";
-import { TOAST_MESSAGE } from "appConstants";
+import { ROUTES, TOAST_MESSAGE } from "appConstants";
+import { useHistory } from "react-router";
+import {
+  createExperiment,
+  createExperimentSucceeded,
+  fetchExperiments,
+} from "action-creators/experimentActionCreators";
+import { loginReset } from "action-creators/loginActionCreators";
 
 const ActivityContainer = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   //get login reducer details
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -22,33 +29,34 @@ const ActivityContainer = () => {
   const activityLogData = activityLogReducer.toJS();
   const { activityLogs } = activityLogData;
 
-  //get status of mail from reducer
-  const mailReportReducer = useSelector((state) => state.mailReportReducer);
-  const { isLoading, error } = mailReportReducer.toJS();
+  const createExperimentReducer = useSelector(
+    (state) => state.createExperimentReducer
+  );
+  const createExperimentReducerData = createExperimentReducer.toJS();
 
   //search activity by experiment name
   const [searchText, setSearchText] = useState("");
+
+  // reset reducers if activity log tab is clicked
+  useEffect(() => {
+    dispatch(loginReset());
+  }, []);
 
   //get activity list api call
   useEffect(() => {
     dispatch(activityLogInitiated(token));
   }, []);
 
-  // check if mail is sent or not and show toast msg acc.
-  useEffect(() => {
-    if (isLoading === false && error === true) {
-      toast.success(TOAST_MESSAGE.sendingMailSuccess);
-    } else if (isLoading === false && error === false) {
-      toast.success(TOAST_MESSAGE.sendingMailSuccess);
-    }
-  }, [isLoading, error]);
-
   const onSearchTextChanged = (text) => {
     setSearchText(text);
   };
 
-  const mailActivityReportHandler = () => {
-    // dispatch(mailReportInitiated({ report, token })); //API call to send an email
+  const expandLogHandler = (experimentDetails) => {
+    // Call experiment success action to populate reducer.
+    dispatch(
+      createExperimentSucceeded({ ...experimentDetails, isExpanded: true })
+    );
+    history.push(ROUTES.plate);
   };
 
   return (
@@ -56,7 +64,7 @@ const ActivityContainer = () => {
       experiments={activityLogs}
       searchText={searchText}
       onSearchTextChanged={onSearchTextChanged}
-      mailActivityReportHandler={mailActivityReportHandler}
+      expandLogHandler={expandLogHandler}
     />
   );
 };
