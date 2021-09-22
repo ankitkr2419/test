@@ -97,6 +97,7 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 func getBaselineValuesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var bl Baseline
+		rw.Header().Add("Content-Type", "application/json")
 
 		vars := mux.Vars(req)
 		expID, err := parseUUID(vars["experiment_id"])
@@ -154,7 +155,6 @@ func getBaselineValuesHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		rw.Write(respBytes)
-		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusAccepted)
 	})
 }
