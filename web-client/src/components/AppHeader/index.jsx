@@ -324,9 +324,9 @@ const AppHeader = (props) => {
                 handleWhiteLightClick={handleWhiteLightClick}
               />
             </DropdownItem>
-            <DropdownItem onClick={handleHelpSupportBtn}>
+            {/* <DropdownItem onClick={handleHelpSupportBtn}>
               {"Help & Support"}
-            </DropdownItem>
+            </DropdownItem> */}
           </DropdownMenu>
         </Dropdown>
       )}
