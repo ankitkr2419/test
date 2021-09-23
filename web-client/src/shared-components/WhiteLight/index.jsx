@@ -7,16 +7,17 @@ const WhiteLight = (props) => {
   const { isLightOn, handleWhiteLightClick } = props;
 
   return (
-    <div className="mt-3 ml-auto">
+    <div className="d-flex ml-auto">
+      <Text className="text-default my-1" size={18}>
+        White Light
+      </Text>
       <Switch
+        className="ml-3"
         id="whiteLightSwitch"
         name="whiteLightSwitch"
         checked={isLightOn}
         onChange={handleWhiteLightClick}
       />
-      <Text className="text-default pl-1" size={12}>
-        White Light
-      </Text>
     </div>
   );
 };

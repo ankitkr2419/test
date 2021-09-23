@@ -90,6 +90,8 @@ const AppHeader = (props) => {
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
   const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
+
   const [isExpSuccessModalVisible, setExpSuccessModalVisibility] =
     useState(false);
   const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
@@ -106,8 +108,13 @@ const AppHeader = (props) => {
     false
   );
 
-  const toggleUserDropdown = () =>
+  const toggleUserDropdown = () => {
     setUserDropdownOpen((prevState) => !prevState);
+  };
+
+  const toggleMenuDropdown = () => {
+    setMenuDropdownOpen((prevState) => !prevState);
+  };
 
   useEffect(() => {
     if (isExperimentSucceeded) {
@@ -273,6 +280,11 @@ const AppHeader = (props) => {
     }
   };
 
+  const handleHelpSupportBtn = () => {
+    toggleMenuDropdown();
+    // model => open
+  };
+
   return (
     <Header>
       <Logo isUserLoggedIn={isUserLoggedIn} app={app} />
@@ -297,12 +309,26 @@ const AppHeader = (props) => {
         </Nav>
       )}
 
-      {/* White Light Switch */}
+      {/* For new menu items, we need to toggle it manually. */}
       {app === APP_TYPE.EXTRACTION && (
-        <WhiteLight
-          isLightOn={isLightOn}
-          handleWhiteLightClick={handleWhiteLightClick}
-        />
+        <Dropdown
+          className="ml-auto"
+          isOpen={menuDropdownOpen}
+          toggle={toggleMenuDropdown}
+        >
+          <DropdownToggle icon name="menu" size={16} />
+          <DropdownMenu right onClick={toggleMenuDropdown}>
+            <DropdownItem>
+              <WhiteLight
+                isLightOn={isLightOn}
+                handleWhiteLightClick={handleWhiteLightClick}
+              />
+            </DropdownItem>
+            <DropdownItem onClick={handleHelpSupportBtn}>
+              {"Help & Support"}
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       )}
 
       {isUserLoggedIn && (
@@ -520,21 +546,6 @@ const AppHeader = (props) => {
               handleCrossBtn={toggleConfirmBackModal}
             />
           )}
-
-          {/* <Dropdown isOpen={menuDropdownOpen} toggle={toggleMenuClick}>
-              <DropdownToggle icon name="menu" size={18} />
-              <DropdownMenu right>
-                <DropdownItem>
-                  <Switch
-                    id="whiteLightSwitch"
-                    name="whiteLightSwitch"
-                    label="White Light"
-                    checked={whiteLightIsOn}
-                    onChange={handleWhiteLightClick}
-                  />
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown> */}
         </div>
       )}
     </Header>
