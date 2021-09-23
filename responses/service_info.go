@@ -78,6 +78,8 @@ var (
 	CartridgeCompletedState       = "cartridge completed"
 	CartridgeListInitialisedState = "cartridge list initialised"
 	CartridgeListCompletedState   = "cartridge list completed"
+	CartridgeCreatedSuccess       = "cartridge created successfully"
+	CartridgeDeletedSuccess       = "cartridge deleted successfully"
 
 	ConsumableDistanceInitialisedState = "consumable initialised"
 	ConsumableDistanceCompletedState   = "ConsumableDistance completed"
