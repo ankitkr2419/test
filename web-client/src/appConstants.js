@@ -61,16 +61,14 @@ export const SOCKET_MESSAGE_TYPE = {
   progressHeater: "PROGRESS_HEATER",
   progressPidTuning: "PROGRESS_SHAKERPIDTUNING",
   successPidTuning: "SUCCESS_SHAKERPIDTUNING",
-  abortPidTuning: "ErrorOperationAborted",
   PROGRESSLidPIDTuning: "PROGRESS_LidPIDTuning",
   ErrorPIDTuning: "ErrorPIDTuning",
   SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
   progressShakerRun: "PROGRESS_SHAKERRUN",
   successShakerRun: "SUCCESS_SHAKERRUN",
-  abortShakerRun: "ErrorOperationAborted",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
-  abortHeaterRun: "ErrorOperationAborted",
+  ErrorOperationAborted: "ErrorOperationAborted",
   progressDyeCalibration: "PROGRESS_OPTCALIB",
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
@@ -206,6 +204,7 @@ export const API_ENDPOINTS = {
   consumable: "consumable-distance",
   dyeCalibration: "optical-caliberation",
   users: "users",
+  whiteLight: "whiteLight",
 };
 
 export const MODAL_MESSAGE = {
@@ -640,6 +639,12 @@ export const TEMPERATURE_GRAPH_OPTIONS = {
       },
     ],
   },
+};
+
+// default min values for amplification plot
+export const DEFAULT_MIN_VALUE = {
+  yAxisMin: 0,
+  xAxisMin: 1,
 };
 
 //analyse data graph constants

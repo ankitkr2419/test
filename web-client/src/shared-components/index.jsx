@@ -24,6 +24,7 @@ import TopHeading from "./TopHeading";
 import ProcessRemaining from "./ProcessRemaining";
 import TemperatureInfo from "./TemperatureInfo";
 import TimeInfo from "./TimeInfo";
+import WhiteLight from "./WhiteLight";
 
 export {
   ButtonGroup,
@@ -56,4 +57,5 @@ export {
   ProcessRemaining,
   TimeInfo,
   TemperatureInfo,
+  WhiteLight,
 };

@@ -52,6 +52,7 @@ import { wellGraphSaga } from "./wellGraphSaga";
 import { temperatureGraphSaga } from "./tempatureGraphSaga";
 import { analyseDataGraphSaga } from "./analyseDataGraphSaga";
 import { usersSaga } from "./usersSaga";
+import { whiteLightSaga } from "./whiteLightSaga";
 
 const allSagas = [
   createTemplateSaga(),
@@ -96,6 +97,7 @@ const allSagas = [
   temperatureGraphSaga(),
   analyseDataGraphSaga(),
   usersSaga(),
+  whiteLightSaga(),
 ];
 
 export default function* rootSaga() {

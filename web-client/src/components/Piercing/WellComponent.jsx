@@ -49,10 +49,12 @@ export const WellComponent = (props) => {
           <Coordinate direction="horizontal" className="px-0 mx-0 well-no">
             {wellsObjArray &&
               wellsObjArray.map((wellObj, index) => {
+                const { height } = wellObj;
                 return (
                   <CoordinateItem
                     key={wellObj.id}
-                    coordinateValue={`${wellObj.footerText}`}
+                    // TODO: Check with UI
+                    // coordinateValue={height ? `Height: ${height}` : ""}
                   />
                 );
               })}
