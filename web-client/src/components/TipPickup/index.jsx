@@ -107,12 +107,6 @@ const TipPickupComponent = () => {
                         formik.setFieldValue("tipPosition", e.value)
                       }
                     />
-                    <Label
-                      for="tip-pickup"
-                      className="font-weight-bold tip-pickup-note mt-2"
-                    >
-                      200 ul
-                    </Label>
                     <FormError>Incorrect Option</FormError>
                   </div>
                 </FormGroup>
