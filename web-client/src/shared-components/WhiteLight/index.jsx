@@ -1,23 +1,27 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Switch } from "core-components";
-import { Text } from "shared-components";
+import { ImageIcon, Text } from "shared-components";
+import bulb from "assets/images/bulb.svg";
+import { StyledWhiteLightComponent } from "./Style";
 
 const WhiteLight = (props) => {
   const { isLightOn, handleWhiteLightClick } = props;
 
   return (
-    <div className="mt-3 ml-auto">
+    <StyledWhiteLightComponent className="d-flex ml-auto">
+      <ImageIcon className="bulb" src={bulb} />
+      <Text className="text-default my-1 px-3" size={18}>
+        White Light
+      </Text>
       <Switch
+        className="ml-3"
         id="whiteLightSwitch"
         name="whiteLightSwitch"
         checked={isLightOn}
         onChange={handleWhiteLightClick}
       />
-      <Text className="text-default pl-1" size={12}>
-        White Light
-      </Text>
-    </div>
+    </StyledWhiteLightComponent>
   );
 };
 
