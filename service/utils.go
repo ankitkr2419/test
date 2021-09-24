@@ -29,6 +29,11 @@ const (
 	// Shaker Temp related ranges
 	minShakerTempAllowed = 20
 	maxShakerTempAllowed = 120
+
+	deckAMinCalibID = 1001
+	deckAMaxCalibID = 1050
+	deckBMinCalibID = 1051
+	deckBMaxCalibID = 1100
 )
 
 const (
