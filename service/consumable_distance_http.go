@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -53,6 +54,50 @@ func listConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 		var ConsumableDistance []db.ConsumableDistance
 		ConsumableDistance, err := deps.Store.ListConsDistances()
 
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.ConsumableDistanceCompletedState)
+			}
+		}()
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConsumableDistanceFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.ConsumableDistanceFetchError)
+			return
+		}
+
+		logger.Infoln(responses.ConsumableDistanceFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, ConsumableDistance)
+	})
+}
+
+func listConsumableDistanceDeckHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		deck := req.URL.Query().Get("deck")
+
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.ConsumableDistanceInitialisedState)
+
+		var ConsumableDistance []db.ConsumableDistance
+		var min, max int64
+
+		switch deck {
+		case plc.DeckA:
+			min = deckAMinCalibID
+			max = deckAMaxCalibID
+		case plc.DeckB:
+			min = deckBMinCalibID
+			max = deckBMaxCalibID
+		default:
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DeckNameInvalid.Error()})
+			logger.WithField("err", "Invalid Deck").Error(responses.DeckNameInvalid)
+			return
+		}
+
+		ConsumableDistance, err := deps.Store.ListConsDistancesDeck(req.Context(), min, max)
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {

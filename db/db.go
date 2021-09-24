@@ -142,4 +142,5 @@ type Storer interface {
 	DeleteUser(ctx context.Context, username string) (err error)
 	ListDyes(ctx context.Context) (DBdye []Dye, err error)
 	UpdateConsumableDistance(ctx context.Context, c ConsumableDistance) (err error)
+	ListConsDistancesDeck(ctx context.Context, min, max int64) (consumabledistance []ConsumableDistance, err error)
 }
