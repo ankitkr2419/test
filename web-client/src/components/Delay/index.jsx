@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import { API_ENDPOINTS, HTTP_METHODS, ROUTES } from "appConstants";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
+import { timeConstants } from "appConstants";
 
 const DelayComponent = (props) => {
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -27,12 +28,16 @@ const DelayComponent = (props) => {
   const editReducer = useSelector((state) => state.editProcessReducer);
   const editReducerData = editReducer.toJS();
 
+  const { SEC_IN_ONE_HOUR, SEC_IN_ONE_MIN, MIN_IN_ONE_HOUR } = timeConstants;
+
   let hours = 0;
   let mins = 0;
+  let secs = 0;
   if (editReducerData?.delay_time) {
     const delay = editReducerData.delay_time;
-    hours = Math.floor(delay / 3600);
-    mins = Math.floor((delay % 3600) / 60);
+    hours = Math.floor(delay / SEC_IN_ONE_HOUR);
+    mins = Math.floor((delay % SEC_IN_ONE_HOUR) / MIN_IN_ONE_HOUR);
+    secs = Math.floor(delay % MIN_IN_ONE_HOUR);
   }
 
   const processesReducer = useSelector((state) => state.processesReducer);
@@ -40,7 +45,7 @@ const DelayComponent = (props) => {
   const history = useHistory();
 
   const formik = useFormik({
-    initialValues: { hours: hours, mins: mins },
+    initialValues: { hours: hours, mins: mins, secs: secs },
     enableReinitialize: true,
   });
 
@@ -58,7 +63,8 @@ const DelayComponent = (props) => {
   const saveBtnHandler = () => {
     const hours = parseInt(formik.values.hours);
     const mins = parseInt(formik.values.mins);
-    const time = hours * 60 * 60 + mins * 60;
+    const secs = parseInt(formik.values.secs);
+    const time = hours * 60 * 60 + mins * 60 + secs;
 
     const requestBody = {
       body: { delay_time: time },
@@ -138,6 +144,26 @@ const DelayComponent = (props) => {
                         Minutes
                       </Label>
                       <FormError>Incorrect Minutes</FormError>
+                    </div>
+
+                    <div className="d-flex flex-column input-field ml-4">
+                      <Input
+                        type="text"
+                        name="seconds"
+                        id="seconds"
+                        placeholder="Type here"
+                        value={formik.values.secs}
+                        onChange={(e) =>
+                          formik.setFieldValue("secs", e.target.value)
+                        }
+                      />
+                      <Label
+                        for="delay"
+                        className="font-weight-bold delay-note mt-2"
+                      >
+                        Seconds
+                      </Label>
+                      <FormError>Incorrect Seconds</FormError>
                     </div>
                   </FormGroup>
                 </div>
