@@ -138,7 +138,11 @@ var (
 	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
 	AuditLogCreateError = fmt.Errorf("error failed saving log")
 
-	CartridgeFetchError = fmt.Errorf("error fetching cartridge record")
+	CartridgeFetchError     = fmt.Errorf("error fetching cartridge record")
+	CartridgeDecodeError    = fmt.Errorf("Error while decoding Cartridge data")
+	CartridegInsertionError = fmt.Errorf("Error while inserting Cartridge")
+	CartridegDeletionError  = fmt.Errorf("Error while deleting Cartridge")
+	CartridgeIDParseError   = fmt.Errorf("Error while parsing Cartridge id")
 
 	InvalidSourcePosition                 = fmt.Errorf("error source position is invalid")
 	InvalidDestinationPosition            = fmt.Errorf("error destination position is invalid")

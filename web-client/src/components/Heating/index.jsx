@@ -61,7 +61,7 @@ const HeatingComponent = (props) => {
       dispatch(saveProcessInitiated(requestBody));
     } else {
       //error
-      toast.error("Invalid Request");
+      toast.error("Invalid Request", { autoClose: false });
     }
   };
 

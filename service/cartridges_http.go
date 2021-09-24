@@ -45,8 +45,8 @@ func createCartridgeHandler(deps Dependencies) http.HandlerFunc {
 
 		err := json.NewDecoder(req.Body).Decode(&m)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			logger.WithField("err", err.Error()).Error("Error while decoding Cartridge data")
+			logger.WithField("err", err.Error()).Error(responses.CartridgeDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err : responses.CartridgeDecodeError.Error()})
 			return
 		}
 
@@ -64,13 +64,12 @@ func createCartridgeHandler(deps Dependencies) http.HandlerFunc {
 		}
 		err = deps.Store.InsertCartridge(req.Context(), m.Cartridge, m.CartridgeWells)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error while inserting Cartridge")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{ Err: responses.CartridegInsertionError.Error() })
+			logger.WithField("err", err.Error()).Error(responses.CartridegInsertionError)
 			return
 		}
 
-		responseCodeAndMsg(rw, http.StatusCreated, m)
-
+		responseCodeAndMsg(rw, http.StatusCreated, MsgObj{ Msg: responses.CartridgeCreatedSuccess })
 	})
 }
 
@@ -79,20 +78,18 @@ func deleteCartridgeHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		id, err := strconv.ParseInt(vars["id"], 10, 64)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			logger.WithField("err", err.Error()).Error(responses.CartridgeIDParseError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err : responses.CartridgeIDParseError.Error()})
 			return
 		}
 
 		err = deps.Store.DeleteCartridge(req.Context(), id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			logger.WithField("err", err.Error()).Error("Error while deleting Cartridge")
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{ Err: responses.CartridegDeletionError.Error() })
+			logger.WithField("err", err.Error()).Error(responses.CartridegDeletionError)
 			return
 		}
-		response := MsgObj{
-			Msg: "cartridge deleted successfully",
-		}
-		responseCodeAndMsg(rw, http.StatusOK, response)
 
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{ Msg: responses.CartridgeDeletedSuccess})
 	})
 }

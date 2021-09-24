@@ -136,7 +136,7 @@ export const connectSocket = (dispatch) => {
           let parsedErrorData = JSON.parse(data);
           let errorMessage = parsedErrorData.message;
           if (errorMessage) {
-            toast.error(errorMessage);
+            toast.error(errorMessage, { autoClose: false });
           }
           break;
         case SOCKET_MESSAGE_TYPE.progressHeater:
