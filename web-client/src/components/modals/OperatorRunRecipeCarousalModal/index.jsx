@@ -35,21 +35,21 @@ const OperatorRunRecipeCarousalModal = (props) => {
           <OperatorCarousal images={images} setNextButtonVisbile={setNextButtonVisbile} />
         </RecipeFlowSlider>
 
-        {isNextButtonVisible && (
-          <NextButton>
-            <Button
-              className="border-primary"
-              color="outline-secondary"
-              size="sm"
-              onClick={() => {
-                handleCarousalModal(); //hide/show
-                onConfirmedRecipeSelection(); //save data in reducer
-              }}
-            >
-              Next
-            </Button>
-          </NextButton>
-        )}
+        {/** next button will always visible but label will be 'skip' instead 'next' for previous slides */}
+        <NextButton>
+          <Button
+            className="border-primary"
+            color="outline-secondary"
+            size="sm"
+            onClick={() => {
+              handleCarousalModal(); //hide/show
+              onConfirmedRecipeSelection(); //save data in reducer
+            }}
+          >
+            {isNextButtonVisible ? "Next" : "Skip"}
+          </Button>
+        </NextButton>
+        
       </ModalBody>
     </Modal>
   );

@@ -4,7 +4,7 @@ import { useHistory, useLocation } from "react-router";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
-import { Logo, ButtonIcon, Text, Icon, MlModal } from "shared-components";
+import { Logo, ButtonIcon, Text, MlModal, WhiteLight } from "shared-components";
 import {
   logoutInitiated,
   loginReset,
@@ -46,6 +46,7 @@ import {
 } from "./constants";
 import { Header } from "./Header";
 import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
+import { whiteLightInitiated } from "action-creators/whiteLightActionCreators";
 
 const AppHeader = (props) => {
   const {
@@ -72,6 +73,7 @@ const AppHeader = (props) => {
   const createExperimentReducer = useSelector(
     (state) => state.createExperimentReducer
   );
+  const whiteLightReducer = useSelector((state) => state.whiteLightReducer);
 
   const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -82,11 +84,14 @@ const AppHeader = (props) => {
   const isExpanded = createExperimentReducer.get("isExpanded");
   const result = createExperimentReducer.get("result");
   const btnProps = getBtnPropObj(result);
+  const { isLightOn } = whiteLightReducer.toJS();
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
   const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
+
   const [isExpSuccessModalVisible, setExpSuccessModalVisibility] =
     useState(false);
   const [isRunConfirmModalVisible, setRunConfirmModalVisibility] =
@@ -103,8 +108,13 @@ const AppHeader = (props) => {
     false
   );
 
-  const toggleUserDropdown = () =>
+  const toggleUserDropdown = () => {
     setUserDropdownOpen((prevState) => !prevState);
+  };
+
+  const toggleMenuDropdown = () => {
+    setMenuDropdownOpen((prevState) => !prevState);
+  };
 
   useEffect(() => {
     if (isExperimentSucceeded) {
@@ -257,10 +267,23 @@ const AppHeader = (props) => {
     const redirectPath = getRedirectObj(currentPathname).redirectPath;
     history.push(redirectPath);
   };
-  
+
   const handleManageUsersClick = () => {
     history.push(ROUTES.users);
-  }
+  };
+
+  const handleWhiteLightClick = () => {
+    if (isLightOn === true) {
+      // dispatch(whiteLightInitiated())
+    } else {
+      // dispatch(whiteLightInitiated())
+    }
+  };
+
+  const handleHelpSupportBtn = () => {
+    toggleMenuDropdown();
+    // model => open
+  };
 
   return (
     <Header>
@@ -285,6 +308,29 @@ const AppHeader = (props) => {
           )}
         </Nav>
       )}
+
+      {/* For new menu items, we need to toggle it manually. */}
+      {app === APP_TYPE.EXTRACTION && (
+        <Dropdown
+          className="ml-auto"
+          isOpen={menuDropdownOpen}
+          toggle={toggleMenuDropdown}
+        >
+          <DropdownToggle icon name="menu" size={16} />
+          <DropdownMenu right onClick={toggleMenuDropdown}>
+            <DropdownItem>
+              <WhiteLight
+                isLightOn={isLightOn}
+                handleWhiteLightClick={handleWhiteLightClick}
+              />
+            </DropdownItem>
+            {/* <DropdownItem onClick={handleHelpSupportBtn}>
+              {"Help & Support"}
+            </DropdownItem> */}
+          </DropdownMenu>
+        </Dropdown>
+      )}
+
       {isUserLoggedIn && (
         <div className="header-elements d-flex align-items-center ml-auto">
           {/* <PrintDataModal /> */}
@@ -500,19 +546,6 @@ const AppHeader = (props) => {
               handleCrossBtn={toggleConfirmBackModal}
             />
           )}
-
-          {/**Uncomment this when required to add these features */}
-          {/* <ActionBtnList className="d-flex justify-content-between align-items-center list-unstyled mb-0">
-            <ActionBtnListItem>
-              <Icon name="setting" size={18} />
-            </ActionBtnListItem>
-            <ActionBtnListItem>
-              <Icon name="notifications" size={18} />
-            </ActionBtnListItem>
-            <ActionBtnListItem>
-              <Icon name="menu" size={18} />
-            </ActionBtnListItem>
-          </ActionBtnList> */}
         </div>
       )}
     </Header>
