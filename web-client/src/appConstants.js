@@ -183,6 +183,7 @@ export const API_ENDPOINTS = {
   pidUpdate: "configs/extraction",
   manual: "manual",
   motor: "motor",
+  senseAndHit: "senseAndHit",
   startShaking: "start-shaking",
   startHeating: "start-heating",
   emailReport: "email-report",

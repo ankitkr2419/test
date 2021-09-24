@@ -53,7 +53,7 @@ const AspireDispenseComponent = () => {
       disabledTab[isAspire ? "aspire" : "dispense"][currentTabName];
 
     if (isCurrentTabDisabled === true) {
-      toast.warning("Please select different tab");
+      toast.warning("Please select different tab", { autoClose: false });
     }
   }, [isAspire]);
 

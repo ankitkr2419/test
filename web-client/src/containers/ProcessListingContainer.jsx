@@ -123,7 +123,8 @@ const ProcessListingContainer = (props) => {
       toast.error(
         direction === "up"
           ? "We can not move first process up"
-          : "We can not move last process down"
+          : "We can not move last process down",
+        { autoClose: false }
       );
       //hide menu
       toggleIsOpen(processId);
