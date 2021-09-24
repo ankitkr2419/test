@@ -129,13 +129,14 @@ export const connectSocket = (dispatch) => {
         // case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
         case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
+        case SOCKET_MESSAGE_TYPE.ErrorPCR:
           dispatch(showErrorModal(data));
           break;
         case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:
           let parsedErrorData = JSON.parse(data);
           let errorMessage = parsedErrorData.message;
           if (errorMessage) {
-            toast.error(errorMessage);
+            toast.error(errorMessage, { autoClose: false });
           }
           break;
         case SOCKET_MESSAGE_TYPE.progressHeater:

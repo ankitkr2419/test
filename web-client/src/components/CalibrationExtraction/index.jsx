@@ -33,6 +33,7 @@ const CalibrationExtractionComponent = (props) => {
     handleLogout,
     handlePidUpdateBtn,
     handleMotorBtn,
+    handleSenseAndHitBtn,
     handleSaveDetailsBtn,
     handleUpdateMotorDetailsBtn,
     handleCreateCartridgeBtn,
@@ -119,7 +120,11 @@ const CalibrationExtractionComponent = (props) => {
           />
 
           {/* Motor Component -   */}
-          <MotorComponent formik={formik} handleMotorBtn={handleMotorBtn} />
+          <MotorComponent
+            formik={formik}
+            handleMotorBtn={handleMotorBtn}
+            handleSenseAndHitBtn={handleSenseAndHitBtn}
+          />
 
           {/* Update Motor Component -   */}
           <UpdateMotorComponent

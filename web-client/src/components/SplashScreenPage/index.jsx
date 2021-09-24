@@ -13,7 +13,7 @@ const SplashScreenComponent = (props) => {
     if(redirectionPath){
       return history.push(redirectionPath);
     } else {
-      toast.warn('Unknown application type!');
+      toast.warning('Unknown application type!', { autoClose: false });
     }
   };
 

@@ -33,6 +33,7 @@ import {
   fetchConsumableActions,
   updateConsumableActions,
   addConsumableActions,
+  senseAndHitActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -228,6 +229,17 @@ export const motorInitiated = (token, body) => ({
 
 export const motorFailed = ({ error }) => ({
   type: motorActions.motorActionFailure,
+  payload: { error },
+});
+
+// action creators for sense and hit
+export const senseAndHitInitiated = (token, body) => ({
+  type: senseAndHitActions.senseAndHitActionInitiated,
+  payload: { token, body },
+});
+
+export const senseAndHitFailed = ({ error }) => ({
+  type: senseAndHitActions.senseAndHitActionFailure,
   payload: { error },
 });
 

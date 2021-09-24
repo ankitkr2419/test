@@ -26,7 +26,7 @@ import {
 import { isBtnDisabled } from "./helpers";
 
 const MotorComponent = (props) => {
-  const { handleMotorBtn, formik } = props;
+  const { handleMotorBtn, handleSenseAndHitBtn, formik } = props;
   const { motorNumber, direction, distance } = formik.values;
 
   const handleBlurDistance = (value) => {
@@ -66,7 +66,7 @@ const MotorComponent = (props) => {
         >
           {"Start Motor"}
         </Text>
-        <Form onSubmit={handleMotorBtn}>
+        <Form>
           <Row form>
             <Col sm={4}>
               <FormGroup>
@@ -151,9 +151,22 @@ const MotorComponent = (props) => {
           <Row>
             <Col>
               <Center className="text-center pt-3">
-                <Button disabled={isBtnDisabled(formik.values)} color="primary">
+                <Button
+                  className="mx-3"
+                  disabled={isBtnDisabled(formik.values)}
+                  color="primary"
+                  onClick={handleMotorBtn}
+                >
                   Start Motor
                 </Button>
+
+                {/* <Button
+                  className="mx-3"
+                  color="primary"
+                  onClick={handleSenseAndHitBtn}
+                >
+                  {"Sense & Hit"}
+                </Button> */}
               </Center>
             </Col>
           </Row>

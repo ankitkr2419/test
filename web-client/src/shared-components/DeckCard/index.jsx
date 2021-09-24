@@ -167,9 +167,11 @@ const DeckCard = (props) => {
     /** one cannot switch between deck while adding/editing processes.*/
     if (deckName !== activeDeckName && isDeckBlocked) {
       if (location.pathname === `/${ROUTES.calibration}`) {
-        toast.warning(TOAST_MESSAGE.deckBlockForCalibration);
+        toast.warning(TOAST_MESSAGE.deckBlockForCalibration, {
+          autoClose: false,
+        });
       } else {
-        toast.warning(TOAST_MESSAGE.deckBlockForProcess);
+        toast.warning(TOAST_MESSAGE.deckBlockForProcess, { autoClose: false });
       }
       return;
     }

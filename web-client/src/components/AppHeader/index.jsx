@@ -225,7 +225,7 @@ const AppHeader = (props) => {
   const onNavLinkClickHandler = (event, pathname) => {
     if (getIsNavLinkDisabled(pathname)) {
       if (pathname === `/${ROUTES.calibration}`) {
-        toast.warning(TOAST_MESSAGE.calRedirect);
+        toast.warning(TOAST_MESSAGE.calRedirect, { autoClose: false });
       }
       event.preventDefault();
     }
