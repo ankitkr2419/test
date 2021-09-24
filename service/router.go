@@ -94,7 +94,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/consumable-distance", authenticate(updateConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 
 	// this takes deck in query parameter since we do not need to validate this api for correct deck from the token.
-	router.HandleFunc("/consumable", authenticate(listConsumableDistanceDeckHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/calibrations", authenticate(listCalibrationsHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/tiptube", authenticate(createTipTubeHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tips-tubes/{id}", authenticate(deleteTipTubeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
