@@ -204,6 +204,8 @@ var (
 	ConsumableDistanceUpdateConfigError = fmt.Errorf("error updating Consumable distance config")
 	CartridgeCreateConfigError          = fmt.Errorf("error creating Cartridge config")
 
+	CalibrationsFetchError = fmt.Errorf("error fetching calibration records")
+
 	DyeDecodeError = fmt.Errorf("error decoding dyes record")
 	DyeFetchError  = fmt.Errorf("error fetching dyes record")
 

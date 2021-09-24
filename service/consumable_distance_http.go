@@ -73,7 +73,7 @@ func listConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func listConsumableDistanceDeckHandler(deps Dependencies) http.HandlerFunc {
+func listCalibrationsHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		deck := req.URL.Query().Get("deck")
@@ -81,7 +81,6 @@ func listConsumableDistanceDeckHandler(deps Dependencies) http.HandlerFunc {
 		//logging when the api is initialised
 		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.ShowOperation, "", responses.ConsumableDistanceInitialisedState)
 
-		var ConsumableDistance []db.ConsumableDistance
 		var min, max int64
 
 		switch deck {
@@ -97,23 +96,23 @@ func listConsumableDistanceDeckHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		ConsumableDistance, err := deps.Store.ListConsDistancesDeck(req.Context(), min, max)
+		calibrations, err := deps.Store.ListConsDistancesDeck(req.Context(), min, max)
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
 				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.ShowOperation, "", err.Error())
 			} else {
-				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.ConsumableDistanceCompletedState)
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.ShowOperation, "", responses.CalibrationCompletedState)
 			}
 		}()
 		if err != nil {
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConsumableDistanceFetchError.Error()})
-			logger.WithField("err", err.Error()).Error(responses.ConsumableDistanceFetchError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationsFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.CalibrationsFetchError)
 			return
 		}
 
-		logger.Infoln(responses.ConsumableDistanceFetchSuccess)
-		responseCodeAndMsg(rw, http.StatusOK, ConsumableDistance)
+		logger.Infoln(responses.CalibrationsFetchSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, calibrations)
 	})
 }
 
