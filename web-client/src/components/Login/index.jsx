@@ -38,7 +38,9 @@ const LoginComponent = (props) => {
     if (username !== "" && password !== "") {
       loginBtnHandler({ username, password });
     } else {
-      toast.error("Username or password can not be empty");
+      toast.error("Username or password can not be empty", {
+        autoClose: false,
+      });
     }
   };
 

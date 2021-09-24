@@ -150,7 +150,9 @@ const SampleSideBarContainer = (props) => {
         }
       });
       if (isDyeFoundInSelectedTargets === true) {
-        toast.error("Two targets for same dye are not allowed!");
+        toast.error("Two targets for same dye are not allowed!", {
+          autoClose: false,
+        });
         return;
       }
     }

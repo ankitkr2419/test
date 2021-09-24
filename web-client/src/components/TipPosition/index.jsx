@@ -143,7 +143,7 @@ const TipPositionComponent = (props) => {
       tipHeight < TIP_HEIGHT_MIN_ALLOWED_VALUE ||
       tipHeight > TIP_HEIGHT_MAX_ALLOWED_VALUE
     ) {
-      toast.error(TIP_POSTION_ERROR_MSG);
+      toast.error(TIP_POSTION_ERROR_MSG, { autoClose: false });
       return;
     }
 
