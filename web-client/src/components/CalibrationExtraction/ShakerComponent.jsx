@@ -67,7 +67,7 @@ const ShakerComponent = (props) => {
     if (requestBody) {
       dispatch(shakerInitiated(requestBody));
     } else {
-      toast.warning("Please check inputted values");
+      toast.warning("Please check inputted values", { autoClose: false });
     }
   };
 
