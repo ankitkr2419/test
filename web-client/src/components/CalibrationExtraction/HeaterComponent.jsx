@@ -56,7 +56,7 @@ const HeaterComponent = (props) => {
       dispatch(heaterInitiated(requestBody));
     } else {
       //error
-      toast.error("Invalid Request", { autoClose: true });
+      toast.error("Invalid Request", { autoClose: false });
     }
   };
 
