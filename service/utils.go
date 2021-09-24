@@ -30,10 +30,10 @@ const (
 	minShakerTempAllowed = 20
 	maxShakerTempAllowed = 120
 
-	deckAMinConsID = 1001
-	deckAMaxConsID = 1050
-	deckBMinConsID = 1051
-	deckBMaxConsID = 1100
+	deckAMinCalibID = 1001
+	deckAMaxCalibID = 1050
+	deckBMinCalibID = 1051
+	deckBMaxCalibID = 1100
 )
 
 const (

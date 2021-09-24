@@ -86,11 +86,11 @@ func listConsumableDistanceDeckHandler(deps Dependencies) http.HandlerFunc {
 
 		switch deck {
 		case plc.DeckA:
-			min = deckAMinConsID
-			max = deckAMaxConsID
+			min = deckAMinCalibID
+			max = deckAMaxCalibID
 		case plc.DeckB:
-			min = deckBMinConsID
-			max = deckBMaxConsID
+			min = deckBMinCalibID
+			max = deckBMaxCalibID
 		default:
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.DeckNameInvalid.Error()})
 			logger.WithField("err", "Invalid Deck").Error(responses.DeckNameInvalid)
