@@ -76,6 +76,7 @@ var (
 	ProcessUpdateError      = fmt.Errorf("error updating process record")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
+	RecipeRunPaniced     = fmt.Errorf("error recipe panicked")
 
 	RecipeDecodeError     = fmt.Errorf("error decoding Recipe record")
 	RecipeValidationError = fmt.Errorf("error validating Recipe record")
