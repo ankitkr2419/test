@@ -69,9 +69,9 @@ type AspireDispense struct {
 	CartridgeType        CartridgeType `db:"cartridge_type" json:"cartridge_type"`
 	SourcePosition       int64         `db:"source_position" json:"source_position" validate:"lte=13"`
 	AspireHeight         float64       `db:"aspire_height" json:"aspire_height" validate:"required,lte=60"`
-	AspireMixingVolume   float64       `db:"aspire_mixing_volume" json:"aspire_mixing_volume" validate:"lte=1000"`
+	AspireMixingVolume   float64       `db:"aspire_mixing_volume" json:"aspire_mixing_volume" validate:"lte=700"`
 	AspireNoOfCycles     int64         `db:"aspire_no_of_cycles" json:"aspire_no_of_cycles" validate:"lte=100"`
-	AspireVolume         float64       `db:"aspire_volume" json:"aspire_volume" validate:"lte=1000"`
+	AspireVolume         float64       `db:"aspire_volume" json:"aspire_volume" validate:"lte=700"`
 	AspireAirVolume      float64       `db:"aspire_air_volume" json:"aspire_air_volume"`
 	DispenseHeight       float64       `db:"dispense_height" json:"dispense_height" validate:"required,lte=60"`
 	DispenseMixingVolume float64       `db:"dispense_mixing_volume" json:"dispense_mixing_volume" validate:"lte=1000"`
