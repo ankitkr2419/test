@@ -233,9 +233,9 @@ export const motorFailed = ({ error }) => ({
 });
 
 // action creators for sense and hit
-export const senseAndHitInitiated = (token, body) => ({
+export const senseAndHitInitiated = (token, deck, body) => ({
   type: senseAndHitActions.senseAndHitActionInitiated,
-  payload: { token, body },
+  payload: { token, deck, body },
 });
 
 export const senseAndHitFailed = ({ error }) => ({

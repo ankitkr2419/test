@@ -160,13 +160,14 @@ const MotorComponent = (props) => {
                   Start Motor
                 </Button>
 
-                {/* <Button
+                <Button
                   className="mx-3"
                   color="primary"
+                  disabled={motorNumber.value === null}
                   onClick={handleSenseAndHitBtn}
                 >
                   {"Sense & Hit"}
-                </Button> */}
+                </Button>
               </Center>
             </Col>
           </Row>

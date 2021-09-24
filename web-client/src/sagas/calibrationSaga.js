@@ -289,7 +289,7 @@ export function* motor(actions) {
 
 export function* senseAndHit(actions) {
   const {
-    payload: { token, body },
+    payload: { token, deck, body },
   } = actions;
   const { senseAndHitActionSuccess, senseAndHitActionFailure } =
     senseAndHitActions;
@@ -299,7 +299,7 @@ export function* senseAndHit(actions) {
       payload: {
         method: HTTP_METHODS.POST,
         body: body,
-        reqPath: `${API_ENDPOINTS.senseAndHit}`,
+        reqPath: `${API_ENDPOINTS.senseAndHit}/${deck}`,
         successAction: senseAndHitActionSuccess,
         failureAction: senseAndHitActionFailure,
         showPopupSuccessMessage: true,

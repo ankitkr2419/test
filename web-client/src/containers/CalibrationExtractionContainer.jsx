@@ -23,6 +23,7 @@ import {
   fetchConsumableInitiated,
   updateConsumableInitiated,
   addConsumableInitiated,
+  senseAndHitInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
@@ -201,7 +202,13 @@ const CalibrationExtractionContainer = () => {
   };
 
   const handleSenseAndHitBtn = () => {
-    console.log("Sense and Hit");
+    const { motorNumber } = formik.values;
+    const body = {
+      motor_number: motorNumber.value,
+    };
+    const deck =
+      name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
+    dispatch(senseAndHitInitiated(token, deck, body));
   };
 
   const handleSaveDetailsBtn = (data) => {
