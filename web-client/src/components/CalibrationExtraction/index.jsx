@@ -44,7 +44,10 @@ const CalibrationExtractionComponent = (props) => {
     isAdmin,
     handleTipesTubesButton,
     addNewConsumableDistance,
+    addNewCalibration,
     consumableDistanceData,
+    calibrationsDataForDeckA,
+    calibrationsDataForDeckB,
   } = props;
 
   const { shaker_1_temp, shaker_2_temp, heater_on } = heaterData;
@@ -147,10 +150,27 @@ const CalibrationExtractionComponent = (props) => {
             handleTipesTubesButton={handleTipesTubesButton}
           />
 
-          {/* Consumable Distances Vars */}
+          {/* Consumable Distances Component */}
           <ConsumableDistancesComponent
-            addNewConsumableDistance={addNewConsumableDistance}
-            consumableDistanceData={consumableDistanceData}
+            addNewData={addNewConsumableDistance}
+            data={consumableDistanceData}
+            heading={"Consumable Distances"}
+          />
+
+          {/* Calibrations Component for Deck A */}
+          <ConsumableDistancesComponent
+            addNewData={addNewCalibration}
+            data={calibrationsDataForDeckA}
+            heading={"Calibrations for Deck A"}
+            isReadOnly
+          />
+
+          {/* Calibrations Component for Deck B */}
+          <ConsumableDistancesComponent
+            addNewData={addNewCalibration}
+            data={calibrationsDataForDeckB}
+            heading={"Calibrations for Deck B"}
+            isReadOnly
           />
         </CardBody>
       </Card>
