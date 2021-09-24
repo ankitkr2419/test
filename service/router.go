@@ -173,7 +173,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/rt-pcr/cycle", authenticate(rtpcrStartCycleHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/rt-pcr/monitor", authenticate(rtpcrMonitorHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/set-threshold/{experiment_id}", setThresholdHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/get-baseline/{experiment_id}", getBaselineValuesHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/get-baseline/{experiment_id}", getBaselineNormalisedValuesHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 
 	// tec funcs
 	router.HandleFunc("/tec/set-temp-and-ramp", authenticate(setTempAndRampHandler(deps), deps, RTPCR)).Methods(http.MethodPost).Headers(versionHeader, v1)
