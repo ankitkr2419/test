@@ -156,3 +156,55 @@ func updateConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ConsumableDistanceUpdateSuccess})
 	})
 }
+
+// Sense and Set Calibration
+func updateCalibrationsHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		/*
+			//logging when the api is initialised
+			go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.CalibrationInitialisedState)
+
+			var m Manual
+			vars := mux.Vars(req)
+			deck := vars["deck"]
+
+			err := json.NewDecoder(req.Body).Decode(&m)
+			// for logging error if there is any otherwise logging success
+			defer func() {
+				if err != nil {
+					go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+				} else {
+					go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.CalibrationCompletedState)
+				}
+			}()
+
+			if err != nil {
+				logger.WithField("err", err.Error()).Errorln(responses.CalibrationDecodeError)
+				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.CalibrationDecodeError.Error()})
+				return
+			}
+
+			currentPosition = plc.Positions[plc.DeckNumber{Deck: deck, Number: m.MotorNum}]
+
+			// Logic is different per calib position
+
+			err = db.UpdateCalibrationValues(req.Context(), position)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateConfigError)
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateConfigError.Error()})
+				return
+			}
+
+			err = deps.Store.UpdateCalibrations(req.Context(), m)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateError)
+				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateError.Error()})
+				return
+			}
+		*/
+
+		logger.Infoln(responses.CalibrationUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.CalibrationUpdateSuccess})
+	})
+}
