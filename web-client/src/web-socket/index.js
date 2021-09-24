@@ -129,6 +129,7 @@ export const connectSocket = (dispatch) => {
         // case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
         case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
+        case SOCKET_MESSAGE_TYPE.ErrorPCR:
           dispatch(showErrorModal(data));
           break;
         case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:

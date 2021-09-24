@@ -44,6 +44,7 @@ export const SOCKET_MESSAGE_TYPE = {
   ErrorPCRStopped: "ErrorPCRStopped",
   ErrorPCRMonitor: "ErrorPCRMonitor",
   ErrorPCRDead: "ErrorPCRDead",
+  ErrorPCR: "ErrorPCR",
   temperatureData: "Temperature",
   PIDProgress: "PROGRESS_PID",
   PIDSuccess: "SUCCESS_PID",
