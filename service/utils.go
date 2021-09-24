@@ -29,6 +29,11 @@ const (
 	// Shaker Temp related ranges
 	minShakerTempAllowed = 20
 	maxShakerTempAllowed = 120
+
+	deckAMinConsID = 1001
+	deckAMaxConsID = 1050
+	deckBMinConsID = 1051
+	deckBMaxConsID = 1100
 )
 
 const (
