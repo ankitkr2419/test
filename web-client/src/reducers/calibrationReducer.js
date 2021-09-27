@@ -308,6 +308,9 @@ export const pidReducer = (state = pidInitialState, action) => {
         pidStatus: PID_STATUS.runFailed,
       });
 
+    case abortActions.abortActionReset:
+      return pidInitialState;
+
     case pidActions.pidActionReset:
       return pidInitialState;
 
@@ -699,6 +702,9 @@ export const shakerRunProgessReducer = (
         shakerRunStatus: SHAKER_RUN_STATUS.progressAborted,
       });
 
+    case abortActions.abortActionReset:
+      return shakerRunProgressInitialState;
+
     case loginActions.loginReset:
       return shakerRunProgressInitialState;
 
@@ -731,6 +737,9 @@ export const heaterRunProgessReducer = (
       return state.merge({
         heaterRunStatus: HEATER_RUN_STATUS.progressAborted,
       });
+
+    case abortActions.abortActionReset:
+      return heaterRunProgressInitialState;
 
     case loginActions.loginReset:
       return heaterRunProgressInitialState;

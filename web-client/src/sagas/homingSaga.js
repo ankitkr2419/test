@@ -15,16 +15,17 @@ import {
 export function* homingAction(actions) {
   const {
     payload: {
-      params: { token },
+      params: { deckName, token },
     },
   } = actions;
+  const deck = deckName ? deckName : "";
   const { homingActionSuccess, homingActionFailed } = homingActions;
   try {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: API_ENDPOINTS.homing,
+        reqPath: `${API_ENDPOINTS.homing}/${deck}`,
         successAction: homingActionSuccess,
         failureAction: homingActionFailed,
         // showPopupSuccessMessage: true,
