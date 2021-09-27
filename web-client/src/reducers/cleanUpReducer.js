@@ -1,3 +1,4 @@
+import { abortActions } from "actions/calibrationActions";
 import {
   runCleanUpAction,
   pauseCleanUpAction,
@@ -8,10 +9,11 @@ import {
   cleanUpSecsActions,
   setShowCleanUpAction,
 } from "actions/cleanUpActions";
-import { DECKCARD_BTN, DECKNAME } from "appConstants";
+import { CLEAN_UP_STATUS, DECKCARD_BTN, DECKNAME } from "appConstants";
 import { getUpdatedDecks } from "utils/helpers";
 
 export const initialState = {
+  cleanUpAbortStatus: null,
   decks: [
     {
       name: DECKNAME.DeckA,
@@ -401,6 +403,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
       return {
         ...state,
+        cleanUpAbortStatus: CLEAN_UP_STATUS.aborting,
         decks: dockAfterAbortInit,
       };
 
@@ -429,6 +432,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
       return {
         ...state,
+        cleanUpAbortStatus: CLEAN_UP_STATUS.aborted,
         decks: dockAfterAbortSuccess,
       };
 
@@ -449,6 +453,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
       return {
         ...state,
+        cleanUpAbortStatus: CLEAN_UP_STATUS.abortFailed,
         decks: dockAfterAbortFailure,
       };
 
@@ -572,6 +577,9 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
         ...state,
         decks: dockAfterHideCleanUp,
       };
+
+    case abortActions.abortActionReset:
+      return initialState;
 
     default:
       return state;

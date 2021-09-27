@@ -49,10 +49,10 @@ const HomingModal = (props) => {
   const handleCompleteBtn = () => {
     dispatch(hideHomingModal());
 
-    // reset abort status of PID, Shaker and Heater
+    // reset abort status of UV, PID, Shaker and Heater
     dispatch(abortReset());
 
-    // reset local states
+    // reset local states of modals
     setIsProgressBarVisible(false);
     setModalBtnDisable(false);
   };

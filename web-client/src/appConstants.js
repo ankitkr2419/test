@@ -74,6 +74,15 @@ export const SOCKET_MESSAGE_TYPE = {
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
 
+export const CLEAN_UP_STATUS = {
+  aborted: "aborted",
+  aborting: "aborting",
+  abortFailed: "abortFailed",
+
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+};
+
 export const HEATER_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",

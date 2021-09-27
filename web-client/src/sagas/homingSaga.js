@@ -25,7 +25,7 @@ export function* homingAction(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.homing}/${deck}`,
+        reqPath: `${API_ENDPOINTS.homing}${deck}`,
         successAction: homingActionSuccess,
         failureAction: homingActionFailed,
         // showPopupSuccessMessage: true,
