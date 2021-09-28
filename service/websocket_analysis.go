@@ -243,7 +243,7 @@ func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDeta
 
 	thresholdLine = make(map[db.TargetDetails]float32, len(targets))
 
-	if !bl.AutoThreshold {
+	if bl.AutoThreshold {
 		start, end := config.GetCycleRange()
 		bl.StartCycle = start
 		bl.EndCycle = end
