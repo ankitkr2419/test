@@ -41,8 +41,9 @@ const DispenseCommonField = (props) => {
               )
             }
           />
-          <Text Tag="span" className="height-icon-box">
-            <Icon name="height" size={20} />
+          <Text Tag="span" className="font-weight-bold height-icon-box">
+            {/* <Icon name="height" size={20} /> */}
+            mm
           </Text>
           <FormError>Incorrect Dispense Height</FormError>
         </div>
@@ -52,12 +53,13 @@ const DispenseCommonField = (props) => {
         <Label for="mixing-volume" className="px-0 label-name">
           Mixing Volume
         </Label>
-        <div className="d-flex flex-column input-field">
+        <div className="d-flex flex-column input-field position-relative">
           <Input
             type="text"
             name="mixingVolume"
             id="mixing-volume"
             placeholder="Type here"
+            className="dispense-input-field"
             value={formik.values.dispense.mixingVolume}
             onChange={(e) =>
               setFormikField(
@@ -70,6 +72,9 @@ const DispenseCommonField = (props) => {
             }
             onBlur={(e) => handleBlur(e.target.value)}
           />
+          <Text Tag="span" className="font-weight-bold height-icon-box">
+            ml
+          </Text>
           <FormError>Incorrect Mixing Volume</FormError>
         </div>
 

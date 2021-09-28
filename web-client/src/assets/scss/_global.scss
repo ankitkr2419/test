@@ -782,3 +782,14 @@ button:focus {
   height: 14px;
   width: 14px;
 }
+
+.temperature-input-field {
+  padding-right: 3rem;
+}
+
+.temperature-unit {
+  position: absolute;
+  top: 7px;
+  left: 11.596rem;
+  color: gray;
+}
