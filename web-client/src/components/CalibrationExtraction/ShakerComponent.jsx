@@ -6,7 +6,7 @@ import classnames from "classnames";
 import { toast } from "react-toastify";
 
 import { Card, CardBody } from "core-components";
-import { ButtonIcon, ButtonBar, Text } from "shared-components";
+import { ButtonIcon, ButtonBar, Text, ColoredCircle } from "shared-components";
 
 import {
   TabContent,
@@ -36,6 +36,11 @@ const ShakerComponent = (props) => {
   let activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
+  const heaterReducer = useSelector((state) => state.heaterProgressReducer);
+  const heaterProgressReducerData = heaterReducer.toJS();
+  const { heater_on, shaker_1_temp, shaker_2_temp } =
+    heaterProgressReducerData.data;
+
   const shakerRunProgessReducer = useSelector(
     (state) => state.shakerRunProgessReducer
   );
@@ -62,7 +67,7 @@ const ShakerComponent = (props) => {
     if (requestBody) {
       dispatch(shakerInitiated(requestBody));
     } else {
-      toast.warning("Please check inputted values");
+      toast.warning("Please check inputted values", { autoClose: false });
     }
   };
 
@@ -106,6 +111,19 @@ const ShakerComponent = (props) => {
                   <TopHeading titleHeading="Shaking" />
                 </div>
               </div>
+              <Card default className="ml-auto mr-5 rounded-lg bg-transparent">
+                <CardBody className="d-flex p-2">
+                  <Text className="font-weight-bold mr-3 text-muted">
+                    Heater Status: <ColoredCircle isOnline={heater_on} />
+                    {"  "}
+                  </Text>
+                  <Text className="font-weight-bold m-0 text-muted">
+                    Heater Temperature 1: {shaker_1_temp ? shaker_1_temp : 0}° C
+                    <br />
+                    Heater Temperature 2: {shaker_2_temp ? shaker_2_temp : 0}° C
+                  </Text>
+                </CardBody>
+              </Card>
             </TopContent>
             <Card className="fix-height-card">
               <CardBody className="p-0 overflow-hidden">

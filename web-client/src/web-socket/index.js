@@ -129,13 +129,14 @@ export const connectSocket = (dispatch) => {
         // case SOCKET_MESSAGE_TYPE.ErrorPCRStopped:
         case SOCKET_MESSAGE_TYPE.ErrorPCRMonitor:
         case SOCKET_MESSAGE_TYPE.ErrorPCRDead:
+        case SOCKET_MESSAGE_TYPE.ErrorPCR:
           dispatch(showErrorModal(data));
           break;
         case SOCKET_MESSAGE_TYPE.ErrorExtractionMonitor:
           let parsedErrorData = JSON.parse(data);
           let errorMessage = parsedErrorData.message;
           if (errorMessage) {
-            toast.error(errorMessage);
+            toast.error(errorMessage, { autoClose: false });
           }
           break;
         case SOCKET_MESSAGE_TYPE.progressHeater:
@@ -147,9 +148,18 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.successPidTuning:
           dispatch(pidInSuccess());
           break;
-        case SOCKET_MESSAGE_TYPE.abortPidTuning:
+        // global abort for PID, Shaker and heater
+        case SOCKET_MESSAGE_TYPE.ErrorOperationAborted:
           dispatch(pidInAborted());
+          dispatch(shakerRunInAborted());
+          dispatch(heaterRunInAborted());
           break;
+        // case SOCKET_MESSAGE_TYPE.abortShakerRun:
+        //   dispatch(shakerRunInAborted());
+        //   break;
+        // case SOCKET_MESSAGE_TYPE.abortHeaterRun:
+        //   dispatch(heaterRunInAborted());
+        //   break;
         case SOCKET_MESSAGE_TYPE.PROGRESSLidPIDTuning:
           dispatch(progressLidPid(JSON.parse(data)));
           break;
@@ -162,17 +172,12 @@ export const connectSocket = (dispatch) => {
         case SOCKET_MESSAGE_TYPE.successShakerRun:
           dispatch(shakerRunInSuccess());
           break;
-        case SOCKET_MESSAGE_TYPE.abortShakerRun:
-          dispatch(shakerRunInAborted());
-          break;
         case SOCKET_MESSAGE_TYPE.progressHeaterRun:
           dispatch(heaterRunInProgress());
           break;
         case SOCKET_MESSAGE_TYPE.successHeaterRun:
           dispatch(heaterRunInSuccess());
           break;
-        case SOCKET_MESSAGE_TYPE.abortHeaterRun:
-          dispatch(heaterRunInAborted());
         case SOCKET_MESSAGE_TYPE.progressDyeCalibration:
           dispatch(progressDyeCalibration());
           break;

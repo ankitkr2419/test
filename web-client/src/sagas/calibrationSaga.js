@@ -32,12 +32,14 @@ import {
   fetchConsumableActions,
   updateConsumableActions,
   addConsumableActions,
+  senseAndHitActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
   updateCalibrationFailed,
   runPidFailed,
   motorFailed,
+  senseAndHitFailed,
   commonDetailsFailed,
   updateCommonDetailsFailed,
   fetchPidFailed,
@@ -282,6 +284,32 @@ export function* motor(actions) {
   } catch (error) {
     console.error("Error updating calibrations configs", error);
     yield put(motorFailed({ error }));
+  }
+}
+
+export function* senseAndHit(actions) {
+  const {
+    payload: { token, body },
+  } = actions;
+  const { senseAndHitActionSuccess, senseAndHitActionFailure } =
+    senseAndHitActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: body,
+        reqPath: `${API_ENDPOINTS.senseAndHit}`,
+        successAction: senseAndHitActionSuccess,
+        failureAction: senseAndHitActionFailure,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating sense and hit", error);
+    yield put(senseAndHitFailed({ error }));
   }
 }
 
@@ -816,6 +844,7 @@ export function* calibrationSaga() {
   yield takeEvery(pidActions.pidActionInitiated, pidStart);
   yield takeEvery(abortActions.abortActionInitiated, abort);
   yield takeEvery(motorActions.motorActionInitiated, motor);
+  yield takeEvery(senseAndHitActions.senseAndHitActionInitiated, senseAndHit);
   yield takeEvery(
     fetchPidDetailsActions.fetchPidActionInitiated,
     fetchPidDetails
@@ -840,7 +869,6 @@ export function* calibrationSaga() {
   yield takeEvery(resetTECActions.initiateAction, resetTEC);
   yield takeEvery(autoTuneTECActions.initiateAction, autoTuneTEC);
   yield takeEvery(runDyeCalibrationActions.initiateAction, runDyeCalibration);
-
   yield takeEvery(fetchToleranceActions.initiateAction, fetchTolerance);
   yield takeEvery(updateToleranceActions.initiateAction, updateTolerance);
   yield takeEvery(fetchConsumableActions.initiateAction, fetchConsumable);

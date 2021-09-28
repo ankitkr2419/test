@@ -68,7 +68,7 @@ const MagnetComponent = (props) => {
   const saveBtnHandler = () => {
     const heightIsInt = `${height}`.match(/^[0-9]\d*$/);
     if (isAttach && !heightIsInt) {
-      toast.error("Please enter valid height");
+      toast.error("Please enter valid height", { autoClose: false });
       return;
     }
     const body = {

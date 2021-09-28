@@ -44,6 +44,7 @@ export const SOCKET_MESSAGE_TYPE = {
   ErrorPCRStopped: "ErrorPCRStopped",
   ErrorPCRMonitor: "ErrorPCRMonitor",
   ErrorPCRDead: "ErrorPCRDead",
+  ErrorPCR: "ErrorPCR",
   temperatureData: "Temperature",
   PIDProgress: "PROGRESS_PID",
   PIDSuccess: "SUCCESS_PID",
@@ -61,16 +62,14 @@ export const SOCKET_MESSAGE_TYPE = {
   progressHeater: "PROGRESS_HEATER",
   progressPidTuning: "PROGRESS_SHAKERPIDTUNING",
   successPidTuning: "SUCCESS_SHAKERPIDTUNING",
-  abortPidTuning: "ErrorOperationAborted",
   PROGRESSLidPIDTuning: "PROGRESS_LidPIDTuning",
   ErrorPIDTuning: "ErrorPIDTuning",
   SUCCESSLidPIDTuning: "SUCCESS_LidPIDTuning",
   progressShakerRun: "PROGRESS_SHAKERRUN",
   successShakerRun: "SUCCESS_SHAKERRUN",
-  abortShakerRun: "ErrorOperationAborted",
   progressHeaterRun: "PROGRESS_HEATERRUN",
   successHeaterRun: "SUCCESS_HETERRUN",
-  abortHeaterRun: "ErrorOperationAborted",
+  ErrorOperationAborted: "ErrorOperationAborted",
   progressDyeCalibration: "PROGRESS_OPTCALIB",
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
@@ -185,6 +184,7 @@ export const API_ENDPOINTS = {
   pidUpdate: "configs/extraction",
   manual: "manual",
   motor: "motor",
+  senseAndHit: "senseAndHit",
   startShaking: "start-shaking",
   startHeating: "start-heating",
   emailReport: "email-report",
@@ -206,6 +206,7 @@ export const API_ENDPOINTS = {
   consumable: "consumable-distance",
   dyeCalibration: "optical-caliberation",
   users: "users",
+  whiteLight: "whiteLight",
 };
 
 export const MODAL_MESSAGE = {
@@ -545,15 +546,15 @@ export const MAX_MOTOR_DISTANCE = 100;
 export const MIN_MOTOR_DIRECTION = 0;
 export const MAX_MOTOR_DIRECTION = 1;
 export const MOTOR_NUMBER_OPTIONS = [
-  { value: 5, label: 5 },
-  { value: 6, label: 6 },
-  { value: 7, label: 7 },
-  { value: 9, label: 9 },
-  { value: 10, label: 10 },
+  { value: 5, label: "Deck" },
+  { value: 6, label: "Magnet Up Down" },
+  { value: 7, label: "Magnet Rev For" },
+  { value: 9, label: "Syringe Module" },
+  { value: 10, label: "Syringe" },
 ];
 export const MOTOR_DIRECTION_OPTIONS = [
-  { value: 0, label: 0 },
-  { value: 1, label: 1 },
+  { value: 0, label: "Against sensor" },
+  { value: 1, label: "Towards sensor" },
 ];
 
 //constants for pid
@@ -640,6 +641,12 @@ export const TEMPERATURE_GRAPH_OPTIONS = {
       },
     ],
   },
+};
+
+// default min values for amplification plot
+export const DEFAULT_MIN_VALUE = {
+  yAxisMin: 0,
+  xAxisMin: 1,
 };
 
 //analyse data graph constants

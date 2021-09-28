@@ -57,6 +57,12 @@ export const motorActions = {
   motorActionFailure: "MOTOR_FAILURE",
 };
 
+export const senseAndHitActions = {
+  senseAndHitActionInitiated: "SENSE_AND_HIT_INITIATED",
+  senseAndHitActionSuccess: "SENSE_AND_HIT_SUCCEEDED",
+  senseAndHitActionFailure: "SENSE_AND_HIT_FAILURE",
+};
+
 export const calibrationActions = {
   calibrationInitiated: "CALIBRATION_INITIATED",
   calibrationSuccess: "CALIBRATION_SUCCESS",

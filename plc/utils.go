@@ -67,6 +67,13 @@ const (
 	homingFastSpeed     = uint16(2000)
 	homingSlowSpeed     = uint16(500)
 	homingDeckFastSpeed = uint16(3000)
+	aspireSlowSpeed		= 2000
+)
+
+// Volumes
+const (
+	minimumAspireVolume = 10
+	maximumAspireVolume = 700
 )
 
 // Magnet States

@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import { toast } from "react-toastify";
 
 import { Card, CardBody } from "core-components";
-import { ButtonIcon, ButtonBar, Text } from "shared-components";
+import { ButtonIcon, ButtonBar, Text, ColoredCircle } from "shared-components";
 import {
   abort,
   heaterInitiated,
@@ -31,6 +31,11 @@ const HeaterComponent = (props) => {
   const { heaterRunStatus } = heaterRunProgessReducer.toJS();
   const { progressing } = HEATER_RUN_STATUS;
 
+  const heaterReducer = useSelector((state) => state.heaterProgressReducer);
+  const heaterProgressReducerData = heaterReducer.toJS();
+  const { heater_on, shaker_1_temp, shaker_2_temp } =
+    heaterProgressReducerData.data;
+
   const formik = useFormik({
     initialValues: heaterInitialFormikState,
     enableReinitialize: true,
@@ -51,7 +56,7 @@ const HeaterComponent = (props) => {
       dispatch(heaterInitiated(requestBody));
     } else {
       //error
-      toast.error("Invalid Request");
+      toast.error("Invalid Request", { autoClose: false });
     }
   };
 
@@ -94,6 +99,19 @@ const HeaterComponent = (props) => {
                   <TopHeading titleHeading="Heating" />
                 </div>
               </div>
+              <Card default className="ml-auto mr-5 rounded-lg bg-transparent">
+                <CardBody className="d-flex p-2">
+                  <Text className="font-weight-bold mr-3 text-muted">
+                    Heater Status: <ColoredCircle isOnline={heater_on} />
+                    {"  "}
+                  </Text>
+                  <Text className="font-weight-bold m-0 text-muted">
+                    Heater Temperature 1: {shaker_1_temp ? shaker_1_temp : 0}° C
+                    <br />
+                    Heater Temperature 2: {shaker_2_temp ? shaker_2_temp : 0}° C
+                  </Text>
+                </CardBody>
+              </Card>
             </TopContent>
             <Card className="fix-height-card">
               <CardBody className="p-0 overflow-hidden">

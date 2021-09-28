@@ -18,6 +18,7 @@ const (
 variables: category, cartridgeType string,
 			cartridgeID, type, source_well, destination_well, aspire_cycles, dispense_cycles int64,
 			asp_height, asp_mix_vol, asp_vol, dis_height, dis_mix_vol float64
+			aspireDispenseSpeed, aspireFastSpeed uint16
 
   1. Check the category of operation
   2. if category is well_to_well then goto 3 else if category is shaker_to_well then goto 5  else 7
@@ -49,9 +50,9 @@ variables: category, cartridgeType string,
 func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64) (response string, err error) {
 
 	var sourceCartridge, destinationCartridge map[string]float64
-	var sourcePosition, destinationPosition, distanceToTravel, position, deckBase, aboveDeck, pickUpTip float64
+	var sourcePosition, destinationPosition, distanceToTravel, position, deckBase, aboveDeck, pickUpTip, diffOfVol float64
 	var ok, dispenseComplete bool
-	var direction, pulses uint16
+	var direction, pulses, aspireDispenseSpeed, aspireFastSpeed, diffOfSpeed uint16
 	var deckAndMotor DeckNumber
 	deckAndMotor.Deck = d.name
 
@@ -303,10 +304,21 @@ skipAspireCycles:
 	//
 
 	// Only Mixing is given
-	if ad.AspireVolume == 0 {
+	if ad.AspireVolume < minimumAspireVolume {
 		goto onlyMixing
 	}
+
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireVolume))
+
+	// Calculate the speed for aspire/dispense
+	aspireFastSpeed = Motors[deckAndMotor]["fast"]
+
+	diffOfSpeed = aspireFastSpeed - aspireSlowSpeed
+	diffOfVol = maximumAspireVolume - minimumAspireVolume
+
+	aspireDispenseSpeed = aspireSlowSpeed + uint16(float64(diffOfSpeed)-float64(diffOfSpeed)*(diffOfVol-(ad.AspireVolume-minimumAspireVolume))/diffOfVol)
+
+	logger.Debugln("ad.AspireVolume : ", ad.AspireVolume, " aspireDispenseSpeed : ", aspireDispenseSpeed)
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {

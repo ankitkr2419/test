@@ -30,7 +30,7 @@ const (
 	selectCartridgeWellsQuery = `SELECT *
 							FROM cartridge_wells WHERE id = $1`
 	deleteCartridgeQuery = `delete from cartridges where id = $1`
-	getCartridgeQuery    = `SELECT * FROM cartridges WHERE id = $1`
+	getCartridgeQuery    = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id WHERE c.id = $1 GROUP BY c.id`
 )
 
 type CartridgeType string

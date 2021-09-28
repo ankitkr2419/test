@@ -16,15 +16,11 @@ import { useDispatch } from "react-redux";
 import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
 import { ROUTES } from "appConstants";
 import { useHistory } from "react-router";
-import { AddNewRecipesForm } from './AddNewRecipesForm';
+import { AddNewRecipesForm } from "./AddNewRecipesForm";
 
 const AddNewRecipesModal = (props) => {
-  const {
-    confirmationText,
-    isOpen,
-    toggleAddNewRecipesModal,
-    deckName,
-  } = props;
+  const { confirmationText, isOpen, toggleAddNewRecipesModal, deckName } =
+    props;
 
   const [recipeName, setRecipeName] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -56,7 +52,7 @@ const AddNewRecipesModal = (props) => {
       history.push(ROUTES.labware);
     } else {
       setSubmitted(true);
-      toast.error("Enter recipe name");
+      toast.error("Enter recipe name", { autoClose: false });
     }
   };
 

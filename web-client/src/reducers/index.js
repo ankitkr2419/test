@@ -87,6 +87,7 @@ import {
   analyseDataGraphThresholdReducer,
   analyseDataGraphBaselineReducer,
 } from "./analyseDataGraph";
+import { whiteLightReducer } from "./whiteLightReducer";
 
 const rootReducer = combineReducers({
   createTemplateReducer,
@@ -154,6 +155,7 @@ const rootReducer = combineReducers({
   consumableReducer,
   shakerRunProgessReducer,
   heaterRunProgessReducer,
+  whiteLightReducer,
 });
 
 export default rootReducer;

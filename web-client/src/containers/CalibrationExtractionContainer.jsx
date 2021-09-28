@@ -70,10 +70,6 @@ const CalibrationExtractionContainer = () => {
   const pidReducerData = pidReducer.toJS();
   const { pidStatus, pidData, isPidUpdateApi } = pidReducerData;
 
-  const abortReducer = useSelector((state) => state.abortReducer);
-  const abortReducerData = abortReducer.toJS();
-  const { abortStatus } = abortReducerData;
-
   const commonDetailsReducer = useSelector(
     (state) => state.commonDetailsReducer
   );
@@ -204,6 +200,10 @@ const CalibrationExtractionContainer = () => {
     dispatch(motorInitiated(token, body));
   };
 
+  const handleSenseAndHitBtn = () => {
+    console.log("Sense and Hit");
+  };
+
   const handleSaveDetailsBtn = (data) => {
     const { name, email, roomTemperature } = data;
     const requestBody = {
@@ -303,6 +303,7 @@ const CalibrationExtractionContainer = () => {
       handleLogout={handleLogout}
       handleBtnClick={handlePidBtn}
       handleMotorBtn={handleMotorBtn}
+      handleSenseAndHitBtn={handleSenseAndHitBtn}
       handleSaveDetailsBtn={handleSaveDetailsBtn}
       handlePidUpdateBtn={handlePidUpdateBtn}
       handleUpdateMotorDetailsBtn={handleUpdateMotorDetailsBtn}
@@ -312,7 +313,6 @@ const CalibrationExtractionContainer = () => {
       heaterData={data}
       progressData={progressData}
       pidStatus={pidStatus}
-      abortStatus={abortStatus}
       deckName={name}
       formik={formik}
       isAdmin={isAdmin}

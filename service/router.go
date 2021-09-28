@@ -93,6 +93,9 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/consumable-distance", authenticate(listConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/consumable-distance", authenticate(updateConsumableDistanceHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPut, http.MethodOptions).Headers(versionHeader, v1)
 
+	// this takes deck in query parameter since we do not need to validate this api for correct deck from the token.
+	router.HandleFunc("/consumable", authenticate(listConsumableDistanceDeckHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
+
 	router.HandleFunc("/tiptube", authenticate(createTipTubeHandler(deps), deps, Extraction, engineer, admin)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/tips-tubes/{id}", authenticate(deleteTipTubeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 
@@ -150,10 +153,11 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tip-operation/{id}", authenticate(showTipOperationHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tip-operation/{id}", authenticate(updateTipOperationHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut).Headers(versionHeader, v1)
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}", authenticate(listTipsTubesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}/{position:[1-9]+}", authenticate(listTipsTubesPositionHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}/{position:[0-9]+}", authenticate(listTipsTubesPositionHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridge", authenticate(createCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/cartridge/{id}", authenticate(deleteCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/cartridge/{id:[0-9]+}", authenticate(deleteCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/cartridge/{id:[0-9]+}", authenticate(showCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//TODO: allow only for engineer

@@ -29,11 +29,11 @@ const CalibrationExtractionComponent = (props) => {
     heaterData,
     progressData,
     pidStatus,
-    abortStatus,
     handleBtnClick,
     handleLogout,
     handlePidUpdateBtn,
     handleMotorBtn,
+    handleSenseAndHitBtn,
     handleSaveDetailsBtn,
     handleUpdateMotorDetailsBtn,
     handleCreateCartridgeBtn,
@@ -105,7 +105,6 @@ const CalibrationExtractionComponent = (props) => {
             {/* {PID Start/Abort Progress Component} */}
             <PidProgressComponent
               pidStatus={pidStatus}
-              abortStatus={abortStatus}
               progressData={progressData}
               handleBtnClick={handleBtnClick}
             />
@@ -121,7 +120,11 @@ const CalibrationExtractionComponent = (props) => {
           />
 
           {/* Motor Component -   */}
-          <MotorComponent formik={formik} handleMotorBtn={handleMotorBtn} />
+          <MotorComponent
+            formik={formik}
+            handleMotorBtn={handleMotorBtn}
+            handleSenseAndHitBtn={handleSenseAndHitBtn}
+          />
 
           {/* Update Motor Component -   */}
           <UpdateMotorComponent
