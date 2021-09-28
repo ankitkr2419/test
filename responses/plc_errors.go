@@ -33,4 +33,6 @@ var (
 	LidPidTuningOffError     = fmt.Errorf("LID PID Tuining was stopped")
 	LidPidTuningNotOffError  = fmt.Errorf("LID PID Tuining was not stopped")
 	LidPidTuningStartError   = fmt.Errorf("LID PID Tuning wasn't started!")
+
+	CalibrationMethodUnset = fmt.Errorf("calibration method unset for given motor")
 )
