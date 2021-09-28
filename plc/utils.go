@@ -52,7 +52,7 @@ const (
 
 const (
 	// 120 Seconds is the minimum UVLight On Time
-	minimumUVLightOnTime       int64 = 2 * 60
+	MinimumUVLightOnTime       int64 = 2 * 60
 	maxCartridgeWellHeightPlay       = 5
 )
 
@@ -67,7 +67,7 @@ const (
 	homingFastSpeed     = uint16(2000)
 	homingSlowSpeed     = uint16(500)
 	homingDeckFastSpeed = uint16(3000)
-	aspireSlowSpeed		= 2000
+	aspireSlowSpeed     = 2000
 )
 
 // Volumes

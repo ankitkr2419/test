@@ -1,8 +1,9 @@
 package plc
 
 import (
-	logger "github.com/sirupsen/logrus"
 	"time"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) NameOfDeck() string {
@@ -188,7 +189,6 @@ func (d *Compact32Deck) IsHeaterInProgress() bool {
 	}
 	return false
 }
-
 
 func (d *Compact32Deck) IsShakerInProgress() bool {
 	if temp, ok := shakerInProgress.Load(d.name); !ok {
@@ -393,4 +393,24 @@ func (d *Compact32Deck) isEngineerOrAdminLogged() bool {
 
 func (d *Compact32Deck) SetEngineerOrAdminLogged(value bool) {
 	EngineerOrAdminLogged.Store(d.name, value)
+}
+
+func (d *Compact32Deck) ReadFlapSensor() (err error) {
+
+	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][46], uint16(1))
+	if err != nil {
+		logger.Errorln("error reading M 46 Sensor : ", err, d.name)
+		return
+	}
+
+	logger.Infoln("Sensor M 46 returned for deck ", d.name, "---> ", results)
+
+	results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][47], uint16(1))
+	if err != nil {
+		logger.Errorln("error reading M 47 Sensor : ", err, d.name)
+		return
+	}
+
+	logger.Infoln("Sensor M 47 returned for deck ", d.name, "---> ", results)
+	return
 }

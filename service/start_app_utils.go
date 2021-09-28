@@ -44,6 +44,19 @@ func monitorForPLCTimeout(deps *Dependencies, exit chan error) {
 	}
 }
 
+// M44 for White Light
+// Magnet M45
+// Flap M46 LH, M47 RH -> Pause and show warning with cancel, abort option
+// Handle Flap Open in Discard
+
+func monitorFlapSensor(deps *Dependencies) {
+	for {
+		// TODO: monitor Flap RH, LH -> Both Decks
+		deps.PlcDeck[plc.DeckA].ReadFlapSensor()
+		time.Sleep(5 * time.Second)
+	}
+}
+
 func SendHeaterDataToEng(deps Dependencies) {
 	go deps.PlcDeck[plc.DeckA].HeaterData()
 	go deps.PlcDeck[plc.DeckB].HeaterData()

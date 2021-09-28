@@ -1,0 +1,35 @@
+Extraction Software Releases
+
+1. Version 1.4.175 24th September
+ - PID Tuning Support Added
+ - Aspire Dispense speed ratio according to the Volume
+ - Remove download button recipe list page
+ - Toast message globally error/warning do not clear
+ - Label for dropdowns in start motor engineer flow
+ - Success message in cartridge create engineers flow
+ - Skip button in slides before running a recipe
+
+2. Version 1.4.178 29th September
+ - abort during for Live shaker/ Live heater/pid caliberation/uv Light
+ - Seconds field added in Delay process
+ - Default value for manual move(1 mm float)
+ - How many recipes using this cartridge
+ - Consumables seperate for deck A and B
+ - Sense and set for consumables to sense the value and set it in manual move
+ - Variable number of wells in aspire dispense/piercing/tip position process
+ - Show units where ever required
+ - Show calibration option only in recipe list page and not while running any experiment 
+
+
+RTPCR Software Releases
+
+1. Version 1.4.175 24th September
+ - If the machine aborted then reset all the values and stay on the same screen and wells must not configurable. The user must go back to the template screen
+ - Near accurate estimated Time for RT-PCR
+ - Bit for Cycle completion
+ - Well Data Normalise/ Optical Calibrations
+ - 
+
+2. Version 1.4.178 29th September
+ - Remove searchable dropdown's where not required.
+ - Analysis data Validation

@@ -129,7 +129,7 @@ type Extraction interface {
 	AttachDetach(ad db.AttachDetach) (response string, err error)
 	DiscardBoxCleanup() (response string, err error)
 	RestoreDeck() (response string, err error)
-	UVLight(uvTime string) (response string, err error)
+	UVLight(uvTime int64) (response string, err error)
 	AddDelay(delay db.Delay, runRecipe bool) (response string, err error)
 	DiscardTipAndHome(discard bool) (response string, err error)
 	Heating(ht db.Heating, live bool) (response string, err error)
@@ -159,6 +159,7 @@ type Extraction interface {
 	HeaterData() error
 	StartRecipeTimeCounter()
 	UpdateRecipeEstimatedTime(ctx context.Context, recipeID uuid.UUID, s db.Storer, err *error) error
+	ReadFlapSensor() error
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {

@@ -2,8 +2,9 @@ package plc
 
 import (
 	"context"
-	"github.com/stretchr/testify/mock"
 	"mylab/cpagent/db"
+
+	"github.com/stretchr/testify/mock"
 )
 
 type PLCMockStore struct {
@@ -69,9 +70,9 @@ func (p *PLCMockStore) RestoreDeck() (response string, err error) {
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) UVLight(uvTime string) (response string, err error) {
+func (p *PLCMockStore) UVLight(uvTime int64) (response int64, err error) {
 	args := p.Called(uvTime)
-	return args.Get(0).(string), args.Error(1)
+	return args.Get(0).(int64), args.Error(1)
 }
 
 func (p *PLCMockStore) AddDelay(delay db.Delay, runRecipe bool) (response string, err error) {

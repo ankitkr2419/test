@@ -157,15 +157,18 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[int]uint16{
-			0: uint16(0x0800), // Motor ON/OFF . (W)
-			1: uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
-			2: uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
-			3: uint16(0x0803), // Heater ON/OFF (W)
-			4: uint16(0x0804), // PID calibration LH ON/OFF (W)
-			5: uint16(0x0805), // Shaker ON/OFF (W)
-			6: uint16(0x0806), // UV Light ON/OFF (W)
-			7: uint16(0x0807), // Light ON/OFF (W)
-			8: uint16(0x0808), // PID calibration RH ON/OFF (W)
+			0:  uint16(0x0800), // Motor ON/OFF . (W)
+			1:  uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
+			2:  uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
+			3:  uint16(0x0803), // Heater ON/OFF (W)
+			4:  uint16(0x0804), // PID calibration LH ON/OFF (W)
+			5:  uint16(0x0805), // Shaker ON/OFF (W)
+			6:  uint16(0x0806), // UV Light ON/OFF (W)
+			7:  uint16(0x0807), // White Light ON/OFF (W)
+			8:  uint16(0x0808), // PID calibration RH ON/OFF (W)
+			45: uint16(0x082D), // Magnet Attach Sensor(R)
+			46: uint16(0x082E), // Flap LH (46 = OFF, 47 = ON) (R)
+			47: uint16(0x082F), // Flap RH (46 = OFF, 47 = ON) (R)
 		},
 	},
 	// Deck B
@@ -191,15 +194,18 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[int]uint16{
-			0: uint16(0x0800), // Motor ON/OFF . (W)
-			1: uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
-			2: uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
-			3: uint16(0x0803), // Heater ON/OFF (W)
-			4: uint16(0x0804), // PID calibration LH ON/OFF (W)
-			5: uint16(0x0805), // Shaker ON/OFF (W)
-			6: uint16(0x0806), // UV Light ON/OFF (W)
-			7: uint16(0x0807), // Light ON/OFF (W)
-			8: uint16(0x0808), // PID calibration RH ON/OFF (W)
+			0:  uint16(0x0800), // Motor ON/OFF . (W)
+			1:  uint16(0x0801), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
+			2:  uint16(0x0802), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
+			3:  uint16(0x0803), // Heater ON/OFF (W)
+			4:  uint16(0x0804), // PID calibration LH ON/OFF (W)
+			5:  uint16(0x0805), // Shaker ON/OFF (W)
+			6:  uint16(0x0806), // UV Light ON/OFF (W)
+			7:  uint16(0x0807), // White Light ON/OFF (W)
+			8:  uint16(0x0808), // PID calibration RH ON/OFF (W)
+			45: uint16(0x082D), // Magnet Attach Sensor(R)
+			46: uint16(0x082E), // Flap LH (46 = OFF, 47 = ON) (R)
+			47: uint16(0x082F), // Flap RH (46 = OFF, 47 = ON) (R)
 		},
 	},
 	/*

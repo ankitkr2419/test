@@ -55,6 +55,7 @@ func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction boo
 			if !noExtraction {
 				// sending complete deps to Heater cause a change in deps has to be reflected consistently
 				go SendHeaterDataToEng(deps)
+				go monitorFlapSensor(&deps)
 			}
 		}
 	}()
