@@ -154,10 +154,11 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tip-operation/{id}", authenticate(showTipOperationHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/tip-operation/{id}", authenticate(updateTipOperationHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut).Headers(versionHeader, v1)
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}", authenticate(listTipsTubesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
-	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}/{position:[1-9]+}", authenticate(listTipsTubesPositionHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}/{position:[0-9]+}", authenticate(listTipsTubesPositionHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridge", authenticate(createCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/cartridge/{id}", authenticate(deleteCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/cartridge/{id:[0-9]+}", authenticate(deleteCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/cartridge/{id:[0-9]+}", authenticate(showCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	//TODO: allow only for engineer
@@ -177,7 +178,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/rt-pcr/cycle", authenticate(rtpcrStartCycleHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/rt-pcr/monitor", authenticate(rtpcrMonitorHandler(deps), deps, RTPCR)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/set-threshold/{experiment_id}", setThresholdHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/get-baseline/{experiment_id}", getBaselineValuesHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/get-baseline/{experiment_id}", getBaselineNormalisedValuesHandler(deps)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
 
 	// tec funcs
 	router.HandleFunc("/tec/set-temp-and-ramp", authenticate(setTempAndRampHandler(deps), deps, RTPCR)).Methods(http.MethodPost).Headers(versionHeader, v1)

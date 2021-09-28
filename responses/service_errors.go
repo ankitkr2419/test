@@ -145,6 +145,9 @@ var (
 	CartridegDeletionError  = fmt.Errorf("Error while deleting Cartridge")
 	CartridgeIDParseError   = fmt.Errorf("Error while parsing Cartridge id")
 
+	InvalidTipTubePositionError = fmt.Errorf("Error Invalid Position for Tip Tube")
+	InvalidCartridgeIDError     = fmt.Errorf("Error Invalid Cartridge ID Error")
+
 	InvalidSourcePosition                 = fmt.Errorf("error source position is invalid")
 	InvalidDestinationPosition            = fmt.Errorf("error destination position is invalid")
 	InvalidDeckPosition                   = fmt.Errorf("error deck position is invalid")
@@ -219,6 +222,9 @@ var (
 
 	DyeInsertError  = fmt.Errorf("error Inserting dyes record")
 	DyeMarshalError = fmt.Errorf("error marshalling dyes record")
+
+	UVTimeFormatDecodeError = fmt.Errorf("error decoding uv time record")
+	UVMinimumTimeError      = fmt.Errorf("error user given uv time is less than minimum allowed time record")
 )
 
 // Special errors which are in []byte format

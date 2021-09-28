@@ -53,7 +53,7 @@ const (
 
 const (
 	// 120 Seconds is the minimum UVLight On Time
-	minimumUVLightOnTime       int64 = 2 * 60
+	MinimumUVLightOnTime       int64 = 2 * 60
 	maxCartridgeWellHeightPlay       = 5
 )
 

@@ -247,8 +247,10 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 				deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 			}
 		}
+		logger.WithFields(logger.Fields{
+			"Deck": deck,
+		}).Infoln("User logged out successfully")
 
-		logger.Infoln(responses.UserLogoutSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UserLogoutSuccess})
 		return
 
