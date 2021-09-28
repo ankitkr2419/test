@@ -3,6 +3,7 @@ package plc
 import (
 	"context"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"time"
 
 	"sync"
@@ -399,6 +400,18 @@ func DoesTipExist(id int64) bool {
 	}
 	logger.Errorln("Tip Doesn't Exist!")
 	return false
+}
+
+func CalculatePosition(ctx context.Context, calibrations []db.ConsumableDistance, dN DeckNumber) (updatedCalibrations []db.ConsumableDistance, err error) {
+	switch uint16(calibrations[0].ID % 10) {
+	case K5_Deck:
+		calibrations[0].Distance = Positions[dN] - consDistance["pos_1"]
+	case K9_Syringe_Module_LHRH:
+	default:
+		err = responses.CalibrationMethodUnset
+		return
+	}
+	return
 }
 
 // TODO: Validate Consumable Distances and Motors here
