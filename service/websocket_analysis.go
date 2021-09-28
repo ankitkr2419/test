@@ -218,7 +218,6 @@ func analyseResult(result []db.Result, wells []int32, targets []db.TargetDetails
 }
 
 func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []db.Well, wellTargets []db.WellTarget) []db.WellTarget {
-	logger.Infoln(DBWells)
 	for _, r := range result {
 		for i, t := range wellTargets {
 			for _, w := range DBWells {
@@ -238,12 +237,17 @@ func analyseResultForThreshold(result []db.Result, threshold float32, DBWells []
 	return wellTargets
 }
 
-func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16) (thresholdLine map[db.TargetDetails]float32) {
+func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDetails, cycles uint16, bl Threshold) (thresholdLine map[db.TargetDetails]float32) {
 
 	formulaWellTarget := make(map[TargetWell]float32, cycles)
-	var finalSum float32
+
 	thresholdLine = make(map[db.TargetDetails]float32, len(targets))
-	// ex: for 8 active wells * 6 targets * no of cycle
+
+	if bl.AutoThreshold {
+		start, end := config.GetCycleRange()
+		bl.StartCycle = start
+		bl.EndCycle = end
+	}
 
 	for _, t := range targets {
 
@@ -257,25 +261,31 @@ func getAutoThreshold(result []db.Result, wells []int32, targets []db.TargetDeta
 			wellResult.WellPosition = aw
 			for _, r := range result {
 				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
-					sum = sum + r.FValue
-					wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
+					if r.Cycle <= bl.EndCycle && r.Cycle >= bl.StartCycle {
+						sum = sum + r.FValue
+						wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
+					}
+
 				}
 			}
 			key = TargetWell{
 				Target: wellResult.TargetID,
 				Well:   wellResult.WellPosition,
 			}
-			avg = float32(sum / cycles)
+			avg = float32(sum / (bl.EndCycle - bl.StartCycle + 1))
 			std = calculateStandardDeviation(wellResult.FValue, avg)
 			formulaWellTarget[key] = avg + 10*std
 			wellResult.FValue = []float32{}
 		}
 
+		var max float32
 		for _, v := range formulaWellTarget {
-			finalSum = finalSum + v
+			if max < v {
+				max = v
+			}
 		}
 
-		thresholdLine[t] = finalSum / float32(len(formulaWellTarget))
+		thresholdLine[t] = max
 	}
 
 	return
@@ -285,6 +295,7 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 
 	var wellResult graph
 	var tempGraph []graph
+	var avg = make(map[TargetWell]float64, 1)
 	// ex: for 8 active wells * 6 targets * no of cycle
 
 	if bl.AutoBaseline {
@@ -292,15 +303,12 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 		bl.StartCycle = start
 		bl.EndCycle = end
 	}
-
-	var targetSum float32
-	targetAverage := make(map[uuid.UUID]float32, len(targets))
+	targetMax := make(map[uuid.UUID]float64, len(targets))
 	for _, t := range targets {
 
 		wellResult.TargetID = t.TargetID
 		for _, aw := range wells {
-			var sum uint16
-			var avg float32
+			var sum float64
 			wellResult.WellPosition = aw
 			for _, r := range result {
 				if r.WellPosition == wellResult.WellPosition && r.TargetID == wellResult.TargetID {
@@ -309,38 +317,55 @@ func getBaselineGraph(result []db.Result, wells []int32, targets []db.TargetDeta
 					wellResult.Threshold = r.Threshold
 					wellResult.TotalCycles = bl.EndCycle
 					if r.Cycle <= bl.EndCycle && r.Cycle >= bl.StartCycle {
-						sum = sum + r.FValue
-
+						sum = sum + float64(r.FValue)
 					}
 					wellResult.FValue = append(wellResult.FValue, float32(r.FValue))
 					wellResult.Cycle = append(wellResult.Cycle, r.Cycle)
 				}
 			}
-			avg = float32(sum / bl.EndCycle)
-			targetSum = targetSum + avg
+
+			key := TargetWell{
+				Target: t.TargetID,
+				Well:   aw,
+			}
+
+			avg[key] = sum / float64(bl.EndCycle-bl.StartCycle+1)
+			if targetMax[t.TargetID] < avg[key] {
+				targetMax[t.TargetID] = avg[key]
+			}
 			tempGraph = append(tempGraph, wellResult)
 			wellResult.Cycle = []uint16{}
 			wellResult.FValue = []float32{}
 		}
 
-		targetAverage[t.TargetID] = targetSum / float32(len(wells))
-
 	}
+
 	for _, v := range tempGraph {
-		for i, cycle := range v.Cycle {
-			if cycle <= bl.EndCycle && cycle >= bl.StartCycle {
-				v.FValue[i] = calculateBaselineValues(v.FValue[i], targetAverage[v.TargetID])
-			}
+
+		key := TargetWell{
+			Target: v.TargetID,
+			Well:   v.WellPosition,
+		}
+		if avg[key] == 0 {
+			avg[key] = 0.1
+		}
+
+		factor := targetMax[v.TargetID] / avg[key]
+		for i := range v.Cycle {
+			v.FValue[i] = calculateBaselineValues(float64(v.FValue[i]), factor, targetMax[v.TargetID])
 		}
 		baselineValues = append(baselineValues, v)
 	}
+
 	return
 }
 
-func calculateBaselineValues(val float32, average float32) (deviation float32) {
+func calculateBaselineValues(val float64, factor, max float64) (deviation float32) {
 
-	value := val - average
-	deviation = value
+	value := val * factor
+
+	normalisedValue := value - max
+	deviation = float32(normalisedValue)
 
 	return
 }
