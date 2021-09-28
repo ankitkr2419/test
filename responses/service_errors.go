@@ -209,6 +209,9 @@ var (
 
 	DyeInsertError  = fmt.Errorf("error Inserting dyes record")
 	DyeMarshalError = fmt.Errorf("error marshalling dyes record")
+
+	UVTimeFormatDecodeError = fmt.Errorf("error decoding uv time record")
+	UVMinimumTimeError      = fmt.Errorf("error user given uv time is less than minimum allowed time record")
 )
 
 // Special errors which are in []byte format
