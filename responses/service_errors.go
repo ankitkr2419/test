@@ -144,6 +144,9 @@ var (
 	CartridegDeletionError  = fmt.Errorf("Error while deleting Cartridge")
 	CartridgeIDParseError   = fmt.Errorf("Error while parsing Cartridge id")
 
+	InvalidTipTubePositionError = fmt.Errorf("Error Invalid Position for Tip Tube")
+	InvalidCartridgeIDError     = fmt.Errorf("Error Invalid Cartridge ID Error")
+
 	InvalidSourcePosition                 = fmt.Errorf("error source position is invalid")
 	InvalidDestinationPosition            = fmt.Errorf("error destination position is invalid")
 	InvalidDeckPosition                   = fmt.Errorf("error deck position is invalid")
