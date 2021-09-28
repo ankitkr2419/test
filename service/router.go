@@ -156,7 +156,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/tips-tubes/{tiptube:[a-z]*}/{position:[0-9]+}", authenticate(listTipsTubesPositionHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridges", authenticate(listCartridgesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridge", authenticate(createCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost, http.MethodOptions).Headers(versionHeader, v1)
-	router.HandleFunc("/cartridge/{id}", authenticate(deleteCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
+	router.HandleFunc("/cartridge/{id:[0-9]+}", authenticate(deleteCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete, http.MethodOptions).Headers(versionHeader, v1)
 	router.HandleFunc("/cartridge/{id:[0-9]+}", authenticate(showCartridgeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodGet, http.MethodOptions).Headers(versionHeader, v1)
 
 	router.HandleFunc("/safe-to-upgrade", safeToUpgradeHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
