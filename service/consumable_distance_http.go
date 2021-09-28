@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -161,50 +163,82 @@ func updateConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 func updateCalibrationsHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		/*
-			//logging when the api is initialised
-			go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.CalibrationInitialisedState)
+		//logging when the api is initialised
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.CalibrationInitialisedState)
 
-			var m Manual
-			vars := mux.Vars(req)
-			deck := vars["deck"]
+		var m Manual
+		vars := mux.Vars(req)
+		deck := vars["deck"]
 
-			err := json.NewDecoder(req.Body).Decode(&m)
-			// for logging error if there is any otherwise logging success
-			defer func() {
-				if err != nil {
-					go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
-				} else {
-					go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.CalibrationCompletedState)
-				}
-			}()
-
+		err := json.NewDecoder(req.Body).Decode(&m)
+		// for logging error if there is any otherwise logging success
+		defer func() {
 			if err != nil {
-				logger.WithField("err", err.Error()).Errorln(responses.CalibrationDecodeError)
-				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.CalibrationDecodeError.Error()})
-				return
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.CalibrationCompletedState)
 			}
+		}()
 
-			currentPosition = plc.Positions[plc.DeckNumber{Deck: deck, Number: m.MotorNum}]
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.CalibrationDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.CalibrationDecodeError.Error()})
+			return
+		}
 
-			// Logic is different per calib position
+		dN := plc.DeckNumber{Deck: deck, Number: uint16(m.MotorNum)}
 
-			err = db.UpdateCalibrationValues(req.Context(), position)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateConfigError)
-				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateConfigError.Error()})
-				return
-			}
+		// Logic is different per calib position
 
-			err = deps.Store.UpdateCalibrations(req.Context(), m)
-			if err != nil {
-				logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateError)
-				responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateError.Error()})
-				return
-			}
-		*/
+		calibrations, err := calculateConsIDAndPosition(req.Context(), deps.Store, dN)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.CalibrationsCalculateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationsCalculateError.Error()})
+			return
+		}
+
+		err = db.UpdateConsumableDistancesValues(calibrations)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateConfigError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateConfigError.Error()})
+			return
+		}
+
+		err = deps.Store.UpdateConsumableDistance(req.Context(), calibrations[0])
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateError.Error()})
+			return
+		}
 
 		logger.Infoln(responses.CalibrationUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.CalibrationUpdateSuccess})
 	})
+}
+
+func calculateConsIDAndPosition(ctx context.Context, store db.Storer, dN plc.DeckNumber) (calibrations []db.ConsumableDistance, err error) {
+	logger.Infoln("Inside calculateConsIDAndPosition for ", dN)
+	var consID uint16
+	switch dN.Deck {
+	case plc.DeckA:
+		consID = deckAMinCalibID - 1 + dN.Number
+	case plc.DeckB:
+		consID = deckBMinCalibID - 1 + dN.Number
+	}
+
+	// Resuing ListConsDistancesDeck for single ID
+	calibrations, err = store.ListConsDistancesDeck(ctx, int64(consID), int64(consID))
+	if len(calibrations) == 0 {
+		err = responses.CalibrationVariableMissingError
+		return
+	}
+
+	// These will be updated calibrations
+	calibrations, err = plc.CalculatePosition(ctx, calibrations, dN)
+	if err != nil {
+		err = responses.CalibrationsPositionCalculateError
+		return
+	}
+
+	return
 }
