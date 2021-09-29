@@ -146,7 +146,7 @@ func (d *Compact32Deck) UVLight(totalTime int64) (response string, err error) {
 		return
 	}
 
-	logger.Infoln("Delay completed for ", delay)
+	logger.Warnln("Delay completed for ", delay)
 
 	return "UV Light Completed Successfully", nil
 }

@@ -9,6 +9,7 @@ var (
 
 	ShakerPidCalibrationError = fmt.Errorf("error doing shaker pid calibration")
 	AbortedError              = fmt.Errorf("Operation was Aborted")
+	UVLightAbortedError       = fmt.Errorf("UV Light was Aborted")
 
 	ErrorAbortedState       = fmt.Errorf("system is in aborted state, please home the machine")
 	ErrorAlreadyPausedState = fmt.Errorf("system is already running, or done with the run")
