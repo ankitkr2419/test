@@ -1,7 +1,9 @@
 package service
 
 import (
+	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 
@@ -79,6 +81,9 @@ func uvLightHandler(deps Dependencies) http.HandlerFunc {
 
 		uvTime := vars["time"]
 		var err error
+		// totalTime is UVLight timer time in Seconds
+		var totalTime int64
+
 		// for logging error if there is any otherwise logging success
 		defer func() {
 			if err != nil {
@@ -88,7 +93,23 @@ func uvLightHandler(deps Dependencies) http.HandlerFunc {
 			}
 		}()
 
-		go deps.PlcDeck[deck].UVLight(uvTime)
+		totalTime, err = db.CalculateTimeInSeconds(uvTime)
+		if err != nil {
+			logger.WithField("Decode Error", err).Errorln(responses.UVTimeFormatDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UVTimeFormatDecodeError.Error(), Deck: deck})
+			return
+		}
+
+		if totalTime < plc.MinimumUVLightOnTime {
+			err = fmt.Errorf("please check your time. minimum time is : %v seconds", plc.MinimumUVLightOnTime)
+			logger.WithField("Validation Error", err).Errorln(responses.UVMinimumTimeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UVMinimumTimeError.Error(), Deck: deck})
+			return
+		}
+
+		logger.Infoln("totalTime", totalTime)
+
+		go deps.PlcDeck[deck].UVLight(totalTime)
 		logger.Infoln(responses.UVCleanupProgress)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UVCleanupProgress, Deck: deck})
 		return

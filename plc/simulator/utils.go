@@ -32,7 +32,7 @@ func (d *SimulatorDriver) checkForValidAddress(registerType string, address uint
 	case "M":
 		// valid range 0-8
 		lowestMAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][0]
-		highestMAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][8]
+		highestMAddress := plc.MODBUS_EXTRACTION[d.DeckName][registerType][47]
 
 		if address >= lowestMAddress && address <= highestMAddress {
 			return

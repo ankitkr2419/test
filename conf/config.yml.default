@@ -52,4 +52,6 @@ micro_lit_pulses: 25
 shaker_steps_per_revolution: 800
 optical_calibration_cycle_count: 2
 
+consumable_distance_conf_file: "./conf/consumable_config_v1_4.yml"
+
 
