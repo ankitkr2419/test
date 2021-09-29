@@ -10,7 +10,7 @@ build:
 	echo "building go code"
 	GOARCH=amd64 GOOS=linux
 	go build -v -ldflags=" \
-	-X 'mylab/cpagent/service.Version=v1.3.0' \
+	-X 'mylab/cpagent/service.Version=v1.4.178' \
 	-X 'mylab/cpagent/service.User=$(shell id -u -n)' \
 	-X 'mylab/cpagent/service.BuiltOn=$(shell date)' \
 	-X 'mylab/cpagent/service.CommitID=$(shell git rev-list -1 HEAD)' \
