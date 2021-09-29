@@ -167,7 +167,6 @@ func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		go deps.Plc.HomingRTPCR()
 		go toleranceCalulation(deps, dyeWellTolerance)
 		logger.Infoln(responses.DyeToleranceProgressSuccess)
 		responseCodeAndMsg(rw, http.StatusCreated, MsgObj{Msg: "dye tolerance calculation in progress"})
@@ -175,17 +174,29 @@ func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
-func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) {
-	cycleCount := config.GetOpticalCalibrationCycleCount()
-	//validate the kit id
-	plc.ExperimentRunning = true
-	dye, err := deps.Store.ShowDye(context.Background(), dwtol.DyeID)
+func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) (err error) {
+	var dye db.Dye
+
 	defer func() {
 		if err != nil {
+			logger.Errorln(err)
 			deps.WsErrCh <- err
 			return
 		}
 	}()
+
+	err = deps.Plc.HomingRTPCR()
+	if err != nil {
+		return
+	}
+	cycleCount := config.GetOpticalCalibrationCycleCount()
+	//validate the kit id
+	plc.ExperimentRunning = true
+	dye, err = deps.Store.ShowDye(context.Background(), dwtol.DyeID)
+	if err != nil {
+		return
+	}
+
 	knownValue, valid := validateandGetKitID(dwtol.KitID, dye.Position)
 	if !valid {
 		err = responses.InvalidKitIDError
@@ -203,7 +214,7 @@ func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) {
 
 	deps.WsMsgCh <- "PROGRESS_OPTCALIB_" + fmt.Sprintf("%d", 100)
 	deps.WsMsgCh <- fmt.Sprintf("SUCCESS_OPTCALIB_successfully caliberated rt-pcr for dye %s", dye.Name)
-
+	return
 }
 
 func validateandGetKitID(kitID string, dyePos int) (knownValue int64, valid bool) {

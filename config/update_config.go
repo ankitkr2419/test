@@ -1,11 +1,12 @@
 package config
 
 import (
-	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 const (

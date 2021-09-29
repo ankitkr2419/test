@@ -3,6 +3,7 @@ package plc
 import (
 	"context"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"time"
 
 	"sync"
@@ -226,7 +227,7 @@ var labwares = make(map[int]string)
 var cartridges = make(map[UniqueCartridge]map[string]float64)
 var Calibs = make(map[DeckNumber]float64)
 
-func LoadAllPLCFuncs(store db.Storer) (err error) {
+func LoadAllPLCFuncsExceptUtils(store db.Storer) (err error) {
 
 	err = selectAllMotors(store)
 	if err != nil {
@@ -249,6 +250,18 @@ func LoadAllPLCFuncs(store db.Storer) (err error) {
 	err = selectAllCartridges(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
+		return
+	}
+
+	loadUtils()
+
+	return nil
+}
+
+func LoadAllPLCFuncs(store db.Storer) (err error) {
+
+	err = LoadAllPLCFuncsExceptUtils(store)
+	if err != nil {
 		return
 	}
 
@@ -399,6 +412,24 @@ func DoesTipExist(id int64) bool {
 	}
 	logger.Errorln("Tip Doesn't Exist!")
 	return false
+}
+
+func CalculatePosition(ctx context.Context, calibration db.ConsumableDistance, dN DeckNumber) (updatedCalibration db.ConsumableDistance, err error) {
+
+	logger.Warnln("Previous: ", calibration)
+	switch dN.Number {
+	case K5_Deck:
+		calibration.Distance = consDistance["pos_1"] - (Positions[dN] - Calibs[dN])
+	case K9_Syringe_Module_LHRH:
+		calibration.Distance = consDistance["deck_base"] - (Positions[dN] - Calibs[dN])
+	default:
+		err = responses.CalibrationMethodUnset
+		return
+	}
+	updatedCalibration = calibration
+	logger.Warnln("Updated: ", calibration)
+
+	return
 }
 
 // TODO: Validate Consumable Distances and Motors here

@@ -76,6 +76,7 @@ var (
 	ProcessUpdateError      = fmt.Errorf("error updating process record")
 
 	RecipeIDInvalidError = fmt.Errorf("error recipe id is invalid")
+	RecipeRunPaniced     = fmt.Errorf("error recipe panicked")
 
 	RecipeDecodeError     = fmt.Errorf("error decoding Recipe record")
 	RecipeValidationError = fmt.Errorf("error validating Recipe record")
@@ -138,11 +139,13 @@ var (
 	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
 	AuditLogCreateError = fmt.Errorf("error failed saving log")
 
-	CartridgeFetchError     = fmt.Errorf("error fetching cartridge record")
-	CartridgeDecodeError    = fmt.Errorf("Error while decoding Cartridge data")
-	CartridegInsertionError = fmt.Errorf("Error while inserting Cartridge")
-	CartridegDeletionError  = fmt.Errorf("Error while deleting Cartridge")
-	CartridgeIDParseError   = fmt.Errorf("Error while parsing Cartridge id")
+	CartridgeFetchError           = fmt.Errorf("error fetching cartridge record")
+	CartridgeDecodeError          = fmt.Errorf("Error while decoding Cartridge data")
+	CartridegInsertionError       = fmt.Errorf("Error while inserting Cartridge")
+	CartridegDeletionError        = fmt.Errorf("Error while deleting Cartridge")
+	CartridegeUnsafeDeletionError = "Error Cartridge not safe to delete used by %v recipes"
+
+	CartridgeIDParseError = fmt.Errorf("Error while parsing Cartridge id")
 
 	InvalidTipTubePositionError = fmt.Errorf("Error Invalid Position for Tip Tube")
 	InvalidCartridgeIDError     = fmt.Errorf("Error Invalid Cartridge ID Error")
@@ -206,6 +209,15 @@ var (
 	ConsumableDistanceUpdateError       = fmt.Errorf("error updating Consumable distance record")
 	ConsumableDistanceUpdateConfigError = fmt.Errorf("error updating Consumable distance config")
 	CartridgeCreateConfigError          = fmt.Errorf("error creating Cartridge config")
+
+	CalibrationsFetchError             = fmt.Errorf("error fetching calibration records")
+	CalibrationDecodeError             = fmt.Errorf("error decoding calibration record")
+	CalibrationUpdateConfigError       = fmt.Errorf("error updating calibrations config")
+	CalibrationUpdateError             = fmt.Errorf("error updating calibrations")
+	CalibrationVariableMissingError    = fmt.Errorf("error calibration variable is missing")
+	CalibrationsPositionCalculateError = fmt.Errorf("error position calculating calibrations")
+	CalibrationsCalculateError         = fmt.Errorf("error calculating calibrations")
+	CalibrationMethodUnsetError        = fmt.Errorf("error calibration method is unset")
 
 	DyeDecodeError = fmt.Errorf("error decoding dyes record")
 	DyeFetchError  = fmt.Errorf("error fetching dyes record")
