@@ -315,13 +315,14 @@ func UpdateConsumableDistancesValues(m []ConsumableDistance) (err error) {
 		Name        string
 		Distance    float64
 		Description string
-	}, 1)
+	}, 0)
 	for _, confConsDist := range config.ConsumableDistance {
 		for _, consDist := range m {
 
 			if consDist.ID == confConsDist.ID {
 				confConsDist.ID = consDist.ID
 				confConsDist.Name = consDist.Name
+				logger.Debugln("At conf", consDist.Distance)
 				confConsDist.Distance = consDist.Distance
 				confConsDist.Description = consDist.Description
 
@@ -330,7 +331,7 @@ func UpdateConsumableDistancesValues(m []ConsumableDistance) (err error) {
 			ConsumableDConf.ConsumableDistance = append(ConsumableDConf.ConsumableDistance, confConsDist)
 		}
 	}
-	res, err := yaml.Marshal(config)
+	res, err := yaml.Marshal(ConsumableDConf)
 	if err != nil {
 		logger.Errorln("error in marshalling", err)
 		return
