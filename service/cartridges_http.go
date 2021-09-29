@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -80,6 +81,14 @@ func deleteCartridgeHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.CartridgeIDParseError)
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.CartridgeIDParseError.Error()})
+			return
+		}
+
+		count, err := deps.Store.IsCartridgeSafeToDelete(req.Context(), id)
+		if err != nil {
+			err = fmt.Errorf(responses.CartridegeUnsafeDeletionError, count[0])
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
+			logger.WithField("err", err.Error()).Error(err)
 			return
 		}
 

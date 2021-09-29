@@ -138,11 +138,13 @@ var (
 	AuditLogFetchError  = fmt.Errorf("error failed fetching log")
 	AuditLogCreateError = fmt.Errorf("error failed saving log")
 
-	CartridgeFetchError     = fmt.Errorf("error fetching cartridge record")
-	CartridgeDecodeError    = fmt.Errorf("Error while decoding Cartridge data")
-	CartridegInsertionError = fmt.Errorf("Error while inserting Cartridge")
-	CartridegDeletionError  = fmt.Errorf("Error while deleting Cartridge")
-	CartridgeIDParseError   = fmt.Errorf("Error while parsing Cartridge id")
+	CartridgeFetchError           = fmt.Errorf("error fetching cartridge record")
+	CartridgeDecodeError          = fmt.Errorf("Error while decoding Cartridge data")
+	CartridegInsertionError       = fmt.Errorf("Error while inserting Cartridge")
+	CartridegDeletionError        = fmt.Errorf("Error while deleting Cartridge")
+	CartridegeUnsafeDeletionError = "Error Cartridge not safe to delete used by %v recipes"
+
+	CartridgeIDParseError = fmt.Errorf("Error while parsing Cartridge id")
 
 	InvalidTipTubePositionError = fmt.Errorf("Error Invalid Position for Tip Tube")
 	InvalidCartridgeIDError     = fmt.Errorf("Error Invalid Cartridge ID Error")

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"mylab/cpagent/responses"
 	"strings"
@@ -29,8 +30,9 @@ const (
 							FROM cartridge_wells`
 	selectCartridgeWellsQuery = `SELECT *
 							FROM cartridge_wells WHERE id = $1`
-	deleteCartridgeQuery = `delete from cartridges where id = $1`
-	getCartridgeQuery    = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id WHERE c.id = $1 GROUP BY c.id`
+	deleteCartridgeQuery      = `delete from cartridges where id = $1`
+	countRecipeCartridgeQuery = `select count(*) from recipes where pos_cartridge_1 = $1 OR pos_cartridge_2 = $2`
+	getCartridgeQuery         = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id WHERE c.id = $1 GROUP BY c.id`
 )
 
 type CartridgeType string
@@ -102,6 +104,19 @@ func (s *pgStore) DeleteCartridge(ctx context.Context, id int64) (err error) {
 		return
 	}
 
+	return
+}
+
+func (s *pgStore) IsCartridgeSafeToDelete(ctx context.Context, id int64) (count []int64, err error) {
+	err = s.db.Select(&count, countRecipeCartridgeQuery, id, id)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error counting recipes related to Cartridge data")
+		return
+	}
+
+	if count[0] != 0 {
+		return count, errors.New("Not safe to delete")
+	}
 	return
 }
 
