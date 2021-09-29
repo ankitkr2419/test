@@ -143,4 +143,5 @@ type Storer interface {
 	ListDyes(ctx context.Context) (DBdye []Dye, err error)
 	UpdateConsumableDistance(ctx context.Context, c ConsumableDistance) (err error)
 	ListConsDistancesDeck(ctx context.Context, min, max int64) (consumabledistance []ConsumableDistance, err error)
+	IsCartridgeSafeToDelete(ctx context.Context, id int64) (count []int64, err error)
 }
