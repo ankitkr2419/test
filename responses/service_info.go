@@ -84,6 +84,11 @@ var (
 	ConsumableDistanceInitialisedState = "consumable initialised"
 	ConsumableDistanceCompletedState   = "ConsumableDistance completed"
 
+	CalibrationsFetchSuccess    = "calibration were fetched successfully"
+	CalibrationUpdateSuccess    = "calibration were updated successfully"
+	CalibrationInitialisedState = "calibrations initialised"
+	CalibrationCompletedState   = "calibration completed"
+
 	TipTubeFetchSuccess  = "tip tube record fetched successfully"
 	TipTubeCreateSuccess = "tip tube record created successfully"
 

@@ -151,6 +151,8 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 	if d.isUVLightInProgress() {
 		//  Switch off UV Light
+		d.ResetRunInProgress()
+
 		response, err = d.switchOffUVLight()
 		if err != nil {
 			logger.Errorln("From deck ", d.name, err)

@@ -86,6 +86,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.UserTokenEncodeError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserTokenEncodeError.Error()})
+			return
 		}
 		response := map[string]string{
 			"msg":   fmt.Sprintf(`%s logged in successfully`, u.Role),
@@ -103,7 +104,19 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.UserLoginSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, response)
+
+		if deck != blank && !deps.PlcDeck[anotherDeck(deck)].IsRunInProgress() {
+			logger.Infoln("Reloading all the PLC Funcs")
+			go plc.LoadAllPLCFuncs(deps.Store)
+		}
 	})
+}
+
+func anotherDeck(deck string) string {
+	if deck == plc.DeckA {
+		return plc.DeckB
+	}
+	return plc.DeckA
 }
 
 func checkEngOrAdminLoggedOnDeck(deps Dependencies, deck string, u db.User) {
