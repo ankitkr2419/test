@@ -168,6 +168,19 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	logger.Infoln("Wrote motorNum", d.name, ". res : ", results)
 	motorNumReg.Store(d.name, motorNum)
 
+	results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][2], uint16(1))
+	if err != nil {
+		logger.Errorln("error reading Sensor : ", err, d.name)
+		return "", err
+	}
+
+	logger.Infoln("Sensor Returned ---> ", results[0], d.name)
+
+	if len(results) > 0 && int(results[0]) == SensorCut && direction == TowardsSensor {
+		logger.Infoln("Sensor has Cut ---> ", results[0], d.name)
+		return "Sensor has cut", nil
+	}
+
 	err = d.sleepIfPaused()
 	if err != nil {
 		return
