@@ -52,7 +52,8 @@ func monitorForPLCTimeout(deps *Dependencies, exit chan error) {
 func monitorFlapSensor(deps *Dependencies) {
 	for {
 		// TODO: monitor Flap RH, LH -> Both Decks
-		deps.PlcDeck[plc.DeckA].ReadFlapSensor()
+		// deps.PlcDeck[plc.DeckA].ReadFlapSensor()
+		// deps.PlcDeck[plc.DeckB].ReadFlapSensor()
 		time.Sleep(5 * time.Second)
 	}
 }

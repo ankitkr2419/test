@@ -58,8 +58,10 @@ func (s *pgStore) UpdateConsumableDistance(ctx context.Context, c ConsumableDist
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
 	}
+
 	return
 }
+
 func makeConsumableQuery(consumabledistance []ConsumableDistance) string {
 	values := make([]string, 0, len(consumabledistance))
 

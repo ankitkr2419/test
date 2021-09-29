@@ -534,7 +534,11 @@ func (d *Compact32Deck) switchOffUVLight() (response string, err error) {
 		return
 	}
 
-	d.resetUVLightInProgress()
+	// reset a little late to avoid bug in uv light delay
+	go func() {
+		time.Sleep(1 * time.Second)
+		d.resetUVLightInProgress()
+	}()
 
 	return "SUCCESS", nil
 }
