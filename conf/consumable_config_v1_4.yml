@@ -198,7 +198,7 @@ consumabledistance:
   name: above_deck
   distance: 10
   description: syringe module goes to this position at fast after pickup or aspire
-    operation
+    operation. This value should be always less than pickup_piercing_tip_up and pickup_tip_up
 - id: 403
   name: indeck_safe
   distance: 10
