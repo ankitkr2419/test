@@ -31,7 +31,7 @@ const (
 	selectCartridgeWellsQuery = `SELECT *
 							FROM cartridge_wells WHERE id = $1`
 	deleteCartridgeQuery      = `delete from cartridges where id = $1`
-	countRecipeCartridgeQuery = `select count(*) from recipes where pos_cartridge_1 = $1 OR pos_cartridge_2 = $2`
+	countRecipeCartridgeQuery = `select count(*) from recipes where pos_cartridge_1 = $1 OR pos_cartridge_2 = $1`
 	getCartridgeQuery         = `SELECT c.*, count(cw.id) as wells_count FROM cartridge_wells cw LEFT JOIN cartridges c ON c.id=cw.id WHERE c.id = $1 GROUP BY c.id`
 )
 
@@ -108,7 +108,7 @@ func (s *pgStore) DeleteCartridge(ctx context.Context, id int64) (err error) {
 }
 
 func (s *pgStore) IsCartridgeSafeToDelete(ctx context.Context, id int64) (count []int64, err error) {
-	err = s.db.Select(&count, countRecipeCartridgeQuery, id, id)
+	err = s.db.Select(&count, countRecipeCartridgeQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error counting recipes related to Cartridge data")
 		return
