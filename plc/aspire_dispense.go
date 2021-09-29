@@ -52,7 +52,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64) 
 	var sourceCartridge, destinationCartridge map[string]float64
 	var sourcePosition, destinationPosition, distanceToTravel, position, deckBase, aboveDeck, pickUpTip, diffOfVol float64
 	var ok, dispenseComplete bool
-	var direction, pulses, aspireDispenseSpeed, aspireFastSpeed, diffOfSpeed uint16
+	var direction, pulses, aspireDispenseSpeed, aspireFastSpeed, diffOfSpeed, mixingSpeed uint16
 	var deckAndMotor DeckNumber
 	deckAndMotor.Deck = d.name
 
@@ -280,19 +280,30 @@ skipToAspireInside:
 	oneMicroLitrePulses := float64(config.GetMicroLitrePulses())
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireMixingVolume))
 
+	// Calculate the speed for aspire/dispense
+	aspireFastSpeed = Motors[deckAndMotor]["fast"]
+
+	diffOfSpeed = aspireFastSpeed - aspireSlowSpeed
+	diffOfVol = maximumAspireVolume - minimumAspireVolume
+
+	aspireDispenseSpeed = aspireSlowSpeed + uint16(float64(diffOfSpeed)-float64(diffOfSpeed)*(diffOfVol-(ad.AspireVolume-minimumAspireVolume))/diffOfVol)
+	mixingSpeed = aspireSlowSpeed + uint16(float64(diffOfSpeed)-float64(diffOfSpeed)*(diffOfVol-(ad.AspireMixingVolume-minimumAspireVolume))/diffOfVol)
+
+	logger.Debugln("ad.AspireMixingVolume : ", ad.AspireMixingVolume, " mixingSpeed : ", mixingSpeed)
+
 	if ad.AspireNoOfCycles == 0 {
 		goto skipAspireCycles
 	}
 	for cycleNumber := int64(1); cycleNumber <= ad.AspireNoOfCycles; cycleNumber++ {
 		// Aspire
-		response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+		response, err = d.setupMotor(mixingSpeed, pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
 
 		// Dispense
 		// TODO: Call a separate function for this kind of setup, as it only DISPENCING
-		response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+		response, err = d.setupMotor(mixingSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
@@ -310,17 +321,7 @@ skipAspireCycles:
 
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireVolume))
 
-	// Calculate the speed for aspire/dispense
-	aspireFastSpeed = Motors[deckAndMotor]["fast"]
-
-	diffOfSpeed = aspireFastSpeed - aspireSlowSpeed
-	diffOfVol = maximumAspireVolume - minimumAspireVolume
-
-	aspireDispenseSpeed = aspireSlowSpeed + uint16(float64(diffOfSpeed)-float64(diffOfSpeed)*(diffOfVol-(ad.AspireVolume-minimumAspireVolume))/diffOfVol)
-
-	logger.Debugln("ad.AspireVolume : ", ad.AspireVolume, " aspireDispenseSpeed : ", aspireDispenseSpeed)
-
-	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+	response, err = d.setupMotor(aspireDispenseSpeed, pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {
 		return
 	}
@@ -437,13 +438,13 @@ onlyMixing:
 	for cycleNumber := int64(1); cycleNumber <= ad.DispenseNoOfCycles; cycleNumber++ {
 		// Dispense
 		// CHECK : should these operations be fast ?
-		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+		response, err = d.setupMotor(mixingSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
 
 		// Aspire
-		response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
+		response, err = d.setupMotor(mixingSpeed, pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
@@ -457,7 +458,7 @@ skipDispenseCycles:
 	if dispenseComplete {
 		logger.Infoln("Dispense Complete is to start")
 
-		response, err = d.setupMotor(homingSlowSpeed, initialSensorCutSyringePulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+		response, err = d.setupMotor(aspireDispenseSpeed, initialSensorCutSyringePulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
@@ -466,7 +467,7 @@ skipDispenseCycles:
 
 		logger.Infoln("Syringe is moving down and dispensing along with extraDispense")
 		// TODO:  Note down Bio team's required speed
-		response, err = d.setupMotor(homingSlowSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+		response, err = d.setupMotor(aspireDispenseSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
 			return
 		}
