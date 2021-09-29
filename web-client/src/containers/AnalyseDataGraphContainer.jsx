@@ -78,6 +78,8 @@ const AnalyseDataGraphContainer = (props) => {
         target_id: selectedTarget?.value,
         auto_threshold: isAutoThreshold,
         threshold: threshold,
+        start_cycle: startCycle,
+        end_cycle: endCycle,
       })
     );
     dispatch(
