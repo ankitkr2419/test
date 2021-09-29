@@ -215,11 +215,6 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 	//fetch cartridge type using id
 	var cartridgeID int64
 
-	err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
-	if err != nil {
-		return err
-	}
-
 	aspireCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.SourcePosition)
 	dispenseCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.DestinationPosition)
 
@@ -249,17 +244,28 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
 			return responses.InvalidDispenseWell
 		}
-
+		err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
+		if err != nil {
+			return err
+		}
 	case db.WD, db.WS:
 		// send cartridge and aspire height for validation
 		if !plc.IsCartridgeWellHeightSafe(aspireCartridgeWell, ad.AspireHeight) {
 			return responses.InvalidAspireWell
+		}
+		err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
+		if err != nil {
+			return err
 		}
 		return
 	case db.DW, db.SW:
 		// send cartridge and dispense height for validation
 		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
 			return responses.InvalidDispenseWell
+		}
+		err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
+		if err != nil {
+			return err
 		}
 	default:
 		return responses.InvalidCategoryAspireDispense
