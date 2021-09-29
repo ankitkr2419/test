@@ -402,15 +402,21 @@ func DoesTipExist(id int64) bool {
 	return false
 }
 
-func CalculatePosition(ctx context.Context, calibrations []db.ConsumableDistance, dN DeckNumber) (updatedCalibrations []db.ConsumableDistance, err error) {
-	switch uint16(calibrations[0].ID % 10) {
+func CalculatePosition(ctx context.Context, calibration db.ConsumableDistance, dN DeckNumber) (updatedCalibration db.ConsumableDistance, err error) {
+
+	logger.Warnln("Previous: ", calibration)
+	switch dN.Number {
 	case K5_Deck:
-		calibrations[0].Distance = Positions[dN] - consDistance["pos_1"]
+		calibration.Distance = consDistance["pos_1"] - Positions[dN]
 	case K9_Syringe_Module_LHRH:
+		calibration.Distance = consDistance["deck_base"] - Positions[dN]
 	default:
 		err = responses.CalibrationMethodUnset
 		return
 	}
+	updatedCalibration = calibration
+	logger.Warnln("Updated: ", calibration)
+
 	return
 }
 
