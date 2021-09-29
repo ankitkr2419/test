@@ -407,9 +407,9 @@ func CalculatePosition(ctx context.Context, calibration db.ConsumableDistance, d
 	logger.Warnln("Previous: ", calibration)
 	switch dN.Number {
 	case K5_Deck:
-		calibration.Distance = consDistance["pos_1"] - Positions[dN]
+		calibration.Distance = consDistance["pos_1"] - (Positions[dN] - Calibs[dN])
 	case K9_Syringe_Module_LHRH:
-		calibration.Distance = consDistance["deck_base"] - Positions[dN]
+		calibration.Distance = consDistance["deck_base"] - (Positions[dN] - Calibs[dN])
 	default:
 		err = responses.CalibrationMethodUnset
 		return
