@@ -768,7 +768,7 @@ export function* fetchCalibrations(actions) {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.GET,
-        reqPath: `consumable?deck=${deckName}`,
+        reqPath: `${API_ENDPOINTS.calibrations}?deck=${deckName}`,
         successAction: successAction,
         failureAction: failureAction,
         showPopupFailureMessage: true,

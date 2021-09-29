@@ -49,7 +49,7 @@ export const homingReducer = (state = initialState, action = {}) => {
 
     case homingActions.hideHomingModaal:
       return {
-        ...initialState,
+        ...state,
         showHomingModal: false,
       };
 
