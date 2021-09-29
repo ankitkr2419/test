@@ -253,8 +253,6 @@ func LoadAllPLCFuncsExceptUtils(store db.Storer) (err error) {
 		return
 	}
 
-	loadUtils()
-
 	return nil
 }
 
