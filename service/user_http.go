@@ -105,11 +105,16 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.UserLoginSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, response)
 
-		if deck != blank && !deps.PlcDeck[anotherDeck(deck)].IsRunInProgress() {
-			logger.Infoln("Reloading all the PLC Funcs")
-			go plc.LoadAllPLCFuncsExceptUtils(deps.Store)
-		}
+		reloadUtils(deps, deck)
+
 	})
+}
+
+func reloadUtils(deps Dependencies, deck string) {
+	if deck != blank && (Application == Extraction || Application == Combined) && !deps.PlcDeck[anotherDeck(deck)].IsRunInProgress() {
+		logger.Infoln("Reloading all the PLC Funcs")
+		go plc.LoadAllPLCFuncsExceptUtils(deps.Store)
+	}
 }
 
 func anotherDeck(deck string) string {
