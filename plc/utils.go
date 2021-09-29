@@ -227,7 +227,7 @@ var labwares = make(map[int]string)
 var cartridges = make(map[UniqueCartridge]map[string]float64)
 var Calibs = make(map[DeckNumber]float64)
 
-func LoadAllPLCFuncs(store db.Storer) (err error) {
+func LoadAllPLCFuncsExceptUtils(store db.Storer) (err error) {
 
 	err = selectAllMotors(store)
 	if err != nil {
@@ -250,6 +250,18 @@ func LoadAllPLCFuncs(store db.Storer) (err error) {
 	err = selectAllCartridges(store)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Select All Cartridge failed")
+		return
+	}
+
+	loadUtils()
+
+	return nil
+}
+
+func LoadAllPLCFuncs(store db.Storer) (err error) {
+
+	err = LoadAllPLCFuncsExceptUtils(store)
+	if err != nil {
 		return
 	}
 

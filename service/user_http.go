@@ -107,7 +107,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		if deck != blank && !deps.PlcDeck[anotherDeck(deck)].IsRunInProgress() {
 			logger.Infoln("Reloading all the PLC Funcs")
-			go plc.LoadAllPLCFuncs(deps.Store)
+			go plc.LoadAllPLCFuncsExceptUtils(deps.Store)
 		}
 	})
 }
