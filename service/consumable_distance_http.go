@@ -219,6 +219,8 @@ func updateCalibrationsHandler(deps Dependencies) http.HandlerFunc {
 func calculateConsIDAndPosition(ctx context.Context, store db.Storer, dN plc.DeckNumber) (calibrations []db.ConsumableDistance, err error) {
 	logger.Infoln("Inside calculateConsIDAndPosition for ", dN)
 	var consID uint16
+	var calibration db.ConsumableDistance
+
 	switch dN.Deck {
 	case plc.DeckA:
 		consID = deckAMinCalibID - 1 + dN.Number
@@ -228,17 +230,24 @@ func calculateConsIDAndPosition(ctx context.Context, store db.Storer, dN plc.Dec
 
 	// Resuing ListConsDistancesDeck for single ID
 	calibrations, err = store.ListConsDistancesDeck(ctx, int64(consID), int64(consID))
+	if err != nil {
+		return
+	}
+
 	if len(calibrations) == 0 {
 		err = responses.CalibrationVariableMissingError
 		return
 	}
 
 	// These will be updated calibrations
-	calibrations, err = plc.CalculatePosition(ctx, calibrations, dN)
+	calibration, err = plc.CalculatePosition(ctx, calibrations[0], dN)
 	if err != nil {
 		err = responses.CalibrationsPositionCalculateError
 		return
 	}
+
+	calibrations = []db.ConsumableDistance{calibration}
+	logger.Debugln(calibrations)
 
 	return
 }
