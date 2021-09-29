@@ -61,7 +61,7 @@ export const initialState = {
   ],
 };
 
-export const cleanUpReducer = (state = initialState, action = {}) => {
+export const cleanUpReducer = (state = initialState, action) => {
   switch (action.type) {
     case runCleanUpAction.runCleanUpInitiated:
       const deckInitiateName =
@@ -111,7 +111,9 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
     case runCleanUpAction.runCleanUpFailed:
       const deckFailureName =
-        action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
+        action.payload.serverErrors.deck === "A"
+          ? DECKNAME.DeckA
+          : DECKNAME.DeckB;
 
       const changesForCleanUpFailureMatched = {
         isLoading: false,
