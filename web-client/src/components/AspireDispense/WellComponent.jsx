@@ -43,7 +43,10 @@ export const WellComponent = (props) => {
                     // isDisabled={wellObj.isDisabled}
                     className={`well ${wellObj.footerText}`}
                     onClickHandler={() =>
-                      wellClickHandler(wellObj.id, wellObj.type)
+                      wellClickHandler(
+                        parseInt(wellObj.id),
+                        parseInt(wellObj.type)
+                      )
                     }
                   />
                 );

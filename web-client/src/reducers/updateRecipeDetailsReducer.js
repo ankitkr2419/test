@@ -4,7 +4,87 @@ import {
   getCartridgeAction,
   getTubesAction,
   getTipsAction,
+  storeExistingRecipeAction,
+  getCartridgeByIdAction,
+  getCartridge1Action,
+  getCartridge2Action,
 } from "actions/saveNewRecipeActions";
+
+const cartridgeDetailsInitialState = {
+  isLoading: false,
+  error: null,
+  cartridgeDetails: null,
+};
+
+export const cartridge1DetailsReducer = (
+  state = cartridgeDetailsInitialState,
+  actions
+) => {
+  switch (actions.type) {
+    case getCartridge1Action.getCartridge1Initiated:
+      return {
+        ...state,
+        isLoading: true,
+        ...actions.payload,
+      };
+
+    case getCartridge1Action.getCartridge1Success:
+      console.log("reducer action.PAYLOAD: ", actions.payload.response);
+      return {
+        ...state,
+        isLoading: false,
+        error: false,
+        cartridgeDetails: actions.payload.response,
+      };
+
+    case getCartridge1Action.getCartridge1Failure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
+
+    case getCartridge1Action.getCartridge1Reset:
+      return cartridgeDetailsInitialState;
+
+    default:
+      return state;
+  }
+};
+
+export const cartridge2DetailsReducer = (
+  state = cartridgeDetailsInitialState,
+  actions
+) => {
+  switch (actions.type) {
+    case getCartridge2Action.getCartridge2Initiated:
+      return {
+        ...state,
+        isLoading: true,
+      };
+
+    case getCartridge2Action.getCartridge2Success:
+      return {
+        ...state,
+        isLoading: false,
+        error: false,
+        cartridgeDetails: actions.payload.response,
+      };
+
+    case getCartridge2Action.getCartridge2Failure:
+      return {
+        ...state,
+        isLoading: false,
+        error: true,
+      };
+
+    case getCartridge2Action.getCartridge2Reset:
+      return cartridgeDetailsInitialState;
+
+    default:
+      return state;
+  }
+};
 
 const initialState = {
   tempDeckName: "",

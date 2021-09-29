@@ -54,7 +54,11 @@ import { recipeActionReducer } from "reducers/recipeActionReducer";
 import { restoreDeckReducer } from "reducers/restoreDeckReducer";
 import { discardDeckReducer } from "reducers/discardDeckReducer";
 import { cleanUpReducer } from "reducers/cleanUpReducer";
-import { updateRecipeDetailsReducer } from "reducers/updateRecipeDetailsReducer";
+import {
+  cartridge1DetailsReducer,
+  cartridge2DetailsReducer,
+  updateRecipeDetailsReducer,
+} from "reducers/updateRecipeDetailsReducer";
 import { processListReducer } from "reducers/processListReducer";
 import { editProcessReducer } from "reducers/editProcessReducer";
 import { appInfoReducer } from "./appInfoReducer";
@@ -128,6 +132,8 @@ const rootReducer = combineReducers({
   discardTipAndHomingReducer,
   cleanUpReducer,
   updateRecipeDetailsReducer,
+  cartridge1DetailsReducer,
+  cartridge2DetailsReducer,
   processListReducer,
   editProcessReducer,
   appInfoReducer,

@@ -31,7 +31,12 @@ import {
 import { showHomingModal as showHomingModalAction } from "action-creators/homingActionCreators";
 import TopContentComponent from "./TopContentComponent";
 import RecipeListingCards from "./RecipeListingCards";
-import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
+import {
+  getCartridge1ActionReset,
+  getCartridge2ActionReset,
+  saveNewRecipe,
+  saveRecipeDetails,
+} from "action-creators/saveNewRecipeActionCreators";
 
 const RecipeListingComponent = (props) => {
   const {
@@ -84,6 +89,12 @@ const RecipeListingComponent = (props) => {
   //     dispatch(showHomingModalAction());
   //   }
   // }, [cleanUpAbortStatus]);
+
+  // reset cartridge 1 and cartridge 2 state
+  useEffect(() => {
+    dispatch(getCartridge1ActionReset());
+    dispatch(getCartridge2ActionReset());
+  });
 
   useEffect(() => {
     setSearchRecipeText("");
