@@ -29,7 +29,6 @@ export const cartridge1DetailsReducer = (
       };
 
     case getCartridge1Action.getCartridge1Success:
-      console.log("reducer action.PAYLOAD: ", actions.payload.response);
       return {
         ...state,
         isLoading: false,
