@@ -18,13 +18,13 @@ type Threshold struct {
 	TargetID      uuid.UUID `json:"target_id"`
 	AutoThreshold bool      `json:"auto_threshold"`
 	Threshold     float32   `json:"threshold"`
-	StartCycle    uint16    `json:"start_cycle"`
-	EndCycle      uint16    `json:"end_cycle"`
+	StartCycle    uint16    `json:"start_cycle" validate:"gte=0"`
+	EndCycle      uint16    `json:"end_cycle" validate:"gte=0"`
 }
 type Baseline struct {
 	AutoBaseline bool   `json:"auto_baseline"`
-	StartCycle   uint16 `json:"start_cycle"`
-	EndCycle     uint16 `json:"end_cycle"`
+	StartCycle   uint16 `json:"start_cycle" validate:"gte=0"`
+	EndCycle     uint16 `json:"end_cycle" validate:"gte=0"`
 }
 type TargetWell struct {
 	Target uuid.UUID
@@ -49,7 +49,12 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
-
+		valid, validationResp := Validate(tc)
+		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.ThresholdValidationError)
+			responseBadRequest(rw, validationResp)
+			return
+		}
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching wells data")
@@ -114,7 +119,12 @@ func getBaselineNormalisedValuesHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
-
+		valid, validationResp := Validate(bl)
+		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.ThresholdValidationError)
+			responseBadRequest(rw, validationResp)
+			return
+		}
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching wells data")

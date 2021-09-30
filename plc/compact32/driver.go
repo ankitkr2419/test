@@ -603,8 +603,10 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 		if err != nil {
 			return
 		}
-		plc.HoldSleep(120)
+		plc.HoldSleep(1)
 	}
+
+	plc.HoldSleep(120)
 
 	logger.Infoln(responses.PIDCalibrationSuccess)
 
