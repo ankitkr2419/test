@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Col, FormGroup, Label, Select } from "core-components";
 
 export const TipSelectionComponent = (props) => {
-  const {heading} = props;
+  const { heading } = props;
   return (
     <div className="process-box mx-auto">
       <div className="mb-3 border-bottom-line">
@@ -17,6 +17,7 @@ export const TipSelectionComponent = (props) => {
               placeholder="Select Tip"
               className=""
               size="sm"
+              isSearchable={false}
             />
           </Col>
         </FormGroup>
@@ -26,9 +27,9 @@ export const TipSelectionComponent = (props) => {
 };
 
 TipSelectionComponent.propTypes = {
-    heading: PropTypes.string
+  heading: PropTypes.string,
 };
 
 TipSelectionComponent.defaultProps = {
-  heading: "Select Tips"
+  heading: "Select Tips",
 };
