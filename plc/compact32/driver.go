@@ -266,7 +266,7 @@ func (d *Compact32) Stop() (err error) {
 		d.ExitCh <- errors.New("PID Error")
 		return nil
 	}
-
+	plc.ExperimentRunning = false
 	d.ExitCh <- errors.New("PCR Aborted")
 	return nil
 }
