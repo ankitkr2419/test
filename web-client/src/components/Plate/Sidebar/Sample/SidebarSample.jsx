@@ -61,7 +61,7 @@ const SidebarSample = (props) => {
 
   return (
     <>
-      <CreatableSelect
+      {/* <CreatableSelect
         isClearable
         isDisabled={isDisabled || isSampleListLoading}
         isLoading={isSampleListLoading}
@@ -73,6 +73,15 @@ const SidebarSample = (props) => {
         value={sample}
         placeholder="Select Sample"
         className="mb-3"
+      /> */}
+      <Input
+        className="mb-3"
+        placeholder="Select Sample"
+        value={sample}
+        onChange={(e) => handleSampleChange(e.target.value)}
+        onBlur={(e) => handleBlurChange(e.target.value)}
+        onCreateOption={(e) => handleSampleCreate(e.target.value)}
+        onInputChange={(e) => handleSampleInputChange(e.target.value)}
       />
       <SampleTargetList
         list={sampleState.get("targets")}
