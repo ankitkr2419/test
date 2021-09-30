@@ -121,7 +121,7 @@ func getBaselineNormalisedValuesHandler(deps Dependencies) http.HandlerFunc {
 		}
 		valid, validationResp := Validate(bl)
 		if !valid {
-			logger.WithField("err", "Validation Error").Errorln(responses.ThresholdValidationError)
+			logger.WithField("err", "Validation Error").Errorln(responses.BaselineValidationError)
 			responseBadRequest(rw, validationResp)
 			return
 		}
