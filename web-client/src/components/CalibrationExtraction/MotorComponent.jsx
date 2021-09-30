@@ -130,10 +130,10 @@ const MotorComponent = (props) => {
                   onChange={(event) =>
                     handleOnChange(
                       "distance.value",
-                      parseInt(event.target.value)
+                      parseFloat(event.target.value)
                     )
                   }
-                  onBlur={(e) => handleBlurDistance(parseInt(e.target.value))}
+                  onBlur={(e) => handleBlurDistance(parseFloat(e.target.value))}
                   onFocus={() => handleOnChange("distance.isInvalid", false)}
                 />
                 {distance.isInvalid && (
