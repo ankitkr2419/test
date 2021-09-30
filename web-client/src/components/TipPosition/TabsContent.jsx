@@ -13,7 +13,14 @@ import {
 } from "appConstants";
 
 export const TabsContent = (props) => {
-  const { formik, activeTab, toggle, wellClickHandler } = props;
+  const {
+    formik,
+    activeTab,
+    toggle,
+    wellClickHandler,
+    cartridge1Details,
+    cartridge2Details,
+  } = props;
 
   return (
     <Card className="card-box">
@@ -27,10 +34,11 @@ export const TabsContent = (props) => {
               className={classnames({
                 active: activeTab === TAB_TYPE_CARTRIDGE_1,
               })}
-              onClick={() => {
-                toggle(TAB_TYPE_CARTRIDGE_1);
-              }}
-              disabled={formik.values.cartridge1.isDisabled}
+              onClick={() => toggle(TAB_TYPE_CARTRIDGE_1)}
+              disabled={
+                formik.values.cartridge1.isDisabled ||
+                cartridge1Details === null
+              }
             >
               Cartridge 1
             </NavLink>
@@ -51,10 +59,11 @@ export const TabsContent = (props) => {
               className={classnames({
                 active: activeTab === TAB_TYPE_CARTRIDGE_2,
               })}
-              onClick={() => {
-                toggle(TAB_TYPE_CARTRIDGE_2);
-              }}
-              disabled={formik.values.cartridge2.isDisabled}
+              onClick={() => toggle(TAB_TYPE_CARTRIDGE_2)}
+              disabled={
+                formik.values.cartridge2.isDisabled ||
+                cartridge2Details === null
+              }
             >
               Cartridge 2
             </NavLink>

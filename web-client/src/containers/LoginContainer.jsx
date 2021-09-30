@@ -16,9 +16,9 @@ const LoginContainer = () => {
   const loginBtnHandler = (data) => {
     let { username, password } = data;
     // let role = username ? username.split("@").pop().split(".")[0] : undefined;
-    let email = username//.split("@")[0];
+    let email = username; //.split("@")[0];
     //TODO remove comments once tested properly
-    dispatch(login({ email, password, deckName: name, /*role*/ }));
+    dispatch(login({ email, password, deckName: name, showToast: true }));
   };
 
   // redirection once logged in

@@ -113,8 +113,9 @@ export const AspireDispenseBox = styled.div`
         height: 2.25rem;
         .height-icon-box {
           position: absolute;
-          top: 3px;
-          right: 0.75rem;
+          top: 5px;
+          left: 11.596rem;
+          color: gray;
         }
       }
       .cycle-input {
@@ -123,7 +124,7 @@ export const AspireDispenseBox = styled.div`
       }
       .aspire-input-field,
       .dispense-input-field {
-        padding-right: 2rem;
+        padding-right: 3rem;
       }
     }
     .coordinate.-horizontal .coordinate-item {
@@ -167,6 +168,6 @@ export const CommmonFields = styled.div`
   }
   .aspire-input-field,
   .dispense-input-field {
-    padding-right: 2rem;
+    padding-right: 3rem;
   }
 `;

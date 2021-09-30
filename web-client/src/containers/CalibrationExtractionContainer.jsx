@@ -23,6 +23,9 @@ import {
   fetchConsumableInitiated,
   updateConsumableInitiated,
   addConsumableInitiated,
+  senseAndHitInitiated,
+  fetchCalibrationsDeckAInitiated,
+  fetchCalibrationsDeckBInitiated,
 } from "action-creators/calibrationActionCreators";
 import { DECKNAME, PID_STATUS } from "appConstants";
 import { useFormik } from "formik";
@@ -80,6 +83,18 @@ const CalibrationExtractionContainer = () => {
   const consumableReducer = useSelector((state) => state.consumableReducer);
   const consumableReducerData = consumableReducer.toJS();
 
+  //Calibrations valriables for Deck A
+  const calibrationDeckAReducer = useSelector(
+    (state) => state.calibrationDeckAReducer
+  );
+  const calibrationDeckAReducerData = calibrationDeckAReducer.toJS();
+
+  //Calibrations valriables for Deck B
+  const calibrationDeckBReducer = useSelector(
+    (state) => state.calibrationDeckBReducer
+  );
+  const calibrationDeckBReducerData = calibrationDeckBReducer.toJS();
+
   // fetch pidDetails API (pidTemp, pidMinutes) called initially
   useEffect(() => {
     dispatch(fetchPidInitiated(token));
@@ -93,6 +108,12 @@ const CalibrationExtractionContainer = () => {
   // fetch consumable distance
   useEffect(() => {
     dispatch(fetchConsumableInitiated(token));
+  }, []);
+
+  // fetch calibrations for Deck A and B
+  useEffect(() => {
+    dispatch(fetchCalibrationsDeckAInitiated(token, DECKNAME.DeckAShort));
+    dispatch(fetchCalibrationsDeckBInitiated(token, DECKNAME.DeckBShort));
   }, []);
 
   useEffect(() => {
@@ -123,8 +144,10 @@ const CalibrationExtractionContainer = () => {
       consumableReducerData.isLoading === false &&
       consumableReducerData.isUpdateApi === true
     )
-      // fetch updated data after updation
+      // fetch updated data after updation for consumables and calibrations
       dispatch(fetchConsumableInitiated(token));
+    dispatch(fetchCalibrationsDeckAInitiated(token, DECKNAME.DeckAShort));
+    dispatch(fetchCalibrationsDeckBInitiated(token, DECKNAME.DeckBShort));
   }, [
     consumableReducerData.error,
     consumableReducerData.isLoading,
@@ -201,7 +224,13 @@ const CalibrationExtractionContainer = () => {
   };
 
   const handleSenseAndHitBtn = () => {
-    console.log("Sense and Hit");
+    const { motorNumber } = formik.values;
+    const body = {
+      motor_number: motorNumber.value,
+    };
+    const deck =
+      name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
+    dispatch(senseAndHitInitiated(token, deck, body));
   };
 
   const handleSaveDetailsBtn = (data) => {
@@ -319,6 +348,8 @@ const CalibrationExtractionContainer = () => {
       handleTipesTubesButton={handleTipesTubesButton}
       addNewConsumableDistance={addNewConsumableDistance}
       consumableDistanceData={consumableReducerData.data || null}
+      calibrationsDataForDeckA={calibrationDeckAReducerData.data || null}
+      calibrationsDataForDeckB={calibrationDeckBReducerData.data || null}
     />
   );
 };

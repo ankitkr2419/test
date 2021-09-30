@@ -19,17 +19,21 @@ import {
 } from "./helpers";
 
 const PiercingComponent = (props) => {
-  const { editReducerData } = props;
+  const { editReducerData, cartridge1Details, cartridge2Details } = props;
 
   const dispatch = useDispatch();
   const history = useHistory();
   const [activeTab, setActiveTab] = useState("0");
   const [showHeightModal, setShowHieghtModal] = useState(false);
   const [currentWellObj, setCurrentWellObj] = useState({});
+
+  // variable number of wells
   const [extractionWells, setExtractionWell] = useState(
-    getWellsInitialArray(8, 0)
+    getWellsInitialArray(cartridge1Details?.wells_count || 8, 0)
   );
-  const [pcrWells, setPcrWell] = useState(getWellsInitialArray(4, 1));
+  const [pcrWells, setPcrWell] = useState(
+    getWellsInitialArray(cartridge2Details?.wells_count || 4, 1)
+  );
 
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
@@ -42,6 +46,14 @@ const PiercingComponent = (props) => {
 
   // if data from editReducer is NOT NULL than updated wellsArrays
   useEffect(() => {
+    // if any if cartridge1 or cartridge2 is null
+    // then disable tab accordingly
+    if (cartridge1Details === null) {
+      setActiveTab("1");
+    } else if (cartridge2Details === null) {
+      setActiveTab("0");
+    }
+
     if (editReducerData?.cartridge_wells) {
       setActiveTab(editReducerData.type === "cartridge_1" ? "0" : "1"); //change tab accordingly
 
@@ -183,6 +195,7 @@ const PiercingComponent = (props) => {
                     <NavLink
                       className={classnames({ active: activeTab === "0" })}
                       onClick={() => toggle("0")}
+                      disabled={cartridge1Details === null}
                     >
                       Extraction
                     </NavLink>
@@ -191,6 +204,7 @@ const PiercingComponent = (props) => {
                     <NavLink
                       className={classnames({ active: activeTab === "1" })}
                       onClick={() => toggle("1")}
+                      disabled={cartridge2Details === null}
                     >
                       PCR
                     </NavLink>

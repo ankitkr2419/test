@@ -25,6 +25,7 @@ import ProcessRemaining from "./ProcessRemaining";
 import TemperatureInfo from "./TemperatureInfo";
 import TimeInfo from "./TimeInfo";
 import WhiteLight from "./WhiteLight";
+import HomingModal from "./HomingModal";
 
 export {
   ButtonGroup,
@@ -58,4 +59,5 @@ export {
   TimeInfo,
   TemperatureInfo,
   WhiteLight,
+  HomingModal,
 };

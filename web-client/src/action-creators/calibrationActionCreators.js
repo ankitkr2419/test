@@ -34,6 +34,8 @@ import {
   updateConsumableActions,
   addConsumableActions,
   senseAndHitActions,
+  fetchCalibrationsDeckAActions,
+  fetchCalibrationsDeckBActions,
 } from "actions/calibrationActions";
 
 //fetch common details - name, email, roomTemperature
@@ -88,37 +90,6 @@ export const updateCommonDetailsInitiated = ({ token, data }) => ({
 
 export const updateCommonDetailsFailed = ({ error }) => ({
   type: updateCommonDetailsActions.updateCommonDetaislFailure,
-  payload: {
-    error,
-  },
-});
-
-//fetch calibration configurations
-export const calibrationInitiated = (token) => ({
-  type: calibrationActions.calibrationInitiated,
-  payload: {
-    token,
-  },
-});
-
-export const calibrationFailed = ({ error }) => ({
-  type: calibrationActions.calibrationFailure,
-  payload: {
-    error,
-  },
-});
-
-//update calibration configurations
-export const updateCalibrationInitiated = ({ token, data }) => ({
-  type: updateCalibrationActions.updateCalibrationInitiated,
-  payload: {
-    token,
-    data,
-  },
-});
-
-export const updateCalibrationFailed = ({ error }) => ({
-  type: updateCalibrationActions.updateCalibrationFailure,
   payload: {
     error,
   },
@@ -233,9 +204,9 @@ export const motorFailed = ({ error }) => ({
 });
 
 // action creators for sense and hit
-export const senseAndHitInitiated = (token, body) => ({
+export const senseAndHitInitiated = (token, deck, body) => ({
   type: senseAndHitActions.senseAndHitActionInitiated,
-  payload: { token, body },
+  payload: { token, deck, body },
 });
 
 export const senseAndHitFailed = ({ error }) => ({
@@ -522,4 +493,26 @@ export const addConsumableInitiated = (payload) => ({
 export const addConsumableFailed = ({ error }) => ({
   type: addConsumableActions.failureAction,
   payload: { error },
+});
+
+//fetch calibrations for Deck A
+export const fetchCalibrationsDeckAInitiated = (token, deckName) => ({
+  type: fetchCalibrationsDeckAActions.initiateAction,
+  payload: { token, deckName },
+});
+
+export const fetchCalibrationsDeckAFailed = (error) => ({
+  type: fetchCalibrationsDeckAActions.failureAction,
+  payload: error,
+});
+
+//fetch calibrations for Deck B
+export const fetchCalibrationsDeckBInitiated = (token, deckName) => ({
+  type: fetchCalibrationsDeckBActions.initiateAction,
+  payload: { token, deckName },
+});
+
+export const fetchCalibrationsDeckBFailed = (error) => ({
+  type: fetchCalibrationsDeckBActions.failureAction,
+  payload: error,
 });

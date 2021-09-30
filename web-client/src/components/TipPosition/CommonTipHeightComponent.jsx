@@ -1,7 +1,7 @@
 import React from "react";
 
 import { FormGroup, Label, Input, FormError } from "core-components";
-import { Icon } from "shared-components";
+import { Icon, Text } from "shared-components";
 import { typeName } from "./functions";
 
 export const CommonTipHeightComponent = (props) => {
@@ -42,16 +42,21 @@ export const CommonTipHeightComponent = (props) => {
           Tip Height
         </Label>
         <div className="tip-height-input-box ml-4">
-          <Input
-            type="number"
-            name="tip-height"
-            id="tip-height"
-            placeholder="Type here"
-            className="tip-height-input"
-            value={formik.values[`${typeName[activeTab]}`].tipHeight}
-            onChange={(e) => handleHeightValueChange(e)}
-          />
-          <Icon name="height" size={16} className="height-icon-btn" />
+          <div className="d-flex flex-column position-relative">
+            <Input
+              type="number"
+              name="tip-height"
+              id="tip-height"
+              placeholder="Type here"
+              className="tip-height-input"
+              value={formik.values[`${typeName[activeTab]}`].tipHeight}
+              onChange={(e) => handleHeightValueChange(e)}
+            />
+            {/* <Icon name="height" size={16} className="height-icon-btn" /> */}
+            <Text Tag="span" className="font-weight-bold height-icon-btn">
+              mm
+            </Text>
+          </div>
           <FormError>Incorrect Tip Height</FormError>
         </div>
       </FormGroup>

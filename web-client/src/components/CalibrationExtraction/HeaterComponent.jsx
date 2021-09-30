@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Redirect } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
 
 import { Card, CardBody } from "core-components";
-import { ButtonIcon, ButtonBar, Text, ColoredCircle } from "shared-components";
+import {
+  ButtonIcon,
+  ButtonBar,
+  Text,
+  ColoredCircle,
+  HomingModal,
+} from "shared-components";
 import {
   abort,
   heaterInitiated,
 } from "action-creators/calibrationActionCreators";
+import { showHomingModal as showHomingModalAction } from "action-creators/homingActionCreators";
 import { getHeaterRequestBody, heaterInitialFormikState } from "./helpers";
 import { PageBody, HeatingBox, TopContent } from "./Style";
 import HeatingProcess from "./HeatingProcess";
@@ -29,7 +36,7 @@ const HeaterComponent = (props) => {
     (state) => state.heaterRunProgessReducer
   );
   const { heaterRunStatus } = heaterRunProgessReducer.toJS();
-  const { progressing } = HEATER_RUN_STATUS;
+  const { progressing, progressAborted } = HEATER_RUN_STATUS;
 
   const heaterReducer = useSelector((state) => state.heaterProgressReducer);
   const heaterProgressReducerData = heaterReducer.toJS();
@@ -42,6 +49,13 @@ const HeaterComponent = (props) => {
   });
 
   const { name, token } = activeDeckObj;
+
+  // if progress is aborted then open homing modal
+  useEffect(() => {
+    if (heaterRunStatus === progressAborted) {
+      dispatch(showHomingModalAction());
+    }
+  }, [heaterRunStatus]);
 
   const handleSaveBtn = () => {
     const body = getHeaterRequestBody(formik);
@@ -85,6 +99,7 @@ const HeaterComponent = (props) => {
 
   return (
     <>
+      <HomingModal />
       <PageBody>
         <HeatingBox>
           <div className="process-content process-heating px-2">

@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { VideoCard } from "shared-components";
+import { HomingModal, VideoCard } from "shared-components";
 import MlModal from "shared-components/MlModal";
 import TimeModal from "components/modals/TimeModal";
 import OperatorRunRecipeCarousalModal from "components/modals/OperatorRunRecipeCarousalModal";
 import { useHistory } from "react-router-dom";
-import { DECKNAME, MODAL_BTN, ROUTES, MODAL_MESSAGE } from "appConstants";
+import {
+  DECKNAME,
+  MODAL_BTN,
+  ROUTES,
+  MODAL_MESSAGE,
+  CLEAN_UP_STATUS,
+} from "appConstants";
 import { logoutInitiated } from "action-creators/loginActionCreators";
 import {
   cleanUpHours,
@@ -22,9 +28,15 @@ import {
   publishRecipeInitiated,
   deleteRecipeInitiated,
 } from "action-creators/recipeActionCreators";
+import { showHomingModal as showHomingModalAction } from "action-creators/homingActionCreators";
 import TopContentComponent from "./TopContentComponent";
 import RecipeListingCards from "./RecipeListingCards";
-import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
+import {
+  getCartridge1ActionReset,
+  getCartridge2ActionReset,
+  saveNewRecipe,
+  saveRecipeDetails,
+} from "action-creators/saveNewRecipeActionCreators";
 
 const RecipeListingComponent = (props) => {
   const {
@@ -49,6 +61,10 @@ const RecipeListingComponent = (props) => {
   const activeDeckObj =
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
+  //cleanUp reducer
+  const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
+  const { cleanUpAbortStatus } = cleanUpReducer;
+
   const isLoggedIn = activeDeckObj.isLoggedIn;
   const error = activeDeckObj.error;
 
@@ -64,6 +80,21 @@ const RecipeListingComponent = (props) => {
   const [recipeIdToPublish, setRecipeIdToPublish] = useState("");
   const [isPublished, setIsPublished] = useState(false); //tells that selected recipe is published/unpublished
   const [publishModal, setPublishModal] = useState(false);
+
+  /**Might be needed later */
+
+  // if progress is aborted then open homing modal
+  // useEffect(() => {
+  //   if (cleanUpAbortStatus === CLEAN_UP_STATUS.aborted) {
+  //     dispatch(showHomingModalAction());
+  //   }
+  // }, [cleanUpAbortStatus]);
+
+  // reset cartridge 1 and cartridge 2 state
+  useEffect(() => {
+    dispatch(getCartridge1ActionReset());
+    dispatch(getCartridge2ActionReset());
+  });
 
   useEffect(() => {
     setSearchRecipeText("");
@@ -211,6 +242,8 @@ const RecipeListingComponent = (props) => {
 
   return (
     <>
+      {/* Might be needed later. */}
+      {/* <HomingModal /> */}
       <div className="landing-content px-2">
         {/* The following modal is displayed when an operator begins to run a recipe */}
         {isOperatorRunRecipeCarousalModalVisible && (

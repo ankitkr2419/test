@@ -29,9 +29,9 @@ import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";
 
 const TipPositionComponent = (props) => {
-  const { editReducerData } = props;
+  const { editReducerData, cartridge1Details, cartridge2Details } = props;
 
-  const [activeTab, setActiveTab] = useState("1");
+  const [activeTab, setActiveTab] = useState("2");
   const [currentWellObj, setCurrentWellObj] = useState({});
   const [showHeightModal, setShowHieghtModal] = useState(false);
 
@@ -51,7 +51,11 @@ const TipPositionComponent = (props) => {
   const token = activeDeckObj.token;
 
   const formik = useFormik({
-    initialValues: getFormikInitialState(editReducerData),
+    initialValues: getFormikInitialState(
+      cartridge1Details,
+      cartridge2Details,
+      editReducerData
+    ),
     enableReinitialize: true,
   });
 
@@ -194,6 +198,8 @@ const TipPositionComponent = (props) => {
               activeTab={activeTab}
               toggle={toggle}
               wellClickHandler={wellClickHandler}
+              cartridge1Details={cartridge1Details}
+              cartridge2Details={cartridge2Details}
             />
             <ButtonBar rightBtnLabel="Save" handleRightBtn={handleSaveBtn} />
           </div>

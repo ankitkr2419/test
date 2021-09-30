@@ -1,9 +1,8 @@
 import { takeEvery, put, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
-import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
+import { API_ENDPOINTS, DECKNAME, HTTP_METHODS } from "appConstants";
 import {
   abortActions,
-  calibrationActions,
   commonDetailsActions,
   fetchPidDetailsActions,
   heaterActions,
@@ -33,6 +32,8 @@ import {
   updateConsumableActions,
   addConsumableActions,
   senseAndHitActions,
+  fetchCalibrationsDeckAActions,
+  fetchCalibrationsDeckBActions,
 } from "actions/calibrationActions";
 import {
   calibrationFailed,
@@ -65,6 +66,8 @@ import {
   fetchConsumableFailed,
   updateConsumableFailed,
   addConsumableFailed,
+  fetchCalibrationsDeckAFailed,
+  fetchCalibrationsDeckBFailed,
 } from "action-creators/calibrationActionCreators";
 
 export function* shaker(actions) {
@@ -165,56 +168,6 @@ export function* updateCommonDetails(actions) {
   }
 }
 
-export function* fetchCalibrations(actions) {
-  const {
-    payload: { token },
-  } = actions;
-  const { calibrationSuccess, calibrationFailure } = calibrationActions;
-
-  try {
-    yield call(callApi, {
-      payload: {
-        method: HTTP_METHODS.GET,
-        body: null,
-        reqPath: `${API_ENDPOINTS.configs}`,
-        successAction: calibrationSuccess,
-        failureAction: calibrationFailure,
-        showPopupFailureMessage: true,
-        token,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching calibrations configs", error);
-    yield put(calibrationFailed({ error }));
-  }
-}
-
-export function* updateCalibrations(actions) {
-  const {
-    payload: { token, data },
-  } = actions;
-  const { updateCalibrationSuccess, updateCalibrationFailure } =
-    updateCalibrationActions;
-
-  try {
-    yield call(callApi, {
-      payload: {
-        method: HTTP_METHODS.PUT,
-        body: { ...data },
-        reqPath: `${API_ENDPOINTS.configs}`,
-        successAction: updateCalibrationSuccess,
-        failureAction: updateCalibrationFailure,
-        showPopupSuccessMessage: true,
-        showPopupFailureMessage: true,
-        token,
-      },
-    });
-  } catch (error) {
-    console.error("Error updating calibrations configs", error);
-    yield put(updateCalibrationFailed({ error }));
-  }
-}
-
 export function* pidStart(actions) {
   const {
     payload: { token, deckName },
@@ -289,7 +242,7 @@ export function* motor(actions) {
 
 export function* senseAndHit(actions) {
   const {
-    payload: { token, body },
+    payload: { token, deck, body },
   } = actions;
   const { senseAndHitActionSuccess, senseAndHitActionFailure } =
     senseAndHitActions;
@@ -299,7 +252,7 @@ export function* senseAndHit(actions) {
       payload: {
         method: HTTP_METHODS.POST,
         body: body,
-        reqPath: `${API_ENDPOINTS.senseAndHit}`,
+        reqPath: `${API_ENDPOINTS.senseAndHit}/${deck}`,
         successAction: senseAndHitActionSuccess,
         failureAction: senseAndHitActionFailure,
         showPopupSuccessMessage: true,
@@ -799,6 +752,39 @@ export function* updateConsumable(actions) {
   }
 }
 
+export function* fetchCalibrations(actions) {
+  const {
+    payload: { token, deckName },
+  } = actions;
+
+  const calibrationActions =
+    deckName === DECKNAME.DeckAShort
+      ? fetchCalibrationsDeckAActions
+      : fetchCalibrationsDeckBActions;
+
+  const { successAction, failureAction } = calibrationActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.GET,
+        reqPath: `${API_ENDPOINTS.calibrations}?deck=${deckName}`,
+        successAction: successAction,
+        failureAction: failureAction,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching calibrations configs", error);
+    if (deckName === DECKNAME.DeckA) {
+      yield put(fetchCalibrationsDeckAFailed(error));
+    } else {
+      yield put(fetchCalibrationsDeckBFailed(error));
+    }
+  }
+}
+
 export function* addConsumable(actions) {
   const {
     payload: { token, requestBody },
@@ -836,10 +822,13 @@ export function* calibrationSaga() {
     updateCommonDetailsActions.updateCommonDetaislInitiated,
     updateCommonDetails
   );
-  yield takeEvery(calibrationActions.calibrationInitiated, fetchCalibrations);
   yield takeEvery(
-    updateCalibrationActions.updateCalibrationInitiated,
-    updateCalibrations
+    fetchCalibrationsDeckAActions.initiateAction,
+    fetchCalibrations
+  );
+  yield takeEvery(
+    fetchCalibrationsDeckBActions.initiateAction,
+    fetchCalibrations
   );
   yield takeEvery(pidActions.pidActionInitiated, pidStart);
   yield takeEvery(abortActions.abortActionInitiated, abort);

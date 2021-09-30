@@ -68,7 +68,7 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
   return {
     category: `${aspireSelectedTabName}_to_${dispenseSelectedTabName}`,
     cartridge_type: `cartridge_${cartridgeType}`,
-    source_position: parseInt(sourcePosition),
+    source_position: parseInt(sourcePosition) || 0,
     aspire_height: parseFloat(aspire.aspireHeight ? aspire.aspireHeight : 0),
     aspire_mixing_volume: parseFloat(
       aspire.mixingVolume ? aspire.mixingVolume : 0
@@ -83,21 +83,26 @@ export const getRequestBody = (activeTab, aspire, dispense) => {
       dispense.mixingVolume ? dispense.mixingVolume : 0
     ),
     dispense_no_of_cycles: parseFloat(dispense.nCycles ? dispense.nCycles : 0),
-    destination_position: parseInt(destinationPosition),
+    destination_position: parseInt(destinationPosition) || 0,
   };
 };
 
 // footerText can be: "aspire-from" or "selected"
 // generates array of objects for wells.
 export const getArray = (
-  length,
+  cartridgeDetails,
   type,
   currentSelectedCategory,
   selectedPosition = null
 ) => {
-  const array = [];
+  if (!cartridgeDetails) {
+    return null;
+  }
 
-  for (let i = 0; i < length; i++) {
+  const array = [];
+  const { wells_count } = cartridgeDetails;
+
+  for (let i = 0; i < wells_count; i++) {
     let isSelected = false;
     if (
       selectedPosition &&
@@ -141,16 +146,48 @@ const getCategoryId = (type, cartridgeType = null) => {
   }
 };
 
+// cart1 and cart2, both are null => return shaker.
+// cart1 is null but not cart2 => return cart2
+// cart2 is null but not cart1 => return cart1
+const getSelectedCategory = (cartridge1Details, cartridge2Details) => {
+  // both are null, return Shaker
+  if (cartridge1Details === null && cartridge2Details === null) {
+    return catergories.SHAKER;
+  }
+  // cart1 is null, return cart2
+  else if (cartridge1Details === null) {
+    return catergories.CATEGORY_2;
+  }
+  // cart2 is null, return cart1
+  else if (cartridge2Details === null) {
+    return catergories.CATEGORY_1;
+  }
+  // both are NOT null, return cart1
+  else {
+    return catergories.CATEGORY_1;
+  }
+};
+
 // this function generates the initial formik state according to the
 // operation being performeed i.e. if NEW process is being created than
 // empty data is loaded in formikState else for EDIT old values are loaded.
-export const getFormikInitialState = (editReducer = null) => {
+export const getFormikInitialState = (
+  cartridge1Details,
+  cartridge2Details,
+  editReducer = null
+) => {
   let type = "cartridge_1", // default
     category,
     category1,
-    category2,
-    aspireSelectedCategory = catergories.CATEGORY_1, // default
-    dispenseSelectedCategory = catergories.CATEGORY_1; // default
+    category2;
+
+  // set initial selected category
+  const selectedCategory = getSelectedCategory(
+    cartridge1Details,
+    cartridge2Details
+  );
+  let aspireSelectedCategory = selectedCategory;
+  let dispenseSelectedCategory = selectedCategory;
 
   // for source
   let sourcePosForCartridge = null;
@@ -189,13 +226,13 @@ export const getFormikInitialState = (editReducer = null) => {
   return {
     aspire: {
       cartridge1Wells: getArray(
-        NUMBER_OF_WELLS,
+        cartridge1Details,
         ASPIRE_WELLS,
         aspireSelectedCategory === catergories.CATEGORY_1,
         sourcePosForCartridge
       ),
       cartridge2Wells: getArray(
-        NUMBER_OF_WELLS,
+        cartridge2Details,
         ASPIRE_WELLS,
         aspireSelectedCategory === catergories.CATEGORY_2,
         sourcePosForCartridge
@@ -211,13 +248,13 @@ export const getFormikInitialState = (editReducer = null) => {
     },
     dispense: {
       cartridge1Wells: getArray(
-        NUMBER_OF_WELLS,
+        cartridge1Details,
         DISPENSE_WELLS,
         dispenseSelectedCategory === catergories.CATEGORY_1,
         destPosForCartridge
       ),
       cartridge2Wells: getArray(
-        NUMBER_OF_WELLS,
+        cartridge2Details,
         DISPENSE_WELLS,
         dispenseSelectedCategory === catergories.CATEGORY_2,
         destPosForCartridge
@@ -254,7 +291,10 @@ const checkIsFilled = (formikData, currentKey = null) => {
 
   for (const key in formikData) {
     // check for wells
-    if (key === "cartridge1Wells" || key === "cartridge2Wells") {
+    if (
+      (key === "cartridge1Wells" || key === "cartridge2Wells") &&
+      formikData[key]
+    ) {
       isFilled = !formikData[`${key}`].every(
         (wellObj) => wellObj.isSelected === false
       );

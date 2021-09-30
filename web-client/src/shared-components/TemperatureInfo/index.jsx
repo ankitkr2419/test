@@ -47,16 +47,22 @@ const TemperatureInfo = (props) => {
           Temperature
         </Label>
         <div className="temperature-box">
-          <Input
-            type="text"
-            name="temperature"
-            id="temperature"
-            placeholder="Type here"
-            value={temperature}
-            onChange={temperatureHandler}
-            onFocus={handleOnFocus}
-            onBlur={(e) => handleOnBlur(parseInt(e.target.value))}
-          />
+          <div className="d-flex flex-column position-relative">
+            <Input
+              className="temperature-input-field"
+              type="text"
+              name="temperature"
+              id="temperature"
+              placeholder="Type here"
+              value={temperature}
+              onChange={temperatureHandler}
+              onFocus={handleOnFocus}
+              onBlur={(e) => handleOnBlur(parseInt(e.target.value))}
+            />
+            <Text Tag="span" className="font-weight-bold temperature-unit">
+              °C
+            </Text>
+          </div>
           {invalidTemperature && (
             <div className="flex-70">
               <Text Tag="p" size={14} className="text-danger">

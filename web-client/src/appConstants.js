@@ -74,6 +74,15 @@ export const SOCKET_MESSAGE_TYPE = {
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
 
+export const CLEAN_UP_STATUS = {
+  aborted: "aborted",
+  aborting: "aborting",
+  abortFailed: "abortFailed",
+
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+};
+
 export const HEATER_STATUS = {
   progressing: "progressing",
   progressComplete: "progressComplete",
@@ -184,7 +193,8 @@ export const API_ENDPOINTS = {
   pidUpdate: "configs/extraction",
   manual: "manual",
   motor: "motor",
-  senseAndHit: "senseAndHit",
+  senseAndHit: "calibrations",
+  calibrations: "calibrations",
   startShaking: "start-shaking",
   startHeating: "start-heating",
   emailReport: "email-report",
@@ -452,11 +462,6 @@ export const TEST_TOKEN =
 export const TEST_RECIPE_ID = "28585f66-8aa7-4e55-bff9-d0fb0240a147";
 
 export const ASPIRE_DISPENSE_DECK_POS_OPTNS = [
-  { value: "1", label: "1" },
-  { value: "2", label: "2" },
-  { value: "3", label: "3" },
-  { value: "4", label: "4" },
-  { value: "5", label: "5" },
   { value: "6", label: "6" },
   { value: "7", label: "7" },
   { value: "8", label: "8" },
@@ -523,6 +528,12 @@ export const timeConstants = {
 };
 export const MAX_RPM_VALUE = 1500;
 export const MIN_RPM_VALUE = 800;
+
+/**
+ * Cartridge types
+ */
+export const CARTRIDGE_1 = "CARTRIDGE_1";
+export const CARTRIDGE_2 = "CARTRIDGE_2";
 
 /**
  * Maximum number of wells that can be present in a plate.

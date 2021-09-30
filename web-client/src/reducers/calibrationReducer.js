@@ -3,7 +3,6 @@ import {
   calibrationActions,
   pidProgressActions,
   pidActions,
-  updateCalibrationActions,
   motorActions,
   commonDetailsActions,
   updateCommonDetailsActions,
@@ -27,6 +26,8 @@ import {
   fetchConsumableActions,
   updateConsumableActions,
   addConsumableActions,
+  fetchCalibrationsDeckBActions,
+  fetchCalibrationsDeckAActions,
 } from "actions/calibrationActions";
 import {
   DECKNAME,
@@ -99,68 +100,75 @@ export const commonDetailsReducer = (
   }
 };
 
-const calibrationInitialState = fromJS({
+const calibrationDeckAInitialState = fromJS({
   isLoading: false,
   error: null,
-  configs: {},
+  data: [],
 });
 
-export const calibrationReducer = (state = calibrationInitialState, action) => {
+export const calibrationDeckAReducer = (
+  state = calibrationDeckAInitialState,
+  action
+) => {
   switch (action.type) {
-    case calibrationActions.calibrationInitiated:
+    case fetchCalibrationsDeckAActions.initiateAction:
       return state.merge({
         isLoading: true,
         error: null,
-        configs: calibrationInitialState.configs,
       });
-    case calibrationActions.calibrationSuccess:
+    case fetchCalibrationsDeckAActions.successAction:
       const res = action.payload.response;
       return state.merge({
         isLoading: false,
         error: false,
-        configs: res,
+        data: res,
       });
-    case calibrationActions.calibrationFailure:
+
+    case fetchCalibrationsDeckAActions.failureAction:
       return state.merge({
         isLoading: false,
         error: true,
       });
-    case calibrationActions.calibrationReset:
-      return state.merge({
-        isLoading: false,
-        error: null,
-        configs: calibrationInitialState.configs,
-      });
+    case fetchCalibrationsDeckAActions.resetAction:
+      return calibrationDeckAInitialState;
+
     default:
       return state;
   }
 };
 
-const updateCalibrationInitialState = fromJS({
+const calibrationDeckBInitialState = fromJS({
   isLoading: false,
   error: null,
+  data: [],
 });
 
-export const updateCalibrationReducer = (
-  state = updateCalibrationInitialState,
+export const calibrationDeckBReducer = (
+  state = calibrationDeckBInitialState,
   action
 ) => {
   switch (action.type) {
-    case updateCalibrationActions.updateCalibrationInitiated:
+    case fetchCalibrationsDeckBActions.initiateAction:
       return state.merge({
         isLoading: true,
         error: null,
       });
-    case updateCalibrationActions.updateCalibrationSuccess:
+    case fetchCalibrationsDeckBActions.successAction:
+      const res = action.payload.response;
       return state.merge({
         isLoading: false,
         error: false,
+        data: res,
       });
-    case updateCalibrationActions.updateCalibrationFailure:
+
+    case fetchCalibrationsDeckBActions.failureAction:
       return state.merge({
         isLoading: false,
         error: true,
       });
+    case fetchCalibrationsDeckBActions.resetAction:
+      return calibrationDeckBInitialState;
+
     default:
       return state;
   }
@@ -299,6 +307,9 @@ export const pidReducer = (state = pidInitialState, action) => {
         isLoading: false,
         pidStatus: PID_STATUS.runFailed,
       });
+
+    case abortActions.abortActionReset:
+      return pidInitialState;
 
     case pidActions.pidActionReset:
       return pidInitialState;
@@ -691,6 +702,9 @@ export const shakerRunProgessReducer = (
         shakerRunStatus: SHAKER_RUN_STATUS.progressAborted,
       });
 
+    case abortActions.abortActionReset:
+      return shakerRunProgressInitialState;
+
     case loginActions.loginReset:
       return shakerRunProgressInitialState;
 
@@ -723,6 +737,9 @@ export const heaterRunProgessReducer = (
       return state.merge({
         heaterRunStatus: HEATER_RUN_STATUS.progressAborted,
       });
+
+    case abortActions.abortActionReset:
+      return heaterRunProgressInitialState;
 
     case loginActions.loginReset:
       return heaterRunProgressInitialState;

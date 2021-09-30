@@ -1,3 +1,4 @@
+import { abortActions } from "actions/calibrationActions";
 import {
   runCleanUpAction,
   pauseCleanUpAction,
@@ -8,10 +9,11 @@ import {
   cleanUpSecsActions,
   setShowCleanUpAction,
 } from "actions/cleanUpActions";
-import { DECKCARD_BTN, DECKNAME } from "appConstants";
+import { CLEAN_UP_STATUS, DECKCARD_BTN, DECKNAME } from "appConstants";
 import { getUpdatedDecks } from "utils/helpers";
 
 export const initialState = {
+  cleanUpAbortStatus: null,
   decks: [
     {
       name: DECKNAME.DeckA,
@@ -59,7 +61,7 @@ export const initialState = {
   ],
 };
 
-export const cleanUpReducer = (state = initialState, action = {}) => {
+export const cleanUpReducer = (state = initialState, action) => {
   switch (action.type) {
     case runCleanUpAction.runCleanUpInitiated:
       const deckInitiateName =
@@ -109,7 +111,9 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
     case runCleanUpAction.runCleanUpFailed:
       const deckFailureName =
-        action.payload.response.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
+        action.payload.serverErrors.deck === "A"
+          ? DECKNAME.DeckA
+          : DECKNAME.DeckB;
 
       const changesForCleanUpFailureMatched = {
         isLoading: false,
@@ -401,6 +405,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
       return {
         ...state,
+        cleanUpAbortStatus: CLEAN_UP_STATUS.aborting,
         decks: dockAfterAbortInit,
       };
 
@@ -429,6 +434,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
       return {
         ...state,
+        cleanUpAbortStatus: CLEAN_UP_STATUS.aborted,
         decks: dockAfterAbortSuccess,
       };
 
@@ -449,6 +455,7 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
 
       return {
         ...state,
+        cleanUpAbortStatus: CLEAN_UP_STATUS.abortFailed,
         decks: dockAfterAbortFailure,
       };
 
@@ -572,6 +579,9 @@ export const cleanUpReducer = (state = initialState, action = {}) => {
         ...state,
         decks: dockAfterHideCleanUp,
       };
+
+    case abortActions.abortActionReset:
+      return initialState;
 
     default:
       return state;

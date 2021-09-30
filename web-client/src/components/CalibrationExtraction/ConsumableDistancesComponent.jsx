@@ -6,8 +6,8 @@ import { Table, Button, Card, CardBody } from "core-components";
 import EditConsumableModal from "./EditConsumableModal";
 import { consumableFormikInitialState } from "./helpers";
 
-const ConsumableDistancesComponent = (props) => {
-  const { addNewConsumableDistance, consumableDistanceData } = props;
+const ConsumablesAndCalibrationsComponent = (props) => {
+  const { addNewData, data, heading, isReadOnly } = props;
 
   const formik = useFormik({
     initialValues: consumableFormikInitialState,
@@ -19,6 +19,11 @@ const ConsumableDistancesComponent = (props) => {
   const [isUpdate, setIsUpdate] = useState(false);
 
   const handleSelect = (id) => {
+    // for calibrations we do not select any value
+    if (isReadOnly === true) {
+      return;
+    }
+
     if (id === selectedId) {
       setSelectedId(null);
       return;
@@ -51,7 +56,7 @@ const ConsumableDistancesComponent = (props) => {
       description: description.value,
       distance: parseFloat(distance.value),
     };
-    addNewConsumableDistance(requestBody, isUpdate);
+    addNewData(requestBody, isUpdate);
     setShowModal(false);
   };
 
@@ -77,7 +82,7 @@ const ConsumableDistancesComponent = (props) => {
             size={24}
             className="text-center text-gray text-bold mt-3 mb-4"
           >
-            {"Consumable Distances"}
+            {heading}
           </Text>
           <div className="table-consumable-wrapper -hold">
             <Table className="table-consumable" size="sm" striped>
@@ -95,20 +100,22 @@ const ConsumableDistancesComponent = (props) => {
                   <th>Discription</th>
                   <th>Distance</th>
 
-                  <th>
-                    <Button
-                      color="primary"
-                      icon
-                      className="ml-auto"
-                      onClick={handleAddBtn}
-                    >
-                      <Icon size={40} name="plus-2" />
-                    </Button>
-                  </th>
+                  {!isReadOnly && (
+                    <th>
+                      <Button
+                        color="primary"
+                        icon
+                        className="ml-auto"
+                        onClick={handleAddBtn}
+                      >
+                        <Icon size={40} name="plus-2" />
+                      </Button>
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
-                {consumableDistanceData.map((distanceObj, index) => {
+                {data.map((distanceObj, index) => {
                   const { id, name, description, distance } = distanceObj;
                   const classes = selectedId === id ? "active" : "";
                   return (
@@ -130,13 +137,6 @@ const ConsumableDistancesComponent = (props) => {
                             handleEditBtn({ id, name, description, distance });
                           }}
                         />
-                        {/* <ButtonIcon
-                    size={16}
-                    name="trash"
-                    onClick={() => {
-                      deleteStep(stepId);
-                    }}
-                  /> */}
                       </td>
                     </tr>
                   );
@@ -150,4 +150,4 @@ const ConsumableDistancesComponent = (props) => {
   );
 };
 
-export default ConsumableDistancesComponent;
+export default ConsumablesAndCalibrationsComponent;

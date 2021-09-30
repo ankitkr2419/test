@@ -74,6 +74,10 @@ const AppHeader = (props) => {
     (state) => state.createExperimentReducer
   );
   const whiteLightReducer = useSelector((state) => state.whiteLightReducer);
+  const recipeActionReducer = useSelector((state) => state.recipeActionReducer);
+  const recipeReducerDataOfActiveDeck = recipeActionReducer.decks.find(
+    (deck) => deck.name === deckName
+  );
 
   const filledWellsPositions = getFilledWellsPosition(wellListReducer);
   const experimentStatus = runExperimentReducer.get("experimentStatus");
@@ -171,8 +175,13 @@ const AppHeader = (props) => {
       } else if (isLoginTypeOperator === true) {
         // hide everything for operator in extraction
         return true;
-      } else if (isLoginTypeAdmin === true && pathname !== ROUTES.calibration) {
+      } else if (
+        isLoginTypeAdmin === true &&
+        (pathname !== ROUTES.calibration ||
+          recipeReducerDataOfActiveDeck.showProcess)
+      ) {
         // hide everything except calibrations for admin in extractions
+        // AND hide calibrations when process is running
         return true;
       }
     }

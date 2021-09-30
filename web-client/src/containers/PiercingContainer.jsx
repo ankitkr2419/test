@@ -7,7 +7,20 @@ const PiercingContainer = () => {
   const editReducer = useSelector((state) => state.editProcessReducer);
   const editReducerData = editReducer.toJS();
 
-  return <PiercingComponent editReducerData={editReducerData} />;
+  const cartridge1DetailsReducer = useSelector(
+    (state) => state.cartridge1DetailsReducer
+  );
+  const cartridge2DetailsReducer = useSelector(
+    (state) => state.cartridge2DetailsReducer
+  );
+
+  return (
+    <PiercingComponent
+      editReducerData={editReducerData}
+      cartridge1Details={cartridge1DetailsReducer.cartridgeDetails}
+      cartridge2Details={cartridge2DetailsReducer.cartridgeDetails}
+    />
+  );
 };
 
 export default PiercingContainer;

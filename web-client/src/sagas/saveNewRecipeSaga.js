@@ -5,9 +5,20 @@ import saveNewRecipeActions, {
   getCartridgeAction,
   getTipsAction,
   getTubesAction,
+  getCartridge1Action,
+  getCartridge2Action,
 } from "actions/saveNewRecipeActions";
-import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
+import {
+  API_ENDPOINTS,
+  CARTRIDGE_1,
+  CARTRIDGE_2,
+  HTTP_METHODS,
+} from "appConstants";
 import { callApi } from "apis/apiHelper";
+import {
+  getCartridge1ActionFailure,
+  getCartridge2ActionFailure,
+} from "action-creators/saveNewRecipeActionCreators";
 
 export function* saveRecipe(actions) {
   //in dev
@@ -65,17 +76,38 @@ export function* getTipsAndTubes(actions) {
 
 export function* getCartridge(actions) {
   //api call
+  const { token, id, type } = actions.payload;
   const { getCartridgeSuccess, getCartridgeFailure } = getCartridgeAction;
-  const token = actions.payload.token;
+
+  let successAction = getCartridgeSuccess;
+  let failureAction = getCartridgeFailure;
+  let reqPath = `${API_ENDPOINTS.cartridges}`;
+
+  if (id) {
+    if (type === CARTRIDGE_1) {
+      const { getCartridge1Success, getCartridge1Failure } =
+        getCartridge1Action;
+
+      successAction = getCartridge1Success;
+      failureAction = getCartridge1Failure;
+    } else {
+      const { getCartridge2Success, getCartridge2Failure } =
+        getCartridge2Action;
+
+      successAction = getCartridge2Success;
+      failureAction = getCartridge2Failure;
+    }
+    reqPath = `${API_ENDPOINTS.cartridge}/${id}`;
+  }
 
   try {
     yield call(callApi, {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.cartridges}`,
-        successAction: getCartridgeSuccess,
-        failureAction: getCartridgeFailure,
+        reqPath: reqPath,
+        successAction: successAction,
+        failureAction: failureAction,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
         token: token,
@@ -83,7 +115,13 @@ export function* getCartridge(actions) {
     });
   } catch (error) {
     console.error("error while starting", error);
-    yield put(getCartridgeFailure(error));
+    if (type && type === CARTRIDGE_1) {
+      yield put(getCartridge1ActionFailure(error));
+    } else if (type && type === CARTRIDGE_2) {
+      yield put(getCartridge2ActionFailure(error));
+    } else {
+      yield put(getCartridgeFailure(error));
+    }
   }
 }
 
@@ -143,6 +181,8 @@ export function* saveNewRecipeSaga() {
     getTipsAndTubes
   );
   yield takeEvery(getCartridgeAction.getCartridgeInitiated, getCartridge);
+  yield takeEvery(getCartridge1Action.getCartridge1Initiated, getCartridge);
+  yield takeEvery(getCartridge2Action.getCartridge2Initiated, getCartridge);
   yield takeEvery(getTipsAction.getTipsInitiated, getTips);
   yield takeEvery(getTubesAction.getTubesInitiated, getTubes);
 }
