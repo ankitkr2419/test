@@ -167,11 +167,10 @@ const Filters = (props) => {
               id="thresholdToggler"
               name="thresholdToggler"
               label={thresholdLabel}
-              checked={isAutoThreshold}
+              checked={isAutoThreshold || isAutoBaseline}
               onChange={() =>
                 onFormikValueChanged("isAutoThreshold.value", !isAutoThreshold)
               }
-              disabled={isAutoBaseline}
             />
             {isAutoThreshold === false && (
               <>
