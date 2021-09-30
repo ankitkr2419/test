@@ -176,7 +176,6 @@ func dyeToleranceHandler(deps Dependencies) http.HandlerFunc {
 
 func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) (err error) {
 	var dye db.Dye
-
 	defer func() {
 		if err != nil {
 			logger.Errorln(err)
@@ -219,6 +218,7 @@ func toleranceCalulation(deps Dependencies, dwtol db.DyeWellTolerance) (err erro
 
 func validateandGetKitID(kitID string, dyePos int) (knownValue int64, valid bool) {
 
+	//valid format yy_knownVal_month_dyeid and this is not _ seperated.
 	if len(kitID) != 8 {
 		logger.Errorln("length of kit id is invalid")
 		return
