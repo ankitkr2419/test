@@ -322,9 +322,10 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 				}
 			} else {
 				targets[j].Threshold = tc.Threshold
-				// analyseResult returns data required for ploting graph
-				wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, targets[j].Threshold, dbWells, wellTargets)...)
 			}
+
+			// analyseResult returns data required for ploting graph
+			wellTarget = append(wellTarget, analyseResultForThreshold(DBResult, targets[j].Threshold, dbWells, wellTargets)...)
 			ett := db.ExpTargetThreshold{
 				ExperimentID: experimentID,
 				TargetID:     v.TargetID,
@@ -335,6 +336,7 @@ func getWellsDataByThreshold(deps Dependencies, experimentID uuid.UUID, wells []
 	}
 
 	if len(wellTarget) > 0 {
+		logger.Infoln(wellTarget)
 		_, err = deps.Store.UpsertWellTargets(context.Background(), wellTarget, experimentID, false)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error upserting well target data")
