@@ -36,6 +36,7 @@ const LabelAndDropDown = (props) => {
               value={value}
               options={options}
               onChange={handleOptionChange}
+              isSearchable={false}
             />
             <FormError>Incorrect {label}</FormError>
           </div>

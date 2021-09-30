@@ -20,6 +20,7 @@ const CartridgeSelection = (props) => {
             options={options}
             value={value}
             onChange={handleOptionChange}
+            isSearchable={false}
           />
           <FormError>Incorrect Cartridge Type</FormError>
         </div>

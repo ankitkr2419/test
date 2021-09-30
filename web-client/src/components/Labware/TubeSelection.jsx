@@ -19,6 +19,7 @@ const TubeSelection = (props) => {
             value={value}
             options={options}
             onChange={handleOptionChange}
+            isSearchable={false}
           />
           <FormError>Incorrect Tube Type</FormError>
         </div>

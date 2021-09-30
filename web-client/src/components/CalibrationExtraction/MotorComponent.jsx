@@ -80,6 +80,7 @@ const MotorComponent = (props) => {
                   value={optionValue}
                   options={MOTOR_NUMBER_OPTIONS}
                   onChange={(e) => handleOptionChange(e, true)}
+                  isSearchable={false}
                 />
                 {motorNumber.isInvalid && (
                   <div className="flex-70">
@@ -104,6 +105,7 @@ const MotorComponent = (props) => {
                   value={optionValue}
                   options={MOTOR_DIRECTION_OPTIONS}
                   onChange={handleOptionChange}
+                  isSearchable={false}
                 />
                 {direction.isInvalid && (
                   <div className="flex-70">

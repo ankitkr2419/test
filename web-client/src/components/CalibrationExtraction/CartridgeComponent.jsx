@@ -178,6 +178,7 @@ const CartridgeComponent = (props) => {
                 onChange={(e) => handleOnChange("type.value", e?.value)}
                 // onBlur={(e) => handleBlur("type", e.target.value)}
                 // onFocus={(e) => handleFocus("type")}
+                isSearchable={false}
               />
               {type.isInvalid && (
                 <div className="flex-auto">

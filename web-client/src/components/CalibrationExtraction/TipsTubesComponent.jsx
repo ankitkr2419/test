@@ -178,6 +178,7 @@ const TipsTubesComponent = (props) => {
                     onChange={(value) =>
                       handleOnChange("tipTubeType.value", value)
                     }
+                    isSearchable={false}
                   />
                 </div>
               </FormGroup>
