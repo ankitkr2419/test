@@ -14,13 +14,20 @@ elif [[  ${dev} != "simulator" ]]; then
 fi
 
 chmod +x ./cpagent
-var="./utils/logs/output_$(date +%s).log"
+dir=${HOME}"/cpagent/utils/logs/"
+var=${HOME}"/cpagent/utils/logs/output_$(date +%s).log"
+
+create_log_file () {
+        echo "Logs for current run are present in "${var}
+        mkdir -p ${dir}
+        touch ${var}
+}
 
 if [[ ${apptype} == "extraction" ]]; then
-    echo "Logs for current run are present in "${var}
+    create_log_file
     sudo ./cpagent start --plc ${dev} --no-rtpcr ${delay} > ${var}
 elif [[ ${apptype} == "rtpcr" ]]; then
-    echo "Logs for current run are present in "${var}
+    create_log_file
     sudo ./cpagent start --plc ${dev} --tec ${dev} --no-extraction > ${var}
 else
   echo "Please specify apptype[extraction, rtpcr]"
