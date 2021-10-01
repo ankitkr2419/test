@@ -78,6 +78,7 @@ const Filters = (props) => {
             options={targetOptions}
             value={selectedTarget}
             onChange={onTargetChanged}
+            isSearchable={false}
           />
         </div>
       </div>

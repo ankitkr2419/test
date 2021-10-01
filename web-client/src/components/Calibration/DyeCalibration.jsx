@@ -85,6 +85,7 @@ const DyeCalibration = (props) => {
                     onChange={(value) =>
                       handleOnChange("selectedDye.value", value)
                     }
+                    isSearchable={false}
                   />
                 </div>
               </FormGroup>

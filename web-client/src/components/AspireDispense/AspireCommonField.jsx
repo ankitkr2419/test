@@ -73,7 +73,7 @@ const AspireCommonField = (props) => {
             onBlur={(e) => handleBlur(e.target.value)}
           />
           <Text Tag="span" className="font-weight-bold height-icon-box">
-            ml
+            μl
           </Text>
           <FormError>Incorrect Mixing Volume</FormError>
         </div>
@@ -131,7 +131,7 @@ const AspireCommonField = (props) => {
             }
           />
           <Text Tag="span" className="font-weight-bold height-icon-box">
-            ml
+            μl
           </Text>
           <FormError>Incorrect Aspire Volume</FormError>
         </div>
@@ -160,7 +160,7 @@ const AspireCommonField = (props) => {
             }
           />
           <Text Tag="span" className="font-weight-bold height-icon-box">
-            ml
+            μl
           </Text>
           <FormError>Incorrect Air Volume</FormError>
         </div>

@@ -106,6 +106,7 @@ const TipPickupComponent = () => {
                       onChange={(e) =>
                         formik.setFieldValue("tipPosition", e.value)
                       }
+                      isSearchable={false}
                     />
                     <FormError>Incorrect Option</FormError>
                   </div>

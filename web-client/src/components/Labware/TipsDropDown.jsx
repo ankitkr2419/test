@@ -47,6 +47,7 @@ const TipsDropdown = (props) => {
                     e?.label || null
                   );
                 }}
+                isSearchable={false}
               />
               <FormError>Incorrect Tip Position {index + 1}</FormError>
             </div>
