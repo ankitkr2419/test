@@ -6,7 +6,7 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 )
 
-const LogsPath = "./utils/output"
+const LogsPath = "$HOME/cpagent/utils/output"
 
 var TecTempLogFile *excelize.File
 
