@@ -73,7 +73,7 @@ const DispenseCommonField = (props) => {
             onBlur={(e) => handleBlur(e.target.value)}
           />
           <Text Tag="span" className="font-weight-bold height-icon-box">
-            ml
+            μl
           </Text>
           <FormError>Incorrect Mixing Volume</FormError>
         </div>
