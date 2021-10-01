@@ -60,7 +60,7 @@ func PrintBinaryInfo() {
 func ShutDownGracefully(deps Dependencies) (err error) {
 	var err1, err2, err3, err4 error
 	// We received an interrupt signal, shut down.
-	logger.Warnln("...........\n----Application shutting down gracefully ----|\n.............................................|")
+	logger.Warnln("\n..............................................\n----Application shutting down gracefully ----|\n.............................................|")
 	if Application == Combined || Application == RTPCR {
 		err1 = deps.Tec.ReachRoomTemp()
 		if err1 != nil {
