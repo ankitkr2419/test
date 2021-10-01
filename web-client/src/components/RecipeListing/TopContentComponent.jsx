@@ -86,11 +86,12 @@ const TopContentComponent = (props) => {
                         </>
                     ) : (
                         <>
-                            <ButtonIcon
+                            {/* Might be needed later in v2.0 */}
+                            {/* <ButtonIcon
                                 name="download-1"
                                 size={28}
                                 className="bg-white border-primary"
-                            />
+                            /> */}
                             <Button
                                 color="secondary"
                                 className="ml-2 border-primary btn-clean-up bg-white"
