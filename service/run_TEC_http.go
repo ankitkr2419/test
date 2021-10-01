@@ -5,11 +5,12 @@ import (
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
 	"net/http"
+	"os"
 )
 
 func runTECHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		file := db.GetExcelFile(tec.LogsPath, "test_output")
+		file := db.GetExcelFile(os.ExpandEnv(tec.LogsPath), "test_output")
 		p := plc.Stage{
 			Holding: []plc.Step{
 				plc.Step{TargetTemp: 25, RampUpTemp: 2, HoldTime: 1, DataCapture: false},
