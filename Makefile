@@ -5,8 +5,12 @@ test-coverage:
 	go test ./... -coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
-build:
+build: yarn go
+
+yarn:
 	sudo utils/build-yarn.sh
+
+go:
 	echo "building go code"
 	GOARCH=amd64 GOOS=linux
 	go build -v -ldflags=" \
