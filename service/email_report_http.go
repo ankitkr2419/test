@@ -20,9 +20,7 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-const (
-	ExpOutputPath    = "./utils/output"
-	ReportOutputPath = "./utils/reports"
+const(
 	pdf              = "pdf"
 	xlsx             = "xlsx"
 )
@@ -100,7 +98,7 @@ func uploadTheReport(expID uuid.UUID, report []*multipart.FileHeader) error {
 		return err
 	}
 
-	tempFile, err := ioutil.TempFile(ReportOutputPath, expID.String()+"."+pdf)
+	tempFile, err := ioutil.TempFile(os.ExpandEnv(reportOutputPath), expID.String()+"."+pdf)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error while Creating a Temporary File")
 		return err
@@ -121,7 +119,7 @@ func uploadTheReport(expID uuid.UUID, report []*multipart.FileHeader) error {
 		return err
 	}
 
-	os.Rename(tempFile.Name(),ReportOutputPath + "/"+ expID.String()+"."+pdf )
+	os.Rename(tempFile.Name(),os.ExpandEnv(reportOutputPath) + "/"+ expID.String()+"."+pdf )
 
 	return nil
 }
@@ -150,7 +148,7 @@ func emailTheReport(experimentID uuid.UUID) (err error) {
 	// attach PDF
 
 	a_pdf := mail.NewAttachment()
-	dat, err = ioutil.ReadFile(fmt.Sprintf("%v/%v.%v", ReportOutputPath, experimentID.String(), pdf))
+	dat, err = ioutil.ReadFile(fmt.Sprintf("%v/%v.%v", os.ExpandEnv(reportOutputPath), experimentID.String(), pdf))
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -165,7 +163,7 @@ func emailTheReport(experimentID uuid.UUID) (err error) {
 	a_xlsx := mail.NewAttachment()
 
 
-	fileName := fmt.Sprintf("%v/output_%v.%v", ExpOutputPath, experimentID.String(), xlsx)
+	fileName := fmt.Sprintf("%v/output_%v.%v", os.ExpandEnv(expOutputPath), experimentID.String(), xlsx)
 	dat, err = ioutil.ReadFile(fmt.Sprintf(fileName))
 	if err != nil {
 		logger.Errorln(err)
