@@ -140,6 +140,7 @@ func getDependenciesAndStartApp(plcName, tecName string, test, noRTPCR, noExtrac
 	logger.Println("run in test mode --->", test)
 	var deps service.Dependencies
 
+	service.PrintBinaryInfo()
 	if deps, err = service.GetAllDependencies(plcName, tecName, test, noRTPCR, noExtraction); err != nil {
 		logger.Errorln("Getting Dependencies failed!")
 		return
