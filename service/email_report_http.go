@@ -16,6 +16,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/sendgrid/sendgrid-go"
+	"github.com/sendgrid/rest"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
@@ -127,6 +128,8 @@ func uploadTheReport(expID uuid.UUID, report []*multipart.FileHeader) error {
 
 func emailTheReport(experimentID uuid.UUID) (err error) {
 
+	var dat []byte
+	var response *rest.Response
 	m := mail.NewV3Mail()
 
 	from := mail.NewEmail("MyLab Software", "mylab.software5656@gmail.com")
@@ -147,7 +150,7 @@ func emailTheReport(experimentID uuid.UUID) (err error) {
 	// attach PDF
 
 	a_pdf := mail.NewAttachment()
-	dat, err := ioutil.ReadFile(fmt.Sprintf("%v/%v.%v", ReportOutputPath, experimentID.String(), pdf))
+	dat, err = ioutil.ReadFile(fmt.Sprintf("%v/%v.%v", ReportOutputPath, experimentID.String(), pdf))
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -181,7 +184,7 @@ func emailTheReport(experimentID uuid.UUID) (err error) {
 	request := sendgrid.GetRequest(config.GetSendGridAPIKey(), "/v3/mail/send", "https://api.sendgrid.com")
 	request.Method = "POST"
 	request.Body = mail.GetRequestBody(m)
-	response, err := sendgrid.API(request)
+	response, err = sendgrid.API(request)
 	if err != nil {
 		logger.Errorln(err)
 		return
