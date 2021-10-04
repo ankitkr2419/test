@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-	"io"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"os"
@@ -22,8 +20,10 @@ const (
 )
 
 const (
-	logsPath = "./utils/logs"
-	tecPath  = "./utils/tec"
+	logsPath         = "$HOME/cpagent/utils/logs"
+	tecPath          = "$HOME/cpagent/utils/tec"
+	expOutputPath    = "$HOME/cpagent/utils/output"
+	reportOutputPath = "$HOME/cpagent/utils/reports"
 )
 
 func monitorForPLCTimeout(deps *Dependencies, exit chan error) {
@@ -73,36 +73,29 @@ func WaitForGracefulShutdown(deps Dependencies, idleConnsClosed chan struct{}) {
 }
 
 func SetLoggersAndFiles() (err error) {
+
 	logger.SetFormatter(&logger.TextFormatter{
 		FullTimestamp:   true,
 		ForceColors:     true,
 		TimestampFormat: "02-01-2006 15:04:05",
 	})
 
-	if _, err = os.Stat(logsPath); os.IsNotExist(err) {
-		os.MkdirAll(logsPath, 0755)
+	if _, err = os.Stat(os.ExpandEnv(logsPath)); os.IsNotExist(err) {
+		os.MkdirAll(os.ExpandEnv(logsPath), 0755)
 		// ignore error and try creating log output file
 	}
-	if _, err = os.Stat(tecPath); os.IsNotExist(err) {
-		os.MkdirAll(tecPath, 0755)
+	if _, err = os.Stat(os.ExpandEnv(tecPath)); os.IsNotExist(err) {
+		os.MkdirAll(os.ExpandEnv(tecPath), 0755)
 	}
-	if _, err = os.Stat(ReportOutputPath); os.IsNotExist(err) {
-		os.MkdirAll(ReportOutputPath, 0755)
+	if _, err = os.Stat(os.ExpandEnv(reportOutputPath)); os.IsNotExist(err) {
+		os.MkdirAll(os.ExpandEnv(reportOutputPath), 0755)
 	}
-	if _, err = os.Stat(ExpOutputPath); os.IsNotExist(err) {
-		os.MkdirAll(ExpOutputPath, 0755)
+	if _, err = os.Stat(os.ExpandEnv(expOutputPath)); os.IsNotExist(err) {
+		os.MkdirAll(os.ExpandEnv(expOutputPath), 0755)
 	}
-
-	// All terminal logs will be noted in below file
-	filename := fmt.Sprintf("%v/output_%v.log", logsPath, time.Now().Unix())
-	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
-	if err != nil {
-		logger.Errorln(responses.WriteToFileError)
-	}
-	// logging output to file and console
-	mw := io.MultiWriter(os.Stdout, f)
-	logger.SetOutput(mw)
-	return
+	//NOTE: if we don't return nil below program will panic for the first time
+	logger.SetOutput(os.Stdout)
+	return nil
 }
 
 func LoadAllSetups(store db.Storer) (err error) {

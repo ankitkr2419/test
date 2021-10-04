@@ -8,6 +8,7 @@ import (
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/tec"
+	"os"
 	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
@@ -116,7 +117,7 @@ func (t *Simulator) TestRun(plcDeps plc.Driver) (err error) {
 		CycleCount: 3,
 	}
 
-	file := db.GetExcelFile(tec.LogsPath, "output")
+	file := db.GetExcelFile(os.ExpandEnv(tec.LogsPath), "output")
 	// Start line
 	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
 	db.AddRowToExcel(file, db.TECSheet, headings)
@@ -204,7 +205,7 @@ func (t *Simulator) RunStage(st []plc.Step, plcDeps plc.Driver, file *excelize.F
 
 func (t *Simulator) RunProfile(plcDeps plc.Driver, tp tec.TempProfile) (err error) {
 
-	file := db.GetExcelFile(tec.LogsPath, "output")
+	file := db.GetExcelFile(os.ExpandEnv(tec.LogsPath), "output")
 
 	// Start line
 	headings := []interface{}{"Description", "Time Taken", "Expected Time", "Initial Temp", "Final Temp", "Ramp"}
