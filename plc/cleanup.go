@@ -100,14 +100,13 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 
 /*
 ALGORITHM
-	1. 	Calculate UV Time in Seconds
 	1.  Start UV Light
 	2.  Add delay
 	3.  Monitor for PAUSE and abort or completion
 	4.  If Paused then monitor for resumed
 */
 
-func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
+func (d *Compact32Deck) UVLight(totalTime int64) (response string, err error) {
 	defer func() {
 		if err != nil {
 			logger.Errorln(err.Error())
@@ -120,28 +119,13 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 		return
 	}
 
-	// totalTime is UVLight timer time in Seconds
 	// timeElapsed is the time from start to pause
-
-	var totalTime int64
 
 	d.SetRunInProgress()
 	defer d.ResetRunInProgress()
 
 	//
-	// 1. 	Calculate UV Time in Seconds
-	//
-	totalTime, err = calculateUVTimeInSeconds(uvTime)
-	if err != nil {
-		return "", err
-	}
-	if totalTime < minimumUVLightOnTime {
-		err = fmt.Errorf("please check your time. minimum time is : %v seconds", minimumUVLightOnTime)
-		return "", err
-	}
-
-	//
-	// 2. Start UV Light
+	// 1. Start UV Light
 	//
 	response, err = d.switchOnUVLight()
 	if err != nil {
@@ -150,7 +134,7 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	defer d.switchOffUVLight()
 
 	//
-	// 3. Add delay
+	// 2. Add delay
 	//
 
 	delay := db.Delay{
@@ -161,6 +145,8 @@ func (d *Compact32Deck) UVLight(uvTime string) (response string, err error) {
 	if err != nil {
 		return
 	}
+
+	logger.Warnln("Delay completed for ", delay)
 
 	return "UV Light Completed Successfully", nil
 }

@@ -78,6 +78,8 @@ const AnalyseDataGraphContainer = (props) => {
         target_id: selectedTarget?.value,
         auto_threshold: isAutoThreshold,
         threshold: threshold,
+        start_cycle: startCycle,
+        end_cycle: endCycle,
       })
     );
     dispatch(
@@ -110,10 +112,10 @@ const AnalyseDataGraphContainer = (props) => {
 
   const getThresholdValue = () => {
     //use default threshold value
-    let thresholdValue = selectedTarget?.threshold;
+    let thresholdValue = threshold;
 
-    //if auto threshold is false get threshold value from api
-    if (isAutoThreshold === false) {
+    //if auto threshold is true get threshold value from api
+    if (isAutoThreshold === true) {
       let targetsFromThresholdApi =
         (thresholdApiResponse?.thresholdApiData !== null &&
           thresholdApiResponse.thresholdApiData[0]?.targets) ||

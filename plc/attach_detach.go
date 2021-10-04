@@ -2,9 +2,10 @@ package plc
 
 import (
 	"fmt"
-	logger "github.com/sirupsen/logrus"
 	"math"
 	"mylab/cpagent/db"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 func (d *Compact32Deck) AttachDetach(ad db.AttachDetach) (response string, err error) {
@@ -46,6 +47,9 @@ func (d *Compact32Deck) detach() (response string, err error) {
 	deckMagnetUpDown := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
 	// motor desc for magnet fwd/rev motion
 	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
+
+	// TODO: This to be taken from Sensor
+
 	// step 1 to calculate the relative position of the magnet from its current
 	// position to move the magnet backward for step 1.
 	if magnetBackPosition, ok = consDistance["magnet_backward_step_1"]; !ok {
@@ -178,6 +182,8 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	if err != nil {
 		return
 	}
+
+	// TODO: This to be taken from Sensor
 
 	// step 2 to calculate the relative position of the magnet from its current
 	// position to move the magnet forward for step 1.

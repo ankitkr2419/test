@@ -20,6 +20,8 @@ const (
 
 	getAllConsDistanceQuery = `SELECT *
 							FROM consumable_distances`
+	getConsDistanceQueryByDeck = `SELECT *
+							FROM consumable_distances where id BETWEEN $1 AND $2`
 	updateConsDistaceQuery1 = `UPDATE consumable_distances SET 
 	distance = $1,
 	description = $2 WHERE id = $3`
@@ -56,8 +58,10 @@ func (s *pgStore) UpdateConsumableDistance(ctx context.Context, c ConsumableDist
 		logger.WithField("error in exec query", err.Error()).Error("Query Failed")
 		return
 	}
+
 	return
 }
+
 func makeConsumableQuery(consumabledistance []ConsumableDistance) string {
 	values := make([]string, 0, len(consumabledistance))
 
@@ -75,6 +79,15 @@ func makeConsumableQuery(consumabledistance []ConsumableDistance) string {
 
 func (s *pgStore) ListConsDistances() (consumabledistance []ConsumableDistance, err error) {
 	err = s.db.Select(&consumabledistance, getAllConsDistanceQuery)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing consumable distance details")
+		return
+	}
+	return
+}
+
+func (s *pgStore) ListConsDistancesDeck(ctx context.Context, min, max int64) (consumabledistance []ConsumableDistance, err error) {
+	err = s.db.Select(&consumabledistance, getConsDistanceQueryByDeck, min, max)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing consumable distance details")
 		return

@@ -18,11 +18,13 @@ type Threshold struct {
 	TargetID      uuid.UUID `json:"target_id"`
 	AutoThreshold bool      `json:"auto_threshold"`
 	Threshold     float32   `json:"threshold"`
+	StartCycle    uint16    `json:"start_cycle" validate:"gte=0"`
+	EndCycle      uint16    `json:"end_cycle" validate:"gte=0"`
 }
 type Baseline struct {
 	AutoBaseline bool   `json:"auto_baseline"`
-	StartCycle   uint16 `json:"start_cycle"`
-	EndCycle     uint16 `json:"end_cycle"`
+	StartCycle   uint16 `json:"start_cycle" validate:"gte=0"`
+	EndCycle     uint16 `json:"end_cycle" validate:"gte=0"`
 }
 type TargetWell struct {
 	Target uuid.UUID
@@ -47,7 +49,12 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
-
+		valid, validationResp := Validate(tc)
+		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.ThresholdValidationError)
+			responseBadRequest(rw, validationResp)
+			return
+		}
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching wells data")
@@ -88,13 +95,12 @@ func setThresholdHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		rw.Write(respBytes)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusAccepted)
+		logger.Infoln("Successfully fetched the threshold values")
+		responseCodeAndMsg(rw, http.StatusOK, respBytes)
 	})
 }
 
-func getBaselineValuesHandler(deps Dependencies) http.HandlerFunc {
+func getBaselineNormalisedValuesHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		var bl Baseline
 		rw.Header().Add("Content-Type", "application/json")
@@ -113,7 +119,12 @@ func getBaselineValuesHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: err.Error()})
 			return
 		}
-
+		valid, validationResp := Validate(bl)
+		if !valid {
+			logger.WithField("err", "Validation Error").Errorln(responses.BaselineValidationError)
+			responseBadRequest(rw, validationResp)
+			return
+		}
 		wells, err := deps.Store.ListWells(req.Context(), expID)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error("Error fetching wells data")
@@ -154,7 +165,7 @@ func getBaselineValuesHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
-		rw.Write(respBytes)
-		rw.WriteHeader(http.StatusAccepted)
+		logger.Infoln("Successfully fetched the baseline values")
+		responseCodeAndMsg(rw, http.StatusOK, respBytes)
 	})
 }

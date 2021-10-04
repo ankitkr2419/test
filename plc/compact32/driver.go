@@ -262,10 +262,10 @@ func (d *Compact32) Start() (err error) {
 func (d *Compact32) Stop() (err error) {
 	if plc.LidPidTuningInProgress {
 		plc.LidPidTuningInProgress = false
+		plc.ExperimentRunning = false
 		d.ExitCh <- errors.New("PID Error")
 		return nil
 	}
-
 	plc.ExperimentRunning = false
 	d.ExitCh <- errors.New("PCR Aborted")
 	return nil
@@ -603,8 +603,10 @@ func (d *Compact32) LidPIDCalibration() (err error) {
 		if err != nil {
 			return
 		}
-		time.Sleep(120 * time.Second)
+		plc.HoldSleep(1)
 	}
+
+	plc.HoldSleep(120)
 
 	logger.Infoln(responses.PIDCalibrationSuccess)
 

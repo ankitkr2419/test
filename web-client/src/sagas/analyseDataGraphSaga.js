@@ -13,7 +13,15 @@ import {
 
 export function* fetchAnalyseDataWithThresholdData(actions) {
   const {
-    payload: { token, experimentId, target_id, auto_threshold, threshold },
+    payload: {
+      token,
+      experimentId,
+      target_id,
+      auto_threshold,
+      threshold,
+      start_cycle,
+      end_cycle,
+    },
   } = actions;
   const { successAction, failureAction } = fetchAnalyseDataWithThresholdActions;
 
@@ -25,6 +33,8 @@ export function* fetchAnalyseDataWithThresholdData(actions) {
           target_id,
           auto_threshold,
           threshold,
+          start_cycle,
+          end_cycle,
         },
         reqPath: `${API_ENDPOINTS.setThreshold}/${experimentId}`,
         successAction: successAction,

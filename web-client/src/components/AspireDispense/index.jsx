@@ -21,7 +21,9 @@ import AspireDispenseTabsContent from "./AspireDispenseTabsContent";
 import { saveProcessInitiated } from "action-creators/processesActionCreators";
 import { toast } from "react-toastify";
 
-const AspireDispenseComponent = () => {
+const AspireDispenseComponent = (props) => {
+  const { cartridge1Details, cartridge2Details } = props;
+
   const [activeTab, setActiveTab] = useState("1");
   const [isAspire, setIsAspire] = useState(true);
   const [disabledTab, setDisabledTab] = useState(disabledTabInitTab);
@@ -42,7 +44,11 @@ const AspireDispenseComponent = () => {
     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
   const formik = useFormik({
-    initialValues: getFormikInitialState(editReducerData),
+    initialValues: getFormikInitialState(
+      cartridge1Details,
+      cartridge2Details,
+      editReducerData
+    ),
     enableReinitialize: true,
   });
 
@@ -91,10 +97,10 @@ const AspireDispenseComponent = () => {
     let wellsObjArray;
     if (type === 0) {
       wellsObjArray =
-        activeTab === 1 ? aspire.cartridge1Wells : aspire.cartridge2Wells;
+        activeTab === "1" ? aspire.cartridge1Wells : aspire.cartridge2Wells;
     } else {
       wellsObjArray =
-        activeTab === 1 ? dispense.cartridge1Wells : dispense.cartridge2Wells;
+        activeTab === "1" ? dispense.cartridge1Wells : dispense.cartridge2Wells;
     }
 
     wellsObjArray.forEach((wellObj, index) => {

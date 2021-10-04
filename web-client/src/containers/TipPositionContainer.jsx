@@ -7,7 +7,20 @@ const TipPositionContainer = (props) => {
   const editReducer = useSelector((state) => state.editProcessReducer);
   const editReducerData = editReducer.toJS();
 
-  return <TipPositionComponent editReducerData={editReducerData} />;
+  const cartridge1DetailsReducer = useSelector(
+    (state) => state.cartridge1DetailsReducer
+  );
+  const cartridge2DetailsReducer = useSelector(
+    (state) => state.cartridge2DetailsReducer
+  );
+
+  return (
+    <TipPositionComponent
+      editReducerData={editReducerData}
+      cartridge1Details={cartridge1DetailsReducer.cartridgeDetails}
+      cartridge2Details={cartridge2DetailsReducer.cartridgeDetails}
+    />
+  );
 };
 
 TipPositionContainer.propTypes = {};

@@ -30,6 +30,14 @@ const Filters = (props) => {
   let isAutoBaseline = formik.values.isAutoBaseline.value;
   let baselineLabel = isAutoBaseline === true ? "Auto" : "Manual";
 
+  // if baseline is in auto mode,
+  // then switch on threshold and disable it
+  useEffect(() => {
+    if (isAutoBaseline === true && isAutoThreshold === false) {
+      formik.setFieldValue("isAutoThreshold.value", true);
+    }
+  }, [isAutoBaseline]);
+
   const onFormikValueChanged = (key, value) => {
     formik.setFieldValue(key, value);
   };
@@ -38,6 +46,8 @@ const Filters = (props) => {
     onFiltersChanged({
       isAutoThreshold: isAutoThreshold,
       threshold: formik.values.threshold.value,
+      startCycle: formik.values.startCycle.value,
+      endCycle: formik.values.endCycle.value,
     });
   };
   const handleThresholdResetButton = () => {
@@ -68,65 +78,8 @@ const Filters = (props) => {
             options={targetOptions}
             value={selectedTarget}
             onChange={onTargetChanged}
+            isSearchable={false}
           />
-        </div>
-      </div>
-
-      {/**threshold */}
-      <div className="threshold-filter d-flex">
-        <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3">
-          Threshold
-        </Text>
-        <div className="d-flex align-items-center flex-wrap flex-90">
-          <FormGroup className="d-flex align-items-center px-2 ml-2">
-            <Switch
-              id="thresholdToggler"
-              name="thresholdToggler"
-              label={thresholdLabel}
-              checked={isAutoThreshold}
-              onChange={() =>
-                onFormikValueChanged("isAutoThreshold.value", !isAutoThreshold)
-              }
-            />
-            {isAutoThreshold === false && (
-              <>
-                <Label className="flex-25 text-right mb-0 p-1">Threshold</Label>
-                <Input
-                  name="thresholdValue"
-                  type="number"
-                  className="flex-25 px-2 py-1 ml-2"
-                  placeholder="Threshold"
-                  step="0.1"
-                  value={formik.values.threshold.value}
-                  onChange={(e) =>
-                    onFormikValueChanged(
-                      "threshold.value",
-                      parseFloat(e.target.value)
-                    )
-                  }
-                />
-              </>
-            )}
-          </FormGroup>
-          <div className="ml-auto">
-            <Button
-              color="primary"
-              size="sm"
-              className="mb-3 ml-3"
-              onClick={handleThresholdApplyButton}
-            >
-              Apply
-            </Button>
-            <Button
-              color="secondary"
-              size="sm"
-              outline={true}
-              className="mb-3 ml-3 border-2 border-gray "
-              onClick={handleThresholdResetButton}
-            >
-              Reset
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -196,6 +149,64 @@ const Filters = (props) => {
               outline={true}
               className="mb-3 ml-3 border-2 border-gray "
               onClick={handleBaselineResetButton}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/**threshold */}
+      <div className="threshold-filter d-flex">
+        <Text Tag="h4" size={19} className="flex-10 title mb-0 pr-3">
+          Threshold
+        </Text>
+        <div className="d-flex align-items-center flex-wrap flex-90">
+          <FormGroup className="d-flex align-items-center px-2 ml-2">
+            <Switch
+              id="thresholdToggler"
+              name="thresholdToggler"
+              label={thresholdLabel}
+              checked={isAutoThreshold || isAutoBaseline}
+              onChange={() =>
+                onFormikValueChanged("isAutoThreshold.value", !isAutoThreshold)
+              }
+            />
+            {isAutoThreshold === false && (
+              <>
+                <Label className="flex-25 text-right mb-0 p-1">Threshold</Label>
+                <Input
+                  name="thresholdValue"
+                  type="number"
+                  className="flex-25 px-2 py-1 ml-2"
+                  placeholder="Threshold"
+                  step="0.1"
+                  value={formik.values.threshold.value}
+                  onChange={(e) =>
+                    onFormikValueChanged(
+                      "threshold.value",
+                      parseFloat(e.target.value)
+                    )
+                  }
+                />
+              </>
+            )}
+          </FormGroup>
+          <div className="ml-auto">
+            <Button
+              color="primary"
+              size="sm"
+              className="mb-3 ml-3"
+              onClick={handleThresholdApplyButton}
+            >
+              Apply
+            </Button>
+            <Button
+              color="secondary"
+              size="sm"
+              outline={true}
+              className="mb-3 ml-3 border-2 border-gray "
+              onClick={handleThresholdResetButton}
             >
               Reset
             </Button>

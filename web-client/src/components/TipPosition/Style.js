@@ -67,12 +67,13 @@ export const TipPositionInfoBox = styled.div`
       width: 14.125rem;
       height: 2.25rem;
       position: relative;
+      padding-right: 3rem;
       .tip-height-input {
-        padding: 0.25rem 1.875rem 0.25rem 0.75rem;
+        padding: 0.25rem 2.8rem 0.25rem 0.75rem;
       }
       .height-icon-btn {
         position: absolute;
-        top: 0.75rem;
+        top: 0.4rem;
         right: 0.75rem;
         color: #717171;
       }
@@ -114,11 +115,11 @@ export const DeckPositionInfoBox = styled.div`
       height: 2.25rem;
       position: relative;
       .tip-height-input {
-        padding: 0.25rem 1.875rem 0.25rem 0.75rem;
+        padding: 0.25rem 2.8rem 0.25rem 0.75rem;
       }
       .height-icon-btn {
         position: absolute;
-        top: 0.75rem;
+        top: 0.4rem;
         right: 0.75rem;
         color: #717171;
       }

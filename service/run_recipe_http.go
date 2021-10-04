@@ -79,6 +79,12 @@ func runNextStepHandler(deps Dependencies) http.HandlerFunc {
 func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise bool, recipeID uuid.UUID) (response string, err error) {
 
 	defer func() {
+
+		if r := recover(); r != nil {
+			logger.Errorln("Recovered in runRecipe", r)
+			err = responses.RecipeRunPaniced
+		}
+
 		if err != nil {
 			logger.Errorln(err.Error())
 			deps.WsErrCh <- fmt.Errorf("%v_%v_%v", plc.ErrorExtractionMonitor, deck, err.Error())
@@ -265,7 +271,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 			if err != nil {
 				return "", err
 			}
-			logger.Infoln("Tip Docking Object: ",td)
+			logger.Infoln("Tip Docking Object: ", td)
 			if td.Type == string(db.Cartridge1) {
 				currentCartridgeID = *recipe.Cartridge1Position
 			} else if td.Type == string(db.Cartridge2) {

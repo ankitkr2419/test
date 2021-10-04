@@ -147,6 +147,7 @@ const UpdateUserModal = (props) => {
                       options={roleOptions}
                       value={role}
                       onChange={(value) => setRole(value)}
+                      isSearchable={false}
                     />
                   </Col>
                 </FormGroup>

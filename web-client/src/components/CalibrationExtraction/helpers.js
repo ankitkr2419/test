@@ -42,7 +42,7 @@ export const formikInitialState = {
   roomTemperature: { value: null, isInvalid: false },
   motorNumber: { value: null, isInvalid: false },
   direction: { value: null, isInvalid: false },
-  distance: { value: null, isInvalid: false },
+  distance: { value: 1, isInvalid: false }, // default value should be 1mm
   pidTemperature: { value: null, isInvalid: false },
   ...formikInitialStateForTipsTubes, //TipsTubes fields
 };

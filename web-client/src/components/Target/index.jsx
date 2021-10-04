@@ -5,7 +5,7 @@ import {
   TargetList,
   TargetListHeader,
   TargetListItem,
-  Text
+  Text,
 } from "shared-components";
 
 import { covertToSelectOption } from "utils/helpers";
@@ -14,7 +14,7 @@ import { checkIfIdPresentInList, validateThreshold } from "./targetHelper";
 import { MIN_THRESHOLD, MAX_THRESHOLD } from "./targetConstants";
 import { TargetActions } from "./Style";
 
-const TargetComponent = props => {
+const TargetComponent = (props) => {
   const {
     // master target list
     listTargetReducer,
@@ -36,10 +36,10 @@ const TargetComponent = props => {
     isNoTargetSelected,
     setThresholdError,
     isThresholdInvalid,
-    onRemoveTarget
+    onRemoveTarget,
   } = props;
 
-  const isTargetDisabled = ele => {
+  const isTargetDisabled = (ele) => {
     if (ele.selectedTarget === undefined || ele.threshold === undefined) {
       return true;
     }
@@ -58,7 +58,7 @@ const TargetComponent = props => {
 
   // reset threshold error flag to false on focus on input field
   const onThresholdFocusHandler = useCallback(
-    index => {
+    (index) => {
       setThresholdError(false, index);
     },
     [setThresholdError]
@@ -67,7 +67,7 @@ const TargetComponent = props => {
   const getFilteredOptionsList = useMemo(() => {
     if (isLoginTypeAdmin === true) {
       return listTargetReducer.filter(
-        ele => !checkIfIdPresentInList(ele.get("id"), selectedTargetState)
+        (ele) => !checkIfIdPresentInList(ele.get("id"), selectedTargetState)
       );
     }
   }, [listTargetReducer, selectedTargetState, isLoginTypeAdmin]);
@@ -88,7 +88,7 @@ const TargetComponent = props => {
         <TargetListItem key={index}>
           {isLoginTypeOperator === true && (
             <CheckBox
-              onChange={event => {
+              onChange={(event) => {
                 onCheckedHandler(event, index);
               }}
               className="mr-2"
@@ -98,7 +98,7 @@ const TargetComponent = props => {
             />
           )}
           {isLoginTypeAdmin === true && (
-            // if it's a admin he can select targets from master targets
+            // operator cannot select/view targets from master targets
             <Select
               className="flex-50 px-2"
               options={covertToSelectOption(
@@ -107,10 +107,11 @@ const TargetComponent = props => {
                 "id"
               )}
               placeholder="Please select target."
-              onChange={selectedTarget => {
+              onChange={(selectedTarget) => {
                 onTargetSelect(selectedTarget, index);
               }}
               value={ele.selectedTarget ? ele.selectedTarget : null}
+              isSearchable={false}
             />
           )}
           {isLoginTypeOperator === true && (
@@ -130,7 +131,7 @@ const TargetComponent = props => {
             index={`threshold${index}`}
             placeholder={`${MIN_THRESHOLD} - ${MAX_THRESHOLD}`}
             value={ele.threshold === undefined ? "" : ele.threshold}
-            onChange={event => {
+            onChange={(event) => {
               onThresholdChange(event.target.value, index);
             }}
             onBlur={() => onThresholdBlurHandler(ele.threshold, index)}
@@ -184,7 +185,7 @@ const TargetComponent = props => {
       isLoginTypeAdmin,
       getFilteredOptionsList,
       onThresholdBlurHandler,
-      onThresholdFocusHandler
+      onThresholdFocusHandler,
     ]
   );
   return (
@@ -277,7 +278,7 @@ TargetComponent.propTypes = {
   onNextClick: PropTypes.func,
   isViewStagesEnabled: PropTypes.bool,
   navigateToStageWizard: PropTypes.func,
-  editTemplate: PropTypes.func
+  editTemplate: PropTypes.func,
 };
 
 export default TargetComponent;

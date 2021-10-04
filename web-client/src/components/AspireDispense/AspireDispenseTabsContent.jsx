@@ -31,6 +31,16 @@ const AspireDispenseTabsContent = (props) => {
   const aspireWellLabel = getWellLabel(aspireCategoryLabel, aspireWellId);
   const dispenseWellLabel = getWellLabel(dispenseCategoryLabel, dispenseWellId);
 
+  // check if we have to hide the label
+  const hideNavBarItem = (key) => {
+    if (key === "cartridge1" && aspire.cartridge1Wells === null) {
+      return true;
+    } else if (key === "cartridge2" && aspire.cartridge2Wells === null) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div className="d-flex">
       <Nav tabs className="d-flex flex-column border-0 side-bar">
@@ -48,19 +58,21 @@ const AspireDispenseTabsContent = (props) => {
         {ASPIRE_DISPENSE_SIDEBAR_LABELS.map((label, index) => {
           let key = Object.keys(disabledTabObj)[index];
           return (
-            <NavItem key={index}>
-              <NavLink
-                className={classnames({
-                  active: activeTab === `${index + 1}`,
-                })}
-                onClick={() => {
-                  toggle(`${index + 1}`);
-                }}
-                disabled={disabledTabObj[key]}
-              >
-                {label}
-              </NavLink>
-            </NavItem>
+            !hideNavBarItem(key) && (
+              <NavItem key={index}>
+                <NavLink
+                  className={classnames({
+                    active: activeTab === `${index + 1}`,
+                  })}
+                  onClick={() => {
+                    toggle(`${index + 1}`);
+                  }}
+                  disabled={disabledTabObj[key]}
+                >
+                  {label}
+                </NavLink>
+              </NavItem>
+            )
           );
         })}
       </Nav>
@@ -79,30 +91,38 @@ const AspireDispenseTabsContent = (props) => {
         </Text>
 
         <TabPane tabId={"1"}>
-          <WellComponent
-            wellsObjArray={
-              isAspire ? aspire.cartridge1Wells : dispense.cartridge1Wells
-            }
-            wellClickHandler={wellClickHandler}
-          />
-          {isAspire ? (
-            <AspireCommonField formik={formik} currentTab={activeTab} />
-          ) : (
-            <DispenseCommonField formik={formik} currentTab={activeTab} />
+          {!hideNavBarItem("cartridge1") && (
+            <>
+              <WellComponent
+                wellsObjArray={
+                  isAspire ? aspire.cartridge1Wells : dispense.cartridge1Wells
+                }
+                wellClickHandler={wellClickHandler}
+              />
+              {isAspire ? (
+                <AspireCommonField formik={formik} currentTab={activeTab} />
+              ) : (
+                <DispenseCommonField formik={formik} currentTab={activeTab} />
+              )}
+            </>
           )}
         </TabPane>
 
         <TabPane tabId="2">
-          <WellComponent
-            wellsObjArray={
-              isAspire ? aspire.cartridge2Wells : dispense.cartridge2Wells
-            }
-            wellClickHandler={wellClickHandler}
-          />
-          {isAspire ? (
-            <AspireCommonField formik={formik} currentTab={activeTab} />
-          ) : (
-            <DispenseCommonField formik={formik} currentTab={activeTab} />
+          {!hideNavBarItem("cartridge2") && (
+            <>
+              <WellComponent
+                wellsObjArray={
+                  isAspire ? aspire.cartridge2Wells : dispense.cartridge2Wells
+                }
+                wellClickHandler={wellClickHandler}
+              />
+              {isAspire ? (
+                <AspireCommonField formik={formik} currentTab={activeTab} />
+              ) : (
+                <DispenseCommonField formik={formik} currentTab={activeTab} />
+              )}
+            </>
           )}
         </TabPane>
 

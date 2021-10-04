@@ -63,20 +63,6 @@ export const senseAndHitActions = {
   senseAndHitActionFailure: "SENSE_AND_HIT_FAILURE",
 };
 
-export const calibrationActions = {
-  calibrationInitiated: "CALIBRATION_INITIATED",
-  calibrationSuccess: "CALIBRATION_SUCCESS",
-  calibrationFailure: "CALIBRATION_FAILURE",
-  calibrationReset: "CALIBRATION_RESET",
-};
-
-export const updateCalibrationActions = {
-  updateCalibrationInitiated: "UPDATE_CALIBRATION_INITIATED",
-  updateCalibrationSuccess: "UPDATE_CALIBRATION_SUCCESS",
-  updateCalibrationFailure: "UPDATE_CALIBRATION_FAILURE",
-  updateCalibrationReset: "UPDATE_CALIBRATION_RESET",
-};
-
 export const commonDetailsActions = {
   commonDetailsInitiated: "COMMON_DETAILS_INITIATED",
   commonDetailsSuccess: "COMMON_DETAILS_SUCCESS",
@@ -237,4 +223,20 @@ export const addConsumableActions = {
   successAction: "ADD_NEW_CONSUMABLE_SUCCESS",
   failureAction: "ADD_NEW_CONSUMABLE_FAILURE",
   resetAction: "ADD_NEW_CONSUMABLE_RESET",
+};
+
+// calibrations for Deck A values
+export const fetchCalibrationsDeckAActions = {
+  initiateAction: "FETCH_CALIBRATION_DECK_A_INITIATED",
+  successAction: "FETCH_CALIBRATION_DECK_A_SUCCESS",
+  failureAction: "FETCH_CALIBRATION_DECK_A_FAILURE",
+  resetAction: "FETCH_CALIBRATION_DECK_A_RESET",
+};
+
+// calibrations for Deck B values
+export const fetchCalibrationsDeckBActions = {
+  initiateAction: "FETCH_CALIBRATION_DECK_B_INITIATED",
+  successAction: "FETCH_CALIBRATION_DECK_B_SUCCESS",
+  failureAction: "FETCH_CALIBRATION_DECK_B_FAILURE",
+  resetAction: "FETCH_CALIBRATION_DECK_B_RESET",
 };

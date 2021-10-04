@@ -86,6 +86,10 @@ skipToStartTimer:
 			}
 			// When UV Light is in progress nothing else is so no special handling below
 			if d.isUVLightInProgress() {
+				if !d.IsRunInProgress() {
+					logger.Errorln(responses.UVLightAbortedError)
+					return "", responses.UVLightAbortedError
+				}
 				d.sendWSData(time1, timeElapsed, delay.DelayTime, uvlightProgress)
 			}
 			if recipeRun {

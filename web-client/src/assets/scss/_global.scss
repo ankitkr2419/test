@@ -535,7 +535,6 @@ button:focus {
       overflow-x: hidden;
     }
     thead {
-      display: block;
       tr {
         box-shadow: rem(0 4px 16px) #00000029;
       }
@@ -782,4 +781,15 @@ button:focus {
   border-width: 0.5px;
   height: 14px;
   width: 14px;
+}
+
+.temperature-input-field {
+  padding-right: 3rem;
+}
+
+.temperature-unit {
+  position: absolute;
+  top: 7px;
+  left: 11.596rem;
+  color: gray;
 }

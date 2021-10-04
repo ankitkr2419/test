@@ -86,6 +86,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.UserTokenEncodeError)
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserTokenEncodeError.Error()})
+			return
 		}
 		response := map[string]string{
 			"msg":   fmt.Sprintf(`%s logged in successfully`, u.Role),
@@ -103,7 +104,24 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		logger.Infoln(responses.UserLoginSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, response)
+
+		reloadUtils(deps, deck)
+
 	})
+}
+
+func reloadUtils(deps Dependencies, deck string) {
+	if deck != blank && (Application == Extraction || Application == Combined) && !deps.PlcDeck[anotherDeck(deck)].IsRunInProgress() {
+		logger.Infoln("Reloading all the PLC Funcs")
+		go plc.LoadAllPLCFuncsExceptUtils(deps.Store)
+	}
+}
+
+func anotherDeck(deck string) string {
+	if deck == plc.DeckA {
+		return plc.DeckB
+	}
+	return plc.DeckA
 }
 
 func checkEngOrAdminLoggedOnDeck(deps Dependencies, deck string, u db.User) {
@@ -234,8 +252,10 @@ func logoutUserHandler(deps Dependencies) http.HandlerFunc {
 				deps.PlcDeck[deck].SetEngineerOrAdminLogged(false)
 			}
 		}
+		logger.WithFields(logger.Fields{
+			"Deck": deck,
+		}).Infoln("User logged out successfully")
 
-		logger.Infoln(responses.UserLogoutSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UserLogoutSuccess})
 		return
 

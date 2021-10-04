@@ -30,6 +30,11 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
 
+	// For Engineer Allow Indeck movements as well
+	if deckAndMotor.Number == K9_Syringe_Module_LHRH{
+		syringeModuleState.Store(d.name, OutDeck)
+	}
+
 	return
 }
 
@@ -151,6 +156,8 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 	if d.isUVLightInProgress() {
 		//  Switch off UV Light
+		d.ResetRunInProgress()
+
 		response, err = d.switchOffUVLight()
 		if err != nil {
 			logger.Errorln("From deck ", d.name, err)

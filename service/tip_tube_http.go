@@ -112,6 +112,12 @@ func listTipsTubesPositionHandler(deps Dependencies) http.HandlerFunc {
 		vars := mux.Vars(req)
 		tipTubeType := vars["tiptube"]
 		position, err := strconv.ParseInt(vars["position"], 10, 64)
+		if err != nil {
+			logger.Errorln(responses.InvalidTipTubePositionError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.InvalidTipTubePositionError.Error()})
+			return
+		}
+
 		var tipsTubes []db.TipsTubes
 
 		// for logging error if there is any otherwise logging success
