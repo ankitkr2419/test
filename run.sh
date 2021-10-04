@@ -13,14 +13,14 @@ elif [[  ${dev} != "simulator" ]]; then
     exit 1
 fi
 
-chmod +x ./cpagent
+sudo chmod +x ./cpagent
 dir=${HOME}"/cpagent/utils/logs/"
 var=${HOME}"/cpagent/utils/logs/output_$(date +%s).log"
 
 create_log_file () {
         echo "Logs for current run are present in "${var}
-        mkdir -p ${dir}
-        touch ${var}
+        sudo mkdir -p ${dir}
+        sudo touch ${var}
 }
 
 if [[ ${apptype} == "extraction" ]]; then
