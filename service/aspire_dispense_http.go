@@ -215,9 +215,6 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 	//fetch cartridge type using id
 	var cartridgeID int64
 
-	aspireCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.SourcePosition)
-	dispenseCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.DestinationPosition)
-
 	switch ad.Category {
 	case db.SD:
 		if isDeckPositionInvalid(ad.DestinationPosition) {
@@ -237,6 +234,13 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 			return responses.InvalidSourcePosition
 		}
 	case db.WW:
+		err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
+		if err != nil {
+			return err
+		}
+		aspireCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.SourcePosition)
+		dispenseCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.DestinationPosition)
+
 		// send cartridge and both height for validation
 		if !plc.IsCartridgeWellHeightSafe(aspireCartridgeWell, ad.AspireHeight) {
 			return responses.InvalidAspireWell
@@ -244,29 +248,31 @@ func ValidateAspireDispenceObject(ctx context.Context, deps Dependencies, ad db.
 		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
 			return responses.InvalidDispenseWell
 		}
+
+	case db.WD, db.WS:
 		err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
 		if err != nil {
 			return err
 		}
-	case db.WD, db.WS:
+		aspireCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.SourcePosition)
+
 		// send cartridge and aspire height for validation
 		if !plc.IsCartridgeWellHeightSafe(aspireCartridgeWell, ad.AspireHeight) {
 			return responses.InvalidAspireWell
 		}
+
+	case db.DW, db.SW:
 		err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
 		if err != nil {
 			return err
 		}
-		return
-	case db.DW, db.SW:
+		dispenseCartridgeWell = createCartridgeWell(cartridgeID, ad.CartridgeType, ad.DestinationPosition)
+
 		// send cartridge and dispense height for validation
 		if !plc.IsCartridgeWellHeightSafe(dispenseCartridgeWell, ad.DispenseHeight) {
 			return responses.InvalidDispenseWell
 		}
-		err = checkCartridgeType(recipe, ad.CartridgeType, &cartridgeID)
-		if err != nil {
-			return err
-		}
+
 	default:
 		return responses.InvalidCategoryAspireDispense
 
