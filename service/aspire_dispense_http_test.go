@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
@@ -21,8 +22,15 @@ type AspireDispenseHandlerTestSuite struct {
 }
 
 func (suite *AspireDispenseHandlerTestSuite) SetupTest() {
+
 	suite.dbMock = &db.DBMockStore{}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{plc.TestTTObj}, nil)
+	suite.dbMock.On("ListCartridges", mock.Anything).Return(plc.TestCartridgeObj, nil)
+	suite.dbMock.On("ListCartridgeWells").Return(plc.TestCartridgeWellsObj, nil)
+	suite.dbMock.On("ListMotors", mock.Anything).Return(plc.TestMotorObj, nil)
+	suite.dbMock.On("ListConsDistances").Return(plc.TestConsDistanceObj, nil)
+	plc.LoadAllPLCFuncsExceptUtils(suite.dbMock)
 }
 
 func TestAspireDispenseTestSuite(t *testing.T) {
@@ -35,22 +43,31 @@ var testAspireDispenseRecord = db.AspireDispense{
 	ID:                   testUUID,
 	Category:             db.WW,
 	CartridgeType:        db.Cartridge1,
-	SourcePosition:       1,
+	SourcePosition:       4,
 	AspireHeight:         2,
 	AspireMixingVolume:   3,
 	AspireNoOfCycles:     4,
 	AspireVolume:         5,
 	AspireAirVolume:      6,
-	DispenseHeight:       7,
+	DispenseHeight:       1,
 	DispenseMixingVolume: 8,
 	DispenseNoOfCycles:   9,
-	DestinationPosition:  10,
+	DestinationPosition:  8,
 	ProcessID:            testProcessUUID,
+}
+
+var testProcessADRecord = db.Process{
+	ID:             testProcessUUID,
+	Name:           testName,
+	Type:           testType,
+	SequenceNumber: sequenceNumber,
+	RecipeID:       recipeUUID,
 }
 
 func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseSuccess() {
 
 	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything, recipeUUID).Return(testAspireDispenseRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -87,6 +104,7 @@ func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseInvalidUUID
 func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseFailure() {
 
 	suite.dbMock.On("CreateAspireDispense", mock.Anything, mock.Anything, recipeUUID).Return(db.AspireDispense{}, responses.AspireDispenseCreateError)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -159,6 +177,8 @@ func (suite *AspireDispenseHandlerTestSuite) TestShowAspireDispenseInvalidUUID()
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(nil)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessADRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 
@@ -179,6 +199,8 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseSuccess() {
 
 func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseFailure() {
 	suite.dbMock.On("UpdateAspireDispense", mock.Anything, mock.Anything).Return(responses.AspireDispenseUpdateError)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessADRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testAspireDispenseRecord)
 
