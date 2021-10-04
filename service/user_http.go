@@ -20,14 +20,15 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		var token string
 		var valueI interface{}
 		var ok bool
-		err := json.NewDecoder(req.Body).Decode(&u)
-		if err != nil {
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error()})
-			return
-		}
 
 		vars := mux.Vars(req)
 		deck := vars["deck"]
+
+		err := json.NewDecoder(req.Body).Decode(&u)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserDecodeError.Error(), Deck: deck})
+			return
+		}
 
 		if deck == blank {
 			goto skipDeckUserCheck
@@ -36,13 +37,13 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		valueI, ok = deckUserLogin.Load(deck)
 		if !ok {
 			logger.WithField("err", "DECK ERROR").Error(responses.UserInvalidDeckError)
-			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserInvalidDeckError.Error()})
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserInvalidDeckError.Error(), Deck: deck})
 			return
 		}
 		if valueI.(string) != u.Username && valueI.(string) != blank {
 			loggedInInfo := fmt.Errorf("%v. %v user already logged in.", responses.UserDeckLoginError, valueI)
 			logger.WithField("err", "DECK ERROR").Error(loggedInInfo)
-			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: loggedInInfo.Error()})
+			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: loggedInInfo.Error(), Deck: deck})
 			return
 		}
 
@@ -64,7 +65,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 				err = responses.UserInvalidError
 			}
 			logger.WithField("err", err.Error()).Error(responses.UserInvalidError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserInvalidError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserInvalidError.Error(), Deck: deck})
 			return
 		}
 
@@ -72,7 +73,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		authID, err := deps.Store.InsertUserAuths(req.Context(), u.Username)
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.UserAuthError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserAuthError.Error(), Deck: deck})
 			return
 		}
 
@@ -85,7 +86,7 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 
 		if err != nil {
 			logger.WithField("err", err.Error()).Error(responses.UserTokenEncodeError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserTokenEncodeError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserTokenEncodeError.Error(), Deck: deck})
 			return
 		}
 		response := map[string]string{
@@ -105,12 +106,12 @@ func validateUserHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.UserLoginSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, response)
 
-		reloadUtils(deps, deck)
+		reloadPLCFuncsExceptUtils(deps, deck)
 
 	})
 }
 
-func reloadUtils(deps Dependencies, deck string) {
+func reloadPLCFuncsExceptUtils(deps Dependencies, deck string) {
 	if deck != blank && (Application == Extraction || Application == Combined) && !deps.PlcDeck[anotherDeck(deck)].IsRunInProgress() {
 		logger.Infoln("Reloading all the PLC Funcs")
 		go plc.LoadAllPLCFuncsExceptUtils(deps.Store)
