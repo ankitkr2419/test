@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
@@ -117,14 +118,14 @@ func (m *DBMockStore) ShowExperiment(ctx context.Context, id uuid.UUID) (t Exper
 	return args.Get(0).(Experiment), args.Error(1)
 }
 
-func (m *DBMockStore) UpsertExpTemplateTarget(ctx context.Context, tt []ExpTemplateTarget, id uuid.UUID) (t []ExpTemplateTarget, err error) {
+func (m *DBMockStore) UpsertExpTemplateTarget(ctx context.Context, tt []ExpTemplateTarget, id uuid.UUID) (t []ExpTempTargeTDye, err error) {
 	args := m.Called(ctx, tt, id)
-	return args.Get(0).([]ExpTemplateTarget), args.Error(1)
+	return args.Get(0).([]ExpTempTargeTDye), args.Error(1)
 }
 
-func (m *DBMockStore) ListExpTemplateTargets(ctx context.Context, id uuid.UUID) (t []ExpTemplateTarget, err error) {
+func (m *DBMockStore) ListExpTemplateTargets(ctx context.Context, id uuid.UUID) (t []ExpTempTargeTDye, err error) {
 	args := m.Called(ctx, id)
-	return args.Get(0).([]ExpTemplateTarget), args.Error(1)
+	return args.Get(0).([]ExpTempTargeTDye), args.Error(1)
 }
 
 func (m *DBMockStore) InsertDyes(ctx context.Context, d []Dye) (dyes []Dye, err error) {
@@ -618,5 +619,73 @@ func (m *DBMockStore) UpdateUser(ctx context.Context, u User, oldName string) (e
 
 func (m *DBMockStore) DeleteUnfinishedTemplates(ctx context.Context) (err error) {
 	args := m.Called(ctx)
+	return args.Error(0)
+}
+
+func (m *DBMockStore) ShowCartridge(ctx context.Context, id int64) (dbCartridge Cartridge, err error) {
+
+	args := m.Called(ctx, id)
+	return args.Get(0).(Cartridge), args.Error(1)
+
+}
+func (m *DBMockStore) ShowCartridgeWells(id int64) (cartridgeWells []CartridgeWells, err error) {
+	args := m.Called(id)
+	return args.Get(0).([]CartridgeWells), args.Error(1)
+
+}
+
+func (m *DBMockStore) SetExcelHeadings(file *excelize.File, experimentID uuid.UUID) (err error) {
+	args := m.Called(file, experimentID)
+	return args.Error(0)
+}
+func (m *DBMockStore) ListTargetDye(ctx context.Context, targetID uuid.UUID) (dye string, err error) {
+	args := m.Called(ctx, targetID)
+	return args.Get(0).(string), args.Error(1)
+
+}
+func (m *DBMockStore) UpsertTargetThreshold(ctx context.Context, tt []ExpTargetThreshold) (err error) {
+	args := m.Called(ctx, tt)
+	return args.Error(0)
+}
+func (m *DBMockStore) GetTargetThreshold(ctx context.Context, expID, targetID uuid.UUID) (tarth ExpTargetThreshold, err error) {
+	args := m.Called(ctx, expID, targetID)
+	return args.Get(0).(ExpTargetThreshold), args.Error(1)
+
+}
+func (m *DBMockStore) UpsertDyeWellTolerance(ctx context.Context, dwTolerance []DyeWellTolerance) (err error) {
+	args := m.Called(ctx, dwTolerance)
+	return args.Error(0)
+}
+func (m *DBMockStore) ShowDye(ctx context.Context, dyeID uuid.UUID) (DBdye Dye, err error) {
+	args := m.Called(ctx, dyeID)
+	return args.Get(0).(Dye), args.Error(1)
+
+}
+func (m *DBMockStore) DeleteUser(ctx context.Context, username string) (err error) {
+	args := m.Called(ctx, username)
+	return args.Error(0)
+}
+func (m *DBMockStore) ListDyes(ctx context.Context) (DBdye []Dye, err error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]Dye), args.Error(1)
+
+}
+func (m *DBMockStore) UpdateConsumableDistance(ctx context.Context, c ConsumableDistance) (err error) {
+	args := m.Called(ctx, c)
+	return args.Error(0)
+}
+func (m *DBMockStore) ListConsDistancesDeck(ctx context.Context, min, max int64) (consumabledistance []ConsumableDistance, err error) {
+	args := m.Called(ctx, min, max)
+	return args.Get(0).([]ConsumableDistance), args.Error(1)
+
+}
+func (m *DBMockStore) IsCartridgeSafeToDelete(ctx context.Context, id int64) (count []int64, err error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]int64), args.Error(1)
+
+}
+
+func (m *DBMockStore) UpdateEstimatedTimeForRecipe(ctx context.Context, id uuid.UUID, estimatedTime int64) error {
+	args := m.Called(ctx, id, estimatedTime)
 	return args.Error(0)
 }
