@@ -53,8 +53,8 @@ func appInfoHandler(deps Dependencies) http.HandlerFunc {
 
 // NOTE: Application doesn't make sense below as it is set at run time only
 func PrintBinaryInfo() {
-	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
-		Version, User, Machine, Branch, CommitID, BuiltOn)
+	fmt.Printf("\nApplication\t: %v \nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
+		Application, Version, User, Machine, Branch, CommitID, BuiltOn)
 }
 
 func ShutDownGracefully(deps Dependencies) (err error) {
