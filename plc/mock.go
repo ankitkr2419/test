@@ -4,6 +4,7 @@ import (
 	"context"
 	"mylab/cpagent/db"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -70,9 +71,9 @@ func (p *PLCMockStore) RestoreDeck() (response string, err error) {
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) UVLight(uvTime int64) (response int64, err error) {
+func (p *PLCMockStore) UVLight(uvTime int64) (response string, err error) {
 	args := p.Called(uvTime)
-	return args.Get(0).(int64), args.Error(1)
+	return args.Get(0).(string), args.Error(1)
 }
 
 func (p *PLCMockStore) AddDelay(delay db.Delay, runRecipe bool) (response string, err error) {
@@ -95,8 +96,8 @@ func (p *PLCMockStore) DiscardTipAndHome(discard bool) (response string, err err
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) Heating(ht db.Heating) (response string, err error) {
-	args := p.Called(ht)
+func (p *PLCMockStore) Heating(ht db.Heating, flag bool) (response string, err error) {
+	args := p.Called(ht, flag)
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -130,8 +131,8 @@ func (p *PLCMockStore) Piercing(pi db.Piercing, cartridgeID int64) (response str
 	return args.Get(0).(string), args.Error(1)
 }
 
-func (p *PLCMockStore) Shaking(shakerData db.Shaker) (response string, err error) {
-	args := p.Called(shakerData)
+func (p *PLCMockStore) Shaking(shakerData db.Shaker, flag bool) (response string, err error) {
+	args := p.Called(shakerData, flag)
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -192,4 +193,40 @@ func (m *MockCompact32Driver) ReadSingleRegister(address uint16) (value uint16, 
 func (m *MockCompact32Driver) WriteSingleCoil(address, value uint16) (err error) {
 	args := m.Called(address, value)
 	return args.Error(0)
+}
+
+func (m *PLCMockStore) HeaterData() error {
+	args := m.Called()
+	return args.Error(0)
+}
+func (m *PLCMockStore) StartRecipeTimeCounter() {
+	m.Called()
+	return
+}
+func (m *PLCMockStore) UpdateRecipeEstimatedTime(ctx context.Context, recipeID uuid.UUID, s db.Storer, err *error) error {
+	args := m.Called(ctx, recipeID, s, err)
+	return args.Error(0)
+}
+func (m *PLCMockStore) ReadFlapSensor() error {
+	args := m.Called()
+	return args.Error(0)
+}
+
+func (m *PLCMockStore) IsHeaterInProgress() bool {
+	args := m.Called()
+	return args.Get(0).(bool)
+}
+func (m *PLCMockStore) IsShakerInProgress() bool {
+	args := m.Called()
+	return args.Get(0).(bool)
+}
+
+func (m *PLCMockStore) SetEngineerOrAdminLogged(value bool) {
+	m.Called(value)
+	return
+}
+
+func (m *PLCMockStore) ResetAborted() {
+	m.Called()
+	return
 }
