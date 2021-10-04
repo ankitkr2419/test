@@ -10,6 +10,7 @@ import (
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
@@ -158,7 +159,7 @@ func runExperimentHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		// create  new file for each experiment with experiment id in file name.
-		file := db.GetExcelFile(ExpOutputPath, fmt.Sprintf("output_%v", expID))
+		file := db.GetExcelFile(os.ExpandEnv(expOutputPath), fmt.Sprintf("output_%v", expID))
 
 		db.SetExperimentExcelFile(file)
 		deps.Store.SetExcelHeadings(file, expID)

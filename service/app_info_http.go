@@ -53,14 +53,14 @@ func appInfoHandler(deps Dependencies) http.HandlerFunc {
 
 // NOTE: Application doesn't make sense below as it is set at run time only
 func PrintBinaryInfo() {
-	fmt.Printf("\nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
-		Version, User, Machine, Branch, CommitID, BuiltOn)
+	fmt.Printf("\nApplication\t: %v \nVersion\t\t: %v \nUser\t\t: %v \nMachine\t\t: %v \nBranch\t\t: %v \nCommitID\t: %v \nBuilt\t\t: %v\n",
+		Application, Version, User, Machine, Branch, CommitID, BuiltOn)
 }
 
 func ShutDownGracefully(deps Dependencies) (err error) {
 	var err1, err2, err3, err4 error
 	// We received an interrupt signal, shut down.
-	logger.Warnln("..................\n----Application shutting down gracefully ----|\n.............................................|")
+	logger.Warnln("\n..............................................\n----Application shutting down gracefully ----|\n.............................................|")
 	if Application == Combined || Application == RTPCR {
 		err1 = deps.Tec.ReachRoomTemp()
 		if err1 != nil {
@@ -90,6 +90,8 @@ func ShutDownGracefully(deps Dependencies) (err error) {
 		logger.Errorln("Shutdown graceful error: ", err)
 		os.Exit(-1)
 	}
+
+	logger.Warnln("\n...........................................\n-------Graceful Shutdown complete --------|\n..........................................|")
 
 	os.Exit(0)
 	return
