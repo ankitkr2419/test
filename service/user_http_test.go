@@ -401,3 +401,22 @@ func (suite *UserHandlerTestSuite) TestUpdateUserFailure() {
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
+
+// Delete User Test cases
+
+func (suite *UserHandlerTestSuite) TestDeleteUserSuccess() {
+	testUserObj := testUserObj
+	suite.dbMock.On("DeleteUser", mock.Anything, testUserObj.Username).Return(nil)
+
+	recorder := makeHTTPCall(http.MethodDelete,
+		"users/{username}",
+		"users/"+testUserObj.Username,
+		"",
+		deleteUserHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	output, _ := json.Marshal(MsgObj{Msg: responses.UserDeleteSuccess})
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+}
