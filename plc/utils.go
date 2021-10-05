@@ -45,7 +45,7 @@ const (
 	initialSensorCutMagnetPulses        = uint16(29999)
 	moveOppositeSensorPulses            = uint16(19999)
 	reverseAfterNonCutPulses            = uint16(2000)
-	reverseAfterNonCutPulsesMagnet      = uint16(400)
+	reverseAfterNonCutPulsesMagnet      = uint16(1000)
 	finalSensorCutPulses                = uint16(2999)
 	minimumPulsesThreshold              = uint16(50)
 	highestUint16                       = uint16(65535)

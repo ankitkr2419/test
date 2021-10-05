@@ -1,9 +1,11 @@
 package service
 
-/*
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
+	"mylab/cpagent/config"
 	"mylab/cpagent/db"
+	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
 
@@ -22,51 +24,123 @@ type ConsumableDistanceHandlerTestSuite struct {
 
 func (suite *ConsumableDistanceHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	config.SetConsumableDistanceFilePath("../conf/test_config.yml")
 }
 
 func TestConsumableDistanceTestSuite(t *testing.T) {
 	suite.Run(t, new(ConsumableDistanceHandlerTestSuite))
 }
 
-func (suite *ConsumableDistanceHandlerTestSuite) TestCreateConsumableDistanceSuccess() {
-	suite.dbMock.On("InsertConsumableDistance", mock.Anything, mock.Anything).Return(db.ConsumableDistance{
-		ID: 1, Name: "deck_start", Distance: 1.11, Description: "deck start point",
-	}, nil)
+var testConsumableObj = db.ConsumableDistance{
+	ID:          0,
+	Name:        "test consumable",
+	Distance:    3.5,
+	Description: "test consumable",
+}
 
-	body := fmt.Sprintf(`{"id":1,"name":"deck_start","distance":1.11,"description":"deck start point","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+func (suite *ConsumableDistanceHandlerTestSuite) TestListConsumableDistanceSuccess() {
+	suite.dbMock.On("ListConsDistances", mock.Anything, mock.Anything).Return([]db.ConsumableDistance{testConsumableObj}, nil)
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 	recorder := makeHTTPCall(http.MethodPost,
-		"/consumabledistance",
-		"/consumabledistance",
-		body,
+		"/consumable-distance/",
+		"/consumable-distance/",
+		"",
+		listConsumableDistanceHandler(Dependencies{Store: suite.dbMock}),
+	)
+	body, _ := json.Marshal([]db.ConsumableDistance{testConsumableObj})
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ConsumableDistanceHandlerTestSuite) TestListConsumableDistanceFailure() {
+	suite.dbMock.On("ListConsDistances", mock.Anything, mock.Anything).Return([]db.ConsumableDistance{}, errors.New("failed to fetch distances"))
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
+	recorder := makeHTTPCall(http.MethodPost,
+		"/consumable-distance/",
+		"/consumable-distance/",
+		"",
+		listConsumableDistanceHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	resp, _ := json.Marshal(ErrObj{Err: responses.ConsumableDistanceFetchError.Error()})
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(resp), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ConsumableDistanceHandlerTestSuite) TestCreateConsumableDistanceSuccess() {
+	suite.dbMock.On("InsertConsumableDistance", mock.Anything, mock.Anything).Return(nil)
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
+	body, _ := json.Marshal(testConsumableObj)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/consumable-distance/",
+		"/consumable-distance/",
+		string(body),
 		createConsumableDistanceHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":1,"name":"deck_start","distance":1.11,"description":"deck start point","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
-
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *ConsumableDistanceHandlerTestSuite) TestCreateConsumableDistanceFailure() {
-	suite.dbMock.On("InsertConsumableDistance", mock.Anything, mock.Anything).Return(db.ConsumableDistance{
-		ID: 1, Name: "deck_start", Distance: 1.11, Description: "deck start point",
-	}, nil)
+	suite.dbMock.On("InsertConsumableDistance", mock.Anything, mock.Anything).Return(errors.New("failed to insert new distances"))
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
-	body := fmt.Sprintf(`{"id":1,"name":"deck_start","distance":1.11,"description":"deck start point","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
+	body, _ := json.Marshal(testConsumableObj)
 	recorder := makeHTTPCall(http.MethodPost,
-		"/consumabledistance",
-		"/consumabledistance",
-		body,
+		"/consumable-distance/",
+		"/consumable-distance/",
+		string(body),
 		createConsumableDistanceHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":1,"name":"deck_start","distance":2.11,"description":"deck start point","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`)
-
-	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.NotEqual(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-*/
+
+func (suite *ConsumableDistanceHandlerTestSuite) TestUpdateConsumableDistanceSuccess() {
+	suite.dbMock.On("UpdateConsumableDistance", mock.Anything, mock.Anything).Return(nil)
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
+	body, _ := json.Marshal(testConsumableObj)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/consumable-distance/",
+		"/consumable-distance/",
+		string(body),
+		updateConsumableDistanceHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	output, _ := json.Marshal(MsgObj{Msg: "consumable distance record updated successfully"})
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *ConsumableDistanceHandlerTestSuite) TestUpdateConsumableDistanceFailure() {
+	suite.dbMock.On("UpdateConsumableDistance", mock.Anything, mock.Anything).Return(errors.New("failed to update new distances"))
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
+	body, _ := json.Marshal(testConsumableObj)
+	recorder := makeHTTPCall(http.MethodPost,
+		"/consumable-distance/",
+		"/consumable-distance/",
+		string(body),
+		updateConsumableDistanceHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output, _ := json.Marshal(ErrObj{Err: responses.ConsumableDistanceUpdateError.Error()})
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	suite.dbMock.AssertExpectations(suite.T())
+}

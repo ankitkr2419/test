@@ -73,3 +73,7 @@ func GetExtractionConfigValues() Extraction {
 func GetConsumableDistanceFilePath() string {
 	return ReadEnvString("consumable_distance_conf_file")
 }
+
+func SetConsumableDistanceFilePath(path string) {
+	viper.Set("consumable_distance_conf_file", path)
+}

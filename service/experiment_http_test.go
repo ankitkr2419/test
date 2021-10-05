@@ -1,17 +1,13 @@
 package service
 
-/*
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
-	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
-	"mylab/cpagent/plc/simulator"
 	"net/http"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -38,13 +34,17 @@ func TestExperimentTestSuite(t *testing.T) {
 	suite.Run(t, new(ExperimentHandlerTestSuite))
 }
 
+var testExpObj = db.Experiment{
+	ID:           testExpID,
+	Description:  "blah blah",
+	TemplateID:   testTemplateID,
+	TemplateName: "test",
+	OperatorName: "ABC"}
+
 func (suite *ExperimentHandlerTestSuite) TestListExperimentsSuccess() {
-	testUUID := uuid.New()
-	tempUUID := uuid.New()
+
 	suite.dbMock.On("ListExperiments", mock.Anything).Return(
-		[]db.Experiment{
-			db.Experiment{ID: testUUID, Description: "blah blah", TemplateID: tempUUID, TemplateName: "test", OperatorName: "ABC"},
-		},
+		[]db.Experiment{testExpObj},
 		nil,
 	)
 
@@ -55,9 +55,9 @@ func (suite *ExperimentHandlerTestSuite) TestListExperimentsSuccess() {
 		"",
 		listExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, tempUUID)
+	output, _ := json.Marshal([]db.Experiment{testExpObj})
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
@@ -81,46 +81,36 @@ func (suite *ExperimentHandlerTestSuite) TestListExperimentsFail() {
 }
 
 func (suite *ExperimentHandlerTestSuite) TestCreateExperimentSuccess() {
-	testUUID := uuid.New()
-	tempUUID := uuid.New()
-	targetUUID := uuid.New()
-	suite.dbMock.On("UpsertExpTemplateTarget", mock.Anything, mock.Anything, mock.Anything).Return(
-		[]db.ExpTemplateTarget{
-			db.ExpTemplateTarget{ExperimentID: testUUID, TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
-		},
-		nil,
-	)
-	suite.dbMock.On("ListTemplateTargets", mock.Anything, mock.Anything).Return(
-		[]db.TemplateTarget{
-			db.TemplateTarget{TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
-		},
-		nil,
-	)
-	suite.dbMock.On("CreateExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
-		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, TemplateName: "test", OperatorName: "ABC",
-	}, nil)
 
-	body := fmt.Sprintf(`{"description":"blah blah","template_id":"%s","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z"}`, tempUUID)
+	suite.dbMock.On("UpsertExpTemplateTarget", mock.Anything, mock.Anything, mock.Anything).Return(
+		testTargTempObj,
+		nil,
+	)
+
+	suite.dbMock.On("ListTemplateTargets", mock.Anything, mock.Anything).Return(
+		[]db.TemplateTarget{testTempTarObj},
+		nil,
+	)
+
+	suite.dbMock.On("CreateExperiment", mock.Anything, mock.Anything).Return(testExpObj, nil)
+
+	body, _ := json.Marshal(testExpObj)
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/experiments",
 		"/experiments",
-		body,
+		string(body),
 		createExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
-	testUUID := uuid.New()
-	tempUUID := uuid.New()
-	suite.dbMock.On("ShowExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
-		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, TemplateName: "test", OperatorName: "ABC",
-	}, nil)
+
+	suite.dbMock.On("ShowExperiment", mock.Anything, mock.Anything).Return(testExpObj, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/experiments/{id}",
@@ -128,90 +118,90 @@ func (suite *ExperimentHandlerTestSuite) TestShowExperimentSuccess() {
 		"",
 		showExperimentHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","description":"blah blah","template_id":"%s","template_name":"test","operator_name":"ABC","start_time":"0001-01-01T00:00:00Z","end_time":"0001-01-01T00:00:00Z","well_count":0,"result":"","repeat_cycle":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
+	output, _ := json.Marshal(testExpObj)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
-	testUUID := uuid.New()
-	tempUUID := uuid.New()
-	sampleID := uuid.New()
-	targetID := uuid.New()
-	exit := make(chan error)
-	websocketMsg := make(chan string)
-	websocketErr := make(chan error)
+// func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
+// 	testUUID := uuid.New()
+// 	tempUUID := uuid.New()
+// 	sampleID := uuid.New()
+// 	targetID := uuid.New()
+// 	exit := make(chan error)
+// 	websocketMsg := make(chan string)
+// 	websocketErr := make(chan error)
 
-	config.Load("simulator_test")
+// 	config.Load("simulator_test")
 
-	config.Load("config_test")
+// 	config.Load("config_test")
 
-	suite.dbMock.On("ListWells", mock.Anything, mock.Anything).Return(
-		[]db.Well{
-			db.Well{ID: testUUID, Position: 1, SampleID: sampleID, ExperimentID: testUUID, Task: "UNKNOWN", ColorCode: "RED", Targets: []db.WellTarget{
-				{WellPosition: 1,
-					ExperimentID: testUUID,
-					TargetID:     targetID,
-					TargetName:   "COVID",
-					CT:           "45"},
-			}, SampleName: ""},
-		},
-		nil,
-	)
+// 	suite.dbMock.On("ListWells", mock.Anything, mock.Anything).Return(
+// 		[]db.Well{
+// 			db.Well{ID: testUUID, Position: 1, SampleID: sampleID, ExperimentID: testUUID, Task: "UNKNOWN", ColorCode: "RED", Targets: []db.WellTarget{
+// 				{WellPosition: 1,
+// 					ExperimentID: testUUID,
+// 					TargetID:     targetID,
+// 					TargetName:   "COVID",
+// 					CT:           "45"},
+// 			}, SampleName: ""},
+// 		},
+// 		nil,
+// 	)
 
-	suite.dbMock.On("ShowExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
-		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
-	}, nil)
+// 	suite.dbMock.On("ShowExperiment", mock.Anything, mock.Anything).Return(db.Experiment{
+// 		ID: testUUID, Description: "blah blah", TemplateID: tempUUID, OperatorName: "ABC",
+// 	}, nil)
 
-	stage1 := db.Stage{ID: testUUID, Type: "cycle", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0}
-	stage2 := db.Stage{ID: testUUID, Type: "hold", RepeatCount: 0, TemplateID: tempUUID, StepCount: 0}
+// 	stage1 := db.Stage{ID: testUUID, Type: "cycle", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0}
+// 	stage2 := db.Stage{ID: testUUID, Type: "hold", RepeatCount: 0, TemplateID: tempUUID, StepCount: 0}
 
-	step := db.Step{TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true, StageID: testUUID}
-	ss1 := db.StageStep{
-		stage1, step,
-	}
-	ss2 := db.StageStep{
-		stage2, step,
-	}
-	suite.dbMock.On("ListStageSteps", mock.Anything, mock.Anything).Return([]db.StageStep{
-		ss1, ss2,
-	}, nil)
+// 	step := db.Step{TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true, StageID: testUUID}
+// 	ss1 := db.StageStep{
+// 		stage1, step,
+// 	}
+// 	ss2 := db.StageStep{
+// 		stage2, step,
+// 	}
+// 	suite.dbMock.On("ListStageSteps", mock.Anything, mock.Anything).Return([]db.StageStep{
+// 		ss1, ss2,
+// 	}, nil)
 
-	suite.dbMock.On("ListConfTargets", mock.Anything, mock.Anything).Return([]db.TargetDetails{}, nil)
+// 	suite.dbMock.On("ListConfTargets", mock.Anything, mock.Anything).Return([]db.TargetDetails{}, nil)
 
-	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
-		nil, nil)
+// 	suite.dbMock.On("UpdateStartTimeExperiments", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
+// 		nil, nil)
 
-	suite.dbMock.On("UpsertWellTargets", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
-		[]db.WellTarget{
-			{
-				WellPosition: 1,
-				ExperimentID: testUUID,
-				TargetID:     targetID,
-				TargetName:   "COVID",
-				CT:           "45",
-			},
-		},
-		nil,
-	)
+// 	suite.dbMock.On("UpsertWellTargets", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
+// 		[]db.WellTarget{
+// 			{
+// 				WellPosition: 1,
+// 				ExperimentID: testUUID,
+// 				TargetID:     targetID,
+// 				TargetName:   "COVID",
+// 				CT:           "45",
+// 			},
+// 		},
+// 		nil,
+// 	)
 
-	suite.dbMock.On("InsertExperimentTemperature", mock.Anything, mock.Anything).Return(
-		nil, nil)
+// 	suite.dbMock.On("InsertExperimentTemperature", mock.Anything, mock.Anything).Return(
+// 		nil, nil)
 
-	recorder := makeHTTPCall(http.MethodGet,
-		"/experiments/{experiment_id}/run",
-		"/experiments/"+testUUID.String()+"/run",
-		"",
-		runExperimentHandler(Dependencies{Store: suite.dbMock, Plc: simulator.NewSimulator(exit), ExitCh: exit, WsErrCh: websocketErr, WsMsgCh: websocketMsg}),
-	)
-	<-websocketMsg // read from chn to avoid block
-	assert.Equal(suite.T(), http.StatusAccepted, recorder.Code)
-	assert.Equal(suite.T(), `{"code":"Warning","message":"Absence of NC,PC or NTC"}`, recorder.Body.String())
+// 	recorder := makeHTTPCall(http.MethodGet,
+// 		"/experiments/{experiment_id}/run",
+// 		"/experiments/"+testUUID.String()+"/run",
+// 		"",
+// 		runExperimentHandler(Dependencies{Store: suite.dbMock, Plc: simulator.NewSimulator(exit, websocketErr), ExitCh: exit, WsErrCh: websocketErr, WsMsgCh: websocketMsg}),
+// 	)
+// 	<-websocketMsg // read from chn to avoid block
+// 	assert.Equal(suite.T(), http.StatusAccepted, recorder.Code)
+// 	assert.Equal(suite.T(), `{"code":"Warning","message":"Absence of NC,PC or NTC"}`, recorder.Body.String())
 
-	suite.dbMock.AssertExpectations(suite.T())
-}
+// 	suite.dbMock.AssertExpectations(suite.T())
+// }
 
 // func (suite *ExperimentHandlerTestSuite) TestStopExperimentFail() {
 // 	expUUID := uuid.New()
@@ -236,4 +226,3 @@ func (suite *ExperimentHandlerTestSuite) TestRunExperimentSuccess() {
 
 // 	suite.dbMock.AssertExpectations(suite.T())
 // }
-*/
