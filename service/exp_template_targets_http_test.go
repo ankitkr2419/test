@@ -44,6 +44,12 @@ var testTargTempObj = []db.ExpTempTargeTDye{
 	},
 }
 
+var testTempTarObj = db.TemplateTarget{
+	TemplateID: testTemplateID,
+	TargetID:   testTargetID,
+	Threshold:  0.5,
+}
+
 func (suite *ExpTempTargetHandlerTestSuite) TestListExpTempTargetSuccess() {
 
 	suite.dbMock.On("ListExpTemplateTargets", mock.Anything, mock.Anything).Return(

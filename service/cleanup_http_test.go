@@ -141,15 +141,16 @@ func (suite *CleanupHandlerTestSuite) TestUVCleanupSuccess() {
 
 	deck := plc.DeckB
 	time := "01:20:00"
+	totalTime, _ := db.CalculateTimeInSeconds(time)
 	//TODO: On Mock return success
 
-	suite.plcDeck[deck].(*plc.PLCMockStore).On("UVLight", time).Return("UV Success", nil).Maybe()
+	suite.plcDeck[deck].(*plc.PLCMockStore).On("UVLight", totalTime).Return("UV Success", nil).Maybe()
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/uv/{time}/{deck:[A-B]}",
 		"/uv/"+time+"/"+deck,
 		"",
-		uvLightHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+		uvLightHandler(testDeps),
 	)
 
 	msg := MsgObj{Msg: responses.UVCleanupProgress, Deck: deck}
