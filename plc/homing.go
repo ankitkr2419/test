@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/responses"
-	
+
 	"math"
 	"time"
 
@@ -282,14 +282,17 @@ func (d *Compact32Deck) magnetUpDownHoming() (response string, err error) {
 	}
 
 	// NOTE: Less Pulses used as 2000 cause magnet dash onto 1000ul tips at worst conditions.
-	logger.Infoln("Magnet is moving down by and after not cut -> 400")
+	logger.Infoln("Magnet is moving down by and after not cut -> 1000")
 	response, err = d.setupMotor(homingFastSpeed, reverseAfterNonCutPulsesMagnet, Motors[deckAndNumber]["ramp"], DOWN, deckAndNumber.Number)
 	if err != nil {
 		return
 	}
 
 	logger.Infoln("Magnet is moving up again by 2999 till sensor cuts")
-	response, err = d.setupMotor(homingSlowSpeed, finalSensorCutPulses, Motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
+	_, err = d.setupMotor(homingSlowSpeed, finalSensorCutPulses, Motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
+	if err != nil {
+		return
+	}
 
 	logger.Infoln("Magnet Up/Down homing is completed.")
 
@@ -317,6 +320,9 @@ func (d *Compact32Deck) magnetFwdRevHoming() (response string, err error) {
 
 	logger.Infoln("Magnet is moving forward again by 2999")
 	response, err = d.setupMotor(homingSlowSpeed, finalSensorCutPulses, Motors[deckAndNumber]["ramp"], FWD, deckAndNumber.Number)
+	if err != nil {
+		return
+	}
 
 	logger.Infoln("Moving Magnet Back by 50mm")
 
