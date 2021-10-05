@@ -27,7 +27,7 @@ const DyeCalibration = (props) => {
   let { selectedDye, kitID } = formikDyeCalibration.values;
 
   const handleBlurKitID = (value) => {
-    if (!value || value < kitID.min) {
+    if (!value || value.length !== kitID.allowedLength) {
       formikDyeCalibration.setFieldValue("kitID.isInvalid", true);
     }
   };
@@ -97,17 +97,25 @@ const DyeCalibration = (props) => {
                   Kit ID
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   name="kitId"
                   id="kitId"
+                  maxLength={kitID.allowedLength}
                   placeholder="Type Kit Id"
                   value={kitID.value}
-                  onChange={(event) =>
-                    handleOnChange("kitID.value", parseInt(event.target.value))
+                  onChange={(e) =>
+                    handleOnChange("kitID.value", e.target.value)
                   }
-                  onBlur={(e) => handleBlurKitID(parseInt(e.target.value))}
+                  onBlur={(e) => handleBlurKitID(e.target.value)}
                   onFocus={() => handleOnChange("kitID.isInvalid", false)}
                 />
+                {(kitID.isInvalid || kitID.value == null) && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      8 characters required
+                    </Text>
+                  </div>
+                )}
               </FormGroup>
             </Col>
             {message && (
@@ -119,7 +127,9 @@ const DyeCalibration = (props) => {
             )}
           </Row>
           <Center className="text-center pt-3">
-            <Button disabled={isDyeCalibrationDisabled} color="primary">
+            <Button
+              /*disabled={isDyeCalibrationDisabled}  (NOTE:may need in future) */ color="primary"
+            >
               Start
             </Button>
           </Center>
