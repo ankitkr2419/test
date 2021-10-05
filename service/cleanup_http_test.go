@@ -6,8 +6,12 @@ import (
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/gorilla/websocket"
+	logger "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -17,11 +21,15 @@ import (
 // functionality from testify - including assertion methods.
 type CleanupHandlerTestSuite struct {
 	suite.Suite
-	dbMock *db.DBMockStore
+	dbMock  *db.DBMockStore
 	plcDeck map[string]plc.Extraction
 }
 
+var testDeps Dependencies
+
 func (suite *CleanupHandlerTestSuite) SetupTest() {
+	var wsMsg = make(chan string)
+	var wsErr = make(chan error)
 	suite.dbMock = &db.DBMockStore{}
 	driverA := &plc.PLCMockStore{}
 	driverB := &plc.PLCMockStore{}
@@ -29,6 +37,10 @@ func (suite *CleanupHandlerTestSuite) SetupTest() {
 		plc.DeckA: driverA,
 		plc.DeckB: driverB,
 	}
+
+	testDeps = Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck, WsErrCh: wsErr, WsMsgCh: wsMsg}
+
+	initiateWebSocket()
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
@@ -64,12 +76,11 @@ func (suite *CleanupHandlerTestSuite) TestDiscardBoxCleanupFailure() {
 	//TODO: On Mock return error
 	suite.plcDeck[deck].(*plc.PLCMockStore).On("DiscardBoxCleanup").Return("Discard Box Cleanup Failure", responses.DiscardBoxMoveError)
 
-
 	recorder := makeHTTPCall(http.MethodGet,
 		"/discard-box/cleanup/{deck:[A-B]}",
 		"/discard-box/cleanup/"+deck,
 		"",
-		discardBoxCleanupHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+		discardBoxCleanupHandler(testDeps),
 	)
 
 	err := ErrObj{Err: responses.DiscardBoxMoveError.Error(), Deck: deck}
@@ -91,7 +102,7 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckSuccess() {
 		"/restore-deck/{deck:[A-B]}",
 		"/restore-deck/"+deck,
 		"",
-		restoreDeckHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+		restoreDeckHandler(testDeps),
 	)
 
 	msg := MsgObj{Msg: responses.RestoreDeckSuccess, Deck: deck}
@@ -114,7 +125,7 @@ func (suite *CleanupHandlerTestSuite) TestRestoreDeckFailure() {
 		"/restore-deck/{deck:[A-B]}",
 		"/restore-deck/"+deck,
 		"",
-		restoreDeckHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+		restoreDeckHandler(testDeps),
 	)
 
 	err := ErrObj{Err: responses.RestoreDeckError.Error(), Deck: deck}
@@ -148,4 +159,31 @@ func (suite *CleanupHandlerTestSuite) TestUVCleanupSuccess() {
 	assert.Equal(suite.T(), string(body), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func testWebSocket(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	defer c.Close()
+	for {
+		select {
+		case msg := <-testDeps.WsMsgCh:
+			logger.Infoln(msg)
+		case err := <-testDeps.WsErrCh:
+			logger.Errorln(err)
+		}
+	}
+}
+
+func initiateWebSocket() {
+
+	s := httptest.NewServer(http.HandlerFunc(testWebSocket))
+	defer s.Close()
+	// Convert http://127.0.0.1 to ws://127.0.0.
+	u := "ws" + strings.TrimPrefix(s.URL, "http")
+	ws, _, _ := websocket.DefaultDialer.Dial(u, nil)
+
+	defer ws.Close()
 }
