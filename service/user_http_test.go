@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
@@ -206,7 +205,10 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckRTPCRSuccess() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
 	//first need to login to test logout
-	deckUserLogin.Store(plc.DeckA, "test")
+	deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
+	defer func() {
+		deckUserLogin.Store(plc.DeckA, blank)
+	}()
 	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
@@ -220,6 +222,8 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckRTPCRSuccess() {
 		logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
+	output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -234,7 +238,10 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckExtractionSuccess() {
 	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
 
 	//first need to login to test logout
-	deckUserLogin.Store(plc.DeckA, "test")
+	deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
+	defer func() {
+		deckUserLogin.Store(plc.DeckA, blank)
+	}()
 	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
 	body, _ := json.Marshal(testUser)
@@ -248,6 +255,8 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckExtractionSuccess() {
 		logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
+	output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -271,15 +280,22 @@ func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckSuccess() {
 		logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
 	)
 
+	output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
-	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, errors.New("failed to fetch user auth record"))
+
+	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Maybe()
+	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError).Maybe()
 
 	//first need to login to test logout
-	deckUserLogin.Store(plc.DeckA, "test")
+	deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
+	defer func() {
+		deckUserLogin.Store(plc.DeckA, blank)
+	}()
 
 	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
 	testTokenA := "Bearer " + token
@@ -294,34 +310,32 @@ func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
 		logoutUserHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"err":"error in authenticating user"}`)
-	assert.Equal(suite.T(), http.StatusForbidden, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	output, _ := json.Marshal(ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
-func (suite *UserHandlerTestSuite) TestLogoutWithDeckDeleteFailure() {
-	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
-	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError)
+func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckFailure() {
 
-	//first need to login to test logout
-	deckUserLogin.Store(plc.DeckA, "test")
+	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Maybe()
+	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError).Maybe()
 
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
-	testTokenA := "Bearer " + token
+	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, blank, Application, map[string]string{})
+	testToken := "Bearer " + token
 	body, _ := json.Marshal(testUser)
 
 	recorder := makeHTTPCallWithHeader(
 		http.MethodDelete,
 		"/logout/{deck:[A-B]?}",
-		"/logout/"+plc.DeckA,
+		"/logout/",
 		string(body),
-		map[string]string{"Authorization": testTokenA},
+		map[string]string{"Authorization": testToken},
 		logoutUserHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`{"err":"%s"}`, responses.UserAuthDataDeleteError.Error())
+	output, _ := json.Marshal(ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
 	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
