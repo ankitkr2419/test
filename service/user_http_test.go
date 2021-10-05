@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"mylab/cpagent/config"
@@ -403,14 +404,18 @@ func (suite *UserHandlerTestSuite) TestUpdateUserFailure() {
 }
 
 // Delete User Test cases
-
+// TODO: Fix this
 func (suite *UserHandlerTestSuite) TestDeleteUserSuccess() {
 	testUserObj := testUserObj
-	suite.dbMock.On("DeleteUser", mock.Anything, testUserObj.Username).Return(nil)
 
-	recorder := makeHTTPCall(http.MethodDelete,
-		"users/{username}",
-		"users/"+testUserObj.Username,
+	ctx := context.WithValue(context.Background(), db.ContextKeyUsername, "main")
+
+	suite.dbMock.On("DeleteUser", ctx, testUserObj.Username).Return(nil)
+
+	recorder := makeHTTPCallWithContext(ctx,
+		http.MethodDelete,
+		"/users/{username}",
+		"/users/"+testUserObj.Username,
 		"",
 		deleteUserHandler(Dependencies{Store: suite.dbMock}),
 	)
