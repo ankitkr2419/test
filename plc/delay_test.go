@@ -49,11 +49,11 @@ var testProcesses = []db.Process{
 
 func (suite *DelayTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
-	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{testTTObj}, nil)
-	suite.dbMock.On("ListCartridges", mock.Anything).Return(testCartridgeObj, nil)
-	suite.dbMock.On("ListCartridgeWells").Return(testCartridgeWellsObj, nil)
-	suite.dbMock.On("ListMotors", mock.Anything).Return(testMotorObj, nil)
-	suite.dbMock.On("ListConsDistances").Return(testConsDistanceObj, nil)
+	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{TestTTObj}, nil)
+	suite.dbMock.On("ListCartridges", mock.Anything).Return(TestCartridgeObj, nil)
+	suite.dbMock.On("ListCartridgeWells").Return(TestCartridgeWellsObj, nil)
+	suite.dbMock.On("ListMotors", mock.Anything).Return(TestMotorObj, nil)
+	suite.dbMock.On("ListConsDistances").Return(TestConsDistanceObj, nil)
 
 	LoadAllPLCFuncs(suite.dbMock)
 	suite.driverMock = &MockCompact32Driver{}

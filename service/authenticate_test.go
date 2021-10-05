@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"mylab/cpagent/config"
 	"mylab/cpagent/db"
@@ -40,7 +41,7 @@ func (suite *AuthenticateTestSuite) TestEncodeTokenWithDeck() {
 }
 
 func (suite *AuthenticateTestSuite) TestEncodeTokenWithoutDeck() {
-	token, _ := EncodeToken("test", testUUID, "tester",  plc.DeckA, Application, map[string]string{})
+	token, _ := EncodeToken("test", testUUID, "tester", plc.DeckA, Application, map[string]string{})
 	tokenType := reflect.TypeOf(token).Kind()
 	assert.Equal(suite.T(), tokenType, reflect.String)
 
@@ -48,7 +49,7 @@ func (suite *AuthenticateTestSuite) TestEncodeTokenWithoutDeck() {
 
 func (suite *AuthenticateTestSuite) TestDecodeTokenWithDeck() {
 
-	token, _ := EncodeToken("test", testUUID, "tester", plc.DeckA,  Application, map[string]string{})
+	token, _ := EncodeToken("test", testUUID, "tester", plc.DeckA, Application, map[string]string{})
 	flag, _ := decodeToken(token)
 
 	deck, ok := flag["deck"].(string)
@@ -80,7 +81,7 @@ func (suite *AuthenticateTestSuite) TestAuthenticateSuccess() {
 		"/test/authenticate",
 		"",
 		map[string]string{"Authorization": "Bearer " + token},
-		authenticate(testHandlerFunc(deps), deps, Application ),
+		authenticate(testHandlerFunc(deps), deps, Application),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 	suite.dbMock.AssertExpectations(suite.T())
@@ -88,6 +89,7 @@ func (suite *AuthenticateTestSuite) TestAuthenticateSuccess() {
 }
 
 func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleSuccess() {
+	Application = Combined
 	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
 	deps := Dependencies{Store: suite.dbMock}
 	token, _ := EncodeToken("test", testUUID, "admin", plc.DeckA, Combined, map[string]string{})
@@ -97,7 +99,7 @@ func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleSuccess() {
 		"/test/authenticate",
 		"",
 		map[string]string{"Authorization": "Bearer " + token},
-		authenticate(testHandlerFunc(deps), deps, admin),
+		authenticate(testHandlerFunc(deps), deps, Combined, admin),
 	)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 
@@ -135,9 +137,10 @@ func (suite *AuthenticateTestSuite) TestAuthenticateWithRoleFailed() {
 		map[string]string{"Authorization": "Bearer " + token},
 		authenticate(testHandlerFunc(deps), deps, admin),
 	)
-
+	output := ErrObj{Err: responses.UserTokenAppNotExistError.Error()}
+	outputBytes, _ := json.Marshal(output)
 	assert.Equal(suite.T(), http.StatusUnauthorized, recorder.Code)
-	assert.Equal(suite.T(), responses.UserTokenAppNotExistError.Error(), recorder.Body.String())
+	assert.Equal(suite.T(), string(outputBytes), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 
 }
