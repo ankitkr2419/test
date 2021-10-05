@@ -17,6 +17,7 @@ import {
 import { Center, Text, ButtonIcon } from "shared-components";
 
 import { OperatorLoginForm } from "../../OperatorLoginModal/OperatorLoginForm";
+import { toast } from "react-toastify";
 
 const CreateUserModal = (props) => {
   const { isOpen, toggleModal, roleOptions, handleCreateUser } = props;
@@ -28,6 +29,8 @@ const CreateUserModal = (props) => {
   const onCreateUser = () => {
     if (username !== "" && password !== "" && role?.value !== null) {
       handleCreateUser({ username, password, role: role.value });
+    } else {
+      toast.error("Please enter all fields");
     }
   };
 

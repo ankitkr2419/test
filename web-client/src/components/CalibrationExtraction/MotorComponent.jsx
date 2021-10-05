@@ -127,6 +127,7 @@ const MotorComponent = (props) => {
                   type="number"
                   name="distance"
                   id="distance"
+                  step="0.1"
                   placeholder={`${MIN_MOTOR_DISTANCE} - ${MAX_MOTOR_DISTANCE}`}
                   value={distance.value}
                   onChange={(event) =>
