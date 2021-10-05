@@ -109,10 +109,14 @@ func makeHTTPCallWithHeader(method, path, requestURL, body string, headers map[s
 	return
 }
 
-func makeHTTPCallWithContext(ctx context.Context, method, path, requestURL, body string, handlerFunc http.HandlerFunc) (recorder *httptest.ResponseRecorder) {
+func makeHTTPCallWithContext(ctxMap map[string]interface{}, method, path, requestURL, body string, handlerFunc http.HandlerFunc) (recorder *httptest.ResponseRecorder) {
 	// create a http request using the given parameters
 	req, _ := http.NewRequest(method, requestURL, strings.NewReader(body))
 
+	ctx := req.Context()
+	for key, value := range ctxMap {
+		ctx = context.WithValue(ctx, key, value)
+	}
 	// test recorder created for capturing api responses
 	recorder = httptest.NewRecorder()
 
