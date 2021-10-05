@@ -339,3 +339,65 @@ func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckFailure() {
 	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
+
+// Update User Test Cases
+func (suite *UserHandlerTestSuite) TestUpdateUserSuccess() {
+
+	newUserObj := testUserObj
+	newUserObj.Username = "new"
+
+	suite.dbMock.On("UpdateUser", mock.Anything, newUserObj, testUserObj.Username).Return(nil)
+
+	// Password without MD5
+	newUserObj.Password = testUser.Password
+
+	body, _ := json.Marshal(newUserObj)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/users/{old_username}",
+		"/users/"+testUserObj.Username,
+		string(body),
+		updateUserHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output, _ := json.Marshal(MsgObj{Msg: responses.UserUpdateSuccess})
+	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *UserHandlerTestSuite) TestUpdateUserDecodeError() {
+	newUserObj := ""
+
+	body, _ := json.Marshal(newUserObj)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/users/{old_username}",
+		"/users/a",
+		string(body),
+		updateUserHandler(Dependencies{Store: suite.dbMock}),
+	)
+	output, _ := json.Marshal(ErrObj{Err: responses.UserDecodeError.Error()})
+	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+}
+
+func (suite *UserHandlerTestSuite) TestUpdateUserFailure() {
+	newUserObj := testUserObj
+	newUserObj.Username = "new"
+
+	suite.dbMock.On("UpdateUser", mock.Anything, newUserObj, testUserObj.Username).Return(responses.UserUpdateError)
+
+	// Password without MD5
+	newUserObj.Password = testUser.Password
+	body, _ := json.Marshal(newUserObj)
+	recorder := makeHTTPCall(http.MethodPut,
+		"/users/{old_username}",
+		"/users/"+testUserObj.Username,
+		string(body),
+		updateUserHandler(Dependencies{Store: suite.dbMock}),
+	)
+
+	output, _ := json.Marshal(ErrObj{Err: responses.UserUpdateError.Error()})
+	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
+	suite.dbMock.AssertExpectations(suite.T())
+}
