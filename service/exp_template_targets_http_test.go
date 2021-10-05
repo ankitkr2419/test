@@ -1,9 +1,8 @@
 package service
 
-/*
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
@@ -28,34 +27,47 @@ func TestExpTempTargetTestSuite(t *testing.T) {
 	suite.Run(t, new(ExpTempTargetHandlerTestSuite))
 }
 
+var testExpID = uuid.New()
+var testTemplateID = uuid.New()
+var testTargetID = uuid.New()
+var testExpTemplateTargetobj = db.ExpTemplateTarget{
+	ExperimentID: testExpID,
+	TemplateID:   testTemplateID,
+	TargetID:     testTargetID,
+	Threshold:    10.5,
+}
+
+var testTargTempObj = []db.ExpTempTargeTDye{
+	db.ExpTempTargeTDye{
+		DyeName:           "test",
+		ExpTemplateTarget: testExpTemplateTargetobj,
+	},
+}
+
 func (suite *ExpTempTargetHandlerTestSuite) TestListExpTempTargetSuccess() {
-	expID := uuid.New()
-	targetUUID := uuid.New()
-	tempUUID := uuid.New()
+
 	suite.dbMock.On("ListExpTemplateTargets", mock.Anything, mock.Anything).Return(
-		[]db.ExpTemplateTarget{
-			db.ExpTemplateTarget{ExperimentID: expID, TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
-		},
+		testTargTempObj,
 		nil,
 	)
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/experiments/{experiment_id}/targets",
-		"/experiments/"+expID.String()+"/targets",
+		"/experiments/"+testExpID.String()+"/targets",
 		"",
 		listExpTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"experiment_id":"%s","template_id":"%s","target_id":"%s","threshold":10.5,"target_name":""}]`, expID, tempUUID, targetUUID)
+	output, _ := json.Marshal(testTargTempObj)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *ExpTempTargetHandlerTestSuite) TestListExpTemplatesFail() {
 	expID := uuid.New()
 	suite.dbMock.On("ListExpTemplateTargets", mock.Anything, mock.Anything).Return(
-		[]db.ExpTemplateTarget{},
+		testTargTempObj,
 		errors.New("error fetching experiment template target"),
 	)
 
@@ -73,29 +85,24 @@ func (suite *ExpTempTargetHandlerTestSuite) TestListExpTemplatesFail() {
 }
 
 func (suite *ExpTempTargetHandlerTestSuite) TestUpsertExpTempTargetSuccess() {
-	expID := uuid.New()
-	targetUUID := uuid.New()
-	tempUUID := uuid.New()
+
 	suite.dbMock.On("UpsertExpTemplateTarget", mock.Anything, mock.Anything, mock.Anything).Return(
-		[]db.ExpTemplateTarget{
-			db.ExpTemplateTarget{ExperimentID: expID, TemplateID: tempUUID, TargetID: targetUUID, Threshold: 10.5},
-		},
+		testTargTempObj,
 		nil,
 	)
 
-	body := fmt.Sprintf(`[{"experiment_id":"%s","template_id":"%s","target_id":"%s","threshold":10.5}]`, expID, tempUUID, targetUUID)
+	body, _ := json.Marshal([]db.ExpTemplateTarget{testExpTemplateTargetobj})
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/experiments/{experiment_id}/targets",
-		"/experiments/"+expID.String()+"/targets",
-		body,
+		"/experiments/"+testExpID.String()+"/targets",
+		string(body),
 		updateExpTempTargetsHandler(Dependencies{Store: suite.dbMock}),
 	)
 
-	output := fmt.Sprintf(`[{"experiment_id":"%s","template_id":"%s","target_id":"%s","threshold":10.5,"target_name":""}]`, expID, tempUUID, targetUUID)
+	output, _ := json.Marshal(testTargTempObj)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
-*/
