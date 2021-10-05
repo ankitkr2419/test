@@ -20,6 +20,13 @@ Extraction Software Releases
  - Show units where ever required
  - Show calibration option only in recipe list page and not while running any experiment 
 
+3. Version 1.4.180 4th October 2021
+ - Bugfix: Homing called after Shaker/Heater Abort(UI fix)
+ - Bugfix: Aspire Dispense Well settings validations corrected
+ - Run procedure updated to make generated data global
+ - Calibration mode allows engineer to take syringe module to indeck
+ - Magnet Homing Scan time reduced
+
 
 RTPCR Software Releases
 
@@ -32,3 +39,9 @@ RTPCR Software Releases
 2. Version 1.4.178 29th September 2021
  - Remove searchable dropdown's where not required.
  - Analysis data Validation
+
+3. Version 1.4.180 4th October 2021
+ - Bugfix: PID Tuning Aborting late (HoldSleep time reduced from 120 to just 1 second)
+ - Bugfix: Analysis for Auto Threshold(Same record inserting multiple time giving ON CONFLICT UPDATE error)
+ - Run procedure updated to make generated data global
+ - Dropdown instead of type support added for remaining fields

@@ -86,7 +86,7 @@ func (d *Compact32Deck) detach() (response string, err error) {
 
 	pulses = uint16(math.Round(float64(Motors[deckMagnetUpDown]["steps"]) * distanceToTravel))
 
-	// set up motor for attach step 2 Downward Motion
+	// set up motor for detach step 2 Downward Motion
 	response, err = d.setupMotor(Motors[deckMagnetUpDown]["fast"], pulses, Motors[deckMagnetUpDown]["ramp"], direction, deckMagnetUpDown.Number)
 	if err != nil {
 		return
@@ -107,7 +107,7 @@ func (d *Compact32Deck) detach() (response string, err error) {
 
 	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
-	// set up motor for attach step 2 Downward Motion
+	// set up motor for detach step 2 Downward Motion
 	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		return
