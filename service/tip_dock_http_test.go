@@ -33,7 +33,7 @@ func TestTipDockTestSuite(t *testing.T) {
 var testTipDockRecord = db.TipDock{
 	ID:        testUUID,
 	Type:      "deck",
-	Position:  1,
+	Position:  7,
 	Height:    1.3,
 	ProcessID: testProcessUUID,
 }
@@ -41,6 +41,7 @@ var testTipDockRecord = db.TipDock{
 func (suite *TipDockHandlerTestSuite) TestCreateTipDockSuccess() {
 
 	suite.dbMock.On("CreateTipDocking", mock.Anything, mock.Anything, recipeUUID).Return(testTipDockRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testTipDockRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -59,6 +60,7 @@ func (suite *TipDockHandlerTestSuite) TestCreateTipDockSuccess() {
 func (suite *TipDockHandlerTestSuite) TestCreateTipDockFailure() {
 
 	suite.dbMock.On("CreateTipDocking", mock.Anything, mock.Anything, recipeUUID).Return(testTipDockRecord, responses.TipDockingCreateError)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testTipDockRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -117,6 +119,8 @@ func (suite *TipDockHandlerTestSuite) TestShowTipDockFailure() {
 func (suite *TipDockHandlerTestSuite) TestUpdateTipDockSuccess() {
 
 	suite.dbMock.On("UpdateTipDock", mock.Anything, testTipDockRecord).Return(nil)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testTipDockRecord)
 
@@ -138,7 +142,8 @@ func (suite *TipDockHandlerTestSuite) TestUpdateTipDockSuccess() {
 func (suite *TipDockHandlerTestSuite) TestUpdateTipDockFailure() {
 
 	suite.dbMock.On("UpdateTipDock", mock.Anything, testTipDockRecord).Return(responses.TipDockingUpdateError)
-
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 	body, _ := json.Marshal(testTipDockRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
