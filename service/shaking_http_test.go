@@ -33,7 +33,7 @@ var testShakingRecord = db.Shaker{
 	ID:          testUUID,
 	Temperature: 80,
 	FollowTemp:  true,
-	RPM1:        6500,
+	RPM1:        800,
 	Time1:       80,
 	ProcessID:   testProcessUUID,
 }
@@ -152,6 +152,7 @@ func (suite *ShakingHandlerTestSuite) TestShowShakingFailure() {
 func (suite *ShakingHandlerTestSuite) TestUpdateShakingSuccess() {
 
 	suite.dbMock.On("UpdateShaking", mock.Anything, mock.Anything).Return(nil)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessADRecord, nil)
 
 	body, _ := json.Marshal(testShakingRecord)
 
@@ -192,6 +193,7 @@ func (suite *ShakingHandlerTestSuite) TestUpdateShakingInvalidUUID() {
 func (suite *ShakingHandlerTestSuite) TestUpdateShakingFailure() {
 
 	suite.dbMock.On("UpdateShaking", mock.Anything, mock.Anything).Return(responses.ShakingUpdateError)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessADRecord, nil)
 
 	body, _ := json.Marshal(testShakingRecord)
 

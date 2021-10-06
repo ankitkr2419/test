@@ -52,7 +52,7 @@ const sequenceNumber int64 = 1
 const invalidBody = "invalid-e-body"
 
 var testProcessRecord = db.Process{
-	ID:             testUUID,
+	ID:             testProcessUUID,
 	Name:           testName,
 	Type:           testType,
 	SequenceNumber: sequenceNumber,
@@ -223,7 +223,7 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessSuccess() {
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/processes/{id}",
-		"/processes/"+testUUID.String(),
+		"/processes/"+testProcessUUID.String(),
 		string(body),
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -257,13 +257,13 @@ func (suite *ProcessHandlerTestSuite) TestUpdateProcessUUIDParseError() {
 
 func (suite *ProcessHandlerTestSuite) TestUpdateProcessFailure() {
 
-	suite.dbMock.On("UpdateProcess", mock.Anything, mock.Anything).Return(responses.ProcessUpdateError)
+	suite.dbMock.On("UpdateProcess", mock.Anything, testProcessRecord).Return(responses.ProcessUpdateError)
 
 	body, _ := json.Marshal(testProcessRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
 		"/processes/{id}",
-		"/processes/"+testUUID.String(),
+		"/processes/"+testProcessUUID.String(),
 		string(body),
 		updateProcessHandler(Dependencies{Store: suite.dbMock}),
 	)

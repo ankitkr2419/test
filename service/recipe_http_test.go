@@ -170,7 +170,7 @@ func (suite *RecipeHandlerTestSuite) TestShowRecipeFailure() {
 
 func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
 
-	suite.dbMock.On("UpdateRecipe", mock.Anything, mock.Anything).Return(testRecipeRecord, nil)
+	suite.dbMock.On("UpdateRecipe", mock.Anything, mock.Anything).Return(nil)
 
 	body, _ := json.Marshal(testRecipeRecord)
 
@@ -191,7 +191,7 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeSuccess() {
 
 func (suite *RecipeHandlerTestSuite) TestUpdateRecipeFailure() {
 
-	suite.dbMock.On("UpdateRecipe", mock.Anything, mock.Anything).Return(db.Recipe{}, fmt.Errorf("Error creating recipe"))
+	suite.dbMock.On("UpdateRecipe", mock.Anything, mock.Anything).Return(fmt.Errorf("Error creating recipe"))
 
 	body, _ := json.Marshal(testRecipeRecord)
 
@@ -210,9 +210,7 @@ func (suite *RecipeHandlerTestSuite) TestUpdateRecipeFailure() {
 
 func (suite *RecipeHandlerTestSuite) TestDeleteRecipeSuccess() {
 
-	suite.dbMock.On("DeleteRecipe", mock.Anything, mock.Anything).Return(
-		recipeUUID,
-		nil)
+	suite.dbMock.On("DeleteRecipe", mock.Anything, mock.Anything).Return(nil)
 
 	recorder := makeHTTPCall(http.MethodDelete,
 		"/recipes/{id}",
@@ -228,7 +226,7 @@ func (suite *RecipeHandlerTestSuite) TestDeleteRecipeSuccess() {
 
 func (suite *RecipeHandlerTestSuite) TestDeleteRecipeFailure() {
 
-	suite.dbMock.On("DeleteRecipe", mock.Anything, mock.Anything).Return("", fmt.Errorf("Error deleting recipe"))
+	suite.dbMock.On("DeleteRecipe", mock.Anything, mock.Anything).Return(fmt.Errorf("Error deleting recipe"))
 
 	recorder := makeHTTPCall(http.MethodDelete,
 		"/recipes/{id}",

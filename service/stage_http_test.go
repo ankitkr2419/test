@@ -1,13 +1,12 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -29,31 +28,35 @@ func TestStageTestSuite(t *testing.T) {
 	suite.Run(t, new(StageHandlerTestSuite))
 }
 
+var testStageObj = db.Stage{
+	ID:          testUUID,
+	Type:        "Repeat",
+	RepeatCount: 3,
+	TemplateID:  testTemplateID,
+	StepCount:   0}
+
 func (suite *StageHandlerTestSuite) TestListStagesSuccess() {
-	testUUID := uuid.New()
-	tempUUID := uuid.New()
+
 	suite.dbMock.On("ListStages", mock.Anything, mock.Anything).Return(
-		[]db.Stage{
-			db.Stage{ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0},
-		},
+		[]db.Stage{testStageObj},
 		nil,
 	)
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/templates/{template_id}/stages",
-		"/templates/"+tempUUID.String()+"/stages",
+		"/templates/"+testTemplateID.String()+"/stages",
 		"",
 		listStagesHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","type":"Repeat","repeat_count":3,"template_id":"%s","step_count":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}]`, testUUID, tempUUID)
+	output, _ := json.Marshal([]db.Stage{testStageObj})
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }
 
 func (suite *StageHandlerTestSuite) TestListStagesFail() {
-	tempUUID := uuid.New()
+
 	suite.dbMock.On("ListStages", mock.Anything, mock.Anything).Return(
 		[]db.Stage{},
 		errors.New("error fetching templates"),
@@ -62,7 +65,7 @@ func (suite *StageHandlerTestSuite) TestListStagesFail() {
 	recorder := makeHTTPCall(
 		http.MethodGet,
 		"/templates/{template_id}/stages",
-		"/templates/"+tempUUID.String()+"/stages",
+		"/templates/"+testTemplateID.String()+"/stages",
 		"",
 		listStagesHandler(Dependencies{Store: suite.dbMock}),
 	)
@@ -73,11 +76,8 @@ func (suite *StageHandlerTestSuite) TestListStagesFail() {
 }
 
 func (suite *StageHandlerTestSuite) TestShowStageSuccess() {
-	testUUID := uuid.New()
-	tempUUID := uuid.New()
-	suite.dbMock.On("ShowStage", mock.Anything, mock.Anything).Return(db.Stage{
-		ID: testUUID, Type: "Repeat", RepeatCount: 3, TemplateID: tempUUID, StepCount: 0,
-	}, nil)
+
+	suite.dbMock.On("ShowStage", mock.Anything, mock.Anything).Return(testStageObj, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
 		"/stages/{id}",
@@ -85,9 +85,9 @@ func (suite *StageHandlerTestSuite) TestShowStageSuccess() {
 		"",
 		showStageHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","type":"Repeat","repeat_count":3,"template_id":"%s","step_count":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, tempUUID)
+	output, _ := json.Marshal(testStageObj)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }

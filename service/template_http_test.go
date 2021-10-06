@@ -1,8 +1,8 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
 	"mylab/cpagent/db"
 	"net/http"
 	"testing"
@@ -23,6 +23,8 @@ type TemplateHandlerTestSuite struct {
 
 func (suite *TemplateHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+
 }
 
 func TestTemplateTestSuite(t *testing.T) {
@@ -71,30 +73,46 @@ func (suite *TemplateHandlerTestSuite) TestListTemplatesFail() {
 }
 
 func (suite *TemplateHandlerTestSuite) TestCreateTemplateSuccess() {
-	testUUID := uuid.New()
+
 	suite.dbMock.On("CreateTemplate", mock.Anything, mock.Anything).Return(db.Template{
 		ID:          testUUID,
 		Name:        "test template",
 		Description: "blah blah",
 		Publish:     false,
+		LidTemp:     100,
+		Volume:      40,
 	}, nil)
 
-	stageUUID := uuid.New()
-	suite.dbMock.On("CreateStages", mock.Anything, mock.Anything).Return([]db.Stage{
-		{ID: stageUUID, Type: "cycle", RepeatCount: 3, TemplateID: testUUID, StepCount: 0},
-	}, nil)
+	suite.dbMock.On("CreateStages", mock.Anything, mock.Anything).Return([]db.Stage{testStageObj}, nil)
 
-	body := `{"name":"test template","description":"blah blah"}`
+	body, _ := json.Marshal(db.Template{
+		ID:          testUUID,
+		Name:        "test template",
+		Description: "blah blah",
+		Publish:     false,
+		LidTemp:     100,
+		Volume:      40,
+	})
 
 	recorder := makeHTTPCall(http.MethodPost,
 		"/templates",
 		"/templates",
-		body,
+		string(body),
 		createTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"test template","description":"blah blah","publish":false,"stages":[{"id":"%s","type":"cycle","repeat_count":3,"template_id":"%s","step_count":0,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}],"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID, stageUUID, testUUID)
+	testTemplate := db.Template{
+		ID:          testUUID,
+		Name:        "test template",
+		Description: "blah blah",
+		Publish:     false,
+		LidTemp:     100,
+		Volume:      40,
+		Stages:      []db.Stage{testStageObj},
+	}
+
+	output, _ := json.Marshal(testTemplate)
 	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -141,12 +159,14 @@ func (suite *TemplateHandlerTestSuite) TestCreateTemplateSuccess() {
 // }
 
 func (suite *TemplateHandlerTestSuite) TestShowTemplateSuccess() {
-	testUUID := uuid.New()
+
 	suite.dbMock.On("ShowTemplate", mock.Anything, mock.Anything).Return(db.Template{
 		ID:          testUUID,
 		Name:        "test template",
 		Description: "blah blah",
 		Publish:     false,
+		LidTemp:     100,
+		Volume:      40,
 	}, nil)
 
 	recorder := makeHTTPCall(http.MethodGet,
@@ -155,9 +175,19 @@ func (suite *TemplateHandlerTestSuite) TestShowTemplateSuccess() {
 		"",
 		showTemplateHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`{"id":"%s","name":"test template","description":"blah blah","publish":false,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`, testUUID)
+	testTemplate := db.Template{
+		ID:          testUUID,
+		Name:        "test template",
+		Description: "blah blah",
+		Publish:     false,
+		LidTemp:     100,
+		Volume:      40,
+	}
+
+	output, _ := json.Marshal(testTemplate)
+
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 
 	suite.dbMock.AssertExpectations(suite.T())
 }
@@ -178,10 +208,10 @@ func (suite *TemplateHandlerTestSuite) TestPublishTemplateSuccess() {
 
 	step := db.Step{TargetTemperature: 25.5, RampRate: 5.5, HoldTime: 120, DataCapture: true, StageID: testUUID}
 	ss1 := db.StageStep{
-		Stage: stage1,Step: step,
+		Stage: stage1, Step: step,
 	}
 	ss2 := db.StageStep{
-		Stage: stage2,Step: step,
+		Stage: stage2, Step: step,
 	}
 	suite.dbMock.On("ListStageSteps", mock.Anything, mock.Anything).Return([]db.StageStep{
 		ss1, ss2,

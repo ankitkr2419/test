@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
@@ -23,6 +24,13 @@ type PiercingHandlerTestSuite struct {
 func (suite *PiercingHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{plc.TestTTObj}, nil)
+	suite.dbMock.On("ListCartridges", mock.Anything).Return(plc.TestCartridgeObj, nil)
+	suite.dbMock.On("ListCartridgeWells").Return(plc.TestCartridgeWellsObj, nil)
+	suite.dbMock.On("ListMotors", mock.Anything).Return(plc.TestMotorObj, nil)
+	suite.dbMock.On("ListConsDistances").Return(plc.TestConsDistanceObj, nil)
+	plc.LoadAllPLCFuncsExceptUtils(suite.dbMock)
 
 }
 
@@ -33,13 +41,15 @@ func TestPiercingTestSuite(t *testing.T) {
 var testPiercingRecord = db.Piercing{
 	ID:             testUUID,
 	Type:           db.Cartridge1,
-	CartridgeWells: []int64{1, 2},
+	CartridgeWells: []int64{4, 8},
 	ProcessID:      testProcessUUID,
+	Heights:        []int64{1, 3},
 }
 
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
 
 	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything, recipeUUID).Return(testPiercingRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testPiercingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -58,6 +68,7 @@ func (suite *PiercingHandlerTestSuite) TestCreatePiercingSuccess() {
 func (suite *PiercingHandlerTestSuite) TestCreatePiercingFailure() {
 
 	suite.dbMock.On("CreatePiercing", mock.Anything, mock.Anything, recipeUUID).Return(db.Piercing{}, responses.PiercingCreateError)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testPiercingRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -115,7 +126,9 @@ func (suite *PiercingHandlerTestSuite) TestShowPiercingFailure() {
 
 func (suite *PiercingHandlerTestSuite) TestUpdatePiercingSuccess() {
 
-	suite.dbMock.On("UpdatePiercing", mock.Anything, testPiercingRecord).Return(testPiercingRecord, nil)
+	suite.dbMock.On("UpdatePiercing", mock.Anything, testPiercingRecord).Return(nil)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testPiercingRecord)
 
@@ -136,7 +149,9 @@ func (suite *PiercingHandlerTestSuite) TestUpdatePiercingSuccess() {
 
 func (suite *PiercingHandlerTestSuite) TestUpdatePiercingFailure() {
 
-	suite.dbMock.On("UpdatePiercing", mock.Anything, testPiercingRecord).Return(db.Piercing{}, responses.PiercingUpdateError)
+	suite.dbMock.On("UpdatePiercing", mock.Anything, testPiercingRecord).Return(responses.PiercingUpdateError)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testPiercingRecord)
 

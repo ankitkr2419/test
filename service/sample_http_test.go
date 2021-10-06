@@ -1,11 +1,10 @@
 package service
 
 import (
-	"fmt"
+	"encoding/json"
 	"mylab/cpagent/db"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -23,14 +22,12 @@ func (suite *SampleHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
 }
 
+var testSampleObj = db.Sample{ID: testUUID, Name: "test sample"}
+
 func (suite *SampleHandlerTestSuite) TestFindSamplesSuccess() {
-	testUUID := uuid.New()
+
 	suite.dbMock.On("FindSamples", mock.Anything, mock.Anything).Return(
-		[]db.Sample{
-			db.Sample{ID: testUUID, Name: "test sample"},
-		},
-		nil,
-	)
+		[]db.Sample{testSampleObj}, nil)
 
 	recorder := makeHTTPCall(
 		http.MethodGet,
@@ -39,8 +36,8 @@ func (suite *SampleHandlerTestSuite) TestFindSamplesSuccess() {
 		"",
 		findSamplesHandler(Dependencies{Store: suite.dbMock}),
 	)
-	output := fmt.Sprintf(`[{"id":"%s","name":"test sample"}]`, testUUID)
+	output, _ := json.Marshal([]db.Sample{testSampleObj})
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), output, recorder.Body.String())
+	assert.Equal(suite.T(), string(output), recorder.Body.String())
 	suite.dbMock.AssertExpectations(suite.T())
 }

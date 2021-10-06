@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -113,12 +114,21 @@ func (s *pgStore) ShowUser(ctx context.Context, username string) (user User, err
 }
 
 func (s *pgStore) DeleteUser(ctx context.Context, username string) (err error) {
-	_, err = s.db.Exec(
+	var result sql.Result
+	result, err = s.db.Exec(
 		deleteUserQuery,
 		username,
 	)
+
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error deleting User")
+		return
+	}
+
+	affectedRows, _ := result.RowsAffected()
+	if affectedRows == 0 {
+		err = responses.ZeroRowsAffectedError
+		logger.Errorln(err)
 		return
 	}
 

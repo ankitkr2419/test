@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"testing"
@@ -23,6 +24,14 @@ type TipOperationHandlerTestSuite struct {
 func (suite *TipOperationHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	suite.dbMock.On("ListTipsTubes", mock.Anything).Return([]db.TipsTubes{plc.TestTTObj}, nil)
+	suite.dbMock.On("ListCartridges", mock.Anything).Return(plc.TestCartridgeObj, nil)
+	suite.dbMock.On("ListCartridgeWells").Return(plc.TestCartridgeWellsObj, nil)
+	suite.dbMock.On("ListMotors", mock.Anything).Return(plc.TestMotorObj, nil)
+	suite.dbMock.On("ListConsDistances").Return(plc.TestConsDistanceObj, nil)
+
+	plc.LoadAllPLCFuncsExceptUtils(suite.dbMock)
 
 }
 
@@ -33,13 +42,14 @@ func TestTipOperationTestSuite(t *testing.T) {
 var testTipOperationRecord = db.TipOperation{
 	ID:        testUUID,
 	Type:      "pickup",
-	Position:  1,
+	Position:  3,
 	ProcessID: testProcessUUID,
 }
 
 func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationSuccess() {
 
 	suite.dbMock.On("CreateTipOperation", mock.Anything, mock.Anything, recipeUUID).Return(testTipOperationRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testTipOperationRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -58,6 +68,7 @@ func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationSuccess() {
 func (suite *TipOperationHandlerTestSuite) TestCreateTipOperationFailure() {
 
 	suite.dbMock.On("CreateTipOperation", mock.Anything, mock.Anything, recipeUUID).Return(testTipOperationRecord, responses.TipOperationCreateError)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testTipOperationRecord)
 	recorder := makeHTTPCall(http.MethodPost,
@@ -116,6 +127,8 @@ func (suite *TipOperationHandlerTestSuite) TestShowTipOperationFailure() {
 func (suite *TipOperationHandlerTestSuite) TestUpdateTipOperationSuccess() {
 
 	suite.dbMock.On("UpdateTipOperation", mock.Anything, testTipOperationRecord).Return(nil)
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 
 	body, _ := json.Marshal(testTipOperationRecord)
 
@@ -137,7 +150,8 @@ func (suite *TipOperationHandlerTestSuite) TestUpdateTipOperationSuccess() {
 func (suite *TipOperationHandlerTestSuite) TestUpdateTipOperationFailure() {
 
 	suite.dbMock.On("UpdateTipOperation", mock.Anything, testTipOperationRecord).Return(responses.TipOperationUpdateError)
-
+	suite.dbMock.On("ShowProcess", mock.Anything, testProcessUUID).Return(testProcessRecord, nil)
+	suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil)
 	body, _ := json.Marshal(testTipOperationRecord)
 
 	recorder := makeHTTPCall(http.MethodPut,
