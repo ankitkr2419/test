@@ -278,6 +278,10 @@ func deleteUserHandler(deps Dependencies) http.HandlerFunc {
 		err := deps.Store.DeleteUser(req.Context(), username)
 		if err != nil {
 			logger.WithField("err", err.Error())
+			if err == responses.ZeroRowsAffectedError {
+				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserNotFoundError.Error()})
+				return
+			}
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.UserDeleteError.Error()})
 			return
 		}

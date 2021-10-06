@@ -73,4 +73,6 @@ var (
 	CalculateResultError = fmt.Errorf("error failed to calculate the optical result")
 
 	CartridgeWellsHeightsMismatchError = fmt.Errorf("error cartridge wells and piercing heights number not matching")
+
+	ZeroRowsAffectedError = fmt.Errorf("error zero rows were affected")
 )

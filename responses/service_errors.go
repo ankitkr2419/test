@@ -118,6 +118,7 @@ var (
 	UserInvalidDeckError      = fmt.Errorf("error invalid deck")
 	UserDeleteError           = fmt.Errorf("error delete user")
 	SameUserDeleteError       = fmt.Errorf("error trying to delete same user")
+	UserNotFoundError         = fmt.Errorf("error user not found")
 
 	//user authenticate
 	UserUnauthorised              = fmt.Errorf("error user unauthorised")
