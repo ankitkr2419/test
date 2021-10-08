@@ -49,14 +49,17 @@ func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction boo
 	websocketErr := make(chan error)
 
 	defer func() {
-		if err == nil {
+		// TODO: Handle this for RTPCR as well
+		// Checking if it is Extraction
+		isExtraction := !noExtraction
+		if err == nil && isExtraction {
 			// NOTE: monitorForPLCTimeout uses the same exit channel that is why it is to be here
 			go monitorForPLCTimeout(&deps, exit)
-			if !noExtraction {
-				// sending complete deps to Heater cause a change in deps has to be reflected consistently
-				go SendHeaterDataToEng(deps)
-				go monitorFlapSensor(&deps)
-			}
+			// sending complete deps to Heater cause a change in deps has to be reflected consistently
+			go SendHeaterDataToEng(deps)
+			go monitorFlapSensor(&deps)
+		} else if err != nil {
+			logger.Warnln("Error while fetching Dependencies: ", err)
 		}
 	}()
 
