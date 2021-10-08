@@ -28,7 +28,7 @@ variables: category, cartridgeType string,
   6. store the destination_well position into destinationPosition variable; goto 9
   7. store the source_well position into sourcePosition variable
   8. store the shaker position into destinationPosition variable
-  9. setup the motor of syringe module to go up atleast 30mm above deck(not required)
+  9. setup the motor of syringe module to go up atleast 30mm above deck(NOT REQUIRED)
   10. calculate the current position difference for deck;
    		if its positive then direction is 1(towards sensor) else 0(oppose sensor)
   11. move deck to match the sourcePosition with help of difference calculated
@@ -107,6 +107,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64) 
 
 	// NOTE : below position is added to sourcePosition/destinationPosition
 	// But only when they are wells
+	// NOTE : Dispense Completely only when it is Position 9 or 11
 	if position, ok = consDistance[string(ad.CartridgeType)+"_start"]; !ok {
 		err = fmt.Errorf(string(ad.CartridgeType) + "_start doesn't exist for consumable distances")
 		logger.Errorln(err)
@@ -179,7 +180,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64) 
 	//
 	// 9. setup the motor of syringe module to go up atleast 30mm above deck
 	//
-	// this step is not required because if the dispencing and aspiring wells are same
+	// this step is NOT REQUIRED because if the dispencing and aspiring wells are same
 	// the syringe does not need to come above the deck.
 	// and if it is aspiring from some other well then it is handled in the below code from step 10.
 
@@ -203,7 +204,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64) 
 	//
 	// 11. move deck to match the sourcePosition with help of difference calculated
 	//
-	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	_, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Deck to Aspire Source. Error: %v", err)
@@ -247,7 +248,7 @@ func (d *Compact32Deck) AspireDispense(ad db.AspireDispense, cartridgeID int64) 
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	_, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip to deck base. Error: %v", err)
@@ -263,7 +264,7 @@ skipToAspireInside:
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	_, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -275,7 +276,7 @@ skipToAspireInside:
 	//
 
 	deckAndMotor.Number = K10_Syringe_LHRH
-	// for volume :-> 25 pulses = 1 microLitres
+	// for volume e.g:-> 25 pulses = 1 microLitres
 	// NOTE: Store volumes in microLitres only
 	oneMicroLitrePulses := float64(config.GetMicroLitrePulses())
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireMixingVolume))
@@ -286,6 +287,10 @@ skipToAspireInside:
 	diffOfSpeed = aspireFastSpeed - aspireSlowSpeed
 	diffOfVol = maximumAspireVolume - minimumAspireVolume
 
+	// This is normalization in range of speed(2000, 6000) or >6000
+	// Speed is determined by the volume.
+	// Minimum Volume= 10 ul -> Speed = 2000
+	// Maximum Volume= 700 ul -> Speed = 6000
 	aspireDispenseSpeed = aspireSlowSpeed + uint16(float64(diffOfSpeed)-float64(diffOfSpeed)*(diffOfVol-(ad.AspireVolume-minimumAspireVolume))/diffOfVol)
 	mixingSpeed = aspireSlowSpeed + uint16(float64(diffOfSpeed)-float64(diffOfSpeed)*(diffOfVol-(ad.AspireMixingVolume-minimumAspireVolume))/diffOfVol)
 
@@ -338,9 +343,13 @@ skipAspireCycles:
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
 
 	//
-	//   16. 2 move syringe module above pickup_tip_up(27 mm) from the deck
+	//   16. 2 move syringe module above pickup_tip_up from the deck
 	//
 	if pickUpTip, ok = consDistance["pickup_tip_up"]; !ok {
 		err = fmt.Errorf("pickup_tip_up doesn't exist for consumable distances")
@@ -354,15 +363,20 @@ skipAspireCycles:
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
 	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
 
 	deckAndMotor.Number = K10_Syringe_LHRH
 
 	//
-	//  17. take airVolume in
+	//  17. take airVolume in slow
 	//
 	pulses = uint16(math.Round(oneMicroLitrePulses * ad.AspireAirVolume))
 	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 	if err != nil {
+		logger.Errorln(err)
 		return
 	}
 
@@ -382,7 +396,7 @@ skipAspireCycles:
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	_, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Deck to Dispense Destination. Error: %v", err)
@@ -392,7 +406,7 @@ skipAspireCycles:
 	// DISPENCING *
 	//*************
 	//
-	//   19. move syringe module down at fast till base
+	//   19. move syringe module down at fast till aboveDeck base
 	//
 
 	// We know the concrete direction here onwards
@@ -403,7 +417,7 @@ skipAspireCycles:
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
+	_, err = d.setupMotor(Motors[deckAndMotor]["fast"], pulses, Motors[deckAndMotor]["ramp"], DOWN, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip to deck base. Error: %v", err)
@@ -420,7 +434,7 @@ onlyMixing:
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
 	logger.Warnln("going to dispensing height", ad.DispenseHeight, distanceToTravel)
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
+	_, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], direction, deckAndMotor.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return "", fmt.Errorf("There was issue moving Syringe Module with tip. Error: %v", err)
@@ -440,12 +454,14 @@ onlyMixing:
 		// CHECK : should these operations be fast ?
 		response, err = d.setupMotor(mixingSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
+			logger.Errorln(err)
 			return
 		}
 
 		// Aspire
 		response, err = d.setupMotor(mixingSpeed, pulses, Motors[deckAndMotor]["ramp"], ASPIRE, deckAndMotor.Number)
 		if err != nil {
+			logger.Errorln(err)
 			return
 		}
 	}
@@ -460,6 +476,7 @@ skipDispenseCycles:
 
 		response, err = d.setupMotor(aspireDispenseSpeed, initialSensorCutSyringePulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
+			logger.Errorln(err)
 			return
 		}
 	} else {
@@ -469,6 +486,7 @@ skipDispenseCycles:
 		// TODO:  Note down Bio team's required speed
 		response, err = d.setupMotor(aspireDispenseSpeed, pulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
 		if err != nil {
+			logger.Errorln(err)
 			return
 		}
 	}
