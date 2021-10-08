@@ -20,10 +20,12 @@ const (
 )
 
 const (
-	logsPath         = "$HOME/cpagent/utils/logs"
-	tecPath          = "$HOME/cpagent/utils/tec"
-	expOutputPath    = "$HOME/cpagent/utils/output"
-	reportOutputPath = "$HOME/cpagent/utils/reports"
+	utilsPath = "$HOME/cpagent/utils/"
+
+	logsPath         = utilsPath + "logs"
+	tecPath          = utilsPath + "tec"
+	expOutputPath    = utilsPath + "output"
+	reportOutputPath = utilsPath + "reports"
 )
 
 func monitorForPLCTimeout(deps *Dependencies, exit chan error) {
