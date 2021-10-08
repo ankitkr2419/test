@@ -28,10 +28,10 @@ create_log_file () {
 
 if [[ ${apptype} == "extraction" ]]; then
     create_log_file
-    sudo ./cpagent start --plc ${dev} --no-rtpcr ${delay} > ${var}
+    sudo ./cpagent start --plc ${dev} --no-rtpcr ${delay} &> ${var}
 elif [[ ${apptype} == "rtpcr" ]]; then
     create_log_file
-    sudo ./cpagent start --plc ${dev} --tec ${dev} --no-extraction > ${var}
+    sudo ./cpagent start --plc ${dev} --tec ${dev} --no-extraction &> ${var}
 else
   echo "Please specify apptype[extraction, rtpcr]"
   exit 1
