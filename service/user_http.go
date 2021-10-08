@@ -275,9 +275,10 @@ func deleteUserHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusForbidden, ErrObj{Err: responses.SameUserDeleteError.Error()})
 			return
 		}
+
 		err := deps.Store.DeleteUser(req.Context(), username)
 		if err != nil {
-			logger.WithField("err", err.Error())
+			logger.WithField("err", err.Error()).Errorln("Delete User responded with error")
 			if err == responses.ZeroRowsAffectedError {
 				responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UserNotFoundError.Error()})
 				return
