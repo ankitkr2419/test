@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const ConfigStartPath = "$HOME/cpagent/conf/"
+
 type Extraction struct {
 	PIDTemperature    int64 `json:"pid_temperature" validate:"required,lte=75,gte=50"`
 	ShakerStepsPerRev int64 `json:"shaker_steps_per_revolution" validate:"required,lte=20000,gte=200"`
@@ -71,7 +73,7 @@ func GetExtractionConfigValues() Extraction {
 }
 
 func GetConsumableDistanceFilePath() string {
-	return ReadEnvString("consumable_distance_conf_file")
+	return ConfigStartPath + ReadEnvString("consumable_distance_conf_file")
 }
 
 func SetConsumableDistanceFilePath(path string) {
