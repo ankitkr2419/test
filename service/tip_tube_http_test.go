@@ -24,12 +24,10 @@ type TipTubeHandlerTestSuite struct {
 func (suite *TipTubeHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
-	db.TipTubeConfFile = "../conf/tips_tubes_config.yml"
 }
 
 func TestTipTubeTestSuite(t *testing.T) {
 	suite.Run(t, new(TipTubeHandlerTestSuite))
-	db.TipTubeConfFile = "./conf/tips_tubes_config.yml"
 }
 
 var testTTObj = db.TipsTubes{
