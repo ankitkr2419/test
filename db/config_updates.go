@@ -2,6 +2,7 @@ package db
 
 import (
 	"io/ioutil"
+	"os"
 
 	conf "mylab/cpagent/config"
 
@@ -15,12 +16,11 @@ import (
 // Updates are in this package instead of configs cause of circular imports
 
 const (
-	cartridgeConfFile          = "./conf/cartridges_config.yml"
-	cartridgeWellConfFile      = "./conf/cartridge_wells_config.yml"
-	tipTubeConfFile            = "./conf/tips_tubes_config.yml"
-	motorConfFile              = "./conf/motor_config.yml"
-	dyeConfFile                = "./conf/dyes.yml"
-	consumableDistanceConfFile = "./conf/consumable_config_v1_4.yml"
+	cartridgeConfFile     = conf.ConfigStartPath + "cartridges_config.yml"
+	cartridgeWellConfFile = conf.ConfigStartPath + "cartridge_wells_config.yml"
+	tipTubeConfFile       = conf.ConfigStartPath + "tips_tubes_config.yml"
+	motorConfFile         = conf.ConfigStartPath + "motor_config.yml"
+	dyeConfFile           = conf.ConfigStartPath + "dyes.yml"
 )
 
 // Config is used to get data from config file
@@ -138,7 +138,7 @@ func SetCartridgeValues(c CartridgeWell) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(cartridgeConfFile, res, 0666)
+	err = ioutil.WriteFile(os.ExpandEnv(cartridgeConfFile), res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return
@@ -150,7 +150,7 @@ func SetCartridgeValues(c CartridgeWell) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(cartridgeWellConfFile, res, 0666)
+	err = ioutil.WriteFile(os.ExpandEnv(cartridgeWellConfFile), res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return
@@ -196,7 +196,7 @@ func SetTipsTubesValues(tt []TipsTubes) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(tipTubeConfFile, res, 0666)
+	err = ioutil.WriteFile(os.ExpandEnv(tipTubeConfFile), res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return
@@ -242,7 +242,7 @@ func SetMotorsValues(m []Motor) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(motorConfFile, res, 0666)
+	err = ioutil.WriteFile(os.ExpandEnv(motorConfFile), res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return
@@ -292,7 +292,7 @@ func UpdateMotorsValues(m []Motor) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(motorConfFile, res, 0666)
+	err = ioutil.WriteFile(os.ExpandEnv(motorConfFile), res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return
@@ -339,7 +339,7 @@ func UpdateConsumableDistancesValues(m []ConsumableDistance) (err error) {
 
 	consumableDistanceConfFile := conf.GetConsumableDistanceFilePath()
 
-	err = ioutil.WriteFile(consumableDistanceConfFile, res, 0666)
+	err = ioutil.WriteFile(os.ExpandEnv(consumableDistanceConfFile), res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return
@@ -378,7 +378,7 @@ func UpdateDyesTolerance(dyes []Dye) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(dyeConfFile, res, 0666)
+	err = ioutil.WriteFile(os.ExpandEnv(dyeConfFile), res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return
