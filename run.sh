@@ -14,6 +14,9 @@ elif [[  ${dev} != "simulator" ]]; then
 fi
 
 sudo chmod +x ./cpagent
+# Only copy config file if it is absent
+# NOTE: Updating has to be manually done
+cp -R -n ./conf $HOME/cpagent
 dir=${HOME}"/cpagent/utils/logs/"
 var=${HOME}"/cpagent/utils/logs/output_$(date +%s).log"
 
