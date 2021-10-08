@@ -104,8 +104,10 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 				sendOnFail(msg, errortype, rw, c)
 
 			case err = <-deps.WsErrCh:
+				logger.Debugln("Actaual Error at WsErrCh: ", err)
 
 				errs := msgDivision(err.Error())
+				logger.Debugln("Actaual Error at msgDivision err 0: ", errs[0])
 				if errs[0] == "ErrorExtractionMonitor" {
 
 					errorData := plc.WSError{
@@ -119,6 +121,7 @@ func wsHandler(deps Dependencies) http.HandlerFunc {
 					}
 					sendOnFail(string(wsError), errs[0], rw, c)
 				} else if errs[0] == plc.ErrorOperationAborted {
+					logger.Debugln("Actaual Error at msgDivision errs: ", errs)
 					errorData := plc.WSError{
 						Message: errs[2],
 						Deck:    errs[1],
@@ -238,6 +241,8 @@ func sendTemperatureAndProgress(deps Dependencies, rw http.ResponseWriter, c *we
 
 func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn) {
 
+	logger.Debugln("Actaual Error at sendOnFail err: ", msg, errortype)
+
 	r := resultOnFail{
 		Type: errortype,
 		Data: msg,
@@ -255,7 +260,7 @@ func sendOnFail(msg, errortype string, rw http.ResponseWriter, c *websocket.Conn
 		return
 	}
 
-	logger.WithField("data", "Fail").Infoln("Websocket send Data")
+	logger.WithField("data", r).Infoln("Websocket send Error Data")
 
 }
 
