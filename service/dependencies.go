@@ -84,7 +84,7 @@ func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction boo
 	case noRTPCR:
 		if plcName == C32 {
 			driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, websocketErr, exit, test, handler)
 		} else {
 			driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
 			driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
@@ -97,7 +97,7 @@ func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction boo
 		if plcName == C32 {
 			driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
 			driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, websocketErr, exit, test, handler)
 		} else {
 			driver = simulator.NewSimulator(exit, websocketErr)
 			driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
