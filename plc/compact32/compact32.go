@@ -1,11 +1,7 @@
 package compact32
 
 import (
-	"encoding/binary"
-	"fmt"
-	"math"
 	"mylab/cpagent/config"
-	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"time"
 
@@ -13,6 +9,8 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
+// NOTE: timeoutMs has caused us problems, make sure it matches and works correctly
+// Also if the Application type is Combined then a separate station_SlaveID needs to be created
 const (
 	HOLDING_STAGE     = "hold"
 	CYCLE_STAGE       = "cycle"
@@ -158,57 +156,4 @@ func NewCompact32DeckDriverB(wsMsgCh chan string, exit chan error, test bool, ha
 	plc.SetDeckName(&C32, plc.DeckB)
 
 	return &C32
-}
-
-func (d *Compact32) CalculateOpticalResult(dye db.Dye, kitID string, knownValue, cycleCount int64) (opticalResult []db.DyeWellTolerance, err error) {
-
-	wellsData := make(map[int][]uint16, cycleCount)
-	defer func() {
-
-		if err != nil {
-			logger.WithField("ERR", err.Error()).Errorln("error in calculating the optical result", err.Error())
-			d.wsErrch <- err
-		}
-	}()
-	plc.ExperimentRunning = true
-	start := plc.FValueRegisterStartAddress + (dye.Position-1)*16
-	for i := 0; i < int(cycleCount); i++ {
-		d.Cycle()
-		wellsData[i] = make([]uint16, 16)
-		data, err := d.Driver.ReadHoldingRegisters(plc.MODBUS["D"][start], uint16(16))
-		if err != nil {
-			logger.WithField("register", plc.MODBUS["D"][start]).Error("ReadHoldingRegisters: Wells emission data")
-		}
-		offset := 0 // offset of data. increment every 2 bytes!
-		for j := 0; j < 16; j++ {
-			wellsData[i][j] = binary.BigEndian.Uint16(data[offset : offset+2])
-			offset += 2
-		}
-
-		d.WsMsgCh <- "PROGRESS_OPTCALIB_" + fmt.Sprintf("%d", (i+1)*(100/int(cycleCount)))
-	}
-
-	for j := 0; j < 16; j++ {
-		var finalValue uint16
-		var deviatedResult db.DyeWellTolerance
-		for i := 0; i < int(cycleCount); i++ {
-
-			finalValue += wellsData[i][j]
-		}
-		finalAvg := float64(finalValue) / float64(cycleCount)
-
-		deviatedValue := float64(knownValue) - finalAvg
-		deviatedResult.OpticalResult = math.Abs((deviatedValue / float64(knownValue)) * 100)
-
-		deviatedResult.DyeID = dye.ID
-		deviatedResult.KitID = kitID
-		deviatedResult.WellNo = j
-		deviatedResult.Valid = true
-		if deviatedResult.OpticalResult > dye.Tolerance {
-			deviatedResult.Valid = false
-		}
-
-		opticalResult = append(opticalResult, deviatedResult)
-	}
-	return
 }
