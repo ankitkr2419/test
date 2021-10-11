@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"errors"
-	"mylab/cpagent/config"
 	"mylab/cpagent/db"
 	"mylab/cpagent/responses"
 	"net/http"
@@ -24,7 +23,6 @@ type ConsumableDistanceHandlerTestSuite struct {
 
 func (suite *ConsumableDistanceHandlerTestSuite) SetupTest() {
 	suite.dbMock = &db.DBMockStore{}
-	config.SetConsumableDistanceFilePath("../conf/test_config.yml")
 }
 
 func TestConsumableDistanceTestSuite(t *testing.T) {

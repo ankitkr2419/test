@@ -14,6 +14,9 @@ elif [[  ${dev} != "simulator" ]]; then
 fi
 
 sudo chmod +x ./cpagent
+# Only copy config file if it is absent
+# NOTE: Updating has to be manually done
+cp -R -n ./conf $HOME/cpagent
 dir=${HOME}"/cpagent/utils/logs/"
 var=${HOME}"/cpagent/utils/logs/output_$(date +%s).log"
 
@@ -28,10 +31,10 @@ create_log_file () {
 
 if [[ ${apptype} == "extraction" ]]; then
     create_log_file
-    sudo ./cpagent start --plc ${dev} --no-rtpcr ${delay} > ${var}
+    sudo ./cpagent start --plc ${dev} --no-rtpcr ${delay} &> ${var}
 elif [[ ${apptype} == "rtpcr" ]]; then
     create_log_file
-    sudo ./cpagent start --plc ${dev} --tec ${dev} --no-extraction > ${var}
+    sudo ./cpagent start --plc ${dev} --tec ${dev} --no-extraction &> ${var}
 else
   echo "Please specify apptype[extraction, rtpcr]"
   exit 1

@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -110,20 +112,34 @@ static void* recvData(void* arg)
 static void WriteDataToDebugFile(char *prefix, char *in)
 {
 	FILE *fd;
-
+	char tecPathBuf[100];
+	char comPathBuf[100];
+	char fullPath[130];
+	time_t seconds; 
 	struct stat st = {0};
 
-	if (stat("./utils/tec", &st) == -1) {
-		mkdir("./utils/tec", 0755);
+	sprintf(tecPathBuf, "%s/%s", getenv("HOME"), "cpagent/utils/tec");
+
+	if (stat(tecPathBuf, &st) == -1) {
+		mkdir(tecPathBuf, 0755);
 	}
 
-	fd = fopen("./utils/tec/ComLog.txt", "a+");
+	// length of seconds is 10, we will only use first 6 digits, 
+	// thus tec Com logs will be generated along 10000 secs
+    seconds = time(NULL);
+	seconds = seconds/10000;
+	sprintf(comPathBuf, "ComLog_%ld.log", seconds);
+
+	sprintf(fullPath, "%s/%s",tecPathBuf, comPathBuf);
+
+	fd = fopen(fullPath, "a+");
 	if(fd >= 0)
 	{
 		int len = strcspn(in, "\r\n");
-		char format[20] = "";
-		sprintf(format, "%%s%%.%ds\n", len);
-		fprintf(fd, format, prefix, in);
+		seconds = time(NULL);
+		char format[40] = "";
+		sprintf(format, "%%d : %%s%%.%ds\n", len);
+		fprintf(fd, format, seconds, prefix, in);
 		fclose(fd);
 	}
 }
