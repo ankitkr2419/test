@@ -102,8 +102,8 @@ func (d *Compact32Deck) RestoreDeck() (response string, err error) {
 ALGORITHM
 	1.  Start UV Light
 	2.  Add delay
-	3.  Monitor for PAUSE and abort or completion
-	4.  If Paused then monitor for resumed
+	3.  Monitor for PAUSE and abort or completion(Already handled in Delay)
+	4.  If Paused then monitor for resumed and goto 3(Already handled in Delay)
 */
 
 func (d *Compact32Deck) UVLight(totalTime int64) (response string, err error) {

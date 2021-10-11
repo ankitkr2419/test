@@ -20,6 +20,9 @@ cp -R -n ./conf $HOME/cpagent
 dir=${HOME}"/cpagent/utils/logs/"
 var=${HOME}"/cpagent/utils/logs/output_$(date +%s).log"
 
+# TODO: Log machine info into HTML file
+# sudo lshw -html > lshw.html
+
 create_log_file () {
         echo "Logs for current run are present in "${var}
         sudo mkdir -p ${dir}

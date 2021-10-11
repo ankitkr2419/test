@@ -23,6 +23,8 @@ const (
 	dyeConfFile           = conf.ConfigStartPath + "dyes.yml"
 )
 
+var TipTubeConfFile = "./conf/tips_tubes_config.yml"
+
 // Config is used to get data from config file
 type Config struct {
 	Dyes []struct {

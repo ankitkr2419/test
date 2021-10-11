@@ -49,14 +49,17 @@ func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction boo
 	websocketErr := make(chan error)
 
 	defer func() {
-		if err == nil {
+		// TODO: Handle this for RTPCR as well
+		// Checking if it is Extraction
+		isExtraction := !noExtraction
+		if err == nil && isExtraction {
 			// NOTE: monitorForPLCTimeout uses the same exit channel that is why it is to be here
 			go monitorForPLCTimeout(&deps, exit)
-			if !noExtraction {
-				// sending complete deps to Heater cause a change in deps has to be reflected consistently
-				go SendHeaterDataToEng(deps)
-				go monitorFlapSensor(&deps)
-			}
+			// sending complete deps to Heater cause a change in deps has to be reflected consistently
+			go SendHeaterDataToEng(deps)
+			go monitorFlapSensor(&deps)
+		} else if err != nil {
+			logger.Warnln("Error while fetching Dependencies: ", err)
 		}
 	}()
 
@@ -84,7 +87,7 @@ func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction boo
 	case noRTPCR:
 		if plcName == C32 {
 			driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, websocketErr, exit, test, handler)
 		} else {
 			driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)
 			driverDeckB = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckB)
@@ -97,7 +100,7 @@ func GetAllDependencies(plcName, tecName string, test, noRTPCR, noExtraction boo
 		if plcName == C32 {
 			driver = compact32.NewCompact32Driver(websocketMsg, websocketErr, exit, test)
 			driverDeckA, handler = compact32.NewCompact32DeckDriverA(websocketMsg, websocketErr, exit, test)
-			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, exit, test, handler)
+			driverDeckB = compact32.NewCompact32DeckDriverB(websocketMsg, websocketErr, exit, test, handler)
 		} else {
 			driver = simulator.NewSimulator(exit, websocketErr)
 			driverDeckA = simulator.NewExtractionSimulator(websocketMsg, websocketErr, exit, plc.DeckA)

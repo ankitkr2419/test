@@ -15,6 +15,7 @@ import (
 
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
+	logger.Infoln("SetUpMotor Deck ", d.name, " Speed: ", speed, " Pulse: ", pulse, " Ramp: ", ramp, " Direction: ", direction, " MotorNum: ", motorNum)
 	var results []byte
 	var temp uint16
 
@@ -176,6 +177,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	logger.Infoln("Sensor Returned ---> ", results[0], d.name)
 
+	// If Sensor has already cut and motor moving TowardsSensor
 	if len(results) > 0 && int(results[0]) == SensorCut && direction == TowardsSensor {
 		logger.Infoln("Sensor has Cut ---> ", results[0], d.name)
 		return "Sensor has cut", nil
@@ -183,6 +185,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 	err = d.sleepIfPaused()
 	if err != nil {
+		logger.Errorln(err)
 		return
 	}
 
@@ -202,6 +205,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 
 		if temp = d.getExecutedPulses(); temp == highestUint16 {
 			err = fmt.Errorf("executedPulses isn't loaded!")
+			logger.Errorln(err)
 			return
 			// Write executed pulses to Position
 		} else if d.isMachineInAbortedState() {
@@ -212,6 +216,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 
 		if d.isMotorOperationCompleted() {
+			logger.Warnln("Nothing to resume")
 			return "Nothing to resume", nil
 		}
 
@@ -222,34 +227,32 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 			return
 		}
 
-		if len(results) > 0 {
-			if int(results[0]) == 1 {
-				logger.Infoln("Completion for deck", d.name, "returned ---> ", results)
-				response, err = d.switchOffMotor()
-				if err != nil {
-					logger.Errorln("err: from setUp--> ", err, d.name)
-					return
-				}
-				distanceMoved := float64(pulse) / float64(Motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
-				switch direction {
-				// Away from Sensor
-				case REV:
-					Positions[deckAndNumber] += distanceMoved
-				// Towards Sensor
-				case FWD:
-					if (Positions[deckAndNumber] - distanceMoved) < 0 {
-						logger.Errorln("Motor Just moved to negative distance", Positions[deckAndNumber]-distanceMoved, "for deck: ", d.name)
-						Positions[deckAndNumber] = 0
-						break
-					}
-					Positions[deckAndNumber] -= distanceMoved
-				default:
-					logger.Errorln("Unknown Direction was found")
-					return "", fmt.Errorf("Unknown Direction was found: %v", direction)
-				}
-				logger.Infoln("pos", Positions[deckAndNumber], d.name)
-				return "RUN Completed", nil
+		if len(results) > 0 && int(results[0]) == 1 {
+			logger.Infoln("Completion for deck", d.name, "returned ---> ", results)
+			response, err = d.switchOffMotor()
+			if err != nil {
+				logger.Errorln("err: from setUp--> ", err, d.name)
+				return
 			}
+			distanceMoved := float64(pulse) / float64(Motors[DeckNumber{Deck: d.name, Number: motorNum}]["steps"])
+			switch direction {
+			// Away from Sensor
+			case REV:
+				Positions[deckAndNumber] += distanceMoved
+			// Towards Sensor
+			case FWD:
+				if (Positions[deckAndNumber] - distanceMoved) < 0 {
+					logger.Errorln("Motor Just moved to negative distance", Positions[deckAndNumber]-distanceMoved, "for deck: ", d.name)
+					Positions[deckAndNumber] = 0
+					break
+				}
+				Positions[deckAndNumber] -= distanceMoved
+			default:
+				logger.Errorln("Unknown Direction was found")
+				return "", fmt.Errorf("Unknown Direction was found: %v", direction)
+			}
+			logger.Infoln("pos", Positions[deckAndNumber], d.name)
+			return "RUN Completed", nil
 		}
 
 		if direction == REV {
@@ -262,28 +265,22 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 		}
 
 		logger.Infoln("Sensor returned for deck ", d.name, "---> ", results)
-		if len(results) > 0 {
-			if int(results[0]) == SensorCut {
-				logger.Infoln("Sensor returned ---> ", results[0], d.name)
-				response, err = d.switchOffMotor()
-				if err != nil {
-					logger.Errorln("Sensor err : ", err, d.name)
-					return "", err
-				}
-				Positions[deckAndNumber] = Calibs[deckAndNumber]
-				logger.Infoln("pos", Positions[deckAndNumber], d.name)
-				return "RUN Completed as Sensor cut", nil
+		if len(results) > 0 && int(results[0]) == SensorCut {
+			logger.Infoln("Sensor returned ---> ", results[0], d.name)
+			response, err = d.switchOffMotor()
+			if err != nil {
+				logger.Errorln("Sensor err : ", err, d.name)
+				return "", err
 			}
+			Positions[deckAndNumber] = Calibs[deckAndNumber]
+			logger.Infoln("pos", Positions[deckAndNumber], d.name)
+			return "RUN Completed as Sensor cut", nil
 		}
 
 	skipSensor:
 		switch pulse {
 		case finalSensorCutPulses:
-			if motorNum == K6_Magnet_Up_Down || motorNum == K7_Magnet_Rev_Fwd{
-				time.Sleep(10 * time.Millisecond)
-			} else {
-				time.Sleep(50 * time.Millisecond)
-			}
+			time.Sleep(50 * time.Millisecond)
 		default:
 			time.Sleep(150 * time.Millisecond)
 		}
