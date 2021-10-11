@@ -27,6 +27,12 @@ Extraction Software Releases
  - Calibration mode allows engineer to take syringe module to indeck
  - Magnet Homing Scan time reduced
 
+4. Version 1.4.182 11th October 2021
+ - Bugfix: Abort for Any Operation on Deck B
+ - Bugfix: Aspire Dispense Abort at any step
+ - Configs defined at global level to make them robust to build changes
+ - Magnet Homing Scan made normal as PLC will handle sensor cut limitation
+
 
 RTPCR Software Releases
 

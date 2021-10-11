@@ -39,6 +39,11 @@ func (suite *UserHandlerTestSuite) SetupTest() {
 	suite.dbMock.On("AddAuditLog", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 }
 
+func (suite *UserHandlerTestSuite) TearDownTest() {
+	t := suite.T()
+	suite.dbMock.AssertExpectations(t)
+}
+
 func TestUserTestSuite(t *testing.T) {
 	suite.Run(t, new(UserHandlerTestSuite))
 }
@@ -58,371 +63,421 @@ var testUserAuthObj = db.UserAuth{
 	AuthID:   testUUID,
 }
 
-func (suite *UserHandlerTestSuite) TestValidateUsersWithDeckSuccess() {
+func (suite *UserHandlerTestSuite) TestValidateUserHandler() {
+	t := suite.T()
+	t.Run("when deck user login is successful", func(t *testing.T) {
+		suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, nil).Once()
+		suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, nil).Once()
 
-	suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, nil)
-	suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, nil)
+		body, _ := json.Marshal(testUser)
 
-	body, _ := json.Marshal(testUser)
+		recorder := makeHTTPCall(
+			http.MethodPost,
+			"/login/A",
+			"/login/A",
+			string(body),
+			validateUserHandler(Dependencies{Store: suite.dbMock}),
+		)
 
-	recorder := makeHTTPCall(
-		http.MethodPost,
-		"/login/A",
-		"/login/A",
-		string(body),
-		validateUserHandler(Dependencies{Store: suite.dbMock}),
-	)
+		// TODO: Unmarshal rcorder.Body into map[string]string and compare for msg and Role
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	})
 
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	suite.dbMock.AssertExpectations(suite.T())
+	t.Run("when non-deck user login is successful", func(t *testing.T) {
+		suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, nil).Once()
+		suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, nil).Once()
+
+		body, _ := json.Marshal(testUser)
+
+		recorder := makeHTTPCall(
+			http.MethodPost,
+			"/login",
+			"/login",
+			string(body),
+			validateUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+
+		// TODO: Validate with JSON Token
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	})
+
+	t.Run("when user not found in records", func(t *testing.T) {
+		suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, errors.New("Record Not Found")).Once()
+
+		body, _ := json.Marshal(testUser)
+
+		recorder := makeHTTPCall(
+			http.MethodPost,
+			"/login",
+			"/login",
+			string(body),
+			validateUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.UserInvalidError.Error()})
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
+
+	t.Run("when user authentication info couldn't be inserted into db", func(t *testing.T) {
+		suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, nil).Once()
+		suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, errors.New("failed to insert user auth")).Once()
+
+		body, _ := json.Marshal(testUser)
+		logger.Infoln(string(body))
+		recorder := makeHTTPCall(
+			http.MethodPost,
+			"/login",
+			"/login",
+			string(body),
+			validateUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.UserAuthError.Error()})
+
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 }
 
-func (suite *UserHandlerTestSuite) TestValidateUsersWithoutDeckSuccess() {
+func (suite *UserHandlerTestSuite) TestCreateUserHandler() {
+	t := suite.T()
+	t.Run("when new user created successfully", func(t *testing.T) {
+		suite.dbMock.On("InsertUser", mock.Anything, testUserObj).Return(nil).Once()
 
-	suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, nil)
-	suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, nil)
+		body, _ := json.Marshal(testUser)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/users",
+			"/users",
+			string(body),
+			createUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(MsgObj{Msg: responses.UserCreateSuccess})
+		assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 
-	body, _ := json.Marshal(testUser)
+	t.Run("when new user couldn't be created", func(t *testing.T) {
+		suite.dbMock.On("InsertUser", mock.Anything, testUserObj).Return(errors.New("cannot insert new user")).Once()
 
-	recorder := makeHTTPCall(
-		http.MethodPost,
-		"/login",
-		"/login",
-		string(body),
-		validateUserHandler(Dependencies{Store: suite.dbMock}),
-	)
+		body, _ := json.Marshal(testUser)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/users",
+			"/users",
+			string(body),
+			createUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.UserInsertError.Error()})
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 
-	// TODO: Validate with JSON Token
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	suite.dbMock.AssertExpectations(suite.T())
+	t.Run("when creating user with invalid role", func(t *testing.T) {
+		testUser := testUser
+		testUser.Role = ""
+
+		testUserObj := testUserObj
+		testUserObj.Role = ""
+
+		suite.dbMock.On("InsertUser", mock.Anything, testUserObj).Return(errors.New("invalid role for new user")).Once()
+
+		body, _ := json.Marshal(testUser)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/users",
+			"/users",
+			string(body),
+			createUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+
+		output, _ := json.Marshal(ErrObj{Err: responses.UserInsertError.Error()})
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 }
 
-func (suite *UserHandlerTestSuite) TestValidateUsersWhenUserNotFound() {
+func (suite *UserHandlerTestSuite) TestLogoutUserHandler() {
+	t := suite.T()
+	t.Run("when RTPCR application user WITH deck logouts successfully", func(t *testing.T) {
+		Application = RTPCR
 
-	suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, errors.New("Record Not Found"))
+		suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Once()
+		suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil).Once()
 
-	body, _ := json.Marshal(testUser)
+		//first need to login to test logout
+		deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
+		defer func() {
+			deckUserLogin.Store(plc.DeckA, blank)
+		}()
+		token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
+		testTokenA := "Bearer " + token
+		body, _ := json.Marshal(testUser)
 
-	recorder := makeHTTPCall(
-		http.MethodPost,
-		"/login",
-		"/login",
-		string(body),
-		validateUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-	output, _ := json.Marshal(ErrObj{Err: responses.UserInvalidError.Error()})
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
+		recorder := makeHTTPCallWithHeader(
+			http.MethodDelete,
+			"/logout/{deck:[A-B]?}",
+			"/logout/"+plc.DeckA,
+			string(body),
+			map[string]string{"Authorization": testTokenA},
+			logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+		)
+
+		output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	})
+
+	t.Run("when Extraction application user WITH deck logouts successfully", func(t *testing.T) {
+		Application = Extraction
+
+		suite.plcDeck[plc.DeckA].(*plc.PLCMockStore).On("SetEngineerOrAdminLogged", false).Return().Once()
+
+		suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Once()
+		suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil).Once()
+
+		//first need to login to test logout
+		deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
+		defer func() {
+			deckUserLogin.Store(plc.DeckA, blank)
+		}()
+		token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
+		testTokenA := "Bearer " + token
+		body, _ := json.Marshal(testUser)
+
+		recorder := makeHTTPCallWithHeader(
+			http.MethodDelete,
+			"/logout/{deck:[A-B]?}",
+			"/logout/"+plc.DeckA,
+			string(body),
+			map[string]string{"Authorization": testTokenA},
+			logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+		)
+
+		output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	})
+
+	t.Run("when RTPCR application user WITHOUT deck logouts successfully", func(t *testing.T) {
+		Application = RTPCR
+
+		suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Once()
+		suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil).Once()
+
+		token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, blank, Application, map[string]string{})
+		testTokenA := "Bearer " + token
+		body, _ := json.Marshal(testUser)
+
+		recorder := makeHTTPCallWithHeader(
+			http.MethodDelete,
+			"/logout/{deck:[A-B]?}",
+			"/logout/",
+			string(body),
+			map[string]string{"Authorization": testTokenA},
+			logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
+		)
+
+		output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+	})
+
+	t.Run("when RTPCR application user WITH deck logout is unsuccessful", func(t *testing.T) {
+		suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Maybe()
+		suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError).Maybe()
+
+		//first need to login to test logout
+		deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
+		defer func() {
+			deckUserLogin.Store(plc.DeckA, blank)
+		}()
+
+		token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
+		testTokenA := "Bearer " + token
+		body, _ := json.Marshal(testUser)
+
+		recorder := makeHTTPCallWithHeader(
+			http.MethodDelete,
+			"/logout/{deck:[A-B]?}",
+			"/logout/"+plc.DeckA,
+			string(body),
+			map[string]string{"Authorization": testTokenA},
+			logoutUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+
+		output, _ := json.Marshal(ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
+
+	t.Run("when RTPCR application user WITHOUT deck logout is unsuccessful", func(t *testing.T) {
+		suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Maybe()
+		suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError).Maybe()
+
+		token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, blank, Application, map[string]string{})
+		testToken := "Bearer " + token
+		body, _ := json.Marshal(testUser)
+
+		recorder := makeHTTPCallWithHeader(
+			http.MethodDelete,
+			"/logout/{deck:[A-B]?}",
+			"/logout/",
+			string(body),
+			map[string]string{"Authorization": testToken},
+			logoutUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+
+		output, _ := json.Marshal(ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
+
 }
 
-func (suite *UserHandlerTestSuite) TestValidateUsersWhenUserAuthInsertFailed() {
+func (suite *UserHandlerTestSuite) TestUpdateUserHandler() {
+	t := suite.T()
+	t.Run("when user info is updated successfully", func(t *testing.T) {
+		newUserObj := testUserObj
+		newUserObj.Username = "new"
 
-	suite.dbMock.On("ValidateUser", mock.Anything, testUserObj).Return(testUserObj, nil)
-	suite.dbMock.On("InsertUserAuths", mock.Anything, testUserObj.Username).Return(testUUID, errors.New("failed to insert user auth"))
+		suite.dbMock.On("UpdateUser", mock.Anything, newUserObj, testUserObj.Username).Return(nil).Once()
 
-	body, _ := json.Marshal(testUser)
-	logger.Infoln(string(body))
-	recorder := makeHTTPCall(
-		http.MethodPost,
-		"/login",
-		"/login",
-		string(body),
-		validateUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-	output, _ := json.Marshal(ErrObj{Err: responses.UserAuthError.Error()})
+		// Password without MD5
+		newUserObj.Password = testUser.Password
 
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
+		body, _ := json.Marshal(newUserObj)
+		recorder := makeHTTPCall(http.MethodPut,
+			"/users/{old_username}",
+			"/users/"+testUserObj.Username,
+			string(body),
+			updateUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(MsgObj{Msg: responses.UserUpdateSuccess})
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
+
+	t.Run("when invalid data is inserted or user update", func(t *testing.T) {
+		newUserObj := ""
+
+		body, _ := json.Marshal(newUserObj)
+		recorder := makeHTTPCall(http.MethodPut,
+			"/users/{old_username}",
+			"/users/a",
+			string(body),
+			updateUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.UserDecodeError.Error()})
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
+
+	t.Run("when user updation failed", func(t *testing.T) {
+		newUserObj := testUserObj
+		newUserObj.Username = "new"
+
+		suite.dbMock.On("UpdateUser", mock.Anything, newUserObj, testUserObj.Username).Return(responses.UserUpdateError).Once()
+
+		// Password without MD5
+		newUserObj.Password = testUser.Password
+		body, _ := json.Marshal(newUserObj)
+		recorder := makeHTTPCall(http.MethodPut,
+			"/users/{old_username}",
+			"/users/"+testUserObj.Username,
+			string(body),
+			updateUserHandler(Dependencies{Store: suite.dbMock}),
+		)
+
+		output, _ := json.Marshal(ErrObj{Err: responses.UserUpdateError.Error()})
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 }
 
-func (suite *UserHandlerTestSuite) TestCreateUserSuccess() {
+func (suite *UserHandlerTestSuite) TestDeleteUserHandler() {
+	t := suite.T()
+	t.Run("when user is deleted successfully", func(t *testing.T) {
+		testUserObj := testUserObj
 
-	suite.dbMock.On("InsertUser", mock.Anything, testUserObj).Return(nil)
+		ctx := map[string]interface{}{
+			db.ContextKeyUsername: "main",
+		}
 
-	body, _ := json.Marshal(testUser)
-	recorder := makeHTTPCall(http.MethodPost,
-		"/users",
-		"/users",
-		string(body),
-		createUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-	output, _ := json.Marshal(MsgObj{Msg: responses.UserCreateSuccess})
-	assert.Equal(suite.T(), http.StatusCreated, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
+		suite.dbMock.On("DeleteUser", mock.Anything, testUserObj.Username).Return(nil).Once()
 
-	suite.dbMock.AssertExpectations(suite.T())
-}
+		recorder := makeHTTPCallWithContext(ctx,
+			http.MethodDelete,
+			"/users/{username}",
+			"/users/"+testUserObj.Username,
+			"",
+			deleteUserHandler(Dependencies{Store: suite.dbMock}),
+		)
 
-func (suite *UserHandlerTestSuite) TestCreateUserFailed() {
+		output, _ := json.Marshal(MsgObj{Msg: responses.UserDeleteSuccess})
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 
-	suite.dbMock.On("InsertUser", mock.Anything, testUserObj).Return(errors.New("cannot insert new user"))
+	// ASK: @Paramita is the Deck independent?
+	t.Run("when deleting the logged in user", func(t *testing.T) {
+		testUserObj := testUserObj
 
-	body, _ := json.Marshal(testUser)
-	recorder := makeHTTPCall(http.MethodPost,
-		"/users",
-		"/users",
-		string(body),
-		createUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-	output, _ := json.Marshal(ErrObj{Err: responses.UserInsertError.Error()})
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
+		ctx := map[string]interface{}{
+			db.ContextKeyUsername: testUserObj.Username,
+		}
 
-	suite.dbMock.AssertExpectations(suite.T())
-}
+		recorder := makeHTTPCallWithContext(ctx,
+			http.MethodDelete,
+			"/users/{username}",
+			"/users/"+testUserObj.Username,
+			"",
+			deleteUserHandler(Dependencies{Store: suite.dbMock}),
+		)
 
-func (suite *UserHandlerTestSuite) TestCreateUserValidationFailed() {
+		output, _ := json.Marshal(ErrObj{Err: responses.SameUserDeleteError.Error()})
+		assert.Equal(suite.T(), http.StatusForbidden, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 
-	testUser := testUser
-	testUser.Role = ""
+	t.Run("when non existing user is being deleted", func(t *testing.T) {
+		testUserObj := testUserObj
 
-	testUserObj := testUserObj
-	testUserObj.Role = ""
+		ctx := map[string]interface{}{
+			db.ContextKeyUsername: "main",
+		}
 
-	suite.dbMock.On("InsertUser", mock.Anything, testUserObj).Return(errors.New("invalid role for new user"))
+		suite.dbMock.On("DeleteUser", mock.Anything, testUserObj.Username).Return(responses.ZeroRowsAffectedError).Once()
 
-	body, _ := json.Marshal(testUser)
-	recorder := makeHTTPCall(http.MethodPost,
-		"/users",
-		"/users",
-		string(body),
-		createUserHandler(Dependencies{Store: suite.dbMock}),
-	)
+		recorder := makeHTTPCallWithContext(ctx,
+			http.MethodDelete,
+			"/users/{username}",
+			"/users/"+testUserObj.Username,
+			"",
+			deleteUserHandler(Dependencies{Store: suite.dbMock}),
+		)
 
-	output, _ := json.Marshal(ErrObj{Err: responses.UserInsertError.Error()})
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
-}
+		output, _ := json.Marshal(ErrObj{Err: responses.UserNotFoundError.Error()})
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 
-func (suite *UserHandlerTestSuite) TestLogoutWithDeckRTPCRSuccess() {
+	t.Run("when user deletion is unsuccessful", func(t *testing.T) {
+		testUserObj := testUserObj
 
-	Application = RTPCR
+		ctx := map[string]interface{}{
+			db.ContextKeyUsername: "main",
+		}
 
-	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
-	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
+		suite.dbMock.On("DeleteUser", mock.Anything, testUserObj.Username).Return(responses.UserDeleteError).Once()
 
-	//first need to login to test logout
-	deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
-	defer func() {
-		deckUserLogin.Store(plc.DeckA, blank)
-	}()
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
-	testTokenA := "Bearer " + token
-	body, _ := json.Marshal(testUser)
+		recorder := makeHTTPCallWithContext(ctx,
+			http.MethodDelete,
+			"/users/{username}",
+			"/users/"+testUserObj.Username,
+			"",
+			deleteUserHandler(Dependencies{Store: suite.dbMock}),
+		)
 
-	recorder := makeHTTPCallWithHeader(
-		http.MethodDelete,
-		"/logout/{deck:[A-B]?}",
-		"/logout/"+plc.DeckA,
-		string(body),
-		map[string]string{"Authorization": testTokenA},
-		logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
-	)
+		output, _ := json.Marshal(ErrObj{Err: responses.UserDeleteError.Error()})
+		assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+	})
 
-	output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *UserHandlerTestSuite) TestLogoutWithDeckExtractionSuccess() {
-
-	Application = Extraction
-
-	suite.plcDeck[plc.DeckA].(*plc.PLCMockStore).On("SetEngineerOrAdminLogged", false).Return()
-
-	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
-	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
-
-	//first need to login to test logout
-	deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
-	defer func() {
-		deckUserLogin.Store(plc.DeckA, blank)
-	}()
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
-	testTokenA := "Bearer " + token
-	body, _ := json.Marshal(testUser)
-
-	recorder := makeHTTPCallWithHeader(
-		http.MethodDelete,
-		"/logout/{deck:[A-B]?}",
-		"/logout/"+plc.DeckA,
-		string(body),
-		map[string]string{"Authorization": testTokenA},
-		logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
-	)
-
-	output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckSuccess() {
-	Application = RTPCR
-
-	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil)
-	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(nil)
-
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, blank, Application, map[string]string{})
-	testTokenA := "Bearer " + token
-	body, _ := json.Marshal(testUser)
-
-	recorder := makeHTTPCallWithHeader(
-		http.MethodDelete,
-		"/logout/{deck:[A-B]?}",
-		"/logout/",
-		string(body),
-		map[string]string{"Authorization": testTokenA},
-		logoutUserHandler(Dependencies{Store: suite.dbMock, PlcDeck: suite.plcDeck}),
-	)
-
-	output, _ := json.Marshal(MsgObj{Msg: responses.UserLogoutSuccess})
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *UserHandlerTestSuite) TestLogoutWithDeckFailure() {
-
-	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Maybe()
-	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError).Maybe()
-
-	//first need to login to test logout
-	deckUserLogin.Store(plc.DeckA, testUserAuthObj.Username)
-	defer func() {
-		deckUserLogin.Store(plc.DeckA, blank)
-	}()
-
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, plc.DeckA, Application, map[string]string{})
-	testTokenA := "Bearer " + token
-	body, _ := json.Marshal(testUser)
-
-	recorder := makeHTTPCallWithHeader(
-		http.MethodDelete,
-		"/logout/{deck:[A-B]?}",
-		"/logout/"+plc.DeckA,
-		string(body),
-		map[string]string{"Authorization": testTokenA},
-		logoutUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-
-	output, _ := json.Marshal(ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *UserHandlerTestSuite) TestLogoutWithoutDeckFailure() {
-
-	suite.dbMock.On("ShowUserAuth", mock.Anything, testUserObj.Username, mock.Anything).Return(testUserAuthObj, nil).Maybe()
-	suite.dbMock.On("DeleteUserAuth", mock.Anything, testUserAuthObj).Return(responses.UserAuthDataDeleteError).Maybe()
-
-	token, _ := EncodeToken(testUserAuthObj.Username, testUserAuthObj.AuthID, testUserObj.Role, blank, Application, map[string]string{})
-	testToken := "Bearer " + token
-	body, _ := json.Marshal(testUser)
-
-	recorder := makeHTTPCallWithHeader(
-		http.MethodDelete,
-		"/logout/{deck:[A-B]?}",
-		"/logout/",
-		string(body),
-		map[string]string{"Authorization": testToken},
-		logoutUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-
-	output, _ := json.Marshal(ErrObj{Err: responses.UserAuthDataDeleteError.Error()})
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-// Update User Test Cases
-func (suite *UserHandlerTestSuite) TestUpdateUserSuccess() {
-
-	newUserObj := testUserObj
-	newUserObj.Username = "new"
-
-	suite.dbMock.On("UpdateUser", mock.Anything, newUserObj, testUserObj.Username).Return(nil)
-
-	// Password without MD5
-	newUserObj.Password = testUser.Password
-
-	body, _ := json.Marshal(newUserObj)
-	recorder := makeHTTPCall(http.MethodPut,
-		"/users/{old_username}",
-		"/users/"+testUserObj.Username,
-		string(body),
-		updateUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-	output, _ := json.Marshal(MsgObj{Msg: responses.UserUpdateSuccess})
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *UserHandlerTestSuite) TestUpdateUserDecodeError() {
-	newUserObj := ""
-
-	body, _ := json.Marshal(newUserObj)
-	recorder := makeHTTPCall(http.MethodPut,
-		"/users/{old_username}",
-		"/users/a",
-		string(body),
-		updateUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-	output, _ := json.Marshal(ErrObj{Err: responses.UserDecodeError.Error()})
-	assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-func (suite *UserHandlerTestSuite) TestUpdateUserFailure() {
-	newUserObj := testUserObj
-	newUserObj.Username = "new"
-
-	suite.dbMock.On("UpdateUser", mock.Anything, newUserObj, testUserObj.Username).Return(responses.UserUpdateError)
-
-	// Password without MD5
-	newUserObj.Password = testUser.Password
-	body, _ := json.Marshal(newUserObj)
-	recorder := makeHTTPCall(http.MethodPut,
-		"/users/{old_username}",
-		"/users/"+testUserObj.Username,
-		string(body),
-		updateUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-
-	output, _ := json.Marshal(ErrObj{Err: responses.UserUpdateError.Error()})
-	assert.Equal(suite.T(), http.StatusInternalServerError, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
-}
-
-// Delete User Test cases
-// TODO: Fix this
-func (suite *UserHandlerTestSuite) TestDeleteUserSuccess() {
-	testUserObj := testUserObj
-
-	ctx := map[string]interface{}{
-		db.ContextKeyUsername: "main",
-	}
-
-	suite.dbMock.On("DeleteUser", mock.Anything, testUserObj.Username).Return(nil)
-
-	recorder := makeHTTPCallWithContext(ctx,
-		http.MethodDelete,
-		"/users/{username}",
-		"/users/"+testUserObj.Username,
-		"",
-		deleteUserHandler(Dependencies{Store: suite.dbMock}),
-	)
-
-	output, _ := json.Marshal(MsgObj{Msg: responses.UserDeleteSuccess})
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), string(output), recorder.Body.String())
-	suite.dbMock.AssertExpectations(suite.T())
 }

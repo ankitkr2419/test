@@ -19,4 +19,5 @@ SECRET_KEY: "123456qwerty"
 SENDGRID_API_KEY: "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"
 receiver_email: "santosh.kavhar@joshsoftware.com"
 receiver_name: "Santosh Kavhar"
+# MACHINE_UUID: "44454C4C-5000-1059-8039-B6C04F545732"
 

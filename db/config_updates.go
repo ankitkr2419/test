@@ -17,11 +17,12 @@ import (
 const (
 	cartridgeConfFile          = "./conf/cartridges_config.yml"
 	cartridgeWellConfFile      = "./conf/cartridge_wells_config.yml"
-	tipTubeConfFile            = "./conf/tips_tubes_config.yml"
 	motorConfFile              = "./conf/motor_config.yml"
 	dyeConfFile                = "./conf/dyes.yml"
 	consumableDistanceConfFile = "./conf/consumable_config_v1_4.yml"
 )
+
+var TipTubeConfFile = "./conf/tips_tubes_config.yml"
 
 // Config is used to get data from config file
 type Config struct {
@@ -196,7 +197,7 @@ func SetTipsTubesValues(tt []TipsTubes) (err error) {
 		return
 	}
 
-	err = ioutil.WriteFile(tipTubeConfFile, res, 0666)
+	err = ioutil.WriteFile(TipTubeConfFile, res, 0666)
 	if err != nil {
 		logger.Errorln("error in writing to file", err)
 		return

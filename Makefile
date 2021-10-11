@@ -14,7 +14,7 @@ go:
 	echo "building go code"
 	GOARCH=amd64 GOOS=linux
 	go build -v -ldflags=" \
-	-X 'mylab/cpagent/service.Version=v1.4.180' \
+	-X 'mylab/cpagent/service.Version=v1.4.182' \
 	-X 'mylab/cpagent/service.User=$(shell id -u -n)' \
 	-X 'mylab/cpagent/service.BuiltOn=$(shell date)' \
 	-X 'mylab/cpagent/service.CommitID=$(shell git rev-list -1 HEAD)' \
