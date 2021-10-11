@@ -32,7 +32,7 @@ func monitorForPLCTimeout(deps *Dependencies, exit chan error) {
 		case err := <-deps.ExitCh:
 			logger.Errorln(err)
 			driverDeckA, handler := compact32.NewCompact32DeckDriverA(deps.WsMsgCh, deps.WsErrCh, exit, false)
-			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, exit, false, handler)
+			driverDeckB := compact32.NewCompact32DeckDriverB(deps.WsMsgCh, deps.WsErrCh, exit, false, handler)
 			plcDeckMap := map[string]plc.Extraction{
 				plc.DeckA: driverDeckA,
 				plc.DeckB: driverDeckB,

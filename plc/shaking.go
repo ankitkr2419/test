@@ -35,7 +35,9 @@ func (d *Compact32Deck) Shaking(shakerData db.Shaker, live bool) (response strin
 
 		if err != nil {
 			logger.Errorln(err)
+			logger.Debugln("Actaual Error at defer: ", err)
 			if err == responses.AbortedError {
+				logger.Debugln("Actaual Error inside if: ", err)
 				d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorOperationAborted, d.name, err.Error())
 				return
 			}

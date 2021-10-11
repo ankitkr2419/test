@@ -15,6 +15,7 @@ import (
 
 func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint16) (response string, err error) {
 
+	logger.Infoln("SetUpMotor Deck ", d.name, " Speed: ", speed, " Pulse: ", pulse, " Ramp: ", ramp, " Direction: ", direction, " MotorNum: ", motorNum)
 	var results []byte
 	var temp uint16
 
@@ -279,11 +280,7 @@ func (d *Compact32Deck) setupMotor(speed, pulse, ramp, direction, motorNum uint1
 	skipSensor:
 		switch pulse {
 		case finalSensorCutPulses:
-			if motorNum == K6_Magnet_Up_Down || motorNum == K7_Magnet_Rev_Fwd{
-				time.Sleep(10 * time.Millisecond)
-			} else {
-				time.Sleep(50 * time.Millisecond)
-			}
+			time.Sleep(50 * time.Millisecond)
 		default:
 			time.Sleep(150 * time.Millisecond)
 		}
