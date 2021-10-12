@@ -344,7 +344,7 @@ func (d *Compact32Deck) magnetDetachIfSafe() (response string, err error) {
 	var results []byte
 	var ok bool
 	var pulses uint16
-	var deckAndNumber DeckNumber
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 
 	// Detaching magnet, doesn't matter even if its already detached
 	if magnetDetachForHoming, ok = consDistance["magnet_detach_for_homing"]; !ok {
@@ -376,8 +376,6 @@ func (d *Compact32Deck) magnetDetachIfSafe() (response string, err error) {
 		logger.Warnln("Magnet will cross max safe position, thus avoiding detach")
 		return "DETACH not needed", nil
 	}
-
-	deckAndNumber = DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 
 	logger.Infoln("Magnet is moving backward by", magnetDetachForHoming, "mm for detachment")
 
