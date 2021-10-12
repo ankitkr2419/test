@@ -83,6 +83,38 @@ func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseHandler() {
 
 	})
 
+	t.Run("when create aspire dispense record recieves invalid source position", func(t *testing.T) {
+		testAspireDispenseRecord.SourcePosition = 0
+
+		body, _ := json.Marshal(testAspireDispenseRecord)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/aspire-dispense/{recipe_id}",
+			"/aspire-dispense/"+recipeUUID.String(),
+			string(body),
+			createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.InvalidSourcePosition.Error()})
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		testAspireDispenseRecord.SourcePosition = 4
+	})
+
+	t.Run("when create aspire dispense record recieves invalid desitination position", func(t *testing.T) {
+		testAspireDispenseRecord.DestinationPosition = 0
+
+		body, _ := json.Marshal(testAspireDispenseRecord)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/aspire-dispense/{recipe_id}",
+			"/aspire-dispense/"+recipeUUID.String(),
+			string(body),
+			createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.InvalidDestinationPosition.Error()})
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		testAspireDispenseRecord.DestinationPosition = 8
+	})
+
 	t.Run("when create aspire dispense return recipe not found error", func(t *testing.T) {
 		suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, responses.RecipeFetchError).Once()
 
@@ -97,6 +129,48 @@ func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseHandler() {
 
 		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 		assert.Equal(suite.T(), string(output), recorder.Body.String())
+
+	})
+
+	t.Run("when create aspire dispense recieves invalid aspire height", func(t *testing.T) {
+		suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil).Once()
+		testAspireDispenseRecord.AspireHeight = 40
+		testAspireDispenseRecord.Category = db.WD
+
+		body, _ := json.Marshal(testAspireDispenseRecord)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/aspire-dispense/{recipe_id}",
+			"/aspire-dispense/"+recipeUUID.String(),
+			string(body),
+			createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.InvalidAspireWell.Error()})
+
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		testAspireDispenseRecord.AspireHeight = 2
+		testAspireDispenseRecord.Category = db.WW
+
+	})
+
+	t.Run("when create aspire dispense recieves invalid aspire height", func(t *testing.T) {
+		suite.dbMock.On("ShowRecipe", mock.Anything, recipeUUID).Return(testRecipeRecord, nil).Once()
+		testAspireDispenseRecord.DispenseHeight = 40
+		testAspireDispenseRecord.Category = db.DW
+
+		body, _ := json.Marshal(testAspireDispenseRecord)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/aspire-dispense/{recipe_id}",
+			"/aspire-dispense/"+recipeUUID.String(),
+			string(body),
+			createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.InvalidDispenseWell.Error()})
+
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		testAspireDispenseRecord.DispenseHeight = 1
+		testAspireDispenseRecord.Category = db.WW
 
 	})
 
@@ -160,6 +234,39 @@ func (suite *AspireDispenseHandlerTestSuite) TestCreateAspireDispenseHandler() {
 			createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
 		)
 		output, _ := json.Marshal(ErrObj{Err: responses.InvalidDispenseWell.Error()})
+
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		testAspireDispenseRecord.DestinationPosition = 8
+
+	})
+	t.Run("when create aspire dispense recieves invalid recipe id", func(t *testing.T) {
+
+		testAspireDispenseRecord.DestinationPosition = 3
+		body, _ := json.Marshal(testAspireDispenseRecord)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/aspire-dispense/{recipe_id}",
+			"/aspire-dispense/"+invalidUUID,
+			string(body),
+			createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		testAspireDispenseRecord.DestinationPosition = 8
+
+	})
+	t.Run("when create aspire dispense recieves invalid object for decode", func(t *testing.T) {
+		body := "{\"id\":\"38afc9ef-250e-477e-90cf-ef6448c0eb90\",\"category\":\"well_to_well\",\"cartridge_type\":\"cartridge_1\",\"source_position\":?,\"aspire_height\":2,\"aspire_mixing_volume\":3,\"aspire_no_of_cycles\":4,\"aspire_volume\":5,\"aspire_air_volume\":6,\"dispense_height\":1,\"dispense_mixing_volume\":8,\"dispense_no_of_cycles\":9,\"destination_position\":8,\"process_id\":\"46e8b814-3eb3-4cd4-9fd3-3b19a08ea456\",\"created_at\":\"0001-01-01T00:00:00Z\",\"updated_at\":\"0001-01-01T00:00:00Z\"}"
+
+		recorder := makeHTTPCall(http.MethodPost,
+			"/aspire-dispense/{recipe_id}",
+			"/aspire-dispense/"+recipeUUID.String(),
+			string(body),
+			createAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.AspireDispenseDecodeError.Error()})
 
 		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 		assert.Equal(suite.T(), string(output), recorder.Body.String())
@@ -367,6 +474,22 @@ func (suite *AspireDispenseHandlerTestSuite) TestUpdateAspireDispenseHandler() {
 
 		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
 		assert.Equal(suite.T(), output, recorder.Body.Bytes())
+
+	})
+	t.Run("when update aspire dispense recieves invalid object for decode", func(t *testing.T) {
+		body := "{\"id\":\"38afc9ef-250e-477e-90cf-ef6448c0eb90\",\"category\":\"well_to_well\",\"cartridge_type\":\"cartridge_1\",\"source_position\":?,\"aspire_height\":2,\"aspire_mixing_volume\":3,\"aspire_no_of_cycles\":4,\"aspire_volume\":5,\"aspire_air_volume\":6,\"dispense_height\":1,\"dispense_mixing_volume\":8,\"dispense_no_of_cycles\":9,\"destination_position\":8,\"process_id\":\"46e8b814-3eb3-4cd4-9fd3-3b19a08ea456\",\"created_at\":\"0001-01-01T00:00:00Z\",\"updated_at\":\"0001-01-01T00:00:00Z\"}"
+
+		recorder := makeHTTPCall(http.MethodPut,
+			"/aspire-dispense/{id}",
+			"/aspire-dispense/"+recipeUUID.String(),
+			string(body),
+			updateAspireDispenseHandler(Dependencies{Store: suite.dbMock}),
+		)
+		output, _ := json.Marshal(ErrObj{Err: responses.AspireDispenseDecodeError.Error()})
+
+		assert.Equal(suite.T(), http.StatusBadRequest, recorder.Code)
+		assert.Equal(suite.T(), string(output), recorder.Body.String())
+		testAspireDispenseRecord.DestinationPosition = 8
 
 	})
 	suite.dbMock.AssertExpectations(suite.T())
