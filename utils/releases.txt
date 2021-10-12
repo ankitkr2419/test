@@ -33,6 +33,10 @@ Extraction Software Releases
  - Configs defined at global level to make them robust to build changes
  - Magnet Homing Scan made normal as PLC will handle sensor cut limitation
 
+5. Version 1.4.184 13th October 2021
+ - Homing Fix for Magnet: Max back pulses taken by latch
+ - Order By for consumables and calibrations
+ - Attach and Detach set/reset M60 and M61 respectively, thus supporting new sensor
 
 RTPCR Software Releases
 
