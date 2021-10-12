@@ -49,6 +49,7 @@ const (
 	finalSensorCutPulses                = uint16(2999)
 	minimumPulsesThreshold              = uint16(50)
 	highestUint16                       = uint16(65535)
+	magnetFwdRevMaxSafePulses           = uint16(10000)
 )
 
 const (
