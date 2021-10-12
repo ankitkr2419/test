@@ -379,6 +379,6 @@ func (d *Compact32Deck) magnetDetachIfSafe() (response string, err error) {
 
 	logger.Infoln("Magnet is moving backward by", magnetDetachForHoming, "mm for detachment")
 
-	response, err = d.setupMotor(Motors[deckAndNumber]["fast"], pulses, Motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
+	response, err = d.setupMotor(Motors[deckAndNumber]["slow"], pulses, Motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
 	return
 }
