@@ -346,7 +346,6 @@ func (d *Compact32Deck) magnetDetachIfSafe() (response string, err error) {
 	var pulses uint16
 	deckAndNumber := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 
-	// Detaching magnet, doesn't matter even if its already detached
 	if magnetDetachForHoming, ok = consDistance["magnet_detach_for_homing"]; !ok {
 		err = fmt.Errorf("magnet_detach_for_homing doesn't exist")
 		logger.Errorln(err, d.name)
