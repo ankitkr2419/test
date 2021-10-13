@@ -49,6 +49,8 @@ const (
 	finalSensorCutPulses                = uint16(2999)
 	minimumPulsesThreshold              = uint16(50)
 	highestUint16                       = uint16(65535)
+	// TODO: Implement below logic for Other Motors as well
+	magnetFwdRevMaxSafePulses = uint16(10000)
 )
 
 const (
