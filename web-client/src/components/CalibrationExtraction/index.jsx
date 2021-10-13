@@ -159,7 +159,7 @@ const CalibrationExtractionComponent = (props) => {
 
           {/* Calibrations Component for Deck A */}
           <ConsumableDistancesComponent
-            addNewData={addNewCalibration}
+            addNewData={addNewConsumableDistance}
             data={calibrationsDataForDeckA}
             heading={"Calibrations for Deck A"}
             isReadOnly
@@ -167,7 +167,7 @@ const CalibrationExtractionComponent = (props) => {
 
           {/* Calibrations Component for Deck B */}
           <ConsumableDistancesComponent
-            addNewData={addNewCalibration}
+            addNewData={addNewConsumableDistance}
             data={calibrationsDataForDeckB}
             heading={"Calibrations for Deck B"}
             isReadOnly
