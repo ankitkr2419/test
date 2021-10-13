@@ -55,6 +55,8 @@ func (d *Compact32Deck) setAborted() {
 }
 
 func (d *Compact32Deck) ResetAborted() {
+	// Sleep to avoid Problems from the websocket Sleep
+	time.Sleep(2 * time.Second)
 	aborted.Store(d.name, false)
 	d.resetShakerInProgress()
 	d.resetHeaterInProgress()

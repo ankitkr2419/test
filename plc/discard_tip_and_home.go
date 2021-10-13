@@ -2,8 +2,8 @@ package plc
 
 import (
 	"encoding/json"
-	"mylab/cpagent/responses"
 	"fmt"
+	"mylab/cpagent/responses"
 
 	logger "github.com/sirupsen/logrus"
 )
