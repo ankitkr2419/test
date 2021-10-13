@@ -152,6 +152,7 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
 			226: uint16(0x10E2), // Motor Number (W)
+			408: uint16(0x1198), // Magnet Fwd/Rev Latch Position Pulses (R)
 			504: uint16(0x11F8), // PID Tuning Completed LH (R) (4 = DONE)
 			534: uint16(0x1216), // PID Tuning Completed RH (R) (4 = DONE)
 		},
@@ -166,9 +167,10 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			6:  uint16(0x0806), // UV Light ON/OFF (W)
 			7:  uint16(0x0807), // White Light ON/OFF (W)
 			8:  uint16(0x0808), // PID calibration RH ON/OFF (W)
-			45: uint16(0x082D), // Magnet Attach Sensor(R)
 			46: uint16(0x082E), // Flap LH (46 = OFF, 47 = ON) (R)
 			47: uint16(0x082F), // Flap RH (46 = OFF, 47 = ON) (R)
+			60: uint16(0x083C), // Magnet Attach Sensor(W)
+			61: uint16(0x083D), // Magnet Detach Sensor(W)
 		},
 	},
 	// Deck B
@@ -189,6 +191,7 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			222: uint16(0x10DE), // Shaker heater selection (Note 3) (W)
 			224: uint16(0x10E0), // Shaker temperature present value RH (R)
 			226: uint16(0x10E2), // Motor Number (W)
+			408: uint16(0x1198), // Magnet Fwd/Rev Latch Position Pulses (R)
 			504: uint16(0x11F8), // PID Tuning Completed LH (R) (4 = DONE)
 			534: uint16(0x1216), // PID Tuning Completed RH (R) (4 = DONE)
 		},
@@ -203,9 +206,10 @@ var MODBUS_EXTRACTION map[string]map[string]map[int]uint16 = map[string]map[stri
 			6:  uint16(0x0806), // UV Light ON/OFF (W)
 			7:  uint16(0x0807), // White Light ON/OFF (W)
 			8:  uint16(0x0808), // PID calibration RH ON/OFF (W)
-			45: uint16(0x082D), // Magnet Attach Sensor(R)
 			46: uint16(0x082E), // Flap LH (46 = OFF, 47 = ON) (R)
 			47: uint16(0x082F), // Flap RH (46 = OFF, 47 = ON) (R)
+			60: uint16(0x083C), // Magnet Attach Sensor(W)
+			61: uint16(0x083D), // Magnet Detach Sensor(W)
 		},
 	},
 	/*

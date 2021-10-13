@@ -1,6 +1,7 @@
 package plc
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/responses"
@@ -239,22 +240,8 @@ func (d *Compact32Deck) deckHoming() (response string, err error) {
 }
 
 func (d *Compact32Deck) magnetHoming() (response string, err error) {
-	var magnetDetach float64
-	var ok bool
-	var pulses uint16
-	deckAndNumber := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 
-	// Detaching magnet, doesn't matter even if its already detached
-	if magnetDetach, ok = consDistance["magnet_detach_for_homing"]; !ok {
-		err = fmt.Errorf("magnet_detach_for_homing doesn't exist")
-		logger.Errorln(err, d.name)
-		return "", err
-	}
-	logger.Infoln("Magnet is moving backward by 5 mm for detachment")
-
-	pulses = uint16(math.Round(float64(Motors[deckAndNumber]["steps"]) * magnetDetach))
-
-	response, err = d.setupMotor(Motors[deckAndNumber]["fast"], pulses, Motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
+	response, err = d.magnetDetachIfSafe()
 	if err != nil {
 		return
 	}
@@ -263,6 +250,7 @@ func (d *Compact32Deck) magnetHoming() (response string, err error) {
 	if err != nil {
 		return
 	}
+
 	response, err = d.magnetFwdRevHoming()
 	if err != nil {
 		return
@@ -349,4 +337,47 @@ func (d *Compact32Deck) magnetFwdRevHoming() (response string, err error) {
 	logger.Infoln("Magnet Fwd/Rev homing is completed with reverse pulses added.")
 
 	return "MAGNET FWD/REV HOMING SUCCESS", nil
+}
+
+func (d *Compact32Deck) magnetDetachIfSafe() (response string, err error) {
+	var magnetDetachForHoming float64
+	var results []byte
+	var ok bool
+	var pulses uint16
+	deckAndNumber := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
+
+	if magnetDetachForHoming, ok = consDistance["magnet_detach_for_homing"]; !ok {
+		err = fmt.Errorf("magnet_detach_for_homing doesn't exist")
+		logger.Errorln(err, d.name)
+		return
+	}
+
+	pulses = uint16(math.Round(float64(Motors[deckAndNumber]["steps"]) * magnetDetachForHoming))
+
+	// Magnet Detach is dependent on D 408 and above Pulses
+	// Read D 408
+	results, err = d.DeckDriver.ReadHoldingRegisters(MODBUS_EXTRACTION[d.name]["D"][408], uint16(1))
+	if err != nil {
+		logger.Errorln("err : ", err, d.name)
+		return
+	}
+
+	logger.Infof("Read D408AddressBytesUint16. res : %+v \n", results)
+	if len(results) == 0 {
+		err = fmt.Errorf("couldn't read D408")
+		return
+	}
+	magnetCurrentPositionPulses := binary.BigEndian.Uint16(results)
+	logger.Infoln("Read D408 Pulses -> ", magnetCurrentPositionPulses)
+
+	// Magnet detaches only if D 408  + pulses has value > maxSafePosition
+	if magnetCurrentPositionPulses+pulses > magnetFwdRevMaxSafePulses {
+		logger.Warnln("Magnet will cross max safe position, thus avoiding detach")
+		return "DETACH not needed", nil
+	}
+
+	logger.Infoln("Magnet is moving backward by", magnetDetachForHoming, "mm for detachment")
+
+	response, err = d.setupMotor(Motors[deckAndNumber]["slow"], pulses, Motors[deckAndNumber]["ramp"], REV, deckAndNumber.Number)
+	return
 }

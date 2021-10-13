@@ -19,9 +19,9 @@ const (
 	insertConsDistaceQuery2 = ` ON CONFLICT DO NOTHING;`
 
 	getAllConsDistanceQuery = `SELECT *
-							FROM consumable_distances`
+							FROM consumable_distances order by id`
 	getConsDistanceQueryByDeck = `SELECT *
-							FROM consumable_distances where id BETWEEN $1 AND $2`
+							FROM consumable_distances where id BETWEEN $1 AND $2 order by id`
 	updateConsDistaceQuery1 = `UPDATE consumable_distances SET 
 	distance = $1,
 	description = $2 WHERE id = $3`
