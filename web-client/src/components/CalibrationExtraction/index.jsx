@@ -22,6 +22,7 @@ import CartridgeComponent from "./CartridgeComponent";
 import DeleteCartridgeComponent from "./DeleteCartridgeComponent";
 import ConsumableDistancesComponent from "./ConsumableDistancesComponent";
 import ShakerAndHeaterComponent from "./ShakerAndHeaterComponent";
+import HomingCurrentDeckComponent from "./HomingCurrentDeckComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -48,6 +49,7 @@ const CalibrationExtractionComponent = (props) => {
     consumableDistanceData,
     calibrationsDataForDeckA,
     calibrationsDataForDeckB,
+    handleHomingDeck,
   } = props;
 
   const { shaker_1_temp, shaker_2_temp, heater_on } = heaterData;
@@ -159,7 +161,7 @@ const CalibrationExtractionComponent = (props) => {
 
           {/* Calibrations Component for Deck A */}
           <ConsumableDistancesComponent
-            addNewData={addNewCalibration}
+            addNewData={addNewConsumableDistance}
             data={calibrationsDataForDeckA}
             heading={"Calibrations for Deck A"}
             isReadOnly
@@ -167,10 +169,16 @@ const CalibrationExtractionComponent = (props) => {
 
           {/* Calibrations Component for Deck B */}
           <ConsumableDistancesComponent
-            addNewData={addNewCalibration}
+            addNewData={addNewConsumableDistance}
             data={calibrationsDataForDeckB}
             heading={"Calibrations for Deck B"}
             isReadOnly
+          />
+
+          {/** Homing for current deck */}
+          <HomingCurrentDeckComponent
+            heading={`Homing for ${deckName}`}
+            handleHomingDeck={handleHomingDeck}
           />
         </CardBody>
       </Card>

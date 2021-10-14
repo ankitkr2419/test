@@ -34,6 +34,7 @@ import {
   formikToArray,
   formikInitialStateForTipsTubes,
 } from "components/CalibrationExtraction/helpers";
+import { deckHomingActionInitiated } from "action-creators/homingActionCreators";
 
 const CalibrationExtractionContainer = () => {
   const dispatch = useDispatch();
@@ -326,6 +327,20 @@ const CalibrationExtractionContainer = () => {
     }
   };
 
+  const handleHomingDeck = () => {
+    let deckName =
+      name === DECKNAME.DeckA
+        ? DECKNAME.DeckAShort
+        : name === DECKNAME.DeckB
+        ? DECKNAME.DeckBShort
+        : null;
+    if (deckName === null) {
+      console.error("deckName not found");
+      return;
+    }
+    dispatch(deckHomingActionInitiated({ deckName, token }));
+  };
+
   return (
     <CalibrationExtractionComponent
       toggleConfirmModal={toggleConfirmModal}
@@ -350,6 +365,7 @@ const CalibrationExtractionContainer = () => {
       consumableDistanceData={consumableReducerData.data || null}
       calibrationsDataForDeckA={calibrationDeckAReducerData.data || null}
       calibrationsDataForDeckB={calibrationDeckBReducerData.data || null}
+      handleHomingDeck={handleHomingDeck}
     />
   );
 };

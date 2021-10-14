@@ -19,11 +19,6 @@ const ConsumablesAndCalibrationsComponent = (props) => {
   const [isUpdate, setIsUpdate] = useState(false);
 
   const handleSelect = (id) => {
-    // for calibrations we do not select any value
-    if (isReadOnly === true) {
-      return;
-    }
-
     if (id === selectedId) {
       setSelectedId(null);
       return;
@@ -97,7 +92,7 @@ const ConsumablesAndCalibrationsComponent = (props) => {
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
-                  <th>Discription</th>
+                  <th>Description</th>
                   <th>Distance</th>
 
                   {!isReadOnly && (
