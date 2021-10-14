@@ -8,14 +8,18 @@ import {
   saveRecipeDataAction,
   publishRecipeAction,
   deleteRecipeAction,
+  actionBtnStates,
 } from "actions/recipeActions";
 import { DECKCARD_BTN, DECKNAME, RUN_RECIPE_TYPE } from "appConstants";
-import { getUpdatedDecks, getUpdatedDecksAfterRecipeListChanged } from "utils/helpers";
+import {
+  getUpdatedDecks,
+  getUpdatedDecksAfterRecipeListChanged,
+} from "utils/helpers";
 
 export const initialState = {
   // recipeData: [], //all recipe data
   tempDeckName: "", //used for fetch recipe list
-  tempRecipeId: "", 
+  tempRecipeId: "",
   tempIsPublished: "",
   decks: [
     {
@@ -300,7 +304,29 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
       return { ...state };
 
     case abortRecipeAction.abortRecipeSuccess:
-      return { ...state };
+      let responseAbortSuccess = action.payload.response;
+      let deckNameAbortSuccess =
+        responseAbortSuccess.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
+
+      const abortRecipeChanges = {
+        abortRecipeResponse: responseAbortSuccess,
+        abortRecipeError: false,
+        leftActionBtn: DECKCARD_BTN.text.done,
+        rightActionBtn: DECKCARD_BTN.text.cancel,
+        leftActionBtnDisabled: true,
+        rightActionBtnDisabled: true,
+      };
+
+      const decksAfterAbortSuccess = getUpdatedDecks(
+        state,
+        deckNameAbortSuccess,
+        abortRecipeChanges
+      );
+
+      return {
+        ...state,
+        decks: decksAfterAbortSuccess,
+      };
 
     case abortRecipeAction.abortRecipeFailed:
       return { ...state };
@@ -392,7 +418,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         decks: newDecksAfterLoggedOut,
       };
 
-    case publishRecipeAction.publishRecipeInitiated: 
+    case publishRecipeAction.publishRecipeInitiated:
       return {
         ...state,
         tempDeckName: action.payload.params.deckName,
@@ -403,50 +429,50 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
 
     case publishRecipeAction.publishRecipeSuccess:
       const changesInMatchedRecipe = {
-        is_published: !state.tempIsPublished
-      }
+        is_published: !state.tempIsPublished,
+      };
 
       const newDecksAfterPublishSuccess = getUpdatedDecksAfterRecipeListChanged(
         state,
         state.tempDeckName,
         state.tempRecipeId,
         changesInMatchedRecipe
-      )
+      );
 
-      return {
-        ...state,
-        tempDeckName:"",
-        tempRecipeId: "",
-        tempIsPublished: "",
-        isLoading: false,
-        decks: newDecksAfterPublishSuccess,
-      }
-
-    case publishRecipeAction.publishRecipeFailed: 
       return {
         ...state,
         tempDeckName: "",
         tempRecipeId: "",
         tempIsPublished: "",
-        isLoading: false
-      } 
-      
-    case deleteRecipeAction.deleteRecipeInitiated: 
+        isLoading: false,
+        decks: newDecksAfterPublishSuccess,
+      };
+
+    case publishRecipeAction.publishRecipeFailed:
+      return {
+        ...state,
+        tempDeckName: "",
+        tempRecipeId: "",
+        tempIsPublished: "",
+        isLoading: false,
+      };
+
+    case deleteRecipeAction.deleteRecipeInitiated:
       return {
         ...state,
         tempDeckName: action.payload.params.deckName,
         tempRecipeId: action.payload.params.recipeId,
-      }
+      };
 
     case deleteRecipeAction.deleteRecipeSuccess:
       const newDecksAfterDeleteRecipe = getUpdatedDecksAfterRecipeListChanged(
         state,
         state.tempDeckName,
         state.tempRecipeId,
-        {},//changes in matched
-        {},//changes in unmatched
-        true,//isDeleteRecipe
-      )
+        {}, //changes in matched
+        {}, //changes in unmatched
+        true //isDeleteRecipe
+      );
       return {
         ...state,
         tempDeckName: "",
@@ -458,7 +484,56 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         ...state,
         tempDeckName: "",
         tempRecipeId: "",
+      };
+
+    // enable disable action btns seperately
+    case actionBtnStates.enableActionBtn:
+      let enableBtnDeckname = action.payload.deckName;
+
+      let enableBtnChanges = null;
+      if (action.payload.isLeftBtn === true) {
+        enableBtnChanges = {
+          leftActionBtnDisabled: false,
+        };
+      } else {
+        enableBtnChanges = {
+          rightActionBtnDisabled: false,
+        };
       }
+
+      const newDeckDataAfterEnableBtn = getUpdatedDecks(
+        state,
+        enableBtnDeckname,
+        enableBtnChanges
+      );
+      return {
+        ...state,
+        decks: newDeckDataAfterEnableBtn,
+      };
+
+    case actionBtnStates.disableActionBtn:
+      let disableBtnDeckname = action.payload.deckName;
+
+      let disableBtnChanges = null;
+      if (action.payload.isLeftBtn === true) {
+        disableBtnChanges = {
+          leftActionBtnDisabled: true,
+        };
+      } else {
+        disableBtnChanges = {
+          rightActionBtnDisabled: true,
+        };
+      }
+
+      const newDeckDataAfterDisableBtn = getUpdatedDecks(
+        state,
+        disableBtnDeckname,
+        disableBtnChanges
+      );
+      return {
+        ...state,
+        decks: newDeckDataAfterDisableBtn,
+      };
 
     default:
       return state;
