@@ -73,7 +73,7 @@ const AppFooter = () => {
 
   //homing reducer to show homing status
   const homingReducer = useSelector((state) => state.homingReducer);
-  const { isHomingActionCompleted } = homingReducer;
+  const { isHomingActionCompleted, homingStatus } = homingReducer;
 
   // change state of disabled btn to enable after homing is completed
   useEffect(() => {
@@ -531,7 +531,7 @@ const AppFooter = () => {
 
       case "processNumber":
         // if tip is discarded, we hide processNumber and processTotal
-        if (isTipDiscarded === true && activeDeckName === deckName) {
+        if (homingStatus !== null && activeDeckName === deckName) {
           return null;
         }
         // else we return processNumber of ongoing process
@@ -542,7 +542,7 @@ const AppFooter = () => {
 
       case "processTotal":
         // if tip is discarded, we hide processNumber and processTotal
-        if (isTipDiscarded === true && activeDeckName === deckName) {
+        if (homingStatus !== null && activeDeckName === deckName) {
           return null;
         }
         // else we return processTotal of ongoing process
@@ -596,7 +596,7 @@ const AppFooter = () => {
 
       case "processName":
         // if tip is discarded, we start homing and show message
-        if (isTipDiscarded === true && activeDeckName === deckName) {
+        if (homingStatus !== null && activeDeckName === deckName) {
           if (isHomingActionCompleted === false) {
             return "Homing is in progress...";
           }

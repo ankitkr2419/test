@@ -3,6 +3,8 @@ import {
   discardTipAndHomingActions,
 } from "actions/homingActions";
 
+import { HOMING_STATUS } from "appConstants";
+
 export const initialState = {
   isLoading: false,
   showHomingModal: true,
@@ -12,6 +14,7 @@ export const initialState = {
   isHomingActionCompleted: false,
   homingActionInProgress: {},
   homingActionInCompleted: {},
+  homingStatus: null,
 };
 
 export const homingReducer = (state = initialState, action = {}) => {
@@ -22,6 +25,7 @@ export const homingReducer = (state = initialState, action = {}) => {
         ...action.payload,
         isLoading: true,
         isHomingActionCompleted: false,
+        homingStatus: HOMING_STATUS.progressStarted,
       };
 
     // case homingActions.homingActionSuccess:
@@ -37,6 +41,7 @@ export const homingReducer = (state = initialState, action = {}) => {
         isLoading: false,
         homingAllDeckCompletionPercentage: action.payload.progress,
         isHomingActionCompleted: false,
+        homingStatus: HOMING_STATUS.progressing,
       };
 
     case homingActions.homingActionInCompleted:
@@ -45,6 +50,7 @@ export const homingReducer = (state = initialState, action = {}) => {
         ...action.payload,
         isLoading: false,
         isHomingActionCompleted: true,
+        homingStatus: HOMING_STATUS.progressComplete,
       };
 
     case homingActions.hideHomingModaal:
