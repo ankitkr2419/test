@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mylab/cpagent/responses"
+	"time"
 
 	logger "github.com/sirupsen/logrus"
 )
@@ -16,6 +17,9 @@ func (d *Compact32Deck) DiscardTipAndHome(discard bool) (response string, err er
 			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
 		}
 	}()
+
+	// Sleep to Compensate the UI Bug From Abort Response from the websocket Sleep
+	time.Sleep(5 * time.Second)
 
 	//Machine Should be in aborted state
 	if !d.isMachineInAbortedState() {

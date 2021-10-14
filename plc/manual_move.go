@@ -31,7 +31,7 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (
 	}
 
 	// For Engineer Allow Indeck movements as well
-	if deckAndMotor.Number == K9_Syringe_Module_LHRH{
+	if deckAndMotor.Number == K9_Syringe_Module_LHRH {
 		syringeModuleState.Store(d.name, OutDeck)
 	}
 
