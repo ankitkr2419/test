@@ -54,15 +54,19 @@ var REGISTERS_EXTRACTION map[string]map[string]map[uint16]uint16 = map[string]ma
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[uint16]uint16{
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][0]: uint16(0), // Motor ON/OFF . (W)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][1]: uint16(0), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][2]: uint16(0), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][3]: uint16(0), // Heater ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][4]: uint16(0), // PID calibration LH ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][5]: uint16(0), // Shaker ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][6]: uint16(0), // UV Light ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][7]: uint16(0), // Light ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][8]: uint16(0), // PID calibration RH ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][0]:  uint16(0), // Motor ON/OFF . (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][1]:  uint16(0), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][2]:  uint16(0), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][3]:  uint16(0), // Heater ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][4]:  uint16(0), // PID calibration LH ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][5]:  uint16(0), // Shaker ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][6]:  uint16(0), // UV Light ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][7]:  uint16(0), // Light ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][8]:  uint16(0), // PID calibration RH ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][46]: uint16(0), // Flap LH (46 = OFF, 47 = ON) (R)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][47]: uint16(0), // Flap RH (46 = OFF, 47 = ON) (R)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][60]: uint16(0), // Magnet Attach Sensor(W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][61]: uint16(0), //  Magnet Detach Sensor(W)
 		},
 	},
 	// Deck B
@@ -88,15 +92,19 @@ var REGISTERS_EXTRACTION map[string]map[string]map[uint16]uint16 = map[string]ma
 		},
 		// Coil registers: ON:0xFF00, OFF: 0x0000
 		"M": map[uint16]uint16{
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][0]: uint16(0), // Motor ON/OFF . (W)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][1]: uint16(0), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][2]: uint16(0), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][3]: uint16(0), // Heater ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][4]: uint16(0), // PID calibration LH ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][5]: uint16(0), // Shaker ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][6]: uint16(0), // UV Light ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][7]: uint16(0), // Light ON/OFF (W)
-			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][8]: uint16(0), // PID calibration RH ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][0]:  uint16(0), // Motor ON/OFF . (W)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][1]:  uint16(0), // Pulses Completion bit. ON = uint16(1), OFF = uint16(0) (R)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][2]:  uint16(0), // Sensor Has Cut. ON = uint16(3), OFF = uint16(2)(R)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][3]:  uint16(0), // Heater ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][4]:  uint16(0), // PID calibration LH ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][5]:  uint16(0), // Shaker ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][6]:  uint16(0), // UV Light ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][7]:  uint16(0), // Light ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckB]["M"][8]:  uint16(0), // PID calibration RH ON/OFF (W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][46]: uint16(0), // Flap LH (46 = OFF, 47 = ON) (R)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][47]: uint16(0), // Flap RH (46 = OFF, 47 = ON) (R)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][60]: uint16(0), // Magnet Attach Sensor(W)
+			plc.MODBUS_EXTRACTION[plc.DeckA]["M"][61]: uint16(0), //  Magnet Detach Sensor(W)
 		},
 	},
 }
