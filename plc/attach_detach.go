@@ -47,14 +47,14 @@ func (d *Compact32Deck) detach() (response string, err error) {
 	// motor desc for magnet fwd/rev motion
 	deckMagnetFwdRev := DeckNumber{Deck: d.name, Number: K7_Magnet_Rev_Fwd}
 
-	// TODO: This to be taken from Sensor
+	// TODO: This to be taken from MyLab Team
 
 	// step 1 to calculate the relative position of the magnet from its current
 	// position to move the magnet backward for step 1.
 	if magnetBackPosition, ok = consDistance["magnet_backward_step_1"]; !ok {
 		err = fmt.Errorf("magnet_backward_step_1 doesn't exist for consuamble distances")
 		logger.Errorln(err)
-		return "", err
+		return
 	}
 
 	// distance and direction setup for magnet for forward step 1
@@ -64,9 +64,24 @@ func (d *Compact32Deck) detach() (response string, err error) {
 
 	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
-	// set up motor for detach step 1 Backward Motion
-	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	// StartUp Attach Sensor M61
+	response, err = d.switchCoilRegister(61, ON, "Attach Sensor M61")
 	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
+	// set up motor for detach step 1 Backward Motion
+	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["slow"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
+	// Reset M61
+	response, err = d.switchCoilRegister(61, OFF, "Attach Sensor M61")
+	if err != nil {
+		logger.Errorln(err)
 		return
 	}
 
@@ -76,7 +91,7 @@ func (d *Compact32Deck) detach() (response string, err error) {
 	if magnetUpPosition, ok = consDistance["magnet_up_step_1"]; !ok {
 		err = fmt.Errorf("magnet_up_step_1 doesn't exist for consuamble distances")
 		logger.Errorln(err)
-		return "", err
+		return
 	}
 	// distance and direction setup for magnet for forward step 1
 	distanceToTravel = Positions[deckMagnetUpDown] - magnetUpPosition
@@ -95,8 +110,9 @@ func (d *Compact32Deck) detach() (response string, err error) {
 	if magnetBackPosition, ok = consDistance["magnet_back_step_2"]; !ok {
 		err = fmt.Errorf("magnet_back_step_2 doesn't exist for consuamble distances")
 		logger.Errorln(err)
-		return "", err
+		return
 	}
+
 	// distance and direction setup for magnet for backward step 2
 	distanceToTravel = Positions[deckMagnetFwdRev] - magnetBackPosition
 
@@ -145,7 +161,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	if deckPosition, ok = consDistance["shaker_tube"]; !ok {
 		err = fmt.Errorf("shaker_tube doesn't exist for consuamble distances")
 		logger.Errorln(err)
-		return "", err
+		return
 	}
 
 	distanceToTravel := Positions[deckAndNumber] - deckPosition
@@ -165,7 +181,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	if magnetDownFirstPosition, ok = consDistance["magnet_down_step_1"]; !ok {
 		err = fmt.Errorf("magnet_down_step_1 doesn't exist for consuamble distances")
 		logger.Errorln(err)
-		return "", err
+		return
 	}
 	// distance and direction setup for magnet down step 1
 	distanceToTravel = Positions[deckMagnetUpDown] - magnetDownFirstPosition
@@ -181,7 +197,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 		return
 	}
 
-	// TODO: This to be taken from Sensor
+	// TODO: This to be taken from MyLab team
 
 	// step 2 to calculate the relative position of the magnet from its current
 	// position to move the magnet forward for step 1.
@@ -197,8 +213,22 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 
 	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
+	// StartUp Attach Sensor M60
+	response, err = d.switchCoilRegister(60, ON, "Attach Sensor M60")
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
 	// set up motor for attach step 1 forward Motion
 	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
+	// Reset M60
+	response, err = d.switchCoilRegister(60, OFF, "Attach Sensor M60")
 	if err != nil {
 		logger.Errorln(err)
 		return
@@ -230,7 +260,7 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2"]; !ok {
 		err = fmt.Errorf("magnet_forward_step_2 doesn't exist for consuamble distances")
 		logger.Errorln(err)
-		return "", err
+		return
 	}
 	// distance and direction setup for magnet for forward step 1
 	distanceToTravel = Positions[deckMagnetFwdRev] - magnetFwdSecPosition
@@ -240,11 +270,28 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 	pulses = uint16(math.Round(float64(Motors[deckMagnetFwdRev]["steps"]) * distanceToTravel))
 
 	// set up motor for attach step 2 Forward Motion
-	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["fast"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
+	response, err = d.setupMotor(Motors[deckMagnetFwdRev]["slow"], pulses, Motors[deckMagnetFwdRev]["ramp"], direction, deckMagnetFwdRev.Number)
 	if err != nil {
 		logger.Errorln(err)
 		return
 	}
 
+	return "Success", nil
+}
+
+// Common Function
+func (d *Compact32Deck) switchCoilRegister(address int, value uint16, description string) (response string, err error) {
+
+	if value == ON {
+		description = "Switching ON " + description
+	} else {
+		description = "Switching OFF " + description
+	}
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][address], value)
+	if err != nil {
+		logger.Errorln("err ", description, err)
+		return
+	}
+	logger.Infoln(description, "for deck ", d.name)
 	return "Success", nil
 }

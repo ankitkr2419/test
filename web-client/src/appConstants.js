@@ -226,6 +226,7 @@ export const MODAL_MESSAGE = {
   setPosition: "Please check the position of tip and magnet!",
   homingConfirmation: "Homing Confirmation",
   experimentSuccess: "Experiment was successful",
+  experimentAborted: "Experiment was aborted",
   abortConfirmation: "Are you sure you want to abort now?",
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",

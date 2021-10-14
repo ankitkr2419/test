@@ -33,6 +33,7 @@ const TipDiscardModal = (props) => {
                 name="tip-discard"
                 label="Tip Discard"
                 className="mb-3"
+                checked={checked}
                 onClick={() => {
                   setChecked(!checked);
                 }}
