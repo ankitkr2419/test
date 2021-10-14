@@ -256,6 +256,8 @@ func (d *Compact32Deck) magnetHoming() (response string, err error) {
 		return
 	}
 
+	magnetState.Store(d.name, detached)
+
 	return "MAGNET HOMING SUCCESS", nil
 }
 
@@ -264,7 +266,7 @@ func (d *Compact32Deck) magnetUpDownHoming() (response string, err error) {
 	deckAndNumber := DeckNumber{Deck: d.name, Number: K6_Magnet_Up_Down}
 
 	logger.Infoln("Magnet is moving up")
-	response, err = d.setupMotor(homingSlowSpeed, initialSensorCutMagnetPulses, Motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
+	response, err = d.setupMotor(homingFastSpeed, initialSensorCutMagnetPulses, Motors[deckAndNumber]["ramp"], UP, deckAndNumber.Number)
 	if err != nil {
 		return
 	}
