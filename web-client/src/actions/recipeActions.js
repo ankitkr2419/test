@@ -39,24 +39,29 @@ export const recipeListingAction = {
 export const saveRecipeDataAction = {
   saveRecipeDataForDeck: "SAVE_RECIPE_DATA_FOR_DECK",
   resetRecipeDataForDeck: "RESET_RECIPE_DATA_FOR_DECK",
-  updateRecipeReducerDataForDeck: "UPDATE_RECIPE_REDUCER_DATA_FOR_DECK"
-}
+  updateRecipeReducerDataForDeck: "UPDATE_RECIPE_REDUCER_DATA_FOR_DECK",
+};
 
 export const stepRunRecipeAction = {
   stepRunRecipeInitiated: "STEP_RUN_RECIPE_INITIATED",
   stepRunRecipeSuccess: "RUN_RECIPE_SUCCESS",
   stepRunRecipeFailed: "RUN_RECIPE_FAILED",
   nextStepRunRecipeInitiated: "NEXT_STEP_RUN_RECIPE_INITIATED",
-}
+};
 
 export const publishRecipeAction = {
   publishRecipeInitiated: "PUBLISH_RECIPE_INITIATED",
   publishRecipeSuccess: "PUBLISH_RECIPE_SUCCESS",
-  publishRecipeFailed: "PUBLISH_RECIPE_FAILED"
-}
+  publishRecipeFailed: "PUBLISH_RECIPE_FAILED",
+};
 
 export const deleteRecipeAction = {
   deleteRecipeInitiated: "DELETE_RECIPE_INITIATED",
   deleteRecipeSuccess: "DELETE_RECIPE_SUCCESS",
   deleteRecipeFailure: "DELETE_RECIPE_FAILURE",
-}
+};
+
+export const actionBtnStates = {
+  enableActionBtn: "ENABLE_ACTION_BTN",
+  disableActionBtn: "DISABLE_ACTION_BTN",
+};

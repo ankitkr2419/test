@@ -28,6 +28,17 @@ const ProecssRemainingBox = styled.div`
 `;
 const ProcessRemaining = (props) => {
   const { processName, processType, processNumber, processTotal } = props;
+
+  const showProcessDetails = () => {
+    if (
+      (processNumber || processNumber === 0) &&
+      (processTotal || processTotal === 0)
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <ProecssRemainingBox>
       <Text Tag="label" className="d-flex align-items-center px-3 py-2 mb-0">
@@ -36,15 +47,20 @@ const ProcessRemaining = (props) => {
           size={19}
           className="text-primary"
         />
-        <Text Tag="span" className="process-remain-label font-weight-bold ml-2">
-          <Text Tag="span" className="process-counter font-weight-bold">
-            {" "}
-            {processNumber}
+        {showProcessDetails() && (
+          <Text
+            Tag="span"
+            className="process-remain-label font-weight-bold ml-2"
+          >
+            <Text Tag="span" className="process-counter font-weight-bold">
+              {" "}
+              {processNumber}
+            </Text>
+            <Text Tag="span" className="total-process ml-1">
+              /{processTotal}{" "}
+            </Text>
           </Text>
-          <Text Tag="span" className="total-process ml-1">
-            /{processTotal}{" "}
-          </Text>
-        </Text>
+        )}
         <Text Tag="span" className="min-label ml-2 font-weight-bold">
           {processName}
         </Text>

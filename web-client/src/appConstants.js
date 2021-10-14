@@ -74,6 +74,13 @@ export const SOCKET_MESSAGE_TYPE = {
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
 
+export const HOMING_STATUS = {
+  progressStarted: "progressStarted",
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+  progressFailed: "progressFailed",
+};
+
 export const CLEAN_UP_STATUS = {
   aborted: "aborted",
   aborting: "aborting",
@@ -226,6 +233,7 @@ export const MODAL_MESSAGE = {
   setPosition: "Please check the position of tip and magnet!",
   homingConfirmation: "Homing Confirmation",
   experimentSuccess: "Experiment was successful",
+  experimentAborted: "Experiment was aborted",
   abortConfirmation: "Are you sure you want to abort now?",
   abortCleanupConfirmation: "Are you sure you want to Abort Cleanup?",
   uvSuccess: "UV Clean Up was successful",
