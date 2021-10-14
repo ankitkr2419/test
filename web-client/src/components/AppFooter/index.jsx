@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DeckCard from "shared-components/DeckCard";
 import {
   DECKNAME,
@@ -18,6 +18,7 @@ import {
   runRecipeReset,
   stepRunRecipeInitiated,
   nextStepRunRecipeInitiated,
+  enableActionBtn,
 } from "action-creators/recipeActionCreators";
 import {
   abortCleanUpActionInitiated,
@@ -28,7 +29,10 @@ import {
 } from "action-creators/cleanUpActionCreators";
 import { MlModal } from "shared-components";
 import TipDiscardModal from "components/modals/TipDiscardModal";
-import { discardTipAndHomingActionInitiated } from "action-creators/homingActionCreators";
+import {
+  discardTipAndHomingActionInitiated,
+  hideHomingModal,
+} from "action-creators/homingActionCreators";
 import { getTimeStr } from "./helpers";
 
 const AppFooter = () => {
@@ -38,6 +42,7 @@ const AppFooter = () => {
   const [confirmDoneModal, setConfirmDoneModal] = useState(false);
   const [tipDiscardModal, setTipDiscardModal] = useState(false);
   const [deckName, setDeckName] = useState("");
+  const [isTipDiscarded, setIsTipDiscarded] = useState(false);
 
   //login reducer
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -65,6 +70,33 @@ const AppFooter = () => {
   let recipeActionReducerForDeckB = recipeActionReducer.decks.find(
     (deckObj) => deckObj.name === DECKNAME.DeckB
   );
+
+  //homing reducer to show homing status
+  const homingReducer = useSelector((state) => state.homingReducer);
+  const { isHomingActionCompleted } = homingReducer;
+
+  // change state of disabled btn to enable after homing is completed
+  useEffect(() => {
+    if (isHomingActionCompleted === true) {
+      dispatch(enableActionBtn({ deckName: deckName, isLeftBtn: true }));
+    }
+  }, [isHomingActionCompleted]);
+
+  // show tip-disard modal only after abort is success
+  useEffect(() => {
+    if (isDeckAActive === true) {
+      if (recipeActionReducerForDeckA.abortRecipeError === false) {
+        setTipDiscardModal(true);
+      }
+    } else {
+      if (recipeActionReducerForDeckB.abortRecipeError === false) {
+        setTipDiscardModal(true);
+      }
+    }
+  }, [
+    recipeActionReducerForDeckA.abortRecipeError,
+    recipeActionReducerForDeckB.abortRecipeError,
+  ]);
 
   //cleanUp reducer
   const cleanUpReducer = useSelector((state) => state.cleanUpReducer);
@@ -344,7 +376,6 @@ const AppFooter = () => {
     let token = loginDataOfA.token;
     if (recipeReducerData.showProcess) {
       dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckA, token }));
-      setTipDiscardModal(!tipDiscardModal);
     } else {
       dispatch(
         abortCleanUpActionInitiated({ deckName: DECKNAME.DeckAShort, token })
@@ -360,7 +391,6 @@ const AppFooter = () => {
     let token = loginDataOfB.token;
     if (recipeReducerData.showProcess) {
       dispatch(abortRecipeInitiated({ deckName: DECKNAME.DeckB, token }));
-      setTipDiscardModal(!tipDiscardModal);
     } else {
       dispatch(
         abortCleanUpActionInitiated({ deckName: DECKNAME.DeckBShort, token })
@@ -380,7 +410,6 @@ const AppFooter = () => {
           token,
         })
       );
-      dispatch(resetRecipeDataForDeck(DECKNAME.DeckA));
     } else {
       let token = loginDataOfB.token;
       dispatch(
@@ -390,9 +419,9 @@ const AppFooter = () => {
           token,
         })
       );
-      dispatch(resetRecipeDataForDeck(DECKNAME.DeckB));
     }
     setTipDiscardModal(!tipDiscardModal);
+    setIsTipDiscarded(true);
   };
 
   //DONE
@@ -410,7 +439,11 @@ const AppFooter = () => {
     let recipeReducerData = recipeActionReducerForDeckA;
 
     if (recipeReducerData.showProcess) {
+      // reset states
       dispatch(runRecipeReset(deckName));
+      setIsTipDiscarded(false);
+      dispatch(hideHomingModal()); // resets homing state
+      dispatch(resetRecipeDataForDeck(DECKNAME.DeckA)); // reset recipe data
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
     }
@@ -421,7 +454,11 @@ const AppFooter = () => {
     let recipeReducerData = recipeActionReducerForDeckB;
 
     if (recipeReducerData.showProcess) {
+      // reset states
       dispatch(runRecipeReset(deckName));
+      setIsTipDiscarded(false);
+      dispatch(hideHomingModal()); // resets homing state
+      dispatch(resetRecipeDataForDeck(DECKNAME.DeckB)); // reset recipe data
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
@@ -441,16 +478,24 @@ const AppFooter = () => {
 
     let isShowProcessForCurrentDeck = recipeReducerData.showProcess;
 
+    const {
+      abortConfirmation,
+      abortCleanupConfirmation,
+      experimentSuccess,
+      experimentAborted,
+      uvSuccess,
+    } = MODAL_MESSAGE;
+
+    const successMsg = isTipDiscarded ? experimentAborted : experimentSuccess;
+
     switch (fieldName) {
       case DECKCARD_BTN.text.abort:
         return isShowProcessForCurrentDeck
-          ? MODAL_MESSAGE.abortConfirmation
-          : MODAL_MESSAGE.abortCleanupConfirmation;
+          ? abortConfirmation
+          : abortCleanupConfirmation;
 
       case DECKCARD_BTN.text.done:
-        return isShowProcessForCurrentDeck
-          ? MODAL_MESSAGE.experimentSuccess
-          : MODAL_MESSAGE.uvSuccess;
+        return isShowProcessForCurrentDeck ? successMsg : uvSuccess;
       default:
         return;
     }
@@ -475,6 +520,9 @@ const AppFooter = () => {
     let loggedInDeck =
       deckName === DECKNAME.DeckA ? isDeckALoggedIn : isDeckBLoggedIn;
 
+    let activeDeckName =
+      isDeckAActive === true ? DECKNAME.DeckA : DECKNAME.DeckB;
+
     switch (fieldName) {
       case "recipeName":
         return recipeReducerData.recipeData?.recipeName
@@ -482,12 +530,22 @@ const AppFooter = () => {
           : null;
 
       case "processNumber":
+        // if tip is discarded, we hide processNumber and processTotal
+        if (isTipDiscarded === true && activeDeckName === deckName) {
+          return null;
+        }
+        // else we return processNumber of ongoing process
         let recipeInProgressData = recipeReducerData.runRecipeInProgress;
         return recipeInProgressData
           ? recipeInProgressData.operation_details.current_step
           : 0;
 
       case "processTotal":
+        // if tip is discarded, we hide processNumber and processTotal
+        if (isTipDiscarded === true && activeDeckName === deckName) {
+          return null;
+        }
+        // else we return processTotal of ongoing process
         return recipeReducerData.recipeData?.processCount
           ? recipeReducerData.recipeData.processCount
           : null;
@@ -537,6 +595,15 @@ const AppFooter = () => {
         );
 
       case "processName":
+        // if tip is discarded, we start homing and show message
+        if (isTipDiscarded === true && activeDeckName === deckName) {
+          if (isHomingActionCompleted === false) {
+            return "Homing is in progress...";
+          }
+          return "Homing completed successfully";
+        }
+
+        // else we show details for the ongoing process
         let checkIsAdminForName =
           deckName === DECKNAME.DeckA
             ? loginDataOfA.isAdmin
