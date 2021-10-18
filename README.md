@@ -113,6 +113,12 @@ Please refer README inside web-client directory if you are facing any issue and 
 # Run
 DEPENDENCY: Make sure that cpagent binary is built
 
+## FOR EXTRACTION
+sudo ./run.sh extraction
+
+## FOR RT-PCR
+sudo ./run.sh rtpcr
+
 ## When there are changes in Migration/DB schema files 
 
 Only if below make command doesn't work then go for individual statements
@@ -184,7 +190,7 @@ $ make zip
 
 # Create Build and then a Zipped Artifact
 ```
-$ make build-and-zip
+$ make baz
 ```
 
 ### Testing
@@ -230,3 +236,5 @@ Comment out the lines that are causing trouble
 
 4. For connecting to the database
 Please refer mac guides or thy this out https://www.codementor.io/@engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb
+
+5. All the config files and utilites can be found on the path `$HOME/cpagent`
