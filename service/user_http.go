@@ -119,6 +119,7 @@ func reloadPLCFuncsExceptUtils(deps Dependencies, deck string) {
 }
 
 func anotherDeck(deck string) string {
+	logger.Infoln("Inside another Deck", deck)
 	if deck == plc.DeckA {
 		return plc.DeckB
 	}

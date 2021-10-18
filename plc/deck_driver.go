@@ -638,6 +638,20 @@ func (d *Compact32Deck) SwitchOffAllCoils() (response string, err error) {
 		err = fmt.Errorf("%v\n%v", err, tempErr)
 	}
 
+	// Reset M60
+	response, err = d.switchCoilRegister(60, OFF, "Attach Sensor M60")
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
+	// Reset M61
+	response, err = d.switchCoilRegister(61, OFF, "Attach Sensor M61")
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
 	// reset completion bit
 	tempErr = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][1], OFF)
 	if tempErr != nil {

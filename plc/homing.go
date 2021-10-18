@@ -256,6 +256,8 @@ func (d *Compact32Deck) magnetHoming() (response string, err error) {
 		return
 	}
 
+	magnetState.Store(d.name, detached)
+
 	return "MAGNET HOMING SUCCESS", nil
 }
 

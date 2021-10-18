@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"mylab/cpagent/db"
+	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
 	"os"
@@ -74,19 +75,19 @@ func ShutDownGracefully(deps Dependencies) (err error) {
 		}
 	}
 	if Application == Combined || Application == Extraction {
-		_, err3 = deps.PlcDeck["A"].SwitchOffAllCoils()
+		_, err3 = deps.PlcDeck[plc.DeckA].SwitchOffAllCoils()
 		if err3 != nil {
 			logger.Errorln("Couldn't switch off Deck A motor!")
 			err = fmt.Errorf("%v\n%v", err, err3)
 		}
 
-		_, err4 = deps.PlcDeck["B"].SwitchOffAllCoils()
+		_, err4 = deps.PlcDeck[plc.DeckB].SwitchOffAllCoils()
 		if err4 != nil {
 			logger.Errorln("Couldn't switch off Deck B motor!")
 			err = fmt.Errorf("%v\n%v", err, err4)
 		}
 	}
-	if err != nil{
+	if err != nil {
 		logger.Errorln("Shutdown graceful error: ", err)
 		os.Exit(-1)
 	}

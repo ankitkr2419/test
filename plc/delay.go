@@ -78,6 +78,7 @@ skipToStartTimer:
 			// delay of 500 ms for checking the delay over time to avoid too much loop
 			time.Sleep(time.Millisecond * 500)
 			if d.isMachineInAbortedState() {
+				logger.Warnln("Machine is in Aborted State, delay will exit")
 				t.Stop()
 				if d.isUVLightInProgress() {
 					d.ResetAborted()
