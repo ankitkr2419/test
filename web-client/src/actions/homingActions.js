@@ -8,6 +8,20 @@ export const homingActions = {
   showHomingModaal: "SHOW_HOMING_MODAL",
 };
 
+// Deck A
+export const homingInProgressActionsForDeckA = {
+  homingActionInProgressForDeckA: "HOMING_IN_PROGRESS_DECK_A",
+  homingActionInSuccessForDeckA: "HOMING_IN_SUCCESS_FOR_DECK_A",
+  resetHomingStateForDeckA: "HOMING_RESET_FOR_DECK_A",
+};
+
+// Deck B
+export const homingInProgressActionsForDeckB = {
+  homingActionInProgressForDeckB: "HOMING_IN_PROGRESS_DECK_B",
+  homingActionInSuccessForDeckB: "HOMING_IN_SUCCESS_FOR_DECK_B",
+  resetHomingStateForDeckB: "HOMING_RESET_FOR_DECK_B",
+};
+
 export const deckHomingActions = {
   deckHomingActionInitiated: "DECK_HOMING_ACTION_INITIATED",
   deckHomingActionSuccess: "DECK_HOMING_ACTION_SUCCESS",
