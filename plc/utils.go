@@ -121,6 +121,7 @@ var homingPercent, currentProcess sync.Map
 var motorNumReg, speedReg, directionReg, rampReg, pulseReg, onReg sync.Map
 
 func loadUtils() {
+	logger.Warnln("loadUtils called")
 
 	wrotePulses.Store(DeckA, uint16(0))
 	wrotePulses.Store(DeckB, uint16(0))
@@ -230,6 +231,8 @@ var cartridges = make(map[UniqueCartridge]map[string]float64)
 var Calibs = make(map[DeckNumber]float64)
 
 func LoadAllPLCFuncsExceptUtils(store db.Storer) (err error) {
+
+	logger.Warnln("LoadAllPLCFuncsExceptUtils called")
 
 	err = selectAllMotors(store)
 	if err != nil {

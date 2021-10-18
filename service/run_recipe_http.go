@@ -189,6 +189,9 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 
 		case db.HeatingProcess:
 			heat, err := deps.Store.ShowHeating(ctx, p.ID)
+			if err != nil {
+				return "", err
+			}
 			logger.Infoln("Heating object :", heat)
 			ht, err := deps.PlcDeck[deck].Heating(heat, false)
 			if err != nil {
@@ -306,7 +309,7 @@ func runRecipe(ctx context.Context, deps Dependencies, deck string, runStepWise 
 	// Home the machine
 	response, err = deps.PlcDeck[deck].Homing()
 	if err != nil {
-		return
+		return "", err
 	}
 
 	return "SUCCESS", nil

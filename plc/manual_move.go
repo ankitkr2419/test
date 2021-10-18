@@ -25,13 +25,15 @@ func (d *Compact32Deck) ManualMovement(motorNum, direction uint16, mm float32) (
 
 	deckAndMotor := DeckNumber{Deck: d.name, Number: motorNum}
 
+	logger.Warnln("Manual Movement: ", d.name, motorNum, direction, mm)
+
 	response, err = d.setupMotor(manualSpeed, uint16(mm*float32(Motors[deckAndMotor]["steps"])), manualRamp, direction, motorNum)
 	if err != nil {
 		return "", fmt.Errorf("there was some issue doing manual movement")
 	}
 
 	// For Engineer Allow Indeck movements as well
-	if deckAndMotor.Number == K9_Syringe_Module_LHRH{
+	if deckAndMotor.Number == K9_Syringe_Module_LHRH {
 		syringeModuleState.Store(d.name, OutDeck)
 	}
 
@@ -200,7 +202,7 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 	}
 
 	// Switch off shaker
-	response, err = d.switchOffShaker()
+	_, err = d.switchOffShaker()
 	if err != nil {
 		logger.Errorln("From deck ", d.name, err)
 		return "", err
@@ -211,10 +213,24 @@ func (d *Compact32Deck) Abort() (response string, err error) {
 
 	// If runInProgress and no timer is in progress, that means we need to read pulses
 	if d.IsRunInProgress() && !d.isTimerInProgress() {
-		response, err = d.readExecutedPulses()
+		_, err = d.readExecutedPulses()
 		if err != nil {
 			logger.Errorln("err : ", err)
 			return "", fmt.Errorf("Operation is ABORTED but current position was lost, please home the machine")
+		}
+
+		// Reset M60
+		_, err = d.switchCoilRegister(60, OFF, "Attach Sensor M60")
+		if err != nil {
+			logger.Errorln(err)
+			return
+		}
+
+		// Reset M61
+		_, err = d.switchCoilRegister(61, OFF, "Attach Sensor M61")
+		if err != nil {
+			logger.Errorln(err)
+			return
 		}
 	}
 

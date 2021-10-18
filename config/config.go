@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/spf13/viper"
@@ -19,10 +20,7 @@ func Load(configFile string) {
 
 	viper.SetConfigName(configFile)
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./conf")
-	viper.AddConfigPath("./")
-	viper.AddConfigPath("./..")
-	viper.AddConfigPath("./../..")
+	viper.AddConfigPath(os.ExpandEnv(ConfigStartPath))
 	viper.MergeInConfig()
 	viper.AutomaticEnv()
 }
