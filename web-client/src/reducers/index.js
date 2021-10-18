@@ -49,6 +49,8 @@ import { operatorLoginModalReducer } from "reducers/operatorLoginModalReducer";
 import {
   homingReducer,
   discardTipAndHomingReducer,
+  homingReducerForDeckA,
+  homingReducerForDeckB,
 } from "reducers/homingReducer";
 import { recipeActionReducer } from "reducers/recipeActionReducer";
 import { restoreDeckReducer } from "reducers/restoreDeckReducer";
@@ -126,6 +128,8 @@ const rootReducer = combineReducers({
   temperatureGraphReducer,
   operatorLoginModalReducer,
   homingReducer,
+  homingReducerForDeckA,
+  homingReducerForDeckB,
   recipeActionReducer,
   restoreDeckReducer,
   discardDeckReducer,
