@@ -258,6 +258,7 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
               },
               leftActionBtn: DECKCARD_BTN.text.done,
               rightActionBtn: DECKCARD_BTN.text.cancel,
+              leftActionBtnDisabled: true,
               rightActionBtnDisabled: true,
               isRunRecipeCompleted: true,
             }

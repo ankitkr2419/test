@@ -4,7 +4,7 @@ import {
   webSocketClosed,
   webSocketError,
 } from "action-creators/webSocketActionCreators";
-import { WS_HOST_URL, SOCKET_MESSAGE_TYPE } from "appConstants";
+import { WS_HOST_URL, SOCKET_MESSAGE_TYPE, DECKNAME } from "appConstants";
 import { updateWellThroughSocket } from "action-creators/wellActionCreators";
 import { wellGraphSucceeded } from "action-creators/wellGraphActionCreators";
 import {
@@ -17,6 +17,10 @@ import { temperatureDataSucceeded } from "action-creators/temperatureGraphAction
 import {
   homingActionInProgress,
   homingActionInCompleted,
+  homingActionInProgressDeckA,
+  homingActionInProgressDeckB,
+  homingActionInCompletedDeckB,
+  homingActionInCompletedDeckA,
 } from "action-creators/homingActionCreators";
 
 import {
@@ -90,7 +94,14 @@ export const connectSocket = (dispatch) => {
           dispatch(experimentedCompleted(data));
           break;
         case SOCKET_MESSAGE_TYPE.homingProgress:
-          dispatch(homingActionInProgress(JSON.parse(data)));
+          let homingParsedData = JSON.parse(data);
+          const { deck } = homingParsedData;
+          dispatch(homingActionInProgress(homingParsedData));
+          if (deck === DECKNAME.DeckAShort) {
+            dispatch(homingActionInProgressDeckA(homingParsedData));
+          } else if (deck === DECKNAME.DeckBShort) {
+            dispatch(homingActionInProgressDeckB(homingParsedData));
+          }
           break;
         case SOCKET_MESSAGE_TYPE.homingSuccess:
           let parsedData = JSON.parse(data);
@@ -102,6 +113,13 @@ export const connectSocket = (dispatch) => {
               : "Homing Successfull";
           toast.success(homingSuccessMsg);
           dispatch(homingActionInCompleted(data));
+          if (parsedData?.deck) {
+            if (parsedData.deck === DECKNAME.DeckAShort) {
+              dispatch(homingActionInCompletedDeckA(parsedData));
+            } else if (parsedData.deck === DECKNAME.DeckBShort) {
+              dispatch(homingActionInCompletedDeckB(parsedData));
+            }
+          }
           break;
         case SOCKET_MESSAGE_TYPE.runRecipeProgress:
           dispatch(runRecipeInProgress(JSON.parse(data)));
