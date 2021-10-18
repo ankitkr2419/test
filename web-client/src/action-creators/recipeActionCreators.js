@@ -8,6 +8,7 @@ import {
   stepRunRecipeAction,
   publishRecipeAction,
   deleteRecipeAction,
+  actionBtnStates,
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
@@ -209,4 +210,14 @@ export const deleteRecipeInitiated = (params) => ({
   payload: {
     params,
   },
+});
+
+export const enableActionBtn = (payload) => ({
+  type: actionBtnStates.enableActionBtn,
+  payload: payload,
+});
+
+export const disableActionBtn = (payload) => ({
+  type: actionBtnStates.disableActionBtn,
+  payload: payload,
 });
