@@ -6,6 +6,7 @@ import {
   MODAL_MESSAGE,
   DECKCARD_BTN,
   RUN_RECIPE_TYPE,
+  HOMING_STATUS,
 } from "appConstants";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -19,6 +20,7 @@ import {
   stepRunRecipeInitiated,
   nextStepRunRecipeInitiated,
   enableActionBtn,
+  disableActionBtn,
 } from "action-creators/recipeActionCreators";
 import {
   abortCleanUpActionInitiated,
@@ -27,6 +29,10 @@ import {
   runCleanUpActionInitiated,
   runCleanUpActionReset,
 } from "action-creators/cleanUpActionCreators";
+import {
+  homingActionResetDeckA,
+  homingActionResetDeckB,
+} from "action-creators/homingActionCreators";
 import { MlModal } from "shared-components";
 import TipDiscardModal from "components/modals/TipDiscardModal";
 import {
@@ -71,16 +77,37 @@ const AppFooter = () => {
     (deckObj) => deckObj.name === DECKNAME.DeckB
   );
 
-  //homing reducer to show homing status
-  const homingReducer = useSelector((state) => state.homingReducer);
-  const { isHomingActionCompleted, homingStatus } = homingReducer;
+  //homing reducer to show homing status for deck A
+  const homingReducerForDeckA = useSelector(
+    (state) => state.homingReducerForDeckA
+  );
+  const { isHomingCompletedForDeckA, homingStatusForDeckA } =
+    homingReducerForDeckA;
+
+  //homing reducer to show homing status for deck B
+  const homingReducerForDeckB = useSelector(
+    (state) => state.homingReducerForDeckB
+  );
+  const { isHomingCompletedForDeckB, homingStatusForDeckB } =
+    homingReducerForDeckB;
 
   // change state of disabled btn to enable after homing is completed
   useEffect(() => {
-    if (isHomingActionCompleted === true) {
-      dispatch(enableActionBtn({ deckName: deckName, isLeftBtn: true }));
+    if (isHomingCompletedForDeckA === true) {
+      dispatch(enableActionBtn({ deckName: DECKNAME.DeckA, isLeftBtn: true }));
+    } else if (isHomingCompletedForDeckB === true) {
+      dispatch(enableActionBtn({ deckName: DECKNAME.DeckB, isLeftBtn: true }));
     }
-  }, [isHomingActionCompleted]);
+  }, [isHomingCompletedForDeckA, isHomingCompletedForDeckB]);
+
+  // disable done btn if homing is in progress
+  useEffect(() => {
+    if (homingStatusForDeckA === HOMING_STATUS.progressing) {
+      dispatch(disableActionBtn({ deckName: DECKNAME.DeckA, isLeftBtn: true }));
+    } else if (homingStatusForDeckB === HOMING_STATUS.progressing) {
+      dispatch(disableActionBtn({ deckName: DECKNAME.DeckB, isLeftBtn: true }));
+    }
+  }, [homingStatusForDeckA, homingStatusForDeckB]);
 
   // show tip-disard modal only after abort is success
   useEffect(() => {
@@ -442,8 +469,8 @@ const AppFooter = () => {
       // reset states
       dispatch(runRecipeReset(deckName));
       setIsTipDiscarded(false);
-      dispatch(hideHomingModal()); // resets homing state
       dispatch(resetRecipeDataForDeck(DECKNAME.DeckA)); // reset recipe data
+      dispatch(homingActionResetDeckA()); // reset homing reducer for deck A
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckA }));
     }
@@ -457,8 +484,8 @@ const AppFooter = () => {
       // reset states
       dispatch(runRecipeReset(deckName));
       setIsTipDiscarded(false);
-      dispatch(hideHomingModal()); // resets homing state
       dispatch(resetRecipeDataForDeck(DECKNAME.DeckB)); // reset recipe data
+      dispatch(homingActionResetDeckB()); // reset homing reducer for deck B
     } else {
       dispatch(runCleanUpActionReset({ deckName: DECKNAME.DeckB }));
     }
@@ -520,9 +547,6 @@ const AppFooter = () => {
     let loggedInDeck =
       deckName === DECKNAME.DeckA ? isDeckALoggedIn : isDeckBLoggedIn;
 
-    let activeDeckName =
-      isDeckAActive === true ? DECKNAME.DeckA : DECKNAME.DeckB;
-
     switch (fieldName) {
       case "recipeName":
         return recipeReducerData.recipeData?.recipeName
@@ -531,7 +555,10 @@ const AppFooter = () => {
 
       case "processNumber":
         // if tip is discarded, we hide processNumber and processTotal
-        if (homingStatus !== null && activeDeckName === deckName) {
+        if (
+          (deckName === DECKNAME.DeckA && homingStatusForDeckA !== null) ||
+          (deckName === DECKNAME.DeckB && homingStatusForDeckB !== null)
+        ) {
           return null;
         }
         // else we return processNumber of ongoing process
@@ -542,7 +569,10 @@ const AppFooter = () => {
 
       case "processTotal":
         // if tip is discarded, we hide processNumber and processTotal
-        if (homingStatus !== null && activeDeckName === deckName) {
+        if (
+          (deckName === DECKNAME.DeckA && homingStatusForDeckA !== null) ||
+          (deckName === DECKNAME.DeckB && homingStatusForDeckB !== null)
+        ) {
           return null;
         }
         // else we return processTotal of ongoing process
@@ -595,12 +625,23 @@ const AppFooter = () => {
         );
 
       case "processName":
+        let homingInProgressMsg = "Homing is in progress...";
+        let homingIsCompleteMsg = "Homing completed successfully";
+
         // if tip is discarded, we start homing and show message
-        if (homingStatus !== null && activeDeckName === deckName) {
-          if (isHomingActionCompleted === false) {
-            return "Homing is in progress...";
+        // for deck A
+        if (deckName === DECKNAME.DeckA && homingStatusForDeckA !== null) {
+          if (isHomingCompletedForDeckA === false) {
+            return homingInProgressMsg;
           }
-          return "Homing completed successfully";
+          return homingIsCompleteMsg;
+        }
+        // for deck B
+        else if (deckName === DECKNAME.DeckB && homingStatusForDeckB !== null) {
+          if (isHomingCompletedForDeckB === false) {
+            return homingInProgressMsg;
+          }
+          return homingIsCompleteMsg;
         }
 
         // else we show details for the ongoing process

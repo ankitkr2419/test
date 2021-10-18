@@ -2,6 +2,8 @@ import {
   homingActions,
   deckHomingActions,
   discardTipAndHomingActions,
+  homingInProgressActionsForDeckA,
+  homingInProgressActionsForDeckB,
 } from "actions/homingActions";
 
 export const hideHomingModal = () => ({
@@ -39,6 +41,36 @@ export const homingActionInProgress = (homingActionInProgress) => ({
 export const homingActionInCompleted = (homingActionInCompleted) => ({
   type: homingActions.homingActionInCompleted,
   payload: homingActionInCompleted,
+});
+
+// homing progressing for deck A
+export const homingActionInProgressDeckA = (payload) => ({
+  type: homingInProgressActionsForDeckA.homingActionInProgressForDeckA,
+  payload: payload,
+});
+
+export const homingActionInCompletedDeckA = (payload) => ({
+  type: homingInProgressActionsForDeckA.homingActionInSuccessForDeckA,
+  payload: payload,
+});
+
+export const homingActionResetDeckA = () => ({
+  type: homingInProgressActionsForDeckA.resetHomingStateForDeckA,
+});
+
+// homing progressing for deck B
+export const homingActionInProgressDeckB = (payload) => ({
+  type: homingInProgressActionsForDeckB.homingActionInProgressForDeckB,
+  payload: payload,
+});
+
+export const homingActionInCompletedDeckB = (payload) => ({
+  type: homingInProgressActionsForDeckB.homingActionInSuccessForDeckB,
+  payload: payload,
+});
+
+export const homingActionResetDeckB = () => ({
+  type: homingInProgressActionsForDeckB.resetHomingStateForDeckB,
 });
 
 export const deckHomingActionInitiated = (params) => ({
