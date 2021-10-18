@@ -9,6 +9,7 @@ export const getWellsInitialArray = (n, type, editReducerData = null) => {
       footerText: "",
       isSelected: false,
       isDisabled: false,
+      height: 0,
     });
   }
   return wellsArray;
@@ -18,6 +19,7 @@ export const getWellsInitialArray = (n, type, editReducerData = null) => {
 //i.e. during edit process.
 export const getWellsArrayForEdit = (wellsArray, editReducerData = null) => {
   const selectedWells = editReducerData && editReducerData.cartridge_wells;
+  const piercingHeights = editReducerData && editReducerData.piercing_heights;
 
   wellsArray.map((wellObj, i) => {
     let typeName = wellObj.type === 0 ? "cartridge_1" : "cartridge_2";
@@ -27,6 +29,7 @@ export const getWellsArrayForEdit = (wellsArray, editReducerData = null) => {
       typeName === editReducerData.type
     ) {
       wellObj.isSelected = true;
+      wellObj.height = piercingHeights[i];
     }
     return wellObj;
   });
@@ -34,13 +37,17 @@ export const getWellsArrayForEdit = (wellsArray, editReducerData = null) => {
 };
 
 //this function updates and renders wellsArray after selecting or de-selecting wells
-export const updateWellsArray = (wellsObjArray, currentWellObj, height) => {
+export const updateWellsArray = (
+  wellsObjArray,
+  currentWellObj,
+  updatedHeight
+) => {
   const updatedWellObjArray = wellsObjArray.map((wellObj) => {
     if (wellObj.id === currentWellObj.id) {
       return {
         ...wellObj,
         isSelected: !wellObj.isSelected, //toggle
-        height: height, // set height
+        height: updatedHeight || wellObj.height, // set height
       };
     }
     return wellObj;

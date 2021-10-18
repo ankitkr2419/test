@@ -74,6 +74,13 @@ export const SOCKET_MESSAGE_TYPE = {
   completedDyeCalibration: "SUCCESS_OPTCALIB",
 };
 
+export const HOMING_STATUS = {
+  progressStarted: "progressStarted",
+  progressing: "progressing",
+  progressComplete: "progressComplete",
+  progressFailed: "progressFailed",
+};
+
 export const CLEAN_UP_STATUS = {
   aborted: "aborted",
   aborting: "aborting",

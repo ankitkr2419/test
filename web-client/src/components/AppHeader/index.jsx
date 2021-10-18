@@ -318,27 +318,39 @@ const AppHeader = (props) => {
         </Nav>
       )}
 
-      {/* For new menu items, we need to toggle it manually. */}
-      {app === APP_TYPE.EXTRACTION && (
-        <Dropdown
-          className="ml-auto"
-          isOpen={menuDropdownOpen}
-          toggle={toggleMenuDropdown}
-        >
-          <DropdownToggle icon name="menu" size={16} />
-          <DropdownMenu right onClick={toggleMenuDropdown}>
-            <DropdownItem>
-              <WhiteLight
-                isLightOn={isLightOn}
-                handleWhiteLightClick={handleWhiteLightClick}
-              />
-            </DropdownItem>
-            {/* <DropdownItem onClick={handleHelpSupportBtn}>
+      <>
+        {/**extraction flow cross button used in process creation/edition flow */}
+        {PATH_TO_SHOW_CROSS_BTN.includes(location.pathname) && (
+          <ButtonIcon
+            size={34}
+            name="cross"
+            onClick={toggleRedirectionModal}
+            className="ml-auto"
+          />
+        )}
+
+        {/* For new menu items, we need to toggle it manually. */}
+        {app === APP_TYPE.EXTRACTION && (
+          <Dropdown
+            className="ml-2"
+            isOpen={menuDropdownOpen}
+            toggle={toggleMenuDropdown}
+          >
+            <DropdownToggle icon name="menu" size={16} />
+            <DropdownMenu right onClick={toggleMenuDropdown}>
+              <DropdownItem>
+                <WhiteLight
+                  isLightOn={isLightOn}
+                  handleWhiteLightClick={handleWhiteLightClick}
+                />
+              </DropdownItem>
+              {/* <DropdownItem onClick={handleHelpSupportBtn}>
               {"Help & Support"}
             </DropdownItem> */}
-          </DropdownMenu>
-        </Dropdown>
-      )}
+            </DropdownMenu>
+          </Dropdown>
+        )}
+      </>
 
       {isUserLoggedIn && (
         <div className="header-elements d-flex align-items-center ml-auto">
@@ -449,6 +461,7 @@ const AppHeader = (props) => {
                 >
                   {role || ""}
                 </Text>
+
                 <Dropdown isOpen={userDropdownOpen} toggle={toggleUserDropdown}>
                   <DropdownToggle icon name="user" size={32} />
                   <DropdownMenu right>
@@ -468,16 +481,6 @@ const AppHeader = (props) => {
                 </Dropdown>
               </div>
             </>
-          )}
-
-          {/**extraction flow cross button used in process creation/edition flow */}
-          {PATH_TO_SHOW_CROSS_BTN.includes(location.pathname) && (
-            <ButtonIcon
-              size={34}
-              name="cross"
-              onClick={toggleRedirectionModal}
-              className="ml-2"
-            />
           )}
 
           {showRedirectionModal && (
