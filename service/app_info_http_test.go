@@ -27,7 +27,7 @@ func TestAppInfoTestSuite(t *testing.T) {
 	suite.Run(t, new(AppInfoHandlerTestSuite))
 }
 
-func (suite *AppInfoHandlerTestSuite) TestCreateAspireDispenseSuccess() {
+func (suite *AppInfoHandlerTestSuite) TestAppInfoHandler() {
 
 	// Setup initial values as these are setup at compile time
 	Application = RTPCR
@@ -55,18 +55,21 @@ func (suite *AppInfoHandlerTestSuite) TestCreateAspireDispenseSuccess() {
 		Branch:      Branch,
 		BuiltOn:     BuiltOn,
 	}
+	t := suite.T()
+	t.Run("when appinfo is fetched successfully", func(t *testing.T) {
 
-	recorder := makeHTTPCall(http.MethodPost,
-		"/app-info",
-		"/app-info",
-		"",
-		appInfoHandler(Dependencies{Store: suite.dbMock}),
-	)
+		recorder := makeHTTPCall(http.MethodPost,
+			"/app-info",
+			"/app-info",
+			"",
+			appInfoHandler(Dependencies{Store: suite.dbMock}),
+		)
+		body, _ := json.Marshal(appInfo)
+		// TODO: Unmarshal rcorder.Body into map[string]string and compare for msg and Role
+		assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+		assert.Equal(suite.T(), string(body), recorder.Body.String())
 
-	body, _ := json.Marshal(appInfo)
+		suite.dbMock.AssertExpectations(suite.T())
+	})
 
-	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
-	assert.Equal(suite.T(), string(body), recorder.Body.String())
-
-	suite.dbMock.AssertExpectations(suite.T())
 }

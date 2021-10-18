@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 type Common struct {
-	RoomTemperature float64  `json:"room_temperature" validate:"required,lte=30,gte=20"`
-	ReceiverEmail   string `json:"receiver_email"`
-	ReceiverName    string `json:"receiver_name"`
+	RoomTemperature float64 `json:"room_temperature" validate:"required,lte=30,gte=20"`
+	ReceiverEmail   string  `json:"receiver_email"`
+	ReceiverName    string  `json:"receiver_name"`
 }
 
 func SetCommonConfigValues(co Common) (err error) {
@@ -82,9 +83,9 @@ func SetRoomTemp(rT float64) {
 	viper.Set("room_temp", rT)
 }
 
-func SetSecretKey(key string) {
-	key = "SECRET_KEY"
-	viper.Set(key, "123456qwerty")
+func SetSecretKey(value string) {
+	key := "SECRET_KEY"
+	viper.Set(key, value)
 }
 
 func SetReceiverEmail(rE string) {
@@ -98,7 +99,7 @@ func SetReceiverName(rN string) {
 func GetCommonConfigValues() Common {
 	return Common{
 		RoomTemperature: GetRoomTemp(),
-		ReceiverEmail: GetReceiverEmail(),
-		ReceiverName: GetReceiverName(),
+		ReceiverEmail:   GetReceiverEmail(),
+		ReceiverName:    GetReceiverName(),
 	}
 }
