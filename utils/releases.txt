@@ -55,3 +55,12 @@ RTPCR Software Releases
  - Bugfix: Analysis for Auto Threshold(Same record inserting multiple time giving ON CONFLICT UPDATE error)
  - Run procedure updated to make generated data global
  - Dropdown instead of type support added for remaining fields
+
+4. Version 1.4.184 18th October 2021
+ - Bugfix: Piercing record updation (non-updated values are not passed as NULL)
+ - Bugfix: Handled Homing magnet detached state
+ - Bugfix: After recipe run success/abort homing progress is shown and everything else for that deck is blocked
+   till successful homing
+ - Bugfix: Discard tip and home api called after getting response from abort
+ - Bugfix: Global config error for application.yml fixed
+ - Homing button added in engineer flow for Extraction 
