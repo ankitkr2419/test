@@ -21,18 +21,13 @@ export const getWellsArrayForEdit = (wellsArray, editReducerData = null) => {
   const selectedWells = editReducerData && editReducerData.cartridge_wells;
   const piercingHeights = editReducerData && editReducerData.piercing_heights;
 
-  wellsArray.map((wellObj, i) => {
-    let typeName = wellObj.type === 0 ? "cartridge_1" : "cartridge_2";
-    if (
-      selectedWells &&
-      selectedWells.includes(i + 1) &&
-      typeName === editReducerData.type
-    ) {
-      wellObj.isSelected = true;
-      wellObj.height = piercingHeights[i];
-    }
-    return wellObj;
-  });
+  // wellId is wellNumber.
+  if (wellsArray) {
+    selectedWells.map((wellId, index) => {
+      wellsArray[wellId - 1].isSelected = true;
+      wellsArray[wellId - 1].height = piercingHeights[index];
+    });
+  }
   return wellsArray;
 };
 

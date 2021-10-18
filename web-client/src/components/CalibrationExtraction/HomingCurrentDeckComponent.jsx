@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Button, Form, Card, CardBody } from "core-components";
 import { Center, Text } from "shared-components";
-import { hideHomingModal } from "action-creators/homingActionCreators";
+import {
+  hideHomingModal,
+  showHomingModal,
+} from "action-creators/homingActionCreators";
 
 const HomingCurrentDeckComponent = (props) => {
   const dispatch = useDispatch();
@@ -13,16 +16,20 @@ const HomingCurrentDeckComponent = (props) => {
   //enable button when homing completed
   const homingReducer = useSelector((state) => state.homingReducer);
   const { isHomingActionCompleted } = homingReducer;
-  if (isHomingActionCompleted === true && isHomingDisabled === true) {
-    setHomingDisability(false);
-    dispatch(hideHomingModal());
-  }
+
+  // enable btn if homing is completed
+  useEffect(() => {
+    if (isHomingActionCompleted === true && isHomingDisabled === true) {
+      setHomingDisability(false);
+    }
+  }, [isHomingActionCompleted, isHomingDisabled]);
 
   //start homing and disable button
   const handleStartHoming = (e) => {
     e.preventDefault();
-    handleHomingDeck();
+    // handleHomingDeck();
     setHomingDisability(true);
+    dispatch(showHomingModal());
   };
 
   return (
