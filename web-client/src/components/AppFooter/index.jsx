@@ -91,23 +91,33 @@ const AppFooter = () => {
   const { isHomingCompletedForDeckB, homingStatusForDeckB } =
     homingReducerForDeckB;
 
-  // change state of disabled btn to enable after homing is completed
+  // enable done btn after homing is completed for Deck A
   useEffect(() => {
     if (isHomingCompletedForDeckA === true) {
       dispatch(enableActionBtn({ deckName: DECKNAME.DeckA, isLeftBtn: true }));
-    } else if (isHomingCompletedForDeckB === true) {
+    }
+  }, [isHomingCompletedForDeckA]);
+
+  // enable done btn after homing is completed for Deck B
+  useEffect(() => {
+    if (isHomingCompletedForDeckB === true) {
       dispatch(enableActionBtn({ deckName: DECKNAME.DeckB, isLeftBtn: true }));
     }
-  }, [isHomingCompletedForDeckA, isHomingCompletedForDeckB]);
+  }, [isHomingCompletedForDeckB]);
 
-  // disable done btn if homing is in progress
+  // disable done btn if homing is in progress for Deck A
   useEffect(() => {
     if (homingStatusForDeckA === HOMING_STATUS.progressing) {
       dispatch(disableActionBtn({ deckName: DECKNAME.DeckA, isLeftBtn: true }));
-    } else if (homingStatusForDeckB === HOMING_STATUS.progressing) {
+    }
+  }, [homingStatusForDeckA]);
+
+  // disable done btn if homing is in progress for Deck B
+  useEffect(() => {
+    if (homingStatusForDeckB === HOMING_STATUS.progressing) {
       dispatch(disableActionBtn({ deckName: DECKNAME.DeckB, isLeftBtn: true }));
     }
-  }, [homingStatusForDeckA, homingStatusForDeckB]);
+  }, [homingStatusForDeckB]);
 
   // show tip-disard modal only after abort is success
   useEffect(() => {
