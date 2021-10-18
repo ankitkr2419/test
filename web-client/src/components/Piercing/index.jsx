@@ -57,21 +57,30 @@ const PiercingComponent = (props) => {
     if (editReducerData?.cartridge_wells) {
       setActiveTab(editReducerData.type === "cartridge_1" ? "0" : "1"); //change tab accordingly
 
-      const upadatedExtractionWells = getWellsArrayForEdit(
-        extractionWells,
-        editReducerData
-      );
-      setExtractionWell((extractionWells) =>
-        extractionWells.map((wellObj, index) => {
-          return { ...wellObj, ...upadatedExtractionWells[index] };
-        })
-      );
-      const upadatedPcrWells = getWellsArrayForEdit(pcrWells, editReducerData);
-      setPcrWell((pcrWells) =>
-        pcrWells.map((wellObj, index) => {
-          return { ...wellObj, ...upadatedPcrWells[index] };
-        })
-      );
+      // for extraction
+      if (editReducerData.type === "cartridge_1") {
+        const upadatedExtractionWells = getWellsArrayForEdit(
+          extractionWells,
+          editReducerData
+        );
+        setExtractionWell((extractionWells) =>
+          extractionWells.map((wellObj, index) => {
+            return { ...wellObj, ...upadatedExtractionWells[index] };
+          })
+        );
+      }
+      // for PCR
+      else if (editReducerData.type === "cartridge_2") {
+        const upadatedPcrWells = getWellsArrayForEdit(
+          pcrWells,
+          editReducerData
+        );
+        setPcrWell((pcrWells) =>
+          pcrWells.map((wellObj, index) => {
+            return { ...wellObj, ...upadatedPcrWells[index] };
+          })
+        );
+      }
     }
   }, [editReducerData]);
 
