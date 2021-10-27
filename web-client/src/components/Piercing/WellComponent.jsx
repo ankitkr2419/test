@@ -35,6 +35,7 @@ export const WellComponent = (props) => {
                   <Well
                     key={wellObj.id}
                     id={wellObj.id}
+                    height={wellObj.height}
                     isRunning={wellObj.isRunning}
                     isSelected={wellObj.isSelected}
                     isDisabled={wellObj.isDisabled}
@@ -46,19 +47,6 @@ export const WellComponent = (props) => {
                 );
               })}
           </div>
-          <Coordinate direction="horizontal" className="px-0 mx-0 well-no">
-            {wellsObjArray &&
-              wellsObjArray.map((wellObj, index) => {
-                const { height } = wellObj;
-                return (
-                  <CoordinateItem
-                    key={wellObj.id}
-                    // TODO: Check with UI
-                    // coordinateValue={height ? `Height: ${height}` : ""}
-                  />
-                );
-              })}
-          </Coordinate>
         </Col>
       </FormGroup>
     </div>
