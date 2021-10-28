@@ -46,6 +46,10 @@ Extraction Software Releases
  - Homing button added in engineer flow for Extraction 
  - After recipe run success/abort, homing progress status is shown 
 
+7. Version 1.4.185 28th October 2021
+ - Bugfix: Piercing record can be inserted after new recipe caliberation
+ - Piercing height is shown in cartridge wells
+
 RTPCR Software Releases
 
 1. Version 1.4.175 24th September 2021
