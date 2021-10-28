@@ -43,26 +43,40 @@ const ProcessListComponent = (props) => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const { token } = activeDeckObj;
-    const { name, pos_cartridge_1, pos_cartridge_2 } = recipeDetails;
-
-    let params = { deckName: name, token: token };
-    if (pos_cartridge_1) {
-      params = { ...params, id: pos_cartridge_1, type: CARTRIDGE_1 };
-      dispatch(getCartridge1ActionInitiated(params));
-    }
-    if (pos_cartridge_2) {
-      params = { ...params, id: pos_cartridge_2, type: CARTRIDGE_2 };
-      dispatch(getCartridge2ActionInitiated(params));
-    }
-  }, [recipeDetails]);
+  /** get isApiCalled field */
+  const cartridge1DetailsReducer = useSelector(
+    (state) => state.cartridge1DetailsReducer
+  );
+  const cartridge2DetailsReducer = useSelector(
+    (state) => state.cartridge2DetailsReducer
+  );
 
   /**get active login deck data*/
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
   let activeDeckObj = loginReducerData?.decks.find((deck) => deck.isActive);
   let deckName = activeDeckObj.name;
+
+  /** call and fill cartridge1 & cartridge2 reducers */
+  useEffect(() => {
+    const { token } = activeDeckObj;
+    const { name, pos_cartridge_1, pos_cartridge_2 } = recipeDetails;
+
+    /** Checks if API is already called */
+    const { isApiCalled: cartridge1ApiCalled } = cartridge1DetailsReducer;
+    const { isApiCalled: cartridge2ApiCalled } = cartridge2DetailsReducer;
+
+    let params = { deckName: name, token: token };
+    if (pos_cartridge_1 && cartridge1ApiCalled === false) {
+      params = { ...params, id: pos_cartridge_1, type: CARTRIDGE_1 };
+      dispatch(getCartridge1ActionInitiated(params));
+    }
+    if (pos_cartridge_2 && cartridge2ApiCalled === false) {
+      params = { ...params, id: pos_cartridge_2, type: CARTRIDGE_2 };
+      dispatch(getCartridge2ActionInitiated(params));
+    }
+  }, [recipeDetails]);
+
   /**
    * if user is not logged in, go to landing page
    */

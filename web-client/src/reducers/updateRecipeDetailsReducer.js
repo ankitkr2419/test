@@ -14,6 +14,7 @@ const cartridgeDetailsInitialState = {
   isLoading: false,
   error: null,
   cartridgeDetails: null,
+  isApiCalled: false, // this maintains re-hitting of APIs
 };
 
 export const cartridge1DetailsReducer = (
@@ -25,6 +26,7 @@ export const cartridge1DetailsReducer = (
       return {
         ...state,
         isLoading: true,
+        isApiCalled: true,
         ...actions.payload,
       };
 
@@ -60,6 +62,7 @@ export const cartridge2DetailsReducer = (
       return {
         ...state,
         isLoading: true,
+        isApiCalled: true,
       };
 
     case getCartridge2Action.getCartridge2Success:
@@ -128,7 +131,7 @@ export const updateRecipeDetailsReducer = (state = initialState, actions) => {
         ...state,
         recipeDetails: {
           ...state.recipeDetails,
-          id: actions.payload.response.id,
+          ...actions.payload.response,
         },
         isLoading: false,
         error: false,

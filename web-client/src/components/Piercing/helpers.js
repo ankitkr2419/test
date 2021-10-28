@@ -42,7 +42,7 @@ export const updateWellsArray = (
       return {
         ...wellObj,
         isSelected: !wellObj.isSelected, //toggle
-        height: updatedHeight || wellObj.height, // set height
+        height: updatedHeight, // set height
       };
     }
     return wellObj;

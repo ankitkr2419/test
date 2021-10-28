@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import classNames from "classnames";
 import styled from "styled-components";
 import { Text } from "shared-components";
+import { Label } from "core-components";
 
 const Well = (props) => {
   const {
@@ -10,6 +11,7 @@ const Well = (props) => {
     id,
     className,
     status,
+    height,
     isRunning,
     isSelected,
     isDisabled,
@@ -31,6 +33,9 @@ const Well = (props) => {
       className={wellClassnames}
       onClick={onClickHandler}
     >
+      <Label className="font-weight-bold piercing-height-labels">
+        {height && parseInt(height) > 0 ? height : ""}
+      </Label>
       <Text Tag="span" className="well-position">
         {position}
       </Text>
