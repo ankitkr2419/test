@@ -184,6 +184,11 @@ consumabledistance:
   name: syringe_module_slow_down_for_discard
   distance: 125
   description: syringe module goes here at slow for discarding tip
+- id: 325
+  name: slow_inside
+  distance: 7
+  description: syringe module goes this much down at slow for picking up the tip after
+    coming fast down
 - id: 326
   name: pcr_slow_speed_up
   distance: 400

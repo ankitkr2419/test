@@ -8,7 +8,7 @@ test-coverage:
 build: yarn go
 
 yarn:
-	sudo utils/build-yarn.sh
+	utils/build-yarn.sh
 
 go:
 	echo "building go code"
