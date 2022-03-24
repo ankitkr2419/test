@@ -53,8 +53,8 @@ const AppFooter = () => {
   //login reducer
   const loginReducer = useSelector((state) => state.loginReducer);
   const loginReducerData = loginReducer.toJS();
-  //   let activeDeckObj =
-  //     loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
+  let activeDeckObj =
+    loginReducerData && loginReducerData.decks.find((deck) => deck.isActive);
 
   let loginDataOfA =
     loginReducerData &&
@@ -107,14 +107,20 @@ const AppFooter = () => {
 
   // disable done btn if homing is in progress for Deck A
   useEffect(() => {
-    if (homingStatusForDeckA === HOMING_STATUS.progressing) {
+    if (
+      homingStatusForDeckA === HOMING_STATUS.progressing &&
+      !activeDeckObj.isEngineer
+    ) {
       dispatch(disableActionBtn({ deckName: DECKNAME.DeckA, isLeftBtn: true }));
     }
   }, [homingStatusForDeckA]);
 
   // disable done btn if homing is in progress for Deck B
   useEffect(() => {
-    if (homingStatusForDeckB === HOMING_STATUS.progressing) {
+    if (
+      homingStatusForDeckB === HOMING_STATUS.progressing &&
+      !activeDeckObj.isEngineer
+    ) {
       dispatch(disableActionBtn({ deckName: DECKNAME.DeckB, isLeftBtn: true }));
     }
   }, [homingStatusForDeckB]);

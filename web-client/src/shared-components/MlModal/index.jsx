@@ -30,6 +30,9 @@ const MlModal = (props) => {
     progressPercentage,
     isProgressBarVisible,
     disabled,
+    senseAndHit,
+    isLogout,
+    CancelFunc,
   } = props;
 
   return (
@@ -47,7 +50,7 @@ const MlModal = (props) => {
                 right={16}
                 size={36}
                 name="cross"
-                onClick={handleCrossBtn}
+                onClick={isLogout ? CancelFunc : handleCrossBtn}
                 className="border-0"
               />
             )}
@@ -62,8 +65,9 @@ const MlModal = (props) => {
               right={16}
               size={36}
               name="cross"
-              onClick={handleCrossBtn}
+              onClick={isLogout ? CancelFunc : handleCrossBtn}
               className="border-0"
+              disabled={disabled}
             />
           )}
           <Text Tag="h5" size={20} className="text-center my-3">
@@ -90,11 +94,11 @@ const MlModal = (props) => {
                 onClick={handleCrossBtn}
                 color="transparent"
                 className="mr-4 border-primary"
+                disabled={senseAndHit}
               >
                 {failureBtn}
               </Button>
             )}
-
             {successBtn && (
               <Button
                 onClick={handleSuccessBtn}
