@@ -37,6 +37,7 @@ import {
   saveNewRecipe,
   saveRecipeDetails,
 } from "action-creators/saveNewRecipeActionCreators";
+import { ResetRecipePageState } from "action-creators/PageActionCreators";
 
 const RecipeListingComponent = (props) => {
   const {
@@ -117,6 +118,8 @@ const RecipeListingComponent = (props) => {
     toggleLogoutModalVisibility();
     //logout api
     // dispatch(loginReset(deckName));
+    dispatch(ResetRecipePageState(deckName));
+
     let token = activeDeckObj.token;
     dispatch(
       logoutInitiated({ deckName: deckName, token: token, showToast: true })
