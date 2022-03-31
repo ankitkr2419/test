@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Text, ButtonIcon } from "shared-components";
 import { ProcessCardBox } from "./ProcessCardBox";
 import { InnerBox } from "./Styles";
@@ -42,9 +42,12 @@ const ProcessCard = (props) => {
     }`;
   };
 
-  const getProcessNumber = (page, index) => {
-    return (page - 1) * 10 + (index + 1);
-  };
+  const memoizedGetIndex = useCallback(
+    (index, page) => {
+      return (page - 1) * 10 + (index + 1);
+    },
+    [index, page]
+  );
 
   return (
     <div className="position-relative">
@@ -124,7 +127,7 @@ const ProcessCard = (props) => {
             onClick={toggleIsOpen}
           >
             <div style={{ paddingRight: "12px", fontWeight: "bold" }}>
-              {getProcessNumber(page, index)}
+              {memoizedGetIndex(page, index)}
             </div>
             <ButtonIcon
               size={14}
