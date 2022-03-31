@@ -189,6 +189,11 @@ consumabledistance:
   distance: 7
   description: syringe module goes this much down at slow for picking up the tip after
     coming fast down
+- id: 326
+  name: pcr_slow_speed_up
+  distance: 400
+  description: this is the speed with which the syringe module in pcr will move upto deckbase after it has 
+    aspired the liquid inside the pcr cartridge well.It doesnot affect extraction cartridge up speed.
 - id: 401
   name: pickup_tip_up
   distance: 27
@@ -317,7 +322,7 @@ consumabledistance:
     syringe distances will be adjusted according to this variable
 - id: 1055
   name: deck_b_zero
-  distance: 10.5
+  distance: 14.5
   description: All distances on deck as well as tips and tubes distances will be adjusted
     according to this variable
 - id: 1056
@@ -337,7 +342,7 @@ consumabledistance:
     distances will be fixed here
 - id: 1059
   name: syringe_module_b_lh_rh_zero
-  distance: 0.5
+  distance: 17
   description: This field is to be calibrated and set by the eng. All volumes will
     be adjusted according to this variable
 - id: 1060
