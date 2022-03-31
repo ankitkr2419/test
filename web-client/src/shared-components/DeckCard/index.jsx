@@ -226,6 +226,7 @@ const DeckCard = (props) => {
       >
         {showProcess && (
           <ProcessRemaining
+            isAdmin={activeDeckObj.isAdmin}
             processName={processName}
             processType={processType}
             processNumber={processNumber}
