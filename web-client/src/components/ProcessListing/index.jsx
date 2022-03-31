@@ -19,6 +19,7 @@ import {
   getCartridge2ActionInitiated,
   getCartridgeActionInitiated,
 } from "action-creators/saveNewRecipeActionCreators";
+import { ResetProcessPageState } from "action-creators/PageActionCreators";
 
 const ProcessListComponent = (props) => {
   let {
@@ -88,6 +89,7 @@ const ProcessListComponent = (props) => {
     setFinishModal(!finishModal);
   };
   const onFinishConfirmationClick = () => {
+    dispatch(ResetProcessPageState(deckName));
     toggleFinishModal();
     onFinishConfirmation();
   };
@@ -107,6 +109,7 @@ const ProcessListComponent = (props) => {
   };
 
   const handleBackToRecipeList = () => {
+    dispatch(ResetProcessPageState(deckName));
     history.push(ROUTES.recipeListing);
   };
 
