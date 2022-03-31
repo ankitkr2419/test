@@ -8,9 +8,15 @@ import {
   paginator,
   initialPaginationStateProcessList,
 } from "utils/paginationHelper";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  nextProcessPageBtn,
+  prevProcessPageBtn,
+} from "action-creators/PageActionCreators";
 
 const ProcessListingCards = (props) => {
   let {
+    deckName,
     processList,
     toggleIsOpen,
     draggedProcessId,
@@ -22,7 +28,12 @@ const ProcessListingCards = (props) => {
     handleDeleteProcess,
   } = props;
 
-  const [page, setPage] = useState(1);
+  const dispatch = useDispatch();
+  const pageReducer = useSelector((state) => state.pageReducer);
+  const page =
+    deckName == "Deck A"
+      ? pageReducer.processPageDeckA
+      : pageReducer.processPageDeckB;
   const [paginatedData, setPaginatedData] = useState(
     initialPaginationStateProcessList
   );
@@ -61,13 +72,13 @@ const ProcessListingCards = (props) => {
 
   const handleNext = useCallback(() => {
     if (paginatedData.nextPage) {
-      setPage(paginatedData.nextPage);
+      dispatch(nextProcessPageBtn(deckName));
     }
   });
 
   const handlePrev = useCallback(() => {
     if (paginatedData.prevPage) {
-      setPage(paginatedData.prevPage);
+      dispatch(prevProcessPageBtn(deckName));
     }
   });
 

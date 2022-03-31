@@ -127,7 +127,7 @@ const ProcessCard = (props) => {
             onClick={toggleIsOpen}
           >
             <div style={{ paddingRight: "12px", fontWeight: "bold" }}>
-              {memoizedGetIndex(page, index)}
+              {memoizedGetIndex(index, page)}
             </div>
             <ButtonIcon
               size={14}

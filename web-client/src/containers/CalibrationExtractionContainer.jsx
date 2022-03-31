@@ -34,12 +34,17 @@ import {
   formikToArray,
   formikInitialStateForTipsTubes,
 } from "components/CalibrationExtraction/helpers";
-import { deckHomingActionInitiated } from "action-creators/homingActionCreators";
+import {
+  deckHomingActionInitiated,
+  showHomingModal,
+} from "action-creators/homingActionCreators";
 
 const CalibrationExtractionContainer = () => {
   const dispatch = useDispatch();
 
   const [showConfirmationModal, setConfirmModal] = useState(false);
+  const [showSenseHitHomingModel, setSenseHitHomingModel] = useState(false);
+  const [motorSelected, setMotorSelected] = useState([]);
 
   const formik = useFormik({
     initialValues: formikInitialState,
@@ -220,18 +225,16 @@ const CalibrationExtractionContainer = () => {
       direction: direction.value,
       distance: distance.value,
     };
+    if (!motorSelected.includes(motorNumber.value)) {
+      setMotorSelected((arr) => [...arr, motorNumber.value]);
+    }
 
     dispatch(motorInitiated(token, body));
   };
 
   const handleSenseAndHitBtn = () => {
-    const { motorNumber } = formik.values;
-    const body = {
-      motor_number: motorNumber.value,
-    };
-    const deck =
-      name === DECKNAME.DeckA ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
-    dispatch(senseAndHitInitiated(token, deck, body));
+    setSenseHitHomingModel(true);
+    dispatch(showHomingModal());
   };
 
   const handleSaveDetailsBtn = (data) => {
@@ -278,7 +281,10 @@ const CalibrationExtractionContainer = () => {
     dispatch(updateMotorDetailsInitiated({ requestBody, token }));
   };
 
-  const toggleConfirmModal = () => setConfirmModal(!showConfirmationModal);
+  const toggleConfirmModal = () => {
+    dispatch(showHomingModal());
+    setConfirmModal(!showConfirmationModal);
+  };
 
   const handleTipesTubesButton = (e) => {
     e.preventDefault();
@@ -354,6 +360,11 @@ const CalibrationExtractionContainer = () => {
       handleCreateCartridgeBtn={handleCreateCartridgeBtn}
       handleDeleteCartridgeBtn={handleDeleteCartridgeBtn}
       showConfirmationModal={showConfirmationModal}
+      setConfirmModal={setConfirmModal}
+      showSenseHitHomingModel={showSenseHitHomingModel}
+      setSenseHitHomingModel={setSenseHitHomingModel}
+      motorSelected={motorSelected}
+      setMotorSelected={setMotorSelected}
       heaterData={data}
       progressData={progressData}
       pidStatus={pidStatus}

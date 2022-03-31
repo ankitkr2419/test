@@ -23,6 +23,8 @@ import DeleteCartridgeComponent from "./DeleteCartridgeComponent";
 import ConsumableDistancesComponent from "./ConsumableDistancesComponent";
 import ShakerAndHeaterComponent from "./ShakerAndHeaterComponent";
 import HomingCurrentDeckComponent from "./HomingCurrentDeckComponent";
+import HomingWithSenseAndHitComponent from "./HomingWithSenseAndHitComponent";
+import LogoutComponent from "./LogoutComponent";
 
 const CalibrationExtractionComponent = (props) => {
   const {
@@ -40,6 +42,11 @@ const CalibrationExtractionComponent = (props) => {
     handleCreateCartridgeBtn,
     handleDeleteCartridgeBtn,
     showConfirmationModal,
+    setConfirmModal,
+    showSenseHitHomingModel,
+    setSenseHitHomingModel,
+    motorSelected,
+    setMotorSelected,
     toggleConfirmModal,
     formik,
     isAdmin,
@@ -129,6 +136,8 @@ const CalibrationExtractionComponent = (props) => {
             formik={formik}
             handleMotorBtn={handleMotorBtn}
             handleSenseAndHitBtn={handleSenseAndHitBtn}
+            setMotorSelected={setMotorSelected}
+            motorSelected={motorSelected}
           />
 
           {/* Update Motor Component -   */}
@@ -184,14 +193,18 @@ const CalibrationExtractionComponent = (props) => {
       </Card>
 
       {showConfirmationModal && (
-        <MlModal
-          isOpen={showConfirmationModal}
-          textHead={deckName}
-          textBody={MODAL_MESSAGE.exitConfirmation}
-          successBtn={MODAL_BTN.yes}
-          failureBtn={MODAL_BTN.no}
-          handleSuccessBtn={handleLogout}
-          handleCrossBtn={toggleConfirmModal}
+        <LogoutComponent
+          handleLogout={handleLogout}
+          setConfirmModal={setConfirmModal}
+        />
+      )}
+
+      {showSenseHitHomingModel && (
+        <HomingWithSenseAndHitComponent
+          formik={formik}
+          setSenseHitHomingModel={setSenseHitHomingModel}
+          motorSelected={motorSelected}
+          setMotorSelected={setMotorSelected}
         />
       )}
     </div>
