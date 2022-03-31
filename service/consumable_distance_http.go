@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"mylab/cpagent/db"
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
@@ -212,7 +213,7 @@ func updateCalibrationsHandler(deps Dependencies) http.HandlerFunc {
 		}
 
 		logger.Infoln(responses.CalibrationUpdateSuccess)
-		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.CalibrationUpdateSuccess})
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: fmt.Sprintf("%s for motor number %d", responses.CalibrationUpdateSuccess, m.MotorNum)})
 	})
 }
 
