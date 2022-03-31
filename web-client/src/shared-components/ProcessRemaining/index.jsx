@@ -4,6 +4,7 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Text, Icon } from "shared-components";
 import { getIconName } from "shared-components/DeckCard/helpers";
+import HeaterStatusBox from "shared-components/HeaterStatusBox";
 
 const ProecssRemainingBox = styled.div`
   position: absolute;
@@ -27,7 +28,8 @@ const ProecssRemainingBox = styled.div`
   }
 `;
 const ProcessRemaining = (props) => {
-  const { processName, processType, processNumber, processTotal } = props;
+  const { processName, processType, processNumber, processTotal, isAdmin } =
+    props;
 
   const showProcessDetails = () => {
     if (
@@ -63,7 +65,9 @@ const ProcessRemaining = (props) => {
         )}
         <Text Tag="span" className="min-label ml-2 font-weight-bold">
           {processName}
+          {"  "}
         </Text>
+        {isAdmin && <HeaterStatusBox />}
       </Text>
     </ProecssRemainingBox>
   );
