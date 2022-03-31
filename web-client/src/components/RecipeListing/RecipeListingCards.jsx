@@ -11,6 +11,11 @@ import {
   initialPaginationStateRecipeList,
 } from "utils/paginationHelper";
 import { CardOverlay } from "./RecipeCardStyle";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  nextRecipePageBtn,
+  prevRecipePageBtn,
+} from "action-creators/PageActionCreators";
 
 const RecipeListingCards = (props) => {
   const {
@@ -28,13 +33,17 @@ const RecipeListingCards = (props) => {
     handleDeleteRecipe,
   } = props;
 
+  const dispatch = useDispatch();
   const [deleteRecipeId, setDeleteRecipeId] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [page, setPage] = useState(1);
   const [paginatedData, setPaginatedData] = useState(
     initialPaginationStateRecipeList
   );
-
+  const pageReducer = useSelector((state) => state.pageReducer);
+  const page =
+    deckName == "Deck A"
+      ? pageReducer.recipePageDeckA
+      : pageReducer.recipePageDeckB;
   /**reset pagination when recipeList changed */
   useEffect(() => {
     findAndSetPagination();
@@ -73,13 +82,13 @@ const RecipeListingCards = (props) => {
 
   const handleNext = useCallback(() => {
     if (paginatedData.nextPage) {
-      setPage(paginatedData.nextPage);
+      dispatch(nextRecipePageBtn(deckName));
     }
   });
 
   const handlePrev = useCallback(() => {
     if (paginatedData.prevPage) {
-      setPage(paginatedData.prevPage);
+      dispatch(prevRecipePageBtn(deckName));
     }
   });
 

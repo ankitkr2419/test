@@ -64,7 +64,7 @@ const MotorComponent = (props) => {
           size={24}
           className="text-center text-gray text-bold mt-3 mb-4"
         >
-          {"Start Motor"}
+          {"Postion Calibration"}
         </Text>
         <Form>
           <Row form>

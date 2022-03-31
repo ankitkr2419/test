@@ -248,6 +248,9 @@ export const MODAL_MESSAGE = {
   deleteActivityConfirmation: "Are you sure you want to delete this activity?",
   backConfirmation: "Are you sure you want to go back?",
   forgotPasswordMsg: "Contact admin to change your password",
+  senseAndHitHomingMsg:
+    "System will now be homed to verify that the system is calibrated",
+  logoutConformation: "Are you sure you want to logout?",
 };
 
 export const MODAL_BTN = {
@@ -258,6 +261,8 @@ export const MODAL_BTN = {
   no: "No",
   viewResults: "View Results",
   complete: "Complete",
+  withHoming: "With Homing",
+  withoutHoming: "Without Homing",
 };
 
 export const DECKCARD_BTN = {

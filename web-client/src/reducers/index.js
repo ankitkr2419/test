@@ -87,6 +87,7 @@ import {
   toleranceReducer,
   consumableReducer,
 } from "./calibrationReducer";
+import { pageReducer } from "reducers/PageReducer";
 import { reportReducer } from "reducers/reportReducer";
 import {
   analyseDataGraphFiltersReducer,
@@ -166,6 +167,7 @@ const rootReducer = combineReducers({
   shakerRunProgessReducer,
   heaterRunProgessReducer,
   whiteLightReducer,
+  pageReducer,
 });
 
 export default rootReducer;
