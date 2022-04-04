@@ -193,8 +193,7 @@ func updateCalibrationsHandler(deps Dependencies) http.HandlerFunc {
 
 		calibrations, err := calculateConsIDAndPosition(req.Context(), deps.Store, dN)
 		if err != nil {
-			logger.WithField("err", err.Error()).Error(responses.CalibrationsCalculateError)
-			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationsCalculateError.Error()})
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: err.Error()})
 			return
 		}
 
@@ -251,7 +250,6 @@ func calculateConsIDAndPosition(ctx context.Context, store db.Storer, dN plc.Dec
 	// These will be updated calibrations
 	calibration, err = plc.CalculatePosition(ctx, calibrations[0], dN)
 	if err != nil {
-		err = responses.CalibrationsPositionCalculateError
 		return
 	}
 

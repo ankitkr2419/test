@@ -218,6 +218,7 @@ var (
 	CalibrationUpdateConfigError       = fmt.Errorf("error updating calibrations config")
 	CalibrationUpdateError             = fmt.Errorf("error updating calibrations")
 	CalibrationVariableMissingError    = fmt.Errorf("error calibration variable is missing")
+	CalibrationNegativeValueError      = fmt.Errorf("error calibrated value went negative")
 	CalibrationsPositionCalculateError = fmt.Errorf("error position calculating calibrations")
 	CalibrationsCalculateError         = fmt.Errorf("error calculating calibrations")
 	CalibrationMethodUnsetError        = fmt.Errorf("error calibration method is unset")
