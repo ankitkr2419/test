@@ -63,6 +63,7 @@ var (
 	TipOperationCompletedState   = "tip operation completed"
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
+	RecipeDuplicationSuccess  = "duplicate recipe record created successfully"
 
 	UserLoginSuccess  = "user successfully logged in."
 	UserCreateSuccess = "user successfully created"
@@ -152,6 +153,8 @@ var (
 	ProcessListCompletedState        = "process list completed"
 	DuplicateProcessInitialisedState = "duplicate process initialised"
 	DuplicateProcessCompletedState   = "duplicate process completed"
+	DuplicateRecipeInitialisedState  = "duplicate recipe initialised"
+	DuplicateRecipeCompletedState    = "duplicate recipe completed"
 	RearrangeProcessInitialisedState = "rearrange process initialised"
 	RearrangeProcessCompletedState   = "rearrange process completed"
 

@@ -128,6 +128,10 @@ type MsgObj struct {
 	Deck string `json:"deck,omitempty"`
 }
 
+type RecipeObj struct {
+	RecipeName string `json:"recipeName"`
+}
+
 func Validate(i interface{}) (valid bool, respBytes []byte) {
 
 	fieldErrors := make(map[string]string)

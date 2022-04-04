@@ -77,6 +77,7 @@ type Storer interface {
 	CreateTipOperation(context.Context, TipOperation, uuid.UUID) (TipOperation, error)
 	ShowRecipe(context.Context, uuid.UUID) (Recipe, error)
 	CreateRecipe(context.Context, Recipe) (Recipe, error)
+	DuplicateRecipe(context.Context, uuid.UUID, string) (Recipe, error)
 	DeleteRecipe(context.Context, uuid.UUID) error
 	UpdateRecipe(context.Context, Recipe) error
 	ListRecipes(context.Context) ([]Recipe, error)
