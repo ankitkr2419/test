@@ -144,6 +144,8 @@ const ProcessListComponent = (props) => {
           rightBtnLabel="Finish"
           handleLeftBtn={handleAddProcessClick}
           handleRightBtn={toggleFinishModal}
+          handleBackToRecipeList={handleBackToRecipeList}
+          pageReset={true}
         />
 
         {/**finish confirmation modal */}
