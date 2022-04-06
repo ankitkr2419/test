@@ -116,10 +116,12 @@ const ProcessListingCards = (props) => {
         {/** Process List */}
         <div className="d-flex flex-column flex-wrap box py-4">
           {paginatedData?.list?.length > 0 ? (
-            paginatedData?.list?.map((processObj) => {
+            paginatedData?.list?.map((processObj, index) => {
               return (
                 <div key={processObj.id}>
                   <ProcessCard
+                    index={index}
+                    page={page}
                     processId={processObj.id}
                     processName={processObj.name}
                     processIconName={getProcessIconName(processObj.type)}

@@ -341,8 +341,20 @@ skipAspireCycles:
 	modifyDirectionAndDistanceToTravel(&distanceToTravel, &direction)
 
 	pulses = uint16(math.Round(float64(Motors[deckAndMotor]["steps"]) * distanceToTravel))
+	//we give different speeds to pcr cartridges
+	if ad.CartridgeType == "cartridge_2" {
+		var pcrSpeed float64
+		if pcrSpeed, ok = consDistance["pcr_slow_speed_up"]; !ok {
+			err = fmt.Errorf("pcr speed doesn't exist for consumable distances")
+			logger.Errorln("Error: ", err)
+			return "", err
+		}
 
-	response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+		response, err = d.setupMotor(uint16(pcrSpeed), pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+
+	} else {
+		response, err = d.setupMotor(Motors[deckAndMotor]["slow"], pulses, Motors[deckAndMotor]["ramp"], UP, deckAndMotor.Number)
+	}
 	if err != nil {
 		logger.Errorln(err)
 		return
