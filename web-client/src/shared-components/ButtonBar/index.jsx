@@ -16,6 +16,8 @@ const ButtonBar = (props) => {
     btnBarClassname,
     isRTPCR,
     backBtnHandler,
+    handleBackToRecipeList,
+    pageReset,
   } = props;
 
   const history = useHistory();
@@ -32,9 +34,17 @@ const ButtonBar = (props) => {
     <ButtonBarBox
       className={`d-flex justify-content-start align-items-center ${btnBarClassname}`}
     >
-      <PrevBtn onClick={handleBackBtn}>
-        <Icon name="angle-left" size={30} />
-      </PrevBtn>
+      {!pageReset && (
+        <PrevBtn onClick={handleBackBtn}>
+          <Icon name="angle-left" size={30} />
+        </PrevBtn>
+      )}
+
+      {pageReset && (
+        <PrevBtn onClick={handleBackToRecipeList}>
+          <Icon name="angle-left" size={30} />
+        </PrevBtn>
+      )}
 
       {leftBtnLabel && (
         <Button
@@ -76,6 +86,7 @@ ButtonBar.defaultProps = {
   isUserLoggedIn: false,
   isLeftBtnDisabled: false,
   isRightBtnDisabled: false,
+  pageReset: false,
 };
 
 export default ButtonBar;
