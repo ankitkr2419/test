@@ -349,6 +349,16 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	//  4. Move Deck to the small hole's position
 	//
 
+	// Dispense complete any remaining air
+	deckAndMotor.Number = K10_Syringe_LHRH
+	logger.Infoln("Dispense Complete is to start")
+
+	response, err = d.setupMotor(Motors[deckAndMotor]["fast"], initialSensorCutSyringePulses, Motors[deckAndMotor]["ramp"], DISPENSE, deckAndMotor.Number)
+	if err != nil {
+		logger.Errorln(err)
+		return
+	}
+
 	deckAndMotor.Number = K5_Deck
 
 	logger.Infoln("Moving Deck to discard_small_hole")
