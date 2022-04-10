@@ -99,6 +99,7 @@ const LandingScreenComponent = (props) => {
           progressPercentage={homingAllDeckCompletionPercentage}
           isProgressBarVisible={isProgressBarVisible}
           disabled={disabled}
+          isWhiteLightBtn={true}
         />
       </div>
     </LandingScreen>

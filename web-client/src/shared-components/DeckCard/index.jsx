@@ -6,6 +6,7 @@ import { Button } from "core-components";
 import ActionButton from "./ActionButton";
 import {
   DECKCARD_BTN,
+  DECKNAME,
   ROUTES,
   SELECT_PROCESS_PROPS,
   TOAST_MESSAGE,
@@ -18,6 +19,7 @@ import { DeckCardBox, CardOverlay } from "./Styles";
 import CommonTimerFields from "./CommonTimerFields";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router";
+import { whiteLightDeckInitiated } from "action-creators/whiteLightActionCreators";
 
 const DeckCard = (props) => {
   const {
@@ -198,6 +200,25 @@ const DeckCard = (props) => {
     );
   };
 
+  const lightReducer = useSelector((state) => state.whiteLightReducer);
+  let lightReducerForDeckA = lightReducer.decks.find(
+    (deckObj) => deckObj.name === DECKNAME.DeckA
+  );
+  let lightReducerForDeckB = lightReducer.decks.find(
+    (deckObj) => deckObj.name === DECKNAME.DeckB
+  );
+
+  const handleWhiteLightDeckClick = () => {
+    let deck = deckName == "Deck A" ? DECKNAME.DeckAShort : DECKNAME.DeckBShort;
+    if (deck == DECKNAME.DeckAShort) {
+      const lightStatus = lightReducerForDeckA.isLightOn ? 0 : 1;
+      dispatch(whiteLightDeckInitiated({ deck, lightStatus }));
+    } else {
+      const lightStatus = lightReducerForDeckB.isLightOn ? 0 : 1;
+      dispatch(whiteLightDeckInitiated({ deck, lightStatus }));
+    }
+  };
+
   return (
     <DeckCardBox
       className="d-flex justify-content-start align-items-center"
@@ -231,6 +252,8 @@ const DeckCard = (props) => {
             processType={processType}
             processNumber={processNumber}
             processTotal={processTotal}
+            handleWhiteLightDeckClick={handleWhiteLightDeckClick}
+            deckName={deckName}
           />
         )}
         <div className="d-flex justify-content-between align-items-center">
