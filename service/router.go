@@ -134,6 +134,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/discard-box/cleanup/{deck:[A-B]}", authenticate(discardBoxCleanupHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/restore-deck/{deck:[A-B]}", authenticate(restoreDeckHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/uv/{time}/{deck:[A-B]}", authenticate(uvLightHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
+	router.HandleFunc("/light/{state}/{deck:[A-B]}", lightHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/discard-tip-and-home/{discard}/{deck:[A-B]}", authenticate(discardAndHomeHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/shaking/{recipe_id}", authenticate(createShakingHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost).Headers(versionHeader, v1)
 	router.HandleFunc("/shaking/{id}", authenticate(showShakingHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)

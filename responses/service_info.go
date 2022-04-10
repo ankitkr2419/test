@@ -128,7 +128,8 @@ var (
 	DiscardBoxMovedSuccess = "Discard box moved to cleanup position successful"
 	RestoreDeckSuccess     = "Restore Deck successful"
 
-	UVCleanupProgress = "uv light clean up in progress"
+	UVCleanupProgress     = "uv light clean up in progress"
+	LightInitialisedState = "light on/off triggered"
 
 	DiscardBoxInitialisedState     = "discard box operation initialised"
 	DiscardBoxCompletedState       = "discard box operation completed"

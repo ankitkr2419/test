@@ -130,6 +130,7 @@ type Extraction interface {
 	DiscardBoxCleanup() (response string, err error)
 	RestoreDeck() (response string, err error)
 	UVLight(uvTime int64) (response string, err error)
+	Light(state uint64) (response string, err error)
 	AddDelay(delay db.Delay, runRecipe bool) (response string, err error)
 	DiscardTipAndHome(discard bool) (response string, err error)
 	Heating(ht db.Heating, live bool) (response string, err error)
