@@ -55,6 +55,12 @@ export const publishRecipeAction = {
   publishRecipeFailed: "PUBLISH_RECIPE_FAILED",
 };
 
+export const updateRecipeNameAction = {
+  updateRecipeNameInitiated: "UPDATE_RECIPE_NAME_INITIATED",
+  updateRecipeNameSuccess: "UPDATE_RECIPE_NAME_SUCCESS",
+  updateRecipeNameFailed: "UPDATE_RECIPE_NAME_FAILED",
+};
+
 export const deleteRecipeAction = {
   deleteRecipeInitiated: "DELETE_RECIPE_INITIATED",
   deleteRecipeSuccess: "DELETE_RECIPE_SUCCESS",

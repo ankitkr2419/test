@@ -1,4 +1,4 @@
-import { takeEvery, put, call } from "redux-saga/effects";
+import { takeEvery, put, call, take } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
 import {
   runRecipeAction,
@@ -9,6 +9,7 @@ import {
   stepRunRecipeAction,
   publishRecipeAction,
   deleteRecipeAction,
+  updateRecipeNameAction,
 } from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
 import {
@@ -40,7 +41,7 @@ export function* runRecipe(actions) {
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -68,7 +69,7 @@ export function* resumeRecipe(actions) {
         successAction: resumeRecipeSuccess,
         failureAction: resumeRecipeFailed,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -97,7 +98,7 @@ export function* abortRecipe(actions) {
         successAction: abortRecipeSuccess,
         failureAction: abortRecipeFailed,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -125,7 +126,7 @@ export function* pauseRecipe(actions) {
         successAction: pauseRecipeSuccess,
         failureAction: pauseRecipeFailed,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -158,7 +159,6 @@ export function* recipeListing(actions) {
   }
 }
 
-
 export function* stepRunRecipe(actions) {
   const {
     payload: {
@@ -178,7 +178,7 @@ export function* stepRunRecipe(actions) {
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -200,11 +200,13 @@ export function* nextStepRunRecipe(actions) {
       payload: {
         method: HTTP_METHODS.GET,
         body: null,
-        reqPath: `${API_ENDPOINTS.runNextStep}/${deckName === DECKNAME.DeckA ? "A" : "B"}`,
+        reqPath: `${API_ENDPOINTS.runNextStep}/${
+          deckName === DECKNAME.DeckA ? "A" : "B"
+        }`,
         successAction: runRecipeSuccess,
         failureAction: runRecipeFailed,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -212,7 +214,6 @@ export function* nextStepRunRecipe(actions) {
     yield put(runrecipeFailure(error));
   }
 }
-
 
 export function* publishRecipe(actions) {
   const {
@@ -231,12 +232,40 @@ export function* publishRecipe(actions) {
       payload: {
         method: HTTP_METHODS.POST,
         body: null,
-        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}/${isPublished ? "unpublish" : "publish"}`,
+        reqPath: `${API_ENDPOINTS.recipeListing}/${recipeId}/${
+          isPublished ? "unpublish" : "publish"
+        }`,
         successAction: publishRecipeSuccess,
         failureAction: publishRecipeFailed,
         showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error in publish recipe", error);
+  }
+}
+
+export function* updateRecipeName(actions) {
+  const {
+    payload: {
+      params: { recipeId, token, recipeName },
+    },
+  } = actions;
+  const { updateRecipeNameSuccess, updateRecipeNameFailed } =
+    updateRecipeNameAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: { recipeName: recipeName },
+        reqPath: `${API_ENDPOINTS.recipeListing}/editName/${recipeId}`,
+        successAction: updateRecipeNameSuccess,
+        failureAction: updateRecipeNameFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
       },
     });
   } catch (error) {
@@ -262,7 +291,7 @@ export function* deleteRecipe(actions) {
         failureAction: deleteRecipeFailure,
         showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -277,7 +306,14 @@ export function* recipeActionSaga() {
   yield takeEvery(resumeRecipeAction.resumeRecipeInitiated, resumeRecipe);
   yield takeEvery(recipeListingAction.recipeListingInitiated, recipeListing);
   yield takeEvery(stepRunRecipeAction.stepRunRecipeInitiated, stepRunRecipe);
-  yield takeEvery(stepRunRecipeAction.nextStepRunRecipeInitiated, nextStepRunRecipe);
+  yield takeEvery(
+    stepRunRecipeAction.nextStepRunRecipeInitiated,
+    nextStepRunRecipe
+  );
   yield takeEvery(publishRecipeAction.publishRecipeInitiated, publishRecipe);
   yield takeEvery(deleteRecipeAction.deleteRecipeInitiated, deleteRecipe);
+  yield takeEvery(
+    updateRecipeNameAction.updateRecipeNameInitiated,
+    updateRecipeName
+  );
 }

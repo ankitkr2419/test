@@ -9,6 +9,7 @@ import {
   publishRecipeAction,
   deleteRecipeAction,
   actionBtnStates,
+  updateRecipeNameAction,
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
@@ -200,6 +201,13 @@ export const nextStepRunRecipeInitiated = (params) => ({
 
 export const publishRecipeInitiated = (params) => ({
   type: publishRecipeAction.publishRecipeInitiated,
+  payload: {
+    params,
+  },
+});
+
+export const updateRecipeNameInitiated = (params) => ({
+  type: updateRecipeNameAction.updateRecipeNameInitiated,
   payload: {
     params,
   },

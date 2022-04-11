@@ -31,6 +31,7 @@ const RecipeListingCards = (props) => {
     handlePublishModalClick,
     handleEditRecipe,
     handleDeleteRecipe,
+    handleEditRecipeNameModalClick,
   } = props;
 
   const dispatch = useDispatch();
@@ -161,13 +162,22 @@ const RecipeListingCards = (props) => {
                   handlePublishModalClick={(recipeId, isPublished) =>
                     handlePublishModalClick(recipeId, isPublished)
                   }
+                  handleEditRecipeNameModalClick={(recipeId) =>
+                    handleEditRecipeNameModalClick(recipeId)
+                  }
                   handleEditRecipe={() => handleEditRecipe(recipe)}
-                  handleDeleteRecipe={() => handleDeleteRecipeClick(recipe.id)}
+                  handleDeleteRecipeClick={(recipeId) => {
+                    handleDeleteRecipeClick(recipeId);
+                  }}
                 />
               </Col>
             ))
           ) : (
-            <h4>No recipes to show!</h4>
+            <Col md={12}>
+              <div className="text-center">
+                <h4>No recipes found</h4>
+              </div>
+            </Col>
           )}
         </Row>
       </CardBody>

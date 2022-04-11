@@ -16,6 +16,7 @@ const RecipeCard = (props) => {
     returnRecipeDetails,
     toggleRunRecipesModal,
     handlePublishModalClick,
+    handleEditRecipeNameModalClick,
     handleEditRecipe,
     handleDeleteRecipe,
     toggle,
@@ -69,12 +70,18 @@ const RecipeCard = (props) => {
                 <ButtonIcon
                   size={25}
                   name={isPublished ? "published" : `publish`}
-                  className={`border-gray ${
+                  className={`border-gray mr-2 ${
                     isPublished
                       ? "published-icon text-white bg-primary"
                       : "text-primary"
                   }`}
                   onClick={() => handlePublishModalClick(recipeId, isPublished)}
+                />
+                <ButtonIcon
+                  size={25}
+                  name="pencil"
+                  className="border-gray text-primary mr-2"
+                  onClick={() => handleEditRecipeNameModalClick(recipeId)}
                 />
               </div>
               <ButtonIcon
