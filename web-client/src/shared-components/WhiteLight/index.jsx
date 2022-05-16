@@ -23,14 +23,13 @@ const WhiteLight = (props) => {
   const handleWhiteLightClick = () => {
     let deckA = DECKNAME.DeckAShort;
     let deckB = DECKNAME.DeckBShort;
-    const lightStatusA = lightReducerForDeckA.isLightOn ? 0 : 1;
-    const lightStatusB = lightReducerForDeckB.isLightOn ? 0 : 1;
-    dispatch(
-      whiteLightDeckInitiated({ deck: deckA, lightStatus: lightStatusA })
-    );
-    dispatch(
-      whiteLightDeckInitiated({ deck: deckB, lightStatus: lightStatusB })
-    );
+    if (lightReducerForDeckA.isLightOn || lightReducerForDeckB.isLightOn) {
+      dispatch(whiteLightDeckInitiated({ deck: deckA, lightStatus: 0 }));
+      dispatch(whiteLightDeckInitiated({ deck: deckB, lightStatus: 0 }));
+    } else {
+      dispatch(whiteLightDeckInitiated({ deck: deckA, lightStatus: 1 }));
+      dispatch(whiteLightDeckInitiated({ deck: deckB, lightStatus: 1 }));
+    }
   };
 
   return (

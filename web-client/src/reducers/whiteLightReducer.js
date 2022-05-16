@@ -29,11 +29,13 @@ export const whiteLightReducer = (state = lightInitialState, action) => {
     case whiteLightDeckActions.initiateAction:
       const deckInitiateName =
         action.payload.params.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
+
       const deckNumber = deckInitiateName == DECKNAME.DeckA ? 0 : 1;
       const changesForLightOn = {
         isLoading: false,
         isError: null,
-        isLightOn: !state.decks[deckNumber].isLightOn,
+        // isLightOn: !state.decks[deckNumber].isLightOn,
+        isLightOn: action.payload.params.lightStatus,
       };
 
       const dockAfterRunInit = getUpdatedDecks(
