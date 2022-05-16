@@ -188,6 +188,7 @@ export const API_ENDPOINTS = {
   tipDiscard: "tip-operation",
   magnet: "attach-detach",
   duplicateProcess: "duplicate-process",
+  duplicateRecipe: "duplicate-recipe",
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",

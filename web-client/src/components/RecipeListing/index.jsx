@@ -38,6 +38,7 @@ import {
   saveRecipeDetails,
 } from "action-creators/saveNewRecipeActionCreators";
 import { ResetRecipePageState } from "action-creators/PageActionCreators";
+import DuplicateRecipeModel from "components/modals/DuplicateRecipeModel";
 
 const RecipeListingComponent = (props) => {
   const {
@@ -55,6 +56,7 @@ const RecipeListingComponent = (props) => {
     toggleRunRecipesModal,
     onChangeRunRecipeType,
     runRecipeType,
+    createDuplicateRecipe,
   } = props;
 
   const loginReducer = useSelector((state) => state.loginReducer);
@@ -81,6 +83,9 @@ const RecipeListingComponent = (props) => {
   const [recipeIdToPublish, setRecipeIdToPublish] = useState("");
   const [isPublished, setIsPublished] = useState(false); //tells that selected recipe is published/unpublished
   const [publishModal, setPublishModal] = useState(false);
+  const [copyRecipeModel, setCopyRecipeModel] = useState(false);
+  const [recipeId, setRecipeId] = useState("");
+  const [recipeName, setRecipeName] = useState("");
 
   /**Might be needed later */
 
@@ -112,6 +117,10 @@ const RecipeListingComponent = (props) => {
 
   const toggleAddNewRecipesModal = () => {
     setAddNewRecipesModal(!addNewRecipesModal);
+  };
+
+  const toggleCopyRecipeModel = () => {
+    setCopyRecipeModel(!copyRecipeModel);
   };
 
   const onLogoutClicked = () => {
@@ -268,6 +277,19 @@ const RecipeListingComponent = (props) => {
           />
         )}
 
+        {copyRecipeModel && (
+          <DuplicateRecipeModel
+            createDuplicateRecipe={createDuplicateRecipe}
+            isOpen={copyRecipeModel}
+            toggleCopyRecipeModel={toggleCopyRecipeModel}
+            deckName={deckName}
+            recipeId={recipeId}
+            confirmationCopyText={`Coping  "${recipeName}" recipe to a new recipe.`}
+            confirmationText={"Enter name of the new recipe"}
+            fileteredRecipeData={fileteredRecipeData}
+          />
+        )}
+
         {timeModal && (
           <TimeModal
             timeModal={timeModal}
@@ -304,6 +326,7 @@ const RecipeListingComponent = (props) => {
             toggleAddNewRecipesModal={toggleAddNewRecipesModal}
             deckName={deckName}
             confirmationText={"Name the Recipe"}
+            fileteredRecipeData={fileteredRecipeData}
           />
         )}
 
@@ -361,6 +384,10 @@ const RecipeListingComponent = (props) => {
               }
               handleEditRecipe={(recipe) => handleEditRecipe(recipe)}
               handleDeleteRecipe={handleDeleteRecipe}
+              createDuplicateRecipe={createDuplicateRecipe}
+              toggleCopyRecipeModel={toggleCopyRecipeModel}
+              setRecipeId={setRecipeId}
+              setRecipeName={setRecipeName}
             />
           )}
         </>

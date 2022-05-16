@@ -16,17 +16,19 @@ import { useDispatch } from "react-redux";
 import { saveNewRecipe } from "action-creators/saveNewRecipeActionCreators";
 import { ROUTES } from "appConstants";
 import { useHistory } from "react-router";
-import { AddNewRecipesForm } from "./AddNewRecipesForm";
+import { AddNewRecipesForm } from "./DuplicateRecipesForm";
 
-const AddNewRecipesModal = (props) => {
+const DuplicateRecipeModal = (props) => {
   const {
+    createDuplicateRecipe,
+    confirmationCopyText,
     confirmationText,
     isOpen,
-    toggleAddNewRecipesModal,
+    toggleCopyRecipeModel,
     deckName,
+    recipeId,
     fileteredRecipeData,
   } = props;
-
   const [recipeName, setRecipeName] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -44,22 +46,11 @@ const AddNewRecipesModal = (props) => {
       toast.error("Recipe with same name already exists");
       return;
     }
-
     if (recipeName) {
       setSubmitted(false);
-
-      dispatch(
-        saveNewRecipe({
-          deckName: deckName,
-          recipeDetails: {
-            name: recipeName,
-          },
-        })
-      );
-      toggleAddNewRecipesModal();
-
-      //go to labware page
-      history.push(ROUTES.labware);
+      createDuplicateRecipe(recipeId, recipeName);
+      toggleCopyRecipeModel();
+      // history.push(ROUTES.labware);
     } else {
       setSubmitted(true);
       toast.error("Enter recipe name", { autoClose: false });
@@ -68,12 +59,7 @@ const AddNewRecipesModal = (props) => {
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        toggle={toggleAddNewRecipesModal}
-        centered
-        size="sm"
-      >
+      <Modal isOpen={isOpen} toggle={toggleCopyRecipeModel} centered size="sm">
         <ModalBody className="p-0">
           <div className="d-flex justify-content-center align-items-center modal-heading">
             <Text className="mb-0 title font-weight-bold">{deckName}</Text>
@@ -84,14 +70,21 @@ const AddNewRecipesModal = (props) => {
               right={16}
               size={36}
               name="cross"
-              onClick={toggleAddNewRecipesModal}
+              onClick={toggleCopyRecipeModel}
               className="border-0"
             />
           </div>
           <div className="d-flex justify-content-center align-items-center flex-column h-100 pt-5 pb-4">
             <Text
-              Tag="h5"
-              size={20}
+              Tag="h4"
+              size={15}
+              className="text-center font-weight-bold mb-2"
+            >
+              {confirmationCopyText}
+            </Text>
+            <Text
+              Tag="h4"
+              size={15}
               className="text-center font-weight-bold mb-4"
             >
               {confirmationText}
@@ -117,7 +110,7 @@ const AddNewRecipesModal = (props) => {
                 </FormGroup>
                 <Center className="my-3">
                   <Button color="primary" onClick={onCreateRecipeClicked}>
-                    Create Recipe
+                    Copy Recipe
                   </Button>
                 </Center>
               </AddNewRecipesForm>
@@ -129,15 +122,15 @@ const AddNewRecipesModal = (props) => {
   );
 };
 
-AddNewRecipesModal.propTypes = {
+DuplicateRecipeModal.propTypes = {
   confirmationText: PropTypes.string,
   isOpen: PropTypes.bool,
   // confirmationClickHandler: PropTypes.func,
 };
 
-AddNewRecipesModal.defaultProps = {
+DuplicateRecipeModal.defaultProps = {
   confirmationText: "Recipe Name",
   isOpen: false,
 };
 
-export default React.memo(AddNewRecipesModal);
+export default React.memo(DuplicateRecipeModal);

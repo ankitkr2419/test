@@ -19,6 +19,9 @@ const RecipeCard = (props) => {
     handleEditRecipe,
     handleDeleteRecipe,
     toggle,
+    toggleCopyRecipeModel,
+    setRecipeId,
+    setRecipeName,
   } = props;
 
   const handleClickOnCard = () => {
@@ -35,6 +38,12 @@ const RecipeCard = (props) => {
     e.stopPropagation();
     toggleRunRecipesModal();
     returnRecipeDetails({ recipeId, recipeName, processCount, isAdmin });
+  };
+
+  const handleDuplicateRecipeClick = () => {
+    toggleCopyRecipeModel();
+    setRecipeId(recipeId);
+    setRecipeName(recipeName);
   };
 
   return (
@@ -71,10 +80,16 @@ const RecipeCard = (props) => {
                   name={isPublished ? "published" : `publish`}
                   className={`border-gray ${
                     isPublished
-                      ? "published-icon text-white bg-primary"
-                      : "text-primary"
+                      ? "published-icon text-white bg-primary mr-2"
+                      : "text-primary mr-2"
                   }`}
                   onClick={() => handlePublishModalClick(recipeId, isPublished)}
+                />
+                <ButtonIcon
+                  size={14}
+                  name="copy"
+                  className="border-gray text-primary"
+                  onClick={handleDuplicateRecipeClick}
                 />
               </div>
               <ButtonIcon
