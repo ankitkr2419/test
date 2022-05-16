@@ -98,6 +98,7 @@ const HomingWithSenseAndHitComponent = (props) => {
       isProgressBarVisible={isProgressBarVisible}
       disabled={modalBtnIsDisabled}
       senseAndHit={modalBtnIsDisabled}
+      isWhiteLightBtn={true}
     />
   );
 };

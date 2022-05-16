@@ -529,6 +529,28 @@ func (d *Compact32Deck) switchOnUVLight() (response string, err error) {
 	return "SUCCESS", nil
 }
 
+func (d *Compact32Deck) switchOnLight() (response string, err error) {
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][7], ON)
+	if err != nil {
+		logger.Errorln("err Switching on the Light: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched on the Light--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
+func (d *Compact32Deck) switchOffLight() (response string, err error) {
+	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][7], OFF)
+	if err != nil {
+		logger.Errorln("err Switching off the Light: ", err)
+		return "", err
+	}
+	logger.Infoln("Switched off the Light--> for deck ", d.name)
+
+	return "SUCCESS", nil
+}
+
 func (d *Compact32Deck) offUVLight() (response string, err error) {
 
 	err = d.DeckDriver.WriteSingleCoil(MODBUS_EXTRACTION[d.name]["M"][6], OFF)

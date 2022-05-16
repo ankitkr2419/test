@@ -32,7 +32,7 @@ export function* runUVCleaning(actions) {
         failureAction: runCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -59,7 +59,7 @@ export function* pauseUVCleaning(actions) {
         failureAction: pauseCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -86,7 +86,7 @@ export function* resumeUVCleaning(actions) {
         failureAction: resumeCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -113,7 +113,7 @@ export function* abortUVCleaning(actions) {
         failureAction: abortCleanUpFailed,
         // showPopupSuccessMessage: true,
         showPopupFailureMessage: true,
-        token
+        token,
       },
     });
   } catch (error) {

@@ -1,17 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Switch } from "core-components";
 import { ImageIcon } from "shared-components";
 import bulb from "assets/images/bulb.svg";
 import { StyledWhiteLightComponent } from "./Style";
 import { DECKNAME } from "appConstants";
-import { whiteLightDeckInitiated } from "action-creators/whiteLightActionCreators";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
-const WhiteLight = (props) => {
-  const { className } = props;
+const WhiteLightDeck = (props) => {
+  const { handleWhiteLightClick, className, deckName } = props;
 
-  const dispatch = useDispatch();
   const lightReducer = useSelector((state) => state.whiteLightReducer);
   let lightReducerForDeckA = lightReducer.decks.find(
     (deckObj) => deckObj.name === DECKNAME.DeckA
@@ -20,31 +17,19 @@ const WhiteLight = (props) => {
     (deckObj) => deckObj.name === DECKNAME.DeckB
   );
 
-  const handleWhiteLightClick = () => {
-    let deckA = DECKNAME.DeckAShort;
-    let deckB = DECKNAME.DeckBShort;
-    const lightStatusA = lightReducerForDeckA.isLightOn ? 0 : 1;
-    const lightStatusB = lightReducerForDeckB.isLightOn ? 0 : 1;
-    dispatch(
-      whiteLightDeckInitiated({ deck: deckA, lightStatus: lightStatusA })
-    );
-    dispatch(
-      whiteLightDeckInitiated({ deck: deckB, lightStatus: lightStatusB })
-    );
-  };
+  let lightDeck =
+    deckName == DECKNAME.DeckA ? lightReducerForDeckA : lightReducerForDeckB;
 
   return (
     <StyledWhiteLightComponent
       className={`d-flex align-items-center ${className}`}
     >
       <ImageIcon className="bulb" src={bulb} />
-      <label className="switch" style={{ marginLeft: "10px" }}>
+      <label className="switch">
         <input
           type="checkbox"
-          checked={
-            lightReducerForDeckA.isLightOn || lightReducerForDeckB.isLightOn
-          }
           onClick={handleWhiteLightClick}
+          checked={lightDeck.isLightOn}
         />
         <span className="slider round"> </span>
       </label>
@@ -52,13 +37,13 @@ const WhiteLight = (props) => {
   );
 };
 
-WhiteLight.propTypes = {
+WhiteLightDeck.propTypes = {
   isLightOn: PropTypes.bool,
   className: PropTypes.string,
 };
 
-WhiteLight.defaultProps = {
+WhiteLightDeck.defaultProps = {
   className: "",
 };
 
-export default WhiteLight;
+export default WhiteLightDeck;
