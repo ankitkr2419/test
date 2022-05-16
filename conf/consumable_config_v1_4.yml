@@ -249,6 +249,13 @@ consumabledistance:
 - id: 609
   name: magnet_back_step_2
   distance: 40
+- id: 610
+  name: magnet_forward_step_2_a
+  distance: 3.5
+  description: This field sets the backward distance for the magnet second step Detach
+- id: 611
+  name: magnet_forward_step_2_b
+  distance: 3.5
   description: This field sets the backward distance for the magnet second step Detach
 - id: 1001
   name: syringe_module_a_lh_zero

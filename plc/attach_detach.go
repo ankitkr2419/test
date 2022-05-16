@@ -257,10 +257,18 @@ func (d *Compact32Deck) attach(height int64) (response string, err error) {
 
 	// step 4 to calculate the relative position of the magnet from its current
 	// position to move the magnet Downward for step 2.
-	if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2"]; !ok {
-		err = fmt.Errorf("magnet_forward_step_2 doesn't exist for consuamble distances")
-		logger.Errorln(err)
-		return
+	if deckAndNumber.Deck == DeckA {
+		if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2_a"]; !ok {
+			err = fmt.Errorf("magnet_forward_step_2_a doesn't exist for consuamble distances")
+			logger.Errorln(err)
+			return
+		}
+	} else {
+		if magnetFwdSecPosition, ok = consDistance["magnet_forward_step_2_b"]; !ok {
+			err = fmt.Errorf("magnet_forward_step_2_b doesn't exist for consuamble distances")
+			logger.Errorln(err)
+			return
+		}
 	}
 	// distance and direction setup for magnet for forward step 1
 	distanceToTravel = Positions[deckMagnetFwdRev] - magnetFwdSecPosition
