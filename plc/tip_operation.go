@@ -324,11 +324,18 @@ func (d *Compact32Deck) tipDiscard() (response string, err error) {
 	// 3. Move Syringe Module down really slow till enough inside big hole
 	//
 
-	logger.Infoln("Moving Syringe to deck base inside")
-	if position, ok = consDistance["syringe_module_slow_down_for_discard"]; !ok {
-		err = fmt.Errorf("syringe_module_slow_down_for_discard doesn't exist for consumable distances")
-		logger.Errorln("Error: ", err)
-		return "", err
+	if deckAndMotor.Deck == DeckA {
+		if position, ok = consDistance["syringe_module_slow_down_for_discard_a"]; !ok {
+			err = fmt.Errorf("syringe_module_slow_down_for_discard_a doesn't exist for consumable distances")
+			logger.Errorln("Error: ", err)
+			return "", err
+		}
+	} else {
+		if position, ok = consDistance["syringe_module_slow_down_for_discard_b"]; !ok {
+			err = fmt.Errorf("syringe_module_slow_down_for_discard_b doesn't exist for consumable distances")
+			logger.Errorln("Error: ", err)
+			return "", err
+		}
 	}
 	// Here syringe_module_slow_down_for_discard will always be greater
 	// than tipFast

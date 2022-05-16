@@ -25,6 +25,7 @@ const (
 	updateConsDistaceQuery1 = `UPDATE consumable_distances SET 
 	distance = $1,
 	description = $2 WHERE id = $3`
+	getConsDistanceQuery = `SELECT * FROM consumable_distances where id = $1`
 )
 
 type ConsumableDistance struct {
@@ -88,6 +89,15 @@ func (s *pgStore) ListConsDistances() (consumabledistance []ConsumableDistance, 
 
 func (s *pgStore) ListConsDistancesDeck(ctx context.Context, min, max int64) (consumabledistance []ConsumableDistance, err error) {
 	err = s.db.Select(&consumabledistance, getConsDistanceQueryByDeck, min, max)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing consumable distance details")
+		return
+	}
+	return
+}
+
+func (s *pgStore) ListOneConsDistances(id int64) (consumabledistance []ConsumableDistance, err error) {
+	err = s.db.Select(&consumabledistance, getConsDistanceQuery, id)
 	if err != nil {
 		logger.WithField("err", err.Error()).Error("Error listing consumable distance details")
 		return

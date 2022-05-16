@@ -219,6 +219,31 @@ func updateCalibrationsHandler(deps Dependencies) http.HandlerFunc {
 			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateError.Error()})
 			return
 		}
+		if dN.Number == 9 {
+			if deck == "A" {
+				cons, err := deps.Store.ListOneConsDistances(312)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateError)
+					responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateError.Error()})
+					return
+				}
+				updatedConsValue := plc.CalculateDiscardHeight(dN)
+				cons[0].Distance = updatedConsValue
+				deps.Store.UpdateConsumableDistance(req.Context(), cons[0])
+
+			} else {
+				cons, err := deps.Store.ListOneConsDistances(313)
+				if err != nil {
+					logger.WithField("err", err.Error()).Error(responses.CalibrationUpdateError)
+					responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.CalibrationUpdateError.Error()})
+					return
+				}
+				updatedConsValue := plc.CalculateDiscardHeight(dN)
+				cons[0].Distance = updatedConsValue
+				deps.Store.UpdateConsumableDistance(req.Context(), cons[0])
+
+			}
+		}
 
 		logger.Infoln(responses.CalibrationUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: fmt.Sprintf("%s for motor number %d", responses.CalibrationUpdateSuccess, m.MotorNum)})
