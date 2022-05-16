@@ -65,3 +65,10 @@ export const actionBtnStates = {
   enableActionBtn: "ENABLE_ACTION_BTN",
   disableActionBtn: "DISABLE_ACTION_BTN",
 };
+
+export const duplicateRecipeActions = {
+  duplicateRecipeInitiated: "DUPLICATE_RECIPE_INITIATED",
+  duplicateRecipeSuccess: "DUPLICATE_RECIPE_SUCCESS",
+  duplicateRecipeFailure: "DUPLICATE_RECIPE_FAILURE",
+  duplicateRecipeReset: "DUPLICATE_RECIPE_RESET",
+};

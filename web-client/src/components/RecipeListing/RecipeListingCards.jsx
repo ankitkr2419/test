@@ -31,6 +31,10 @@ const RecipeListingCards = (props) => {
     handlePublishModalClick,
     handleEditRecipe,
     handleDeleteRecipe,
+    createDuplicateRecipe,
+    toggleCopyRecipeModel,
+    setRecipeId,
+    setRecipeName,
   } = props;
 
   const dispatch = useDispatch();
@@ -163,6 +167,10 @@ const RecipeListingCards = (props) => {
                   }
                   handleEditRecipe={() => handleEditRecipe(recipe)}
                   handleDeleteRecipe={() => handleDeleteRecipeClick(recipe.id)}
+                  createDuplicateRecipe={createDuplicateRecipe}
+                  toggleCopyRecipeModel={toggleCopyRecipeModel}
+                  setRecipeId={setRecipeId}
+                  setRecipeName={setRecipeName}
                 />
               </Col>
             ))

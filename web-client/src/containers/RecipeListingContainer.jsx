@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import RecipeListingComponent from "components/RecipeListing";
 import {
+  duplicateRecipeInitiated,
   recipeListingInitiated,
   saveRecipeDataForDeck,
 } from "action-creators/recipeActionCreators";
@@ -135,6 +136,13 @@ const RecipeListingContainer = (props) => {
   };
   const toggleRunRecipesModal = () => setRunRecipesModal(!runRecipesmodal);
 
+  const createDuplicateRecipe = (recipeId, recipeName) => {
+    const token = activeDeckObj.token;
+    dispatch(
+      duplicateRecipeInitiated({ recipeId, token, deckName, recipeName })
+    );
+  };
+
   if (!activeDeckObj.isLoggedIn) return <Redirect to={`/${ROUTES.landing}`} />;
 
   return (
@@ -153,6 +161,7 @@ const RecipeListingContainer = (props) => {
         onConfirmedRunRecipeByAdmin={onConfirmedRunRecipeByAdmin}
         runRecipesmodal={runRecipesmodal}
         toggleRunRecipesModal={toggleRunRecipesModal}
+        createDuplicateRecipe={createDuplicateRecipe}
         runRecipeType={runRecipeType}
         onChangeRunRecipeType={onChangeRunRecipeType}
         deckName={deckName}
