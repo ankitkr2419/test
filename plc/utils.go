@@ -429,6 +429,10 @@ func CalculatePosition(ctx context.Context, calibration db.ConsumableDistance, d
 		err = responses.CalibrationMethodUnset
 		return
 	}
+	if calibration.Distance < 0 {
+		err = responses.CalibrationNegativeValueError
+		return
+	}
 	updatedCalibration = calibration
 	logger.Warnln("Updated: ", calibration)
 
