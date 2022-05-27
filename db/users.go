@@ -53,11 +53,16 @@ func (s *pgStore) ValidateUser(ctx context.Context, u User) (User, error) {
 		return User{}, err
 	}
 
-	if rows.Next() {
+	isValid := rows.Next()
+	if isValid {
 		if err = rows.Scan(&u.Role); err != nil {
 			logger.WithField("err", err.Error()).Error("Error getting user role details")
 			return User{}, err
 		}
+	} else {
+		err = errors.New("User not found")
+		logger.WithField("err", err.Error()).Error("User not found")
+		return User{}, err
 	}
 
 	return u, nil

@@ -9,6 +9,7 @@ import {
   publishRecipeAction,
   deleteRecipeAction,
   actionBtnStates,
+  updateRecipeNameAction,
   duplicateRecipeActions,
 } from "actions/recipeActions";
 import { DECKCARD_BTN, DECKNAME, RUN_RECIPE_TYPE } from "appConstants";
@@ -88,6 +89,36 @@ export const initialState = {
 
 export const recipeActionReducer = (state = initialState, action = {}) => {
   switch (action.type) {
+    case updateRecipeNameAction.updateRecipeNameInitiated:
+      return {
+        ...state,
+        tempDeckName: action.payload.params.deckName,
+      };
+
+    case updateRecipeNameAction.updateRecipeNameSuccess:
+      const renamedRecipe = action.payload.response;
+      let deckIndexUpdate = state.tempDeckName == DECKNAME.DeckA ? 0 : 1;
+      const recipeListingSuccessNameChanges = {
+        allRecipeData: [
+          ...state.decks[deckIndexUpdate].allRecipeData.map((recipe) =>
+            recipe.id == renamedRecipe.id ? renamedRecipe : recipe
+          ),
+        ],
+      };
+      const newDecksAfterRecipeNameUpdate = getUpdatedDecks(
+        state,
+        state.tempDeckName,
+        recipeListingSuccessNameChanges
+      );
+
+      return {
+        ...state,
+        tempDeckName: "",
+        decks: newDecksAfterRecipeNameUpdate,
+      };
+    case updateRecipeNameAction.updateRecipeNameFailed:
+      return { ...state };
+
     case duplicateRecipeActions.duplicateRecipeInitiated:
       return {
         ...state,

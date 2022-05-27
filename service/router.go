@@ -121,6 +121,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/recipes/{id}", authenticate(deleteRecipeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodDelete).Headers(versionHeader, v1)
 	router.HandleFunc("/recipes/{id}", authenticate(updateRecipeHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPut).Headers(versionHeader, v1)
 	router.HandleFunc("/recipes/{id}/{publish:[a-z]*}", authenticate(publishRecipeHandler(deps), deps, Extraction, admin)).Methods(http.MethodPost).Headers(versionHeader, v1)
+	router.HandleFunc("/recipes/editName/{id}", authenticate(updateRecipeNameHandler(deps), deps, Extraction, admin)).Methods(http.MethodPost).Headers(versionHeader, v1)
 	router.HandleFunc("/processes", authenticate(createProcessHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodPost).Headers(versionHeader, v1)
 	router.HandleFunc("/recipe/{id}/processes", authenticate(listProcessesHandler(deps), deps, Extraction)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	router.HandleFunc("/duplicate-process/{process_id}", authenticate(duplicateProcessHandler(deps), deps, Extraction, admin, engineer)).Methods(http.MethodGet).Headers(versionHeader, v1)

@@ -305,6 +305,62 @@ func publishRecipeHandler(deps Dependencies) http.HandlerFunc {
 	})
 }
 
+func updateRecipeNameHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+
+		go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.InitialisedState, db.UpdateOperation, "", responses.RecipePublishedState)
+
+		vars := mux.Vars(req)
+		id, err := parseUUID(vars["id"])
+
+		// for logging error if there is any otherwise logging success
+		defer func() {
+			if err != nil {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.ErrorState, db.UpdateOperation, "", err.Error())
+
+			} else {
+				go deps.Store.AddAuditLog(req.Context(), db.ApiOperation, db.CompletedState, db.UpdateOperation, "", responses.RecipePublishedState)
+
+			}
+
+		}()
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.UUIDParseError.Error()})
+			return
+		}
+
+		//for more clarity, we take whole keywords(publish and unpublish) from the url
+		var recipeN RecipeObj
+		var recipe db.Recipe
+
+		err = json.NewDecoder(req.Body).Decode(&recipeN)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeDecodeError.Error()})
+			return
+		}
+
+		recipe.ID = id
+		recipe, err = deps.Store.ShowRecipe(req.Context(), id)
+		if err != nil {
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeFetchError.Error()})
+			logger.WithField("err", err.Error()).Error(responses.RecipeFetchError)
+			return
+		}
+
+		recipe.Name = recipeN.RecipeName
+		err = deps.Store.UpdateRecipe(req.Context(), recipe)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.RecipeUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeUpdateError.Error()})
+			return
+		}
+
+		logger.Infoln(responses.RecipeUpdateSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, recipe)
+	})
+}
+
 func duplicateRecipeHandler(deps Dependencies) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)

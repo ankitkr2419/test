@@ -1,4 +1,4 @@
-import { takeEvery, put, call } from "redux-saga/effects";
+import { takeEvery, put, call, take } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
 import {
   runRecipeAction,
@@ -9,6 +9,7 @@ import {
   stepRunRecipeAction,
   publishRecipeAction,
   deleteRecipeAction,
+  updateRecipeNameAction,
   duplicateRecipeActions,
 } from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
@@ -248,6 +249,32 @@ export function* publishRecipe(actions) {
   }
 }
 
+export function* updateRecipeName(actions) {
+  const {
+    payload: {
+      params: { recipeId, token, recipeName },
+    },
+  } = actions;
+  const { updateRecipeNameSuccess, updateRecipeNameFailed } =
+    updateRecipeNameAction;
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: { recipeName: recipeName },
+        reqPath: `${API_ENDPOINTS.recipeListing}/editName/${recipeId}`,
+        successAction: updateRecipeNameSuccess,
+        failureAction: updateRecipeNameFailed,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error in publish recipe", error);
+  }
+}
+
 export function* deleteRecipe(actions) {
   const {
     payload: {
@@ -316,5 +343,9 @@ export function* recipeActionSaga() {
   yield takeEvery(
     duplicateRecipeActions.duplicateRecipeInitiated,
     duplicateRecipe
+  );
+  yield takeEvery(
+    updateRecipeNameAction.updateRecipeNameInitiated,
+    updateRecipeName
   );
 }

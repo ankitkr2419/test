@@ -27,6 +27,7 @@ import RunRecipesModal from "components/modals/RunRecipesModal";
 import {
   publishRecipeInitiated,
   deleteRecipeInitiated,
+  updateRecipeNameInitiated,
 } from "action-creators/recipeActionCreators";
 import { showHomingModal as showHomingModalAction } from "action-creators/homingActionCreators";
 import TopContentComponent from "./TopContentComponent";
@@ -38,6 +39,7 @@ import {
   saveRecipeDetails,
 } from "action-creators/saveNewRecipeActionCreators";
 import { ResetRecipePageState } from "action-creators/PageActionCreators";
+import EditRecipeNameModel from "components/modals/EditRecipeNameModel";
 import DuplicateRecipeModel from "components/modals/DuplicateRecipeModel";
 
 const RecipeListingComponent = (props) => {
@@ -83,6 +85,8 @@ const RecipeListingComponent = (props) => {
   const [recipeIdToPublish, setRecipeIdToPublish] = useState("");
   const [isPublished, setIsPublished] = useState(false); //tells that selected recipe is published/unpublished
   const [publishModal, setPublishModal] = useState(false);
+  const [editNameModel, setEditNameModel] = useState(false);
+  const [recipeIdToRename, setRecipeIdToRename] = useState("");
   const [copyRecipeModel, setCopyRecipeModel] = useState(false);
   const [recipeId, setRecipeId] = useState("");
   const [recipeName, setRecipeName] = useState("");
@@ -152,10 +156,34 @@ const RecipeListingComponent = (props) => {
     setPublishModal(!publishModal);
   };
 
-  const handlePublishModalClick = (recipeId, isPublished) => {
+  const handlePublishModalClick = (recipeId) => {
     setRecipeIdToPublish(recipeId);
     setIsPublished(isPublished);
     if (recipeId) togglePublishModal();
+  };
+
+  const toggleEditRecipeNameModal = () => {
+    // setPublishModal(!publishModal);
+    setEditNameModel(!editNameModel);
+  };
+
+  const handleEditRecipeNameModalClick = (recipeId) => {
+    setRecipeIdToRename(recipeId);
+    if (recipeId) toggleEditRecipeNameModal();
+  };
+
+  const handleEditRecipeNameConfirmation = (recipeName) => {
+    const token = activeDeckObj.token;
+    if (recipeIdToRename) {
+      dispatch(
+        updateRecipeNameInitiated({
+          recipeId: recipeIdToRename,
+          token: token,
+          deckName: deckName,
+          recipeName: recipeName,
+        })
+      );
+    } else console.error("recipeId not found!");
   };
 
   const handlePublishConfirmation = () => {
@@ -347,6 +375,20 @@ const RecipeListingComponent = (props) => {
           />
         )}
 
+        {editNameModel && (
+          <EditRecipeNameModel
+            confirmationText={`Edit Recipe Name To`}
+            isOpen={editNameModel}
+            toggleEditRecipeNameModal={toggleEditRecipeNameModal}
+            recipeId={recipeIdToRename}
+            deckName={deckName}
+            token={activeDeckObj.token}
+            handleEditRecipeNameConfirmation={(recipeName) =>
+              handleEditRecipeNameConfirmation(recipeName)
+            }
+          />
+        )}
+
         {/** Sub - Menu above recipe listings (like addNewRecipe/ cleanUp/ etc) */}
         <TopContentComponent
           isProcessInProgress={isProcessInProgress}
@@ -379,11 +421,15 @@ const RecipeListingComponent = (props) => {
               selectedRecipeData={selectedRecipeData}
               returnRecipeDetails={returnRecipeDetails}
               toggleRunRecipesModal={toggleRunRecipesModal}
+              toggleEditRecipeNameModal={toggleEditRecipeNameModal}
               handlePublishModalClick={(recipeId, isPublished) =>
                 handlePublishModalClick(recipeId, isPublished)
               }
               handleEditRecipe={(recipe) => handleEditRecipe(recipe)}
               handleDeleteRecipe={handleDeleteRecipe}
+              handleEditRecipeNameModalClick={(recipeId) =>
+                handleEditRecipeNameModalClick(recipeId)
+              }
               createDuplicateRecipe={createDuplicateRecipe}
               toggleCopyRecipeModel={toggleCopyRecipeModel}
               setRecipeId={setRecipeId}

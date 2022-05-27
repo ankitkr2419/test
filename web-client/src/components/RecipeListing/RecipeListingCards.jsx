@@ -31,6 +31,7 @@ const RecipeListingCards = (props) => {
     handlePublishModalClick,
     handleEditRecipe,
     handleDeleteRecipe,
+    handleEditRecipeNameModalClick,
     createDuplicateRecipe,
     toggleCopyRecipeModel,
     setRecipeId,
@@ -165,7 +166,13 @@ const RecipeListingCards = (props) => {
                   handlePublishModalClick={(recipeId, isPublished) =>
                     handlePublishModalClick(recipeId, isPublished)
                   }
+                  handleEditRecipeNameModalClick={(recipeId) =>
+                    handleEditRecipeNameModalClick(recipeId)
+                  }
                   handleEditRecipe={() => handleEditRecipe(recipe)}
+                  handleDeleteRecipeClick={(recipeId) => {
+                    handleDeleteRecipeClick(recipeId);
+                  }}
                   handleDeleteRecipe={() => handleDeleteRecipeClick(recipe.id)}
                   createDuplicateRecipe={createDuplicateRecipe}
                   toggleCopyRecipeModel={toggleCopyRecipeModel}
@@ -175,7 +182,11 @@ const RecipeListingCards = (props) => {
               </Col>
             ))
           ) : (
-            <h4>No recipes to show!</h4>
+            <Col md={12}>
+              <div className="text-center">
+                <h4>No recipes found</h4>
+              </div>
+            </Col>
           )}
         </Row>
       </CardBody>
