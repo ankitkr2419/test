@@ -171,3 +171,25 @@ func calculateUVTimeInSeconds(uvTime string) (totalTime int64, err error) {
 	totalTime, err = db.CalculateTimeInSeconds(uvTime)
 	return
 }
+
+func (d *Compact32Deck) Light(state uint64) (response string, err error) {
+	defer func() {
+		if err != nil {
+			logger.Errorln(err.Error())
+			d.WsErrCh <- fmt.Errorf("%v_%v_%v", ErrorExtractionMonitor, d.name, err.Error())
+		}
+	}()
+
+	if state == 1 {
+		response, err = d.switchOnLight()
+		if err != nil {
+			return
+		}
+	} else {
+		response, err = d.switchOffLight()
+		if err != nil {
+			return
+		}
+	}
+	return "LIGHT ON/OFF COMPLETED", nil
+}

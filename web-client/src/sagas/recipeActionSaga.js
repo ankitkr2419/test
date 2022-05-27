@@ -10,6 +10,7 @@ import {
   publishRecipeAction,
   deleteRecipeAction,
   updateRecipeNameAction,
+  duplicateRecipeActions,
 } from "actions/recipeActions";
 import { API_ENDPOINTS, HTTP_METHODS, DECKNAME } from "appConstants";
 import {
@@ -18,6 +19,7 @@ import {
   pauseRecipeFailed as pauseRecipeFailure,
   abortRecipeFailed as abortRecipeFailure,
   recipeListingFailed as recipeListingFailure,
+  duplicateRecipeFail,
 } from "action-creators/recipeActionCreators";
 
 import { toast } from "react-toastify";
@@ -299,6 +301,32 @@ export function* deleteRecipe(actions) {
   }
 }
 
+export function* duplicateRecipe(actions) {
+  const {
+    payload: { recipeId, token, recipeName },
+  } = actions;
+  const { duplicateRecipeSuccess, duplicateRecipeFailure } =
+    duplicateRecipeActions;
+
+  try {
+    yield call(callApi, {
+      payload: {
+        method: HTTP_METHODS.POST,
+        body: { recipeName },
+        reqPath: `${API_ENDPOINTS.duplicateRecipe}/${recipeId}`,
+        successAction: duplicateRecipeSuccess,
+        failureAction: duplicateRecipeFailure,
+        showPopupSuccessMessage: true,
+        showPopupFailureMessage: true,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Error in creating duplicate recipe", error);
+    yield put(duplicateRecipeFail({ error }));
+  }
+}
+
 export function* recipeActionSaga() {
   yield takeEvery(runRecipeAction.runRecipeInitiated, runRecipe);
   yield takeEvery(abortRecipeAction.abortRecipeInitiated, abortRecipe);
@@ -312,6 +340,10 @@ export function* recipeActionSaga() {
   );
   yield takeEvery(publishRecipeAction.publishRecipeInitiated, publishRecipe);
   yield takeEvery(deleteRecipeAction.deleteRecipeInitiated, deleteRecipe);
+  yield takeEvery(
+    duplicateRecipeActions.duplicateRecipeInitiated,
+    duplicateRecipe
+  );
   yield takeEvery(
     updateRecipeNameAction.updateRecipeNameInitiated,
     updateRecipeName

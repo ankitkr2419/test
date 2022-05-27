@@ -204,3 +204,122 @@ func (s *pgStore) UpdateEstimatedTimeForRecipe(ctx context.Context, id uuid.UUID
 
 	return
 }
+
+func (s *pgStore) DuplicateRecipe(ctx context.Context, RecipeID uuid.UUID, recipeName string) (duplicateP Recipe, err error) {
+	go s.AddAuditLog(ctx, DBOperation, InitialisedState, CreateOperation, "", responses.DuplicateRecipeInitialisedState)
+
+	var lastInsertID uuid.UUID
+	defer func() {
+		if err != nil {
+			go s.AddAuditLog(ctx, DBOperation, ErrorState, CreateOperation, "", err.Error())
+		} else {
+			go s.AddAuditLog(ctx, DBOperation, CompletedState, CreateOperation, "", responses.DuplicateRecipeCompletedState)
+		}
+	}()
+	err = s.db.Get(&duplicateP, getRecipeQuery, RecipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error fetching recipe")
+		return
+	}
+
+	err = s.db.QueryRow(
+		createRecipeQuery,
+		recipeName,
+		duplicateP.Description,
+		duplicateP.Position1,
+		duplicateP.Position2,
+		duplicateP.Position3,
+		duplicateP.Position4,
+		duplicateP.Position5,
+		duplicateP.Position6,
+		duplicateP.Position7,
+		duplicateP.Cartridge1Position,
+		duplicateP.Position9,
+		duplicateP.Cartridge2Position,
+		duplicateP.Position11,
+		duplicateP.TotalTime,
+		duplicateP.IsPublished,
+	).Scan(&lastInsertID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error duplicating recipe")
+		return
+	}
+	duplicateP.Name = recipeName
+	duplicateP.ID = lastInsertID
+
+	process, err := s.ListProcesses(ctx, RecipeID)
+	if err != nil {
+		logger.WithField("err", err.Error()).Error("Error listing process")
+		return
+	}
+	for _, p := range process {
+		switch p.Type {
+		case "TipPickup":
+			to, err := s.ShowTipOperation(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching tip operation Object")
+				break
+			}
+			s.CreateTipOperation(ctx, to, duplicateP.ID)
+		case "Piercing":
+			po, err := s.ShowPiercing(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching Piercing Object")
+				break
+			}
+			s.CreatePiercing(ctx, po, duplicateP.ID)
+		case "TipDiscard":
+			td, err := s.ShowTipOperation(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching tip discard Object")
+				break
+			}
+			s.CreateTipOperation(ctx, td, duplicateP.ID)
+		case "TipDocking":
+			td, err := s.ShowTipDocking(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching tip docking Object")
+				break
+			}
+			s.CreateTipDocking(ctx, td, duplicateP.ID)
+		case "AspireDispense":
+			ad, err := s.ShowAspireDispense(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching aspire dispense Object")
+				break
+			}
+			s.CreateAspireDispense(ctx, ad, duplicateP.ID)
+		case "Heating":
+			h, err := s.ShowHeating(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching heating Object")
+				break
+			}
+			s.CreateHeating(ctx, h, duplicateP.ID)
+		case "Shaking":
+			sh, err := s.ShowShaking(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching shaking Object")
+				break
+			}
+			s.CreateShaking(ctx, sh, duplicateP.ID)
+		case "AttachDetach":
+			ad, err := s.ShowAttachDetach(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching attach detach Object")
+				break
+			}
+			s.CreateAttachDetach(ctx, ad, duplicateP.ID)
+		case "Delay":
+			d, err := s.ShowDelay(ctx, p.ID)
+			if err != nil {
+				logger.WithField("err", err.Error()).Error("Error fetching delay Object")
+				break
+			}
+			s.CreateDelay(ctx, d, duplicateP.ID)
+		default:
+			return
+		}
+	}
+	return
+}

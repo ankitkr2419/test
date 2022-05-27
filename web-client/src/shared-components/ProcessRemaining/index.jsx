@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Text, Icon } from "shared-components";
 import { getIconName } from "shared-components/DeckCard/helpers";
 import HeaterStatusBox from "shared-components/HeaterStatusBox";
+import WhiteLightDeck from "shared-components/WhiteLightDeck";
 
 const ProecssRemainingBox = styled.div`
   position: absolute;
-  height: 38px;
-  top: -40px;
+  height: 48px;
+  top: -49px;
   width: 100%;
   left: 0;
   background: #fff;
@@ -28,8 +29,15 @@ const ProecssRemainingBox = styled.div`
   }
 `;
 const ProcessRemaining = (props) => {
-  const { processName, processType, processNumber, processTotal, isAdmin } =
-    props;
+  const {
+    processName,
+    processType,
+    processNumber,
+    processTotal,
+    isAdmin,
+    handleWhiteLightDeckClick,
+    deckName,
+  } = props;
 
   const showProcessDetails = () => {
     if (
@@ -42,7 +50,11 @@ const ProcessRemaining = (props) => {
   };
 
   return (
-    <ProecssRemainingBox>
+    <ProecssRemainingBox className="d-flex align-items-center px-3 py-2 mb-0">
+      <WhiteLightDeck
+        handleWhiteLightClick={handleWhiteLightDeckClick}
+        deckName={deckName}
+      />
       <Text Tag="label" className="d-flex align-items-center px-3 py-2 mb-0">
         <Icon
           name={getIconName(processType)}
@@ -67,8 +79,8 @@ const ProcessRemaining = (props) => {
           {processName}
           {"  "}
         </Text>
-        {isAdmin && <HeaterStatusBox />}
       </Text>
+      {isAdmin && <HeaterStatusBox />}
     </ProecssRemainingBox>
   );
 };

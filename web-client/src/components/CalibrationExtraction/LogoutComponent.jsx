@@ -91,6 +91,7 @@ const LogoutComponent = (props) => {
       senseAndHit={modalBtnIsDisabled}
       isLogout={true}
       CancelFunc={cancelFunc}
+      isWhiteLightBtn={true}
     />
   );
 };

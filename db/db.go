@@ -68,6 +68,7 @@ type Storer interface {
 	InsertCartridge(context.Context, []Cartridge, []CartridgeWells) error
 	ListMotors(context.Context) ([]Motor, error)
 	ListConsDistances() ([]ConsumableDistance, error)
+	ListOneConsDistances(id int64) ([]ConsumableDistance, error)
 	ListTipsTubes(ttype string) (tipstubes []TipsTubes, err error)
 	ShowTip(id int64) (TipsTubes, error)
 	ListCartridges(ctx context.Context) ([]Cartridge, error)
@@ -77,6 +78,7 @@ type Storer interface {
 	CreateTipOperation(context.Context, TipOperation, uuid.UUID) (TipOperation, error)
 	ShowRecipe(context.Context, uuid.UUID) (Recipe, error)
 	CreateRecipe(context.Context, Recipe) (Recipe, error)
+	DuplicateRecipe(context.Context, uuid.UUID, string) (Recipe, error)
 	DeleteRecipe(context.Context, uuid.UUID) error
 	UpdateRecipe(context.Context, Recipe) error
 	ListRecipes(context.Context) ([]Recipe, error)

@@ -10,6 +10,7 @@ import {
   deleteRecipeAction,
   actionBtnStates,
   updateRecipeNameAction,
+  duplicateRecipeActions,
 } from "actions/recipeActions";
 import { DECKCARD_BTN, DECKNAME, RUN_RECIPE_TYPE } from "appConstants";
 import {
@@ -96,10 +97,10 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
 
     case updateRecipeNameAction.updateRecipeNameSuccess:
       const renamedRecipe = action.payload.response;
-      let deckIndex = state.tempDeckName == DECKNAME.DeckA ? 0 : 1;
+      let deckIndexUpdate = state.tempDeckName == DECKNAME.DeckA ? 0 : 1;
       const recipeListingSuccessNameChanges = {
         allRecipeData: [
-          ...state.decks[deckIndex].allRecipeData.map((recipe) =>
+          ...state.decks[deckIndexUpdate].allRecipeData.map((recipe) =>
             recipe.id == renamedRecipe.id ? renamedRecipe : recipe
           ),
         ],
@@ -115,8 +116,40 @@ export const recipeActionReducer = (state = initialState, action = {}) => {
         tempDeckName: "",
         decks: newDecksAfterRecipeNameUpdate,
       };
-
     case updateRecipeNameAction.updateRecipeNameFailed:
+      return { ...state };
+
+    case duplicateRecipeActions.duplicateRecipeInitiated:
+      return {
+        ...state,
+        tempDeckName: action.payload.deckName,
+      };
+
+    case duplicateRecipeActions.duplicateRecipeSuccess:
+      const duplicateRecipe = action.payload.response;
+      let deckIndex = state.tempDeckName == DECKNAME.DeckA ? 0 : 1;
+      const recipeListingSuccessDuplicateChanges = {
+        allRecipeData: [
+          ...state.decks[deckIndex].allRecipeData,
+          duplicateRecipe,
+        ],
+      };
+      const newDecksAfterRecipeDuplicate = getUpdatedDecks(
+        state,
+        state.tempDeckName,
+        recipeListingSuccessDuplicateChanges
+      );
+
+      return {
+        ...state,
+        tempDeckName: "",
+        decks: newDecksAfterRecipeDuplicate,
+      };
+
+    case duplicateRecipeActions.duplicateRecipeFailure:
+      return { ...state };
+
+    case duplicateRecipeActions.duplicateRecipeReset:
       return { ...state };
 
     case saveRecipeDataAction.saveRecipeDataForDeck: //set and update: depend on deckName

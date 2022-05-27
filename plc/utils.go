@@ -429,6 +429,10 @@ func CalculatePosition(ctx context.Context, calibration db.ConsumableDistance, d
 		err = responses.CalibrationMethodUnset
 		return
 	}
+	if calibration.Distance < 0 {
+		err = responses.CalibrationNegativeValueError
+		return
+	}
 	updatedCalibration = calibration
 	logger.Warnln("Updated: ", calibration)
 
@@ -436,3 +440,8 @@ func CalculatePosition(ctx context.Context, calibration db.ConsumableDistance, d
 }
 
 // TODO: Validate Consumable Distances and Motors here
+
+//calculate distance to travel after coming at deck base
+func CalculateDiscardHeight(dN DeckNumber) float64 {
+	return (consDistance["deck_base"] - Calibs[dN]) + consDistance["max_tip_height"]
+}

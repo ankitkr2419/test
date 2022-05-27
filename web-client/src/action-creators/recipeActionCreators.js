@@ -10,6 +10,7 @@ import {
   deleteRecipeAction,
   actionBtnStates,
   updateRecipeNameAction,
+  duplicateRecipeActions,
 } from "actions/recipeActions";
 
 export const runRecipeInitiated = (params) => ({
@@ -228,4 +229,22 @@ export const enableActionBtn = (payload) => ({
 export const disableActionBtn = (payload) => ({
   type: actionBtnStates.disableActionBtn,
   payload: payload,
+});
+
+export const duplicateRecipeInitiated = (params) => ({
+  type: duplicateRecipeActions.duplicateRecipeInitiated,
+  payload: {
+    ...params,
+  },
+});
+
+export const duplicateRecipeFail = (params) => ({
+  type: duplicateRecipeActions.duplicateRecipeFailure,
+  payload: {
+    ...params,
+  },
+});
+
+export const duplicateRecipeReset = () => ({
+  type: duplicateRecipeActions.duplicateRecipeReset,
 });

@@ -360,3 +360,34 @@ func updateRecipeNameHandler(deps Dependencies) http.HandlerFunc {
 		responseCodeAndMsg(rw, http.StatusCreated, recipe)
 	})
 }
+
+func duplicateRecipeHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		recipeID, err := parseUUID(vars["recipe_id"])
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeIDInvalidError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeIDInvalidError.Error()})
+			return
+		}
+
+		var ro RecipeObj
+		err = json.NewDecoder(req.Body).Decode(&ro)
+		if err != nil {
+			logger.WithField("err", err.Error()).Errorln(responses.RecipeNameDecodeError)
+			responseCodeAndMsg(rw, http.StatusBadRequest, ErrObj{Err: responses.RecipeNameDecodeError.Error()})
+			return
+		}
+
+		recipe, err := deps.Store.DuplicateRecipe(req.Context(), recipeID, ro.RecipeName)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.RecipeDuplicationError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.RecipeDuplicationError.Error()})
+			return
+		}
+
+		logger.Infoln(responses.RecipeDuplicationSuccess)
+		responseCodeAndMsg(rw, http.StatusCreated, recipe)
+	})
+}

@@ -69,6 +69,7 @@ const HomingModal = (props) => {
       progressPercentage={homingAllDeckCompletionPercentage}
       isProgressBarVisible={isProgressBarVisible}
       disabled={modalBtnIsDisabled}
+      isWhiteLightBtn={true}
     />
   );
 };

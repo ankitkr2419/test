@@ -1,20 +1,20 @@
-import { whiteLightActions } from "actions/whiteLightActions";
+import { whiteLightDeckActions } from "actions/whiteLightActions";
 
-export const whiteLightInitiated = (payload) => ({
-  type: whiteLightActions.initiateAction,
-  payload,
+export const whiteLightDeckInitiated = (params) => ({
+  type: whiteLightDeckActions.initiateAction,
+  payload: { params },
 });
 
-export const whiteLightSuccess = (response) => ({
-  type: whiteLightActions.successAction,
+export const whiteLightDeckSuccess = (response) => ({
+  type: whiteLightDeckActions.successAction,
   payload: response,
 });
 
-export const whiteLightFailed = (error) => ({
-  type: whiteLightActions.failureAction,
+export const whiteLightDeckFailed = (error) => ({
+  type: whiteLightDeckActions.failureAction,
   payload: error,
 });
 
-export const whiteLightReset = () => ({
-  type: whiteLightActions.resetAction,
+export const whiteLightDeckReset = () => ({
+  type: whiteLightDeckActions.resetAction,
 });

@@ -1,26 +1,33 @@
 import { takeEvery, call } from "redux-saga/effects";
 import { callApi } from "apis/apiHelper";
-import { whiteLightActions } from "actions/whiteLightActions";
-import {} from "action-creators/whiteLightActionCreators";
-import { API_ENDPOINTS } from "appConstants";
+import {
+  whiteLightDeckActions,
+  whiteLightBothDeckActions,
+} from "actions/whiteLightActions";
+import { API_ENDPOINTS, HTTP_METHODS } from "appConstants";
 
-export function* whiteLight(actions) {
-  const { successAction, failureAction } = whiteLightActions;
+export function* whiteLightDeck(actions) {
+  const {
+    payload: {
+      params: { deck, lightStatus },
+    },
+  } = actions;
+  const { successAction, failureAction } = whiteLightDeckActions;
   try {
     yield call(callApi, {
       payload: {
-        reqPath: `${API_ENDPOINTS.whiteLight}`,
-        successAction,
-        failureAction,
-        showPopupSuccessMessage: true,
-        showPopupFailureMessage: true,
+        method: HTTP_METHODS.GET,
+        body: null,
+        reqPath: `${API_ENDPOINTS.whiteLight}/${lightStatus}/${deck}`,
+        successAction: successAction,
+        failureAction: failureAction,
       },
     });
   } catch (error) {
-    console.log("Error while turning on white-light: ", error);
+    console.error("error while aborting", error);
   }
 }
 
 export function* whiteLightSaga() {
-  yield takeEvery(whiteLightActions.initiateAction, whiteLight);
+  yield takeEvery(whiteLightDeckActions.initiateAction, whiteLightDeck);
 }

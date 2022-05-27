@@ -6,6 +6,7 @@ import (
 	"mylab/cpagent/plc"
 	"mylab/cpagent/responses"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
@@ -113,5 +114,22 @@ func uvLightHandler(deps Dependencies) http.HandlerFunc {
 		logger.Infoln(responses.UVCleanupProgress)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.UVCleanupProgress, Deck: deck})
 		return
+	})
+}
+
+func lightHandler(deps Dependencies) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		deck := vars["deck"]
+
+		state, err := strconv.ParseUint(vars["state"], 10, 8)
+		if err != nil {
+			logger.WithField("Parse Error", err).Errorln("Error in parsing state")
+			return
+		}
+
+		go deps.PlcDeck[deck].Light(state)
+		logger.Infoln(responses.LightInitialisedState)
+		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.LightInitialisedState, Deck: deck})
 	})
 }

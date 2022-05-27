@@ -20,7 +20,7 @@ export const resumeCleanUpAction = {
   resumeCleanUpFailed: "RESUME_CLEAN_UP_FAILED",
   resumeCleanUpReset: "RESUME_CLEAN_UP_RESET",
   resumeCleanUpInProgress: "PROGRESS_RESUME_CLEAN_UP",
-  resumeCleanUpInCompleted: "SUCCESS_RESUME_CLEAN_UP"
+  resumeCleanUpInCompleted: "SUCCESS_RESUME_CLEAN_UP",
 };
 
 export const abortCleanUpAction = {

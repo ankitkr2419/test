@@ -188,6 +188,7 @@ export const API_ENDPOINTS = {
   tipDiscard: "tip-operation",
   magnet: "attach-detach",
   duplicateProcess: "duplicate-process",
+  duplicateRecipe: "duplicate-recipe",
   attachDetach: "attach-detach",
   tipDocking: "tip-docking",
   delay: "delay",
@@ -223,7 +224,7 @@ export const API_ENDPOINTS = {
   consumable: "consumable-distance",
   dyeCalibration: "optical-caliberation",
   users: "users",
-  whiteLight: "whiteLight",
+  whiteLight: "light",
 };
 
 export const MODAL_MESSAGE = {

@@ -88,7 +88,7 @@ const AppHeader = (props) => {
   const isExpanded = createExperimentReducer.get("isExpanded");
   const result = createExperimentReducer.get("result");
   const btnProps = getBtnPropObj(result);
-  const { isLightOn } = whiteLightReducer.toJS();
+  // const { isLightOn } = whiteLightReducer.toJS();
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
@@ -281,14 +281,6 @@ const AppHeader = (props) => {
     history.push(ROUTES.users);
   };
 
-  const handleWhiteLightClick = () => {
-    if (isLightOn === true) {
-      // dispatch(whiteLightInitiated())
-    } else {
-      // dispatch(whiteLightInitiated())
-    }
-  };
-
   const handleHelpSupportBtn = () => {
     toggleMenuDropdown();
     // model => open
@@ -339,10 +331,7 @@ const AppHeader = (props) => {
             <DropdownToggle icon name="menu" size={16} />
             <DropdownMenu right onClick={toggleMenuDropdown}>
               <DropdownItem>
-                <WhiteLight
-                  isLightOn={isLightOn}
-                  handleWhiteLightClick={handleWhiteLightClick}
-                />
+                <WhiteLight />
               </DropdownItem>
               {/* <DropdownItem onClick={handleHelpSupportBtn}>
               {"Help & Support"}

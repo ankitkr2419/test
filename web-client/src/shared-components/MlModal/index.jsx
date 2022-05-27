@@ -4,6 +4,7 @@ import { Button, Modal, ModalBody } from "core-components";
 import { Center, Text, ButtonGroup, ButtonIcon } from "shared-components";
 import { Progress } from "reactstrap";
 import styled from "styled-components";
+import WhiteLight from "shared-components/WhiteLight";
 
 const CustomProgressBar = styled.div`
   .custom-progress-bar {
@@ -33,6 +34,7 @@ const MlModal = (props) => {
     senseAndHit,
     isLogout,
     CancelFunc,
+    isWhiteLightBtn,
   } = props;
 
   return (
@@ -75,6 +77,7 @@ const MlModal = (props) => {
               {textBody}
             </Text>
           </Text>
+          {isWhiteLightBtn && <WhiteLight className="d-flex" />}
         </div>
 
         {/* Conditional rendering for progress bar */}
@@ -127,6 +130,7 @@ MlModal.propTypes = {
   toggleModal: PropTypes.func,
   progressPercentage: PropTypes.number,
   isProgressBarVisible: PropTypes.bool,
+  isWhiteLightBtn: PropTypes.bool,
 };
 
 MlModal.defaultProps = {
@@ -134,6 +138,7 @@ MlModal.defaultProps = {
   showCrossBtn: true,
   isProgressBarVisible: false,
   disabled: false,
+  isWhiteLightBtn: false,
 };
 
 export default React.memo(MlModal);

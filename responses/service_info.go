@@ -63,6 +63,7 @@ var (
 	TipOperationCompletedState   = "tip operation completed"
 
 	ProcessDuplicationSuccess = "duplicate process record created successfully"
+	RecipeDuplicationSuccess  = "duplicate recipe record created successfully"
 
 	UserLoginSuccess  = "user successfully logged in."
 	UserCreateSuccess = "user successfully created"
@@ -128,7 +129,8 @@ var (
 	DiscardBoxMovedSuccess = "Discard box moved to cleanup position successful"
 	RestoreDeckSuccess     = "Restore Deck successful"
 
-	UVCleanupProgress = "uv light clean up in progress"
+	UVCleanupProgress     = "uv light clean up in progress"
+	LightInitialisedState = "light on/off triggered"
 
 	DiscardBoxInitialisedState     = "discard box operation initialised"
 	DiscardBoxCompletedState       = "discard box operation completed"
@@ -152,6 +154,8 @@ var (
 	ProcessListCompletedState        = "process list completed"
 	DuplicateProcessInitialisedState = "duplicate process initialised"
 	DuplicateProcessCompletedState   = "duplicate process completed"
+	DuplicateRecipeInitialisedState  = "duplicate recipe initialised"
+	DuplicateRecipeCompletedState    = "duplicate recipe completed"
 	RearrangeProcessInitialisedState = "rearrange process initialised"
 	RearrangeProcessCompletedState   = "rearrange process completed"
 

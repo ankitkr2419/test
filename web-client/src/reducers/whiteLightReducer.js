@@ -1,29 +1,65 @@
 import { fromJS } from "immutable";
-import { whiteLightActions } from "actions/whiteLightActions";
+import {
+  whiteLightActions,
+  whiteLightDeckActions,
+  whiteLightBothDeckActions,
+} from "actions/whiteLightActions";
+import { DECKNAME } from "appConstants";
+import { getUpdatedDecks } from "utils/helpers";
 
-const whiteLightInitialState = fromJS({
-  isLoading: false,
-  isError: null,
-  isLightOn: null,
-});
+export const lightInitialState = {
+  decks: [
+    {
+      name: DECKNAME.DeckA,
+      isLoading: false,
+      isError: null,
+      isLightOn: false,
+    },
+    {
+      name: DECKNAME.DeckB,
+      isLoading: false,
+      isError: null,
+      isLightOn: false,
+    },
+  ],
+};
 
-export const whiteLightReducer = (state = whiteLightInitialState, action) => {
+export const whiteLightReducer = (state = lightInitialState, action) => {
   switch (action.type) {
-    case whiteLightActions.initiateAction:
-      return state.merge({ isLoading: true });
+    case whiteLightDeckActions.initiateAction:
+      const deckInitiateName =
+        action.payload.params.deck === "A" ? DECKNAME.DeckA : DECKNAME.DeckB;
 
-    case whiteLightActions.successAction:
-      return state.merge({
+      const deckNumber = deckInitiateName == DECKNAME.DeckA ? 0 : 1;
+      const changesForLightOn = {
         isLoading: false,
-        isLightOn: true,
-      });
+        isError: null,
+        // isLightOn: !state.decks[deckNumber].isLightOn,
+        isLightOn: action.payload.params.lightStatus,
+      };
 
-    case whiteLightActions.failureAction:
-      return state.merge({ isLoading: false, isError: true });
+      const dockAfterRunInit = getUpdatedDecks(
+        state,
+        deckInitiateName,
+        changesForLightOn
+      );
 
-    case whiteLightActions.resetAction:
-      return whiteLightInitialState;
-
+      return {
+        ...state,
+        decks: dockAfterRunInit,
+      };
+    case whiteLightDeckActions.successAction:
+      return {
+        ...state,
+      };
+    case whiteLightDeckActions.failureAction:
+      return {
+        ...state,
+      };
+    case whiteLightDeckActions.resetAction:
+      return {
+        ...state,
+      };
     default:
       return state;
   }
