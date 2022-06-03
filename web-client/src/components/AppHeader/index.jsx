@@ -176,9 +176,9 @@ const AppHeader = (props) => {
         // hide everything for operator in extraction
         return true;
       } else if (
-        isLoginTypeAdmin === true &&
-        (pathname !== ROUTES.calibration ||
-          recipeReducerDataOfActiveDeck.showProcess)
+        isLoginTypeAdmin === true
+        // (pathname !== ROUTES.calibration ||
+        //   recipeReducerDataOfActiveDeck.showProcess)
       ) {
         // hide everything except calibrations for admin in extractions
         // AND hide calibrations when process is running
