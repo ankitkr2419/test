@@ -30,9 +30,12 @@ const OperatorRunRecipeCarousalModal = (props) => {
           onClick={toggleModalView}
           className="ml-auto border-0"
         />
-        <Center className="font-weight-bold mb-4">Recipe Name</Center>
+        {/* <Center className="font-weight-bold mb-4">Recipe Name</Center> */}
         <RecipeFlowSlider className="mb-4">
-          <OperatorCarousal images={images} setNextButtonVisbile={setNextButtonVisbile} />
+          <OperatorCarousal
+            images={images}
+            setNextButtonVisbile={setNextButtonVisbile}
+          />
         </RecipeFlowSlider>
 
         {/** next button will always visible but label will be 'skip' instead 'next' for previous slides */}
@@ -49,7 +52,6 @@ const OperatorRunRecipeCarousalModal = (props) => {
             {isNextButtonVisible ? "Next" : "Skip"}
           </Button>
         </NextButton>
-        
       </ModalBody>
     </Modal>
   );
