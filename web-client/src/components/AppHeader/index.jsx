@@ -45,8 +45,8 @@ import {
   getRedirectObj,
 } from "./constants";
 import { Header } from "./Header";
-import { ActionBtnList, ActionBtnListItem } from "./ActionBtnList";
-import { whiteLightInitiated } from "action-creators/whiteLightActionCreators";
+import { ResetProcessPageState } from "action-creators/PageActionCreators";
+import AboutUsModel from "components/modals/AboutUsModel";
 
 const AppHeader = (props) => {
   const {
@@ -91,6 +91,7 @@ const AppHeader = (props) => {
   // const { isLightOn } = whiteLightReducer.toJS();
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
+  const [isAboutUsModelVisible, setAboutUsModelVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
   const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -272,6 +273,7 @@ const AppHeader = (props) => {
 
   const handleRedirectionButton = () => {
     toggleRedirectionModal();
+    dispatch(ResetProcessPageState(deckName));
     const currentPathname = location.pathname;
     const redirectPath = getRedirectObj(currentPathname).redirectPath;
     history.push(redirectPath);
@@ -284,6 +286,11 @@ const AppHeader = (props) => {
   const handleHelpSupportBtn = () => {
     toggleMenuDropdown();
     // model => open
+    setAboutUsModelVisibility(true);
+  };
+
+  const toggleAboutUsModal = () => {
+    setAboutUsModelVisibility(!isAboutUsModelVisible);
   };
 
   return (
@@ -323,23 +330,32 @@ const AppHeader = (props) => {
 
         {/* For new menu items, we need to toggle it manually. */}
         {app === APP_TYPE.EXTRACTION && (
-          <Dropdown
-            className="ml-2"
-            isOpen={menuDropdownOpen}
-            toggle={toggleMenuDropdown}
-          >
-            <DropdownToggle icon name="menu" size={16} />
-            <DropdownMenu right onClick={toggleMenuDropdown}>
-              <DropdownItem>
-                <WhiteLight />
-              </DropdownItem>
-              {/* <DropdownItem onClick={handleHelpSupportBtn}>
-              {"Help & Support"}
-            </DropdownItem> */}
-            </DropdownMenu>
-          </Dropdown>
+          <div className="d-flex align-items-center">
+            <Dropdown
+              className="ml-2 mr-3"
+              isOpen={menuDropdownOpen}
+              toggle={toggleMenuDropdown}
+            >
+              <DropdownToggle icon name="menu" size={16} />
+              <DropdownMenu right onClick={toggleMenuDropdown}>
+                <DropdownItem>
+                  <WhiteLight />
+                </DropdownItem>
+                <DropdownItem onClick={handleHelpSupportBtn}>
+                  {"About Us"}
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </div>
         )}
       </>
+
+      {isAboutUsModelVisible && (
+        <AboutUsModel
+          isOpen={isAboutUsModelVisible}
+          toggleAboutUsModal={toggleAboutUsModal}
+        />
+      )}
 
       {isUserLoggedIn && (
         <div className="header-elements d-flex align-items-center ml-auto">
@@ -485,7 +501,6 @@ const AppHeader = (props) => {
           )}
 
           {/* MODALS */}
-
           {isExitModalVisible && (
             <MlModal
               isOpen={isExitModalVisible}

@@ -129,10 +129,24 @@ const CalibrationExtractionContainer = () => {
     ) {
       // populate formik data with fetched values
       if (isUpdateApi === false) {
-        const { receiver_name, receiver_email, room_temperature } = details;
+        const {
+          receiver_name,
+          receiver_email,
+          room_temperature,
+          serial_number,
+          software_version,
+          machine_version,
+          manufacturing_year,
+          contact_number,
+        } = details;
         formik.setFieldValue("name.value", receiver_name);
         formik.setFieldValue("email.value", receiver_email);
         formik.setFieldValue("roomTemperature.value", room_temperature);
+        formik.setFieldValue("serialNo.value", serial_number);
+        formik.setFieldValue("softwareVersion.value", software_version);
+        formik.setFieldValue("machineVersion.value", machine_version);
+        formik.setFieldValue("manufacturingYear.value", manufacturing_year);
+        formik.setFieldValue("contactNumber.value", contact_number);
       } else {
         // fetch updated data after updation
         dispatch(commonDetailsInitiated(token));
@@ -238,11 +252,25 @@ const CalibrationExtractionContainer = () => {
   };
 
   const handleSaveDetailsBtn = (data) => {
-    const { name, email, roomTemperature } = data;
+    const {
+      name,
+      email,
+      roomTemperature,
+      serialNo,
+      manufacturingYear,
+      machineVersion,
+      softwareVersion,
+      contactNumber,
+    } = data;
     const requestBody = {
       receiver_name: name.value,
       receiver_email: email.value,
       room_temperature: roomTemperature.value,
+      serial_number: serialNo.value,
+      manufacturing_year: manufacturingYear.value,
+      machine_version: machineVersion.value,
+      software_version: softwareVersion.value,
+      contact_number: contactNumber.value,
     };
     dispatch(updateCommonDetailsInitiated({ token, data: requestBody }));
   };

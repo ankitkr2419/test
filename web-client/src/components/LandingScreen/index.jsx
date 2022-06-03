@@ -15,6 +15,7 @@ import {
 import { LandingScreen } from "./LandingScreen";
 import { Redirect } from "react-router";
 import { login, logoutInitiated } from "action-creators/loginActionCreators";
+import { commonDetailsInitiated } from "action-creators/calibrationActionCreators";
 
 const LandingScreenComponent = (props) => {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ const LandingScreenComponent = (props) => {
 
   const homingConfirmation = () => {
     dispatch(homingActionInitiated({ token: tokenForHoming }));
+    dispatch(commonDetailsInitiated(tokenForHoming));
     setIsProgressBarVisible(!isProgressBarVisible);
     setDisabled(!disabled);
   };
