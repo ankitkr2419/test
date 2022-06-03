@@ -22,7 +22,16 @@ import { isSaveDetailsBtnDisabled } from "./helpers";
 
 const CommonFieldsComponent = (props) => {
   const { handleSaveDetailsBtn, formik } = props;
-  const { name, email, roomTemperature } = formik.values;
+  const {
+    name,
+    email,
+    roomTemperature,
+    serialNo,
+    manufacturingYear,
+    machineVersion,
+    softwareVersion,
+    contactNumber,
+  } = formik.values;
 
   const handleBlurName = (value) => {
     if (!value) {
@@ -141,6 +150,142 @@ const CommonFieldsComponent = (props) => {
                     <Text Tag="p" size={14} className="text-danger">
                       Room temperature should be between {MIN_ROOM_TEMPERATURE}{" "}
                       - {MAX_ROOM_TEMPERATURE}.
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col>
+
+            <Col sm={4}>
+              <FormGroup>
+                <Label for="serialNo" className="font-weight-bold">
+                  serial Number
+                </Label>
+                <Input
+                  name="serialNo"
+                  id="serialNo"
+                  placeholder={"Type here"}
+                  value={serialNo.value}
+                  onChange={(event) => {
+                    handleOnChange("serialNo.value", event.target.value);
+                  }}
+                  onFocus={() => handleOnChange("serialNo.isInvalid", false)}
+                />
+                {serialNo.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      "Enter serial number"
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col>
+
+            <Col sm={4}>
+              <FormGroup>
+                <Label for="manufacturingYear" className="font-weight-bold">
+                  Manufacturung Year
+                </Label>
+                <Input
+                  name="manufacturungYear"
+                  id="manufacturungYear"
+                  placeholder={"Type here"}
+                  value={manufacturingYear.value}
+                  onChange={(event) => {
+                    handleOnChange(
+                      "manufacturingYear.value",
+                      event.target.value
+                    );
+                  }}
+                  onFocus={() =>
+                    handleOnChange("manufacturingYear.isInvalid", false)
+                  }
+                />
+                {manufacturingYear.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      "Enter manufacturing Year"
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col>
+
+            <Col sm={4}>
+              <FormGroup>
+                <Label for="machineVersion" className="font-weight-bold">
+                  Machine Version
+                </Label>
+                <Input
+                  name="machineVersion"
+                  id="machineVersion"
+                  placeholder={"Type here"}
+                  value={machineVersion.value}
+                  onChange={(event) => {
+                    handleOnChange("machineVersion.value", event.target.value);
+                  }}
+                  onFocus={() =>
+                    handleOnChange("machineVersion.isInvalid", false)
+                  }
+                />
+                {machineVersion.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      "Enter Machine Version"
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col>
+
+            <Col sm={4}>
+              <FormGroup>
+                <Label for="softwareVersion" className="font-weight-bold">
+                  Software Version
+                </Label>
+                <Input
+                  name="softwareVersion"
+                  id="softwareVersion"
+                  placeholder={"Type here"}
+                  value={softwareVersion.value}
+                  onChange={(event) => {
+                    handleOnChange("softwareVersion.value", event.target.value);
+                  }}
+                  onFocus={() =>
+                    handleOnChange("softwareVersion.isInvalid", false)
+                  }
+                />
+                {machineVersion.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      "Enter Software Version"
+                    </Text>
+                  </div>
+                )}
+              </FormGroup>
+            </Col>
+
+            <Col sm={4}>
+              <FormGroup>
+                <Label for="contactNumber" className="font-weight-bold">
+                  Contact Number
+                </Label>
+                <Input
+                  name="contactNumber"
+                  id="contactNumber"
+                  placeholder={"Type here"}
+                  value={contactNumber.value}
+                  onChange={(event) => {
+                    handleOnChange("contactNumber.value", event.target.value);
+                  }}
+                  onFocus={() =>
+                    handleOnChange("contactNumber.isInvalid", false)
+                  }
+                />
+                {contactNumber.isInvalid && (
+                  <div className="flex-70">
+                    <Text Tag="p" size={14} className="text-danger">
+                      "Enter Contact Number"
                     </Text>
                   </div>
                 )}

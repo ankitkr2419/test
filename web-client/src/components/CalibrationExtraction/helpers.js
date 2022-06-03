@@ -44,6 +44,11 @@ export const formikInitialState = {
   direction: { value: null, isInvalid: false },
   distance: { value: 1, isInvalid: false }, // default value should be 1mm
   pidTemperature: { value: null, isInvalid: false },
+  serialNo: { value: null, isInvalid: false },
+  manufacturingYear: { value: null, isInvalid: false },
+  machineVersion: { value: null, isInvalid: false },
+  softwareVersion: { value: null, isInvalid: false },
+  contactNumber: { value: null, isInvalid: false },
   ...formikInitialStateForTipsTubes, //TipsTubes fields
 };
 

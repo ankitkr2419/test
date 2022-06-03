@@ -7,9 +7,14 @@ import (
 )
 
 type Common struct {
-	RoomTemperature float64 `json:"room_temperature" validate:"required,lte=30,gte=20"`
-	ReceiverEmail   string  `json:"receiver_email"`
-	ReceiverName    string  `json:"receiver_name"`
+	RoomTemperature   float64 `json:"room_temperature" validate:"required,lte=30,gte=20"`
+	ReceiverEmail     string  `json:"receiver_email"`
+	ReceiverName      string  `json:"receiver_name"`
+	SerialNumber      string  `json:"serial_number"`
+	MachineVersion    string  `json:"machine_version"`
+	SoftwareVersion   string  `json:"software_version"`
+	ContactNumber     string  `json:"contact_number"`
+	ManufacturingYear string  `json:"manufacturing_year"`
 }
 
 func SetCommonConfigValues(co Common) (err error) {
@@ -19,11 +24,21 @@ func SetCommonConfigValues(co Common) (err error) {
 		fmt.Sprintf("room_temp: %.2f", GetRoomTemp()),
 		fmt.Sprintf("receiver_email: %s", GetReceiverEmail()),
 		fmt.Sprintf("receiver_name: %s", GetReceiverName()),
+		fmt.Sprintf("serial_number: %s", GetSerialNumber()),
+		fmt.Sprintf("machine_version: %s", GetMachineVersion()),
+		fmt.Sprintf("software_version: %s", GetSoftwareVersion()),
+		fmt.Sprintf("contact_number: %s", GetContactNumber()),
+		fmt.Sprintf("manufacturing_year: %s", GetManufacturingYear()),
 	)
 	newString = append(newString,
 		fmt.Sprintf("room_temp: %.2f", co.RoomTemperature),
 		fmt.Sprintf("receiver_email: %s", co.ReceiverEmail),
 		fmt.Sprintf("receiver_name: %s", co.ReceiverName),
+		fmt.Sprintf("serial_number: %s", co.SerialNumber),
+		fmt.Sprintf("machine_version: %s", co.MachineVersion),
+		fmt.Sprintf("software_version: %s", co.SoftwareVersion),
+		fmt.Sprintf("contact_number: %s", co.ContactNumber),
+		fmt.Sprintf("manufacturing_year: %s", co.ManufacturingYear),
 	)
 
 	err = UpdateConfig(configPath)
@@ -34,6 +49,11 @@ func SetCommonConfigValues(co Common) (err error) {
 	SetRoomTemp(co.RoomTemperature)
 	SetReceiverEmail(co.ReceiverEmail)
 	SetReceiverName(co.ReceiverName)
+	SetSerialNumber(co.SerialNumber)
+	SetMachineVersion(co.MachineVersion)
+	SetSoftwareVersion(co.SoftwareVersion)
+	SetContactNumber(co.ContactNumber)
+	SetManufacturingYear(co.ManufacturingYear)
 	return
 }
 
@@ -79,6 +99,36 @@ func GetReceiverEmail() string {
 	return viper.GetString(key)
 }
 
+func GetSerialNumber() string {
+	key := "serial_number"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
+func GetMachineVersion() string {
+	key := "machine_version"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
+func GetSoftwareVersion() string {
+	key := "software_version"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
+func GetContactNumber() string {
+	key := "contact_number"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
+func GetManufacturingYear() string {
+	key := "manufacturing_year"
+	checkIfSet(key)
+	return viper.GetString(key)
+}
+
 func SetRoomTemp(rT float64) {
 	viper.Set("room_temp", rT)
 }
@@ -96,10 +146,35 @@ func SetReceiverName(rN string) {
 	viper.Set("receiver_name", rN)
 }
 
+func SetSerialNumber(sN string) {
+	viper.Set("serial_number", sN)
+}
+
+func SetMachineVersion(mV string) {
+	viper.Set("machine_version", mV)
+}
+
+func SetSoftwareVersion(sV string) {
+	viper.Set("software_version", sV)
+}
+
+func SetContactNumber(cN string) {
+	viper.Set("contact_number", cN)
+}
+
+func SetManufacturingYear(mY string) {
+	viper.Set("manufacturing_year", mY)
+}
+
 func GetCommonConfigValues() Common {
 	return Common{
-		RoomTemperature: GetRoomTemp(),
-		ReceiverEmail:   GetReceiverEmail(),
-		ReceiverName:    GetReceiverName(),
+		RoomTemperature:   GetRoomTemp(),
+		ReceiverEmail:     GetReceiverEmail(),
+		ReceiverName:      GetReceiverName(),
+		SerialNumber:      GetSerialNumber(),
+		MachineVersion:    GetMachineVersion(),
+		SoftwareVersion:   GetSoftwareVersion(),
+		ContactNumber:     GetContactNumber(),
+		ManufacturingYear: GetManufacturingYear(),
 	}
 }
