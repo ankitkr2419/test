@@ -4,7 +4,14 @@ import { useHistory, useLocation } from "react-router";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
-import { Logo, ButtonIcon, Text, MlModal, WhiteLight } from "shared-components";
+import {
+  Logo,
+  ButtonIcon,
+  Text,
+  MlModal,
+  WhiteLight,
+  ImageIcon,
+} from "shared-components";
 import {
   logoutInitiated,
   loginReset,
@@ -47,6 +54,10 @@ import {
 import { Header } from "./Header";
 import { ResetProcessPageState } from "action-creators/PageActionCreators";
 import AboutUsModel from "components/modals/AboutUsModel";
+import shutdown from "../../assets/images/Shutdown_button_orange.svg";
+import { StyledShutdownComponent } from "./style";
+import { shutdownInitiated } from "action-creators/appInfoActionCreators";
+import ShutdownModel from "components/modals/ShutdownModel";
 
 const AppHeader = (props) => {
   const {
@@ -92,6 +103,7 @@ const AppHeader = (props) => {
 
   const [isExitModalVisible, setExitModalVisibility] = useState(false);
   const [isAboutUsModelVisible, setAboutUsModelVisibility] = useState(false);
+  const [isShutdownModalVisible, setShutdownModalVisibility] = useState(false);
   const [isWarningModalVisible, setWarningModalVisibility] = useState(false);
   const [isAbortModalVisible, setAbortModalVisibility] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -289,6 +301,10 @@ const AppHeader = (props) => {
     setAboutUsModelVisibility(true);
   };
 
+  const toggleStutdownModel = () => {
+    setShutdownModalVisibility(!isShutdownModalVisible);
+  };
+
   const toggleAboutUsModal = () => {
     setAboutUsModelVisibility(!isAboutUsModelVisible);
   };
@@ -346,6 +362,9 @@ const AppHeader = (props) => {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
+            <StyledShutdownComponent onClick={() => toggleStutdownModel()}>
+              <ImageIcon className="shutdown" src={shutdown} />
+            </StyledShutdownComponent>
           </div>
         )}
       </>
@@ -354,6 +373,17 @@ const AppHeader = (props) => {
         <AboutUsModel
           isOpen={isAboutUsModelVisible}
           toggleAboutUsModal={toggleAboutUsModal}
+        />
+      )}
+
+      {isShutdownModalVisible && (
+        <ShutdownModel
+          isOpen={isShutdownModalVisible}
+          handleCrossBtn={toggleStutdownModel}
+          handleSuccessBtn={() => {
+            toggleStutdownModel();
+            dispatch(shutdownInitiated());
+          }}
         />
       )}
 
