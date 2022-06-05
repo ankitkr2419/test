@@ -199,5 +199,7 @@ func InitRouter(deps Dependencies) (router *mux.Router) {
 	router.HandleFunc("/dyes", authenticate(updateDyeToleranceHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodPut).Headers(versionHeader, v1)
 	router.HandleFunc("/dyes", authenticate(listDyesHandler(deps), deps, RTPCR, engineer, admin)).Methods(http.MethodGet).Headers(versionHeader, v1)
 
+	//shutdown
+	router.HandleFunc("/shutdown", shutDownHandler(deps)).Methods(http.MethodGet).Headers(versionHeader, v1)
 	return
 }

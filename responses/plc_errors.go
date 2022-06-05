@@ -19,6 +19,7 @@ var (
 	HeatingError         = fmt.Errorf("error doing heating")
 	ProcessesAbsentError = fmt.Errorf("no process present in the recipe")
 	FetchHeaterTempError = fmt.Errorf("error fetching heater temperature")
+	FetchErrorBitError   = fmt.Errorf("error fetching error bit")
 
 	InvalidOperationWebsocket = fmt.Errorf("invalid operation selected for websocket")
 
@@ -36,4 +37,5 @@ var (
 	LidPidTuningStartError   = fmt.Errorf("LID PID Tuning wasn't started!")
 
 	CalibrationMethodUnset = fmt.Errorf("calibration method unset for given motor")
+	ShutdownError          = fmt.Errorf("error shutting down the system")
 )
