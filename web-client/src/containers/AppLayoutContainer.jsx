@@ -18,6 +18,7 @@ import ModalContainer from "./ModalContainer";
 import { useLocation } from "react-router-dom";
 import AppFooter from "components/AppFooter";
 import { APP_TYPE, ROUTES } from "appConstants";
+import ShutdownLoader from "shared-components/ShutdownLoader";
 
 export const CardOverlay = styled.div`
   position: absolute;
@@ -53,6 +54,7 @@ const AppLayoutContainer = (props) => {
   const appInfoReducer = useSelector((state) => state.appInfoReducer);
   const appInfoData = appInfoReducer.toJS();
   const app = appInfoData?.appInfo?.app;
+  const { isShutdownLoading } = appInfoData;
 
   // connect to websocket on mount
   useEffect(() => {
@@ -94,6 +96,7 @@ const AppLayoutContainer = (props) => {
 
   return (
     <Router>
+      {isShutdownLoading && <ShutdownLoader />}
       {(cleanUpReducerData.showCleanUp ||
         recipeActionReducerData.showProcess) && <CardOverlay />}
       {location.pathname === "/splashscreen" ? null : (

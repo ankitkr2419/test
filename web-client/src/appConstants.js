@@ -225,6 +225,7 @@ export const API_ENDPOINTS = {
   dyeCalibration: "optical-caliberation",
   users: "users",
   whiteLight: "light",
+  shutdown: "shutdown",
 };
 
 export const MODAL_MESSAGE = {
