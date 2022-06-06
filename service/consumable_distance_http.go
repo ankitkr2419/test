@@ -155,6 +155,13 @@ func updateConsumableDistanceHandler(deps Dependencies) http.HandlerFunc {
 			return
 		}
 
+		err = plc.LoadAllPLCFuncsExceptUtils(deps.Store)
+		if err != nil {
+			logger.WithField("err", err.Error()).Error(responses.ConsumableDistanceUpdateError)
+			responseCodeAndMsg(rw, http.StatusInternalServerError, ErrObj{Err: responses.ConsumableDistanceUpdateError.Error()})
+			return
+		}
+
 		logger.Infoln(responses.ConsumableDistanceUpdateSuccess)
 		responseCodeAndMsg(rw, http.StatusOK, MsgObj{Msg: responses.ConsumableDistanceUpdateSuccess})
 	})

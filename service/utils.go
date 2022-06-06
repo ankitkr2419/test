@@ -23,7 +23,7 @@ const (
 	blank                string = ""
 	// NOTE: These are version specific
 	maxDeckPosition  = 11
-	minAspDisDeckPos = 6
+	minAspDisDeckPos = 1
 	cartridge1Pos    = 8
 	cartridge2Pos    = 10
 	// Shaker Temp related ranges

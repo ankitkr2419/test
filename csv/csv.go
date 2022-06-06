@@ -981,6 +981,12 @@ func createTipDockingProcess(record []string, store db.Storer) (err error) {
 		logger.Errorln(err, record[1])
 		return err
 	}
+
+	if t.Height, err = strconv.ParseFloat(record[2], 64); err != nil {
+		logger.Errorln(err, record[2])
+		return err
+	}
+
 	valid, _ := service.Validate(t)
 	if !valid {
 		logger.WithField("err", "Validation Error").Errorln(responses.TipDockingValidationError)
