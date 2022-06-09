@@ -1,6 +1,7 @@
 package plc
 
 import (
+	"errors"
 	"time"
 
 	logger "github.com/sirupsen/logrus"
@@ -412,5 +413,33 @@ func (d *Compact32Deck) ReadFlapSensor() (err error) {
 	}
 
 	logger.Infoln("Sensor M 47 returned for deck ", d.name, "---> ", results)
+	return
+}
+
+func (d *Compact32Deck) IsFlapSensorOpen() (err error) {
+
+	results, err := d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][46], uint16(1))
+	if err != nil {
+		logger.Errorln("error reading M 46 Sensor : ", err, d.name)
+		return
+	}
+	logger.Infoln("Sensor M 46 returned for deck ", d.name, "---> ", results)
+
+	if results[0] == 46 {
+		err = errors.New("flap is open for deck " + d.name)
+		return
+	}
+	results, err = d.DeckDriver.ReadCoils(MODBUS_EXTRACTION[d.name]["M"][47], uint16(1))
+	if err != nil {
+		logger.Errorln("error reading M 47 Sensor : ", err, d.name)
+		return
+	}
+	logger.Infoln("Sensor M 47 returned for deck ", d.name, "---> ", results)
+
+	if results[0] == 46 {
+		err = errors.New("flap is open for deck " + d.name)
+		return
+	}
+
 	return
 }
