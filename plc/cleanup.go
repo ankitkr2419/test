@@ -22,6 +22,11 @@ func (d *Compact32Deck) DiscardBoxCleanup() (response string, err error) {
 		return
 	}
 
+	err = d.IsFlapSensorOpen()
+	if err != nil {
+		return
+	}
+
 	var position, distanceToTravel float64
 	var ok bool
 	var pulses uint16

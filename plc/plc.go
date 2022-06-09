@@ -162,6 +162,7 @@ type Extraction interface {
 	UpdateRecipeEstimatedTime(ctx context.Context, recipeID uuid.UUID, s db.Storer, err *error) error
 	ReadFlapSensor() error
 	ShutDown() error
+	IsFlapSensorOpen() error
 }
 
 func SetDeckName(C32 *Compact32Deck, deck string) {
